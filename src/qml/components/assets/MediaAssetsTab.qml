@@ -1512,6 +1512,7 @@ Item {
                 }
 
                 ThemedButton {
+                    visible: FileDialogs.supportsDirectoryPicker()
                     text: qsTr("Import folder")
                     glyph: Theme.icons.folderInput
                     onClicked: root.importFolderRequested()

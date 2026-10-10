@@ -1006,14 +1006,21 @@ PanelFrame {
                             }
 
                             ThemedMenuItem {
+                                visible: FileDialogs.supportsDirectoryPicker()
+                                height: visible ? implicitHeight : 0
                                 text: qsTr("Import Folder…")
                                 icon.name: Theme.icons.folderInput
                                 onTriggered: root.importFolder()
                             }
 
-                            ThemedMenuSeparator { }
+                            ThemedMenuSeparator {
+                                visible: FileDialogs.supportsDirectoryPicker()
+                                height: visible ? implicitHeight : 0
+                            }
 
                             ThemedMenuItem {
+                                visible: FileDialogs.supportsDirectoryPicker()
+                                height: visible ? implicitHeight : 0
                                 text: qsTr("Collect Media to Folder…")
                                 icon.name: Theme.icons.folderOutput
                                 enabled: !EditorState.projectFile.collectingMedia

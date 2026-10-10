@@ -11,6 +11,14 @@ ApplicationWindow {
     color: Theme.appBackground
     title: "CutWire Drift"
 
+    // On Android the platform sizes the window. Chosen on a desktop, this shell opens phone-shaped
+    // instead of filling a desktop-sized default; it stays resizable, and nothing is persisted.
+    readonly property bool _desktopHost: Qt.platform.os !== "android" && Qt.platform.os !== "ios"
+    width: _desktopHost ? 420 : 0
+    height: _desktopHost ? 860 : 0
+    minimumWidth: _desktopHost ? 320 : 0
+    minimumHeight: _desktopHost ? 560 : 0
+
     // Theme is a singleton and cannot see a window, so the size class it reports has to be fed
     // from whichever root is live. Screen is the wrong source: it ignores tiling and split view.
     onWidthChanged: Theme.windowWidth = width
@@ -388,7 +396,7 @@ ApplicationWindow {
         }
         // debugInfoDialog before settingsDialog: it opens from inside Settings, so it is the
         // one on top whenever both are up.
-        const modals = [debugInfoDialogLoader.item, settingsDialogLoader.item, projectPropertiesDialog,
+        const modals = [shellSwitchDialogLoader.item, debugInfoDialogLoader.item, settingsDialogLoader.item, projectPropertiesDialog,
                         recoveryDialog, unsavedDialog, addonStartupDialog, addonManagerDialogLoader.item,
                         missingAddonsDialogLoader.item, updateDialogLoader.item,
                         reverseProgressDialogLoader.item, subtitleProgressDialogLoader.item]
@@ -591,6 +599,7 @@ ApplicationWindow {
     LazyLoader { id: debugInfoDialogLoader; keepLoaded: true; sourceComponent: Component { DebugInfoDialog { } } }
 
     LazyLoader { id: settingsDialogLoader; sourceComponent: Component { SettingsDialog { } } }
+    LazyLoader { id: shellSwitchDialogLoader; sourceComponent: Component { ShellSwitchDialog { } } }
     LazyLoader { id: subtitleProgressDialogLoader; sourceComponent: Component { SubtitleProgressDialog { } } }
     LazyLoader { id: reverseProgressDialogLoader; sourceComponent: Component { ReverseProgressDialog { } } }
 
@@ -653,6 +662,44 @@ ApplicationWindow {
     // settings tab.
     function openSettings() {
         settingsDialogLoader.ensure().open()
+    }
+
+    function switchShell(target) {
+        shellSwitchDialogLoader.ensure().openFor(target, false)
+    }
+
+    // A mouse on a tablet or in DeX means the touch layout is probably the wrong one, so offer the
+    // desktop shell: at launch, or whenever one is plugged in, at most once per session. Held back
+    // while a startup prompt is up so the two do not stack.
+    property bool _mouseOfferMade: false
+    Timer {
+        interval: 1200
+        repeat: true
+        running: Qt.platform.os === "android" && PointerDevices.mousePresent && !window._mouseOfferMade
+        onTriggered: {
+            if (recoveryDialog.visible
+                    || (languageChooserDialogLoader.item && languageChooserDialogLoader.item.visible))
+                return
+            window._mouseOfferMade = true
+            shellSwitchDialogLoader.ensure().openFor("desktop", true)
+        }
+    }
+
+    // Shell.qml only builds a shell at startup, so applying a layout change is a relaunch. On
+    // Android the recovery snapshot carries unsaved work across; on a desktop running this shell
+    // the usual prompt runs first.
+    function restartToApplyShell() {
+        if (Qt.platform.os === "android") {
+            EditorState.projectFile.flushRecoverySnapshot()
+            EditorState.preferences.restartApp()
+            return
+        }
+        window.confirmIfDirty(function () {
+            EditorState.projectFile.discardUnsavedChanges()
+            EditorState.preferences.restartApp()
+            window.forceClose = true
+            window.close()
+        })
     }
 
     function openAddonManager(kind) {
@@ -905,36 +952,7 @@ ApplicationWindow {
         }
     }
 
-    // Backgrounding the app leaves the audio sink and the composite timer running, which
-    // keeps decoding video nobody can see and holds the audio focus. Android will kill the
-    // process for it eventually; pausing is the honest response to losing the foreground.
-    Connections {
-        target: Qt.application
-        function onStateChanged() {
-            if (Qt.application.state === Qt.ApplicationActive)
-                return
-            if (EditorState.playing)
-                EditorState.playback.pause()
-            // The two audition players are separate transports with their own audio sinks and
-            // decode timers; pausing only the main one left them playing to nobody.
-            EditorState.speedCurve.pause()
-            if (denoiseWindowLoader.item)
-                denoiseWindowLoader.item.stopPlayback()
-            // Losing the foreground is the last moment guaranteed to run: the OS can reclaim the
-            // process from here without another callback, and aboutToQuit does not fire when it does.
-            EditorState.projectFile.flushRecoverySnapshot()
-            // Decoder buffers, GL targets and image caches are all rebuildable; holding them
-            // while backgrounded is what gets the process killed instead of resumed. Only for a
-            // real backgrounding though: Android reports Inactive for every SAF picker, share
-            // sheet and permission dialog, and tearing all of that down on a tap of Import would
-            // cost a full rebuild on the way back. A job still running needs its decoders.
-            if (Qt.application.state === Qt.ApplicationSuspended
-                    || Qt.application.state === Qt.ApplicationHidden) {
-                if (!EditorState.exportInProgress && !EditorState.projectFile.packaging)
-                    EditorState.releaseTransientCaches()
-            }
-        }
-    }
+    AndroidLifecycle { denoiseWindow: denoiseWindowLoader.item }
 
     Connections {
         target: Addons

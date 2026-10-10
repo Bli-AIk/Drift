@@ -21,6 +21,11 @@ Item {
     signal closed()
 
     property int assetIndex: -1
+    // Set when cropping a timeline clip (openClip) rather than editing a bin row. The crop then
+    // lands on that clip alone, and trim and rotate do not apply: the clip has its own in/out.
+    property string clipId: ""
+    // The clip's frame as opened, which is what "unchanged" means in clip mode.
+    property rect clipBaseFrame: Qt.rect(0, 0, 1, 1)
     property string assetId: ""
     property string kind: ""
     property string sourcePath: ""
@@ -57,7 +62,7 @@ Item {
     readonly property bool isAudio: kind === "audio"
     readonly property bool isVideo: kind === "video"
     readonly property bool canCrop: !isAudio
-    readonly property bool canTrim: !isImage && durationSeconds > 0.05
+    readonly property bool canTrim: clipId.length === 0 && !isImage && durationSeconds > 0.05
     readonly property bool canPlay: !isImage
 
     readonly property int displayW: {
@@ -69,8 +74,13 @@ Item {
         return (rot === 90 || rot === 270) ? root.sourceWidth : root.sourceHeight
     }
 
-    readonly property bool cropDirty: cropX > 0.001 || cropY > 0.001
-                                      || cropW < 0.999 || cropH < 0.999
+    readonly property bool cropDirty: clipId.length > 0
+                                      ? (Math.abs(cropX - clipBaseFrame.x) > 0.001
+                                         || Math.abs(cropY - clipBaseFrame.y) > 0.001
+                                         || Math.abs(cropW - clipBaseFrame.width) > 0.001
+                                         || Math.abs(cropH - clipBaseFrame.height) > 0.001)
+                                      : (cropX > 0.001 || cropY > 0.001
+                                         || cropW < 0.999 || cropH < 0.999)
     readonly property bool trimDirty: canTrim
                                       && (Math.abs(inSeconds - persistedInSeconds) > 0.02
                                           || Math.abs(outSeconds - persistedOutSeconds) > 0.02)
@@ -85,6 +95,7 @@ Item {
             return
         }
         EditorState.assetPreview.windowOpen = true
+        root.clipId = ""
         root.assetIndex = index
         root.assetId = asset.id || ""
         root.kind = asset.kind || ""
@@ -111,6 +122,38 @@ Item {
             root.cropW = frame.width; root.cropH = frame.height
         }
         EditorState.assetPreview.begin(index)
+    }
+
+    function openClip(track, index) {
+        const clip = EditorState.clipAt(track, index)
+        if (!clip || (clip.kind !== "video" && clip.kind !== "image")) {
+            root.closed()
+            return
+        }
+        EditorState.assetPreview.pause()
+        EditorState.assetPreview.windowOpen = true
+        root.clipId = clip.id
+        root.assetIndex = -1
+        root.assetId = ""
+        root.kind = clip.kind
+        root.sourcePath = clip.path
+        root.assetName = clip.name
+        root.filmstripPath = clip.filmstripPath || ""
+        root.durationSeconds = clip.sourceDuration
+        root.sourceWidth = clip.sourceWidth
+        root.sourceHeight = clip.sourceHeight
+        root.rotationDegrees = clip.sourceRotation
+        root.rotationOverride = -1
+        root.effectiveRotation = clip.sourceRotation
+        root.inSeconds = clip.inPoint
+        root.outSeconds = clip.outPoint
+        const frame = clip.sourceFrame
+        root.clipBaseFrame = Qt.rect(frame.x, frame.y, frame.width, frame.height)
+        root.cropX = frame.x; root.cropY = frame.y
+        root.cropW = frame.width; root.cropH = frame.height
+        root.mode = "crop"
+        EditorState.assetPreview.beginClip(track, index)
+        root.seekTo(root.inSeconds)
     }
 
     // Steps the bin's rotation correction by 90° and reopens the preview session so the player's
@@ -150,8 +193,10 @@ Item {
     }
 
     function resetEdits() {
-        root.inSeconds = root.persistedInSeconds
-        root.outSeconds = root.persistedOutSeconds
+        if (root.clipId.length === 0) {
+            root.inSeconds = root.persistedInSeconds
+            root.outSeconds = root.persistedOutSeconds
+        }
         root.cropX = 0
         root.cropY = 0
         root.cropW = 1
@@ -310,9 +355,14 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             variant: "primary"
             text: qsTr("Save")
-            enabled: root.dirty && !root.saving && root.assetIndex >= 0
+            enabled: root.dirty && !root.saving && (root.assetIndex >= 0 || root.clipId.length > 0)
             onClicked: {
                 EditorState.assetPreview.pause()
+                if (root.clipId.length > 0) {
+                    if (EditorState.setClipSourceFrame(root.clipId, root.cropX, root.cropY, root.cropW, root.cropH))
+                        root.close()
+                    return
+                }
                 EditorState.saveAssetEdit(root.assetIndex, root.inSeconds,
                                           root.canTrim ? root.outSeconds : -1,
                                           root.cropX, root.cropY, root.cropW, root.cropH)
@@ -691,7 +741,7 @@ Item {
         ThemedButton {
             width: parent.width
             height: Theme.controlHeight
-            visible: root.isVideo
+            visible: root.isVideo && root.clipId.length === 0
             variant: "secondary"
             text: qsTr("Rotate")
             enabled: !root.saving

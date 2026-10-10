@@ -83,6 +83,8 @@ Item {
                         { id: "theme", label: Theme.darkMode ? qsTr("Light mode") : qsTr("Dark mode"),
                           icon: Theme.darkMode ? Theme.icons.sun : Theme.icons.moon, shown: true },
                         { id: "settings", label: qsTr("Settings"), icon: Theme.icons.settings, shown: true },
+                        { id: "desktopLayout", label: qsTr("Switch to desktop layout"), icon: Theme.icons.monitor,
+                          shown: true },
                         { id: "extras", label: qsTr("Extras"), icon: Theme.icons.package, shown: true },
                         { id: "update", label: qsTr("Update available"), icon: Theme.icons.download,
                           shown: Updates.updateAvailable },
@@ -108,6 +110,8 @@ Item {
                                 Theme.toggleDarkMode()
                             else if (modelData.id === "settings")
                                 win.openSettings()
+                            else if (modelData.id === "desktopLayout")
+                                win.switchShell("desktop")
                             else if (modelData.id === "extras")
                                 win.openExtras()
                             else if (modelData.id === "update")

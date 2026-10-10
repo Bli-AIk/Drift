@@ -37,6 +37,24 @@ Rectangle {
 
     // Runs `action` immediately when clean; otherwise opens the unsaved prompt.
     // Used by New / Open / Recent / Quit and the matching shortcuts.
+    // Android Back: closes the topmost dialog this header owns. True if one was open, even when
+    // it swallowed the key.
+    function closeTopDialog() {
+        const dialogs = [unsavedDialog, exportDialogLoader.item, exportProgressDialogLoader.item,
+                         projectPropertiesDialogLoader.item, agentAccessDialog, videoSizeDialogLoader.item,
+                         languageChooserDialogLoader.item, packageProgressDialog]
+        for (var i = 0; i < dialogs.length; ++i) {
+            const d = dialogs[i]
+            if (!d || !d.visible)
+                continue
+            // Packaging cancels on close; the dialog's own button is the way out.
+            if (d !== packageProgressDialog && (d.closePolicy & Popup.CloseOnEscape))
+                d.close()
+            return true
+        }
+        return false
+    }
+
     function confirmIfDirty(action) {
         if (!EditorState.projectFile.hasUnsavedChanges) {
             action()
@@ -605,6 +623,12 @@ Rectangle {
                         onTriggered: languageChooserDialogLoader.ensure().openFromHeader()
                     }
 
+                    ThemedMenuItem {
+                        text: qsTr("Switch to mobile layout…")
+                        icon.name: Theme.icons.smartphone
+                        onTriggered: root.Window.window.switchShell("mobile")
+                    }
+
                     ThemedMenuSeparator { }
 
                     // Infrequent tools. They were icon-only header buttons of their own,
@@ -721,7 +745,7 @@ Rectangle {
                 width: implicitWidth
                 height: implicitHeight
                 anchors.verticalCenter: parent.verticalCenter
-                visible: Updates.updateAvailable
+                visible: Updates.updateAvailable && Qt.platform.os !== "android"
 
                 IconButton {
                     id: updateBtn

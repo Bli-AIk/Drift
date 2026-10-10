@@ -9,9 +9,14 @@
 #include <QGuiApplication>
 #include <QLibraryInfo>
 #include <QLocale>
+#include <QProcess>
 #include <QSettings>
 #include <QTranslator>
 #include <QVariantMap>
+
+#ifdef Q_OS_ANDROID
+#include <QJniObject>
+#endif
 
 #include <cmath>
 #include <limits>
@@ -20,6 +25,9 @@ namespace {
 
 QTranslator g_appTranslator;
 QTranslator g_qtTranslator;
+QString g_appliedShell;
+// QT_SCALE_FACTOR came from ui/scale rather than the user's environment.
+bool g_uiScaleFromSettings = false;
 
 QString storedUiLanguage()
 {
@@ -137,6 +145,7 @@ PreferencesController::PreferencesController(QObject *parent)
     m_uiLanguage = storedUiLanguage();
     m_needsUiLanguagePrompt = needsFirstLaunchLanguagePrompt();
     m_uiScale = storedUiScale();
+    m_interfaceShell = storedInterfaceShell();
     // Unset means the user has never toggled the theme, so the UI keeps tracking the OS.
     const QVariant storedDarkMode = settings.value(QStringLiteral("ui/darkMode"));
     m_darkModeOverridden = storedDarkMode.isValid();
@@ -451,6 +460,7 @@ void PreferencesController::applyStoredUiScale()
     if (qFuzzyCompare(scale, 1.0))
         return;
     qputenv("QT_SCALE_FACTOR", QByteArray::number(scale, 'g', 4));
+    g_uiScaleFromSettings = true;
 }
 
 double PreferencesController::appliedUiScale() const
@@ -475,4 +485,99 @@ void PreferencesController::setUiScale(double scale)
     else
         settings.setValue(QStringLiteral("ui/scale"), m_uiScale);
     emit uiScaleChanged();
+}
+
+QString PreferencesController::storedInterfaceShell()
+{
+    const QString value = QSettings().value(QStringLiteral("ui/shell")).toString();
+    if (value == QLatin1String("desktop") || value == QLatin1String("mobile"))
+        return value;
+    return QStringLiteral("auto");
+}
+
+QString PreferencesController::resolveInterfaceShell(const QString &shell)
+{
+    if (shell == QLatin1String("desktop") || shell == QLatin1String("mobile"))
+        return shell;
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+    return QStringLiteral("mobile");
+#else
+    return QStringLiteral("desktop");
+#endif
+}
+
+void PreferencesController::setAppliedShell(const QString &shell)
+{
+    g_appliedShell = resolveInterfaceShell(shell);
+}
+
+QString PreferencesController::appliedShell() const
+{
+    return g_appliedShell.isEmpty() ? resolveInterfaceShell(QString()) : g_appliedShell;
+}
+
+bool PreferencesController::interfaceShellNeedsRestart() const
+{
+    return resolveInterfaceShell(m_interfaceShell) != appliedShell();
+}
+
+void PreferencesController::setInterfaceShell(const QString &shell)
+{
+    const QString normalized = (shell == QLatin1String("desktop") || shell == QLatin1String("mobile"))
+                                       ? shell
+                                       : QStringLiteral("auto");
+    if (m_interfaceShell == normalized)
+        return;
+    m_interfaceShell = normalized;
+    QSettings settings;
+    if (m_interfaceShell == QLatin1String("auto"))
+        settings.remove(QStringLiteral("ui/shell"));
+    else
+        settings.setValue(QStringLiteral("ui/shell"), m_interfaceShell);
+    emit interfaceShellChanged();
+}
+
+bool PreferencesController::canRestart() const
+{
+    return !qEnvironmentVariableIsSet("FLATPAK_ID");
+}
+
+void PreferencesController::restartApp()
+{
+    if (!canRestart())
+        return;
+#ifdef Q_OS_ANDROID
+    QSettings().sync();
+    QJniObject context = QNativeInterface::QAndroidApplication::context();
+    QJniObject::callStaticMethod<void>("org/cutwire/drift/AppRestart", "restart",
+                                       "(Landroid/content/Context;)V", context.object());
+#else
+    if (m_relaunchOnQuit)
+        return;
+    m_relaunchOnQuit = true;
+    connect(qApp, &QCoreApplication::aboutToQuit, this, [] {
+        // --shell= would override the preference that prompted the restart.
+        QStringList args = QCoreApplication::arguments().mid(1);
+        args.removeIf([](const QString &arg) { return arg.startsWith(QLatin1String("--shell=")); });
+        // Inside an AppImage the binary lives in a mount that goes away with this process, and
+        // the runtime's variables point at it; relaunch the image itself with them cleared.
+        const QString appImage = qEnvironmentVariable("APPIMAGE");
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        if (!appImage.isEmpty()) {
+            for (const char *name : {"APPIMAGE", "APPDIR", "ARGV0", "OWD", "LD_LIBRARY_PATH",
+                                     "QT_PLUGIN_PATH", "QML2_IMPORT_PATH", "QML_IMPORT_PATH",
+                                     "QT_QPA_PLATFORM_PLUGIN_PATH"})
+                env.remove(QString::fromLatin1(name));
+        }
+        // Otherwise the child would take this run's scale as an explicit override and ignore a
+        // ui/scale change made in the same session.
+        if (g_uiScaleFromSettings)
+            env.remove(QStringLiteral("QT_SCALE_FACTOR"));
+        QProcess process;
+        process.setProgram(appImage.isEmpty() ? QCoreApplication::applicationFilePath() : appImage);
+        process.setArguments(args);
+        process.setProcessEnvironment(env);
+        process.startDetached();
+    });
+#endif
 }

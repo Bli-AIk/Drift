@@ -914,6 +914,8 @@ qt_add_executable(drift
     src/models/FileDialogs.cpp
     src/models/Haptics.h
     src/models/Haptics.cpp
+    src/models/PointerDevices.h
+    src/models/PointerDevices.cpp
     src/models/AssetLibrary.h
     src/models/AssetLibrary.cpp
     src/models/BinFolderListModel.h
@@ -1315,6 +1317,7 @@ qt_add_qml_module(drift
         src/qml/components/ThemedLabel.qml
         src/qml/components/ThemedDialog.qml
         src/qml/components/LazyLoader.qml
+        src/qml/components/AndroidLifecycle.qml
         src/qml/components/AddonManagerDialog.qml
         src/qml/components/AddonStartupDialog.qml
         src/qml/components/MissingAddonsDialog.qml
@@ -1334,6 +1337,7 @@ qt_add_qml_module(drift
         src/qml/components/SheetActionRow.qml
         src/qml/components/SheetActionTile.qml
         src/qml/components/SettingsDialog.qml
+        src/qml/components/ShellSwitchDialog.qml
         src/qml/components/PasteAttributesDialog.qml
         src/qml/components/PackageProgressDialog.qml
         src/qml/components/ExportDialog.qml

@@ -75,6 +75,15 @@ class PreferencesController : public QObject
     Q_PROPERTY(double uiScale READ uiScale WRITE setUiScale NOTIFY uiScaleChanged)
     Q_PROPERTY(double appliedUiScale READ appliedUiScale CONSTANT)
     Q_PROPERTY(bool uiScaleNeedsRestart READ uiScaleNeedsRestart NOTIFY uiScaleChanged)
+    // Which shell to build at startup: "auto", "desktop" or "mobile". QSettings("ui/shell").
+    // Shell.qml decides once, so a change needs a restart. appliedShell is the shell actually
+    // running ("desktop" or "mobile"), after --shell= and DRIFT_SHELL have had their say.
+    Q_PROPERTY(QString interfaceShell READ interfaceShell WRITE setInterfaceShell NOTIFY interfaceShellChanged)
+    Q_PROPERTY(QString appliedShell READ appliedShell CONSTANT)
+    Q_PROPERTY(bool interfaceShellNeedsRestart READ interfaceShellNeedsRestart NOTIFY interfaceShellChanged)
+    // False inside Flatpak: the sandbox dies with its first process, taking a relaunched child
+    // with it, so the UI asks for a manual restart instead.
+    Q_PROPERTY(bool canRestart READ canRestart CONSTANT)
 
 public:
     explicit PreferencesController(QObject *parent = nullptr);
@@ -134,6 +143,21 @@ public:
     // Writes QT_SCALE_FACTOR from ui/scale unless the environment already set one.
     // Call once before QApplication; organization/application names must already be set.
     static void applyStoredUiScale();
+    QString interfaceShell() const { return m_interfaceShell; }
+    void setInterfaceShell(const QString &shell);
+    QString appliedShell() const;
+    bool interfaceShellNeedsRestart() const;
+    // "auto", "desktop" or "mobile". Safe before any PreferencesController exists.
+    static QString storedInterfaceShell();
+    // Maps "auto" to this platform's default; "desktop" and "mobile" pass through.
+    static QString resolveInterfaceShell(const QString &shell);
+    // Recorded by main.cpp once the shell for this run is decided.
+    static void setAppliedShell(const QString &shell);
+    bool canRestart() const;
+    // Android relaunches the activity right away; flush recovery first. Elsewhere this only
+    // arms a relaunch for aboutToQuit, so the caller still closes the window and the
+    // unsaved-changes prompt gets its say.
+    Q_INVOKABLE void restartApp();
     // Installs the .qm for ui/language (or the system locale). Call once after QApplication
     // is named, and again from setUiLanguage. Safe before any PreferencesController exists.
     static void installUiTranslators();
@@ -153,6 +177,7 @@ signals:
     void invertTimelineScrollChanged();
     void uiLanguageChanged();
     void uiScaleChanged();
+    void interfaceShellChanged();
     // setVaapiZeroCopy, setMediaCodecZeroCopy and setPreferredGpu take effect on the next
     // launch. AppController turns this into a status toast.
     void restartNoticeRequested(const QString &text);
@@ -176,4 +201,6 @@ private:
     QString m_uiLanguage;
     bool m_needsUiLanguagePrompt = false;
     double m_uiScale = 1.0;
+    QString m_interfaceShell = QStringLiteral("auto");
+    bool m_relaunchOnQuit = false;
 };

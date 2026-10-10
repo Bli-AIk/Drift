@@ -334,6 +334,49 @@ Item {
                     color: Theme.panelSecondaryForeground
                 }
 
+                ThemedLabel {
+                    text: qsTr("Layout")
+                }
+
+                ThemedComboBox {
+                    width: parent.width
+                    textRole: "label"
+                    valueRole: "id"
+                    model: [
+                        { id: "auto",    label: qsTr("Automatic") },
+                        { id: "desktop", label: qsTr("Desktop") },
+                        { id: "mobile",  label: qsTr("Mobile") }
+                    ]
+                    tooltip: qsTr("Desktop suits a mouse and keyboard, including tablets in desktop mode. Mobile is the touch layout made for phones. Takes effect after restart.")
+                    currentIndex: {
+                        const opts = model
+                        for (var i = 0; i < opts.length; ++i) {
+                            if (opts[i].id === EditorState.preferences.interfaceShell)
+                                return i
+                        }
+                        return 0
+                    }
+                    onActivated: {
+                        if (currentIndex >= 0 && currentIndex < model.length)
+                            EditorState.preferences.interfaceShell = model[currentIndex].id
+                    }
+                }
+
+                ThemedLabel {
+                    width: parent.width
+                    visible: EditorState.preferences.interfaceShellNeedsRestart
+                    text: qsTr("Restart Drift to switch layouts.")
+                    color: Theme.panelSecondaryForeground
+                }
+
+                ThemedButton {
+                    visible: EditorState.preferences.interfaceShellNeedsRestart
+                             && EditorState.preferences.canRestart
+                    variant: "secondary"
+                    text: qsTr("Restart now")
+                    onClicked: Window.window.restartToApplyShell()
+                }
+
                 ThemedSwitch {
                     visible: !Theme.touchUi
                     checked: EditorState.preferences.invertTimelineScroll

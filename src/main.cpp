@@ -15,6 +15,7 @@
 #include "models/EditorState.h"
 #include "models/FileDialogs.h"
 #include "models/Haptics.h"
+#include "models/PointerDevices.h"
 #include "models/LayoutStore.h"
 #include "models/MarketClient.h"
 #include "models/DriftAssetStore.h"
@@ -673,6 +674,7 @@ int main(int argc, char *argv[])
     static UpdateChecker updateChecker;
     static LayoutStore layoutStore;
     static drift::Haptics haptics;
+    static drift::PointerDevices pointerDevices;
     editorState.setAddonManager(&addonManager);
     marketClient.setAssetLibrary(&assetLibrary);
     editorState.setMarketClient(&marketClient);
@@ -690,6 +692,7 @@ int main(int argc, char *argv[])
     qmlRegisterSingletonInstance("Drift", 1, 0, "Updates", &updateChecker);
     qmlRegisterSingletonInstance("Drift", 1, 0, "LayoutMemory", &layoutStore);
     qmlRegisterSingletonInstance("Drift", 1, 0, "Haptics", &haptics);
+    qmlRegisterSingletonInstance("Drift", 1, 0, "PointerDevices", &pointerDevices);
 
     app.installEventFilter(new FileOpenFilter(&editorState, &marketClient, &app));
     {
@@ -725,19 +728,19 @@ int main(int argc, char *argv[])
     engine.addImageProvider(QStringLiteral("textlook"), new TextLookPreviewImageProvider());
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreationFailed, &app, [] { QGuiApplication::exit(-1); }, Qt::QueuedConnection);
-    // Shell.qml owns the choice between Main.qml (desktop) and AndroidMain.qml (touch) and can
-    // re-make it at runtime as the window crosses the compact breakpoint. Resolved here in one
-    // place, in a fixed precedence: explicit argument, then environment, then platform default.
+    // Shell.qml builds Main.qml (desktop) or AndroidMain.qml (touch) once, at startup. Resolved
+    // here in one place, in a fixed precedence: explicit argument, then environment, then the
+    // Settings choice (ui/shell), then platform default.
     const QStringList shellArgs = app.arguments();
-    QString shellPreference = QStringLiteral("auto");
+    const QString envShell = qEnvironmentVariable("DRIFT_SHELL");
+    QString shellPreference = PreferencesController::storedInterfaceShell();
     if (shellArgs.contains(QStringLiteral("--shell=mobile")))
         shellPreference = QStringLiteral("mobile");
     else if (shellArgs.contains(QStringLiteral("--shell=desktop")))
         shellPreference = QStringLiteral("desktop");
-    else if (qEnvironmentVariableIsSet("DRIFT_SHELL"))
-        shellPreference = qEnvironmentVariable("DRIFT_SHELL");
-    if (shellPreference != QLatin1String("mobile") && shellPreference != QLatin1String("desktop"))
-        shellPreference = QStringLiteral("auto");
+    else if (envShell == QLatin1String("mobile") || envShell == QLatin1String("desktop"))
+        shellPreference = envShell;
+    PreferencesController::setAppliedShell(shellPreference);
 
     engine.setInitialProperties({{QStringLiteral("shellPreference"), shellPreference}});
     engine.loadFromModule("Drift", "Shell");
