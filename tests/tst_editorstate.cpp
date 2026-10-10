@@ -3116,7 +3116,7 @@ void EditorStateTest::stabilizeRendersRangeIntoBinAndSwapsClip()
     project.tracks()[1].clips.append(audio);
     state.selectClip(0, 0);
 
-    state.stabilizeClip(0, 0);
+    state.stabilize()->run(0, 0);
     QTRY_VERIFY_WITH_TIMEOUT(!state.project()->tracks().at(0).clips.at(0).stabilizing, 120'000);
     QCOMPARE(state.lastMessage(), QStringLiteral("Stabilized video added to the media bin"));
 
@@ -4140,7 +4140,7 @@ void EditorStateTest::behindSubjectTargetsAChosenClip()
     QVERIFY(target.value(QStringLiteral("explicit")).toBool());
     QVERIFY(target.value(QStringLiteral("hasDepth")).toBool());
     // Adding the effect gave the title an adjustment lane, so indices are checked by what they
-    // point at: they are what the inspector hands to estimateDepthForClip.
+    // point at: they are what the inspector hands to depth.estimate.
     QCOMPARE(project.tracks().at(target.value(QStringLiteral("track")).toInt())
                  .clips.at(target.value(QStringLiteral("clip")).toInt()).id,
              QStringLiteral("far"));
@@ -6111,8 +6111,8 @@ void EditorStateTest::denoiseAddsCleanedClipOnTrackAbove()
     project.tracks().append(track);
     const int sourceTrack = 1;
 
-    QSignalSpy finished(&state, &AppController::denoiseFinished);
-    state.applyDenoise(sourceTrack, 0);
+    QSignalSpy finished(state.denoise(), &DenoiseController::finished);
+    state.denoise()->apply(sourceTrack, 0);
     QVERIFY2(finished.wait(180000), "denoise did not finish");
     QCOMPARE(finished.count(), 1);
     QVERIFY2(finished.at(0).at(0).toBool(),
@@ -7886,7 +7886,7 @@ void EditorStateTest::undoRevertsClipPropertyEdits()
     }
     {
         AssetLibrary l; AppController s(&l); fresh(s, drift::ClipType::Video);
-        s.setClipStabilizeMode(0, 0, QStringLiteral("keyframes"));
+        s.stabilize()->setMode(0, 0, QStringLiteral("keyframes"));
         QCOMPARE(clip0(s).stabilizeMode, drift::StabilizeMode::Keyframes);
         s.undo();
         QCOMPARE(clip0(s).stabilizeMode, drift::StabilizeMode::Bake);
@@ -8729,7 +8729,7 @@ void EditorStateTest::effectAdjustmentReportsItsSourceClipsFaceState()
     QCOMPARE(state.selectedClipData().value(QStringLiteral("hasFaceTrack")).toBool(), true);
 
     // And the scan reaches through: asking the adjustment to clear it clears the clip's.
-    state.clearFaceTrack(hostTrack, hostClip);
+    state.faces()->clearTrack(hostTrack, hostClip);
     QVERIFY(state.project()->tracks().at(0).clips.at(0).faceTrackPath.isEmpty());
 
     // A standalone adjustment layer has no one clip to scan, so it must not offer to.

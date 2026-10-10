@@ -83,7 +83,7 @@ Item {
                 currentIndex: Math.max(0, root.modeIds.indexOf(root.stabilizeMode))
                 tooltip: qsTr("Render a stabilized copy, or animate the clip with sparse transform keys")
                 onActivated: (index) => {
-                    EditorState.setClipStabilizeMode(
+                    EditorState.stabilize.setMode(
                                 EditorState.selectedTrack, EditorState.selectedClip,
                                 root.modeIds[index])
                 }
@@ -118,7 +118,7 @@ Item {
                 }
                 onPressedChanged: {
                     if (!pressed && root.clipData) {
-                        EditorState.setClipStabilizeSmoothing(
+                        EditorState.stabilize.setSmoothing(
                              EditorState.selectedTrack, EditorState.selectedClip, value)
                     }
                 }
@@ -142,7 +142,7 @@ Item {
                 text: qsTr("Tripod mode")
                 checked: root.clipData ? !!root.clipData.stabilizeTripod : false
                 enabled: !root.stabilizing
-                onToggled: EditorState.setClipStabilizeTripod(
+                onToggled: EditorState.stabilize.setTripod(
                                EditorState.selectedTrack, EditorState.selectedClip, checked)
             }
 
@@ -189,7 +189,7 @@ Item {
             ThemedButton {
                 text: root.actionLabel
                 variant: (root.stabilized && !root.stale) ? "secondary" : "primary"
-                onClicked: EditorState.stabilizeClip(
+                onClicked: EditorState.stabilize.run(
                                EditorState.selectedTrack, EditorState.selectedClip)
             }
 
@@ -198,7 +198,7 @@ Item {
                 variant: "ghost"
                 // A stabilized video is its own bin item; the original is still there to swap back.
                 visible: root.appliedAsKeyframes
-                onClicked: EditorState.removeClipStabilization(
+                onClicked: EditorState.stabilize.remove(
                                EditorState.selectedTrack, EditorState.selectedClip)
             }
         }
@@ -227,7 +227,7 @@ Item {
             width: parent.width
             text: qsTr("Cancel")
             variant: "ghost"
-            onClicked: EditorState.cancelClipStabilization(
+            onClicked: EditorState.stabilize.cancel(
                            EditorState.selectedTrack, EditorState.selectedClip)
         }
     }

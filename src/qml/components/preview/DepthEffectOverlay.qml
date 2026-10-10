@@ -371,9 +371,9 @@ Item {
                             root.writeParam(handle.modelData.effect, "focusX", handle.liveX)
                             root.writeParam(handle.modelData.effect, "focusY", handle.liveY)
                             if (!handle.values.follow) {
-                                const d = EditorState.sampleDepthAt(EditorState.selectedTrack,
-                                                                    EditorState.selectedClip,
-                                                                    handle.liveX, handle.liveY)
+                                const d = EditorState.depth.sampleAt(EditorState.selectedTrack,
+                                                                     EditorState.selectedClip,
+                                                                     handle.liveX, handle.liveY)
                                 if (d >= 0)
                                     root.writeParam(handle.modelData.effect, "focusDepth", d)
                             }

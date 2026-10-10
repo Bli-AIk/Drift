@@ -51,20 +51,20 @@ Item {
         // Asked of the engine rather than the addon registry, and reset when an addon lands:
         // the model can equally come from DRIFT_DEPTH_MODEL_DIR.
         property bool runtimeReady: Addons.runtimeAvailable()
-        property bool depthReady: EditorState.depthAvailable() && Addons.runtimeAvailable()
+        property bool depthReady: EditorState.depth.available() && Addons.runtimeAvailable()
         property bool highQuality: false
         property int jobRevision: 0
         readonly property var job: {
             void panel.jobRevision
-            return panel.targetId ? EditorState.depthJob(panel.targetId) : ({})
+            return panel.targetId ? EditorState.depth.job(panel.targetId) : ({})
         }
         readonly property bool running: job.active === true
 
         spacing: Theme.spacingSm
 
         Connections {
-            target: EditorState
-            function onDepthJobChanged(clipId) {
+            target: EditorState.depth
+            function onJobChanged(clipId) {
                 if (clipId === panel.targetId)
                     panel.jobRevision++
             }
@@ -75,7 +75,7 @@ Item {
                 if (kind !== "depth-model" && kind !== "onnxruntime")
                     return
                 panel.runtimeReady = Addons.runtimeAvailable()
-                panel.depthReady = EditorState.depthAvailable() && panel.runtimeReady
+                panel.depthReady = EditorState.depth.available() && panel.runtimeReady
             }
         }
 
@@ -123,8 +123,8 @@ Item {
             width: parent.width
             text: panel.hasDepth ? qsTr("Re-estimate depth") : qsTr("Estimate depth")
             variant: panel.hasDepth ? "ghost" : "secondary"
-            onClicked: EditorState.estimateDepthForClip(panel.targetTrack, panel.targetClip,
-                                                        panel.highQuality)
+            onClicked: EditorState.depth.estimate(panel.targetTrack, panel.targetClip,
+                                                  panel.highQuality)
         }
 
         ThemedButton {
@@ -132,7 +132,7 @@ Item {
             width: parent.width
             text: qsTr("Clear depth")
             variant: "ghost"
-            onClicked: EditorState.clearDepth(panel.targetTrack, panel.targetClip)
+            onClicked: EditorState.depth.clear(panel.targetTrack, panel.targetClip)
         }
 
         Text {
@@ -156,7 +156,7 @@ Item {
             width: parent.width
             text: qsTr("Cancel")
             variant: "ghost"
-            onClicked: EditorState.cancelDepthEstimation(panel.targetId)
+            onClicked: EditorState.depth.cancel(panel.targetId)
         }
 
         ThemedButton {
@@ -229,7 +229,7 @@ Item {
             // Folded together because every control below is gated on the same answer;
             // runtimeReady is kept apart only to say which half is missing.
             property bool runtimeReady: Addons.runtimeAvailable()
-            property bool faceReady: EditorState.faceDetectionAvailable()
+            property bool faceReady: EditorState.faces.available()
                                      && Addons.runtimeAvailable()
 
             // Landmarks are baked onto the media clip, and the selection here is the adjustment
@@ -292,7 +292,7 @@ Item {
                     if (kind !== "face-model" && kind !== "onnxruntime")
                         return
                     faceSection.runtimeReady = Addons.runtimeAvailable()
-                    faceSection.faceReady = EditorState.faceDetectionAvailable()
+                    faceSection.faceReady = EditorState.faces.available()
                                             && faceSection.runtimeReady
                 }
             }
@@ -323,7 +323,7 @@ Item {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 visible: faceSection.canTrack && faceSection.faceReady && !faceSection.hasTrack
-                         && !EditorState.faceDetecting
+                         && !EditorState.faces.detecting
                 text: qsTr("These effects follow a face, so the clip has to be scanned before they do anything.")
                 color: Theme.warning
                 font.family: Theme.fontFamily
@@ -338,7 +338,7 @@ Item {
                 wrapMode: Text.WordWrap
                 visible: faceSection.canTrack && faceSection.faceReady && faceSection.hasTrack
                          && !faceSection.trackHasContours && faceSection.faceUse.beauty
-                         && !EditorState.faceDetecting
+                         && !EditorState.faces.detecting
                 text: qsTr("This clip was scanned before makeup was supported. Re-detect faces to enable the Beauty effects.")
                 color: Theme.warning
                 font.family: Theme.fontFamily
@@ -353,7 +353,7 @@ Item {
                 wrapMode: Text.WordWrap
                 visible: faceSection.canTrack && faceSection.faceReady && faceSection.hasTrack
                          && !faceSection.trackHasMesh && faceSection.faceUse.mesh
-                         && !EditorState.faceDetecting
+                         && !EditorState.faces.detecting
                 text: qsTr("This clip was scanned before the face mesh was supported. Re-detect faces to enable 3D Face Mesh and Face Retouch.")
                 color: Theme.warning
                 font.family: Theme.fontFamily
@@ -361,46 +361,46 @@ Item {
             }
 
             ThemedButton {
-                visible: faceSection.canTrack && faceSection.faceReady && !EditorState.faceDetecting
+                visible: faceSection.canTrack && faceSection.faceReady && !EditorState.faces.detecting
                 width: parent.width
                 text: faceSection.hasTrack ? qsTr("Re-detect faces") : qsTr("Scan for faces…")
                 variant: faceSection.hasTrack ? "ghost" : "secondary"
-                onClicked: EditorState.detectFacesForClip(
+                onClicked: EditorState.faces.detect(
                                EditorState.selectedTrack, EditorState.selectedClip)
             }
 
             ThemedButton {
                 visible: faceSection.canTrack && faceSection.faceReady && faceSection.hasTrack
-                         && !EditorState.faceDetecting
+                         && !EditorState.faces.detecting
                 width: parent.width
                 text: qsTr("Clear face track")
                 variant: "ghost"
-                onClicked: EditorState.clearFaceTrack(
+                onClicked: EditorState.faces.clearTrack(
                                EditorState.selectedTrack, EditorState.selectedClip)
             }
 
             Text {
                 width: parent.width
                 wrapMode: Text.WordWrap
-                visible: EditorState.faceDetecting
-                text: EditorState.faceDetectStatus
+                visible: EditorState.faces.detecting
+                text: EditorState.faces.status
                 color: Theme.mutedForeground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
 
             ThemedProgressBar {
-                visible: EditorState.faceDetecting
+                visible: EditorState.faces.detecting
                 width: parent.width
-                value: EditorState.faceDetectProgress
+                value: EditorState.faces.progress
             }
 
             ThemedButton {
-                visible: EditorState.faceDetecting
+                visible: EditorState.faces.detecting
                 width: parent.width
                 text: qsTr("Cancel")
                 variant: "ghost"
-                onClicked: EditorState.cancelFaceDetection()
+                onClicked: EditorState.faces.cancel()
             }
 
             ThemedButton {
@@ -450,7 +450,7 @@ Item {
             DepthPanel {
                 width: parent.width
                 // The media clip the depth belongs to; the selection may be the adjustment pinned
-                // to it, which estimateDepthForClip redirects through.
+                // to it, which depth estimation redirects through.
                 targetTrack: EditorState.selectedTrack
                 targetClip: EditorState.selectedClip
                 targetId: depthSection.hostData.depthClipId || ""

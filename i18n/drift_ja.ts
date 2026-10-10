@@ -1035,6 +1035,10 @@
         <translation>設定</translation>
     </message>
     <message>
+        <source>Switch to desktop layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Extras</source>
         <translation>拡張機能</translation>
     </message>
@@ -2368,112 +2372,8 @@
         <translation>スピードカーブを削除しました</translation>
     </message>
     <message>
-        <source>Getting ready…</source>
-        <translation>準備中…</translation>
-    </message>
-    <message>
-        <source>Could not decode frame %1</source>
-        <translation>フレーム %1 をデコードできませんでした</translation>
-    </message>
-    <message>
-        <source>Clear Face Track</source>
-        <translation>顔トラックをクリア</translation>
-    </message>
-    <message>
-        <source>Face detection already in progress</source>
-        <translation>顔検出は既に実行中です</translation>
-    </message>
-    <message>
-        <source>Select a video clip to detect faces in</source>
-        <translation>顔を検出するビデオクリップを選択してください</translation>
-    </message>
-    <message>
-        <source>Clip has no video to scan</source>
-        <translation>クリップにスキャンするビデオがありません</translation>
-    </message>
-    <message>
-        <source>Clip is too short to scan</source>
-        <translation>クリップが短すぎてスキャンできません</translation>
-    </message>
-    <message>
-        <source>Face detection cancelled</source>
-        <translation>顔検出をキャンセルしました</translation>
-    </message>
-    <message>
-        <source>Scanning frame %1 of %2…</source>
-        <translation>フレーム %1 / %2 をスキャン中…</translation>
-    </message>
-    <message>
-        <source>No faces found in this clip</source>
-        <translation>このクリップに顔は見つかりませんでした</translation>
-    </message>
-    <message>
-        <source>Could not write the face track</source>
-        <translation>顔トラックを書き込めませんでした</translation>
-    </message>
-    <message>
-        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
-        <translation>顔検出完了 — %2 フレーム中 %1 フレームで顔が見えました</translation>
-    </message>
-    <message>
-        <source>Face detection complete</source>
-        <translation>顔検出完了</translation>
-    </message>
-    <message>
-        <source>Scanned clip no longer exists</source>
-        <translation>スキャンしたクリップが存在しなくなりました</translation>
-    </message>
-    <message>
-        <source>Detect Faces</source>
-        <translation>顔を検出</translation>
-    </message>
-    <message>
         <source>Clip</source>
         <translation>クリップ</translation>
-    </message>
-    <message>
-        <source>Getting noise removal ready…</source>
-        <translation>ノイズ除去の準備中…</translation>
-    </message>
-    <message>
-        <source>Clip is too short to process</source>
-        <translation>クリップが短すぎて処理できません</translation>
-    </message>
-    <message>
-        <source>Noise removal cancelled</source>
-        <translation>ノイズ除去をキャンセルしました</translation>
-    </message>
-    <message>
-        <source>Removing noise (left)…</source>
-        <translation>ノイズ除去中 (左)…</translation>
-    </message>
-    <message>
-        <source>Removing noise (right)…</source>
-        <translation>ノイズ除去中 (右)…</translation>
-    </message>
-    <message>
-        <source>Writing audio…</source>
-        <translation>音声を書き込み中…</translation>
-    </message>
-    <message>
-        <source>Noise removal already in progress</source>
-        <translation>ノイズ除去は既に実行中です</translation>
-    </message>
-    <message>
-        <source>Select a video or audio clip</source>
-        <translation>ビデオまたはオーディオクリップを選択してください</translation>
-    </message>
-    <message>
-        <source>Clip has no audio</source>
-        <translation>クリップに音声がありません</translation>
-    </message>
-    <message>
-        <source>Could not create a preview file</source>
-        <translation>プレビューファイルを作成できませんでした</translation>
-    </message>
-    <message>
-        <source>Ready</source>
-        <translation>準備完了</translation>
     </message>
     <message numerus="yes">
         <source>Imported %n subtitles</source>
@@ -2542,68 +2442,6 @@
     <message>
         <source>Save combined multicam</source>
         <translation>マルチカムを結合して保存</translation>
-    </message>
-    <message>
-        <source>Select a video clip to stabilize</source>
-        <translation>手ぶれ補正するビデオクリップを選択</translation>
-    </message>
-    <message>
-        <source>Clip has no video file</source>
-        <translation>クリップにビデオファイルがありません</translation>
-    </message>
-    <message>
-        <source>Stabilization already in progress for this clip</source>
-        <translation>このクリップの手ぶれ補正は既に実行中です</translation>
-    </message>
-    <message>
-        <source>Could not create stabilization cache directory</source>
-        <translation>手ぶれ補正キャッシュディレクトリを作成できませんでした</translation>
-    </message>
-    <message>
-        <source>Stabilize Video</source>
-        <translation>ビデオ手ぶれ補正</translation>
-    </message>
-    <message>
-        <source>Remove Stabilization</source>
-        <translation>手ぶれ補正を削除</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Smoothing</source>
-        <translation>手ぶれ補正の滑らかさを変更</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Tripod Mode</source>
-        <translation>手ぶれ補正の三脚モードを変更</translation>
-    </message>
-    <message>
-        <source>Detecting faces…</source>
-        <translation>顔を検出中…</translation>
-    </message>
-    <message>
-        <source>Already looking for scenes</source>
-        <translation>シーン検索は既に実行中です</translation>
-    </message>
-    <message>
-        <source>Select a video clip to find scenes in</source>
-        <translation>シーンを検索するビデオクリップを選択してください</translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n scene(s)</source>
-        <translation>
-            <numerusform>%n 個のシーンを発見</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Looking for scenes…</source>
-        <translation>シーンを検索中…</translation>
-    </message>
-    <message>
-        <source>Scene detection cancelled</source>
-        <translation>シーン検出をキャンセルしました</translation>
-    </message>
-    <message>
-        <source>Removing noise…</source>
-        <translation>ノイズ除去中…</translation>
     </message>
     <message>
         <source>Could not create an output file</source>
@@ -2826,86 +2664,6 @@
     <message>
         <source>Transition curve updated</source>
         <translation>トランジションカーブを更新しました</translation>
-    </message>
-    <message>
-        <source>Select a video or image clip to estimate depth for</source>
-        <translation>深度を推定するビデオまたは画像クリップを選択してください</translation>
-    </message>
-    <message>
-        <source>Clip has no video to estimate depth for</source>
-        <translation>クリップに深度を推定するためのビデオがありません</translation>
-    </message>
-    <message>
-        <source>Depth estimation needs the Depth addon</source>
-        <translation>深度の推定には Depth アドオンが必要です</translation>
-    </message>
-    <message>
-        <source>Depth is already being estimated for this clip</source>
-        <translation>このクリップの深度はすでに推定中です</translation>
-    </message>
-    <message>
-        <source>Estimating depth…</source>
-        <translation>深度を推定中…</translation>
-    </message>
-    <message>
-        <source>Clip no longer exists</source>
-        <translation>クリップはもう存在しません</translation>
-    </message>
-    <message>
-        <source>Estimate Depth</source>
-        <translation>深度を推定</translation>
-    </message>
-    <message>
-        <source>Clear Depth</source>
-        <translation>深度をクリア</translation>
-    </message>
-    <message>
-        <source>Building keyframes…</source>
-        <translation>キーフレームを構築中…</translation>
-    </message>
-    <message>
-        <source>Rendering stabilized video…</source>
-        <translation>手ぶれ補正済みビデオをレンダリング中…</translation>
-    </message>
-    <message>
-        <source>Analyzing camera motion…</source>
-        <translation>カメラの動きを分析中…</translation>
-    </message>
-    <message>
-        <source>Stabilization cancelled.</source>
-        <translation>手ぶれ補正をキャンセルしました。</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis file is missing.</source>
-        <translation>手ぶれ補正分析ファイルが見つかりません。</translation>
-    </message>
-    <message>
-        <source>Could not read camera motion from the analysis file.</source>
-        <translation>分析ファイルからカメラの動きを読み取れませんでした。</translation>
-    </message>
-    <message>
-        <source>Stabilize with Keyframes</source>
-        <translation>キーフレームで手ぶれ補正</translation>
-    </message>
-    <message>
-        <source>Stabilization keyframes applied.</source>
-        <translation>手ぶれ補正キーフレームを適用しました。</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Mode</source>
-        <translation>手ぶれ補正モードを変更</translation>
-    </message>
-    <message>
-        <source> (denoised)</source>
-        <translation> (ノイズ除去済み)</translation>
-    </message>
-    <message>
-        <source>Remove noise</source>
-        <translation>ノイズ除去</translation>
-    </message>
-    <message>
-        <source>Noise removed</source>
-        <translation>ノイズを除去しました</translation>
     </message>
     <message>
         <source>Shape added</source>
@@ -3522,70 +3280,6 @@
     <message>
         <source>%1 copy</source>
         <translation>%1 をコピー</translation>
-    </message>
-    <message>
-        <source>%1 (stabilized)</source>
-        <translation>%1 (手ぶれ補正済み)</translation>
-    </message>
-    <message>
-        <source>Select a video clip to enhance</source>
-        <translation>強化するビデオクリップを選択してください</translation>
-    </message>
-    <message>
-        <source>Choose a model to enhance with</source>
-        <translation>強化に使用するモデルを選択してください</translation>
-    </message>
-    <message>
-        <source>This clip is already being enhanced</source>
-        <translation>このクリップは既に強化中です</translation>
-    </message>
-    <message>
-        <source>%1 (enhanced %2x)</source>
-        <translation>%1 (%2 倍に強化)</translation>
-    </message>
-    <message>
-        <source>%1 (enhanced)</source>
-        <translation>%1 (強化済み)</translation>
-    </message>
-    <message>
-        <source>Enhance Video</source>
-        <translation>ビデオを強化</translation>
-    </message>
-    <message>
-        <source>Enhanced video added to the media bin</source>
-        <translation>強化したビデオをメディアビンに追加しました</translation>
-    </message>
-    <message>
-        <source>Enhancing video…</source>
-        <translation>ビデオを強化中…</translation>
-    </message>
-    <message>
-        <source>This build of Drift has no video stabilization support</source>
-        <translation>このビルドの Drift はビデオの手ぶれ補正に対応していません</translation>
-    </message>
-    <message>
-        <source>The video this clip was stabilized from is no longer in the media bin</source>
-        <translation>このクリップの手ぶれ補正の元になったビデオは、メディアビンに存在しません</translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed.</source>
-        <translation>手ぶれ補正のレンダリングに失敗しました。</translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed: %1</source>
-        <translation>手ぶれ補正のレンダリングに失敗しました : %1</translation>
-    </message>
-    <message>
-        <source>Stabilized video added to the media bin</source>
-        <translation>手ぶれ補正済みのビデオをメディアビンに追加しました</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed.</source>
-        <translation>手ぶれ補正の分析に失敗しました。</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed: %1</source>
-        <translation>手ぶれ補正の分析に失敗しました : %1</translation>
     </message>
     <message>
         <source>Audio adjustment</source>
@@ -5650,6 +5344,93 @@
     </message>
 </context>
 <context>
+    <name>DenoiseController</name>
+    <message>
+        <source>Getting noise removal ready…</source>
+        <translation>ノイズ除去の準備中…</translation>
+    </message>
+    <message>
+        <source>Clip is too short to process</source>
+        <translation>クリップが短すぎて処理できません</translation>
+    </message>
+    <message>
+        <source>Reading audio…</source>
+        <translation>音声を読み取り中…</translation>
+    </message>
+    <message>
+        <source>Noise removal cancelled</source>
+        <translation>ノイズ除去をキャンセルしました</translation>
+    </message>
+    <message>
+        <source>No audio decoded</source>
+        <translation>音声がデコードされていません</translation>
+    </message>
+    <message>
+        <source>Removing noise (left)…</source>
+        <translation>ノイズ除去中 (左)…</translation>
+    </message>
+    <message>
+        <source>Removing noise (right)…</source>
+        <translation>ノイズ除去中 (右)…</translation>
+    </message>
+    <message>
+        <source>Writing audio…</source>
+        <translation>音声を書き込み中…</translation>
+    </message>
+    <message>
+        <source>Noise removal already in progress</source>
+        <translation>ノイズ除去は既に実行中です</translation>
+    </message>
+    <message>
+        <source>Select a video or audio clip</source>
+        <translation>ビデオまたはオーディオクリップを選択してください</translation>
+    </message>
+    <message>
+        <source>Clip has no audio</source>
+        <translation>クリップに音声がありません</translation>
+    </message>
+    <message>
+        <source>Starting…</source>
+        <translation>開始中…</translation>
+    </message>
+    <message>
+        <source>Could not create a preview file</source>
+        <translation>プレビューファイルを作成できませんでした</translation>
+    </message>
+    <message>
+        <source>Ready</source>
+        <translation>準備完了</translation>
+    </message>
+    <message>
+        <source>Removing noise…</source>
+        <translation>ノイズ除去中…</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>出力ファイルを作成できませんでした</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>完了</translation>
+    </message>
+    <message>
+        <source>Clip</source>
+        <translation>クリップ</translation>
+    </message>
+    <message>
+        <source> (denoised)</source>
+        <translation> (ノイズ除去済み)</translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation>ノイズ除去</translation>
+    </message>
+    <message>
+        <source>Noise removed</source>
+        <translation>ノイズを除去しました</translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWindow</name>
     <message>
         <source>Remove noise</source>
@@ -5690,6 +5471,41 @@
     <message>
         <source>Cancel</source>
         <translation>キャンセル</translation>
+    </message>
+</context>
+<context>
+    <name>DepthController</name>
+    <message>
+        <source>Select a video or image clip to estimate depth for</source>
+        <translation>深度を推定するビデオまたは画像クリップを選択してください</translation>
+    </message>
+    <message>
+        <source>Clip has no video to estimate depth for</source>
+        <translation>クリップに深度を推定するためのビデオがありません</translation>
+    </message>
+    <message>
+        <source>Depth estimation needs the Depth addon</source>
+        <translation>深度の推定には Depth アドオンが必要です</translation>
+    </message>
+    <message>
+        <source>Depth is already being estimated for this clip</source>
+        <translation>このクリップの深度はすでに推定中です</translation>
+    </message>
+    <message>
+        <source>Estimating depth…</source>
+        <translation>深度を推定中…</translation>
+    </message>
+    <message>
+        <source>Clip no longer exists</source>
+        <translation>クリップはもう存在しません</translation>
+    </message>
+    <message>
+        <source>Estimate Depth</source>
+        <translation>深度を推定</translation>
+    </message>
+    <message>
+        <source>Clear Depth</source>
+        <translation>深度をクリア</translation>
     </message>
 </context>
 <context>
@@ -6134,6 +5950,10 @@
     <message>
         <source>Language…</source>
         <translation>言語…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Debug info…</source>
@@ -7133,6 +6953,77 @@
     <message>
         <source>“%1” will be removed from your face props. Effects using it will show it as missing until it is imported again.</source>
         <translation>「%1」はフェイスプロップから削除されます。これを使用しているエフェクトは、再度インポートされるまで見つからない状態として表示されます。</translation>
+    </message>
+</context>
+<context>
+    <name>FaceTrackingController</name>
+    <message>
+        <source>Clear Face Track</source>
+        <translation>顔トラックをクリア</translation>
+    </message>
+    <message>
+        <source>Face detection already in progress</source>
+        <translation>顔検出は既に実行中です</translation>
+    </message>
+    <message>
+        <source>Select a video clip to detect faces in</source>
+        <translation>顔を検出するビデオクリップを選択してください</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation>クリップにスキャンするビデオがありません</translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation>準備中…</translation>
+    </message>
+    <message>
+        <source>Detecting faces…</source>
+        <translation>顔を検出中…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>完了</translation>
+    </message>
+    <message>
+        <source>Clip is too short to scan</source>
+        <translation>クリップが短すぎてスキャンできません</translation>
+    </message>
+    <message>
+        <source>Face detection cancelled</source>
+        <translation>顔検出をキャンセルしました</translation>
+    </message>
+    <message>
+        <source>Could not decode frame %1</source>
+        <translation>フレーム %1 をデコードできませんでした</translation>
+    </message>
+    <message>
+        <source>Scanning frame %1 of %2…</source>
+        <translation>フレーム %1 / %2 をスキャン中…</translation>
+    </message>
+    <message>
+        <source>No faces found in this clip</source>
+        <translation>このクリップに顔は見つかりませんでした</translation>
+    </message>
+    <message>
+        <source>Could not write the face track</source>
+        <translation>顔トラックを書き込めませんでした</translation>
+    </message>
+    <message>
+        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
+        <translation>顔検出完了 — %2 フレーム中 %1 フレームで顔が見えました</translation>
+    </message>
+    <message>
+        <source>Face detection complete</source>
+        <translation>顔検出完了</translation>
+    </message>
+    <message>
+        <source>Scanned clip no longer exists</source>
+        <translation>スキャンしたクリップが存在しなくなりました</translation>
+    </message>
+    <message>
+        <source>Detect Faces</source>
+        <translation>顔を検出</translation>
     </message>
 </context>
 <context>
@@ -8142,6 +8033,10 @@
         <translation>ガイドの切り替え</translation>
     </message>
     <message>
+        <source>Switch to Mobile Layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;Window</source>
         <translation>ウィンドウ(&amp;W)</translation>
     </message>
@@ -8215,6 +8110,10 @@
     </message>
     <message>
         <source>Checking for updates…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Links can’t be opened in this layout.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11050,6 +10949,41 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>RestoreController</name>
+    <message>
+        <source>Select a video clip to enhance</source>
+        <translation>強化するビデオクリップを選択してください</translation>
+    </message>
+    <message>
+        <source>Choose a model to enhance with</source>
+        <translation>強化に使用するモデルを選択してください</translation>
+    </message>
+    <message>
+        <source>This clip is already being enhanced</source>
+        <translation>このクリップは既に強化中です</translation>
+    </message>
+    <message>
+        <source>%1 (enhanced %2x)</source>
+        <translation>%1 (%2 倍に強化)</translation>
+    </message>
+    <message>
+        <source>%1 (enhanced)</source>
+        <translation>%1 (強化済み)</translation>
+    </message>
+    <message>
+        <source>Enhance Video</source>
+        <translation>ビデオを強化</translation>
+    </message>
+    <message>
+        <source>Enhanced video added to the media bin</source>
+        <translation>強化したビデオをメディアビンに追加しました</translation>
+    </message>
+    <message>
+        <source>Enhancing video…</source>
+        <translation>ビデオを強化中…</translation>
+    </message>
+</context>
+<context>
     <name>RestoreWindow</name>
     <message>
         <source>Enhance video</source>
@@ -11280,6 +11214,43 @@ If playback stutters, try another.</source>
     <message>
         <source>No frames could be decoded from this clip</source>
         <translation>このクリップからフレームをデコードできませんでした</translation>
+    </message>
+</context>
+<context>
+    <name>SceneDetectController</name>
+    <message>
+        <source>Already looking for scenes</source>
+        <translation>シーン検索は既に実行中です</translation>
+    </message>
+    <message>
+        <source>Select a video clip to find scenes in</source>
+        <translation>シーンを検索するビデオクリップを選択してください</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation>クリップにスキャンするビデオがありません</translation>
+    </message>
+    <message numerus="yes">
+        <source>Found %n scene(s)</source>
+        <translation>
+            <numerusform>%n 個のシーンを発見</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation>準備中…</translation>
+    </message>
+    <message>
+        <source>Looking for scenes…</source>
+        <translation>シーンを検索中…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>完了</translation>
+    </message>
+    <message>
+        <source>Scene detection cancelled</source>
+        <translation>シーン検出をキャンセルしました</translation>
     </message>
 </context>
 <context>
@@ -11695,6 +11666,34 @@ If playback stutters, try another.</source>
     <message>
         <source>Restart Drift to apply this size.</source>
         <translation>このサイズを適用するには Drift を再起動してください。</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mobile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop suits a mouse and keyboard, including tablets in desktop mode. Mobile is the touch layout made for phones. Takes effect after restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Horizontal mouse-wheel pan</source>
@@ -12428,6 +12427,49 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>ShellSwitchDialog</name>
+    <message>
+        <source>Switch to the mobile layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the desktop layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Later</source>
+        <translation type="unfinished">後で</translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A mouse is connected. The desktop layout has full menus, panels and precise timeline editing. Drift restarts to switch, and your project is kept.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The mobile layout is the touch interface made for phones. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The desktop layout suits a mouse and keyboard. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ShortcutCaptureField</name>
     <message>
         <source>Shortcut for %1</source>
@@ -12834,6 +12876,113 @@ If playback stutters, try another.</source>
     <message>
         <source>Could not write subtitle file</source>
         <translation>字幕ファイルを書き込めませんでした</translation>
+    </message>
+</context>
+<context>
+    <name>StabilizeController</name>
+    <message>
+        <source>%1 (stabilized)</source>
+        <translation>%1 (手ぶれ補正済み)</translation>
+    </message>
+    <message>
+        <source>Select a video clip to stabilize</source>
+        <translation>手ぶれ補正するビデオクリップを選択</translation>
+    </message>
+    <message>
+        <source>Clip has no video file</source>
+        <translation>クリップにビデオファイルがありません</translation>
+    </message>
+    <message>
+        <source>Stabilization already in progress for this clip</source>
+        <translation>このクリップの手ぶれ補正は既に実行中です</translation>
+    </message>
+    <message>
+        <source>This build of Drift has no video stabilization support</source>
+        <translation>このビルドの Drift はビデオの手ぶれ補正に対応していません</translation>
+    </message>
+    <message>
+        <source>The video this clip was stabilized from is no longer in the media bin</source>
+        <translation>このクリップの手ぶれ補正の元になったビデオは、メディアビンに存在しません</translation>
+    </message>
+    <message>
+        <source>Could not create stabilization cache directory</source>
+        <translation>手ぶれ補正キャッシュディレクトリを作成できませんでした</translation>
+    </message>
+    <message>
+        <source>Building keyframes…</source>
+        <translation>キーフレームを構築中…</translation>
+    </message>
+    <message>
+        <source>Rendering stabilized video…</source>
+        <translation>手ぶれ補正済みビデオをレンダリング中…</translation>
+    </message>
+    <message>
+        <source>Analyzing camera motion…</source>
+        <translation>カメラの動きを分析中…</translation>
+    </message>
+    <message>
+        <source>Stabilization cancelled.</source>
+        <translation>手ぶれ補正をキャンセルしました。</translation>
+    </message>
+    <message>
+        <source>Could not read camera motion from the analysis file.</source>
+        <translation>分析ファイルからカメラの動きを読み取れませんでした。</translation>
+    </message>
+    <message>
+        <source>Stabilize with Keyframes</source>
+        <translation>キーフレームで手ぶれ補正</translation>
+    </message>
+    <message>
+        <source>Stabilization keyframes applied.</source>
+        <translation>手ぶれ補正キーフレームを適用しました。</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis file is missing.</source>
+        <translation>手ぶれ補正分析ファイルが見つかりません。</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>出力ファイルを作成できませんでした</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed.</source>
+        <translation>手ぶれ補正のレンダリングに失敗しました。</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed: %1</source>
+        <translation>手ぶれ補正のレンダリングに失敗しました : %1</translation>
+    </message>
+    <message>
+        <source>Stabilize Video</source>
+        <translation>ビデオ手ぶれ補正</translation>
+    </message>
+    <message>
+        <source>Stabilized video added to the media bin</source>
+        <translation>手ぶれ補正済みのビデオをメディアビンに追加しました</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed.</source>
+        <translation>手ぶれ補正の分析に失敗しました。</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed: %1</source>
+        <translation>手ぶれ補正の分析に失敗しました : %1</translation>
+    </message>
+    <message>
+        <source>Remove Stabilization</source>
+        <translation>手ぶれ補正を削除</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Smoothing</source>
+        <translation>手ぶれ補正の滑らかさを変更</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Tripod Mode</source>
+        <translation>手ぶれ補正の三脚モードを変更</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Mode</source>
+        <translation>手ぶれ補正モードを変更</translation>
     </message>
 </context>
 <context>

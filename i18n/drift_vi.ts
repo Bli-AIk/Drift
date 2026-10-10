@@ -1035,6 +1035,10 @@
         <translation>Cài đặt</translation>
     </message>
     <message>
+        <source>Switch to desktop layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Extras</source>
         <translation>Bổ trợ</translation>
     </message>
@@ -2368,112 +2372,8 @@
         <translation>Đã xóa đường cong tốc độ</translation>
     </message>
     <message>
-        <source>Getting ready…</source>
-        <translation>Đang chuẩn bị…</translation>
-    </message>
-    <message>
-        <source>Could not decode frame %1</source>
-        <translation>Không thể giải mã khung %1</translation>
-    </message>
-    <message>
-        <source>Clear Face Track</source>
-        <translation>Xóa theo dõi khuôn mặt</translation>
-    </message>
-    <message>
-        <source>Face detection already in progress</source>
-        <translation>Đang tiến hành nhận diện khuôn mặt</translation>
-    </message>
-    <message>
-        <source>Select a video clip to detect faces in</source>
-        <translation>Chọn một video clip để nhận diện khuôn mặt</translation>
-    </message>
-    <message>
-        <source>Clip has no video to scan</source>
-        <translation>Clip không có video để quét</translation>
-    </message>
-    <message>
-        <source>Clip is too short to scan</source>
-        <translation>Clip quá ngắn để quét</translation>
-    </message>
-    <message>
-        <source>Face detection cancelled</source>
-        <translation>Đã hủy nhận diện khuôn mặt</translation>
-    </message>
-    <message>
-        <source>Scanning frame %1 of %2…</source>
-        <translation>Đang quét khung %1 của %2…</translation>
-    </message>
-    <message>
-        <source>No faces found in this clip</source>
-        <translation>Không tìm thấy khuôn mặt nào trong clip này</translation>
-    </message>
-    <message>
-        <source>Could not write the face track</source>
-        <translation>Không thể ghi track khuôn mặt</translation>
-    </message>
-    <message>
-        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
-        <translation>Đã hoàn tất nhận diện khuôn mặt - một khuôn mặt được hiển thị trong %1 của %2 khung hình</translation>
-    </message>
-    <message>
-        <source>Face detection complete</source>
-        <translation>Nhận diện khuôn mặt hoàn tất</translation>
-    </message>
-    <message>
-        <source>Scanned clip no longer exists</source>
-        <translation>Clip đã quét không còn tồn tại</translation>
-    </message>
-    <message>
-        <source>Detect Faces</source>
-        <translation>Nhận diện khuôn mặt</translation>
-    </message>
-    <message>
         <source>Clip</source>
         <translation>Clip</translation>
-    </message>
-    <message>
-        <source>Getting noise removal ready…</source>
-        <translation>Đang chuẩn bị khử tiếng ồn…</translation>
-    </message>
-    <message>
-        <source>Clip is too short to process</source>
-        <translation>Clip quá ngắn để xử lý</translation>
-    </message>
-    <message>
-        <source>Noise removal cancelled</source>
-        <translation>Đã hủy khử tiếng ồn</translation>
-    </message>
-    <message>
-        <source>Removing noise (left)…</source>
-        <translation>Đang khử tiếng ồn (trái)…</translation>
-    </message>
-    <message>
-        <source>Removing noise (right)…</source>
-        <translation>Đang khử tiếng ồn (phải)…</translation>
-    </message>
-    <message>
-        <source>Writing audio…</source>
-        <translation>Đang ghi âm thanh…</translation>
-    </message>
-    <message>
-        <source>Noise removal already in progress</source>
-        <translation>Đang tiến hành khử tiếng ồn</translation>
-    </message>
-    <message>
-        <source>Select a video or audio clip</source>
-        <translation>Chọn một đoạn video hoặc âm thanh</translation>
-    </message>
-    <message>
-        <source>Clip has no audio</source>
-        <translation>Clip không có âm thanh</translation>
-    </message>
-    <message>
-        <source>Could not create a preview file</source>
-        <translation>Không thể tạo tệp xem trước</translation>
-    </message>
-    <message>
-        <source>Ready</source>
-        <translation>Sẵn sàng</translation>
     </message>
     <message numerus="yes">
         <source>Imported %n subtitles</source>
@@ -2542,68 +2442,6 @@
     <message>
         <source>Save combined multicam</source>
         <translation>Lưu hợp nhất đa góc quay</translation>
-    </message>
-    <message>
-        <source>Select a video clip to stabilize</source>
-        <translation>Chọn một video clip để ổn định</translation>
-    </message>
-    <message>
-        <source>Clip has no video file</source>
-        <translation>Clip không có tệp video</translation>
-    </message>
-    <message>
-        <source>Stabilization already in progress for this clip</source>
-        <translation>Quá trình ổn định đang được tiến hành cho clip này</translation>
-    </message>
-    <message>
-        <source>Could not create stabilization cache directory</source>
-        <translation>Không thể tạo thư mục bộ đệm ổn định</translation>
-    </message>
-    <message>
-        <source>Stabilize Video</source>
-        <translation>Ổn định Video</translation>
-    </message>
-    <message>
-        <source>Remove Stabilization</source>
-        <translation>Xóa tính năng ổn định</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Smoothing</source>
-        <translation>Thay đổi độ mượt ổn định</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Tripod Mode</source>
-        <translation>Thay đổi chế độ ổn định Tripod</translation>
-    </message>
-    <message>
-        <source>Detecting faces…</source>
-        <translation>Đang nhận diện khuôn mặt…</translation>
-    </message>
-    <message>
-        <source>Already looking for scenes</source>
-        <translation>Đang tìm kiếm phân cảnh</translation>
-    </message>
-    <message>
-        <source>Select a video clip to find scenes in</source>
-        <translation>Chọn clip để dò phân cảnh</translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n scene(s)</source>
-        <translation>
-            <numerusform>Đã tìm thấy %n phân cảnh</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Looking for scenes…</source>
-        <translation>Đang tìm kiếm phân cảnh…</translation>
-    </message>
-    <message>
-        <source>Scene detection cancelled</source>
-        <translation>Đã hủy phát hiện phân cảnh</translation>
-    </message>
-    <message>
-        <source>Removing noise…</source>
-        <translation>Đang khử tiếng ồn…</translation>
     </message>
     <message>
         <source>Could not create an output file</source>
@@ -2826,86 +2664,6 @@
     <message>
         <source>Transition curve updated</source>
         <translation>Đã cập nhật đường cong chuyển cảnh</translation>
-    </message>
-    <message>
-        <source>Select a video or image clip to estimate depth for</source>
-        <translation>Chọn một video hoặc clip hình ảnh để ước tính độ sâu</translation>
-    </message>
-    <message>
-        <source>Clip has no video to estimate depth for</source>
-        <translation>Clip không có video để ước lượng độ sâu</translation>
-    </message>
-    <message>
-        <source>Depth estimation needs the Depth addon</source>
-        <translation>Ước tính độ sâu cần có phần bổ trợ Độ sâu</translation>
-    </message>
-    <message>
-        <source>Depth is already being estimated for this clip</source>
-        <translation>Độ sâu đã được ước tính cho clip này</translation>
-    </message>
-    <message>
-        <source>Estimating depth…</source>
-        <translation>Đang ước tính độ sâu…</translation>
-    </message>
-    <message>
-        <source>Clip no longer exists</source>
-        <translation>Clip không còn tồn tại</translation>
-    </message>
-    <message>
-        <source>Estimate Depth</source>
-        <translation>Ước tính độ sâu</translation>
-    </message>
-    <message>
-        <source>Clear Depth</source>
-        <translation>Xóa độ sâu</translation>
-    </message>
-    <message>
-        <source>Building keyframes…</source>
-        <translation>Đang tạo keyframe…</translation>
-    </message>
-    <message>
-        <source>Rendering stabilized video…</source>
-        <translation>Đang kết xuất video ổn định…</translation>
-    </message>
-    <message>
-        <source>Analyzing camera motion…</source>
-        <translation>Đang phân tích chuyển động của camera…</translation>
-    </message>
-    <message>
-        <source>Stabilization cancelled.</source>
-        <translation>Ổn định bị hủy bỏ.</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis file is missing.</source>
-        <translation>Tệp phân tích độ ổn định bị thiếu.</translation>
-    </message>
-    <message>
-        <source>Could not read camera motion from the analysis file.</source>
-        <translation>Không thể đọc chuyển động của camera từ tệp phân tích.</translation>
-    </message>
-    <message>
-        <source>Stabilize with Keyframes</source>
-        <translation>Ổn định với Keyframe</translation>
-    </message>
-    <message>
-        <source>Stabilization keyframes applied.</source>
-        <translation>Đã áp dụng keyframe ổn định.</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Mode</source>
-        <translation>Thay đổi chế độ ổn định</translation>
-    </message>
-    <message>
-        <source> (denoised)</source>
-        <translation> (đã khử nhiễu)</translation>
-    </message>
-    <message>
-        <source>Remove noise</source>
-        <translation>Khử tiếng ồn</translation>
-    </message>
-    <message>
-        <source>Noise removed</source>
-        <translation>Đã khử tiếng ồn</translation>
     </message>
     <message>
         <source>Shape added</source>
@@ -3530,70 +3288,6 @@
     <message>
         <source>%1 copy</source>
         <translation>%1 sao chép</translation>
-    </message>
-    <message>
-        <source>%1 (stabilized)</source>
-        <translation>%1 (đã ổn định)</translation>
-    </message>
-    <message>
-        <source>Select a video clip to enhance</source>
-        <translation>Chọn một video clip để nâng cấp</translation>
-    </message>
-    <message>
-        <source>Choose a model to enhance with</source>
-        <translation>Chọn một mô hình để nâng cấp</translation>
-    </message>
-    <message>
-        <source>This clip is already being enhanced</source>
-        <translation>Clip này đã được nâng cấp rồi</translation>
-    </message>
-    <message>
-        <source>%1 (enhanced %2x)</source>
-        <translation>%1 (đã nâng cấp %2x)</translation>
-    </message>
-    <message>
-        <source>%1 (enhanced)</source>
-        <translation>%1 (đã nâng cấp)</translation>
-    </message>
-    <message>
-        <source>Enhance Video</source>
-        <translation>Nâng cấp Video</translation>
-    </message>
-    <message>
-        <source>Enhanced video added to the media bin</source>
-        <translation>Video nâng cấp đã được thêm vào ngăn phương tiện</translation>
-    </message>
-    <message>
-        <source>Enhancing video…</source>
-        <translation>Đang nâng cấp video…</translation>
-    </message>
-    <message>
-        <source>This build of Drift has no video stabilization support</source>
-        <translation>Bản dựng Drift này không hỗ trợ ổn định video</translation>
-    </message>
-    <message>
-        <source>The video this clip was stabilized from is no longer in the media bin</source>
-        <translation>Video mà clip này đã được ổn định không còn trong ngăn phương tiện nữa</translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed.</source>
-        <translation>Kết xuất ổn định không thành công.</translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed: %1</source>
-        <translation>Kết xuất ổn định không thành công: %1</translation>
-    </message>
-    <message>
-        <source>Stabilized video added to the media bin</source>
-        <translation>Video đã ổn định được thêm vào ngăn phương tiện</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed.</source>
-        <translation>Phân tích độ ổn định không thành công.</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed: %1</source>
-        <translation>Phân tích độ ổn định không thành công: %1</translation>
     </message>
     <message>
         <source>Audio adjustment</source>
@@ -5650,6 +5344,93 @@
     </message>
 </context>
 <context>
+    <name>DenoiseController</name>
+    <message>
+        <source>Getting noise removal ready…</source>
+        <translation>Đang chuẩn bị khử tiếng ồn…</translation>
+    </message>
+    <message>
+        <source>Clip is too short to process</source>
+        <translation>Clip quá ngắn để xử lý</translation>
+    </message>
+    <message>
+        <source>Reading audio…</source>
+        <translation>Đang đọc âm thanh…</translation>
+    </message>
+    <message>
+        <source>Noise removal cancelled</source>
+        <translation>Đã hủy khử tiếng ồn</translation>
+    </message>
+    <message>
+        <source>No audio decoded</source>
+        <translation>Không giải mã được âm thanh</translation>
+    </message>
+    <message>
+        <source>Removing noise (left)…</source>
+        <translation>Đang khử tiếng ồn (trái)…</translation>
+    </message>
+    <message>
+        <source>Removing noise (right)…</source>
+        <translation>Đang khử tiếng ồn (phải)…</translation>
+    </message>
+    <message>
+        <source>Writing audio…</source>
+        <translation>Đang ghi âm thanh…</translation>
+    </message>
+    <message>
+        <source>Noise removal already in progress</source>
+        <translation>Đang tiến hành khử tiếng ồn</translation>
+    </message>
+    <message>
+        <source>Select a video or audio clip</source>
+        <translation>Chọn một đoạn video hoặc âm thanh</translation>
+    </message>
+    <message>
+        <source>Clip has no audio</source>
+        <translation>Clip không có âm thanh</translation>
+    </message>
+    <message>
+        <source>Starting…</source>
+        <translation>Đang khởi động…</translation>
+    </message>
+    <message>
+        <source>Could not create a preview file</source>
+        <translation>Không thể tạo tệp xem trước</translation>
+    </message>
+    <message>
+        <source>Ready</source>
+        <translation>Sẵn sàng</translation>
+    </message>
+    <message>
+        <source>Removing noise…</source>
+        <translation>Đang khử tiếng ồn…</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>Không thể tạo tệp đầu ra</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Hoàn tất</translation>
+    </message>
+    <message>
+        <source>Clip</source>
+        <translation>Clip</translation>
+    </message>
+    <message>
+        <source> (denoised)</source>
+        <translation> (đã khử nhiễu)</translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation>Khử tiếng ồn</translation>
+    </message>
+    <message>
+        <source>Noise removed</source>
+        <translation>Đã khử tiếng ồn</translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWindow</name>
     <message>
         <source>Remove noise</source>
@@ -5690,6 +5471,41 @@
     <message>
         <source>Cancel</source>
         <translation>Hủy bỏ</translation>
+    </message>
+</context>
+<context>
+    <name>DepthController</name>
+    <message>
+        <source>Select a video or image clip to estimate depth for</source>
+        <translation>Chọn một video hoặc clip hình ảnh để ước tính độ sâu</translation>
+    </message>
+    <message>
+        <source>Clip has no video to estimate depth for</source>
+        <translation>Clip không có video để ước lượng độ sâu</translation>
+    </message>
+    <message>
+        <source>Depth estimation needs the Depth addon</source>
+        <translation>Ước tính độ sâu cần có phần bổ trợ Độ sâu</translation>
+    </message>
+    <message>
+        <source>Depth is already being estimated for this clip</source>
+        <translation>Độ sâu đã được ước tính cho clip này</translation>
+    </message>
+    <message>
+        <source>Estimating depth…</source>
+        <translation>Đang ước tính độ sâu…</translation>
+    </message>
+    <message>
+        <source>Clip no longer exists</source>
+        <translation>Clip không còn tồn tại</translation>
+    </message>
+    <message>
+        <source>Estimate Depth</source>
+        <translation>Ước tính độ sâu</translation>
+    </message>
+    <message>
+        <source>Clear Depth</source>
+        <translation>Xóa độ sâu</translation>
     </message>
 </context>
 <context>
@@ -6126,6 +5942,10 @@
     <message>
         <source>Language…</source>
         <translation>Ngôn ngữ…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Debug info…</source>
@@ -7136,6 +6956,77 @@
     </message>
 </context>
 <context>
+    <name>FaceTrackingController</name>
+    <message>
+        <source>Clear Face Track</source>
+        <translation>Xóa theo dõi khuôn mặt</translation>
+    </message>
+    <message>
+        <source>Face detection already in progress</source>
+        <translation>Đang tiến hành nhận diện khuôn mặt</translation>
+    </message>
+    <message>
+        <source>Select a video clip to detect faces in</source>
+        <translation>Chọn một video clip để nhận diện khuôn mặt</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation>Clip không có video để quét</translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation>Đang chuẩn bị…</translation>
+    </message>
+    <message>
+        <source>Detecting faces…</source>
+        <translation>Đang nhận diện khuôn mặt…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Hoàn tất</translation>
+    </message>
+    <message>
+        <source>Clip is too short to scan</source>
+        <translation>Clip quá ngắn để quét</translation>
+    </message>
+    <message>
+        <source>Face detection cancelled</source>
+        <translation>Đã hủy nhận diện khuôn mặt</translation>
+    </message>
+    <message>
+        <source>Could not decode frame %1</source>
+        <translation>Không thể giải mã khung %1</translation>
+    </message>
+    <message>
+        <source>Scanning frame %1 of %2…</source>
+        <translation>Đang quét khung %1 của %2…</translation>
+    </message>
+    <message>
+        <source>No faces found in this clip</source>
+        <translation>Không tìm thấy khuôn mặt nào trong clip này</translation>
+    </message>
+    <message>
+        <source>Could not write the face track</source>
+        <translation>Không thể ghi track khuôn mặt</translation>
+    </message>
+    <message>
+        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
+        <translation>Đã hoàn tất nhận diện khuôn mặt - một khuôn mặt được hiển thị trong %1 của %2 khung hình</translation>
+    </message>
+    <message>
+        <source>Face detection complete</source>
+        <translation>Nhận diện khuôn mặt hoàn tất</translation>
+    </message>
+    <message>
+        <source>Scanned clip no longer exists</source>
+        <translation>Clip đã quét không còn tồn tại</translation>
+    </message>
+    <message>
+        <source>Detect Faces</source>
+        <translation>Nhận diện khuôn mặt</translation>
+    </message>
+</context>
+<context>
     <name>FadeCurveWindow</name>
     <message>
         <source>Custom curve</source>
@@ -8142,6 +8033,10 @@
         <translation>Bật tắt đường kẻ</translation>
     </message>
     <message>
+        <source>Switch to Mobile Layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;Window</source>
         <translation>&amp;Cửa sổ</translation>
     </message>
@@ -8215,6 +8110,10 @@
     </message>
     <message>
         <source>Checking for updates…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Links can’t be opened in this layout.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11050,6 +10949,41 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
     </message>
 </context>
 <context>
+    <name>RestoreController</name>
+    <message>
+        <source>Select a video clip to enhance</source>
+        <translation>Chọn một video clip để nâng cấp</translation>
+    </message>
+    <message>
+        <source>Choose a model to enhance with</source>
+        <translation>Chọn một mô hình để nâng cấp</translation>
+    </message>
+    <message>
+        <source>This clip is already being enhanced</source>
+        <translation>Clip này đã được nâng cấp rồi</translation>
+    </message>
+    <message>
+        <source>%1 (enhanced %2x)</source>
+        <translation>%1 (đã nâng cấp %2x)</translation>
+    </message>
+    <message>
+        <source>%1 (enhanced)</source>
+        <translation>%1 (đã nâng cấp)</translation>
+    </message>
+    <message>
+        <source>Enhance Video</source>
+        <translation>Nâng cấp Video</translation>
+    </message>
+    <message>
+        <source>Enhanced video added to the media bin</source>
+        <translation>Video nâng cấp đã được thêm vào ngăn phương tiện</translation>
+    </message>
+    <message>
+        <source>Enhancing video…</source>
+        <translation>Đang nâng cấp video…</translation>
+    </message>
+</context>
+<context>
     <name>RestoreWindow</name>
     <message>
         <source>Enhance video</source>
@@ -11280,6 +11214,43 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
     <message>
         <source>No frames could be decoded from this clip</source>
         <translation>Không có khung hình nào có thể được giải mã từ clip này</translation>
+    </message>
+</context>
+<context>
+    <name>SceneDetectController</name>
+    <message>
+        <source>Already looking for scenes</source>
+        <translation>Đang tìm kiếm phân cảnh</translation>
+    </message>
+    <message>
+        <source>Select a video clip to find scenes in</source>
+        <translation>Chọn clip để dò phân cảnh</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation>Clip không có video để quét</translation>
+    </message>
+    <message numerus="yes">
+        <source>Found %n scene(s)</source>
+        <translation>
+            <numerusform>Đã tìm thấy %n phân cảnh</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation>Đang chuẩn bị…</translation>
+    </message>
+    <message>
+        <source>Looking for scenes…</source>
+        <translation>Đang tìm kiếm phân cảnh…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Hoàn tất</translation>
+    </message>
+    <message>
+        <source>Scene detection cancelled</source>
+        <translation>Đã hủy phát hiện phân cảnh</translation>
     </message>
 </context>
 <context>
@@ -11695,6 +11666,34 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
     <message>
         <source>Restart Drift to apply this size.</source>
         <translation>Khởi động lại Drift để áp dụng kích thước này.</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mobile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop suits a mouse and keyboard, including tablets in desktop mode. Mobile is the touch layout made for phones. Takes effect after restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Horizontal mouse-wheel pan</source>
@@ -12428,6 +12427,49 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
     </message>
 </context>
 <context>
+    <name>ShellSwitchDialog</name>
+    <message>
+        <source>Switch to the mobile layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the desktop layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Later</source>
+        <translation type="unfinished">Để sau</translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A mouse is connected. The desktop layout has full menus, panels and precise timeline editing. Drift restarts to switch, and your project is kept.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The mobile layout is the touch interface made for phones. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The desktop layout suits a mouse and keyboard. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ShortcutCaptureField</name>
     <message>
         <source>Shortcut for %1</source>
@@ -12834,6 +12876,113 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
     <message>
         <source>Could not write subtitle file</source>
         <translation>Không thể ghi tệp phụ đề</translation>
+    </message>
+</context>
+<context>
+    <name>StabilizeController</name>
+    <message>
+        <source>%1 (stabilized)</source>
+        <translation>%1 (đã ổn định)</translation>
+    </message>
+    <message>
+        <source>Select a video clip to stabilize</source>
+        <translation>Chọn một video clip để ổn định</translation>
+    </message>
+    <message>
+        <source>Clip has no video file</source>
+        <translation>Clip không có tệp video</translation>
+    </message>
+    <message>
+        <source>Stabilization already in progress for this clip</source>
+        <translation>Quá trình ổn định đang được tiến hành cho clip này</translation>
+    </message>
+    <message>
+        <source>This build of Drift has no video stabilization support</source>
+        <translation>Bản dựng Drift này không hỗ trợ ổn định video</translation>
+    </message>
+    <message>
+        <source>The video this clip was stabilized from is no longer in the media bin</source>
+        <translation>Video mà clip này đã được ổn định không còn trong ngăn phương tiện nữa</translation>
+    </message>
+    <message>
+        <source>Could not create stabilization cache directory</source>
+        <translation>Không thể tạo thư mục bộ đệm ổn định</translation>
+    </message>
+    <message>
+        <source>Building keyframes…</source>
+        <translation>Đang tạo keyframe…</translation>
+    </message>
+    <message>
+        <source>Rendering stabilized video…</source>
+        <translation>Đang kết xuất video ổn định…</translation>
+    </message>
+    <message>
+        <source>Analyzing camera motion…</source>
+        <translation>Đang phân tích chuyển động của camera…</translation>
+    </message>
+    <message>
+        <source>Stabilization cancelled.</source>
+        <translation>Ổn định bị hủy bỏ.</translation>
+    </message>
+    <message>
+        <source>Could not read camera motion from the analysis file.</source>
+        <translation>Không thể đọc chuyển động của camera từ tệp phân tích.</translation>
+    </message>
+    <message>
+        <source>Stabilize with Keyframes</source>
+        <translation>Ổn định với Keyframe</translation>
+    </message>
+    <message>
+        <source>Stabilization keyframes applied.</source>
+        <translation>Đã áp dụng keyframe ổn định.</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis file is missing.</source>
+        <translation>Tệp phân tích độ ổn định bị thiếu.</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>Không thể tạo tệp đầu ra</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed.</source>
+        <translation>Kết xuất ổn định không thành công.</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed: %1</source>
+        <translation>Kết xuất ổn định không thành công: %1</translation>
+    </message>
+    <message>
+        <source>Stabilize Video</source>
+        <translation>Ổn định Video</translation>
+    </message>
+    <message>
+        <source>Stabilized video added to the media bin</source>
+        <translation>Video đã ổn định được thêm vào ngăn phương tiện</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed.</source>
+        <translation>Phân tích độ ổn định không thành công.</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed: %1</source>
+        <translation>Phân tích độ ổn định không thành công: %1</translation>
+    </message>
+    <message>
+        <source>Remove Stabilization</source>
+        <translation>Xóa tính năng ổn định</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Smoothing</source>
+        <translation>Thay đổi độ mượt ổn định</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Tripod Mode</source>
+        <translation>Thay đổi chế độ ổn định Tripod</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Mode</source>
+        <translation>Thay đổi chế độ ổn định</translation>
     </message>
 </context>
 <context>

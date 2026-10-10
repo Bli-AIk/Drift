@@ -210,14 +210,14 @@ Item {
             // Whether the model is on disk is a one-shot filesystem answer, not a
             // binding, hence the reset below when an addon of this kind appears.
             // The runtime that runs it is a second, separate addon.
-            property bool denoiseReady: EditorState.denoiseAvailable()
+            property bool denoiseReady: EditorState.denoise.available()
             property bool runtimeReady: Addons.runtimeAvailable()
 
             Connections {
                 target: Addons
                 function onKindChanged(kind) {
                     if (kind === "denoise-model")
-                        denoiseSection.denoiseReady = EditorState.denoiseAvailable()
+                        denoiseSection.denoiseReady = EditorState.denoise.available()
                     else if (kind === "onnxruntime")
                         denoiseSection.runtimeReady = Addons.runtimeAvailable()
                 }
@@ -235,7 +235,7 @@ Item {
                 visible: denoiseSection.denoiseReady && denoiseSection.runtimeReady
                 width: parent.width
                 text: qsTr("Remove noise…")
-                enabled: !EditorState.denoising
+                enabled: !EditorState.denoise.running
                 onClicked: {
                     const data = EditorState.selectedClipData
                     root.Window.window.openDenoise(

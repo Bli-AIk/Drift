@@ -1040,6 +1040,10 @@
         <translation>الإعدادات</translation>
     </message>
     <message>
+        <source>Switch to desktop layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Extras</source>
         <translation>الإضافات</translation>
     </message>
@@ -2379,112 +2383,8 @@
         <translation>تمت إزالة منحنى السرعة</translation>
     </message>
     <message>
-        <source>Getting ready…</source>
-        <translation>جارٍ التحضير…</translation>
-    </message>
-    <message>
-        <source>Could not decode frame %1</source>
-        <translation>تعذر فك ترميز الإطار %1</translation>
-    </message>
-    <message>
-        <source>Clear Face Track</source>
-        <translation>مسح مسار الوجه</translation>
-    </message>
-    <message>
-        <source>Face detection already in progress</source>
-        <translation>اكتشاف الوجه قيد التنفيذ بالفعل</translation>
-    </message>
-    <message>
-        <source>Select a video clip to detect faces in</source>
-        <translation>حدد مقطع فيديو لاكتشاف الوجوه فيه</translation>
-    </message>
-    <message>
-        <source>Clip has no video to scan</source>
-        <translation>لا يحتوي المقطع على فيديو لمسحه</translation>
-    </message>
-    <message>
-        <source>Clip is too short to scan</source>
-        <translation>المقطع قصير جدًا لمسحه</translation>
-    </message>
-    <message>
-        <source>Face detection cancelled</source>
-        <translation>تم إلغاء اكتشاف الوجه</translation>
-    </message>
-    <message>
-        <source>Scanning frame %1 of %2…</source>
-        <translation>جارٍ مسح الإطار %1 من %2…</translation>
-    </message>
-    <message>
-        <source>No faces found in this clip</source>
-        <translation>لم يتم العثور على أي وجوه في هذا المقطع</translation>
-    </message>
-    <message>
-        <source>Could not write the face track</source>
-        <translation>تعذرت كتابة مسار الوجه</translation>
-    </message>
-    <message>
-        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
-        <translation>اكتمل اكتشاف الوجه — كان الوجه مرئيًا في %1 من %2 إطارًا</translation>
-    </message>
-    <message>
-        <source>Face detection complete</source>
-        <translation>اكتمل اكتشاف الوجه</translation>
-    </message>
-    <message>
-        <source>Scanned clip no longer exists</source>
-        <translation>المقطع الممسوح لم يعد موجودًا</translation>
-    </message>
-    <message>
-        <source>Detect Faces</source>
-        <translation>اكتشاف الوجوه</translation>
-    </message>
-    <message>
         <source>Clip</source>
         <translation>مقطع</translation>
-    </message>
-    <message>
-        <source>Getting noise removal ready…</source>
-        <translation>جارٍ إعداد إزالة الضوضاء…</translation>
-    </message>
-    <message>
-        <source>Clip is too short to process</source>
-        <translation>المقطع قصير جدًا لمعالجته</translation>
-    </message>
-    <message>
-        <source>Noise removal cancelled</source>
-        <translation>تم إلغاء إزالة الضوضاء</translation>
-    </message>
-    <message>
-        <source>Removing noise (left)…</source>
-        <translation>جارٍ إزالة الضوضاء (اليسار)…</translation>
-    </message>
-    <message>
-        <source>Removing noise (right)…</source>
-        <translation>جارٍ إزالة الضوضاء (اليمين)…</translation>
-    </message>
-    <message>
-        <source>Writing audio…</source>
-        <translation>جارٍ كتابة الصوت…</translation>
-    </message>
-    <message>
-        <source>Noise removal already in progress</source>
-        <translation>إزالة الضوضاء قيد التنفيذ بالفعل</translation>
-    </message>
-    <message>
-        <source>Select a video or audio clip</source>
-        <translation>حدد مقطع فيديو أو صوت</translation>
-    </message>
-    <message>
-        <source>Clip has no audio</source>
-        <translation>لا يحتوي المقطع على صوت</translation>
-    </message>
-    <message>
-        <source>Could not create a preview file</source>
-        <translation>تعذر إنشاء ملف المعاينة</translation>
-    </message>
-    <message>
-        <source>Ready</source>
-        <translation>جاهز</translation>
     </message>
     <message numerus="yes">
         <source>Imported %n subtitles</source>
@@ -2563,73 +2463,6 @@
     <message>
         <source>Save combined multicam</source>
         <translation>حفظ الكاميرات المتعددة المجمعة</translation>
-    </message>
-    <message>
-        <source>Select a video clip to stabilize</source>
-        <translation>حدد مقطع فيديو لتثبيت الصورة</translation>
-    </message>
-    <message>
-        <source>Clip has no video file</source>
-        <translation>لا يحتوي المقطع على ملف فيديو</translation>
-    </message>
-    <message>
-        <source>Stabilization already in progress for this clip</source>
-        <translation>تثبيت الصورة قيد التنفيذ بالفعل لهذا المقطع</translation>
-    </message>
-    <message>
-        <source>Could not create stabilization cache directory</source>
-        <translation>تعذر إنشاء مجلد ذاكرة التخزين المؤقت لتثبيت الصورة</translation>
-    </message>
-    <message>
-        <source>Stabilize Video</source>
-        <translation>تثبيت صورة الفيديو</translation>
-    </message>
-    <message>
-        <source>Remove Stabilization</source>
-        <translation>إزالة تثبيت الصورة</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Smoothing</source>
-        <translation>تغيير تنعيم تثبيت الصورة</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Tripod Mode</source>
-        <translation>تغيير وضع الحامل الثلاثي لتثبيت الصورة</translation>
-    </message>
-    <message>
-        <source>Detecting faces…</source>
-        <translation>جارٍ اكتشاف الوجوه…</translation>
-    </message>
-    <message>
-        <source>Already looking for scenes</source>
-        <translation>جارٍ البحث عن المشاهد بالفعل</translation>
-    </message>
-    <message>
-        <source>Select a video clip to find scenes in</source>
-        <translation>حدد مقطع فيديو للبحث عن المشاهد فيه</translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n scene(s)</source>
-        <translation>
-            <numerusform>تم العثور على %n مشهد</numerusform>
-            <numerusform>تم العثور على %n مشهد</numerusform>
-            <numerusform>تم العثور على %n مشهدين</numerusform>
-            <numerusform>تم العثور على %n مشاهد</numerusform>
-            <numerusform>تم العثور على %n مشهدًا</numerusform>
-            <numerusform>تم العثور على %n مشهد</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Looking for scenes…</source>
-        <translation>جارٍ البحث عن المشاهد…</translation>
-    </message>
-    <message>
-        <source>Scene detection cancelled</source>
-        <translation>تم إلغاء اكتشاف المشاهد</translation>
-    </message>
-    <message>
-        <source>Removing noise…</source>
-        <translation>جارٍ إزالة الضوضاء…</translation>
     </message>
     <message>
         <source>Could not create an output file</source>
@@ -2773,54 +2606,6 @@
     <message>
         <source>Transition curve updated</source>
         <translation>تم تحديث منحنى الانتقال</translation>
-    </message>
-    <message>
-        <source>Building keyframes…</source>
-        <translation>جارٍ إنشاء الإطارات المفتاحية…</translation>
-    </message>
-    <message>
-        <source>Rendering stabilized video…</source>
-        <translation>جارٍ معالجة الفيديو المثبت…</translation>
-    </message>
-    <message>
-        <source>Analyzing camera motion…</source>
-        <translation>جارٍ تحليل حركة الكاميرا…</translation>
-    </message>
-    <message>
-        <source>Stabilization cancelled.</source>
-        <translation>تم إلغاء تثبيت الصورة.</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis file is missing.</source>
-        <translation>ملف تحليل تثبيت الصورة مفقود.</translation>
-    </message>
-    <message>
-        <source>Could not read camera motion from the analysis file.</source>
-        <translation>تعذر قراءة حركة الكاميرا من ملف التحليل.</translation>
-    </message>
-    <message>
-        <source>Stabilize with Keyframes</source>
-        <translation>تثبيت الصورة باستخدام الإطارات المفتاحية</translation>
-    </message>
-    <message>
-        <source>Stabilization keyframes applied.</source>
-        <translation>تم تطبيق الإطارات المفتاحية لتثبيت الصورة.</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Mode</source>
-        <translation>تغيير وضع تثبيت الصورة</translation>
-    </message>
-    <message>
-        <source> (denoised)</source>
-        <translation> (تمت إزالة الضوضاء)</translation>
-    </message>
-    <message>
-        <source>Remove noise</source>
-        <translation>إزالة الضوضاء</translation>
-    </message>
-    <message>
-        <source>Noise removed</source>
-        <translation>تمت إزالة الضوضاء</translation>
     </message>
     <message>
         <source>Shape added</source>
@@ -3421,102 +3206,6 @@
     <message>
         <source>These clips overlap in time — caption them separately</source>
         <translation>تتداخل هذه المقاطع في الوقت — أنشئ تسميات توضيحية لها بشكل منفصل</translation>
-    </message>
-    <message>
-        <source>Select a video or image clip to estimate depth for</source>
-        <translation>حدد مقطع فيديو أو صورة لتقدير العمق له</translation>
-    </message>
-    <message>
-        <source>Clip has no video to estimate depth for</source>
-        <translation>لا يحتوي المقطع على فيديو لتقدير العمق له</translation>
-    </message>
-    <message>
-        <source>Depth estimation needs the Depth addon</source>
-        <translation>يتطلب تقدير العمق إضافة العمق</translation>
-    </message>
-    <message>
-        <source>Depth is already being estimated for this clip</source>
-        <translation>يجري تقدير العمق لهذا المقطع بالفعل</translation>
-    </message>
-    <message>
-        <source>Estimating depth…</source>
-        <translation>جارٍ تقدير العمق…</translation>
-    </message>
-    <message>
-        <source>Clip no longer exists</source>
-        <translation>لم يعد المقطع موجودًا</translation>
-    </message>
-    <message>
-        <source>Estimate Depth</source>
-        <translation>تقدير العمق</translation>
-    </message>
-    <message>
-        <source>%1 (stabilized)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select a video clip to enhance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Choose a model to enhance with</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This clip is already being enhanced</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 (enhanced %2x)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 (enhanced)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhance Video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhanced video added to the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhancing video…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Clear Depth</source>
-        <translation>مسح العمق</translation>
-    </message>
-    <message>
-        <source>This build of Drift has no video stabilization support</source>
-        <translation>لا يدعم هذا الإصدار من Drift تثبيت صورة الفيديو</translation>
-    </message>
-    <message>
-        <source>The video this clip was stabilized from is no longer in the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed.</source>
-        <translation>فشلت معالجة تثبيت الصورة.</translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed: %1</source>
-        <translation>فشلت معالجة تثبيت الصورة: %1</translation>
-    </message>
-    <message>
-        <source>Stabilized video added to the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed.</source>
-        <translation>فشل تحليل تثبيت الصورة.</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed: %1</source>
-        <translation>فشل تحليل تثبيت الصورة: %1</translation>
     </message>
     <message>
         <source>Audio adjustment</source>
@@ -5760,6 +5449,93 @@
     </message>
 </context>
 <context>
+    <name>DenoiseController</name>
+    <message>
+        <source>Getting noise removal ready…</source>
+        <translation>جارٍ إعداد إزالة الضوضاء…</translation>
+    </message>
+    <message>
+        <source>Clip is too short to process</source>
+        <translation>المقطع قصير جدًا لمعالجته</translation>
+    </message>
+    <message>
+        <source>Reading audio…</source>
+        <translation>جارٍ قراءة الصوت…</translation>
+    </message>
+    <message>
+        <source>Noise removal cancelled</source>
+        <translation>تم إلغاء إزالة الضوضاء</translation>
+    </message>
+    <message>
+        <source>No audio decoded</source>
+        <translation>لم يتم فك ترميز أي صوت</translation>
+    </message>
+    <message>
+        <source>Removing noise (left)…</source>
+        <translation>جارٍ إزالة الضوضاء (اليسار)…</translation>
+    </message>
+    <message>
+        <source>Removing noise (right)…</source>
+        <translation>جارٍ إزالة الضوضاء (اليمين)…</translation>
+    </message>
+    <message>
+        <source>Writing audio…</source>
+        <translation>جارٍ كتابة الصوت…</translation>
+    </message>
+    <message>
+        <source>Noise removal already in progress</source>
+        <translation>إزالة الضوضاء قيد التنفيذ بالفعل</translation>
+    </message>
+    <message>
+        <source>Select a video or audio clip</source>
+        <translation>حدد مقطع فيديو أو صوت</translation>
+    </message>
+    <message>
+        <source>Clip has no audio</source>
+        <translation>لا يحتوي المقطع على صوت</translation>
+    </message>
+    <message>
+        <source>Starting…</source>
+        <translation>جارٍ البدء…</translation>
+    </message>
+    <message>
+        <source>Could not create a preview file</source>
+        <translation>تعذر إنشاء ملف المعاينة</translation>
+    </message>
+    <message>
+        <source>Ready</source>
+        <translation>جاهز</translation>
+    </message>
+    <message>
+        <source>Removing noise…</source>
+        <translation>جارٍ إزالة الضوضاء…</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>تعذر إنشاء ملف إخراج</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>تم</translation>
+    </message>
+    <message>
+        <source>Clip</source>
+        <translation>مقطع</translation>
+    </message>
+    <message>
+        <source> (denoised)</source>
+        <translation> (تمت إزالة الضوضاء)</translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation>إزالة الضوضاء</translation>
+    </message>
+    <message>
+        <source>Noise removed</source>
+        <translation>تمت إزالة الضوضاء</translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWindow</name>
     <message>
         <source>Remove noise</source>
@@ -5800,6 +5576,41 @@
     <message>
         <source>Cancel</source>
         <translation>إلغاء</translation>
+    </message>
+</context>
+<context>
+    <name>DepthController</name>
+    <message>
+        <source>Select a video or image clip to estimate depth for</source>
+        <translation>حدد مقطع فيديو أو صورة لتقدير العمق له</translation>
+    </message>
+    <message>
+        <source>Clip has no video to estimate depth for</source>
+        <translation>لا يحتوي المقطع على فيديو لتقدير العمق له</translation>
+    </message>
+    <message>
+        <source>Depth estimation needs the Depth addon</source>
+        <translation>يتطلب تقدير العمق إضافة العمق</translation>
+    </message>
+    <message>
+        <source>Depth is already being estimated for this clip</source>
+        <translation>يجري تقدير العمق لهذا المقطع بالفعل</translation>
+    </message>
+    <message>
+        <source>Estimating depth…</source>
+        <translation>جارٍ تقدير العمق…</translation>
+    </message>
+    <message>
+        <source>Clip no longer exists</source>
+        <translation>لم يعد المقطع موجودًا</translation>
+    </message>
+    <message>
+        <source>Estimate Depth</source>
+        <translation>تقدير العمق</translation>
+    </message>
+    <message>
+        <source>Clear Depth</source>
+        <translation>مسح العمق</translation>
     </message>
 </context>
 <context>
@@ -6274,6 +6085,10 @@
     <message>
         <source>Language…</source>
         <translation>اللغة…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Debug info…</source>
@@ -7278,6 +7093,77 @@
     <message>
         <source>“%1” will be removed from your face props. Effects using it will show it as missing until it is imported again.</source>
         <translation>ستتم إزالة “%1” من ملحقات الوجه لديك. ستعرض التأثيرات التي تستخدمه أنه مفقود حتى يتم استيراده مجددًا.</translation>
+    </message>
+</context>
+<context>
+    <name>FaceTrackingController</name>
+    <message>
+        <source>Clear Face Track</source>
+        <translation>مسح مسار الوجه</translation>
+    </message>
+    <message>
+        <source>Face detection already in progress</source>
+        <translation>اكتشاف الوجه قيد التنفيذ بالفعل</translation>
+    </message>
+    <message>
+        <source>Select a video clip to detect faces in</source>
+        <translation>حدد مقطع فيديو لاكتشاف الوجوه فيه</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation>لا يحتوي المقطع على فيديو لمسحه</translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation>جارٍ التحضير…</translation>
+    </message>
+    <message>
+        <source>Detecting faces…</source>
+        <translation>جارٍ اكتشاف الوجوه…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>تم</translation>
+    </message>
+    <message>
+        <source>Clip is too short to scan</source>
+        <translation>المقطع قصير جدًا لمسحه</translation>
+    </message>
+    <message>
+        <source>Face detection cancelled</source>
+        <translation>تم إلغاء اكتشاف الوجه</translation>
+    </message>
+    <message>
+        <source>Could not decode frame %1</source>
+        <translation>تعذر فك ترميز الإطار %1</translation>
+    </message>
+    <message>
+        <source>Scanning frame %1 of %2…</source>
+        <translation>جارٍ مسح الإطار %1 من %2…</translation>
+    </message>
+    <message>
+        <source>No faces found in this clip</source>
+        <translation>لم يتم العثور على أي وجوه في هذا المقطع</translation>
+    </message>
+    <message>
+        <source>Could not write the face track</source>
+        <translation>تعذرت كتابة مسار الوجه</translation>
+    </message>
+    <message>
+        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
+        <translation>اكتمل اكتشاف الوجه — كان الوجه مرئيًا في %1 من %2 إطارًا</translation>
+    </message>
+    <message>
+        <source>Face detection complete</source>
+        <translation>اكتمل اكتشاف الوجه</translation>
+    </message>
+    <message>
+        <source>Scanned clip no longer exists</source>
+        <translation>المقطع الممسوح لم يعد موجودًا</translation>
+    </message>
+    <message>
+        <source>Detect Faces</source>
+        <translation>اكتشاف الوجوه</translation>
     </message>
 </context>
 <context>
@@ -8292,6 +8178,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Switch to Mobile Layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;Window</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8365,6 +8255,10 @@
     </message>
     <message>
         <source>Checking for updates…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Links can’t be opened in this layout.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11280,6 +11174,41 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>RestoreController</name>
+    <message>
+        <source>Select a video clip to enhance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a model to enhance with</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This clip is already being enhanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (enhanced %2x)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (enhanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhance Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhanced video added to the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhancing video…</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RestoreWindow</name>
     <message>
         <source>Enhance video</source>
@@ -11510,6 +11439,48 @@ If playback stutters, try another.</source>
     <message>
         <source>No frames could be decoded from this clip</source>
         <translation>تعذر فك ترميز أي إطارات من هذا المقطع</translation>
+    </message>
+</context>
+<context>
+    <name>SceneDetectController</name>
+    <message>
+        <source>Already looking for scenes</source>
+        <translation>جارٍ البحث عن المشاهد بالفعل</translation>
+    </message>
+    <message>
+        <source>Select a video clip to find scenes in</source>
+        <translation>حدد مقطع فيديو للبحث عن المشاهد فيه</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation>لا يحتوي المقطع على فيديو لمسحه</translation>
+    </message>
+    <message numerus="yes">
+        <source>Found %n scene(s)</source>
+        <translation>
+            <numerusform>تم العثور على %n مشهد</numerusform>
+            <numerusform>تم العثور على %n مشهد</numerusform>
+            <numerusform>تم العثور على %n مشهدين</numerusform>
+            <numerusform>تم العثور على %n مشاهد</numerusform>
+            <numerusform>تم العثور على %n مشهدًا</numerusform>
+            <numerusform>تم العثور على %n مشهد</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation>جارٍ التحضير…</translation>
+    </message>
+    <message>
+        <source>Looking for scenes…</source>
+        <translation>جارٍ البحث عن المشاهد…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>تم</translation>
+    </message>
+    <message>
+        <source>Scene detection cancelled</source>
+        <translation>تم إلغاء اكتشاف المشاهد</translation>
     </message>
 </context>
 <context>
@@ -11925,6 +11896,34 @@ If playback stutters, try another.</source>
     <message>
         <source>Restart Drift to apply this size.</source>
         <translation>أعد تشغيل Drift لتطبيق هذا الحجم.</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mobile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop suits a mouse and keyboard, including tablets in desktop mode. Mobile is the touch layout made for phones. Takes effect after restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Horizontal mouse-wheel pan</source>
@@ -12658,6 +12657,49 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>ShellSwitchDialog</name>
+    <message>
+        <source>Switch to the mobile layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the desktop layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Later</source>
+        <translation type="unfinished">لاحقًا</translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A mouse is connected. The desktop layout has full menus, panels and precise timeline editing. Drift restarts to switch, and your project is kept.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The mobile layout is the touch interface made for phones. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The desktop layout suits a mouse and keyboard. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ShortcutCaptureField</name>
     <message>
         <source>Shortcut for %1</source>
@@ -13064,6 +13106,113 @@ If playback stutters, try another.</source>
     <message>
         <source>Could not write subtitle file</source>
         <translation>تعذر كتابة ملف الترجمة</translation>
+    </message>
+</context>
+<context>
+    <name>StabilizeController</name>
+    <message>
+        <source>%1 (stabilized)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a video clip to stabilize</source>
+        <translation>حدد مقطع فيديو لتثبيت الصورة</translation>
+    </message>
+    <message>
+        <source>Clip has no video file</source>
+        <translation>لا يحتوي المقطع على ملف فيديو</translation>
+    </message>
+    <message>
+        <source>Stabilization already in progress for this clip</source>
+        <translation>تثبيت الصورة قيد التنفيذ بالفعل لهذا المقطع</translation>
+    </message>
+    <message>
+        <source>This build of Drift has no video stabilization support</source>
+        <translation>لا يدعم هذا الإصدار من Drift تثبيت صورة الفيديو</translation>
+    </message>
+    <message>
+        <source>The video this clip was stabilized from is no longer in the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create stabilization cache directory</source>
+        <translation>تعذر إنشاء مجلد ذاكرة التخزين المؤقت لتثبيت الصورة</translation>
+    </message>
+    <message>
+        <source>Building keyframes…</source>
+        <translation>جارٍ إنشاء الإطارات المفتاحية…</translation>
+    </message>
+    <message>
+        <source>Rendering stabilized video…</source>
+        <translation>جارٍ معالجة الفيديو المثبت…</translation>
+    </message>
+    <message>
+        <source>Analyzing camera motion…</source>
+        <translation>جارٍ تحليل حركة الكاميرا…</translation>
+    </message>
+    <message>
+        <source>Stabilization cancelled.</source>
+        <translation>تم إلغاء تثبيت الصورة.</translation>
+    </message>
+    <message>
+        <source>Could not read camera motion from the analysis file.</source>
+        <translation>تعذر قراءة حركة الكاميرا من ملف التحليل.</translation>
+    </message>
+    <message>
+        <source>Stabilize with Keyframes</source>
+        <translation>تثبيت الصورة باستخدام الإطارات المفتاحية</translation>
+    </message>
+    <message>
+        <source>Stabilization keyframes applied.</source>
+        <translation>تم تطبيق الإطارات المفتاحية لتثبيت الصورة.</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis file is missing.</source>
+        <translation>ملف تحليل تثبيت الصورة مفقود.</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>تعذر إنشاء ملف إخراج</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed.</source>
+        <translation>فشلت معالجة تثبيت الصورة.</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed: %1</source>
+        <translation>فشلت معالجة تثبيت الصورة: %1</translation>
+    </message>
+    <message>
+        <source>Stabilize Video</source>
+        <translation>تثبيت صورة الفيديو</translation>
+    </message>
+    <message>
+        <source>Stabilized video added to the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed.</source>
+        <translation>فشل تحليل تثبيت الصورة.</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed: %1</source>
+        <translation>فشل تحليل تثبيت الصورة: %1</translation>
+    </message>
+    <message>
+        <source>Remove Stabilization</source>
+        <translation>إزالة تثبيت الصورة</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Smoothing</source>
+        <translation>تغيير تنعيم تثبيت الصورة</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Tripod Mode</source>
+        <translation>تغيير وضع الحامل الثلاثي لتثبيت الصورة</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Mode</source>
+        <translation>تغيير وضع تثبيت الصورة</translation>
     </message>
 </context>
 <context>

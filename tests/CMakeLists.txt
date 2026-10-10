@@ -30,6 +30,12 @@ qt_add_executable(tst_editorstate
     ../src/models/SpeedCurveController.cpp
     ../src/models/CurveEditorController.cpp
     ../src/models/SegmentationController.cpp
+    ../src/models/SceneDetectController.cpp
+    ../src/models/DepthController.cpp
+    ../src/models/DenoiseController.cpp
+    ../src/models/RestoreController.cpp
+    ../src/models/FaceTrackingController.cpp
+    ../src/models/StabilizeController.cpp
     ../src/models/TtsController.cpp
     ../src/models/VoiceLibrary.cpp
     ../src/preview/PreviewController.cpp
@@ -205,6 +211,12 @@ qt_add_executable(tst_mcp
     ../src/models/SpeedCurveController.cpp
     ../src/models/CurveEditorController.cpp
     ../src/models/SegmentationController.cpp
+    ../src/models/SceneDetectController.cpp
+    ../src/models/DepthController.cpp
+    ../src/models/DenoiseController.cpp
+    ../src/models/RestoreController.cpp
+    ../src/models/FaceTrackingController.cpp
+    ../src/models/StabilizeController.cpp
     ../src/models/TtsController.cpp
     ../src/models/VoiceLibrary.cpp
     ../src/preview/PreviewController.cpp

@@ -2130,34 +2130,34 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
 
     // --- ai ---
     if (tool == QLatin1String("denoise_status"))
-        return ok({{QStringLiteral("available"), m_controller->denoiseAvailable()}});
+        return ok({{QStringLiteral("available"), m_controller->denoise()->available()}});
 
     if (tool == QLatin1String("apply_denoise")) {
         const ClipRef ref = resolveClip(args);
         if (!ref.valid())
             return clipRefError(args);
-        m_controller->applyDenoise(ref.track, ref.clip);
+        m_controller->denoise()->apply(ref.track, ref.clip);
         return ok(clipFeedback(ref, {{QStringLiteral("started"), true}}));
     }
 
     if (tool == QLatin1String("cancel_denoise")) {
-        m_controller->cancelDenoise();
+        m_controller->denoise()->cancel();
         return ok({{QStringLiteral("cancelled"), true}});
     }
 
     if (tool == QLatin1String("face_detection_status"))
-        return ok({{QStringLiteral("available"), m_controller->faceDetectionAvailable()}});
+        return ok({{QStringLiteral("available"), m_controller->faces()->available()}});
 
     if (tool == QLatin1String("detect_faces")) {
         const ClipRef ref = resolveClip(args);
         if (!ref.valid())
             return clipRefError(args);
-        m_controller->detectFacesForClip(ref.track, ref.clip);
+        m_controller->faces()->detect(ref.track, ref.clip);
         return ok(clipFeedback(ref, {{QStringLiteral("started"), true}}));
     }
 
     if (tool == QLatin1String("cancel_face_detection")) {
-        m_controller->cancelFaceDetection();
+        m_controller->faces()->cancel();
         return ok({{QStringLiteral("cancelled"), true}});
     }
 
@@ -2165,7 +2165,7 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
         const ClipRef ref = resolveClip(args);
         if (!ref.valid())
             return clipRefError(args);
-        m_controller->clearFaceTrack(ref.track, ref.clip);
+        m_controller->faces()->clearTrack(ref.track, ref.clip);
         return ok(clipFeedback(ref));
     }
 
@@ -2173,11 +2173,11 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
         const ClipRef ref = resolveClip(args);
         if (!ref.valid())
             return clipRefError(args);
-        if (!m_controller->depthAvailable())
+        if (!m_controller->depth()->available())
             return err("addon_missing", QStringLiteral("Depth estimation needs the depth-model addon: "
                                                        "list_addons, then install_addon."));
         const bool high = argString(args, QStringLiteral("quality")) == QLatin1String("high");
-        const QString id = m_controller->estimateDepthForClip(ref.track, ref.clip, high);
+        const QString id = m_controller->depth()->estimate(ref.track, ref.clip, high);
         if (id.isEmpty())
             return err("failed", m_controller->lastMessage());
         return ok(clipFeedback(ref, {{QStringLiteral("job_id"), id}}));
@@ -2187,7 +2187,7 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
         const ClipRef ref = resolveClip(args);
         if (!ref.valid())
             return clipRefError(args);
-        m_controller->clearDepth(ref.track, ref.clip);
+        m_controller->depth()->clear(ref.track, ref.clip);
         return ok(clipFeedback(ref));
     }
 
@@ -2198,7 +2198,7 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
         const double time = args.contains(QStringLiteral("time"))
                                 ? args.value(QStringLiteral("time")).toDouble()
                                 : -1.0;
-        const double depth = m_controller->sampleDepthAt(
+        const double depth = m_controller->depth()->sampleAt(
             ref.track, ref.clip, args.value(QStringLiteral("x")).toDouble(),
             args.value(QStringLiteral("y")).toDouble(), time);
         if (depth < 0.0)
@@ -2597,15 +2597,15 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
         if (!ref.valid())
             return clipRefError(args);
         if (args.contains(QStringLiteral("smoothing")))
-            m_controller->setClipStabilizeSmoothing(ref.track, ref.clip,
-                                                    jsonInt(args.value(QStringLiteral("smoothing")), 15));
+            m_controller->stabilize()->setSmoothing(ref.track, ref.clip,
+                                                          jsonInt(args.value(QStringLiteral("smoothing")), 15));
         if (args.contains(QStringLiteral("tripod")))
-            m_controller->setClipStabilizeTripod(ref.track, ref.clip,
-                                                 jsonBool(args.value(QStringLiteral("tripod"))));
+            m_controller->stabilize()->setTripod(ref.track, ref.clip,
+                                                       jsonBool(args.value(QStringLiteral("tripod"))));
         if (args.contains(QStringLiteral("mode")))
-            m_controller->setClipStabilizeMode(ref.track, ref.clip,
-                                               argString(args, QStringLiteral("mode")));
-        m_controller->stabilizeClip(ref.track, ref.clip);
+            m_controller->stabilize()->setMode(ref.track, ref.clip,
+                                                     argString(args, QStringLiteral("mode")));
+        m_controller->stabilize()->run(ref.track, ref.clip);
         return ok(clipFeedback(ref, {{QStringLiteral("started"), true}}));
     }
 
@@ -2613,7 +2613,7 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
         const ClipRef ref = resolveClip(args);
         if (!ref.valid())
             return clipRefError(args);
-        m_controller->cancelClipStabilization(ref.track, ref.clip);
+        m_controller->stabilize()->cancel(ref.track, ref.clip);
         return ok(clipFeedback(ref));
     }
 
@@ -2627,7 +2627,7 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
             return err("not_keyframe_stabilized",
                        QStringLiteral("Only keyframe stabilization can be removed; a stabilized "
                                       "video is a bin asset, so point the clip back at the original"));
-        m_controller->removeClipStabilization(ref.track, ref.clip);
+        m_controller->stabilize()->remove(ref.track, ref.clip);
         return ok(clipFeedback(ref));
     }
 
@@ -2682,17 +2682,17 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
     if (tool == QLatin1String("set_scene_threshold")) {
         if (!args.contains(QStringLiteral("threshold")))
             return err("bad_args", QStringLiteral("threshold required"));
-        m_controller->setSceneThreshold(jsonNumber(args.value(QStringLiteral("threshold")), 0.0));
+        m_controller->scenes()->setThreshold(jsonNumber(args.value(QStringLiteral("threshold")), 0.0));
         return ok({{QStringLiteral("threshold"), jsonNumber(args.value(QStringLiteral("threshold")), 0.0)}});
     }
 
     if (tool == QLatin1String("clear_scenes")) {
-        m_controller->clearScenes();
+        m_controller->scenes()->clear();
         return ok({});
     }
 
     if (tool == QLatin1String("cancel_scene_detection")) {
-        m_controller->cancelSceneDetection();
+        m_controller->scenes()->cancel();
         return ok({});
     }
 

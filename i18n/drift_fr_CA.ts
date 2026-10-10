@@ -1037,6 +1037,10 @@
         <translation>Paramètres</translation>
     </message>
     <message>
+        <source>Switch to desktop layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Extras</source>
         <translation>Extras</translation>
     </message>
@@ -2373,112 +2377,8 @@
         <translation>Courbe de vitesse supprimée</translation>
     </message>
     <message>
-        <source>Getting ready…</source>
-        <translation>Préparation en cours…</translation>
-    </message>
-    <message>
-        <source>Could not decode frame %1</source>
-        <translation>Impossible de décoder le cadre %1</translation>
-    </message>
-    <message>
-        <source>Clear Face Track</source>
-        <translation>Effacer le suivi du visage</translation>
-    </message>
-    <message>
-        <source>Face detection already in progress</source>
-        <translation>La détection de visage est déjà en cours</translation>
-    </message>
-    <message>
-        <source>Select a video clip to detect faces in</source>
-        <translation>Sélectionnez un clip vidéo pour détecter les visages</translation>
-    </message>
-    <message>
-        <source>Clip has no video to scan</source>
-        <translation>Le clip ne contient pas de vidéo à analyser</translation>
-    </message>
-    <message>
-        <source>Clip is too short to scan</source>
-        <translation>Le clip est trop court pour être analysé</translation>
-    </message>
-    <message>
-        <source>Face detection cancelled</source>
-        <translation>Détection des visages annulée</translation>
-    </message>
-    <message>
-        <source>Scanning frame %1 of %2…</source>
-        <translation>Analyse du cadre %1 sur %2…</translation>
-    </message>
-    <message>
-        <source>No faces found in this clip</source>
-        <translation>Aucun visage trouvé dans ce clip</translation>
-    </message>
-    <message>
-        <source>Could not write the face track</source>
-        <translation>Impossible d&apos;écrire la piste des visages</translation>
-    </message>
-    <message>
-        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
-        <translation>Détection des visages terminée — un visage était visible dans %1 sur %2 images</translation>
-    </message>
-    <message>
-        <source>Face detection complete</source>
-        <translation>Détection des visages terminée</translation>
-    </message>
-    <message>
-        <source>Scanned clip no longer exists</source>
-        <translation>Le clip scanné n&apos;existe plus</translation>
-    </message>
-    <message>
-        <source>Detect Faces</source>
-        <translation>Détecter les visages</translation>
-    </message>
-    <message>
         <source>Clip</source>
         <translation>Clip</translation>
-    </message>
-    <message>
-        <source>Getting noise removal ready…</source>
-        <translation>Préparation de la suppression du bruit…</translation>
-    </message>
-    <message>
-        <source>Clip is too short to process</source>
-        <translation>Le clip est trop court pour être traité</translation>
-    </message>
-    <message>
-        <source>Noise removal cancelled</source>
-        <translation>Suppression du bruit annulée</translation>
-    </message>
-    <message>
-        <source>Removing noise (left)…</source>
-        <translation>Suppression du bruit (gauche) …</translation>
-    </message>
-    <message>
-        <source>Removing noise (right)…</source>
-        <translation>Suppression du bruit (droite) …</translation>
-    </message>
-    <message>
-        <source>Writing audio…</source>
-        <translation>Écriture de l&apos;audio…</translation>
-    </message>
-    <message>
-        <source>Noise removal already in progress</source>
-        <translation>La suppression du bruit est déjà en cours</translation>
-    </message>
-    <message>
-        <source>Select a video or audio clip</source>
-        <translation>Sélectionnez une vidéo ou un clip audio</translation>
-    </message>
-    <message>
-        <source>Clip has no audio</source>
-        <translation>Le clip ne possède pas de piste audio</translation>
-    </message>
-    <message>
-        <source>Could not create a preview file</source>
-        <translation>Impossible de créer le fichier d’aperçu</translation>
-    </message>
-    <message>
-        <source>Ready</source>
-        <translation>Prêt</translation>
     </message>
     <message numerus="yes">
         <source>Imported %n subtitles</source>
@@ -2553,69 +2453,6 @@
     <message>
         <source>Save combined multicam</source>
         <translation>Enregistrer le multicam combiné</translation>
-    </message>
-    <message>
-        <source>Select a video clip to stabilize</source>
-        <translation>Sélectionnez un clip vidéo à stabiliser</translation>
-    </message>
-    <message>
-        <source>Clip has no video file</source>
-        <translation>Le clip n&apos;a pas de fichier vidéo</translation>
-    </message>
-    <message>
-        <source>Stabilization already in progress for this clip</source>
-        <translation>Stabilisation déjà en cours pour ce clip</translation>
-    </message>
-    <message>
-        <source>Could not create stabilization cache directory</source>
-        <translation>Impossible de créer le dossier de cache de stabilisation</translation>
-    </message>
-    <message>
-        <source>Stabilize Video</source>
-        <translation>Stabiliser la vidéo</translation>
-    </message>
-    <message>
-        <source>Remove Stabilization</source>
-        <translation>Supprimer stabilization</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Smoothing</source>
-        <translation>Modifier le lissage de la stabilisation</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Tripod Mode</source>
-        <translation>Modifier le mode trépied de la stabilisation</translation>
-    </message>
-    <message>
-        <source>Detecting faces…</source>
-        <translation>Détection des visages…</translation>
-    </message>
-    <message>
-        <source>Already looking for scenes</source>
-        <translation>Recherche de scènes déjà en cours</translation>
-    </message>
-    <message>
-        <source>Select a video clip to find scenes in</source>
-        <translation>Sélectionnez un clip vidéo pour y trouver des scènes</translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n scene(s)</source>
-        <translation>
-            <numerusform>%n scène trouvée</numerusform>
-            <numerusform>%n scènes trouvées</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Looking for scenes…</source>
-        <translation>Recherche de scènes…</translation>
-    </message>
-    <message>
-        <source>Scene detection cancelled</source>
-        <translation>Détection de scène annulée</translation>
-    </message>
-    <message>
-        <source>Removing noise…</source>
-        <translation>Suppression du bruit…</translation>
     </message>
     <message>
         <source>Could not create an output file</source>
@@ -2839,86 +2676,6 @@
     <message>
         <source>Transition curve updated</source>
         <translation>Courbe de transition mise à jour</translation>
-    </message>
-    <message>
-        <source>Select a video or image clip to estimate depth for</source>
-        <translation>Sélectionnez un clip vidéo ou image pour estimer la profondeur</translation>
-    </message>
-    <message>
-        <source>Clip has no video to estimate depth for</source>
-        <translation>Le clip ne contient aucune vidéo pour estimer la profondeur</translation>
-    </message>
-    <message>
-        <source>Depth estimation needs the Depth addon</source>
-        <translation>L&apos;estimation de la profondeur nécessite l&apos;extension Profondeur</translation>
-    </message>
-    <message>
-        <source>Depth is already being estimated for this clip</source>
-        <translation>La profondeur est déjà en cours d&apos;estimation pour ce clip</translation>
-    </message>
-    <message>
-        <source>Estimating depth…</source>
-        <translation>Estimation de la profondeur…</translation>
-    </message>
-    <message>
-        <source>Clip no longer exists</source>
-        <translation>Le clip n&apos;existe plus</translation>
-    </message>
-    <message>
-        <source>Estimate Depth</source>
-        <translation>Estimer la profondeur</translation>
-    </message>
-    <message>
-        <source>Clear Depth</source>
-        <translation>Effacer la profondeur</translation>
-    </message>
-    <message>
-        <source>Building keyframes…</source>
-        <translation>Génération des images clés…</translation>
-    </message>
-    <message>
-        <source>Rendering stabilized video…</source>
-        <translation>Rendu de la vidéo stabilisée…</translation>
-    </message>
-    <message>
-        <source>Analyzing camera motion…</source>
-        <translation>Analyse du mouvement de caméra…</translation>
-    </message>
-    <message>
-        <source>Stabilization cancelled.</source>
-        <translation>Stabilisation annulée.</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis file is missing.</source>
-        <translation>Le fichier d’analyse de stabilisation est manquant.</translation>
-    </message>
-    <message>
-        <source>Could not read camera motion from the analysis file.</source>
-        <translation>Impossible de lire le mouvement de caméra à partir du fichier d’analyse.</translation>
-    </message>
-    <message>
-        <source>Stabilize with Keyframes</source>
-        <translation>Stabiliser avec des images clés</translation>
-    </message>
-    <message>
-        <source>Stabilization keyframes applied.</source>
-        <translation>Images clés de stabilisation appliquées.</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Mode</source>
-        <translation>Changer le mode de stabilisation</translation>
-    </message>
-    <message>
-        <source> (denoised)</source>
-        <translation> (débruité)</translation>
-    </message>
-    <message>
-        <source>Remove noise</source>
-        <translation>Supprimer le bruit</translation>
-    </message>
-    <message>
-        <source>Noise removed</source>
-        <translation>Bruit supprimé</translation>
     </message>
     <message>
         <source>Shape added</source>
@@ -3535,70 +3292,6 @@
     <message>
         <source>%1 copy</source>
         <translation>%1 copie</translation>
-    </message>
-    <message>
-        <source>%1 (stabilized)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select a video clip to enhance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Choose a model to enhance with</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This clip is already being enhanced</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 (enhanced %2x)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 (enhanced)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhance Video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhanced video added to the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhancing video…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This build of Drift has no video stabilization support</source>
-        <translation>Cette version de Drift ne prend pas en charge la stabilisation vidéo</translation>
-    </message>
-    <message>
-        <source>The video this clip was stabilized from is no longer in the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed.</source>
-        <translation>Le rendu de la stabilisation a échoué.</translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed: %1</source>
-        <translation>Le rendu de la stabilisation a échoué : %1</translation>
-    </message>
-    <message>
-        <source>Stabilized video added to the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed.</source>
-        <translation>L&apos;analyse de la stabilisation a échoué.</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed: %1</source>
-        <translation>L&apos;analyse de la stabilisation a échoué : %1</translation>
     </message>
     <message>
         <source>Audio adjustment</source>
@@ -5674,6 +5367,93 @@
     </message>
 </context>
 <context>
+    <name>DenoiseController</name>
+    <message>
+        <source>Getting noise removal ready…</source>
+        <translation>Préparation de la suppression du bruit…</translation>
+    </message>
+    <message>
+        <source>Clip is too short to process</source>
+        <translation>Le clip est trop court pour être traité</translation>
+    </message>
+    <message>
+        <source>Reading audio…</source>
+        <translation>Lecture audio…</translation>
+    </message>
+    <message>
+        <source>Noise removal cancelled</source>
+        <translation>Suppression du bruit annulée</translation>
+    </message>
+    <message>
+        <source>No audio decoded</source>
+        <translation>Aucun audio décodé</translation>
+    </message>
+    <message>
+        <source>Removing noise (left)…</source>
+        <translation>Suppression du bruit (gauche) …</translation>
+    </message>
+    <message>
+        <source>Removing noise (right)…</source>
+        <translation>Suppression du bruit (droite) …</translation>
+    </message>
+    <message>
+        <source>Writing audio…</source>
+        <translation>Écriture de l&apos;audio…</translation>
+    </message>
+    <message>
+        <source>Noise removal already in progress</source>
+        <translation>La suppression du bruit est déjà en cours</translation>
+    </message>
+    <message>
+        <source>Select a video or audio clip</source>
+        <translation>Sélectionnez une vidéo ou un clip audio</translation>
+    </message>
+    <message>
+        <source>Clip has no audio</source>
+        <translation>Le clip ne possède pas de piste audio</translation>
+    </message>
+    <message>
+        <source>Starting…</source>
+        <translation>Démarrage…</translation>
+    </message>
+    <message>
+        <source>Could not create a preview file</source>
+        <translation>Impossible de créer le fichier d’aperçu</translation>
+    </message>
+    <message>
+        <source>Ready</source>
+        <translation>Prêt</translation>
+    </message>
+    <message>
+        <source>Removing noise…</source>
+        <translation>Suppression du bruit…</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>Impossible de créer un fichier de sortie</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Terminé</translation>
+    </message>
+    <message>
+        <source>Clip</source>
+        <translation>Clip</translation>
+    </message>
+    <message>
+        <source> (denoised)</source>
+        <translation> (débruité)</translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation>Supprimer le bruit</translation>
+    </message>
+    <message>
+        <source>Noise removed</source>
+        <translation>Bruit supprimé</translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWindow</name>
     <message>
         <source>Remove noise</source>
@@ -5714,6 +5494,41 @@
     <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
+    </message>
+</context>
+<context>
+    <name>DepthController</name>
+    <message>
+        <source>Select a video or image clip to estimate depth for</source>
+        <translation>Sélectionnez un clip vidéo ou image pour estimer la profondeur</translation>
+    </message>
+    <message>
+        <source>Clip has no video to estimate depth for</source>
+        <translation>Le clip ne contient aucune vidéo pour estimer la profondeur</translation>
+    </message>
+    <message>
+        <source>Depth estimation needs the Depth addon</source>
+        <translation>L&apos;estimation de la profondeur nécessite l&apos;extension Profondeur</translation>
+    </message>
+    <message>
+        <source>Depth is already being estimated for this clip</source>
+        <translation>La profondeur est déjà en cours d&apos;estimation pour ce clip</translation>
+    </message>
+    <message>
+        <source>Estimating depth…</source>
+        <translation>Estimation de la profondeur…</translation>
+    </message>
+    <message>
+        <source>Clip no longer exists</source>
+        <translation>Le clip n&apos;existe plus</translation>
+    </message>
+    <message>
+        <source>Estimate Depth</source>
+        <translation>Estimer la profondeur</translation>
+    </message>
+    <message>
+        <source>Clear Depth</source>
+        <translation>Effacer la profondeur</translation>
     </message>
 </context>
 <context>
@@ -6164,6 +5979,10 @@
     <message>
         <source>Language…</source>
         <translation>Langue…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Debug info…</source>
@@ -7164,6 +6983,77 @@
     <message>
         <source>“%1” will be removed from your face props. Effects using it will show it as missing until it is imported again.</source>
         <translation>« %1 » sera supprimé de vos accessoires de visage. Les effets qui l&apos;utilisent l&apos;indiqueront comme manquant jusqu&apos;à ce qu&apos;il soit importé de nouveau.</translation>
+    </message>
+</context>
+<context>
+    <name>FaceTrackingController</name>
+    <message>
+        <source>Clear Face Track</source>
+        <translation>Effacer le suivi du visage</translation>
+    </message>
+    <message>
+        <source>Face detection already in progress</source>
+        <translation>La détection de visage est déjà en cours</translation>
+    </message>
+    <message>
+        <source>Select a video clip to detect faces in</source>
+        <translation>Sélectionnez un clip vidéo pour détecter les visages</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation>Le clip ne contient pas de vidéo à analyser</translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation>Préparation en cours…</translation>
+    </message>
+    <message>
+        <source>Detecting faces…</source>
+        <translation>Détection des visages…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Terminé</translation>
+    </message>
+    <message>
+        <source>Clip is too short to scan</source>
+        <translation>Le clip est trop court pour être analysé</translation>
+    </message>
+    <message>
+        <source>Face detection cancelled</source>
+        <translation>Détection des visages annulée</translation>
+    </message>
+    <message>
+        <source>Could not decode frame %1</source>
+        <translation>Impossible de décoder le cadre %1</translation>
+    </message>
+    <message>
+        <source>Scanning frame %1 of %2…</source>
+        <translation>Analyse du cadre %1 sur %2…</translation>
+    </message>
+    <message>
+        <source>No faces found in this clip</source>
+        <translation>Aucun visage trouvé dans ce clip</translation>
+    </message>
+    <message>
+        <source>Could not write the face track</source>
+        <translation>Impossible d&apos;écrire la piste des visages</translation>
+    </message>
+    <message>
+        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
+        <translation>Détection des visages terminée — un visage était visible dans %1 sur %2 images</translation>
+    </message>
+    <message>
+        <source>Face detection complete</source>
+        <translation>Détection des visages terminée</translation>
+    </message>
+    <message>
+        <source>Scanned clip no longer exists</source>
+        <translation>Le clip scanné n&apos;existe plus</translation>
+    </message>
+    <message>
+        <source>Detect Faces</source>
+        <translation>Détecter les visages</translation>
     </message>
 </context>
 <context>
@@ -8175,6 +8065,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Switch to Mobile Layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;Window</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8248,6 +8142,10 @@
     </message>
     <message>
         <source>Checking for updates…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Links can’t be opened in this layout.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11099,6 +10997,41 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
+    <name>RestoreController</name>
+    <message>
+        <source>Select a video clip to enhance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a model to enhance with</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This clip is already being enhanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (enhanced %2x)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (enhanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhance Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhanced video added to the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhancing video…</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RestoreWindow</name>
     <message>
         <source>Enhance video</source>
@@ -11329,6 +11262,44 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>No frames could be decoded from this clip</source>
         <translation>Aucune image ne peut être décodée à partir de ce clip</translation>
+    </message>
+</context>
+<context>
+    <name>SceneDetectController</name>
+    <message>
+        <source>Already looking for scenes</source>
+        <translation>Recherche de scènes déjà en cours</translation>
+    </message>
+    <message>
+        <source>Select a video clip to find scenes in</source>
+        <translation>Sélectionnez un clip vidéo pour y trouver des scènes</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation>Le clip ne contient pas de vidéo à analyser</translation>
+    </message>
+    <message numerus="yes">
+        <source>Found %n scene(s)</source>
+        <translation>
+            <numerusform>%n scène trouvée</numerusform>
+            <numerusform>%n scènes trouvées</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation>Préparation en cours…</translation>
+    </message>
+    <message>
+        <source>Looking for scenes…</source>
+        <translation>Recherche de scènes…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Terminé</translation>
+    </message>
+    <message>
+        <source>Scene detection cancelled</source>
+        <translation>Détection de scène annulée</translation>
     </message>
 </context>
 <context>
@@ -11744,6 +11715,34 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>Restart Drift to apply this size.</source>
         <translation>Redémarrer Drift pour appliquer cette échelle.</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mobile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop suits a mouse and keyboard, including tablets in desktop mode. Mobile is the touch layout made for phones. Takes effect after restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Horizontal mouse-wheel pan</source>
@@ -12477,6 +12476,49 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
+    <name>ShellSwitchDialog</name>
+    <message>
+        <source>Switch to the mobile layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the desktop layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Later</source>
+        <translation type="unfinished">Plus tard</translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A mouse is connected. The desktop layout has full menus, panels and precise timeline editing. Drift restarts to switch, and your project is kept.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The mobile layout is the touch interface made for phones. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The desktop layout suits a mouse and keyboard. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ShortcutCaptureField</name>
     <message>
         <source>Shortcut for %1</source>
@@ -12883,6 +12925,113 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>Could not write subtitle file</source>
         <translation>Impossible d&apos;écrire le fichier de sous-titres</translation>
+    </message>
+</context>
+<context>
+    <name>StabilizeController</name>
+    <message>
+        <source>%1 (stabilized)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a video clip to stabilize</source>
+        <translation>Sélectionnez un clip vidéo à stabiliser</translation>
+    </message>
+    <message>
+        <source>Clip has no video file</source>
+        <translation>Le clip n&apos;a pas de fichier vidéo</translation>
+    </message>
+    <message>
+        <source>Stabilization already in progress for this clip</source>
+        <translation>Stabilisation déjà en cours pour ce clip</translation>
+    </message>
+    <message>
+        <source>This build of Drift has no video stabilization support</source>
+        <translation>Cette version de Drift ne prend pas en charge la stabilisation vidéo</translation>
+    </message>
+    <message>
+        <source>The video this clip was stabilized from is no longer in the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create stabilization cache directory</source>
+        <translation>Impossible de créer le dossier de cache de stabilisation</translation>
+    </message>
+    <message>
+        <source>Building keyframes…</source>
+        <translation>Génération des images clés…</translation>
+    </message>
+    <message>
+        <source>Rendering stabilized video…</source>
+        <translation>Rendu de la vidéo stabilisée…</translation>
+    </message>
+    <message>
+        <source>Analyzing camera motion…</source>
+        <translation>Analyse du mouvement de caméra…</translation>
+    </message>
+    <message>
+        <source>Stabilization cancelled.</source>
+        <translation>Stabilisation annulée.</translation>
+    </message>
+    <message>
+        <source>Could not read camera motion from the analysis file.</source>
+        <translation>Impossible de lire le mouvement de caméra à partir du fichier d’analyse.</translation>
+    </message>
+    <message>
+        <source>Stabilize with Keyframes</source>
+        <translation>Stabiliser avec des images clés</translation>
+    </message>
+    <message>
+        <source>Stabilization keyframes applied.</source>
+        <translation>Images clés de stabilisation appliquées.</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis file is missing.</source>
+        <translation>Le fichier d’analyse de stabilisation est manquant.</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>Impossible de créer un fichier de sortie</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed.</source>
+        <translation>Le rendu de la stabilisation a échoué.</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed: %1</source>
+        <translation>Le rendu de la stabilisation a échoué : %1</translation>
+    </message>
+    <message>
+        <source>Stabilize Video</source>
+        <translation>Stabiliser la vidéo</translation>
+    </message>
+    <message>
+        <source>Stabilized video added to the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed.</source>
+        <translation>L&apos;analyse de la stabilisation a échoué.</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed: %1</source>
+        <translation>L&apos;analyse de la stabilisation a échoué : %1</translation>
+    </message>
+    <message>
+        <source>Remove Stabilization</source>
+        <translation>Supprimer stabilization</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Smoothing</source>
+        <translation>Modifier le lissage de la stabilisation</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Tripod Mode</source>
+        <translation>Modifier le mode trépied de la stabilisation</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Mode</source>
+        <translation>Changer le mode de stabilisation</translation>
     </message>
 </context>
 <context>

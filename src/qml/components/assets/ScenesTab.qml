@@ -18,7 +18,7 @@ Item {
     // The live analysis belongs to whichever clip was scanned, which is not necessarily
     // the one selected now.
     readonly property bool showingSelected:
-        EditorState.sceneClipId !== "" && EditorState.sceneClipId === EditorState.selectedClipData.id
+        EditorState.scenes.clipId !== "" && EditorState.scenes.clipId === EditorState.selectedClipData.id
 
     property bool sortByScore: false
     property string labelFilter: ""
@@ -26,7 +26,7 @@ Item {
     // Scene rows in display order. Sorting by score is a view concern — the underlying
     // list stays in time order so `index` still addresses the right scene.
     readonly property var visibleScenes: {
-        let rows = EditorState.scenes.slice()
+        let rows = EditorState.scenes.list.slice()
         if (root.labelFilter !== "")
             rows = rows.filter(s => (s.labels || []).indexOf(root.labelFilter) >= 0)
         if (root.sortByScore)
@@ -38,7 +38,7 @@ Item {
     // the object pass has run.
     readonly property var allLabels: {
         const seen = {}
-        for (const scene of EditorState.scenes) {
+        for (const scene of EditorState.scenes.list) {
             for (const label of (scene.labels || []))
                 seen[label] = true
         }
@@ -50,7 +50,7 @@ Item {
     Connections {
         target: EditorState
         function onFilmstripTileReady(path) {
-            if (path === EditorState.sceneClipPath)
+            if (path === EditorState.scenes.clipPath)
                 root.tileRevision++
         }
     }
@@ -74,7 +74,7 @@ Item {
         // --- controls -------------------------------------------------------
         Row {
             spacing: Theme.spacingMd
-            visible: !EditorState.sceneDetecting
+            visible: !EditorState.scenes.detecting
 
             ThemedButton {
                 text: qsTr("Find scenes")
@@ -84,17 +84,17 @@ Item {
                 tooltip: root.hasVideoClip
                          ? qsTr("Scan the selected clip for shot boundaries")
                          : qsTr("Select a video clip first")
-                onClicked: EditorState.detectScenesForClip(root.selectedTrack, root.selectedClip,
+                onClicked: EditorState.scenes.detect(root.selectedTrack, root.selectedClip,
                                                            objectToggle.checked)
             }
 
             ThemedButton {
                 text: qsTr("Clear")
                 variant: "secondary"
-                visible: EditorState.scenes.length > 0
+                visible: EditorState.scenes.list.length > 0
                 onClicked: {
                     root.labelFilter = ""
-                    EditorState.clearScenes()
+                    EditorState.scenes.clear()
                 }
             }
         }
@@ -103,7 +103,7 @@ Item {
             id: objectToggle
             text: qsTr("Identify objects")
             enabled: EditorState.objectDetectionAvailable()
-            visible: !EditorState.sceneDetecting
+            visible: !EditorState.scenes.detecting
             tooltip: enabled
                      ? qsTr("Also label each shot with what is in it. Slower.")
                      : qsTr("Needs the Scene Labels add-on — install it from Extras")
@@ -114,7 +114,7 @@ Item {
         Column {
             width: header.width
             spacing: Theme.spacingXs
-            visible: !EditorState.sceneDetecting
+            visible: !EditorState.scenes.detecting
 
             Text {
                 text: qsTr("Sensitivity")
@@ -131,9 +131,9 @@ Item {
                 // is what does that.
                 from: 4
                 to: 60
-                value: 64 - EditorState.sceneThreshold()
+                value: 64 - EditorState.scenes.threshold()
                 valueFormatter: function (v) { return Number(64 - v).toFixed(0) }
-                onMoved: EditorState.setSceneThreshold(64 - value)
+                onMoved: EditorState.scenes.setThreshold(64 - value)
             }
         }
 
@@ -141,10 +141,10 @@ Item {
         Column {
             width: header.width
             spacing: Theme.spacingSm
-            visible: EditorState.sceneDetecting
+            visible: EditorState.scenes.detecting
 
             Text {
-                text: EditorState.sceneDetectStatus
+                text: EditorState.scenes.status
                 color: Theme.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
@@ -154,20 +154,20 @@ Item {
 
             ThemedProgressBar {
                 width: header.width
-                value: EditorState.sceneDetectProgress
+                value: EditorState.scenes.progress
             }
 
             ThemedButton {
                 text: qsTr("Cancel")
                 variant: "secondary"
-                onClicked: EditorState.cancelSceneDetection()
+                onClicked: EditorState.scenes.cancel()
             }
         }
 
         // --- filters --------------------------------------------------------
         Row {
             spacing: Theme.spacingMd
-            visible: EditorState.scenes.length > 0 && !EditorState.sceneDetecting
+            visible: EditorState.scenes.list.length > 0 && !EditorState.scenes.detecting
 
             ThemedToggleButton {
                 checked: root.sortByScore
@@ -188,7 +188,7 @@ Item {
         Flow {
             width: header.width
             spacing: Theme.spacingXs
-            visible: root.allLabels.length > 0 && !EditorState.sceneDetecting
+            visible: root.allLabels.length > 0 && !EditorState.scenes.detecting
 
             Repeater {
                 model: root.allLabels
@@ -205,8 +205,8 @@ Item {
         Text {
             width: header.width
             wrapMode: Text.WordWrap
-            visible: EditorState.scenes.length > 0 && !root.showingSelected
-                     && !EditorState.sceneDetecting
+            visible: EditorState.scenes.list.length > 0 && !root.showingSelected
+                     && !EditorState.scenes.detecting
             text: qsTr("These scenes are from another clip. Select it again, or run Find scenes on the current one.")
             color: Theme.warning
             font.family: Theme.fontFamily
@@ -217,7 +217,7 @@ Item {
     EmptyState {
         anchors.centerIn: parent
         width: parent.width
-        visible: EditorState.scenes.length === 0 && !EditorState.sceneDetecting
+        visible: EditorState.scenes.list.length === 0 && !EditorState.scenes.detecting
         glyph: Theme.icons.listVideo
         title: root.hasVideoClip ? qsTr("No scenes yet") : qsTr("No video clip selected")
         hint: root.hasVideoClip
@@ -237,7 +237,7 @@ Item {
         anchors.rightMargin: Theme.pagePadding
         clip: true
         spacing: Theme.spacingXs
-        visible: EditorState.scenes.length > 0 && !EditorState.sceneDetecting
+        visible: EditorState.scenes.list.length > 0 && !EditorState.scenes.detecting
         model: root.visibleScenes
         ScrollBar.vertical: AppScrollBar { }
 
@@ -275,12 +275,12 @@ Item {
                         // simply the whole second the representative frame falls in.
                         source: {
                             root.tileRevision // re-evaluate when a decode lands
-                            return EditorState.sceneClipPath === ""
+                            return EditorState.scenes.clipPath === ""
                                 ? ""
                                 : EditorState.filmstripTileUrl(
-                                      EditorState.sceneClipPath, 0,
+                                      EditorState.scenes.clipPath, 0,
                                       Math.floor(row.modelData.thumbnailSeconds),
-                                      EditorState.sceneClipRotationCorrection)
+                                      EditorState.scenes.clipRotationCorrection)
                         }
                     }
                 }
@@ -356,7 +356,7 @@ Item {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
                     Haptics.select()
-                    EditorState.seekToScene(row.modelData.index)
+                    EditorState.scenes.seekTo(row.modelData.index)
                 }
             }
         }

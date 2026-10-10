@@ -12,7 +12,7 @@ Window {
 
     // The main window, for its addon manager.
     property var host: null
-    // A clip id or a bin video's asset id; see AppController::restoreVideo.
+    // A clip id or a bin video's asset id; see RestoreController::run.
     property string targetId: ""
     property bool forAsset: false
     property real rangeSeconds: 0
@@ -20,18 +20,18 @@ Window {
     property int sourceHeight: 0
     property real sourceFps: 30
 
-    // Rebuilt rather than bound: restoreModels() is a plain call, so nothing would re-evaluate it
+    // Rebuilt rather than bound: models() is a plain call, so nothing would re-evaluate it
     // when an addon is installed or a model is dropped into the folder while this window is open.
     property var decompressModel: []
     property var upscaleModel: []
     property bool runtimeReady: Addons.runtimeAvailable()
 
     property int jobRevision: 0
-    readonly property var job: { jobRevision; return root.targetId ? EditorState.restoreJob(root.targetId) : ({}) }
+    readonly property var job: { jobRevision; return root.targetId ? EditorState.restore.job(root.targetId) : ({}) }
     readonly property bool running: job.active === true
 
     property int previewRevision: 0
-    readonly property var preview: { previewRevision; return EditorState.restorePreviewState() }
+    readonly property var preview: { previewRevision; return EditorState.restore.previewState() }
     readonly property bool hasEnhanced: preview.enhancedWidth > 0
     // Which models made the enhanced half, so a later change of model can say it is out of date.
     property string previewedWith: ""
@@ -52,7 +52,7 @@ Window {
 
     // Time estimates. Each model's secondsPerMegapixel was measured on one reference CPU; the factor
     // scales that to this machine once a preview has been timed.
-    property var speed: EditorState.restoreSpeed()
+    property var speed: EditorState.restore.speed()
     readonly property real sourceMegapixels: Math.max(1, (preview.width || sourceWidth) * (preview.height || sourceHeight)) / 1e6
     // Fastest and slowest upscaler, for the picker's relative speed meter.
     readonly property var speedRange: {
@@ -132,20 +132,20 @@ Window {
     }
 
     function openTarget(id) {
-        const info = EditorState.restoreTargetInfo(id)
+        const info = EditorState.restore.targetInfo(id)
         root.targetId = id
         root.rangeSeconds = info.seconds || 0
         root.sourceWidth = info.width || 0
         root.sourceHeight = info.height || 0
         root.sourceFps = info.fps || 30
-        root.speed = EditorState.restoreSpeed()
+        root.speed = EditorState.restore.speed()
         root.previewedWith = ""
         picker.visible = false
         frameSlider.value = 0
         stage.resetView()
         root.refreshModels()
         root.jobRevision++
-        EditorState.setRestorePreviewFrame(id, 0)
+        EditorState.restore.setPreviewFrame(id, 0)
         root.show()
         root.raise()
         root.requestActivate()
@@ -156,7 +156,7 @@ Window {
         const decompress = [{ label: qsTr("None"), value: "", scale: 1 }]
         const upscale = [{ label: qsTr("None"), name: qsTr("No upscaling"), value: "", scale: 1,
                            summary: qsTr("Keep the original size."), content: [] }]
-        const models = root.runtimeReady ? EditorState.restoreModels() : []
+        const models = root.runtimeReady ? EditorState.restore.models() : []
         for (let i = 0; i < models.length; ++i) {
             const m = models[i]
             const label = m.custom ? qsTr("%1 (custom, experimental)").arg(m.name) : m.name
@@ -177,20 +177,20 @@ Window {
     onClosing: {
         // A full run keeps going and lands in the bin; a preview nobody can see does not.
         if (root.running && root.job.kind === "restore-preview")
-            EditorState.cancelRestore(root.targetId)
-        EditorState.endRestorePreview()
+            EditorState.restore.cancel(root.targetId)
+        EditorState.restore.endPreview()
     }
 
     Connections {
-        target: EditorState
-        function onRestoreJobChanged(targetId) {
+        target: EditorState.restore
+        function onJobChanged(targetId) {
             if (targetId === root.targetId)
                 root.jobRevision++
         }
-        function onRestorePreviewChanged() {
+        function onPreviewChanged() {
             root.previewRevision++
             // A finished preview refines the speed estimate.
-            root.speed = EditorState.restoreSpeed()
+            root.speed = EditorState.restore.speed()
         }
     }
 
@@ -416,7 +416,7 @@ Window {
                     from: 0
                     to: Math.max(0.001, root.rangeSeconds)
                     enabled: !root.running
-                    onMoved: EditorState.setRestorePreviewFrame(root.targetId, value)
+                    onMoved: EditorState.restore.setPreviewFrame(root.targetId, value)
                 }
 
                 ThemedLabel {
@@ -518,7 +518,7 @@ Window {
                     enabled: !root.running && root.preview.width > 0 && !root.preview.loading
                              && root.hasModelChoice
                     onClicked: {
-                        if (EditorState.previewRestore(root.targetId,
+                        if (EditorState.restore.preview(root.targetId,
                                                        decompressBox.currentValue || "",
                                                        root.upscaleId) !== "")
                             root.previewedWith = root.chosenModels
@@ -558,7 +558,7 @@ Window {
                     text: root.running ? qsTr("Stop") : qsTr("Close")
                     onClicked: {
                         if (root.running)
-                            EditorState.cancelRestore(root.targetId)
+                            EditorState.restore.cancel(root.targetId)
                         else
                             root.close()
                     }
@@ -568,7 +568,7 @@ Window {
                     variant: "primary"
                     text: qsTr("Enhance clip")
                     enabled: !root.running && root.hasModelChoice
-                    onClicked: EditorState.restoreVideo(root.targetId,
+                    onClicked: EditorState.restore.run(root.targetId,
                                                         decompressBox.currentValue || "",
                                                         root.upscaleId)
                 }
@@ -742,7 +742,7 @@ Window {
                     variant: "ghost"
                     text: qsTr("Open custom models folder")
                     visible: root.runtimeReady
-                    onClicked: Qt.openUrlExternally("file://" + EditorState.restoreModelsFolder())
+                    onClicked: Qt.openUrlExternally("file://" + EditorState.restore.modelsFolder())
                 }
 
                 ThemedButton {

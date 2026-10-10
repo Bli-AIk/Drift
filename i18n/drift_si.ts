@@ -1036,6 +1036,10 @@
         <translation>සැකසීම්</translation>
     </message>
     <message>
+        <source>Switch to desktop layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Extras</source>
         <translation>අමතර අංග</translation>
     </message>
@@ -2371,112 +2375,8 @@
         <translation>වේග වක්‍රය ඉවත් කරන ලදී</translation>
     </message>
     <message>
-        <source>Getting ready…</source>
-        <translation>සූදානම් වෙමින්…</translation>
-    </message>
-    <message>
-        <source>Could not decode frame %1</source>
-        <translation>%1 රාමුව විකේතනය කිරීමට නොහැකි විය</translation>
-    </message>
-    <message>
-        <source>Clear Face Track</source>
-        <translation>මුහුණු ට්‍රැකය හිස් කරන්න</translation>
-    </message>
-    <message>
-        <source>Face detection already in progress</source>
-        <translation>මුහුණු හඳුනාගැනීම දැනටමත් සිදුවෙමින් පවතී</translation>
-    </message>
-    <message>
-        <source>Select a video clip to detect faces in</source>
-        <translation>මුහුණු හඳුනාගැනීම සඳහා වීඩියෝ ක්ලිපයක් තෝරන්න</translation>
-    </message>
-    <message>
-        <source>Clip has no video to scan</source>
-        <translation>ස්කෑන් කිරීමට ක්ලිපයේ වීඩියෝ නොමැත</translation>
-    </message>
-    <message>
-        <source>Clip is too short to scan</source>
-        <translation>ස්කෑන් කිරීමට ක්ලිපය කෙටි වැඩිය</translation>
-    </message>
-    <message>
-        <source>Face detection cancelled</source>
-        <translation>මුහුණු හඳුනාගැනීම අවලංගු කෙරිණි</translation>
-    </message>
-    <message>
-        <source>Scanning frame %1 of %2…</source>
-        <translation>%1/%2 රාමුව ස්කෑන් කරමින්…</translation>
-    </message>
-    <message>
-        <source>No faces found in this clip</source>
-        <translation>මෙම ක්ලිපයේ කිසිදු මුහුණක් හමු නොවීය</translation>
-    </message>
-    <message>
-        <source>Could not write the face track</source>
-        <translation>මුහුණු ට්‍රැකය ලිවීමට නොහැකි විය</translation>
-    </message>
-    <message>
-        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
-        <translation>මුහුණු හඳුනාගැනීම සම්පූර්ණයි — රාමු %2කින් %1ක මුහුණක් දක්නට ලැබිණි</translation>
-    </message>
-    <message>
-        <source>Face detection complete</source>
-        <translation>මුහුණු හඳුනාගැනීම සම්පූර්ණයි</translation>
-    </message>
-    <message>
-        <source>Scanned clip no longer exists</source>
-        <translation>ස්කෑන් කරන ලද ක්ලිපය තවදුරටත් නොපවතී</translation>
-    </message>
-    <message>
-        <source>Detect Faces</source>
-        <translation>මුහුණු හඳුනාගන්න</translation>
-    </message>
-    <message>
         <source>Clip</source>
         <translation>ක්ලිප්</translation>
-    </message>
-    <message>
-        <source>Getting noise removal ready…</source>
-        <translation>ඝෝෂා ඉවත් කිරීම සූදානම් කරමින්…</translation>
-    </message>
-    <message>
-        <source>Clip is too short to process</source>
-        <translation>සැකසීමට ක්ලිපය කෙටි වැඩිය</translation>
-    </message>
-    <message>
-        <source>Noise removal cancelled</source>
-        <translation>ඝෝෂා ඉවත් කිරීම අවලංගු කෙරිණි</translation>
-    </message>
-    <message>
-        <source>Removing noise (left)…</source>
-        <translation>ඝෝෂා ඉවත් කරමින් (වම)…</translation>
-    </message>
-    <message>
-        <source>Removing noise (right)…</source>
-        <translation>ඝෝෂා ඉවත් කරමින් (දකුණ)…</translation>
-    </message>
-    <message>
-        <source>Writing audio…</source>
-        <translation>ශ්‍රව්‍ය ලියමින්…</translation>
-    </message>
-    <message>
-        <source>Noise removal already in progress</source>
-        <translation>ඝෝෂා ඉවත් කිරීම දැනටමත් ක්‍රියාත්මක වේ</translation>
-    </message>
-    <message>
-        <source>Select a video or audio clip</source>
-        <translation>වීඩියෝ හෝ ශ්‍රව්‍ය ක්ලිපයක් තෝරන්න</translation>
-    </message>
-    <message>
-        <source>Clip has no audio</source>
-        <translation>ක්ලිපයේ ශ්‍රව්‍යයක් නැත</translation>
-    </message>
-    <message>
-        <source>Could not create a preview file</source>
-        <translation>පෙරදසුන් ගොනුවක් සෑදීමට නොහැකි විය</translation>
-    </message>
-    <message>
-        <source>Ready</source>
-        <translation>සූදානම්</translation>
     </message>
     <message numerus="yes">
         <source>Imported %n subtitles</source>
@@ -2547,69 +2447,6 @@
     <message>
         <source>Save combined multicam</source>
         <translation>ඒකාබද්ධ බහු කැමරාව සුරකින්න</translation>
-    </message>
-    <message>
-        <source>Select a video clip to stabilize</source>
-        <translation>ස්ථාවර කිරීමට වීඩියෝ ක්ලිප් එකක් තෝරන්න</translation>
-    </message>
-    <message>
-        <source>Clip has no video file</source>
-        <translation>ක්ලිප් එකෙහි වීඩියෝ ගොනුවක් නොමැත</translation>
-    </message>
-    <message>
-        <source>Stabilization already in progress for this clip</source>
-        <translation>මෙම ක්ලිප් එක සඳහා දැනටමත් ස්ථාවර කිරීම ක්‍රියාත්මක වේ</translation>
-    </message>
-    <message>
-        <source>Could not create stabilization cache directory</source>
-        <translation>ස්ථාවර කිරීමේ හැඹිලි බහලුම සෑදීමට නොහැකි විය</translation>
-    </message>
-    <message>
-        <source>Stabilize Video</source>
-        <translation>වීඩියෝව ස්ථාවර කරන්න</translation>
-    </message>
-    <message>
-        <source>Remove Stabilization</source>
-        <translation>ස්ථාවර කිරීම ඉවත් කරන්න</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Smoothing</source>
-        <translation>ස්ථාවර කිරීමේ සුමටතාව වෙනස් කරන්න</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Tripod Mode</source>
-        <translation>ස්ථාවර කිරීමේ ට්‍රයිපොඩ් ප්‍රකාරය වෙනස් කරන්න</translation>
-    </message>
-    <message>
-        <source>Detecting faces…</source>
-        <translation>මුහුණු හඳුනාගනිමින්…</translation>
-    </message>
-    <message>
-        <source>Already looking for scenes</source>
-        <translation>දැනටමත් දර්ශන සොයමින් සිටී</translation>
-    </message>
-    <message>
-        <source>Select a video clip to find scenes in</source>
-        <translation>දර්ශන සෙවීම සඳහා වීඩියෝ ක්ලිප් එකක් තෝරන්න</translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n scene(s)</source>
-        <translation>
-            <numerusform>දර්ශන %nක් හමු විය</numerusform>
-            <numerusform>දර්ශන %nක් හමු විය</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Looking for scenes…</source>
-        <translation>දර්ශන සොයමින්…</translation>
-    </message>
-    <message>
-        <source>Scene detection cancelled</source>
-        <translation>දර්ශන හඳුනාගැනීම අවලංගු විය</translation>
-    </message>
-    <message>
-        <source>Removing noise…</source>
-        <translation>ඝෝෂා ඉවත් කරමින්…</translation>
     </message>
     <message>
         <source>Could not create an output file</source>
@@ -2833,86 +2670,6 @@
     <message>
         <source>Transition curve updated</source>
         <translation>සංක්‍රාන්ති වක්‍රය යාවත්කාලීන කරන ලදී</translation>
-    </message>
-    <message>
-        <source>Select a video or image clip to estimate depth for</source>
-        <translation>ගැඹුර තක්සේරු කිරීම සඳහා වීඩියෝ හෝ පින්තූර ක්ලිපයක් තෝරන්න</translation>
-    </message>
-    <message>
-        <source>Clip has no video to estimate depth for</source>
-        <translation>ගැඹුර තක්සේරු කිරීමට ක්ලිපයේ වීඩියෝවක් නොමැත</translation>
-    </message>
-    <message>
-        <source>Depth estimation needs the Depth addon</source>
-        <translation>ගැඹුර තක්සේරු කිරීම සඳහා Depth ඇඩෝනය අවශ්‍ය වේ</translation>
-    </message>
-    <message>
-        <source>Depth is already being estimated for this clip</source>
-        <translation>මෙම ක්ලිපය සඳහා දැනටමත් ගැඹුර තක්සේරු කෙරෙමින් පවතී</translation>
-    </message>
-    <message>
-        <source>Estimating depth…</source>
-        <translation>ගැඹුර තක්සේරු කරමින්…</translation>
-    </message>
-    <message>
-        <source>Clip no longer exists</source>
-        <translation>ක්ලිපය තවදුරටත් නොපවතී</translation>
-    </message>
-    <message>
-        <source>Estimate Depth</source>
-        <translation>ගැඹුර තක්සේරු කරන්න</translation>
-    </message>
-    <message>
-        <source>Clear Depth</source>
-        <translation>ගැඹුර ඉවත් කරන්න</translation>
-    </message>
-    <message>
-        <source>Building keyframes…</source>
-        <translation>කීෆ්‍රේම ගොඩනඟමින්…</translation>
-    </message>
-    <message>
-        <source>Rendering stabilized video…</source>
-        <translation>ස්ථාවර කළ වීඩියෝව රෙන්ඩර් කරමින්…</translation>
-    </message>
-    <message>
-        <source>Analyzing camera motion…</source>
-        <translation>කැමරා චලනය විශ්ලේෂණය කරමින්…</translation>
-    </message>
-    <message>
-        <source>Stabilization cancelled.</source>
-        <translation>ස්ථාවර කිරීම අවලංගු විය.</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis file is missing.</source>
-        <translation>ස්ථාවර කිරීමේ විශ්ලේෂණ ගොනුව නැත.</translation>
-    </message>
-    <message>
-        <source>Could not read camera motion from the analysis file.</source>
-        <translation>විශ්ලේෂණ ගොනුවෙන් කැමරා චලනය කියවීමට නොහැකි විය.</translation>
-    </message>
-    <message>
-        <source>Stabilize with Keyframes</source>
-        <translation>කීෆ්‍රේම සමඟ ස්ථාවර කරන්න</translation>
-    </message>
-    <message>
-        <source>Stabilization keyframes applied.</source>
-        <translation>ස්ථාවර කිරීමේ කීෆ්‍රේම යොදන ලදී.</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Mode</source>
-        <translation>ස්ථාවර කිරීමේ ප්‍රකාරය වෙනස් කරන්න</translation>
-    </message>
-    <message>
-        <source> (denoised)</source>
-        <translation> (ඝෝෂා ඉවත් කළ)</translation>
-    </message>
-    <message>
-        <source>Remove noise</source>
-        <translation>ඝෝෂා ඉවත් කරන්න</translation>
-    </message>
-    <message>
-        <source>Noise removed</source>
-        <translation>ඝෝෂා ඉවත් කරන ලදී</translation>
     </message>
     <message>
         <source>Shape added</source>
@@ -3529,70 +3286,6 @@
     <message>
         <source>%1 copy</source>
         <translation>%1 පිටපත</translation>
-    </message>
-    <message>
-        <source>%1 (stabilized)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select a video clip to enhance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Choose a model to enhance with</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This clip is already being enhanced</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 (enhanced %2x)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 (enhanced)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhance Video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhanced video added to the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhancing video…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This build of Drift has no video stabilization support</source>
-        <translation>Drift හි මෙම සංස්කරණයට වීඩියෝ ස්ථාවර කිරීමේ සහාය නොමැත</translation>
-    </message>
-    <message>
-        <source>The video this clip was stabilized from is no longer in the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed.</source>
-        <translation>ස්ථාවර කිරීම රෙන්ඩර් වීම අසමත් විය.</translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed: %1</source>
-        <translation>ස්ථාවර කිරීම රෙන්ඩර් වීම අසමත් විය: %1</translation>
-    </message>
-    <message>
-        <source>Stabilized video added to the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed.</source>
-        <translation>ස්ථාවර කිරීමේ විශ්ලේෂණය අසමත් විය.</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed: %1</source>
-        <translation>ස්ථාවර කිරීමේ විශ්ලේෂණය අසමත් විය: %1</translation>
     </message>
     <message>
         <source>Audio adjustment</source>
@@ -5672,6 +5365,93 @@
     </message>
 </context>
 <context>
+    <name>DenoiseController</name>
+    <message>
+        <source>Getting noise removal ready…</source>
+        <translation>ඝෝෂා ඉවත් කිරීම සූදානම් කරමින්…</translation>
+    </message>
+    <message>
+        <source>Clip is too short to process</source>
+        <translation>සැකසීමට ක්ලිපය කෙටි වැඩිය</translation>
+    </message>
+    <message>
+        <source>Reading audio…</source>
+        <translation>ශ්‍රව්‍ය කියවමින්…</translation>
+    </message>
+    <message>
+        <source>Noise removal cancelled</source>
+        <translation>ඝෝෂා ඉවත් කිරීම අවලංගු කෙරිණි</translation>
+    </message>
+    <message>
+        <source>No audio decoded</source>
+        <translation>කිසිදු ශ්‍රව්‍යයක් විකේතනය නොවීය</translation>
+    </message>
+    <message>
+        <source>Removing noise (left)…</source>
+        <translation>ඝෝෂා ඉවත් කරමින් (වම)…</translation>
+    </message>
+    <message>
+        <source>Removing noise (right)…</source>
+        <translation>ඝෝෂා ඉවත් කරමින් (දකුණ)…</translation>
+    </message>
+    <message>
+        <source>Writing audio…</source>
+        <translation>ශ්‍රව්‍ය ලියමින්…</translation>
+    </message>
+    <message>
+        <source>Noise removal already in progress</source>
+        <translation>ඝෝෂා ඉවත් කිරීම දැනටමත් ක්‍රියාත්මක වේ</translation>
+    </message>
+    <message>
+        <source>Select a video or audio clip</source>
+        <translation>වීඩියෝ හෝ ශ්‍රව්‍ය ක්ලිපයක් තෝරන්න</translation>
+    </message>
+    <message>
+        <source>Clip has no audio</source>
+        <translation>ක්ලිපයේ ශ්‍රව්‍යයක් නැත</translation>
+    </message>
+    <message>
+        <source>Starting…</source>
+        <translation>ආරම්භ කරමින්…</translation>
+    </message>
+    <message>
+        <source>Could not create a preview file</source>
+        <translation>පෙරදසුන් ගොනුවක් සෑදීමට නොහැකි විය</translation>
+    </message>
+    <message>
+        <source>Ready</source>
+        <translation>සූදානම්</translation>
+    </message>
+    <message>
+        <source>Removing noise…</source>
+        <translation>ඝෝෂා ඉවත් කරමින්…</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>ප්‍රතිදාන ගොනුවක් සෑදීමට නොහැකි විය</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>නිමයි</translation>
+    </message>
+    <message>
+        <source>Clip</source>
+        <translation>ක්ලිප්</translation>
+    </message>
+    <message>
+        <source> (denoised)</source>
+        <translation> (ඝෝෂා ඉවත් කළ)</translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation>ඝෝෂා ඉවත් කරන්න</translation>
+    </message>
+    <message>
+        <source>Noise removed</source>
+        <translation>ඝෝෂා ඉවත් කරන ලදී</translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWindow</name>
     <message>
         <source>Remove noise</source>
@@ -5712,6 +5492,41 @@
     <message>
         <source>Cancel</source>
         <translation>අවලංගු කරන්න</translation>
+    </message>
+</context>
+<context>
+    <name>DepthController</name>
+    <message>
+        <source>Select a video or image clip to estimate depth for</source>
+        <translation>ගැඹුර තක්සේරු කිරීම සඳහා වීඩියෝ හෝ පින්තූර ක්ලිපයක් තෝරන්න</translation>
+    </message>
+    <message>
+        <source>Clip has no video to estimate depth for</source>
+        <translation>ගැඹුර තක්සේරු කිරීමට ක්ලිපයේ වීඩියෝවක් නොමැත</translation>
+    </message>
+    <message>
+        <source>Depth estimation needs the Depth addon</source>
+        <translation>ගැඹුර තක්සේරු කිරීම සඳහා Depth ඇඩෝනය අවශ්‍ය වේ</translation>
+    </message>
+    <message>
+        <source>Depth is already being estimated for this clip</source>
+        <translation>මෙම ක්ලිපය සඳහා දැනටමත් ගැඹුර තක්සේරු කෙරෙමින් පවතී</translation>
+    </message>
+    <message>
+        <source>Estimating depth…</source>
+        <translation>ගැඹුර තක්සේරු කරමින්…</translation>
+    </message>
+    <message>
+        <source>Clip no longer exists</source>
+        <translation>ක්ලිපය තවදුරටත් නොපවතී</translation>
+    </message>
+    <message>
+        <source>Estimate Depth</source>
+        <translation>ගැඹුර තක්සේරු කරන්න</translation>
+    </message>
+    <message>
+        <source>Clear Depth</source>
+        <translation>ගැඹුර ඉවත් කරන්න</translation>
     </message>
 </context>
 <context>
@@ -6162,6 +5977,10 @@
     <message>
         <source>Language…</source>
         <translation>භාෂාව…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Debug info…</source>
@@ -7162,6 +6981,77 @@
     <message>
         <source>“%1” will be removed from your face props. Effects using it will show it as missing until it is imported again.</source>
         <translation>“%1” ඔබේ මුහුණු ප්‍රොප් වෙතින් ඉවත් කරනු ඇත. එය නැවත ආයාත කරන තෙක්, එය භාවිත කරන ප්‍රයෝග මඟින් එය අස්ථානගත වී ඇති බව පෙන්වනු ඇත.</translation>
+    </message>
+</context>
+<context>
+    <name>FaceTrackingController</name>
+    <message>
+        <source>Clear Face Track</source>
+        <translation>මුහුණු ට්‍රැකය හිස් කරන්න</translation>
+    </message>
+    <message>
+        <source>Face detection already in progress</source>
+        <translation>මුහුණු හඳුනාගැනීම දැනටමත් සිදුවෙමින් පවතී</translation>
+    </message>
+    <message>
+        <source>Select a video clip to detect faces in</source>
+        <translation>මුහුණු හඳුනාගැනීම සඳහා වීඩියෝ ක්ලිපයක් තෝරන්න</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation>ස්කෑන් කිරීමට ක්ලිපයේ වීඩියෝ නොමැත</translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation>සූදානම් වෙමින්…</translation>
+    </message>
+    <message>
+        <source>Detecting faces…</source>
+        <translation>මුහුණු හඳුනාගනිමින්…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>නිමයි</translation>
+    </message>
+    <message>
+        <source>Clip is too short to scan</source>
+        <translation>ස්කෑන් කිරීමට ක්ලිපය කෙටි වැඩිය</translation>
+    </message>
+    <message>
+        <source>Face detection cancelled</source>
+        <translation>මුහුණු හඳුනාගැනීම අවලංගු කෙරිණි</translation>
+    </message>
+    <message>
+        <source>Could not decode frame %1</source>
+        <translation>%1 රාමුව විකේතනය කිරීමට නොහැකි විය</translation>
+    </message>
+    <message>
+        <source>Scanning frame %1 of %2…</source>
+        <translation>%1/%2 රාමුව ස්කෑන් කරමින්…</translation>
+    </message>
+    <message>
+        <source>No faces found in this clip</source>
+        <translation>මෙම ක්ලිපයේ කිසිදු මුහුණක් හමු නොවීය</translation>
+    </message>
+    <message>
+        <source>Could not write the face track</source>
+        <translation>මුහුණු ට්‍රැකය ලිවීමට නොහැකි විය</translation>
+    </message>
+    <message>
+        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
+        <translation>මුහුණු හඳුනාගැනීම සම්පූර්ණයි — රාමු %2කින් %1ක මුහුණක් දක්නට ලැබිණි</translation>
+    </message>
+    <message>
+        <source>Face detection complete</source>
+        <translation>මුහුණු හඳුනාගැනීම සම්පූර්ණයි</translation>
+    </message>
+    <message>
+        <source>Scanned clip no longer exists</source>
+        <translation>ස්කෑන් කරන ලද ක්ලිපය තවදුරටත් නොපවතී</translation>
+    </message>
+    <message>
+        <source>Detect Faces</source>
+        <translation>මුහුණු හඳුනාගන්න</translation>
     </message>
 </context>
 <context>
@@ -8172,6 +8062,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Switch to Mobile Layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;Window</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8245,6 +8139,10 @@
     </message>
     <message>
         <source>Checking for updates…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Links can’t be opened in this layout.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11096,6 +10994,41 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>RestoreController</name>
+    <message>
+        <source>Select a video clip to enhance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a model to enhance with</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This clip is already being enhanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (enhanced %2x)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (enhanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhance Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhanced video added to the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhancing video…</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RestoreWindow</name>
     <message>
         <source>Enhance video</source>
@@ -11326,6 +11259,44 @@ If playback stutters, try another.</source>
     <message>
         <source>No frames could be decoded from this clip</source>
         <translation>මෙම ක්ලිපයෙන් කිසිදු රාමුවක් විකේතනය කළ නොහැකි විය</translation>
+    </message>
+</context>
+<context>
+    <name>SceneDetectController</name>
+    <message>
+        <source>Already looking for scenes</source>
+        <translation>දැනටමත් දර්ශන සොයමින් සිටී</translation>
+    </message>
+    <message>
+        <source>Select a video clip to find scenes in</source>
+        <translation>දර්ශන සෙවීම සඳහා වීඩියෝ ක්ලිප් එකක් තෝරන්න</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation>ස්කෑන් කිරීමට ක්ලිපයේ වීඩියෝ නොමැත</translation>
+    </message>
+    <message numerus="yes">
+        <source>Found %n scene(s)</source>
+        <translation>
+            <numerusform>දර්ශන %nක් හමු විය</numerusform>
+            <numerusform>දර්ශන %nක් හමු විය</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation>සූදානම් වෙමින්…</translation>
+    </message>
+    <message>
+        <source>Looking for scenes…</source>
+        <translation>දර්ශන සොයමින්…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>නිමයි</translation>
+    </message>
+    <message>
+        <source>Scene detection cancelled</source>
+        <translation>දර්ශන හඳුනාගැනීම අවලංගු විය</translation>
     </message>
 </context>
 <context>
@@ -11741,6 +11712,34 @@ If playback stutters, try another.</source>
     <message>
         <source>Restart Drift to apply this size.</source>
         <translation>මෙම ප්‍රමාණය යෙදීමට Drift නැවත ආරම්භ කරන්න.</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mobile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop suits a mouse and keyboard, including tablets in desktop mode. Mobile is the touch layout made for phones. Takes effect after restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Horizontal mouse-wheel pan</source>
@@ -12474,6 +12473,49 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>ShellSwitchDialog</name>
+    <message>
+        <source>Switch to the mobile layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the desktop layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Later</source>
+        <translation type="unfinished">පසුව</translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A mouse is connected. The desktop layout has full menus, panels and precise timeline editing. Drift restarts to switch, and your project is kept.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The mobile layout is the touch interface made for phones. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The desktop layout suits a mouse and keyboard. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ShortcutCaptureField</name>
     <message>
         <source>Shortcut for %1</source>
@@ -12880,6 +12922,113 @@ If playback stutters, try another.</source>
     <message>
         <source>Could not write subtitle file</source>
         <translation>උපසිරැසි ගොනුව ලිවීමට නොහැකි විය</translation>
+    </message>
+</context>
+<context>
+    <name>StabilizeController</name>
+    <message>
+        <source>%1 (stabilized)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a video clip to stabilize</source>
+        <translation>ස්ථාවර කිරීමට වීඩියෝ ක්ලිප් එකක් තෝරන්න</translation>
+    </message>
+    <message>
+        <source>Clip has no video file</source>
+        <translation>ක්ලිප් එකෙහි වීඩියෝ ගොනුවක් නොමැත</translation>
+    </message>
+    <message>
+        <source>Stabilization already in progress for this clip</source>
+        <translation>මෙම ක්ලිප් එක සඳහා දැනටමත් ස්ථාවර කිරීම ක්‍රියාත්මක වේ</translation>
+    </message>
+    <message>
+        <source>This build of Drift has no video stabilization support</source>
+        <translation>Drift හි මෙම සංස්කරණයට වීඩියෝ ස්ථාවර කිරීමේ සහාය නොමැත</translation>
+    </message>
+    <message>
+        <source>The video this clip was stabilized from is no longer in the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create stabilization cache directory</source>
+        <translation>ස්ථාවර කිරීමේ හැඹිලි බහලුම සෑදීමට නොහැකි විය</translation>
+    </message>
+    <message>
+        <source>Building keyframes…</source>
+        <translation>කීෆ්‍රේම ගොඩනඟමින්…</translation>
+    </message>
+    <message>
+        <source>Rendering stabilized video…</source>
+        <translation>ස්ථාවර කළ වීඩියෝව රෙන්ඩර් කරමින්…</translation>
+    </message>
+    <message>
+        <source>Analyzing camera motion…</source>
+        <translation>කැමරා චලනය විශ්ලේෂණය කරමින්…</translation>
+    </message>
+    <message>
+        <source>Stabilization cancelled.</source>
+        <translation>ස්ථාවර කිරීම අවලංගු විය.</translation>
+    </message>
+    <message>
+        <source>Could not read camera motion from the analysis file.</source>
+        <translation>විශ්ලේෂණ ගොනුවෙන් කැමරා චලනය කියවීමට නොහැකි විය.</translation>
+    </message>
+    <message>
+        <source>Stabilize with Keyframes</source>
+        <translation>කීෆ්‍රේම සමඟ ස්ථාවර කරන්න</translation>
+    </message>
+    <message>
+        <source>Stabilization keyframes applied.</source>
+        <translation>ස්ථාවර කිරීමේ කීෆ්‍රේම යොදන ලදී.</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis file is missing.</source>
+        <translation>ස්ථාවර කිරීමේ විශ්ලේෂණ ගොනුව නැත.</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>ප්‍රතිදාන ගොනුවක් සෑදීමට නොහැකි විය</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed.</source>
+        <translation>ස්ථාවර කිරීම රෙන්ඩර් වීම අසමත් විය.</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed: %1</source>
+        <translation>ස්ථාවර කිරීම රෙන්ඩර් වීම අසමත් විය: %1</translation>
+    </message>
+    <message>
+        <source>Stabilize Video</source>
+        <translation>වීඩියෝව ස්ථාවර කරන්න</translation>
+    </message>
+    <message>
+        <source>Stabilized video added to the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed.</source>
+        <translation>ස්ථාවර කිරීමේ විශ්ලේෂණය අසමත් විය.</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed: %1</source>
+        <translation>ස්ථාවර කිරීමේ විශ්ලේෂණය අසමත් විය: %1</translation>
+    </message>
+    <message>
+        <source>Remove Stabilization</source>
+        <translation>ස්ථාවර කිරීම ඉවත් කරන්න</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Smoothing</source>
+        <translation>ස්ථාවර කිරීමේ සුමටතාව වෙනස් කරන්න</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Tripod Mode</source>
+        <translation>ස්ථාවර කිරීමේ ට්‍රයිපොඩ් ප්‍රකාරය වෙනස් කරන්න</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Mode</source>
+        <translation>ස්ථාවර කිරීමේ ප්‍රකාරය වෙනස් කරන්න</translation>
     </message>
 </context>
 <context>

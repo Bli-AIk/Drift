@@ -620,13 +620,13 @@ QJsonObject McpController::inspect(const InspectOptions &options) const
         // Scene state without the rows — list_scenes returns those. There is deliberately no
         // `stale` flag as there is for beats: this analysis describes the source file, not the
         // mix, so edits do not invalidate it.
-        if (m_app->m_sceneDetecting || !m_app->m_scenes.isEmpty()) {
+        if (m_app->scenes()->detecting() || !m_app->scenes()->list().isEmpty()) {
             jobs.insert(QStringLiteral("sceneDetect"),
-                        QJsonObject{{QStringLiteral("active"), m_app->m_sceneDetecting},
-                                    {QStringLiteral("progress"), m_app->m_sceneDetectProgress},
-                                    {QStringLiteral("status"), m_app->m_sceneDetectStatus},
-                                    {QStringLiteral("clip"), m_app->m_sceneClipId},
-                                    {QStringLiteral("scenes"), int(m_app->m_scenes.size())}});
+                        QJsonObject{{QStringLiteral("active"), m_app->scenes()->detecting()},
+                                    {QStringLiteral("progress"), m_app->scenes()->progress()},
+                                    {QStringLiteral("status"), m_app->scenes()->status()},
+                                    {QStringLiteral("clip"), m_app->scenes()->clipId()},
+                                    {QStringLiteral("scenes"), int(m_app->scenes()->list().size())}});
         }
         if (m_app->m_marketClient && m_app->m_marketClient->activeDownloadCount() > 0) {
             jobs.insert(QStringLiteral("market"),
@@ -1037,8 +1037,8 @@ QJsonObject McpController::frameSheet(const FrameSheetRequest &request)
         QList<QPair<double, QPair<QString, int>>> hits;
         const auto collect = [&](const drift::Clip &c) {
             drift::SceneAnalysis analysis;
-            if (!drift::loadCachedAnalysis(m_app->sceneRequestFor(c, true, 0.0), &analysis)
-                && !drift::loadCachedAnalysis(m_app->sceneRequestFor(c, false, 0.0), &analysis)) {
+            if (!drift::loadCachedAnalysis(m_app->scenes()->sceneRequestFor(c, true, 0.0), &analysis)
+                && !drift::loadCachedAnalysis(m_app->scenes()->sceneRequestFor(c, false, 0.0), &analysis)) {
                 unscanned.append(c.id);
                 const double t = sourceMode ? drift::usToSeconds(c.srcIn)
                                             : drift::usToSeconds(c.timelineStart);
@@ -1933,26 +1933,26 @@ QJsonObject McpController::detectScenes(int trackIndex, int clipIndex, double th
                    QStringLiteral("Object labelling needs the object-model addon — ask the user "
                                   "to install it from Extras"));
     }
-    if (m_app->m_sceneDetecting)
+    if (m_app->scenes()->detecting())
         return err("conflict", QStringLiteral("A scene scan is already running"));
 
     if (threshold > 0.0)
-        m_app->setSceneThreshold(threshold);
+        m_app->scenes()->setThreshold(threshold);
 
-    const drift::SceneDetectRequest request = m_app->sceneRequestFor(clip, withObjects, minScene);
+    const drift::SceneDetectRequest request = m_app->scenes()->sceneRequestFor(clip, withObjects, minScene);
 
     // Report a cache hit synchronously: an agent that would otherwise poll for an async job
     // can carry straight on to list_scenes.
     drift::SceneAnalysis cached;
     if (drift::loadCachedAnalysis(request, &cached) && (!withObjects || cached.objectsScanned)) {
-        m_app->applySceneAnalysis(cached, clip.id, clip.path, clip.rotationCorrection);
+        m_app->scenes()->applySceneAnalysis(cached, clip.id, clip.path, clip.rotationCorrection);
         return ok({{QStringLiteral("cached"), true},
                    {QStringLiteral("clip"), clip.id},
                    {QStringLiteral("scenes"), int(cached.scenes.size())},
                    {QStringLiteral("cuts"), int(cached.cuts.size())}});
     }
 
-    m_app->detectScenesForClip(trackIndex, clipIndex, withObjects, minScene);
+    m_app->scenes()->detect(trackIndex, clipIndex, withObjects, minScene);
     return ok({{QStringLiteral("started"), true}, {QStringLiteral("clip"), clip.id}});
 }
 
@@ -1962,21 +1962,21 @@ QVariantList McpController::sceneRows(int trackIndex, int clipIndex, const drift
     if (trackIndex < 0 || clipIndex < 0) {
         for (const drift::Track &track : m_app->m_project.tracks()) {
             for (const drift::Clip &candidate : track.clips) {
-                if (candidate.id == m_app->m_sceneClipId)
+                if (candidate.id == m_app->scenes()->clipId())
                     *clip = &candidate;
             }
         }
-        return *clip ? m_app->m_scenes : QVariantList{};
+        return *clip ? m_app->scenes()->list() : QVariantList{};
     }
     const auto &tracks = m_app->m_project.tracks();
     if (trackIndex >= tracks.size() || clipIndex >= tracks.at(trackIndex).clips.size())
         return {};
     *clip = &tracks.at(trackIndex).clips.at(clipIndex);
-    if ((*clip)->id == m_app->m_sceneClipId)
-        return m_app->m_scenes;
+    if ((*clip)->id == m_app->scenes()->clipId())
+        return m_app->scenes()->list();
     drift::SceneAnalysis analysis;
-    if (drift::loadCachedAnalysis(m_app->sceneRequestFor(**clip, true, 0.0), &analysis)
-        || drift::loadCachedAnalysis(m_app->sceneRequestFor(**clip, false, 0.0), &analysis))
+    if (drift::loadCachedAnalysis(m_app->scenes()->sceneRequestFor(**clip, true, 0.0), &analysis)
+        || drift::loadCachedAnalysis(m_app->scenes()->sceneRequestFor(**clip, false, 0.0), &analysis))
         return sceneRowsFromAnalysis(analysis);
     return {};
 }
@@ -2160,8 +2160,8 @@ QJsonObject McpController::findScenes(const QString &label, double minScore, int
             // Labelled and unlabelled scans are cached separately, so look for both rather
             // than reporting a clip as unscanned because only the labelled pass exists.
             drift::SceneAnalysis analysis;
-            if (!drift::loadCachedAnalysis(m_app->sceneRequestFor(clip, true, 0.0), &analysis)
-                && !drift::loadCachedAnalysis(m_app->sceneRequestFor(clip, false, 0.0), &analysis)) {
+            if (!drift::loadCachedAnalysis(m_app->scenes()->sceneRequestFor(clip, true, 0.0), &analysis)
+                && !drift::loadCachedAnalysis(m_app->scenes()->sceneRequestFor(clip, false, 0.0), &analysis)) {
                 unscanned.append(clip.id);
                 continue;
             }
@@ -2214,13 +2214,13 @@ QJsonObject McpController::findScenes(const QString &label, double minScore, int
 
 QList<double> McpController::sceneCutTimes(double minScore, const QString &label) const
 {
-    if (m_app->m_scenes.isEmpty())
+    if (m_app->scenes()->list().isEmpty())
         return {};
 
     const drift::Clip *clip = nullptr;
     for (const drift::Track &track : m_app->m_project.tracks()) {
         for (const drift::Clip &candidate : track.clips) {
-            if (candidate.id == m_app->m_sceneClipId) {
+            if (candidate.id == m_app->scenes()->clipId()) {
                 clip = &candidate;
                 break;
             }
@@ -2230,7 +2230,7 @@ QList<double> McpController::sceneCutTimes(double minScore, const QString &label
         return {};
 
     QList<double> times;
-    for (const QVariant &value : m_app->m_scenes) {
+    for (const QVariant &value : m_app->scenes()->list()) {
         const QVariantMap scene = value.toMap();
         // Scene 0 opens at the clip's own start, which is not a cut.
         if (scene.value(QStringLiteral("index")).toInt() == 0)

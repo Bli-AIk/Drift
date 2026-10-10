@@ -1036,6 +1036,10 @@
         <translation>সেটিংস</translation>
     </message>
     <message>
+        <source>Switch to desktop layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Extras</source>
         <translation>অতিরিক্ত প্যাক</translation>
     </message>
@@ -2371,112 +2375,8 @@
         <translation type="unfinished">গতি বক্ররেখা সরানো হয়েছে।</translation>
     </message>
     <message>
-        <source>Getting ready…</source>
-        <translation type="unfinished">প্রস্তুত হচ্ছে…</translation>
-    </message>
-    <message>
-        <source>Could not decode frame %1</source>
-        <translation type="unfinished">ফ্রেম ডিকোড করা যায়নি %1</translation>
-    </message>
-    <message>
-        <source>Clear Face Track</source>
-        <translation type="unfinished">ক্লিয়ার ফেস ট্র্যাক</translation>
-    </message>
-    <message>
-        <source>Face detection already in progress</source>
-        <translation type="unfinished">মুখ সনাক্তকরণ ইতিমধ্যেই চলছে।</translation>
-    </message>
-    <message>
-        <source>Select a video clip to detect faces in</source>
-        <translation type="unfinished">মুখ সনাক্ত করতে একটি ভিডিও ক্লিপ নির্বাচন করুন।</translation>
-    </message>
-    <message>
-        <source>Clip has no video to scan</source>
-        <translation type="unfinished">ক্লিপটিতে স্ক্যান করার মতো কোনো ভিডিও নেই।</translation>
-    </message>
-    <message>
-        <source>Clip is too short to scan</source>
-        <translation type="unfinished">ক্লিপটি স্ক্যান করার জন্য খুব ছোট</translation>
-    </message>
-    <message>
-        <source>Face detection cancelled</source>
-        <translation type="unfinished">মুখ সনাক্তকরণ বাতিল করা হয়েছে।</translation>
-    </message>
-    <message>
-        <source>Scanning frame %1 of %2…</source>
-        <translation type="unfinished">স্ক্যানিং ফ্রেম %1 এর %2…</translation>
-    </message>
-    <message>
-        <source>No faces found in this clip</source>
-        <translation type="unfinished">এই ক্লিপে কোন মুখ পাওয়া যায়নি</translation>
-    </message>
-    <message>
-        <source>Could not write the face track</source>
-        <translation type="unfinished">ফেস ট্র্যাক লেখা যায়নি</translation>
-    </message>
-    <message>
-        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
-        <translation type="unfinished">মুখ সনাক্তকরণ সম্পূর্ণ হয়েছে — %2 ফ্রেমের %1 মধ্যে একটি মুখ দৃশ্যমান ছিল</translation>
-    </message>
-    <message>
-        <source>Face detection complete</source>
-        <translation type="unfinished">মুখ সনাক্তকরণ সম্পূর্ণ</translation>
-    </message>
-    <message>
-        <source>Scanned clip no longer exists</source>
-        <translation type="unfinished">স্ক্যান করা ক্লিপ আর বিদ্যমান নেই।</translation>
-    </message>
-    <message>
-        <source>Detect Faces</source>
-        <translation type="unfinished">মুখ সনাক্ত করুন</translation>
-    </message>
-    <message>
         <source>Clip</source>
         <translation>ক্লিপ</translation>
-    </message>
-    <message>
-        <source>Getting noise removal ready…</source>
-        <translation type="unfinished">শব্দ অপসারণ প্রস্তুত করা হচ্ছে…</translation>
-    </message>
-    <message>
-        <source>Clip is too short to process</source>
-        <translation type="unfinished">ক্লিপ প্রক্রিয়া করার জন্য খুব ছোট</translation>
-    </message>
-    <message>
-        <source>Noise removal cancelled</source>
-        <translation type="unfinished">শব্দ অপসারণ বাতিল করা হয়েছে</translation>
-    </message>
-    <message>
-        <source>Removing noise (left)…</source>
-        <translation type="unfinished">শব্দ অপসারণ করা হচ্ছে (বাম)…</translation>
-    </message>
-    <message>
-        <source>Removing noise (right)…</source>
-        <translation type="unfinished">শব্দ অপসারণ করা হচ্ছে (ডানদিকে)…</translation>
-    </message>
-    <message>
-        <source>Writing audio…</source>
-        <translation type="unfinished">অডিও লেখা হচ্ছে…</translation>
-    </message>
-    <message>
-        <source>Noise removal already in progress</source>
-        <translation type="unfinished">শব্দ অপসারণের কাজ ইতিমধ্যেই চলছে।</translation>
-    </message>
-    <message>
-        <source>Select a video or audio clip</source>
-        <translation type="unfinished">একটি ভিডিও বা অডিও ক্লিপ নির্বাচন করুন</translation>
-    </message>
-    <message>
-        <source>Clip has no audio</source>
-        <translation type="unfinished">ক্লিপে কোন অডিও নেই</translation>
-    </message>
-    <message>
-        <source>Could not create a preview file</source>
-        <translation type="unfinished">একটি পূর্বরূপ ফাইল তৈরি করা যায়নি।</translation>
-    </message>
-    <message>
-        <source>Ready</source>
-        <translation>প্রস্তুত</translation>
     </message>
     <message numerus="yes">
         <source>Imported %n subtitles</source>
@@ -2547,69 +2447,6 @@
     <message>
         <source>Save combined multicam</source>
         <translation type="unfinished">সম্মিলিত মাল্টিক্যাম সংরক্ষণ করুন</translation>
-    </message>
-    <message>
-        <source>Select a video clip to stabilize</source>
-        <translation type="unfinished">স্থিতিশীল করতে একটি ভিডিও ক্লিপ নির্বাচন করুন।</translation>
-    </message>
-    <message>
-        <source>Clip has no video file</source>
-        <translation type="unfinished">ক্লিপের কোন ভিডিও ফাইল নেই</translation>
-    </message>
-    <message>
-        <source>Stabilization already in progress for this clip</source>
-        <translation type="unfinished">এই ক্লিপের জন্য ইতিমধ্যেই স্থিরকরণ প্রক্রিয়াধীন রয়েছে।</translation>
-    </message>
-    <message>
-        <source>Could not create stabilization cache directory</source>
-        <translation type="unfinished">স্ট্যাবিলাইজেশন ক্যাশে ডিরেক্টরি তৈরি করা যায়নি</translation>
-    </message>
-    <message>
-        <source>Stabilize Video</source>
-        <translation type="unfinished">ভিডিও স্থির করুন</translation>
-    </message>
-    <message>
-        <source>Remove Stabilization</source>
-        <translation type="unfinished">স্থিতিশীলতা সরান</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Smoothing</source>
-        <translation type="unfinished">পরিবর্তন স্থিরকরণ স্মুথিং</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Tripod Mode</source>
-        <translation type="unfinished">স্ট্যাবিলাইজেশন ট্রাইপড মোড পরিবর্তন করুন</translation>
-    </message>
-    <message>
-        <source>Detecting faces…</source>
-        <translation type="unfinished">মুখ সনাক্ত করা হচ্ছে…</translation>
-    </message>
-    <message>
-        <source>Already looking for scenes</source>
-        <translation type="unfinished">ইতিমধ্যে দৃশ্য খুঁজছেন</translation>
-    </message>
-    <message>
-        <source>Select a video clip to find scenes in</source>
-        <translation type="unfinished">দৃশ্যগুলি খুঁজতে একটি ভিডিও ক্লিপ নির্বাচন করুন।</translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n scene(s)</source>
-        <translation>
-            <numerusform>%nটি দৃশ্য পাওয়া গেছে</numerusform>
-            <numerusform>%nটি দৃশ্য পাওয়া গেছে</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Looking for scenes…</source>
-        <translation type="unfinished">দৃশ্য খুঁজছি…</translation>
-    </message>
-    <message>
-        <source>Scene detection cancelled</source>
-        <translation type="unfinished">দৃশ্য সনাক্তকরণ বাতিল করা হয়েছে।</translation>
-    </message>
-    <message>
-        <source>Removing noise…</source>
-        <translation type="unfinished">শব্দ অপসারণ করা হচ্ছে…</translation>
     </message>
     <message>
         <source>Could not create an output file</source>
@@ -2833,86 +2670,6 @@
     <message>
         <source>Transition curve updated</source>
         <translation type="unfinished">ট্রানজিশন কার্ভ আপডেট করা হয়েছে</translation>
-    </message>
-    <message>
-        <source>Select a video or image clip to estimate depth for</source>
-        <translation type="unfinished">গভীরতা অনুমান করতে একটি ভিডিও বা চিত্র ক্লিপ নির্বাচন করুন।</translation>
-    </message>
-    <message>
-        <source>Clip has no video to estimate depth for</source>
-        <translation type="unfinished">ক্লিপের গভীরতা অনুমান করার জন্য কোনো ভিডিও নেই।</translation>
-    </message>
-    <message>
-        <source>Depth estimation needs the Depth addon</source>
-        <translation type="unfinished">গভীরতার অনুমানের জন্য ডেপথ অ্যাডন প্রয়োজন</translation>
-    </message>
-    <message>
-        <source>Depth is already being estimated for this clip</source>
-        <translation type="unfinished">এই ক্লিপের জন্য ইতিমধ্যেই গভীরতা অনুমান করা হচ্ছে।</translation>
-    </message>
-    <message>
-        <source>Estimating depth…</source>
-        <translation type="unfinished">গভীরতা অনুমান করা হচ্ছে…</translation>
-    </message>
-    <message>
-        <source>Clip no longer exists</source>
-        <translation type="unfinished">ক্লিপটি আর বিদ্যমান নেই।</translation>
-    </message>
-    <message>
-        <source>Estimate Depth</source>
-        <translation>গভীরতা নির্ণয় করুন</translation>
-    </message>
-    <message>
-        <source>Clear Depth</source>
-        <translation>গভীরতার তথ্য মুছুন</translation>
-    </message>
-    <message>
-        <source>Building keyframes…</source>
-        <translation type="unfinished">কীফ্রেম তৈরি করা হচ্ছে…</translation>
-    </message>
-    <message>
-        <source>Rendering stabilized video…</source>
-        <translation type="unfinished">রেন্ডারিং স্থিতিশীল ভিডিও…</translation>
-    </message>
-    <message>
-        <source>Analyzing camera motion…</source>
-        <translation type="unfinished">ক্যামেরার গতি বিশ্লেষণ করা হচ্ছে…</translation>
-    </message>
-    <message>
-        <source>Stabilization cancelled.</source>
-        <translation type="unfinished">স্থিতিশীলকরণ বাতিল করা হয়েছে.</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis file is missing.</source>
-        <translation type="unfinished">স্থিতিশীলতা বিশ্লেষণ ফাইল অনুপস্থিত.</translation>
-    </message>
-    <message>
-        <source>Could not read camera motion from the analysis file.</source>
-        <translation type="unfinished">বিশ্লেষণ ফাইল থেকে ক্যামেরার গতি পড়তে পারেনি.</translation>
-    </message>
-    <message>
-        <source>Stabilize with Keyframes</source>
-        <translation type="unfinished">কীফ্রেমের সাথে স্থিতিশীল করুন</translation>
-    </message>
-    <message>
-        <source>Stabilization keyframes applied.</source>
-        <translation type="unfinished">স্ট্যাবিলাইজেশন কীফ্রেম প্রয়োগ করা হয়েছে.</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Mode</source>
-        <translation type="unfinished">স্থিরকরণ মোড পরিবর্তন করুন</translation>
-    </message>
-    <message>
-        <source> (denoised)</source>
-        <translation> (নয়েজমুক্ত)</translation>
-    </message>
-    <message>
-        <source>Remove noise</source>
-        <translation>নয়েজ সরান</translation>
-    </message>
-    <message>
-        <source>Noise removed</source>
-        <translation>নয়েজ সরানো হয়েছে</translation>
     </message>
     <message>
         <source>Shape added</source>
@@ -3529,70 +3286,6 @@
     <message>
         <source>%1 copy</source>
         <translation>%1 অনুলিপি</translation>
-    </message>
-    <message>
-        <source>%1 (stabilized)</source>
-        <translation type="unfinished">%1 (স্থিতিশীল)</translation>
-    </message>
-    <message>
-        <source>Select a video clip to enhance</source>
-        <translation type="unfinished">উন্নত করতে একটি ভিডিও ক্লিপ নির্বাচন করুন।</translation>
-    </message>
-    <message>
-        <source>Choose a model to enhance with</source>
-        <translation type="unfinished">উন্নত করার জন্য একটি মডেল বেছে নিন</translation>
-    </message>
-    <message>
-        <source>This clip is already being enhanced</source>
-        <translation type="unfinished">এই ক্লিপটি ইতিমধ্যেই উন্নত করা হচ্ছে।</translation>
-    </message>
-    <message>
-        <source>%1 (enhanced %2x)</source>
-        <translation type="unfinished">%1 (বর্ধিত %2 x)</translation>
-    </message>
-    <message>
-        <source>%1 (enhanced)</source>
-        <translation type="unfinished">%1 (বর্ধিত)</translation>
-    </message>
-    <message>
-        <source>Enhance Video</source>
-        <translation type="unfinished">ভিডিও উন্নত করুন</translation>
-    </message>
-    <message>
-        <source>Enhanced video added to the media bin</source>
-        <translation type="unfinished">উন্নত ভিডিও মিডিয়া বিনে যোগ করা হয়েছে</translation>
-    </message>
-    <message>
-        <source>Enhancing video…</source>
-        <translation type="unfinished">ভিডিও উন্নত করা হচ্ছে…</translation>
-    </message>
-    <message>
-        <source>This build of Drift has no video stabilization support</source>
-        <translation type="unfinished">Driftের এই বিল্ডটিতে কোনো ভিডিও স্ট্যাবিলাইজেশন সাপোর্ট নেই</translation>
-    </message>
-    <message>
-        <source>The video this clip was stabilized from is no longer in the media bin</source>
-        <translation type="unfinished">যে ভিডিওটি থেকে এই ক্লিপটি স্থির করা হয়েছে সেটি আর মিডিয়া বিনে নেই।</translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed.</source>
-        <translation type="unfinished">স্ট্যাবিলাইজেশন রেন্ডারিং ব্যর্থ হয়েছে.</translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed: %1</source>
-        <translation type="unfinished">স্ট্যাবিলাইজেশন রেন্ডারিং ব্যর্থ হয়েছে: %1</translation>
-    </message>
-    <message>
-        <source>Stabilized video added to the media bin</source>
-        <translation type="unfinished">স্থিতিশীল ভিডিও মিডিয়া বিনে যোগ করা হয়েছে</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed.</source>
-        <translation type="unfinished">স্থিতিশীলতা বিশ্লেষণ ব্যর্থ হয়েছে.</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed: %1</source>
-        <translation type="unfinished">স্থিতিশীলতা বিশ্লেষণ ব্যর্থ হয়েছে: %1</translation>
     </message>
     <message>
         <source>Audio adjustment</source>
@@ -5672,6 +5365,93 @@
     </message>
 </context>
 <context>
+    <name>DenoiseController</name>
+    <message>
+        <source>Getting noise removal ready…</source>
+        <translation type="unfinished">শব্দ অপসারণ প্রস্তুত করা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Clip is too short to process</source>
+        <translation type="unfinished">ক্লিপ প্রক্রিয়া করার জন্য খুব ছোট</translation>
+    </message>
+    <message>
+        <source>Reading audio…</source>
+        <translation type="unfinished">অডিও পড়া হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Noise removal cancelled</source>
+        <translation type="unfinished">শব্দ অপসারণ বাতিল করা হয়েছে</translation>
+    </message>
+    <message>
+        <source>No audio decoded</source>
+        <translation type="unfinished">কোন অডিও ডিকোড করা হয়নি</translation>
+    </message>
+    <message>
+        <source>Removing noise (left)…</source>
+        <translation type="unfinished">শব্দ অপসারণ করা হচ্ছে (বাম)…</translation>
+    </message>
+    <message>
+        <source>Removing noise (right)…</source>
+        <translation type="unfinished">শব্দ অপসারণ করা হচ্ছে (ডানদিকে)…</translation>
+    </message>
+    <message>
+        <source>Writing audio…</source>
+        <translation type="unfinished">অডিও লেখা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Noise removal already in progress</source>
+        <translation type="unfinished">শব্দ অপসারণের কাজ ইতিমধ্যেই চলছে।</translation>
+    </message>
+    <message>
+        <source>Select a video or audio clip</source>
+        <translation type="unfinished">একটি ভিডিও বা অডিও ক্লিপ নির্বাচন করুন</translation>
+    </message>
+    <message>
+        <source>Clip has no audio</source>
+        <translation type="unfinished">ক্লিপে কোন অডিও নেই</translation>
+    </message>
+    <message>
+        <source>Starting…</source>
+        <translation type="unfinished">শুরু হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Could not create a preview file</source>
+        <translation type="unfinished">একটি পূর্বরূপ ফাইল তৈরি করা যায়নি।</translation>
+    </message>
+    <message>
+        <source>Ready</source>
+        <translation>প্রস্তুত</translation>
+    </message>
+    <message>
+        <source>Removing noise…</source>
+        <translation type="unfinished">শব্দ অপসারণ করা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation type="unfinished">একটি আউটপুট ফাইল তৈরি করা যায়নি</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>সম্পন্ন</translation>
+    </message>
+    <message>
+        <source>Clip</source>
+        <translation>ক্লিপ</translation>
+    </message>
+    <message>
+        <source> (denoised)</source>
+        <translation> (নয়েজমুক্ত)</translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation>নয়েজ সরান</translation>
+    </message>
+    <message>
+        <source>Noise removed</source>
+        <translation>নয়েজ সরানো হয়েছে</translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWindow</name>
     <message>
         <source>Remove noise</source>
@@ -5712,6 +5492,41 @@
     <message>
         <source>Cancel</source>
         <translation>বাতিল করুন</translation>
+    </message>
+</context>
+<context>
+    <name>DepthController</name>
+    <message>
+        <source>Select a video or image clip to estimate depth for</source>
+        <translation type="unfinished">গভীরতা অনুমান করতে একটি ভিডিও বা চিত্র ক্লিপ নির্বাচন করুন।</translation>
+    </message>
+    <message>
+        <source>Clip has no video to estimate depth for</source>
+        <translation type="unfinished">ক্লিপের গভীরতা অনুমান করার জন্য কোনো ভিডিও নেই।</translation>
+    </message>
+    <message>
+        <source>Depth estimation needs the Depth addon</source>
+        <translation type="unfinished">গভীরতার অনুমানের জন্য ডেপথ অ্যাডন প্রয়োজন</translation>
+    </message>
+    <message>
+        <source>Depth is already being estimated for this clip</source>
+        <translation type="unfinished">এই ক্লিপের জন্য ইতিমধ্যেই গভীরতা অনুমান করা হচ্ছে।</translation>
+    </message>
+    <message>
+        <source>Estimating depth…</source>
+        <translation type="unfinished">গভীরতা অনুমান করা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Clip no longer exists</source>
+        <translation type="unfinished">ক্লিপটি আর বিদ্যমান নেই।</translation>
+    </message>
+    <message>
+        <source>Estimate Depth</source>
+        <translation>গভীরতা নির্ণয় করুন</translation>
+    </message>
+    <message>
+        <source>Clear Depth</source>
+        <translation>গভীরতার তথ্য মুছুন</translation>
     </message>
 </context>
 <context>
@@ -6162,6 +5977,10 @@
     <message>
         <source>Language…</source>
         <translation>ভাষা…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Debug info…</source>
@@ -7162,6 +6981,77 @@
     <message>
         <source>“%1” will be removed from your face props. Effects using it will show it as missing until it is imported again.</source>
         <translation type="unfinished">“%1” আপনার মুখের প্রপস থেকে সরানো হবে। এটি ব্যবহার করার ইফেক্টগুলি এটিকে অনুপস্থিত হিসাবে দেখাবে যতক্ষণ না এটি আবার ইমপোর্ট করা হয়.</translation>
+    </message>
+</context>
+<context>
+    <name>FaceTrackingController</name>
+    <message>
+        <source>Clear Face Track</source>
+        <translation type="unfinished">ক্লিয়ার ফেস ট্র্যাক</translation>
+    </message>
+    <message>
+        <source>Face detection already in progress</source>
+        <translation type="unfinished">মুখ সনাক্তকরণ ইতিমধ্যেই চলছে।</translation>
+    </message>
+    <message>
+        <source>Select a video clip to detect faces in</source>
+        <translation type="unfinished">মুখ সনাক্ত করতে একটি ভিডিও ক্লিপ নির্বাচন করুন।</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation type="unfinished">ক্লিপটিতে স্ক্যান করার মতো কোনো ভিডিও নেই।</translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation type="unfinished">প্রস্তুত হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Detecting faces…</source>
+        <translation type="unfinished">মুখ সনাক্ত করা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>সম্পন্ন</translation>
+    </message>
+    <message>
+        <source>Clip is too short to scan</source>
+        <translation type="unfinished">ক্লিপটি স্ক্যান করার জন্য খুব ছোট</translation>
+    </message>
+    <message>
+        <source>Face detection cancelled</source>
+        <translation type="unfinished">মুখ সনাক্তকরণ বাতিল করা হয়েছে।</translation>
+    </message>
+    <message>
+        <source>Could not decode frame %1</source>
+        <translation type="unfinished">ফ্রেম ডিকোড করা যায়নি %1</translation>
+    </message>
+    <message>
+        <source>Scanning frame %1 of %2…</source>
+        <translation type="unfinished">স্ক্যানিং ফ্রেম %1 এর %2…</translation>
+    </message>
+    <message>
+        <source>No faces found in this clip</source>
+        <translation type="unfinished">এই ক্লিপে কোন মুখ পাওয়া যায়নি</translation>
+    </message>
+    <message>
+        <source>Could not write the face track</source>
+        <translation type="unfinished">ফেস ট্র্যাক লেখা যায়নি</translation>
+    </message>
+    <message>
+        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
+        <translation type="unfinished">মুখ সনাক্তকরণ সম্পূর্ণ হয়েছে — %2 ফ্রেমের %1 মধ্যে একটি মুখ দৃশ্যমান ছিল</translation>
+    </message>
+    <message>
+        <source>Face detection complete</source>
+        <translation type="unfinished">মুখ সনাক্তকরণ সম্পূর্ণ</translation>
+    </message>
+    <message>
+        <source>Scanned clip no longer exists</source>
+        <translation type="unfinished">স্ক্যান করা ক্লিপ আর বিদ্যমান নেই।</translation>
+    </message>
+    <message>
+        <source>Detect Faces</source>
+        <translation type="unfinished">মুখ সনাক্ত করুন</translation>
     </message>
 </context>
 <context>
@@ -8172,6 +8062,10 @@
         <translation type="unfinished">টগল গাইড</translation>
     </message>
     <message>
+        <source>Switch to Mobile Layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;Window</source>
         <translation>উইন্ডো (&amp;W)</translation>
     </message>
@@ -8246,6 +8140,10 @@
     <message>
         <source>Checking for updates…</source>
         <translation type="unfinished">আপডেটের জন্য পরীক্ষা করা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Links can’t be opened in this layout.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Export finished.</source>
@@ -11096,6 +10994,41 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>RestoreController</name>
+    <message>
+        <source>Select a video clip to enhance</source>
+        <translation type="unfinished">উন্নত করতে একটি ভিডিও ক্লিপ নির্বাচন করুন।</translation>
+    </message>
+    <message>
+        <source>Choose a model to enhance with</source>
+        <translation type="unfinished">উন্নত করার জন্য একটি মডেল বেছে নিন</translation>
+    </message>
+    <message>
+        <source>This clip is already being enhanced</source>
+        <translation type="unfinished">এই ক্লিপটি ইতিমধ্যেই উন্নত করা হচ্ছে।</translation>
+    </message>
+    <message>
+        <source>%1 (enhanced %2x)</source>
+        <translation type="unfinished">%1 (বর্ধিত %2 x)</translation>
+    </message>
+    <message>
+        <source>%1 (enhanced)</source>
+        <translation type="unfinished">%1 (বর্ধিত)</translation>
+    </message>
+    <message>
+        <source>Enhance Video</source>
+        <translation type="unfinished">ভিডিও উন্নত করুন</translation>
+    </message>
+    <message>
+        <source>Enhanced video added to the media bin</source>
+        <translation type="unfinished">উন্নত ভিডিও মিডিয়া বিনে যোগ করা হয়েছে</translation>
+    </message>
+    <message>
+        <source>Enhancing video…</source>
+        <translation type="unfinished">ভিডিও উন্নত করা হচ্ছে…</translation>
+    </message>
+</context>
+<context>
     <name>RestoreWindow</name>
     <message>
         <source>Enhance video</source>
@@ -11326,6 +11259,44 @@ If playback stutters, try another.</source>
     <message>
         <source>No frames could be decoded from this clip</source>
         <translation type="unfinished">এই ক্লিপ থেকে কোনো ফ্রেম ডিকোড করা যাবে না</translation>
+    </message>
+</context>
+<context>
+    <name>SceneDetectController</name>
+    <message>
+        <source>Already looking for scenes</source>
+        <translation type="unfinished">ইতিমধ্যে দৃশ্য খুঁজছেন</translation>
+    </message>
+    <message>
+        <source>Select a video clip to find scenes in</source>
+        <translation type="unfinished">দৃশ্যগুলি খুঁজতে একটি ভিডিও ক্লিপ নির্বাচন করুন।</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation type="unfinished">ক্লিপটিতে স্ক্যান করার মতো কোনো ভিডিও নেই।</translation>
+    </message>
+    <message numerus="yes">
+        <source>Found %n scene(s)</source>
+        <translation>
+            <numerusform>%nটি দৃশ্য পাওয়া গেছে</numerusform>
+            <numerusform>%nটি দৃশ্য পাওয়া গেছে</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation type="unfinished">প্রস্তুত হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Looking for scenes…</source>
+        <translation type="unfinished">দৃশ্য খুঁজছি…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>সম্পন্ন</translation>
+    </message>
+    <message>
+        <source>Scene detection cancelled</source>
+        <translation type="unfinished">দৃশ্য সনাক্তকরণ বাতিল করা হয়েছে।</translation>
     </message>
 </context>
 <context>
@@ -11741,6 +11712,34 @@ If playback stutters, try another.</source>
     <message>
         <source>Restart Drift to apply this size.</source>
         <translation type="unfinished">এই আকার প্রয়োগ করতে Drift পুনরায় চালু করুন.</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mobile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop suits a mouse and keyboard, including tablets in desktop mode. Mobile is the touch layout made for phones. Takes effect after restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Horizontal mouse-wheel pan</source>
@@ -12474,6 +12473,49 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>ShellSwitchDialog</name>
+    <message>
+        <source>Switch to the mobile layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the desktop layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Later</source>
+        <translation type="unfinished">পরে</translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A mouse is connected. The desktop layout has full menus, panels and precise timeline editing. Drift restarts to switch, and your project is kept.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The mobile layout is the touch interface made for phones. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The desktop layout suits a mouse and keyboard. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ShortcutCaptureField</name>
     <message>
         <source>Shortcut for %1</source>
@@ -12880,6 +12922,113 @@ If playback stutters, try another.</source>
     <message>
         <source>Could not write subtitle file</source>
         <translation type="unfinished">সাবটাইটেল ফাইল লেখা যায়নি</translation>
+    </message>
+</context>
+<context>
+    <name>StabilizeController</name>
+    <message>
+        <source>%1 (stabilized)</source>
+        <translation type="unfinished">%1 (স্থিতিশীল)</translation>
+    </message>
+    <message>
+        <source>Select a video clip to stabilize</source>
+        <translation type="unfinished">স্থিতিশীল করতে একটি ভিডিও ক্লিপ নির্বাচন করুন।</translation>
+    </message>
+    <message>
+        <source>Clip has no video file</source>
+        <translation type="unfinished">ক্লিপের কোন ভিডিও ফাইল নেই</translation>
+    </message>
+    <message>
+        <source>Stabilization already in progress for this clip</source>
+        <translation type="unfinished">এই ক্লিপের জন্য ইতিমধ্যেই স্থিরকরণ প্রক্রিয়াধীন রয়েছে।</translation>
+    </message>
+    <message>
+        <source>This build of Drift has no video stabilization support</source>
+        <translation type="unfinished">Driftের এই বিল্ডটিতে কোনো ভিডিও স্ট্যাবিলাইজেশন সাপোর্ট নেই</translation>
+    </message>
+    <message>
+        <source>The video this clip was stabilized from is no longer in the media bin</source>
+        <translation type="unfinished">যে ভিডিওটি থেকে এই ক্লিপটি স্থির করা হয়েছে সেটি আর মিডিয়া বিনে নেই।</translation>
+    </message>
+    <message>
+        <source>Could not create stabilization cache directory</source>
+        <translation type="unfinished">স্ট্যাবিলাইজেশন ক্যাশে ডিরেক্টরি তৈরি করা যায়নি</translation>
+    </message>
+    <message>
+        <source>Building keyframes…</source>
+        <translation type="unfinished">কীফ্রেম তৈরি করা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Rendering stabilized video…</source>
+        <translation type="unfinished">রেন্ডারিং স্থিতিশীল ভিডিও…</translation>
+    </message>
+    <message>
+        <source>Analyzing camera motion…</source>
+        <translation type="unfinished">ক্যামেরার গতি বিশ্লেষণ করা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Stabilization cancelled.</source>
+        <translation type="unfinished">স্থিতিশীলকরণ বাতিল করা হয়েছে.</translation>
+    </message>
+    <message>
+        <source>Could not read camera motion from the analysis file.</source>
+        <translation type="unfinished">বিশ্লেষণ ফাইল থেকে ক্যামেরার গতি পড়তে পারেনি.</translation>
+    </message>
+    <message>
+        <source>Stabilize with Keyframes</source>
+        <translation type="unfinished">কীফ্রেমের সাথে স্থিতিশীল করুন</translation>
+    </message>
+    <message>
+        <source>Stabilization keyframes applied.</source>
+        <translation type="unfinished">স্ট্যাবিলাইজেশন কীফ্রেম প্রয়োগ করা হয়েছে.</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis file is missing.</source>
+        <translation type="unfinished">স্থিতিশীলতা বিশ্লেষণ ফাইল অনুপস্থিত.</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation type="unfinished">একটি আউটপুট ফাইল তৈরি করা যায়নি</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed.</source>
+        <translation type="unfinished">স্ট্যাবিলাইজেশন রেন্ডারিং ব্যর্থ হয়েছে.</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed: %1</source>
+        <translation type="unfinished">স্ট্যাবিলাইজেশন রেন্ডারিং ব্যর্থ হয়েছে: %1</translation>
+    </message>
+    <message>
+        <source>Stabilize Video</source>
+        <translation type="unfinished">ভিডিও স্থির করুন</translation>
+    </message>
+    <message>
+        <source>Stabilized video added to the media bin</source>
+        <translation type="unfinished">স্থিতিশীল ভিডিও মিডিয়া বিনে যোগ করা হয়েছে</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed.</source>
+        <translation type="unfinished">স্থিতিশীলতা বিশ্লেষণ ব্যর্থ হয়েছে.</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed: %1</source>
+        <translation type="unfinished">স্থিতিশীলতা বিশ্লেষণ ব্যর্থ হয়েছে: %1</translation>
+    </message>
+    <message>
+        <source>Remove Stabilization</source>
+        <translation type="unfinished">স্থিতিশীলতা সরান</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Smoothing</source>
+        <translation type="unfinished">পরিবর্তন স্থিরকরণ স্মুথিং</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Tripod Mode</source>
+        <translation type="unfinished">স্ট্যাবিলাইজেশন ট্রাইপড মোড পরিবর্তন করুন</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Mode</source>
+        <translation type="unfinished">স্থিরকরণ মোড পরিবর্তন করুন</translation>
     </message>
 </context>
 <context>

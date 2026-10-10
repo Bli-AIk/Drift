@@ -62,8 +62,14 @@ struct MediaEditSpec;
 #include "preview/PreviewController.h"
 #include "AssetPreviewController.h"
 #include "CurveEditorController.h"
+#include "DenoiseController.h"
+#include "DepthController.h"
+#include "FaceTrackingController.h"
 #include "McpController.h"
+#include "RestoreController.h"
+#include "SceneDetectController.h"
 #include "SegmentationController.h"
+#include "StabilizeController.h"
 #include "TtsController.h"
 #include "VoiceLibrary.h"
 #include "SpeedCurveController.h"
@@ -85,6 +91,12 @@ class AppController : public QObject
     friend class SpeedCurveController;
     friend class CurveEditorController;
     friend class SegmentationController;
+    friend class SceneDetectController;
+    friend class DepthController;
+    friend class DenoiseController;
+    friend class RestoreController;
+    friend class FaceTrackingController;
+    friend class StabilizeController;
     friend class TtsController;
     friend class VoiceLibrary;
 
@@ -115,6 +127,18 @@ class AppController : public QObject
     Q_PROPERTY(CurveEditorController *curves READ curves CONSTANT)
     // Cutout pipeline and prompting session. QML: EditorState.segmentation.
     Q_PROPERTY(SegmentationController *segmentation READ segmentation CONSTANT)
+    // Shot detection for a video clip. QML: EditorState.scenes.
+    Q_PROPERTY(SceneDetectController *scenes READ scenes CONSTANT)
+    // Depth estimation for a clip. QML: EditorState.depth.
+    Q_PROPERTY(DepthController *depth READ depth CONSTANT)
+    // Noise removal for a clip's audio. QML: EditorState.denoise.
+    Q_PROPERTY(DenoiseController *denoise READ denoise CONSTANT)
+    // Video restore and enhance (decompression, upscaling). QML: EditorState.restore.
+    Q_PROPERTY(RestoreController *restore READ restore CONSTANT)
+    // Face landmark tracking and Face Swap source ingest. QML: EditorState.faces.
+    Q_PROPERTY(FaceTrackingController *faces READ faces CONSTANT)
+    // Clip stabilization. QML: EditorState.stabilize.
+    Q_PROPERTY(StabilizeController *stabilize READ stabilize CONSTANT)
     // Local text-to-speech and the cloned-voice library. QML: EditorState.tts, EditorState.voices.
     Q_PROPERTY(TtsController *tts READ tts CONSTANT)
     Q_PROPERTY(VoiceLibrary *voices READ voices CONSTANT)
@@ -224,9 +248,6 @@ class AppController : public QObject
     Q_PROPERTY(bool reverseRendering READ reverseRendering NOTIFY reverseRenderingChanged)
     Q_PROPERTY(double reverseRenderProgress READ reverseRenderProgress NOTIFY reverseRenderProgressChanged)
     Q_PROPERTY(QString reverseRenderStatus READ reverseRenderStatus NOTIFY reverseRenderStatusChanged)
-    Q_PROPERTY(bool denoising READ denoising NOTIFY denoisingChanged)
-    Q_PROPERTY(double denoiseProgress READ denoiseProgress NOTIFY denoiseProgressChanged)
-    Q_PROPERTY(QString denoiseStatus READ denoiseStatus NOTIFY denoiseStatusChanged)
     // Multicam punching session. The live project is not touched until Save; switches rewrite a
     // staged copy that playback is pointed at so the program monitor shows the mix.
     Q_PROPERTY(bool multicamActive READ multicamActive NOTIFY multicamChanged)
@@ -243,20 +264,6 @@ class AppController : public QObject
     // There is enough imported video to build a rig from, and no visual clips that building one
     // would disturb. Drives the window's "set this up for me" offer.
     Q_PROPERTY(bool multicamCanSetUp READ multicamCanSetUp NOTIFY multicamChanged)
-    Q_PROPERTY(bool faceDetecting READ faceDetecting NOTIFY faceDetectingChanged)
-    Q_PROPERTY(double faceDetectProgress READ faceDetectProgress NOTIFY faceDetectProgressChanged)
-    Q_PROPERTY(QString faceDetectStatus READ faceDetectStatus NOTIFY faceDetectStatusChanged)
-    // Detected shots for the clip named by sceneClipId. Analysis state, not project state:
-    // it describes the source media, so it is cached on disk rather than saved (see
-    // engine/SceneDetect.h) and is never pushed through the undo stack.
-    Q_PROPERTY(QVariantList scenes READ scenes NOTIFY scenesChanged)
-    Q_PROPERTY(QString sceneClipId READ sceneClipId NOTIFY scenesChanged)
-    // Source file the live analysis describes, so the panel can ask for thumbnails.
-    Q_PROPERTY(QString sceneClipPath READ sceneClipPath NOTIFY scenesChanged)
-    Q_PROPERTY(int sceneClipRotationCorrection READ sceneClipRotationCorrection NOTIFY scenesChanged)
-    Q_PROPERTY(bool sceneDetecting READ sceneDetecting NOTIFY sceneDetectingChanged)
-    Q_PROPERTY(double sceneDetectProgress READ sceneDetectProgress NOTIFY sceneDetectProgressChanged)
-    Q_PROPERTY(QString sceneDetectStatus READ sceneDetectStatus NOTIFY sceneDetectStatusChanged)
     Q_PROPERTY(int selectedTrack READ selectedTrack NOTIFY selectionChanged)
     Q_PROPERTY(int selectedClip READ selectedClip NOTIFY selectionChanged)
     Q_PROPERTY(QVariantList selection READ selection NOTIFY selectionChanged)
@@ -322,6 +329,12 @@ public:
     SpeedCurveController *speedCurve() const { return m_speedCurve; }
     CurveEditorController *curves() const { return m_curves; }
     SegmentationController *segmentation() const { return m_segmentation; }
+    SceneDetectController *scenes() const { return m_sceneDetect; }
+    DepthController *depth() const { return m_depth; }
+    DenoiseController *denoise() const { return m_denoise; }
+    RestoreController *restore() const { return m_restore; }
+    FaceTrackingController *faces() const { return m_faces; }
+    StabilizeController *stabilize() const { return m_stabilize; }
     TtsController *tts() const { return m_tts; }
     VoiceLibrary *voices() const { return m_voices; }
     McpController *mcp() const { return m_mcpController; }
@@ -415,19 +428,6 @@ public:
     bool reverseRendering() const { return m_reverseRendering; }
     double reverseRenderProgress() const { return m_reverseProgress; }
     QString reverseRenderStatus() const { return m_reverseStatus; }
-    bool denoising() const { return m_denoising; }
-    double denoiseProgress() const { return m_denoiseProgress; }
-    QString denoiseStatus() const { return m_denoiseStatus; }
-    bool faceDetecting() const { return m_faceDetecting; }
-    double faceDetectProgress() const { return m_faceDetectProgress; }
-    QString faceDetectStatus() const { return m_faceDetectStatus; }
-    QVariantList scenes() const { return m_scenes; }
-    QString sceneClipId() const { return m_sceneClipId; }
-    QString sceneClipPath() const { return m_sceneClipPath; }
-    int sceneClipRotationCorrection() const { return m_sceneClipRotationCorrection; }
-    bool sceneDetecting() const { return m_sceneDetecting; }
-    double sceneDetectProgress() const { return m_sceneDetectProgress; }
-    QString sceneDetectStatus() const { return m_sceneDetectStatus; }
     int selectedTrack() const { return m_selectedTrack; }
     int selectedClip() const { return m_selectedClip; }
     QVariantList selection() const;
@@ -690,93 +690,10 @@ public:
     Q_INVOKABLE void setTransitionEasing(int trackIndex, const QString &transitionId,
                                          const QString &curve);
 
-    // Noise removal (DeepFilterNet3). previewDenoise renders a short window either side of the
-    // model — original and cleaned — so the denoise window can A/B them before anything is
-    // committed; applyDenoise renders the whole clip and adds it to the timeline.
-    Q_INVOKABLE bool denoiseAvailable();
-    Q_INVOKABLE void previewDenoise(int trackIndex, int clipIndex, double atSeconds);
-    Q_INVOKABLE void applyDenoise(int trackIndex, int clipIndex);
-    Q_INVOKABLE void cancelDenoise();
 
-    // Bakes the clip's face landmarks to a sidecar so the face warp effects have something to
-    // follow. Runs off the GUI thread; the result lands on the clip through the undo stack.
-    Q_INVOKABLE void detectFacesForClip(int trackIndex, int clipIndex);
-    Q_INVOKABLE void cancelFaceDetection();
-    Q_INVOKABLE void clearFaceTrack(int trackIndex, int clipIndex);
-    Q_INVOKABLE bool faceDetectionAvailable();
-
-    // Estimates the clip's depth for the depth effects as a JobRegistry "depth" job targeting the
-    // clip id. Returns the job id, or empty when it could not start (the reason goes to
-    // lastMessage). The sidecar lands on the clip through the undo stack.
-    Q_INVOKABLE QString estimateDepthForClip(int trackIndex, int clipIndex, bool highQuality = false);
-    Q_INVOKABLE void cancelDepthEstimation(const QString &clipId);
-    Q_INVOKABLE void clearDepth(int trackIndex, int clipIndex);
-    Q_INVOKABLE bool depthAvailable();
-    // {active, progress, status, error} of the newest depth job for a clip; empty if there is none.
-    Q_INVOKABLE QVariantMap depthJob(const QString &clipId) const;
-
-    // Restore models (compression removal, upscaling), installed addons and custom .onnx files:
-    // [{id, name, task: "decompress"|"upscale", scale, custom}].
-    Q_INVOKABLE QVariantList restoreModels();
-    // The folder custom restore models are read from, created if missing.
-    Q_INVOKABLE QString restoreModelsFolder();
-    // The enhance window works on a target: a clip id (its used source range) or a bin video's
-    // asset id (the whole file).
-    //
-    // Runs the target through an optional decompression model, then an optional upscaler, into a
-    // new bin item beside its media, as a JobRegistry "restore" job targeting that id. Either
-    // model id may be empty, not both. Returns the job id, or empty when it could not start (the
-    // reason goes to lastMessage).
-    Q_INVOKABLE QString restoreVideo(const QString &targetId, const QString &decompressModel,
-                                     const QString &upscaleModel);
-    Q_INVOKABLE void cancelRestore(const QString &targetId);
-    // {active, progress, status, error, kind} of the newest restore or restore-preview job for a
-    // target; empty if there is none.
-    Q_INVOKABLE QVariantMap restoreJob(const QString &targetId) const;
-    // The enhance window's before/after. Decodes the frame `offsetSeconds` into the target at
-    // source resolution as image://segment/restore-original, dropping any result. Calls made
-    // while a decode runs collapse into the newest, so it can follow a dragged slider.
-    Q_INVOKABLE void setRestorePreviewFrame(const QString &targetId, double offsetSeconds);
-    // Runs the models over that frame as a JobRegistry "restore-preview" job; the result becomes
-    // image://segment/restore-enhanced. Returns the job id, or empty when it could not start.
-    Q_INVOKABLE QString previewRestore(const QString &targetId, const QString &decompressModel,
-                                       const QString &upscaleModel);
-    // {seconds, width, height (upright), fps} of a target.
-    Q_INVOKABLE QVariantMap restoreTargetInfo(const QString &targetId) const;
-    // {factor, calibrated}: how this machine's CPU compares with the one the models'
-    // secondsPerMegapixel were measured on. Each preview run refines it.
-    Q_INVOKABLE QVariantMap restoreSpeed() const;
-    // {revision, width, height, enhancedWidth, enhancedHeight, loading}
-    Q_INVOKABLE QVariantMap restorePreviewState() const;
-    Q_INVOKABLE void endRestorePreview();
-    // Normalised depth (0 far, 1 near) under a point of the clip's frame, given in 0..1 frame
-    // coordinates, at a timeline time (negative: the playhead). -1 when the clip has no depth.
-    Q_INVOKABLE double sampleDepthAt(int trackIndex, int clipIndex, double nx, double ny,
-                                     double atSeconds = -1.0);
-
-    // Finds the shot boundaries in a clip's source range. Runs off the GUI thread; the
-    // result lands in `scenes` and in the on-disk cache, never in the project. A cached
-    // analysis for the same clip and settings is published immediately without rescanning.
-    // minSceneSeconds <= 0 means "leave the engine default alone".
-    Q_INVOKABLE void detectScenesForClip(int trackIndex, int clipIndex, bool withObjects,
-                                         double minSceneSeconds = 0.0);
-    Q_INVOKABLE void cancelSceneDetection();
-    Q_INVOKABLE void stabilizeClip(int trackIndex, int clipIndex);
-    Q_INVOKABLE void cancelClipStabilization(int trackIndex, int clipIndex);
-    Q_INVOKABLE void removeClipStabilization(int trackIndex, int clipIndex);
-    Q_INVOKABLE void setClipStabilizeSmoothing(int trackIndex, int clipIndex, int value);
-    Q_INVOKABLE void setClipStabilizeTripod(int trackIndex, int clipIndex, bool enabled);
-    Q_INVOKABLE void setClipStabilizeMode(int trackIndex, int clipIndex, const QString &mode);
     // Whether the optional object-labelling pass can run. False until the object-model
     // addon is installed, which is what the panel's toggle is gated on.
     Q_INVOKABLE bool objectDetectionAvailable() const;
-    Q_INVOKABLE void clearScenes();
-    // Move the playhead to a detected scene. Scenes are in source time; this maps back
-    // through the clip's trim and speed to reach the right timeline position.
-    Q_INVOKABLE void seekToScene(int sceneIndex);
-    // Sensitivity, persisted in QSettings so a scan does not forget it between sessions.
-    Q_INVOKABLE double sceneThreshold() const;
-    Q_INVOKABLE void setSceneThreshold(double threshold);
     // shapeKind/shapeId is a catalog id from builtinShapes(), which is not always a ShapeKind name:
     // "circle" and "ellipse" are the same kind with different default aspects.
     Q_INVOKABLE void addShapeClip(const QString &shapeKind, double atSeconds);
@@ -1655,27 +1572,10 @@ signals:
     void reverseRenderStatusChanged();
     void reverseRenderFinished(bool ok, const QString &message);
     void reverseConfirmRequested(int trackIndex, int clipIndex, double seconds);
-    void denoisingChanged();
-    void denoiseProgressChanged();
-    void denoiseStatusChanged();
-    void denoisePreviewReady(const QString &originalPath, const QString &cleanPath);
-    void denoiseFinished(bool ok, const QString &message);
     void multicamChanged();
     void multicamFramesChanged();
     // Raised by the "multicam" shortcut/action. QML owns the window, as with the file actions.
     void openMulticamWindowRequested();
-    void faceDetectingChanged();
-    void depthJobChanged(const QString &clipId);
-    void restoreJobChanged(const QString &clipId);
-    void restorePreviewChanged();
-    void faceDetectProgressChanged();
-    void faceDetectStatusChanged();
-    void faceDetectionFinished(bool ok, const QString &message);
-    void scenesChanged();
-    void sceneDetectingChanged();
-    void sceneDetectProgressChanged();
-    void sceneDetectStatusChanged();
-    void sceneDetectionFinished(bool ok, const QString &message);
     void currentBinFolderIdChanged();
     void selectionChanged();
     void editCapabilitiesChanged();
@@ -1842,23 +1742,6 @@ protected:
     bool startMulticamPunching(const QList<QPair<int, int>> &videoClips);
     void rebuildMulticamStaged();
     void applyMulticamSlicesToProject(drift::Project &project, bool combined);
-    void finalizeDepth(const QString &clipId, const QString &path);
-    void finalizeFaceDetection(const QString &clipId, const QString &trackPath,
-                               drift::TimeUs srcOffsetUs);
-    // Landmark a Face Swap source photo in the background and cache the result. Cheap enough
-    // (one still, sub-second once the session is warm) that it gets no progress UI of its own —
-    // the effect renders pass-through until the landmarks land, then the preview refreshes.
-    void ingestFaceSwapSource(const QString &photoPath);
-    // Every Face Swap photo in the project that has no cached landmarks. Runs on open, because
-    // the sidecar is derived and does not travel with the bundle.
-    void ingestFaceSwapSourcesInProject();
-    // The one place a scan request is built, so the GUI and MCP paths cannot disagree about
-    // the settings — and therefore about the cache key derived from them.
-    drift::SceneDetectRequest sceneRequestFor(const drift::Clip &clip, bool withObjects,
-                                              double minSceneSeconds) const;
-    // Publishes a finished scene analysis into m_scenes, shaped for QML.
-    void applySceneAnalysis(const drift::SceneAnalysis &analysis, const QString &clipId,
-                            const QString &clipPath, int rotationCorrection);
     struct SubtitleSource
     {
         QString path;
@@ -1880,21 +1763,6 @@ protected:
                                      int maxWordsPerCue);
     void finalizeGeneratedSubtitles(drift::TimeUs timelineStart, drift::TimeUs timelineDuration,
                                     const QList<drift::SubtitleCue> &cues);
-    void finalizeDenoise(const QString &clipId, const QString &audioPath);
-    // Runs on the stabilize worker: maps a job's 0..1 onto [rangeFrom, rangeTo] of the clip's
-    // progress, posts it to the UI thread, and returns false once `cancel` is set.
-    std::function<bool(double)> stabilizeProgressReporter(const QString &clipId,
-                                                          const QSharedPointer<QAtomicInt> &cancel,
-                                                          double rangeFrom, double rangeTo);
-    void setStabilizeProgress(const QString &clipId, double progress, const QString &status,
-                              bool force);
-    void clearStabilizeProgress(const QString &clipId);
-    // Shared body of the two denoise jobs: decodes [srcIn, srcIn + span) of `path` at the model's
-    // rate, runs each channel through it, and writes the result. Runs on a worker thread.
-    // `originalPathOut` is written only when non-empty, for the preview's A/B source.
-    bool renderDenoisedAudio(const QString &path, drift::TimeUs srcIn, drift::TimeUs span,
-                             const QString &outPath, const QString &originalPath,
-                             double progressFrom, double progressTo, QString *errorOut);
     // Defaulted severity so the existing call sites, which report ordinary status,
     // stay unchanged; pass "error"/"warning" explicitly where a failure is reported.
     Q_INVOKABLE void setLastMessage(const QString &message,
@@ -2025,17 +1893,6 @@ protected:
     void restoreFilmstripsAfterLoad();
     void normalizeSelection();
     bool isValidClipIndex(int trackIndex, int clipIndex) const;
-    struct RestoreSource
-    {
-        QString path;
-        drift::TimeUs srcIn = 0;
-        drift::TimeUs srcOut = 0;
-        int rotationCorrection = 0;
-        const drift::MediaAsset *asset = nullptr;
-    };
-    // A clip id or asset id resolved to the video it reads; nullopt when it is neither.
-    std::optional<RestoreSource> restoreSource(const QString &targetId) const;
-    void calibrateRestoreSpeed(const QStringList &modelIds, double megapixels, double seconds);
     // Adds a video Drift rendered to the bin as one undoable edit; returns its asset id.
     QString addRenderedVideoAsset(const QString &path, const QString &name,
                                   const QString &folderId, const MediaInfo &info,
@@ -2043,10 +1900,6 @@ protected:
     // The same without the undo step, for a caller folding it into an edit of its own.
     QString insertRenderedVideoAsset(const QString &path, const QString &name,
                                      const QString &folderId, const MediaInfo &info);
-    // Projects saved before stabilized videos were bin assets kept the render on the clip; this
-    // makes each one a "(stabilized)" asset the clip reads instead. Runs on load, after bundle
-    // paths are remapped.
-    void migrateLegacyStabilizedClips();
     QList<int> subtitleMergeIndices(const QList<QPair<int, int>> &pairs) const;
     void mergeSubtitleClipsAt(int trackIndex, QList<int> clipIndices);
 
@@ -2194,48 +2047,8 @@ protected:
     QString m_reverseStatus;
     QAtomicInt m_reverseCancel = 0;
 
-    bool m_denoising = false;
-    double m_denoiseProgress = 0.0;
-    QString m_denoiseStatus;
-    QAtomicInt m_denoiseCancel = 0;
-    // The A/B snippets currently on offer. Dragging the preview window along a clip re-renders
-    // repeatedly, so each pair is deleted as the next supersedes it.
-    QString m_denoisePreviewClean;
-    QString m_denoisePreviewOriginal;
     // Playhead per timeline, so switching tabs returns to where each was left. "" = main.
     QHash<QString, drift::TimeUs> m_sequencePlayheads;
-    bool m_faceDetecting = false;
-    double m_faceDetectProgress = 0.0;
-    QString m_faceDetectStatus;
-    QAtomicInt m_faceDetectCancel = 0;
-    // Photos with an ingest in flight, so a slider nudge or a second clip using the same photo
-    // does not queue the landmarker twice.
-    QSet<QString> m_faceSwapIngesting;
-    // Scene detection. Only one clip's analysis is live at a time — the panel shows the
-    // selected clip — so this needs no cache of its own beyond the on-disk one.
-    QVariantList m_scenes;
-    QString m_sceneClipId;
-    QString m_sceneClipPath;
-    int m_sceneClipRotationCorrection = 0;
-    bool m_sceneDetecting = false;
-    double m_sceneDetectProgress = 0.0;
-    QString m_sceneDetectStatus;
-    QAtomicInt m_sceneDetectCancel = 0;
-    QMap<QString, QSharedPointer<QAtomicInt>> m_stabilizeJobs;
-    QMap<QString, double> m_stabilizeProgress;
-    QMap<QString, QString> m_stabilizeStatus;
-    QMap<QString, qint64> m_stabilizeLastProgressEmit;
-    QSet<QString> m_stabilizeCancelRequested;
-    quint64 m_sceneGeneration = 0;
-    // Enhance window preview. The generation drops a frame decode or model run that finishes
-    // after the frame has moved on.
-    int m_restorePreviewRevision = 0;
-    quint64 m_restorePreviewGeneration = 0;
-    bool m_restoreFrameLoading = false;
-    QSize m_restoreOriginalSize;
-    QSize m_restoreEnhancedSize;
-    bool m_restoreDecodeBusy = false;
-    std::optional<std::pair<QString, double>> m_restorePendingFrame;
     int m_selectedTrack = -1;
     int m_selectedClip = -1;
     int m_selectedTransitionTrack = -1;
@@ -2258,6 +2071,12 @@ protected:
     SpeedCurveController *m_speedCurve = nullptr;
     CurveEditorController *m_curves = nullptr;
     SegmentationController *m_segmentation = nullptr;
+    SceneDetectController *m_sceneDetect = nullptr;
+    DepthController *m_depth = nullptr;
+    DenoiseController *m_denoise = nullptr;
+    RestoreController *m_restore = nullptr;
+    FaceTrackingController *m_faces = nullptr;
+    StabilizeController *m_stabilize = nullptr;
     TtsController *m_tts = nullptr;
     VoiceLibrary *m_voices = nullptr;
     QStringList m_activeGuideSets{QStringLiteral("thirds")};

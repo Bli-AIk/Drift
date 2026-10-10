@@ -901,6 +901,18 @@ qt_add_executable(drift
     src/models/CurveEditorController.cpp
     src/models/SegmentationController.h
     src/models/SegmentationController.cpp
+    src/models/SceneDetectController.h
+    src/models/SceneDetectController.cpp
+    src/models/DepthController.h
+    src/models/DepthController.cpp
+    src/models/DenoiseController.h
+    src/models/DenoiseController.cpp
+    src/models/RestoreController.h
+    src/models/RestoreController.cpp
+    src/models/FaceTrackingController.h
+    src/models/FaceTrackingController.cpp
+    src/models/StabilizeController.h
+    src/models/StabilizeController.cpp
     src/models/TtsController.h
     src/models/TtsController.cpp
     src/models/VoiceLibrary.h

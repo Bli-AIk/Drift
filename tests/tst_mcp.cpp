@@ -2220,7 +2220,7 @@ void McpTest::sceneWorkflowEndToEnd()
     drift::mcp::McpDispatcher dispatcher(&state);
     const QJsonObject clipRef{{QStringLiteral("clip"), QStringLiteral("scene-clip")}};
 
-    QSignalSpy finished(&state, &AppController::sceneDetectionFinished);
+    QSignalSpy finished(state.scenes(), &SceneDetectController::finished);
     const QJsonObject started = dispatcher.applyOne(QStringLiteral("detect_scenes"), clipRef);
     QVERIFY2(started.value(QStringLiteral("ok")).toBool(),
              qPrintable(started.value(QStringLiteral("detail")).toString()));

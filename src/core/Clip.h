@@ -133,7 +133,7 @@ struct Clip
     // transformX/Y keys instead. `stabilizing` is transient UI state and is not saved.
     //
     // legacyStabilizePath is only ever read: projects from before stabilized videos were bin
-    // assets kept a whole-source render here, and AppController::migrateLegacyStabilizedClips
+    // assets kept a whole-source render here, and StabilizeController::migrateLegacyClips
     // turns it into an asset on load.
     QString legacyStabilizePath;
     bool stabilizing = false;

@@ -1037,6 +1037,10 @@
         <translation>Настройки</translation>
     </message>
     <message>
+        <source>Switch to desktop layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Extras</source>
         <translation>Дополнения</translation>
     </message>
@@ -2374,112 +2378,8 @@
         <translation>Кривая скорости удалена</translation>
     </message>
     <message>
-        <source>Getting ready…</source>
-        <translation>Подготовка…</translation>
-    </message>
-    <message>
-        <source>Could not decode frame %1</source>
-        <translation>Не удалось декодировать кадр %1</translation>
-    </message>
-    <message>
-        <source>Clear Face Track</source>
-        <translation>Очистить отслеживание лица</translation>
-    </message>
-    <message>
-        <source>Face detection already in progress</source>
-        <translation>Поиск лиц уже выполняется</translation>
-    </message>
-    <message>
-        <source>Select a video clip to detect faces in</source>
-        <translation>Выберите видеоклип для поиска лиц</translation>
-    </message>
-    <message>
-        <source>Clip has no video to scan</source>
-        <translation>В клипе нет видео для анализа</translation>
-    </message>
-    <message>
-        <source>Clip is too short to scan</source>
-        <translation>Клип слишком короткий для анализа</translation>
-    </message>
-    <message>
-        <source>Face detection cancelled</source>
-        <translation>Поиск лиц отменён</translation>
-    </message>
-    <message>
-        <source>Scanning frame %1 of %2…</source>
-        <translation>Анализ кадра %1 из %2…</translation>
-    </message>
-    <message>
-        <source>No faces found in this clip</source>
-        <translation>Лица в этом клипе не найдены</translation>
-    </message>
-    <message>
-        <source>Could not write the face track</source>
-        <translation>Не удалось записать данные отслеживания лица</translation>
-    </message>
-    <message>
-        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
-        <translation>Поиск лиц завершён: лицо видно в %1 из %2 кадров</translation>
-    </message>
-    <message>
-        <source>Face detection complete</source>
-        <translation>Поиск лиц завершён</translation>
-    </message>
-    <message>
-        <source>Scanned clip no longer exists</source>
-        <translation>Проанализированного клипа больше нет</translation>
-    </message>
-    <message>
-        <source>Detect Faces</source>
-        <translation>Найти лица</translation>
-    </message>
-    <message>
         <source>Clip</source>
         <translation>Клип</translation>
-    </message>
-    <message>
-        <source>Getting noise removal ready…</source>
-        <translation>Подготовка удаления шума…</translation>
-    </message>
-    <message>
-        <source>Clip is too short to process</source>
-        <translation>Клип слишком короткий для обработки</translation>
-    </message>
-    <message>
-        <source>Noise removal cancelled</source>
-        <translation>Удаление шума отменено</translation>
-    </message>
-    <message>
-        <source>Removing noise (left)…</source>
-        <translation>Удаление шума (левый канал)…</translation>
-    </message>
-    <message>
-        <source>Removing noise (right)…</source>
-        <translation>Удаление шума (правый канал)…</translation>
-    </message>
-    <message>
-        <source>Writing audio…</source>
-        <translation>Запись аудио…</translation>
-    </message>
-    <message>
-        <source>Noise removal already in progress</source>
-        <translation>Удаление шума уже выполняется</translation>
-    </message>
-    <message>
-        <source>Select a video or audio clip</source>
-        <translation>Выберите видео- или аудиоклип</translation>
-    </message>
-    <message>
-        <source>Clip has no audio</source>
-        <translation>В клипе нет аудио</translation>
-    </message>
-    <message>
-        <source>Could not create a preview file</source>
-        <translation>Не удалось создать файл предпросмотра</translation>
-    </message>
-    <message>
-        <source>Ready</source>
-        <translation>Готово</translation>
     </message>
     <message numerus="yes">
         <source>Imported %n subtitles</source>
@@ -2552,70 +2452,6 @@
     <message>
         <source>Save combined multicam</source>
         <translation>Сохранить объединённый мультикамерный монтаж</translation>
-    </message>
-    <message>
-        <source>Select a video clip to stabilize</source>
-        <translation>Выберите видеоклип для стабилизации</translation>
-    </message>
-    <message>
-        <source>Clip has no video file</source>
-        <translation>В клипе нет видеофайла</translation>
-    </message>
-    <message>
-        <source>Stabilization already in progress for this clip</source>
-        <translation>Стабилизация этого клипа уже выполняется</translation>
-    </message>
-    <message>
-        <source>Could not create stabilization cache directory</source>
-        <translation>Не удалось создать папку кеша стабилизации</translation>
-    </message>
-    <message>
-        <source>Stabilize Video</source>
-        <translation>Стабилизировать видео</translation>
-    </message>
-    <message>
-        <source>Remove Stabilization</source>
-        <translation>Убрать стабилизацию</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Smoothing</source>
-        <translation>Изменить сглаживание стабилизации</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Tripod Mode</source>
-        <translation>Изменить режим штатива</translation>
-    </message>
-    <message>
-        <source>Detecting faces…</source>
-        <translation>Поиск лиц…</translation>
-    </message>
-    <message>
-        <source>Already looking for scenes</source>
-        <translation>Поиск сцен уже выполняется</translation>
-    </message>
-    <message>
-        <source>Select a video clip to find scenes in</source>
-        <translation>Выберите видеоклип для поиска сцен</translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n scene(s)</source>
-        <translation>
-            <numerusform>Найдена %n сцена</numerusform>
-            <numerusform>Найдено %n сцены</numerusform>
-            <numerusform>Найдено %n сцен</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Looking for scenes…</source>
-        <translation>Поиск сцен…</translation>
-    </message>
-    <message>
-        <source>Scene detection cancelled</source>
-        <translation>Поиск сцен отменён</translation>
-    </message>
-    <message>
-        <source>Removing noise…</source>
-        <translation>Удаление шума…</translation>
     </message>
     <message>
         <source>Could not create an output file</source>
@@ -2840,86 +2676,6 @@
     <message>
         <source>Transition curve updated</source>
         <translation>Кривая перехода изменена</translation>
-    </message>
-    <message>
-        <source>Select a video or image clip to estimate depth for</source>
-        <translation>Выберите видео- или графический клип для оценки глубины</translation>
-    </message>
-    <message>
-        <source>Clip has no video to estimate depth for</source>
-        <translation>В клипе нет видео для оценки глубины</translation>
-    </message>
-    <message>
-        <source>Depth estimation needs the Depth addon</source>
-        <translation>Для оценки глубины требуется дополнение Depth</translation>
-    </message>
-    <message>
-        <source>Depth is already being estimated for this clip</source>
-        <translation>Оценка глубины для этого клипа уже выполняется</translation>
-    </message>
-    <message>
-        <source>Estimating depth…</source>
-        <translation>Оценка глубины…</translation>
-    </message>
-    <message>
-        <source>Clip no longer exists</source>
-        <translation>Клипа больше нет</translation>
-    </message>
-    <message>
-        <source>Estimate Depth</source>
-        <translation>Оценить глубину</translation>
-    </message>
-    <message>
-        <source>Clear Depth</source>
-        <translation>Очистить глубину</translation>
-    </message>
-    <message>
-        <source>Building keyframes…</source>
-        <translation>Создание ключевых кадров…</translation>
-    </message>
-    <message>
-        <source>Rendering stabilized video…</source>
-        <translation>Визуализация стабилизированного видео…</translation>
-    </message>
-    <message>
-        <source>Analyzing camera motion…</source>
-        <translation>Анализ движения камеры…</translation>
-    </message>
-    <message>
-        <source>Stabilization cancelled.</source>
-        <translation>Стабилизация отменена.</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis file is missing.</source>
-        <translation>Файл анализа стабилизации отсутствует.</translation>
-    </message>
-    <message>
-        <source>Could not read camera motion from the analysis file.</source>
-        <translation>Не удалось прочитать данные о движении камеры из файла анализа.</translation>
-    </message>
-    <message>
-        <source>Stabilize with Keyframes</source>
-        <translation>Стабилизировать ключевыми кадрами</translation>
-    </message>
-    <message>
-        <source>Stabilization keyframes applied.</source>
-        <translation>Ключевые кадры стабилизации применены.</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Mode</source>
-        <translation>Изменить режим стабилизации</translation>
-    </message>
-    <message>
-        <source> (denoised)</source>
-        <translation> (с удалённым шумом)</translation>
-    </message>
-    <message>
-        <source>Remove noise</source>
-        <translation>Удалить шум</translation>
-    </message>
-    <message>
-        <source>Noise removed</source>
-        <translation>Шум удалён</translation>
     </message>
     <message>
         <source>Shape added</source>
@@ -3536,70 +3292,6 @@
     <message>
         <source>%1 copy</source>
         <translation>Копия %1</translation>
-    </message>
-    <message>
-        <source>%1 (stabilized)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select a video clip to enhance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Choose a model to enhance with</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This clip is already being enhanced</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 (enhanced %2x)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 (enhanced)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhance Video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhanced video added to the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhancing video…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This build of Drift has no video stabilization support</source>
-        <translation>В этой сборке Drift стабилизация видео не поддерживается</translation>
-    </message>
-    <message>
-        <source>The video this clip was stabilized from is no longer in the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed.</source>
-        <translation>Не удалось создать стабилизированное видео.</translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed: %1</source>
-        <translation>Не удалось создать стабилизированное видео: %1</translation>
-    </message>
-    <message>
-        <source>Stabilized video added to the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed.</source>
-        <translation>Не удалось проанализировать видео для стабилизации.</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed: %1</source>
-        <translation>Не удалось проанализировать видео для стабилизации: %1</translation>
     </message>
     <message>
         <source>Audio adjustment</source>
@@ -5694,6 +5386,93 @@
     </message>
 </context>
 <context>
+    <name>DenoiseController</name>
+    <message>
+        <source>Getting noise removal ready…</source>
+        <translation>Подготовка удаления шума…</translation>
+    </message>
+    <message>
+        <source>Clip is too short to process</source>
+        <translation>Клип слишком короткий для обработки</translation>
+    </message>
+    <message>
+        <source>Reading audio…</source>
+        <translation>Чтение аудио…</translation>
+    </message>
+    <message>
+        <source>Noise removal cancelled</source>
+        <translation>Удаление шума отменено</translation>
+    </message>
+    <message>
+        <source>No audio decoded</source>
+        <translation>Не удалось декодировать аудио</translation>
+    </message>
+    <message>
+        <source>Removing noise (left)…</source>
+        <translation>Удаление шума (левый канал)…</translation>
+    </message>
+    <message>
+        <source>Removing noise (right)…</source>
+        <translation>Удаление шума (правый канал)…</translation>
+    </message>
+    <message>
+        <source>Writing audio…</source>
+        <translation>Запись аудио…</translation>
+    </message>
+    <message>
+        <source>Noise removal already in progress</source>
+        <translation>Удаление шума уже выполняется</translation>
+    </message>
+    <message>
+        <source>Select a video or audio clip</source>
+        <translation>Выберите видео- или аудиоклип</translation>
+    </message>
+    <message>
+        <source>Clip has no audio</source>
+        <translation>В клипе нет аудио</translation>
+    </message>
+    <message>
+        <source>Starting…</source>
+        <translation>Запуск…</translation>
+    </message>
+    <message>
+        <source>Could not create a preview file</source>
+        <translation>Не удалось создать файл предпросмотра</translation>
+    </message>
+    <message>
+        <source>Ready</source>
+        <translation>Готово</translation>
+    </message>
+    <message>
+        <source>Removing noise…</source>
+        <translation>Удаление шума…</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>Не удалось создать выходной файл</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Готово</translation>
+    </message>
+    <message>
+        <source>Clip</source>
+        <translation>Клип</translation>
+    </message>
+    <message>
+        <source> (denoised)</source>
+        <translation> (с удалённым шумом)</translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation>Удалить шум</translation>
+    </message>
+    <message>
+        <source>Noise removed</source>
+        <translation>Шум удалён</translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWindow</name>
     <message>
         <source>Remove noise</source>
@@ -5734,6 +5513,41 @@
     <message>
         <source>Cancel</source>
         <translation>Отмена</translation>
+    </message>
+</context>
+<context>
+    <name>DepthController</name>
+    <message>
+        <source>Select a video or image clip to estimate depth for</source>
+        <translation>Выберите видео- или графический клип для оценки глубины</translation>
+    </message>
+    <message>
+        <source>Clip has no video to estimate depth for</source>
+        <translation>В клипе нет видео для оценки глубины</translation>
+    </message>
+    <message>
+        <source>Depth estimation needs the Depth addon</source>
+        <translation>Для оценки глубины требуется дополнение Depth</translation>
+    </message>
+    <message>
+        <source>Depth is already being estimated for this clip</source>
+        <translation>Оценка глубины для этого клипа уже выполняется</translation>
+    </message>
+    <message>
+        <source>Estimating depth…</source>
+        <translation>Оценка глубины…</translation>
+    </message>
+    <message>
+        <source>Clip no longer exists</source>
+        <translation>Клипа больше нет</translation>
+    </message>
+    <message>
+        <source>Estimate Depth</source>
+        <translation>Оценить глубину</translation>
+    </message>
+    <message>
+        <source>Clear Depth</source>
+        <translation>Очистить глубину</translation>
     </message>
 </context>
 <context>
@@ -6190,6 +6004,10 @@
     <message>
         <source>Language…</source>
         <translation>Язык…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Debug info…</source>
@@ -7191,6 +7009,77 @@
     <message>
         <source>“%1” will be removed from your face props. Effects using it will show it as missing until it is imported again.</source>
         <translation>«%1» будет удалён из объектов для лица. Эффекты, использующие его, будут показывать его как отсутствующий, пока вы не импортируете его снова.</translation>
+    </message>
+</context>
+<context>
+    <name>FaceTrackingController</name>
+    <message>
+        <source>Clear Face Track</source>
+        <translation>Очистить отслеживание лица</translation>
+    </message>
+    <message>
+        <source>Face detection already in progress</source>
+        <translation>Поиск лиц уже выполняется</translation>
+    </message>
+    <message>
+        <source>Select a video clip to detect faces in</source>
+        <translation>Выберите видеоклип для поиска лиц</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation>В клипе нет видео для анализа</translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation>Подготовка…</translation>
+    </message>
+    <message>
+        <source>Detecting faces…</source>
+        <translation>Поиск лиц…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Готово</translation>
+    </message>
+    <message>
+        <source>Clip is too short to scan</source>
+        <translation>Клип слишком короткий для анализа</translation>
+    </message>
+    <message>
+        <source>Face detection cancelled</source>
+        <translation>Поиск лиц отменён</translation>
+    </message>
+    <message>
+        <source>Could not decode frame %1</source>
+        <translation>Не удалось декодировать кадр %1</translation>
+    </message>
+    <message>
+        <source>Scanning frame %1 of %2…</source>
+        <translation>Анализ кадра %1 из %2…</translation>
+    </message>
+    <message>
+        <source>No faces found in this clip</source>
+        <translation>Лица в этом клипе не найдены</translation>
+    </message>
+    <message>
+        <source>Could not write the face track</source>
+        <translation>Не удалось записать данные отслеживания лица</translation>
+    </message>
+    <message>
+        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
+        <translation>Поиск лиц завершён: лицо видно в %1 из %2 кадров</translation>
+    </message>
+    <message>
+        <source>Face detection complete</source>
+        <translation>Поиск лиц завершён</translation>
+    </message>
+    <message>
+        <source>Scanned clip no longer exists</source>
+        <translation>Проанализированного клипа больше нет</translation>
+    </message>
+    <message>
+        <source>Detect Faces</source>
+        <translation>Найти лица</translation>
     </message>
 </context>
 <context>
@@ -8202,6 +8091,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Switch to Mobile Layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;Window</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8275,6 +8168,10 @@
     </message>
     <message>
         <source>Checking for updates…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Links can’t be opened in this layout.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11142,6 +11039,41 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>RestoreController</name>
+    <message>
+        <source>Select a video clip to enhance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a model to enhance with</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This clip is already being enhanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (enhanced %2x)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (enhanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhance Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhanced video added to the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhancing video…</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RestoreWindow</name>
     <message>
         <source>Enhance video</source>
@@ -11372,6 +11304,45 @@ If playback stutters, try another.</source>
     <message>
         <source>No frames could be decoded from this clip</source>
         <translation>Не удалось декодировать ни одного кадра этого клипа</translation>
+    </message>
+</context>
+<context>
+    <name>SceneDetectController</name>
+    <message>
+        <source>Already looking for scenes</source>
+        <translation>Поиск сцен уже выполняется</translation>
+    </message>
+    <message>
+        <source>Select a video clip to find scenes in</source>
+        <translation>Выберите видеоклип для поиска сцен</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation>В клипе нет видео для анализа</translation>
+    </message>
+    <message numerus="yes">
+        <source>Found %n scene(s)</source>
+        <translation>
+            <numerusform>Найдена %n сцена</numerusform>
+            <numerusform>Найдено %n сцены</numerusform>
+            <numerusform>Найдено %n сцен</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation>Подготовка…</translation>
+    </message>
+    <message>
+        <source>Looking for scenes…</source>
+        <translation>Поиск сцен…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Готово</translation>
+    </message>
+    <message>
+        <source>Scene detection cancelled</source>
+        <translation>Поиск сцен отменён</translation>
     </message>
 </context>
 <context>
@@ -11787,6 +11758,34 @@ If playback stutters, try another.</source>
     <message>
         <source>Restart Drift to apply this size.</source>
         <translation>Перезапустите Drift, чтобы применить этот размер.</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mobile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop suits a mouse and keyboard, including tablets in desktop mode. Mobile is the touch layout made for phones. Takes effect after restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Horizontal mouse-wheel pan</source>
@@ -12520,6 +12519,49 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>ShellSwitchDialog</name>
+    <message>
+        <source>Switch to the mobile layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the desktop layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Later</source>
+        <translation type="unfinished">Позже</translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A mouse is connected. The desktop layout has full menus, panels and precise timeline editing. Drift restarts to switch, and your project is kept.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The mobile layout is the touch interface made for phones. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The desktop layout suits a mouse and keyboard. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ShortcutCaptureField</name>
     <message>
         <source>Shortcut for %1</source>
@@ -12926,6 +12968,113 @@ If playback stutters, try another.</source>
     <message>
         <source>Could not write subtitle file</source>
         <translation>Не удалось записать файл субтитров</translation>
+    </message>
+</context>
+<context>
+    <name>StabilizeController</name>
+    <message>
+        <source>%1 (stabilized)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a video clip to stabilize</source>
+        <translation>Выберите видеоклип для стабилизации</translation>
+    </message>
+    <message>
+        <source>Clip has no video file</source>
+        <translation>В клипе нет видеофайла</translation>
+    </message>
+    <message>
+        <source>Stabilization already in progress for this clip</source>
+        <translation>Стабилизация этого клипа уже выполняется</translation>
+    </message>
+    <message>
+        <source>This build of Drift has no video stabilization support</source>
+        <translation>В этой сборке Drift стабилизация видео не поддерживается</translation>
+    </message>
+    <message>
+        <source>The video this clip was stabilized from is no longer in the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create stabilization cache directory</source>
+        <translation>Не удалось создать папку кеша стабилизации</translation>
+    </message>
+    <message>
+        <source>Building keyframes…</source>
+        <translation>Создание ключевых кадров…</translation>
+    </message>
+    <message>
+        <source>Rendering stabilized video…</source>
+        <translation>Визуализация стабилизированного видео…</translation>
+    </message>
+    <message>
+        <source>Analyzing camera motion…</source>
+        <translation>Анализ движения камеры…</translation>
+    </message>
+    <message>
+        <source>Stabilization cancelled.</source>
+        <translation>Стабилизация отменена.</translation>
+    </message>
+    <message>
+        <source>Could not read camera motion from the analysis file.</source>
+        <translation>Не удалось прочитать данные о движении камеры из файла анализа.</translation>
+    </message>
+    <message>
+        <source>Stabilize with Keyframes</source>
+        <translation>Стабилизировать ключевыми кадрами</translation>
+    </message>
+    <message>
+        <source>Stabilization keyframes applied.</source>
+        <translation>Ключевые кадры стабилизации применены.</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis file is missing.</source>
+        <translation>Файл анализа стабилизации отсутствует.</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>Не удалось создать выходной файл</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed.</source>
+        <translation>Не удалось создать стабилизированное видео.</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed: %1</source>
+        <translation>Не удалось создать стабилизированное видео: %1</translation>
+    </message>
+    <message>
+        <source>Stabilize Video</source>
+        <translation>Стабилизировать видео</translation>
+    </message>
+    <message>
+        <source>Stabilized video added to the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed.</source>
+        <translation>Не удалось проанализировать видео для стабилизации.</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed: %1</source>
+        <translation>Не удалось проанализировать видео для стабилизации: %1</translation>
+    </message>
+    <message>
+        <source>Remove Stabilization</source>
+        <translation>Убрать стабилизацию</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Smoothing</source>
+        <translation>Изменить сглаживание стабилизации</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Tripod Mode</source>
+        <translation>Изменить режим штатива</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Mode</source>
+        <translation>Изменить режим стабилизации</translation>
     </message>
 </context>
 <context>

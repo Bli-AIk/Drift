@@ -40,7 +40,7 @@ Window {
         root.show()
         root.raise()
         root.requestActivate()
-        EditorState.previewDenoise(track, clip, 0)
+        EditorState.denoise.preview(track, clip, 0)
     }
 
     // Backgrounding on Android pauses every transport. This window owns its own audition
@@ -53,18 +53,18 @@ Window {
 
     onClosing: {
         player.stop()
-        if (EditorState.denoising)
-            EditorState.cancelDenoise()
+        if (EditorState.denoise.running)
+            EditorState.denoise.cancel()
     }
 
     Connections {
-        target: EditorState
-        function onDenoisePreviewReady(originalPath, cleanPath) {
+        target: EditorState.denoise
+        function onPreviewReady(originalPath, cleanPath) {
             player.stop()
             root.originalPath = originalPath
             root.cleanPath = cleanPath
         }
-        function onDenoiseFinished(ok, message) {
+        function onFinished(ok, message) {
             if (ok)
                 root.close()
         }
@@ -274,11 +274,11 @@ Window {
                 anchors.verticalCenter: parent.verticalCenter
                 from: 0
                 to: Math.max(0.001, root.clipDurationSeconds - root.previewSpan)
-                enabled: !EditorState.denoising
+                enabled: !EditorState.denoise.running
                 // Re-rendering on every tick would queue a model run per pixel of drag.
                 onPressedChanged: {
                     if (!pressed)
-                        EditorState.previewDenoise(root.trackIndex, root.clipIndex, value)
+                        EditorState.denoise.preview(root.trackIndex, root.clipIndex, value)
                 }
             }
 
@@ -292,27 +292,27 @@ Window {
         Column {
             width: parent.width
             spacing: Theme.spacingSm
-            visible: EditorState.denoising
+            visible: EditorState.denoise.running
 
             LabelledProgressRing {
                 anchors.horizontalCenter: parent.horizontalCenter
                 ringSize: 64
-                value: EditorState.denoiseProgress
-                indeterminate: EditorState.denoiseProgress <= 0
+                value: EditorState.denoise.progress
+                indeterminate: EditorState.denoise.progress <= 0
             }
 
             ThemedLabel {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap
-                text: EditorState.denoiseStatus
+                text: EditorState.denoise.status
             }
 
             ThemedButton {
                 anchors.horizontalCenter: parent.horizontalCenter
                 variant: "destructive"
                 text: qsTr("Cancel")
-                onClicked: EditorState.cancelDenoise()
+                onClicked: EditorState.denoise.cancel()
             }
         }
     }
@@ -334,10 +334,10 @@ Window {
         ThemedButton {
             variant: "primary"
             text: qsTr("Remove noise")
-            enabled: root.hasPreview && !EditorState.denoising
+            enabled: root.hasPreview && !EditorState.denoise.running
             onClicked: {
                 player.stop()
-                EditorState.applyDenoise(root.trackIndex, root.clipIndex)
+                EditorState.denoise.apply(root.trackIndex, root.clipIndex)
             }
         }
     }

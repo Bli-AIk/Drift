@@ -1035,6 +1035,10 @@
         <translation>설정</translation>
     </message>
     <message>
+        <source>Switch to desktop layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Extras</source>
         <translation>추가 기능</translation>
     </message>
@@ -2368,112 +2372,8 @@
         <translation>속도 곡선이 제거됨</translation>
     </message>
     <message>
-        <source>Getting ready…</source>
-        <translation>준비 중…</translation>
-    </message>
-    <message>
-        <source>Could not decode frame %1</source>
-        <translation>프레임 %1을(를) 디코딩할 수 없습니다</translation>
-    </message>
-    <message>
-        <source>Clear Face Track</source>
-        <translation>얼굴 추적 지우기</translation>
-    </message>
-    <message>
-        <source>Face detection already in progress</source>
-        <translation>얼굴 감지가 이미 진행 중입니다</translation>
-    </message>
-    <message>
-        <source>Select a video clip to detect faces in</source>
-        <translation>얼굴을 감지할 동영상 클립을 선택하세요</translation>
-    </message>
-    <message>
-        <source>Clip has no video to scan</source>
-        <translation>클립에 스캔할 동영상이 없습니다</translation>
-    </message>
-    <message>
-        <source>Clip is too short to scan</source>
-        <translation>클립이 너무 짧아 스캔할 수 없습니다</translation>
-    </message>
-    <message>
-        <source>Face detection cancelled</source>
-        <translation>얼굴 감지가 취소됨</translation>
-    </message>
-    <message>
-        <source>Scanning frame %1 of %2…</source>
-        <translation>%2개 중 %1번째 프레임 스캔 중…</translation>
-    </message>
-    <message>
-        <source>No faces found in this clip</source>
-        <translation>이 클립에서 얼굴을 찾지 못했습니다</translation>
-    </message>
-    <message>
-        <source>Could not write the face track</source>
-        <translation>얼굴 추적 데이터를 쓸 수 없습니다</translation>
-    </message>
-    <message>
-        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
-        <translation>얼굴 감지 완료 — %2개 프레임 중 %1개에서 얼굴이 표시됨</translation>
-    </message>
-    <message>
-        <source>Face detection complete</source>
-        <translation>얼굴 감지 완료</translation>
-    </message>
-    <message>
-        <source>Scanned clip no longer exists</source>
-        <translation>스캔한 클립이 더 이상 존재하지 않습니다</translation>
-    </message>
-    <message>
-        <source>Detect Faces</source>
-        <translation>얼굴 감지</translation>
-    </message>
-    <message>
         <source>Clip</source>
         <translation>클립</translation>
-    </message>
-    <message>
-        <source>Getting noise removal ready…</source>
-        <translation>노이즈 제거 준비 중…</translation>
-    </message>
-    <message>
-        <source>Clip is too short to process</source>
-        <translation>클립이 너무 짧아 처리할 수 없습니다</translation>
-    </message>
-    <message>
-        <source>Noise removal cancelled</source>
-        <translation>노이즈 제거가 취소됨</translation>
-    </message>
-    <message>
-        <source>Removing noise (left)…</source>
-        <translation>노이즈 제거 중(왼쪽)…</translation>
-    </message>
-    <message>
-        <source>Removing noise (right)…</source>
-        <translation>노이즈 제거 중(오른쪽)…</translation>
-    </message>
-    <message>
-        <source>Writing audio…</source>
-        <translation>오디오 쓰는 중…</translation>
-    </message>
-    <message>
-        <source>Noise removal already in progress</source>
-        <translation>노이즈 제거가 이미 진행 중입니다</translation>
-    </message>
-    <message>
-        <source>Select a video or audio clip</source>
-        <translation>동영상 또는 오디오 클립을 선택하세요</translation>
-    </message>
-    <message>
-        <source>Clip has no audio</source>
-        <translation>클립에 오디오가 없습니다</translation>
-    </message>
-    <message>
-        <source>Could not create a preview file</source>
-        <translation>미리보기 파일을 만들 수 없습니다</translation>
-    </message>
-    <message>
-        <source>Ready</source>
-        <translation>준비됨</translation>
     </message>
     <message numerus="yes">
         <source>Imported %n subtitles</source>
@@ -2542,68 +2442,6 @@
     <message>
         <source>Save combined multicam</source>
         <translation>통합 멀티캠 저장</translation>
-    </message>
-    <message>
-        <source>Select a video clip to stabilize</source>
-        <translation>안정화할 동영상 클립을 선택하세요</translation>
-    </message>
-    <message>
-        <source>Clip has no video file</source>
-        <translation>클립에 동영상 파일이 없습니다</translation>
-    </message>
-    <message>
-        <source>Stabilization already in progress for this clip</source>
-        <translation>이 클립은 이미 안정화 중입니다</translation>
-    </message>
-    <message>
-        <source>Could not create stabilization cache directory</source>
-        <translation>안정화 캐시 디렉터리를 만들 수 없습니다</translation>
-    </message>
-    <message>
-        <source>Stabilize Video</source>
-        <translation>동영상 안정화</translation>
-    </message>
-    <message>
-        <source>Remove Stabilization</source>
-        <translation>안정화 제거</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Smoothing</source>
-        <translation>안정화 부드러움 변경</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Tripod Mode</source>
-        <translation>안정화 삼각대 모드 변경</translation>
-    </message>
-    <message>
-        <source>Detecting faces…</source>
-        <translation>얼굴 감지 중…</translation>
-    </message>
-    <message>
-        <source>Already looking for scenes</source>
-        <translation>이미 장면을 찾는 중입니다</translation>
-    </message>
-    <message>
-        <source>Select a video clip to find scenes in</source>
-        <translation>장면을 찾을 동영상 클립을 선택하세요</translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n scene(s)</source>
-        <translation>
-            <numerusform>장면 %n개를 찾았습니다</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Looking for scenes…</source>
-        <translation>장면을 찾는 중…</translation>
-    </message>
-    <message>
-        <source>Scene detection cancelled</source>
-        <translation>장면 감지가 취소됨</translation>
-    </message>
-    <message>
-        <source>Removing noise…</source>
-        <translation>노이즈 제거 중…</translation>
     </message>
     <message>
         <source>Could not create an output file</source>
@@ -2826,86 +2664,6 @@
     <message>
         <source>Transition curve updated</source>
         <translation>전환 곡선이 업데이트됨</translation>
-    </message>
-    <message>
-        <source>Select a video or image clip to estimate depth for</source>
-        <translation>깊이를 추정할 동영상 또는 이미지 클립을 선택하세요</translation>
-    </message>
-    <message>
-        <source>Clip has no video to estimate depth for</source>
-        <translation>클립에 깊이를 추정할 동영상이 없습니다</translation>
-    </message>
-    <message>
-        <source>Depth estimation needs the Depth addon</source>
-        <translation>깊이 추정에는 Depth 추가 기능이 필요합니다</translation>
-    </message>
-    <message>
-        <source>Depth is already being estimated for this clip</source>
-        <translation>이 클립의 깊이를 이미 추정하고 있습니다</translation>
-    </message>
-    <message>
-        <source>Estimating depth…</source>
-        <translation>깊이 추정 중…</translation>
-    </message>
-    <message>
-        <source>Clip no longer exists</source>
-        <translation>클립이 더 이상 존재하지 않습니다</translation>
-    </message>
-    <message>
-        <source>Estimate Depth</source>
-        <translation>깊이 추정</translation>
-    </message>
-    <message>
-        <source>Clear Depth</source>
-        <translation>깊이 지우기</translation>
-    </message>
-    <message>
-        <source>Building keyframes…</source>
-        <translation>키프레임 생성 중…</translation>
-    </message>
-    <message>
-        <source>Rendering stabilized video…</source>
-        <translation>안정화된 동영상 렌더링 중…</translation>
-    </message>
-    <message>
-        <source>Analyzing camera motion…</source>
-        <translation>카메라 움직임 분석 중…</translation>
-    </message>
-    <message>
-        <source>Stabilization cancelled.</source>
-        <translation>안정화가 취소되었습니다.</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis file is missing.</source>
-        <translation>안정화 분석 파일이 없습니다.</translation>
-    </message>
-    <message>
-        <source>Could not read camera motion from the analysis file.</source>
-        <translation>분석 파일에서 카메라 움직임을 읽을 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Stabilize with Keyframes</source>
-        <translation>키프레임으로 안정화</translation>
-    </message>
-    <message>
-        <source>Stabilization keyframes applied.</source>
-        <translation>안정화 키프레임이 적용되었습니다.</translation>
-    </message>
-    <message>
-        <source>Change Stabilization Mode</source>
-        <translation>안정화 모드 변경</translation>
-    </message>
-    <message>
-        <source> (denoised)</source>
-        <translation> (노이즈 제거됨)</translation>
-    </message>
-    <message>
-        <source>Remove noise</source>
-        <translation>노이즈 제거</translation>
-    </message>
-    <message>
-        <source>Noise removed</source>
-        <translation>노이즈가 제거됨</translation>
     </message>
     <message>
         <source>Shape added</source>
@@ -3522,70 +3280,6 @@
     <message>
         <source>%1 copy</source>
         <translation>%1 복사본</translation>
-    </message>
-    <message>
-        <source>%1 (stabilized)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select a video clip to enhance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Choose a model to enhance with</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This clip is already being enhanced</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 (enhanced %2x)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 (enhanced)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhance Video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhanced video added to the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhancing video…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This build of Drift has no video stabilization support</source>
-        <translation>이 Drift 빌드에서는 동영상 안정화를 지원하지 않습니다</translation>
-    </message>
-    <message>
-        <source>The video this clip was stabilized from is no longer in the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed.</source>
-        <translation>안정화 렌더링에 실패했습니다.</translation>
-    </message>
-    <message>
-        <source>Stabilization rendering failed: %1</source>
-        <translation>안정화 렌더링에 실패했습니다: %1</translation>
-    </message>
-    <message>
-        <source>Stabilized video added to the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed.</source>
-        <translation>안정화 분석에 실패했습니다.</translation>
-    </message>
-    <message>
-        <source>Stabilization analysis failed: %1</source>
-        <translation>안정화 분석에 실패했습니다: %1</translation>
     </message>
     <message>
         <source>Audio adjustment</source>
@@ -5650,6 +5344,93 @@
     </message>
 </context>
 <context>
+    <name>DenoiseController</name>
+    <message>
+        <source>Getting noise removal ready…</source>
+        <translation>노이즈 제거 준비 중…</translation>
+    </message>
+    <message>
+        <source>Clip is too short to process</source>
+        <translation>클립이 너무 짧아 처리할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Reading audio…</source>
+        <translation>오디오 읽는 중…</translation>
+    </message>
+    <message>
+        <source>Noise removal cancelled</source>
+        <translation>노이즈 제거가 취소됨</translation>
+    </message>
+    <message>
+        <source>No audio decoded</source>
+        <translation>디코딩된 오디오가 없습니다</translation>
+    </message>
+    <message>
+        <source>Removing noise (left)…</source>
+        <translation>노이즈 제거 중(왼쪽)…</translation>
+    </message>
+    <message>
+        <source>Removing noise (right)…</source>
+        <translation>노이즈 제거 중(오른쪽)…</translation>
+    </message>
+    <message>
+        <source>Writing audio…</source>
+        <translation>오디오 쓰는 중…</translation>
+    </message>
+    <message>
+        <source>Noise removal already in progress</source>
+        <translation>노이즈 제거가 이미 진행 중입니다</translation>
+    </message>
+    <message>
+        <source>Select a video or audio clip</source>
+        <translation>동영상 또는 오디오 클립을 선택하세요</translation>
+    </message>
+    <message>
+        <source>Clip has no audio</source>
+        <translation>클립에 오디오가 없습니다</translation>
+    </message>
+    <message>
+        <source>Starting…</source>
+        <translation>시작 중…</translation>
+    </message>
+    <message>
+        <source>Could not create a preview file</source>
+        <translation>미리보기 파일을 만들 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Ready</source>
+        <translation>준비됨</translation>
+    </message>
+    <message>
+        <source>Removing noise…</source>
+        <translation>노이즈 제거 중…</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>출력 파일을 만들 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>완료</translation>
+    </message>
+    <message>
+        <source>Clip</source>
+        <translation>클립</translation>
+    </message>
+    <message>
+        <source> (denoised)</source>
+        <translation> (노이즈 제거됨)</translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation>노이즈 제거</translation>
+    </message>
+    <message>
+        <source>Noise removed</source>
+        <translation>노이즈가 제거됨</translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWindow</name>
     <message>
         <source>Remove noise</source>
@@ -5690,6 +5471,41 @@
     <message>
         <source>Cancel</source>
         <translation>취소</translation>
+    </message>
+</context>
+<context>
+    <name>DepthController</name>
+    <message>
+        <source>Select a video or image clip to estimate depth for</source>
+        <translation>깊이를 추정할 동영상 또는 이미지 클립을 선택하세요</translation>
+    </message>
+    <message>
+        <source>Clip has no video to estimate depth for</source>
+        <translation>클립에 깊이를 추정할 동영상이 없습니다</translation>
+    </message>
+    <message>
+        <source>Depth estimation needs the Depth addon</source>
+        <translation>깊이 추정에는 Depth 추가 기능이 필요합니다</translation>
+    </message>
+    <message>
+        <source>Depth is already being estimated for this clip</source>
+        <translation>이 클립의 깊이를 이미 추정하고 있습니다</translation>
+    </message>
+    <message>
+        <source>Estimating depth…</source>
+        <translation>깊이 추정 중…</translation>
+    </message>
+    <message>
+        <source>Clip no longer exists</source>
+        <translation>클립이 더 이상 존재하지 않습니다</translation>
+    </message>
+    <message>
+        <source>Estimate Depth</source>
+        <translation>깊이 추정</translation>
+    </message>
+    <message>
+        <source>Clear Depth</source>
+        <translation>깊이 지우기</translation>
     </message>
 </context>
 <context>
@@ -6134,6 +5950,10 @@
     <message>
         <source>Language…</source>
         <translation>언어…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Debug info…</source>
@@ -7133,6 +6953,77 @@
     <message>
         <source>“%1” will be removed from your face props. Effects using it will show it as missing until it is imported again.</source>
         <translation>“%1”이(가) 얼굴 소품에서 제거됩니다. 이를 사용하는 효과는 다시 가져올 때까지 소품이 없다고 표시됩니다.</translation>
+    </message>
+</context>
+<context>
+    <name>FaceTrackingController</name>
+    <message>
+        <source>Clear Face Track</source>
+        <translation>얼굴 추적 지우기</translation>
+    </message>
+    <message>
+        <source>Face detection already in progress</source>
+        <translation>얼굴 감지가 이미 진행 중입니다</translation>
+    </message>
+    <message>
+        <source>Select a video clip to detect faces in</source>
+        <translation>얼굴을 감지할 동영상 클립을 선택하세요</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation>클립에 스캔할 동영상이 없습니다</translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation>준비 중…</translation>
+    </message>
+    <message>
+        <source>Detecting faces…</source>
+        <translation>얼굴 감지 중…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>완료</translation>
+    </message>
+    <message>
+        <source>Clip is too short to scan</source>
+        <translation>클립이 너무 짧아 스캔할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Face detection cancelled</source>
+        <translation>얼굴 감지가 취소됨</translation>
+    </message>
+    <message>
+        <source>Could not decode frame %1</source>
+        <translation>프레임 %1을(를) 디코딩할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Scanning frame %1 of %2…</source>
+        <translation>%2개 중 %1번째 프레임 스캔 중…</translation>
+    </message>
+    <message>
+        <source>No faces found in this clip</source>
+        <translation>이 클립에서 얼굴을 찾지 못했습니다</translation>
+    </message>
+    <message>
+        <source>Could not write the face track</source>
+        <translation>얼굴 추적 데이터를 쓸 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Face detection complete — a face was visible in %1 of %2 frames</source>
+        <translation>얼굴 감지 완료 — %2개 프레임 중 %1개에서 얼굴이 표시됨</translation>
+    </message>
+    <message>
+        <source>Face detection complete</source>
+        <translation>얼굴 감지 완료</translation>
+    </message>
+    <message>
+        <source>Scanned clip no longer exists</source>
+        <translation>스캔한 클립이 더 이상 존재하지 않습니다</translation>
+    </message>
+    <message>
+        <source>Detect Faces</source>
+        <translation>얼굴 감지</translation>
     </message>
 </context>
 <context>
@@ -8142,6 +8033,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Switch to Mobile Layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;Window</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8215,6 +8110,10 @@
     </message>
     <message>
         <source>Checking for updates…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Links can’t be opened in this layout.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11043,6 +10942,41 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>RestoreController</name>
+    <message>
+        <source>Select a video clip to enhance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a model to enhance with</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This clip is already being enhanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (enhanced %2x)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (enhanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhance Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhanced video added to the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhancing video…</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RestoreWindow</name>
     <message>
         <source>under a second</source>
@@ -11273,6 +11207,43 @@ If playback stutters, try another.</source>
     <message>
         <source>No frames could be decoded from this clip</source>
         <translation>이 클립에서 디코딩할 수 있는 프레임이 없습니다</translation>
+    </message>
+</context>
+<context>
+    <name>SceneDetectController</name>
+    <message>
+        <source>Already looking for scenes</source>
+        <translation>이미 장면을 찾는 중입니다</translation>
+    </message>
+    <message>
+        <source>Select a video clip to find scenes in</source>
+        <translation>장면을 찾을 동영상 클립을 선택하세요</translation>
+    </message>
+    <message>
+        <source>Clip has no video to scan</source>
+        <translation>클립에 스캔할 동영상이 없습니다</translation>
+    </message>
+    <message numerus="yes">
+        <source>Found %n scene(s)</source>
+        <translation>
+            <numerusform>장면 %n개를 찾았습니다</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Getting ready…</source>
+        <translation>준비 중…</translation>
+    </message>
+    <message>
+        <source>Looking for scenes…</source>
+        <translation>장면을 찾는 중…</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>완료</translation>
+    </message>
+    <message>
+        <source>Scene detection cancelled</source>
+        <translation>장면 감지가 취소됨</translation>
     </message>
 </context>
 <context>
@@ -11688,6 +11659,34 @@ If playback stutters, try another.</source>
     <message>
         <source>Restart Drift to apply this size.</source>
         <translation>이 크기를 적용하려면 Drift를 다시 시작하세요.</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mobile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop suits a mouse and keyboard, including tablets in desktop mode. Mobile is the touch layout made for phones. Takes effect after restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Horizontal mouse-wheel pan</source>
@@ -12421,6 +12420,49 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>ShellSwitchDialog</name>
+    <message>
+        <source>Switch to the mobile layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the desktop layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Later</source>
+        <translation type="unfinished">나중에</translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A mouse is connected. The desktop layout has full menus, panels and precise timeline editing. Drift restarts to switch, and your project is kept.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The mobile layout is the touch interface made for phones. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The desktop layout suits a mouse and keyboard. Drift restarts to switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ShortcutCaptureField</name>
     <message>
         <source>Shortcut for %1</source>
@@ -12827,6 +12869,113 @@ If playback stutters, try another.</source>
     <message>
         <source>Could not write subtitle file</source>
         <translation>자막 파일을 쓸 수 없습니다</translation>
+    </message>
+</context>
+<context>
+    <name>StabilizeController</name>
+    <message>
+        <source>%1 (stabilized)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a video clip to stabilize</source>
+        <translation>안정화할 동영상 클립을 선택하세요</translation>
+    </message>
+    <message>
+        <source>Clip has no video file</source>
+        <translation>클립에 동영상 파일이 없습니다</translation>
+    </message>
+    <message>
+        <source>Stabilization already in progress for this clip</source>
+        <translation>이 클립은 이미 안정화 중입니다</translation>
+    </message>
+    <message>
+        <source>This build of Drift has no video stabilization support</source>
+        <translation>이 Drift 빌드에서는 동영상 안정화를 지원하지 않습니다</translation>
+    </message>
+    <message>
+        <source>The video this clip was stabilized from is no longer in the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create stabilization cache directory</source>
+        <translation>안정화 캐시 디렉터리를 만들 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Building keyframes…</source>
+        <translation>키프레임 생성 중…</translation>
+    </message>
+    <message>
+        <source>Rendering stabilized video…</source>
+        <translation>안정화된 동영상 렌더링 중…</translation>
+    </message>
+    <message>
+        <source>Analyzing camera motion…</source>
+        <translation>카메라 움직임 분석 중…</translation>
+    </message>
+    <message>
+        <source>Stabilization cancelled.</source>
+        <translation>안정화가 취소되었습니다.</translation>
+    </message>
+    <message>
+        <source>Could not read camera motion from the analysis file.</source>
+        <translation>분석 파일에서 카메라 움직임을 읽을 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Stabilize with Keyframes</source>
+        <translation>키프레임으로 안정화</translation>
+    </message>
+    <message>
+        <source>Stabilization keyframes applied.</source>
+        <translation>안정화 키프레임이 적용되었습니다.</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis file is missing.</source>
+        <translation>안정화 분석 파일이 없습니다.</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>출력 파일을 만들 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed.</source>
+        <translation>안정화 렌더링에 실패했습니다.</translation>
+    </message>
+    <message>
+        <source>Stabilization rendering failed: %1</source>
+        <translation>안정화 렌더링에 실패했습니다: %1</translation>
+    </message>
+    <message>
+        <source>Stabilize Video</source>
+        <translation>동영상 안정화</translation>
+    </message>
+    <message>
+        <source>Stabilized video added to the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed.</source>
+        <translation>안정화 분석에 실패했습니다.</translation>
+    </message>
+    <message>
+        <source>Stabilization analysis failed: %1</source>
+        <translation>안정화 분석에 실패했습니다: %1</translation>
+    </message>
+    <message>
+        <source>Remove Stabilization</source>
+        <translation>안정화 제거</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Smoothing</source>
+        <translation>안정화 부드러움 변경</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Tripod Mode</source>
+        <translation>안정화 삼각대 모드 변경</translation>
+    </message>
+    <message>
+        <source>Change Stabilization Mode</source>
+        <translation>안정화 모드 변경</translation>
     </message>
 </context>
 <context>
