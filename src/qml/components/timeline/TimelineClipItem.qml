@@ -431,7 +431,7 @@ Item {
                 icon.name: Theme.icons.rabbit
                 // Converts the bin media, so every clip using it follows along.
                 visible: clipItem.mediaAssetId.length > 0 && !clipItem.mediaEditFriendly
-                onTriggered: EditorState.convertAssetsToConstantFrameRate([clipItem.mediaAssetId])
+                onTriggered: EditorState.bin.convertToConstantFrameRate([clipItem.mediaAssetId])
             }
             ThemedMenuItem {
                 text: qsTr("Crop…")

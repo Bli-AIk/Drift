@@ -2040,44 +2040,12 @@
         <translation>Phương tiện đã được đổi tên</translation>
     </message>
     <message>
-        <source>That file could not be read.</source>
-        <translation>Tệp đó không thể đọc được.</translation>
-    </message>
-    <message>
-        <source>That file is already in this project.</source>
-        <translation>Tệp đó đã có trong dự án này.</translation>
-    </message>
-    <message>
         <source>Crop clip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Crop saved</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Converting %1 to an edit-friendly format…</source>
-        <translation>Đang chuyển đổi %1 sang định dạng dễ chỉnh sửa…</translation>
-    </message>
-    <message>
-        <source>That media is no longer in this project.</source>
-        <translation>Phương tiện đó không còn trong dự án này nữa.</translation>
-    </message>
-    <message>
-        <source>“%1” is %2, but this slot holds %3.</source>
-        <translation>“%1” là %2, nhưng vùng này đang giữ %3.</translation>
-    </message>
-    <message>
-        <source>Media replaced</source>
-        <translation>Đã thay thế phương tiện</translation>
     </message>
     <message>
         <source>New project</source>
@@ -2480,50 +2448,6 @@
     <message>
         <source>Media rotated</source>
         <translation>Đã xoay phương tiện</translation>
-    </message>
-    <message>
-        <source>An edit is already saving</source>
-        <translation>Một bản chỉnh sửa đang được lưu</translation>
-    </message>
-    <message>
-        <source>Could not open the media file</source>
-        <translation>Không thể mở tệp phương tiện</translation>
-    </message>
-    <message>
-        <source>Media trimmed</source>
-        <translation>Đã cắt phương tiện</translation>
-    </message>
-    <message>
-        <source>Trim saved</source>
-        <translation>Đã lưu cắt xén</translation>
-    </message>
-    <message>
-        <source>Saving…</source>
-        <translation>Đang lưu…</translation>
-    </message>
-    <message>
-        <source>Converting…</source>
-        <translation>Đang chuyển đổi…</translation>
-    </message>
-    <message>
-        <source>Saving media…</source>
-        <translation>Đang lưu phương tiện…</translation>
-    </message>
-    <message>
-        <source>Couldn’t save that edit</source>
-        <translation>Không thể lưu bản chỉnh sửa đó</translation>
-    </message>
-    <message>
-        <source>Updating the library…</source>
-        <translation>Đang cập nhật thư viện…</translation>
-    </message>
-    <message>
-        <source>Couldn’t update the library</source>
-        <translation>Không thể cập nhật thư viện</translation>
-    </message>
-    <message>
-        <source>Media edited</source>
-        <translation>Đã chỉnh sửa phương tiện</translation>
     </message>
     <message>
         <source>Save project as…</source>
@@ -3244,18 +3168,6 @@
     <message>
         <source>%1 (off)</source>
         <translation>%1 (tắt)</translation>
-    </message>
-    <message>
-        <source>%1 (trimmed)</source>
-        <translation>%1 (đã cắt)</translation>
-    </message>
-    <message>
-        <source>Rendering…</source>
-        <translation>Đang kết xuất…</translation>
-    </message>
-    <message>
-        <source>Render Trimmed Copy</source>
-        <translation>Kết xuất bản sao đã cắt</translation>
     </message>
     <message>
         <source>Transform selection together</source>
@@ -4115,41 +4027,15 @@
         <source>Close gap</source>
         <translation>Xóa khoảng trống</translation>
     </message>
-    <message>
-        <source>Folder created</source>
-        <translation>Đã tạo thư mục</translation>
-    </message>
-    <message>
-        <source>Folder renamed</source>
-        <translation>Đã đổi tên thư mục</translation>
-    </message>
-    <message>
-        <source>Folder deleted</source>
-        <translation>Đã xóa thư mục</translation>
-    </message>
-    <message>
-        <source>Media moved</source>
-        <translation>Đã di chuyển phương tiện</translation>
-    </message>
     <message numerus="yes">
         <source>%n items removed</source>
         <translation>
             <numerusform>%n mục đã bị xóa</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n items moved</source>
-        <translation>
-            <numerusform>%n mục đã được di chuyển</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Clips added</source>
         <translation>Đã thêm clip</translation>
-    </message>
-    <message>
-        <source>Folder moved</source>
-        <translation>Đã di chuyển thư mục</translation>
     </message>
     <message>
         <source>Track renamed</source>
@@ -8761,6 +8647,131 @@
         <translation>
             <numerusform>Xóa %n mục khỏi dự án</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>MediaBinController</name>
+    <message>
+        <source>Folder created</source>
+        <translation>Đã tạo thư mục</translation>
+    </message>
+    <message>
+        <source>Folder renamed</source>
+        <translation>Đã đổi tên thư mục</translation>
+    </message>
+    <message>
+        <source>Folder moved</source>
+        <translation>Đã di chuyển thư mục</translation>
+    </message>
+    <message>
+        <source>Folder deleted</source>
+        <translation>Đã xóa thư mục</translation>
+    </message>
+    <message>
+        <source>Media moved</source>
+        <translation>Đã di chuyển phương tiện</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n items moved</source>
+        <translation>
+            <numerusform>%n mục đã được di chuyển</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>That file could not be read.</source>
+        <translation>Tệp đó không thể đọc được.</translation>
+    </message>
+    <message>
+        <source>That file is already in this project.</source>
+        <translation>Tệp đó đã có trong dự án này.</translation>
+    </message>
+    <message>
+        <source>An edit is already saving</source>
+        <translation>Một bản chỉnh sửa đang được lưu</translation>
+    </message>
+    <message>
+        <source>Could not open the media file</source>
+        <translation>Không thể mở tệp phương tiện</translation>
+    </message>
+    <message>
+        <source>Crop image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media trimmed</source>
+        <translation>Đã cắt phương tiện</translation>
+    </message>
+    <message>
+        <source>Trim saved</source>
+        <translation>Đã lưu cắt xén</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>Không thể tạo tệp đầu ra</translation>
+    </message>
+    <message>
+        <source>%1 (trimmed)</source>
+        <translation>%1 (đã cắt)</translation>
+    </message>
+    <message>
+        <source>Rendering…</source>
+        <translation>Đang kết xuất…</translation>
+    </message>
+    <message>
+        <source>Render Trimmed Copy</source>
+        <translation>Kết xuất bản sao đã cắt</translation>
+    </message>
+    <message>
+        <source>Couldn’t save that edit</source>
+        <translation>Không thể lưu bản chỉnh sửa đó</translation>
+    </message>
+    <message>
+        <source>Converting…</source>
+        <translation>Đang chuyển đổi…</translation>
+    </message>
+    <message>
+        <source>Saving…</source>
+        <translation>Đang lưu…</translation>
+    </message>
+    <message>
+        <source>Converting %1 to an edit-friendly format…</source>
+        <translation>Đang chuyển đổi %1 sang định dạng dễ chỉnh sửa…</translation>
+    </message>
+    <message>
+        <source>Saving media…</source>
+        <translation>Đang lưu phương tiện…</translation>
+    </message>
+    <message>
+        <source>Updating the library…</source>
+        <translation>Đang cập nhật thư viện…</translation>
+    </message>
+    <message>
+        <source>Couldn’t update the library</source>
+        <translation>Không thể cập nhật thư viện</translation>
+    </message>
+    <message>
+        <source>That media is no longer in this project.</source>
+        <translation>Phương tiện đó không còn trong dự án này nữa.</translation>
+    </message>
+    <message>
+        <source>“%1” is %2, but this slot holds %3.</source>
+        <translation>“%1” là %2, nhưng vùng này đang giữ %3.</translation>
+    </message>
+    <message>
+        <source>Media edited</source>
+        <translation>Đã chỉnh sửa phương tiện</translation>
+    </message>
+    <message>
+        <source>Media replaced</source>
+        <translation>Đã thay thế phương tiện</translation>
     </message>
 </context>
 <context>

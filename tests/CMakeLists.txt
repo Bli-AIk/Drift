@@ -36,6 +36,7 @@ qt_add_executable(tst_editorstate
     ../src/models/RestoreController.cpp
     ../src/models/FaceTrackingController.cpp
     ../src/models/StabilizeController.cpp
+    ../src/models/MediaBinController.cpp
     ../src/models/TtsController.cpp
     ../src/models/VoiceLibrary.cpp
     ../src/preview/PreviewController.cpp
@@ -217,6 +218,7 @@ qt_add_executable(tst_mcp
     ../src/models/RestoreController.cpp
     ../src/models/FaceTrackingController.cpp
     ../src/models/StabilizeController.cpp
+    ../src/models/MediaBinController.cpp
     ../src/models/TtsController.cpp
     ../src/models/VoiceLibrary.cpp
     ../src/preview/PreviewController.cpp

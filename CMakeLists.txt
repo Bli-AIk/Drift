@@ -913,6 +913,8 @@ qt_add_executable(drift
     src/models/FaceTrackingController.cpp
     src/models/StabilizeController.h
     src/models/StabilizeController.cpp
+    src/models/MediaBinController.h
+    src/models/MediaBinController.cpp
     src/models/TtsController.h
     src/models/TtsController.cpp
     src/models/VoiceLibrary.h

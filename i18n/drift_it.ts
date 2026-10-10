@@ -2043,44 +2043,12 @@
         <translation>Elemento multimediale rinominato</translation>
     </message>
     <message>
-        <source>That file could not be read.</source>
-        <translation>Impossibile leggere il file.</translation>
-    </message>
-    <message>
-        <source>That file is already in this project.</source>
-        <translation>Il file è già presente in questo progetto.</translation>
-    </message>
-    <message>
         <source>Crop clip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Crop saved</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Converting %1 to an edit-friendly format…</source>
-        <translation>Conversione di %1 in un formato ottimizzato per la modifica in corso…</translation>
-    </message>
-    <message>
-        <source>That media is no longer in this project.</source>
-        <translation>L&apos;elemento multimediale non è più presente in questo progetto.</translation>
-    </message>
-    <message>
-        <source>“%1” is %2, but this slot holds %3.</source>
-        <translation>“%1” è %2, ma questo slot contiene %3.</translation>
-    </message>
-    <message>
-        <source>Media replaced</source>
-        <translation>Elemento multimediale sostituito</translation>
     </message>
     <message>
         <source>New project</source>
@@ -2486,50 +2454,6 @@
     <message>
         <source>Media rotated</source>
         <translation>Elemento multimediale ruotato</translation>
-    </message>
-    <message>
-        <source>An edit is already saving</source>
-        <translation>Un salvataggio delle modifiche è già in corso</translation>
-    </message>
-    <message>
-        <source>Could not open the media file</source>
-        <translation>Impossibile aprire il file multimediale</translation>
-    </message>
-    <message>
-        <source>Media trimmed</source>
-        <translation>Elemento multimediale ritagliato</translation>
-    </message>
-    <message>
-        <source>Trim saved</source>
-        <translation>Ritaglio salvato</translation>
-    </message>
-    <message>
-        <source>Saving…</source>
-        <translation>Salvataggio in corso…</translation>
-    </message>
-    <message>
-        <source>Converting…</source>
-        <translation>Conversione in corso…</translation>
-    </message>
-    <message>
-        <source>Saving media…</source>
-        <translation>Salvataggio elemento multimediale in corso…</translation>
-    </message>
-    <message>
-        <source>Couldn’t save that edit</source>
-        <translation>Impossibile salvare la modifica</translation>
-    </message>
-    <message>
-        <source>Updating the library…</source>
-        <translation>Aggiornamento libreria in corso…</translation>
-    </message>
-    <message>
-        <source>Couldn’t update the library</source>
-        <translation>Impossibile aggiornare la libreria</translation>
-    </message>
-    <message>
-        <source>Media edited</source>
-        <translation>Elemento multimediale modificato</translation>
     </message>
     <message>
         <source>Save project as…</source>
@@ -3242,18 +3166,6 @@
     <message>
         <source>%1 (off)</source>
         <translation>%1 (disattivo)</translation>
-    </message>
-    <message>
-        <source>%1 (trimmed)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rendering…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Render Trimmed Copy</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Transform selection together</source>
@@ -4120,22 +4032,6 @@
         <source>Close gap</source>
         <translation>Chiudi spazio</translation>
     </message>
-    <message>
-        <source>Folder created</source>
-        <translation>Cartella creata</translation>
-    </message>
-    <message>
-        <source>Folder renamed</source>
-        <translation>Cartella rinominata</translation>
-    </message>
-    <message>
-        <source>Folder deleted</source>
-        <translation>Cartella eliminata</translation>
-    </message>
-    <message>
-        <source>Media moved</source>
-        <translation>Elemento multimediale spostato</translation>
-    </message>
     <message numerus="yes">
         <source>%n items removed</source>
         <translation>
@@ -4143,20 +4039,9 @@
             <numerusform>%n elementi rimossi</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n items moved</source>
-        <translation>
-            <numerusform>%n elemento spostato</numerusform>
-            <numerusform>%n elementi spostati</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Clips added</source>
         <translation>Clip aggiunte</translation>
-    </message>
-    <message>
-        <source>Folder moved</source>
-        <translation>Cartella spostata</translation>
     </message>
     <message>
         <source>Track renamed</source>
@@ -8795,6 +8680,132 @@
             <numerusform>Rimuovi %n elemento dal progetto</numerusform>
             <numerusform>Rimuovi %n elementi dal progetto</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>MediaBinController</name>
+    <message>
+        <source>Folder created</source>
+        <translation>Cartella creata</translation>
+    </message>
+    <message>
+        <source>Folder renamed</source>
+        <translation>Cartella rinominata</translation>
+    </message>
+    <message>
+        <source>Folder moved</source>
+        <translation>Cartella spostata</translation>
+    </message>
+    <message>
+        <source>Folder deleted</source>
+        <translation>Cartella eliminata</translation>
+    </message>
+    <message>
+        <source>Media moved</source>
+        <translation>Elemento multimediale spostato</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n items moved</source>
+        <translation>
+            <numerusform>%n elemento spostato</numerusform>
+            <numerusform>%n elementi spostati</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>That file could not be read.</source>
+        <translation>Impossibile leggere il file.</translation>
+    </message>
+    <message>
+        <source>That file is already in this project.</source>
+        <translation>Il file è già presente in questo progetto.</translation>
+    </message>
+    <message>
+        <source>An edit is already saving</source>
+        <translation>Un salvataggio delle modifiche è già in corso</translation>
+    </message>
+    <message>
+        <source>Could not open the media file</source>
+        <translation>Impossibile aprire il file multimediale</translation>
+    </message>
+    <message>
+        <source>Crop image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media trimmed</source>
+        <translation>Elemento multimediale ritagliato</translation>
+    </message>
+    <message>
+        <source>Trim saved</source>
+        <translation>Ritaglio salvato</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>Impossibile creare un file di output</translation>
+    </message>
+    <message>
+        <source>%1 (trimmed)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Render Trimmed Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn’t save that edit</source>
+        <translation>Impossibile salvare la modifica</translation>
+    </message>
+    <message>
+        <source>Converting…</source>
+        <translation>Conversione in corso…</translation>
+    </message>
+    <message>
+        <source>Saving…</source>
+        <translation>Salvataggio in corso…</translation>
+    </message>
+    <message>
+        <source>Converting %1 to an edit-friendly format…</source>
+        <translation>Conversione di %1 in un formato ottimizzato per la modifica in corso…</translation>
+    </message>
+    <message>
+        <source>Saving media…</source>
+        <translation>Salvataggio elemento multimediale in corso…</translation>
+    </message>
+    <message>
+        <source>Updating the library…</source>
+        <translation>Aggiornamento libreria in corso…</translation>
+    </message>
+    <message>
+        <source>Couldn’t update the library</source>
+        <translation>Impossibile aggiornare la libreria</translation>
+    </message>
+    <message>
+        <source>That media is no longer in this project.</source>
+        <translation>L&apos;elemento multimediale non è più presente in questo progetto.</translation>
+    </message>
+    <message>
+        <source>“%1” is %2, but this slot holds %3.</source>
+        <translation>“%1” è %2, ma questo slot contiene %3.</translation>
+    </message>
+    <message>
+        <source>Media edited</source>
+        <translation>Elemento multimediale modificato</translation>
+    </message>
+    <message>
+        <source>Media replaced</source>
+        <translation>Elemento multimediale sostituito</translation>
     </message>
 </context>
 <context>

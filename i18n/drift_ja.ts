@@ -2040,44 +2040,12 @@
         <translation>メディア名を変更しました</translation>
     </message>
     <message>
-        <source>That file could not be read.</source>
-        <translation>そのファイルは読み取れませんでした。</translation>
-    </message>
-    <message>
-        <source>That file is already in this project.</source>
-        <translation>そのファイルはこのプロジェクトに既に存在します。</translation>
-    </message>
-    <message>
         <source>Crop clip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Crop saved</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Converting %1 to an edit-friendly format…</source>
-        <translation>%1 を編集に適した形式に変換中…</translation>
-    </message>
-    <message>
-        <source>That media is no longer in this project.</source>
-        <translation>そのメディアはこのプロジェクトに存在しません。</translation>
-    </message>
-    <message>
-        <source>“%1” is %2, but this slot holds %3.</source>
-        <translation>「%1」は %2 ですが、このスロットは %3 を保持しています。</translation>
-    </message>
-    <message>
-        <source>Media replaced</source>
-        <translation>メディアを置き換えました</translation>
     </message>
     <message>
         <source>New project</source>
@@ -2480,50 +2448,6 @@
     <message>
         <source>Media rotated</source>
         <translation>メディアを回転しました</translation>
-    </message>
-    <message>
-        <source>An edit is already saving</source>
-        <translation>編集は既に保存中です</translation>
-    </message>
-    <message>
-        <source>Could not open the media file</source>
-        <translation>メディアファイルを開けませんでした</translation>
-    </message>
-    <message>
-        <source>Media trimmed</source>
-        <translation>メディアがトリミングされました</translation>
-    </message>
-    <message>
-        <source>Trim saved</source>
-        <translation>トリミングが保存されました</translation>
-    </message>
-    <message>
-        <source>Saving…</source>
-        <translation>保存中…</translation>
-    </message>
-    <message>
-        <source>Converting…</source>
-        <translation>変換中…</translation>
-    </message>
-    <message>
-        <source>Saving media…</source>
-        <translation>メディアを保存中…</translation>
-    </message>
-    <message>
-        <source>Couldn’t save that edit</source>
-        <translation>その編集を保存できませんでした</translation>
-    </message>
-    <message>
-        <source>Updating the library…</source>
-        <translation>ライブラリを更新中…</translation>
-    </message>
-    <message>
-        <source>Couldn’t update the library</source>
-        <translation>ライブラリを更新できませんでした</translation>
-    </message>
-    <message>
-        <source>Media edited</source>
-        <translation>メディアを編集しました</translation>
     </message>
     <message>
         <source>Save project as…</source>
@@ -3236,18 +3160,6 @@
     <message>
         <source>%1 (off)</source>
         <translation>%1 (オフ)</translation>
-    </message>
-    <message>
-        <source>%1 (trimmed)</source>
-        <translation>%1 (トリミング済み)</translation>
-    </message>
-    <message>
-        <source>Rendering…</source>
-        <translation>レンダリング中…</translation>
-    </message>
-    <message>
-        <source>Render Trimmed Copy</source>
-        <translation>トリミングしたコピーをレンダリング</translation>
     </message>
     <message>
         <source>Transform selection together</source>
@@ -4107,41 +4019,15 @@
         <source>Close gap</source>
         <translation>ギャップを埋める</translation>
     </message>
-    <message>
-        <source>Folder created</source>
-        <translation>フォルダーを作成しました</translation>
-    </message>
-    <message>
-        <source>Folder renamed</source>
-        <translation>フォルダー名を変更しました</translation>
-    </message>
-    <message>
-        <source>Folder deleted</source>
-        <translation>フォルダーを削除しました</translation>
-    </message>
-    <message>
-        <source>Media moved</source>
-        <translation>メディアを移動しました</translation>
-    </message>
     <message numerus="yes">
         <source>%n items removed</source>
         <translation>
             <numerusform>%n 個の項目を削除しました</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n items moved</source>
-        <translation>
-            <numerusform>%n 個の項目を移動しました</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Clips added</source>
         <translation>クリップを追加しました</translation>
-    </message>
-    <message>
-        <source>Folder moved</source>
-        <translation>フォルダーを移動しました</translation>
     </message>
     <message>
         <source>Track renamed</source>
@@ -8761,6 +8647,131 @@
         <translation>
             <numerusform>%n 個の項目をプロジェクトから削除</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>MediaBinController</name>
+    <message>
+        <source>Folder created</source>
+        <translation>フォルダーを作成しました</translation>
+    </message>
+    <message>
+        <source>Folder renamed</source>
+        <translation>フォルダー名を変更しました</translation>
+    </message>
+    <message>
+        <source>Folder moved</source>
+        <translation>フォルダーを移動しました</translation>
+    </message>
+    <message>
+        <source>Folder deleted</source>
+        <translation>フォルダーを削除しました</translation>
+    </message>
+    <message>
+        <source>Media moved</source>
+        <translation>メディアを移動しました</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n items moved</source>
+        <translation>
+            <numerusform>%n 個の項目を移動しました</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>That file could not be read.</source>
+        <translation>そのファイルは読み取れませんでした。</translation>
+    </message>
+    <message>
+        <source>That file is already in this project.</source>
+        <translation>そのファイルはこのプロジェクトに既に存在します。</translation>
+    </message>
+    <message>
+        <source>An edit is already saving</source>
+        <translation>編集は既に保存中です</translation>
+    </message>
+    <message>
+        <source>Could not open the media file</source>
+        <translation>メディアファイルを開けませんでした</translation>
+    </message>
+    <message>
+        <source>Crop image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media trimmed</source>
+        <translation>メディアがトリミングされました</translation>
+    </message>
+    <message>
+        <source>Trim saved</source>
+        <translation>トリミングが保存されました</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>出力ファイルを作成できませんでした</translation>
+    </message>
+    <message>
+        <source>%1 (trimmed)</source>
+        <translation>%1 (トリミング済み)</translation>
+    </message>
+    <message>
+        <source>Rendering…</source>
+        <translation>レンダリング中…</translation>
+    </message>
+    <message>
+        <source>Render Trimmed Copy</source>
+        <translation>トリミングしたコピーをレンダリング</translation>
+    </message>
+    <message>
+        <source>Couldn’t save that edit</source>
+        <translation>その編集を保存できませんでした</translation>
+    </message>
+    <message>
+        <source>Converting…</source>
+        <translation>変換中…</translation>
+    </message>
+    <message>
+        <source>Saving…</source>
+        <translation>保存中…</translation>
+    </message>
+    <message>
+        <source>Converting %1 to an edit-friendly format…</source>
+        <translation>%1 を編集に適した形式に変換中…</translation>
+    </message>
+    <message>
+        <source>Saving media…</source>
+        <translation>メディアを保存中…</translation>
+    </message>
+    <message>
+        <source>Updating the library…</source>
+        <translation>ライブラリを更新中…</translation>
+    </message>
+    <message>
+        <source>Couldn’t update the library</source>
+        <translation>ライブラリを更新できませんでした</translation>
+    </message>
+    <message>
+        <source>That media is no longer in this project.</source>
+        <translation>そのメディアはこのプロジェクトに存在しません。</translation>
+    </message>
+    <message>
+        <source>“%1” is %2, but this slot holds %3.</source>
+        <translation>「%1」は %2 ですが、このスロットは %3 を保持しています。</translation>
+    </message>
+    <message>
+        <source>Media edited</source>
+        <translation>メディアを編集しました</translation>
+    </message>
+    <message>
+        <source>Media replaced</source>
+        <translation>メディアを置き換えました</translation>
     </message>
 </context>
 <context>

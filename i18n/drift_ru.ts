@@ -2046,44 +2046,12 @@
         <translation>Медиафайл переименован</translation>
     </message>
     <message>
-        <source>That file could not be read.</source>
-        <translation>Не удалось прочитать файл.</translation>
-    </message>
-    <message>
-        <source>That file is already in this project.</source>
-        <translation>Этот файл уже есть в проекте.</translation>
-    </message>
-    <message>
         <source>Crop clip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Crop saved</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Converting %1 to an edit-friendly format…</source>
-        <translation>Преобразование %1 в формат для удобного монтажа…</translation>
-    </message>
-    <message>
-        <source>That media is no longer in this project.</source>
-        <translation>Этого медиафайла больше нет в проекте.</translation>
-    </message>
-    <message>
-        <source>“%1” is %2, but this slot holds %3.</source>
-        <translation>«%1» имеет тип %2, а сюда можно поместить только %3.</translation>
-    </message>
-    <message>
-        <source>Media replaced</source>
-        <translation>Медиафайл заменён</translation>
     </message>
     <message>
         <source>New project</source>
@@ -2492,50 +2460,6 @@
     <message>
         <source>Media rotated</source>
         <translation>Медиафайл повёрнут</translation>
-    </message>
-    <message>
-        <source>An edit is already saving</source>
-        <translation>Изменения уже сохраняются</translation>
-    </message>
-    <message>
-        <source>Could not open the media file</source>
-        <translation>Не удалось открыть медиафайл</translation>
-    </message>
-    <message>
-        <source>Media trimmed</source>
-        <translation>Медиафайл обрезан</translation>
-    </message>
-    <message>
-        <source>Trim saved</source>
-        <translation>Обрезка сохранена</translation>
-    </message>
-    <message>
-        <source>Saving…</source>
-        <translation>Сохранение…</translation>
-    </message>
-    <message>
-        <source>Converting…</source>
-        <translation>Преобразование…</translation>
-    </message>
-    <message>
-        <source>Saving media…</source>
-        <translation>Сохранение медиафайла…</translation>
-    </message>
-    <message>
-        <source>Couldn’t save that edit</source>
-        <translation>Не удалось сохранить изменения</translation>
-    </message>
-    <message>
-        <source>Updating the library…</source>
-        <translation>Обновление медиатеки…</translation>
-    </message>
-    <message>
-        <source>Couldn’t update the library</source>
-        <translation>Не удалось обновить медиатеку</translation>
-    </message>
-    <message>
-        <source>Media edited</source>
-        <translation>Медиафайл изменён</translation>
     </message>
     <message>
         <source>Save project as…</source>
@@ -3248,18 +3172,6 @@
     <message>
         <source>%1 (off)</source>
         <translation>%1 (выкл.)</translation>
-    </message>
-    <message>
-        <source>%1 (trimmed)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rendering…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Render Trimmed Copy</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Transform selection together</source>
@@ -4133,22 +4045,6 @@
         <source>Close gap</source>
         <translation>Убрать промежуток</translation>
     </message>
-    <message>
-        <source>Folder created</source>
-        <translation>Папка создана</translation>
-    </message>
-    <message>
-        <source>Folder renamed</source>
-        <translation>Папка переименована</translation>
-    </message>
-    <message>
-        <source>Folder deleted</source>
-        <translation>Папка удалена</translation>
-    </message>
-    <message>
-        <source>Media moved</source>
-        <translation>Медиафайл перемещён</translation>
-    </message>
     <message numerus="yes">
         <source>%n items removed</source>
         <translation>
@@ -4157,21 +4053,9 @@
             <numerusform>Удалено %n элементов</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n items moved</source>
-        <translation>
-            <numerusform>Перемещён %n элемент</numerusform>
-            <numerusform>Перемещено %n элемента</numerusform>
-            <numerusform>Перемещено %n элементов</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Clips added</source>
         <translation>Клипы добавлены</translation>
-    </message>
-    <message>
-        <source>Folder moved</source>
-        <translation>Папка перемещена</translation>
     </message>
     <message>
         <source>Track renamed</source>
@@ -8829,6 +8713,133 @@
             <numerusform>Удалить %n элемента из проекта</numerusform>
             <numerusform>Удалить %n элементов из проекта</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>MediaBinController</name>
+    <message>
+        <source>Folder created</source>
+        <translation>Папка создана</translation>
+    </message>
+    <message>
+        <source>Folder renamed</source>
+        <translation>Папка переименована</translation>
+    </message>
+    <message>
+        <source>Folder moved</source>
+        <translation>Папка перемещена</translation>
+    </message>
+    <message>
+        <source>Folder deleted</source>
+        <translation>Папка удалена</translation>
+    </message>
+    <message>
+        <source>Media moved</source>
+        <translation>Медиафайл перемещён</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n items moved</source>
+        <translation>
+            <numerusform>Перемещён %n элемент</numerusform>
+            <numerusform>Перемещено %n элемента</numerusform>
+            <numerusform>Перемещено %n элементов</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>That file could not be read.</source>
+        <translation>Не удалось прочитать файл.</translation>
+    </message>
+    <message>
+        <source>That file is already in this project.</source>
+        <translation>Этот файл уже есть в проекте.</translation>
+    </message>
+    <message>
+        <source>An edit is already saving</source>
+        <translation>Изменения уже сохраняются</translation>
+    </message>
+    <message>
+        <source>Could not open the media file</source>
+        <translation>Не удалось открыть медиафайл</translation>
+    </message>
+    <message>
+        <source>Crop image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media trimmed</source>
+        <translation>Медиафайл обрезан</translation>
+    </message>
+    <message>
+        <source>Trim saved</source>
+        <translation>Обрезка сохранена</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>Не удалось создать выходной файл</translation>
+    </message>
+    <message>
+        <source>%1 (trimmed)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Render Trimmed Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn’t save that edit</source>
+        <translation>Не удалось сохранить изменения</translation>
+    </message>
+    <message>
+        <source>Converting…</source>
+        <translation>Преобразование…</translation>
+    </message>
+    <message>
+        <source>Saving…</source>
+        <translation>Сохранение…</translation>
+    </message>
+    <message>
+        <source>Converting %1 to an edit-friendly format…</source>
+        <translation>Преобразование %1 в формат для удобного монтажа…</translation>
+    </message>
+    <message>
+        <source>Saving media…</source>
+        <translation>Сохранение медиафайла…</translation>
+    </message>
+    <message>
+        <source>Updating the library…</source>
+        <translation>Обновление медиатеки…</translation>
+    </message>
+    <message>
+        <source>Couldn’t update the library</source>
+        <translation>Не удалось обновить медиатеку</translation>
+    </message>
+    <message>
+        <source>That media is no longer in this project.</source>
+        <translation>Этого медиафайла больше нет в проекте.</translation>
+    </message>
+    <message>
+        <source>“%1” is %2, but this slot holds %3.</source>
+        <translation>«%1» имеет тип %2, а сюда можно поместить только %3.</translation>
+    </message>
+    <message>
+        <source>Media edited</source>
+        <translation>Медиафайл изменён</translation>
+    </message>
+    <message>
+        <source>Media replaced</source>
+        <translation>Медиафайл заменён</translation>
     </message>
 </context>
 <context>

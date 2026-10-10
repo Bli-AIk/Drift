@@ -110,7 +110,7 @@ QString RestoreController::run(const QString &targetId, const QString &decompres
 
     const drift::MediaAsset *source = src->asset;
     const QString sourceName = source ? source->name : QFileInfo(src->path).completeBaseName();
-    const QString folderId = source ? source->folderId : m_app->m_currentBinFolderId;
+    const QString folderId = source ? source->folderId : m_app->m_bin->currentFolderId();
     drift::MediaEditSpec spec;
     spec.inputPath = src->path;
     spec.outputPath = drift::newEditedMediaPath(m_app->m_project.id(), QStringLiteral("video"));

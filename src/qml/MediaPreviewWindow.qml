@@ -76,7 +76,7 @@ Window {
                                       && (Math.abs(inSeconds - persistedInSeconds) > 0.02
                                           || Math.abs(outSeconds - persistedOutSeconds) > 0.02)
     readonly property bool dirty: cropDirty || trimDirty || frameResetPending
-    readonly property bool saving: EditorState.editingAsset && !EditorState.assetEditIsConversion
+    readonly property bool saving: EditorState.bin.editing && !EditorState.bin.editIsConversion
 
     // Bin videos end on a second page that offers an upscale; everything else saves directly.
     readonly property bool hasFinishPage: isVideo && clipId.length === 0
@@ -253,7 +253,7 @@ Window {
             root.host.openRestoreAsset(id)
             return
         }
-        root.renderingCopy = EditorState.renderAssetCopy(root.assetIndex, root.inSeconds,
+        root.renderingCopy = EditorState.bin.renderCopy(root.assetIndex, root.inSeconds,
                                                          root.canTrim ? root.outSeconds : -1,
                                                          root.cropX, root.cropY, root.cropW, root.cropH)
     }
@@ -283,26 +283,30 @@ Window {
         EditorState.assetPreview.pause()
         EditorState.assetPreview.end()
         if (root.saving)
-            EditorState.cancelAssetEdit()
+            EditorState.bin.cancelEdit()
         EditorState.assetPreview.windowOpen = false
     }
 
     Connections {
-        target: EditorState
-        function onAssetCopyRendered(assetId) {
+        target: EditorState.bin
+        function onCopyRendered(assetId) {
             if (!root.renderingCopy)
                 return
             root.renderingCopy = false
             root.close()
             root.host.openRestoreAsset(assetId)
         }
-        function onAssetEditFinished(ok, message) {
+        function onEditFinished(ok, message) {
             root.renderingCopy = false
             // A background frame-rate conversion is not this window's save.
-            if (!ok || EditorState.assetEditIsConversion)
+            if (!ok || EditorState.bin.editIsConversion)
                 return
             root.close()
         }
+    }
+
+    Connections {
+        target: EditorState
         function onProjectReset() {
             root.close()
         }
@@ -1044,8 +1048,8 @@ Window {
             elide: Text.ElideRight
             tone: "muted"
             text: root.saving
-                  ? (EditorState.assetEditStatus.length > 0
-                     ? EditorState.assetEditStatus
+                  ? (EditorState.bin.editStatus.length > 0
+                     ? EditorState.bin.editStatus
                      : qsTr("Saving…"))
                   : root.page === 1 ? ""
                   : root.hasFinishPage ? qsTr("Choose the part and crop to keep, then Next.")
@@ -1060,7 +1064,7 @@ Window {
             text: root.saving ? qsTr("Cancel") : qsTr("Close")
             onClicked: {
                 if (root.saving)
-                    EditorState.cancelAssetEdit()
+                    EditorState.bin.cancelEdit()
                 else
                     root.close()
             }
@@ -1106,7 +1110,7 @@ Window {
                 }
                 if (AssetLibrary.assetAt(root.assetIndex).id !== root.assetId)
                     return
-                EditorState.saveAssetEdit(root.assetIndex, root.inSeconds,
+                EditorState.bin.saveEdit(root.assetIndex, root.inSeconds,
                                           root.canTrim ? root.outSeconds : -1,
                                           root.cropX, root.cropY, root.cropW, root.cropH)
             }
@@ -1127,14 +1131,14 @@ Window {
             ThemedLabel {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
-                text: EditorState.assetEditStatus.length > 0
-                      ? EditorState.assetEditStatus : qsTr("Saving…")
+                text: EditorState.bin.editStatus.length > 0
+                      ? EditorState.bin.editStatus : qsTr("Saving…")
                 tone: "default"
                 size: "sm"
             }
             ThemedProgressBar {
                 width: parent.width
-                value: EditorState.assetEditProgress
+                value: EditorState.bin.editProgress
             }
         }
     }

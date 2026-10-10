@@ -2040,44 +2040,12 @@
         <translation>미디어 이름이 변경됨</translation>
     </message>
     <message>
-        <source>That file could not be read.</source>
-        <translation>파일을 읽을 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>That file is already in this project.</source>
-        <translation>해당 파일은 이미 이 프로젝트에 있습니다.</translation>
-    </message>
-    <message>
         <source>Crop clip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Crop saved</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Converting %1 to an edit-friendly format…</source>
-        <translation>%1을(를) 편집하기 좋은 형식으로 변환 중…</translation>
-    </message>
-    <message>
-        <source>That media is no longer in this project.</source>
-        <translation>해당 미디어는 더 이상 이 프로젝트에 없습니다.</translation>
-    </message>
-    <message>
-        <source>“%1” is %2, but this slot holds %3.</source>
-        <translation>“%1”은(는) %2이지만 이 슬롯에는 %3이(가) 필요합니다.</translation>
-    </message>
-    <message>
-        <source>Media replaced</source>
-        <translation>미디어가 교체됨</translation>
     </message>
     <message>
         <source>New project</source>
@@ -2480,50 +2448,6 @@
     <message>
         <source>Media rotated</source>
         <translation>미디어가 회전됨</translation>
-    </message>
-    <message>
-        <source>An edit is already saving</source>
-        <translation>이미 편집 내용을 저장하는 중입니다</translation>
-    </message>
-    <message>
-        <source>Could not open the media file</source>
-        <translation>미디어 파일을 열 수 없습니다</translation>
-    </message>
-    <message>
-        <source>Media trimmed</source>
-        <translation>미디어가 잘렸습니다</translation>
-    </message>
-    <message>
-        <source>Trim saved</source>
-        <translation>자르기가 저장됨</translation>
-    </message>
-    <message>
-        <source>Saving…</source>
-        <translation>저장 중…</translation>
-    </message>
-    <message>
-        <source>Converting…</source>
-        <translation>변환 중…</translation>
-    </message>
-    <message>
-        <source>Saving media…</source>
-        <translation>미디어 저장 중…</translation>
-    </message>
-    <message>
-        <source>Couldn’t save that edit</source>
-        <translation>해당 편집 내용을 저장할 수 없습니다</translation>
-    </message>
-    <message>
-        <source>Updating the library…</source>
-        <translation>라이브러리 업데이트 중…</translation>
-    </message>
-    <message>
-        <source>Couldn’t update the library</source>
-        <translation>라이브러리를 업데이트할 수 없습니다</translation>
-    </message>
-    <message>
-        <source>Media edited</source>
-        <translation>미디어가 편집됨</translation>
     </message>
     <message>
         <source>Save project as…</source>
@@ -3236,18 +3160,6 @@
     <message>
         <source>%1 (off)</source>
         <translation>%1(꺼짐)</translation>
-    </message>
-    <message>
-        <source>%1 (trimmed)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rendering…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Render Trimmed Copy</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Transform selection together</source>
@@ -4107,41 +4019,15 @@
         <source>Close gap</source>
         <translation>간격 닫기</translation>
     </message>
-    <message>
-        <source>Folder created</source>
-        <translation>폴더가 생성됨</translation>
-    </message>
-    <message>
-        <source>Folder renamed</source>
-        <translation>폴더 이름이 변경됨</translation>
-    </message>
-    <message>
-        <source>Folder deleted</source>
-        <translation>폴더가 삭제됨</translation>
-    </message>
-    <message>
-        <source>Media moved</source>
-        <translation>미디어가 이동됨</translation>
-    </message>
     <message numerus="yes">
         <source>%n items removed</source>
         <translation>
             <numerusform>항목 %n개 제거됨</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n items moved</source>
-        <translation>
-            <numerusform>항목 %n개 이동됨</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Clips added</source>
         <translation>클립이 추가됨</translation>
-    </message>
-    <message>
-        <source>Folder moved</source>
-        <translation>폴더가 이동됨</translation>
     </message>
     <message>
         <source>Track renamed</source>
@@ -8761,6 +8647,131 @@
         <translation>
             <numerusform>프로젝트에서 항목 %n개 제거</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>MediaBinController</name>
+    <message>
+        <source>Folder created</source>
+        <translation>폴더가 생성됨</translation>
+    </message>
+    <message>
+        <source>Folder renamed</source>
+        <translation>폴더 이름이 변경됨</translation>
+    </message>
+    <message>
+        <source>Folder moved</source>
+        <translation>폴더가 이동됨</translation>
+    </message>
+    <message>
+        <source>Folder deleted</source>
+        <translation>폴더가 삭제됨</translation>
+    </message>
+    <message>
+        <source>Media moved</source>
+        <translation>미디어가 이동됨</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n items moved</source>
+        <translation>
+            <numerusform>항목 %n개 이동됨</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>That file could not be read.</source>
+        <translation>파일을 읽을 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>That file is already in this project.</source>
+        <translation>해당 파일은 이미 이 프로젝트에 있습니다.</translation>
+    </message>
+    <message>
+        <source>An edit is already saving</source>
+        <translation>이미 편집 내용을 저장하는 중입니다</translation>
+    </message>
+    <message>
+        <source>Could not open the media file</source>
+        <translation>미디어 파일을 열 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Crop image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media trimmed</source>
+        <translation>미디어가 잘렸습니다</translation>
+    </message>
+    <message>
+        <source>Trim saved</source>
+        <translation>자르기가 저장됨</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>출력 파일을 만들 수 없습니다</translation>
+    </message>
+    <message>
+        <source>%1 (trimmed)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Render Trimmed Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn’t save that edit</source>
+        <translation>해당 편집 내용을 저장할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Converting…</source>
+        <translation>변환 중…</translation>
+    </message>
+    <message>
+        <source>Saving…</source>
+        <translation>저장 중…</translation>
+    </message>
+    <message>
+        <source>Converting %1 to an edit-friendly format…</source>
+        <translation>%1을(를) 편집하기 좋은 형식으로 변환 중…</translation>
+    </message>
+    <message>
+        <source>Saving media…</source>
+        <translation>미디어 저장 중…</translation>
+    </message>
+    <message>
+        <source>Updating the library…</source>
+        <translation>라이브러리 업데이트 중…</translation>
+    </message>
+    <message>
+        <source>Couldn’t update the library</source>
+        <translation>라이브러리를 업데이트할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>That media is no longer in this project.</source>
+        <translation>해당 미디어는 더 이상 이 프로젝트에 없습니다.</translation>
+    </message>
+    <message>
+        <source>“%1” is %2, but this slot holds %3.</source>
+        <translation>“%1”은(는) %2이지만 이 슬롯에는 %3이(가) 필요합니다.</translation>
+    </message>
+    <message>
+        <source>Media edited</source>
+        <translation>미디어가 편집됨</translation>
+    </message>
+    <message>
+        <source>Media replaced</source>
+        <translation>미디어가 교체됨</translation>
     </message>
 </context>
 <context>

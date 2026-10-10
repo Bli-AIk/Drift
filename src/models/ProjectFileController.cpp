@@ -817,7 +817,7 @@ void ProjectFileController::importMogrt(const QUrl &url)
 
     if (m_app->m_assetLibrary)
         m_app->m_assetLibrary->setProject(&m_app->m_project);
-    m_app->m_binFolderModel.setProject(&m_app->m_project);
+    m_app->m_bin->folderModel()->setProject(&m_app->m_project);
 
     setDirty(true);
     m_app->finishEdit(tr("Template imported: %1").arg(tmpl->title));
@@ -1131,7 +1131,7 @@ void ProjectFileController::collectMediaToFolder(const QUrl &folder, bool move)
                     m_app->pushProjectEdit(before, tr("Collect media"));
                 if (m_app->m_assetLibrary)
                     m_app->m_assetLibrary->setProject(&m_app->m_project);
-                m_app->m_binFolderModel.setProject(&m_app->m_project);
+                m_app->m_bin->folderModel()->setProject(&m_app->m_project);
                 m_app->restoreFilmstripsAfterLoad();
                 m_app->notifyTracksChanged();
                 setDirty(true);
@@ -1449,7 +1449,7 @@ void ProjectFileController::rehydrateMissingSources()
                 // to be told; a load has already cleared undo, and a restored file is not an edit.
                 if (m_app->m_assetLibrary)
                     m_app->m_assetLibrary->setProject(&m_app->m_project);
-                m_app->m_binFolderModel.setProject(&m_app->m_project);
+                m_app->m_bin->folderModel()->setProject(&m_app->m_project);
                 m_app->restoreFilmstripsAfterLoad();
                 m_app->notifyTracksChanged();
             });
@@ -1480,8 +1480,8 @@ void ProjectFileController::newProject(bool silent)
     m_embeddedSources.clear();
     if (m_app->m_assetLibrary)
         m_app->m_assetLibrary->setProject(&m_app->m_project);
-    m_app->m_binFolderModel.setProject(&m_app->m_project);
-    m_app->setCurrentBinFolderId(QString());
+    m_app->m_bin->folderModel()->setProject(&m_app->m_project);
+    m_app->m_bin->setCurrentFolderId(QString());
     m_app->m_playback.setProject(&m_app->m_project);
     m_app->m_undoStack.clear();
     m_app->clearSelection();

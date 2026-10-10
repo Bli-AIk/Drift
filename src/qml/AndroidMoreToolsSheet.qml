@@ -374,7 +374,7 @@ AndroidBottomSheet {
             EditorState.separateAllAudioTracks(track, clipIndex)
             break
         case "editFriendly":
-            EditorState.convertAssetsToConstantFrameRate([root.mediaAssetId])
+            EditorState.bin.convertToConstantFrameRate([root.mediaAssetId])
             break
         case "mergeSubtitles":
             EditorState.mergeSelectedClips()

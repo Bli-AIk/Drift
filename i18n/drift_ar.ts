@@ -2055,40 +2055,12 @@
         <translation>تمت إعادة تسمية الوسائط</translation>
     </message>
     <message>
-        <source>That file could not be read.</source>
-        <translation>تعذر قراءة ذلك الملف.</translation>
-    </message>
-    <message>
-        <source>That file is already in this project.</source>
-        <translation>ذلك الملف موجود بالفعل في هذا المشروع.</translation>
-    </message>
-    <message>
         <source>Crop clip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Crop saved</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>That media is no longer in this project.</source>
-        <translation>تلك الوسائط لم تعد موجودة في هذا المشروع.</translation>
-    </message>
-    <message>
-        <source>“%1” is %2, but this slot holds %3.</source>
-        <translation>“%1” هو %2، لكن هذه الخانة تحتوي على %3.</translation>
-    </message>
-    <message>
-        <source>Media replaced</source>
-        <translation>تم استبدال الوسائط</translation>
     </message>
     <message>
         <source>New project</source>
@@ -2502,46 +2474,6 @@
     <message>
         <source>Media rotated</source>
         <translation>تم تدوير الوسائط</translation>
-    </message>
-    <message>
-        <source>An edit is already saving</source>
-        <translation>جارٍ حفظ أحد التعديلات بالفعل</translation>
-    </message>
-    <message>
-        <source>Could not open the media file</source>
-        <translation>تعذر فتح ملف الوسائط</translation>
-    </message>
-    <message>
-        <source>Media trimmed</source>
-        <translation>تم قص الوسائط</translation>
-    </message>
-    <message>
-        <source>Trim saved</source>
-        <translation>تم حفظ القص</translation>
-    </message>
-    <message>
-        <source>Saving…</source>
-        <translation>جارٍ الحفظ…</translation>
-    </message>
-    <message>
-        <source>Saving media…</source>
-        <translation>جارٍ حفظ الوسائط…</translation>
-    </message>
-    <message>
-        <source>Couldn’t save that edit</source>
-        <translation>تعذر حفظ هذا التعديل</translation>
-    </message>
-    <message>
-        <source>Updating the library…</source>
-        <translation>جارٍ تحديث المكتبة…</translation>
-    </message>
-    <message>
-        <source>Couldn’t update the library</source>
-        <translation>تعذر تحديث المكتبة</translation>
-    </message>
-    <message>
-        <source>Media edited</source>
-        <translation>تم تعديل الوسائط</translation>
     </message>
     <message>
         <source>Save project as…</source>
@@ -3078,26 +3010,6 @@
     <message>
         <source>%1 (off)</source>
         <translation>%1 (متوقف)</translation>
-    </message>
-    <message>
-        <source>%1 (trimmed)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rendering…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Render Trimmed Copy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Converting…</source>
-        <translation>جارٍ التحويل…</translation>
-    </message>
-    <message>
-        <source>Converting %1 to an edit-friendly format…</source>
-        <translation>جارٍ تحويل %1 إلى تنسيق مناسب للتحرير…</translation>
     </message>
     <message>
         <source>Transform selection together</source>
@@ -4172,22 +4084,6 @@
         <source>Close gap</source>
         <translation>إغلاق الفراغ</translation>
     </message>
-    <message>
-        <source>Folder created</source>
-        <translation>تم إنشاء المجلد</translation>
-    </message>
-    <message>
-        <source>Folder renamed</source>
-        <translation>تمت إعادة تسمية المجلد</translation>
-    </message>
-    <message>
-        <source>Folder deleted</source>
-        <translation>تم حذف المجلد</translation>
-    </message>
-    <message>
-        <source>Media moved</source>
-        <translation>تم نقل الوسائط</translation>
-    </message>
     <message numerus="yes">
         <source>%n items removed</source>
         <translation>
@@ -4199,24 +4095,9 @@
             <numerusform>تمت إزالة %n عنصر</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n items moved</source>
-        <translation>
-            <numerusform>تم نقل %n عنصر</numerusform>
-            <numerusform>تم نقل %n عنصر</numerusform>
-            <numerusform>تم نقل %n عنصرين</numerusform>
-            <numerusform>تم نقل %n عناصر</numerusform>
-            <numerusform>تم نقل %n عنصرًا</numerusform>
-            <numerusform>تم نقل %n عنصر</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Clips added</source>
         <translation>تمت إضافة المقاطع</translation>
-    </message>
-    <message>
-        <source>Folder moved</source>
-        <translation>تم نقل المجلد</translation>
     </message>
     <message>
         <source>Track renamed</source>
@@ -8931,6 +8812,136 @@
             <numerusform>إزالة %n عنصرًا من المشروع</numerusform>
             <numerusform>إزالة %n عنصر من المشروع</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>MediaBinController</name>
+    <message>
+        <source>Folder created</source>
+        <translation>تم إنشاء المجلد</translation>
+    </message>
+    <message>
+        <source>Folder renamed</source>
+        <translation>تمت إعادة تسمية المجلد</translation>
+    </message>
+    <message>
+        <source>Folder moved</source>
+        <translation>تم نقل المجلد</translation>
+    </message>
+    <message>
+        <source>Folder deleted</source>
+        <translation>تم حذف المجلد</translation>
+    </message>
+    <message>
+        <source>Media moved</source>
+        <translation>تم نقل الوسائط</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n items moved</source>
+        <translation>
+            <numerusform>تم نقل %n عنصر</numerusform>
+            <numerusform>تم نقل %n عنصر</numerusform>
+            <numerusform>تم نقل %n عنصرين</numerusform>
+            <numerusform>تم نقل %n عناصر</numerusform>
+            <numerusform>تم نقل %n عنصرًا</numerusform>
+            <numerusform>تم نقل %n عنصر</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>That file could not be read.</source>
+        <translation>تعذر قراءة ذلك الملف.</translation>
+    </message>
+    <message>
+        <source>That file is already in this project.</source>
+        <translation>ذلك الملف موجود بالفعل في هذا المشروع.</translation>
+    </message>
+    <message>
+        <source>An edit is already saving</source>
+        <translation>جارٍ حفظ أحد التعديلات بالفعل</translation>
+    </message>
+    <message>
+        <source>Could not open the media file</source>
+        <translation>تعذر فتح ملف الوسائط</translation>
+    </message>
+    <message>
+        <source>Crop image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media trimmed</source>
+        <translation>تم قص الوسائط</translation>
+    </message>
+    <message>
+        <source>Trim saved</source>
+        <translation>تم حفظ القص</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>تعذر إنشاء ملف إخراج</translation>
+    </message>
+    <message>
+        <source>%1 (trimmed)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Render Trimmed Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn’t save that edit</source>
+        <translation>تعذر حفظ هذا التعديل</translation>
+    </message>
+    <message>
+        <source>Converting…</source>
+        <translation>جارٍ التحويل…</translation>
+    </message>
+    <message>
+        <source>Saving…</source>
+        <translation>جارٍ الحفظ…</translation>
+    </message>
+    <message>
+        <source>Converting %1 to an edit-friendly format…</source>
+        <translation>جارٍ تحويل %1 إلى تنسيق مناسب للتحرير…</translation>
+    </message>
+    <message>
+        <source>Saving media…</source>
+        <translation>جارٍ حفظ الوسائط…</translation>
+    </message>
+    <message>
+        <source>Updating the library…</source>
+        <translation>جارٍ تحديث المكتبة…</translation>
+    </message>
+    <message>
+        <source>Couldn’t update the library</source>
+        <translation>تعذر تحديث المكتبة</translation>
+    </message>
+    <message>
+        <source>That media is no longer in this project.</source>
+        <translation>تلك الوسائط لم تعد موجودة في هذا المشروع.</translation>
+    </message>
+    <message>
+        <source>“%1” is %2, but this slot holds %3.</source>
+        <translation>“%1” هو %2، لكن هذه الخانة تحتوي على %3.</translation>
+    </message>
+    <message>
+        <source>Media edited</source>
+        <translation>تم تعديل الوسائط</translation>
+    </message>
+    <message>
+        <source>Media replaced</source>
+        <translation>تم استبدال الوسائط</translation>
     </message>
 </context>
 <context>

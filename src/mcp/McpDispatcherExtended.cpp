@@ -590,7 +590,7 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
             return err("bad_args", QStringLiteral("path required"));
         if (!QFileInfo::exists(path))
             return err("not_found", QStringLiteral("File not found"));
-        if (!m_controller->replaceAssetSource(index, QUrl::fromLocalFile(path)))
+        if (!m_controller->bin()->replaceSource(index, QUrl::fromLocalFile(path)))
             return err("bad_args", QStringLiteral("Replace refused"));
         return ok({{QStringLiteral("index"), index}, {QStringLiteral("path"), path}});
     }
@@ -605,7 +605,7 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
         const QFileInfo info(path);
         if (!info.absoluteDir().exists() && !QDir().mkpath(info.absolutePath()))
             return err("bad_args", QStringLiteral("Could not create parent folder"));
-        if (!m_controller->exportAssetImage(index, QUrl::fromLocalFile(path)))
+        if (!m_controller->bin()->exportImage(index, QUrl::fromLocalFile(path)))
             return err("bad_args", QStringLiteral("Export refused"));
         return ok({{QStringLiteral("index"), index}, {QStringLiteral("path"), path}});
     }

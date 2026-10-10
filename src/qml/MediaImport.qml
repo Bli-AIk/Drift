@@ -26,7 +26,7 @@ QtObject {
     property var _awaitIds: []
     property var _awaitCallback: null
 
-    readonly property bool importing: AssetLibrary.importing || EditorState.importingFolder
+    readonly property bool importing: AssetLibrary.importing || EditorState.bin.importingFolder
 
     function importUrls(urls, fromDrop, onFinished) {
         if (!urls || urls.length === 0)
@@ -201,7 +201,7 @@ QtObject {
                 Toasts.post("warning",
                             qsTr("%n clip(s) have a variable frame rate, which can drift out of sync with audio. Convert them to an edit-friendly format to fix it.", "", vfrIds.length),
                             12000, qsTr("Convert"),
-                            function () { EditorState.convertAssetsToConstantFrameRate(vfrIds) })
+                            function () { EditorState.bin.convertToConstantFrameRate(vfrIds) })
             }
         }
     }

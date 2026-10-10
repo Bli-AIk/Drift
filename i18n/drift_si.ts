@@ -2043,44 +2043,12 @@
         <translation>මාධ්‍ය නම වෙනස් කෙරිණි</translation>
     </message>
     <message>
-        <source>That file could not be read.</source>
-        <translation>එම ගොනුව කියවීමට නොහැකි විය.</translation>
-    </message>
-    <message>
-        <source>That file is already in this project.</source>
-        <translation>එම ගොනුව දැනටමත් මෙම ව්‍යාපෘතියේ ඇත.</translation>
-    </message>
-    <message>
         <source>Crop clip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Crop saved</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Converting %1 to an edit-friendly format…</source>
-        <translation>%1 සංස්කරණයට සුදුසු ආකෘතියකට පරිවර්තනය වෙමින්…</translation>
-    </message>
-    <message>
-        <source>That media is no longer in this project.</source>
-        <translation>එම මාධ්‍ය තවදුරටත් මෙම ව්‍යාපෘතියේ නොමැත.</translation>
-    </message>
-    <message>
-        <source>“%1” is %2, but this slot holds %3.</source>
-        <translation>“%1” යනු %2 වේ, නමුත් මෙම ස්ථානයට දැමිය හැක්කේ %3 පමණි.</translation>
-    </message>
-    <message>
-        <source>Media replaced</source>
-        <translation>මාධ්‍ය ප්‍රතිස්ථාපනය කෙරිණි</translation>
     </message>
     <message>
         <source>New project</source>
@@ -2486,50 +2454,6 @@
     <message>
         <source>Media rotated</source>
         <translation>මාධ්‍ය කරකවන ලදී</translation>
-    </message>
-    <message>
-        <source>An edit is already saving</source>
-        <translation>දැනටමත් සංස්කරණයක් සුරැකෙමින් පවතී</translation>
-    </message>
-    <message>
-        <source>Could not open the media file</source>
-        <translation>මාධ්‍ය ගොනුව විවෘත කිරීමට නොහැකි විය</translation>
-    </message>
-    <message>
-        <source>Media trimmed</source>
-        <translation>මාධ්‍ය කප්පාදු කරන ලදී</translation>
-    </message>
-    <message>
-        <source>Trim saved</source>
-        <translation>කප්පාදුව සුරකින ලදී</translation>
-    </message>
-    <message>
-        <source>Saving…</source>
-        <translation>සුරකිමින්…</translation>
-    </message>
-    <message>
-        <source>Converting…</source>
-        <translation>පරිවර්තනය වෙමින්…</translation>
-    </message>
-    <message>
-        <source>Saving media…</source>
-        <translation>මාධ්‍ය සුරකිමින්…</translation>
-    </message>
-    <message>
-        <source>Couldn’t save that edit</source>
-        <translation>එම සංස්කරණය සුරැකීමට නොහැකි විය</translation>
-    </message>
-    <message>
-        <source>Updating the library…</source>
-        <translation>පුස්තකාලය යාවත්කාලීන කරමින්…</translation>
-    </message>
-    <message>
-        <source>Couldn’t update the library</source>
-        <translation>පුස්තකාලය යාවත්කාලීන කිරීමට නොහැකි විය</translation>
-    </message>
-    <message>
-        <source>Media edited</source>
-        <translation>මාධ්‍ය සංස්කරණය කරන ලදී</translation>
     </message>
     <message>
         <source>Save project as…</source>
@@ -3242,18 +3166,6 @@
     <message>
         <source>%1 (off)</source>
         <translation>%1 (අක්‍රියයි)</translation>
-    </message>
-    <message>
-        <source>%1 (trimmed)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rendering…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Render Trimmed Copy</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Transform selection together</source>
@@ -4120,22 +4032,6 @@
         <source>Close gap</source>
         <translation>හිඩැස වසන්න</translation>
     </message>
-    <message>
-        <source>Folder created</source>
-        <translation>ෆෝල්ඩරය සාදන ලදී</translation>
-    </message>
-    <message>
-        <source>Folder renamed</source>
-        <translation>ෆෝල්ඩරයේ නම වෙනස් කරන ලදී</translation>
-    </message>
-    <message>
-        <source>Folder deleted</source>
-        <translation>ෆෝල්ඩරය මකා දමන ලදී</translation>
-    </message>
-    <message>
-        <source>Media moved</source>
-        <translation>මාධ්‍යය ගෙන යන ලදී</translation>
-    </message>
     <message numerus="yes">
         <source>%n items removed</source>
         <translation>
@@ -4143,20 +4039,9 @@
             <numerusform>අයිතම %n ක් ඉවත් කරන ලදී</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n items moved</source>
-        <translation>
-            <numerusform>අයිතම %n ක් ගෙන යන ලදී</numerusform>
-            <numerusform>අයිතම %n ක් ගෙන යන ලදී</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Clips added</source>
         <translation>ක්ලිප් එක් කරන ලදී</translation>
-    </message>
-    <message>
-        <source>Folder moved</source>
-        <translation>ෆෝල්ඩරය ගෙන යන ලදී</translation>
     </message>
     <message>
         <source>Track renamed</source>
@@ -8795,6 +8680,132 @@
             <numerusform>අයිතම %n ක් ව්‍යාපෘතියෙන් ඉවත් කරන්න</numerusform>
             <numerusform>අයිතම %n ක් ව්‍යාපෘතියෙන් ඉවත් කරන්න</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>MediaBinController</name>
+    <message>
+        <source>Folder created</source>
+        <translation>ෆෝල්ඩරය සාදන ලදී</translation>
+    </message>
+    <message>
+        <source>Folder renamed</source>
+        <translation>ෆෝල්ඩරයේ නම වෙනස් කරන ලදී</translation>
+    </message>
+    <message>
+        <source>Folder moved</source>
+        <translation>ෆෝල්ඩරය ගෙන යන ලදී</translation>
+    </message>
+    <message>
+        <source>Folder deleted</source>
+        <translation>ෆෝල්ඩරය මකා දමන ලදී</translation>
+    </message>
+    <message>
+        <source>Media moved</source>
+        <translation>මාධ්‍යය ගෙන යන ලදී</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n items moved</source>
+        <translation>
+            <numerusform>අයිතම %n ක් ගෙන යන ලදී</numerusform>
+            <numerusform>අයිතම %n ක් ගෙන යන ලදී</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>That file could not be read.</source>
+        <translation>එම ගොනුව කියවීමට නොහැකි විය.</translation>
+    </message>
+    <message>
+        <source>That file is already in this project.</source>
+        <translation>එම ගොනුව දැනටමත් මෙම ව්‍යාපෘතියේ ඇත.</translation>
+    </message>
+    <message>
+        <source>An edit is already saving</source>
+        <translation>දැනටමත් සංස්කරණයක් සුරැකෙමින් පවතී</translation>
+    </message>
+    <message>
+        <source>Could not open the media file</source>
+        <translation>මාධ්‍ය ගොනුව විවෘත කිරීමට නොහැකි විය</translation>
+    </message>
+    <message>
+        <source>Crop image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media trimmed</source>
+        <translation>මාධ්‍ය කප්පාදු කරන ලදී</translation>
+    </message>
+    <message>
+        <source>Trim saved</source>
+        <translation>කප්පාදුව සුරකින ලදී</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation>ප්‍රතිදාන ගොනුවක් සෑදීමට නොහැකි විය</translation>
+    </message>
+    <message>
+        <source>%1 (trimmed)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Render Trimmed Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn’t save that edit</source>
+        <translation>එම සංස්කරණය සුරැකීමට නොහැකි විය</translation>
+    </message>
+    <message>
+        <source>Converting…</source>
+        <translation>පරිවර්තනය වෙමින්…</translation>
+    </message>
+    <message>
+        <source>Saving…</source>
+        <translation>සුරකිමින්…</translation>
+    </message>
+    <message>
+        <source>Converting %1 to an edit-friendly format…</source>
+        <translation>%1 සංස්කරණයට සුදුසු ආකෘතියකට පරිවර්තනය වෙමින්…</translation>
+    </message>
+    <message>
+        <source>Saving media…</source>
+        <translation>මාධ්‍ය සුරකිමින්…</translation>
+    </message>
+    <message>
+        <source>Updating the library…</source>
+        <translation>පුස්තකාලය යාවත්කාලීන කරමින්…</translation>
+    </message>
+    <message>
+        <source>Couldn’t update the library</source>
+        <translation>පුස්තකාලය යාවත්කාලීන කිරීමට නොහැකි විය</translation>
+    </message>
+    <message>
+        <source>That media is no longer in this project.</source>
+        <translation>එම මාධ්‍ය තවදුරටත් මෙම ව්‍යාපෘතියේ නොමැත.</translation>
+    </message>
+    <message>
+        <source>“%1” is %2, but this slot holds %3.</source>
+        <translation>“%1” යනු %2 වේ, නමුත් මෙම ස්ථානයට දැමිය හැක්කේ %3 පමණි.</translation>
+    </message>
+    <message>
+        <source>Media edited</source>
+        <translation>මාධ්‍ය සංස්කරණය කරන ලදී</translation>
+    </message>
+    <message>
+        <source>Media replaced</source>
+        <translation>මාධ්‍ය ප්‍රතිස්ථාපනය කෙරිණි</translation>
     </message>
 </context>
 <context>

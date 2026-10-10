@@ -85,7 +85,7 @@ Item {
                                       && (Math.abs(inSeconds - persistedInSeconds) > 0.02
                                           || Math.abs(outSeconds - persistedOutSeconds) > 0.02)
     readonly property bool dirty: cropDirty || trimDirty
-    readonly property bool saving: EditorState.editingAsset && !EditorState.assetEditIsConversion
+    readonly property bool saving: EditorState.bin.editing && !EditorState.bin.editIsConversion
     readonly property real position: EditorState.assetPreview.position
 
     function openFor(index) {
@@ -255,12 +255,16 @@ Item {
     }
 
     Connections {
-        target: EditorState
-        function onAssetEditFinished(ok, message) {
+        target: EditorState.bin
+        function onEditFinished(ok, message) {
             // A background frame-rate conversion is not this sheet's save.
-            if (ok && !EditorState.assetEditIsConversion)
+            if (ok && !EditorState.bin.editIsConversion)
                 root.close()
         }
+    }
+
+    Connections {
+        target: EditorState
         function onProjectReset() {
             root.close()
         }
@@ -363,7 +367,7 @@ Item {
                         root.close()
                     return
                 }
-                EditorState.saveAssetEdit(root.assetIndex, root.inSeconds,
+                EditorState.bin.saveEdit(root.assetIndex, root.inSeconds,
                                           root.canTrim ? root.outSeconds : -1,
                                           root.cropX, root.cropY, root.cropW, root.cropH)
             }
@@ -974,8 +978,8 @@ Item {
             size: "sm"
             tone: "muted"
             text: root.saving
-                  ? (EditorState.assetEditStatus.length > 0
-                     ? EditorState.assetEditStatus : qsTr("Saving…"))
+                  ? (EditorState.bin.editStatus.length > 0
+                     ? EditorState.bin.editStatus : qsTr("Saving…"))
                   : root.dirty
                     ? (!root.isAudio ? qsTr("Save keeps the original file and stores this crop.") : qsTr("Save keeps the original file and stores this trim."))
                     : qsTr("Nothing changed yet. Trim or crop above, or go back and drag this onto the timeline.")
@@ -1002,19 +1006,19 @@ Item {
             ThemedLabel {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
-                text: EditorState.assetEditStatus.length > 0
-                      ? EditorState.assetEditStatus : qsTr("Saving…")
+                text: EditorState.bin.editStatus.length > 0
+                      ? EditorState.bin.editStatus : qsTr("Saving…")
                 size: "sm"
             }
             ThemedProgressBar {
                 width: parent.width
-                value: EditorState.assetEditProgress
+                value: EditorState.bin.editProgress
             }
             ThemedButton {
                 anchors.horizontalCenter: parent.horizontalCenter
                 variant: "ghost"
                 text: qsTr("Cancel")
-                onClicked: EditorState.cancelAssetEdit()
+                onClicked: EditorState.bin.cancelEdit()
             }
         }
     }

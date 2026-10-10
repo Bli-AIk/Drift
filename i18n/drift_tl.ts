@@ -2043,43 +2043,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>That file could not be read.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>That file is already in this project.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Crop clip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Crop saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Converting %1 to an edit-friendly format…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>That media is no longer in this project.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>“%1” is %2, but this slot holds %3.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Media replaced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2485,54 +2453,6 @@
     </message>
     <message>
         <source>Media rotated</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Folder moved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>An edit is already saving</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not open the media file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Media trimmed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Trim saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Saving…</source>
-        <translation type="unfinished">Sine-save…</translation>
-    </message>
-    <message>
-        <source>Converting…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Saving media…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Couldn’t save that edit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Updating the library…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Couldn’t update the library</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Media edited</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3246,18 +3166,6 @@
     <message>
         <source>%1 (off)</source>
         <translation>%1 (pinatay)</translation>
-    </message>
-    <message>
-        <source>%1 (trimmed)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rendering…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Render Trimmed Copy</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Transform selection together</source>
@@ -4128,31 +4036,8 @@
         <source>Close gap</source>
         <translation type="unfinished">Isara ang puwang</translation>
     </message>
-    <message>
-        <source>Folder created</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Folder renamed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Folder deleted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Media moved</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>%n items removed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n items moved</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -8795,6 +8680,132 @@
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>MediaBinController</name>
+    <message>
+        <source>Folder created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder renamed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder moved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder deleted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media moved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n items moved</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>That file could not be read.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>That file is already in this project.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An edit is already saving</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open the media file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media trimmed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trim saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (trimmed)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Render Trimmed Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn’t save that edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Converting…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saving…</source>
+        <translation type="unfinished">Sine-save…</translation>
+    </message>
+    <message>
+        <source>Converting %1 to an edit-friendly format…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saving media…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updating the library…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn’t update the library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>That media is no longer in this project.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>“%1” is %2, but this slot holds %3.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media edited</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media replaced</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -7,6 +7,7 @@
 
 #include <QSet>
 #include <QString>
+#include <QUrl>
 
 #include <QMatrix4x4>
 #include <QTransform>
@@ -56,3 +57,9 @@ void syncLinkedPartnersFrom(Project &project, const Clip &source,
                             const QSet<QString> &skipClipIds = {});
 
 } // namespace drift::appdetail
+
+// Defined in AppController.cpp; also used by MediaBinController.cpp.
+bool writeTargetIsDisposable(const QUrl &url);
+#ifdef Q_OS_ANDROID
+QString materializeContentUrl(const QUrl &url);
+#endif

@@ -2043,44 +2043,12 @@
         <translation type="unfinished">মিডিয়ার নাম পরিবর্তন করা হয়েছে</translation>
     </message>
     <message>
-        <source>That file could not be read.</source>
-        <translation type="unfinished">ফাইলটি পড়া যাবে না.</translation>
-    </message>
-    <message>
-        <source>That file is already in this project.</source>
-        <translation type="unfinished">ফাইলটি ইতিমধ্যেই এই প্রকল্পে রয়েছে.</translation>
-    </message>
-    <message>
         <source>Crop clip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Crop saved</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Converting %1 to an edit-friendly format…</source>
-        <translation type="unfinished">%1 কে সম্পাদনা-বান্ধব বিন্যাসে রূপান্তর করা হচ্ছে…</translation>
-    </message>
-    <message>
-        <source>That media is no longer in this project.</source>
-        <translation type="unfinished">সেই মিডিয়া আর এই প্রকল্পে নেই.</translation>
-    </message>
-    <message>
-        <source>“%1” is %2, but this slot holds %3.</source>
-        <translation type="unfinished">“%1” হল %2, কিন্তু এই স্লটে %3 আছে.</translation>
-    </message>
-    <message>
-        <source>Media replaced</source>
-        <translation type="unfinished">মিডিয়া প্রতিস্থাপিত হয়েছে</translation>
     </message>
     <message>
         <source>New project</source>
@@ -2486,50 +2454,6 @@
     <message>
         <source>Media rotated</source>
         <translation type="unfinished">মিডিয়া ঘোরানো হয়েছে</translation>
-    </message>
-    <message>
-        <source>An edit is already saving</source>
-        <translation type="unfinished">একটি সম্পাদনা ইতিমধ্যেই সংরক্ষণ করা হচ্ছে।</translation>
-    </message>
-    <message>
-        <source>Could not open the media file</source>
-        <translation type="unfinished">মিডিয়া ফাইল খোলা যায়নি</translation>
-    </message>
-    <message>
-        <source>Media trimmed</source>
-        <translation type="unfinished">মিডিয়া ছাঁটা</translation>
-    </message>
-    <message>
-        <source>Trim saved</source>
-        <translation type="unfinished">ট্রিম সংরক্ষিত</translation>
-    </message>
-    <message>
-        <source>Saving…</source>
-        <translation>সংরক্ষণ করা হচ্ছে…</translation>
-    </message>
-    <message>
-        <source>Converting…</source>
-        <translation type="unfinished">রূপান্তর করা হচ্ছে…</translation>
-    </message>
-    <message>
-        <source>Saving media…</source>
-        <translation type="unfinished">মিডিয়া সংরক্ষণ করা হচ্ছে…</translation>
-    </message>
-    <message>
-        <source>Couldn’t save that edit</source>
-        <translation type="unfinished">সম্পাদনাটি সংরক্ষণ করা যায়নি।</translation>
-    </message>
-    <message>
-        <source>Updating the library…</source>
-        <translation type="unfinished">লাইব্রেরি আপডেট করা হচ্ছে…</translation>
-    </message>
-    <message>
-        <source>Couldn’t update the library</source>
-        <translation type="unfinished">লাইব্রেরি আপডেট করা যায়নি</translation>
-    </message>
-    <message>
-        <source>Media edited</source>
-        <translation type="unfinished">মিডিয়া সম্পাদিত</translation>
     </message>
     <message>
         <source>Save project as…</source>
@@ -3242,18 +3166,6 @@
     <message>
         <source>%1 (off)</source>
         <translation type="unfinished">%1 (বন্ধ)</translation>
-    </message>
-    <message>
-        <source>%1 (trimmed)</source>
-        <translation type="unfinished">%1 (ছাঁটা)</translation>
-    </message>
-    <message>
-        <source>Rendering…</source>
-        <translation type="unfinished">রেন্ডারিং…</translation>
-    </message>
-    <message>
-        <source>Render Trimmed Copy</source>
-        <translation type="unfinished">ট্রিমড কপি রেন্ডার করুন</translation>
     </message>
     <message>
         <source>Transform selection together</source>
@@ -4120,31 +4032,8 @@
         <source>Close gap</source>
         <translation>ফাঁক বন্ধ করুন</translation>
     </message>
-    <message>
-        <source>Folder created</source>
-        <translation type="unfinished">ফোল্ডার তৈরি হয়েছে</translation>
-    </message>
-    <message>
-        <source>Folder renamed</source>
-        <translation type="unfinished">ফোল্ডারের নাম পরিবর্তন করা হয়েছে</translation>
-    </message>
-    <message>
-        <source>Folder deleted</source>
-        <translation type="unfinished">ফোল্ডার মুছে ফেলা হয়েছে</translation>
-    </message>
-    <message>
-        <source>Media moved</source>
-        <translation type="unfinished">মিডিয়া সরানো হয়েছে</translation>
-    </message>
     <message numerus="yes">
         <source>%n items removed</source>
-        <translation>
-            <numerusform>%nটি আইটেম সরানো হয়েছে</numerusform>
-            <numerusform>%nটি আইটেম সরানো হয়েছে</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n items moved</source>
         <translation>
             <numerusform>%nটি আইটেম সরানো হয়েছে</numerusform>
             <numerusform>%nটি আইটেম সরানো হয়েছে</numerusform>
@@ -4153,10 +4042,6 @@
     <message>
         <source>Clips added</source>
         <translation type="unfinished">ক্লিপ যোগ করা হয়েছে</translation>
-    </message>
-    <message>
-        <source>Folder moved</source>
-        <translation type="unfinished">ফোল্ডার সরানো হয়েছে।</translation>
     </message>
     <message>
         <source>Track renamed</source>
@@ -8795,6 +8680,132 @@
             <numerusform>প্রকল্প থেকে %nটি আইটেম সরান</numerusform>
             <numerusform>প্রকল্প থেকে %nটি আইটেম সরান</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>MediaBinController</name>
+    <message>
+        <source>Folder created</source>
+        <translation type="unfinished">ফোল্ডার তৈরি হয়েছে</translation>
+    </message>
+    <message>
+        <source>Folder renamed</source>
+        <translation type="unfinished">ফোল্ডারের নাম পরিবর্তন করা হয়েছে</translation>
+    </message>
+    <message>
+        <source>Folder moved</source>
+        <translation type="unfinished">ফোল্ডার সরানো হয়েছে।</translation>
+    </message>
+    <message>
+        <source>Folder deleted</source>
+        <translation type="unfinished">ফোল্ডার মুছে ফেলা হয়েছে</translation>
+    </message>
+    <message>
+        <source>Media moved</source>
+        <translation type="unfinished">মিডিয়া সরানো হয়েছে</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n items moved</source>
+        <translation>
+            <numerusform>%nটি আইটেম সরানো হয়েছে</numerusform>
+            <numerusform>%nটি আইটেম সরানো হয়েছে</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>That file could not be read.</source>
+        <translation type="unfinished">ফাইলটি পড়া যাবে না.</translation>
+    </message>
+    <message>
+        <source>That file is already in this project.</source>
+        <translation type="unfinished">ফাইলটি ইতিমধ্যেই এই প্রকল্পে রয়েছে.</translation>
+    </message>
+    <message>
+        <source>An edit is already saving</source>
+        <translation type="unfinished">একটি সম্পাদনা ইতিমধ্যেই সংরক্ষণ করা হচ্ছে।</translation>
+    </message>
+    <message>
+        <source>Could not open the media file</source>
+        <translation type="unfinished">মিডিয়া ফাইল খোলা যায়নি</translation>
+    </message>
+    <message>
+        <source>Crop image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media trimmed</source>
+        <translation type="unfinished">মিডিয়া ছাঁটা</translation>
+    </message>
+    <message>
+        <source>Trim saved</source>
+        <translation type="unfinished">ট্রিম সংরক্ষিত</translation>
+    </message>
+    <message>
+        <source>Could not create an output file</source>
+        <translation type="unfinished">একটি আউটপুট ফাইল তৈরি করা যায়নি</translation>
+    </message>
+    <message>
+        <source>%1 (trimmed)</source>
+        <translation type="unfinished">%1 (ছাঁটা)</translation>
+    </message>
+    <message>
+        <source>Rendering…</source>
+        <translation type="unfinished">রেন্ডারিং…</translation>
+    </message>
+    <message>
+        <source>Render Trimmed Copy</source>
+        <translation type="unfinished">ট্রিমড কপি রেন্ডার করুন</translation>
+    </message>
+    <message>
+        <source>Couldn’t save that edit</source>
+        <translation type="unfinished">সম্পাদনাটি সংরক্ষণ করা যায়নি।</translation>
+    </message>
+    <message>
+        <source>Converting…</source>
+        <translation type="unfinished">রূপান্তর করা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Saving…</source>
+        <translation>সংরক্ষণ করা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Converting %1 to an edit-friendly format…</source>
+        <translation type="unfinished">%1 কে সম্পাদনা-বান্ধব বিন্যাসে রূপান্তর করা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Saving media…</source>
+        <translation type="unfinished">মিডিয়া সংরক্ষণ করা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Updating the library…</source>
+        <translation type="unfinished">লাইব্রেরি আপডেট করা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Couldn’t update the library</source>
+        <translation type="unfinished">লাইব্রেরি আপডেট করা যায়নি</translation>
+    </message>
+    <message>
+        <source>That media is no longer in this project.</source>
+        <translation type="unfinished">সেই মিডিয়া আর এই প্রকল্পে নেই.</translation>
+    </message>
+    <message>
+        <source>“%1” is %2, but this slot holds %3.</source>
+        <translation type="unfinished">“%1” হল %2, কিন্তু এই স্লটে %3 আছে.</translation>
+    </message>
+    <message>
+        <source>Media edited</source>
+        <translation type="unfinished">মিডিয়া সম্পাদিত</translation>
+    </message>
+    <message>
+        <source>Media replaced</source>
+        <translation type="unfinished">মিডিয়া প্রতিস্থাপিত হয়েছে</translation>
     </message>
 </context>
 <context>

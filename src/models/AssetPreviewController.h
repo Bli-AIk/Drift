@@ -39,7 +39,7 @@ public:
     void setWindowOpen(bool open);
 
     // begin auditions the bin row; the page owns the trim and crop values and hands them to
-    // saveAssetEdit itself.
+    // saveEdit itself.
     Q_INVOKABLE void begin(int index);
     // A timeline clip's whole source, for the crop window.
     Q_INVOKABLE void beginClip(int track, int index);

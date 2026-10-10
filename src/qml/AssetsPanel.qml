@@ -34,7 +34,7 @@ PanelFrame {
 
     // True while an import is running, so the panel can show progress. The folder walk counts:
     // it is the half that can take a while on a deep tree or a sandboxed (portal) mount.
-    readonly property bool importing: AssetLibrary.importing || EditorState.importingFolder
+    readonly property bool importing: AssetLibrary.importing || EditorState.bin.importingFolder
 
     // A single id goes through the existing single-asset add so that case is byte-for-byte the
     // behavior it always was; only an actual multi-selection goes through the batch add, which
@@ -218,7 +218,7 @@ PanelFrame {
         onAccepted: {
             const label = newFolderNameField.text.trim()
             if (label.length > 0)
-                EditorState.createBinFolder(label, EditorState.currentBinFolderId)
+                EditorState.bin.createFolder(label, EditorState.bin.currentFolderId)
         }
     }
 
@@ -261,7 +261,7 @@ PanelFrame {
                 return
             const label = folderRenameField.text.trim()
             if (label.length > 0)
-                EditorState.renameBinFolder(root.pendingFolderRenameId, label)
+                EditorState.bin.renameFolder(root.pendingFolderRenameId, label)
             root.pendingFolderRenameId = ""
         }
         onRejected: root.pendingFolderRenameId = ""
@@ -283,7 +283,7 @@ PanelFrame {
     function requestMoveAssetToFolder(assetIds) {
         root.pendingMoveFolderId = ""
         root.pendingMoveAssetIds = assetIds
-        root.pendingMoveAssetCurrentFolderId = EditorState.currentBinFolderId
+        root.pendingMoveAssetCurrentFolderId = EditorState.bin.currentFolderId
         folderPickerDialog.open()
     }
 
@@ -444,10 +444,10 @@ PanelFrame {
                             const targetId = optionRow.modelData.id
                             folderPickerDialog.close()
                             if (root.pendingMoveFolderId !== "") {
-                                EditorState.moveBinFolder(root.pendingMoveFolderId, targetId)
+                                EditorState.bin.moveFolder(root.pendingMoveFolderId, targetId)
                                 root.pendingMoveFolderId = ""
                             } else if (root.pendingMoveAssetIds.length > 0) {
-                                EditorState.moveAssetsToFolder(root.pendingMoveAssetIds, targetId)
+                                EditorState.bin.moveAssetsToFolder(root.pendingMoveAssetIds, targetId)
                                 root.pendingMoveAssetIds = []
                             }
                         }
@@ -463,7 +463,7 @@ PanelFrame {
         var url = FileDialogs.openFile(qsTr("Replace Media"), [AssetLibrary.mediaNameFilter()])
         if (!url || url.toString() === "")
             return
-        EditorState.replaceAssetSource(assetIndex, url)
+        EditorState.bin.replaceSource(assetIndex, url)
     }
 
     // Writes an image row back out to disk — the way a freeze frame captured in the preview
@@ -478,7 +478,7 @@ PanelFrame {
         ], asset.name, "png")
         if (!url || url.toString() === "")
             return
-        if (EditorState.exportAssetImage(assetIndex, url))
+        if (EditorState.bin.exportImage(assetIndex, url))
             Toasts.success(qsTr("Exported “%1”.").arg(asset.name))
         else
             Toasts.error(qsTr("Couldn’t export that image."))
@@ -500,21 +500,14 @@ PanelFrame {
         var url = FileDialogs.saveFile(qsTr("Save As"), filters, baseName, suffix)
         if (!url || url.toString() === "")
             return
-        if (EditorState.saveAssetAs(assetIndex, url))
+        if (EditorState.bin.saveAs(assetIndex, url))
             Toasts.info(qsTr("Saving “%1”…").arg(asset.name))
         else
             Toasts.error(qsTr("Couldn’t save “%1”.").arg(asset.name))
     }
 
     Connections {
-        target: EditorState
-
-        function onAssetSaveFinished(ok, name) {
-            if (ok)
-                Toasts.success(qsTr("Saved “%1”.").arg(name))
-            else
-                Toasts.error(qsTr("Couldn’t save “%1”.").arg(name))
-        }
+        target: EditorState.bin
 
         // Hitting the limit outranks the skipped count: the walk stopped early, so what it passed
         // over is only part of the story and saying both would suggest otherwise.
@@ -530,8 +523,15 @@ PanelFrame {
             }
         }
 
+        function onSaveFinished(ok, name) {
+            if (ok)
+                Toasts.success(qsTr("Saved “%1”.").arg(name))
+            else
+                Toasts.error(qsTr("Couldn’t save “%1”.").arg(name))
+        }
+
         // The probe runs off-thread, so the outcome comes back here rather than from the call.
-        function onAssetReplaceFinished(ok, message, adjustedClips) {
+        function onReplaceFinished(ok, message, adjustedClips) {
             if (!ok) {
                 Toasts.warning(message)
             } else if (adjustedClips > 0) {
@@ -541,11 +541,12 @@ PanelFrame {
                 Toasts.success(qsTr("Replaced with “%1”.").arg(message))
             }
         }
-        function onAssetEditFinished(ok, message) {
+
+        function onEditFinished(ok, message) {
             if (!ok) {
                 if (message && message.length > 0)
                     Toasts.warning(message)
-            } else if (EditorState.assetEditIsConversion) {
+            } else if (EditorState.bin.editIsConversion) {
                 Toasts.success(qsTr("“%1” is now in an edit-friendly format.").arg(message))
             } else {
                 Toasts.success(qsTr("Saved “%1”. Drag it onto the timeline.").arg(message))
@@ -562,14 +563,14 @@ PanelFrame {
 
     // Imports a whole directory: a new bin folder mirrors the picked folder (and everything
     // nested under it), and every media file lands in the bin folder matching its containing
-    // directory. EditorState.importFolder does the walk synchronously — probing and
+    // directory. EditorState.bin.importFolder does the walk synchronously — probing and
     // thumbnailing each file still happens in the background the same as any other import.
     function importFolder() {
         var url = FileDialogs.openDirectory(qsTr("Import Folder"))
         if (!url || url.toString() === "")
             return
         // The walk runs off-thread, so the outcome arrives as onFolderImportFinished below.
-        if (!EditorState.importFolder(url))
+        if (!EditorState.bin.importFolder(url))
             Toasts.error(qsTr("Couldn’t import that folder."))
     }
 

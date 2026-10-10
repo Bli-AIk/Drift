@@ -14,7 +14,6 @@
 #include "engine/ProjectBundle.h"
 #include "TimelineClipsModel.h"
 #include "models/AssetLibrary.h"
-#include "models/BinFolderListModel.h"
 #include "models/CloudProviders.h"
 #include "core/GuideSet.h"
 
@@ -69,6 +68,7 @@ struct MediaEditSpec;
 #include "RestoreController.h"
 #include "SceneDetectController.h"
 #include "SegmentationController.h"
+#include "MediaBinController.h"
 #include "StabilizeController.h"
 #include "TtsController.h"
 #include "VoiceLibrary.h"
@@ -97,6 +97,7 @@ class AppController : public QObject
     friend class RestoreController;
     friend class FaceTrackingController;
     friend class StabilizeController;
+    friend class MediaBinController;
     friend class TtsController;
     friend class VoiceLibrary;
 
@@ -104,14 +105,7 @@ class AppController : public QObject
 
     Q_PROPERTY(AssetLibrary *assetLibrary READ assetLibrary CONSTANT)
     Q_PROPERTY(CloudProviders *cloudProviders READ cloudProviders CONSTANT)
-    Q_PROPERTY(BinFolderListModel *binFolderModel READ binFolderModel CONSTANT)
-    // Which bin folder is currently being viewed; empty = bin root. Transient navigation state —
-    // not persisted, not undoable, same treatment as mediaGridMode's touch-only sibling.
-    Q_PROPERTY(QString currentBinFolderId READ currentBinFolderId WRITE setCurrentBinFolderId
-                   NOTIFY currentBinFolderIdChanged)
-    // True while importFolder's off-thread directory walk is running, so the bin can raise its
-    // progress overlay over a slow tree (a big hierarchy, or a Flatpak document-portal mount).
-    Q_PROPERTY(bool importingFolder READ importingFolder NOTIFY importingFolderChanged)
+    Q_PROPERTY(MediaBinController *bin READ bin CONSTANT)
     Q_PROPERTY(PlaybackEngine *playback READ playback CONSTANT)
     // The preview area's editor state, tools and overlay maths.
     Q_PROPERTY(PreviewController *preview READ preview CONSTANT)
@@ -230,19 +224,6 @@ class AppController : public QObject
     Q_PROPERTY(double exportProgress READ exportProgress NOTIFY exportProgressChanged)
     Q_PROPERTY(bool canShareExport READ canShareExport NOTIFY canShareExportChanged)
     Q_PROPERTY(bool subtitleGenerating READ subtitleGenerating NOTIFY subtitleGeneratingChanged)
-    // Id of the asset whose replacement is being probed, empty when idle. Only that one bin row
-    // goes busy: the rest of the panel stays usable, and the wait belongs to the row the user
-    // right-clicked.
-    Q_PROPERTY(QString replacingAssetId READ replacingAssetId NOTIFY replacingAssetIdChanged)
-    // True while a bin-row crop/trim is encoding. Progress belongs to MediaPreviewWindow.
-    Q_PROPERTY(bool editingAsset READ editingAsset NOTIFY assetEditChanged)
-    Q_PROPERTY(double assetEditProgress READ assetEditProgress NOTIFY assetEditChanged)
-    Q_PROPERTY(QString assetEditStatus READ assetEditStatus NOTIFY assetEditChanged)
-    // The running (or, once it finishes, the last) asset edit job is a frame-rate conversion
-    // rather than a crop, so the finish can be worded for it. Also carries its name while it runs,
-    // since a conversion has no preview window to show progress in.
-    Q_PROPERTY(bool assetEditIsConversion READ assetEditIsConversion NOTIFY assetEditChanged)
-    Q_PROPERTY(QString assetEditName READ assetEditName NOTIFY assetEditChanged)
     Q_PROPERTY(double subtitleGenProgress READ subtitleGenProgress NOTIFY subtitleGenProgressChanged)
     Q_PROPERTY(QString subtitleGenStatus READ subtitleGenStatus NOTIFY subtitleGenStatusChanged)
     Q_PROPERTY(bool reverseRendering READ reverseRendering NOTIFY reverseRenderingChanged)
@@ -318,9 +299,7 @@ public:
 
     AssetLibrary *assetLibrary() const { return m_assetLibrary; }
     CloudProviders *cloudProviders() const { return m_cloud; }
-    BinFolderListModel *binFolderModel() { return &m_binFolderModel; }
-    QString currentBinFolderId() const { return m_currentBinFolderId; }
-    void setCurrentBinFolderId(const QString &folderId);
+    MediaBinController *bin() const { return m_bin; }
     PlaybackEngine *playback() { return &m_playback; }
     PreviewController *preview() const { return m_preview; }
     PreferencesController *preferences() const { return m_preferences; }
@@ -417,12 +396,6 @@ public:
     double exportProgress() const;
     bool canShareExport() const;
     bool subtitleGenerating() const { return m_subtitleGenerating; }
-    QString replacingAssetId() const { return m_replacingAssetId; }
-    bool editingAsset() const { return m_editingAsset; }
-    double assetEditProgress() const { return m_assetEditProgress; }
-    QString assetEditStatus() const { return m_assetEditStatus; }
-    bool assetEditIsConversion() const { return m_assetEditIsConversion; }
-    QString assetEditName() const { return m_assetEditKeepName; }
     double subtitleGenProgress() const { return m_subtitleGenProgress; }
     QString subtitleGenStatus() const { return m_subtitleGenStatus; }
     bool reverseRendering() const { return m_reverseRendering; }
@@ -578,56 +551,7 @@ public:
     // Bin-preview orientation for a video asset (absolute 0/90/180/270; -1 = the file's own tag),
     // as one undoable edit — AssetLibrary::setAssetRotation on its own leaves no undo entry.
     Q_INVOKABLE bool setAssetRotation(int assetIndex, int degrees);
-    // Bin folder CRUD. parentId empty = bin root; nesting is arbitrary depth.
-    Q_INVOKABLE QString createBinFolder(const QString &name, const QString &parentId);
-    Q_INVOKABLE bool renameBinFolder(const QString &folderId, const QString &name);
-    // Reparents the folder itself, keeping its own assets and subfolders — they stay pointed
-    // at it, so they move along without being touched individually. Refuses moving a folder
-    // into itself or into one of its own descendants.
-    Q_INVOKABLE bool moveBinFolder(const QString &folderId, const QString &newParentId);
-    // Moves the folder's direct children (assets and subfolders) up to its own parent, then
-    // removes it. Never blocks and never recurses into deleting contents.
-    Q_INVOKABLE bool deleteBinFolder(const QString &folderId);
-    Q_INVOKABLE bool moveAssetToFolder(int assetIndex, const QString &folderId);
-    // Multi-select bulk move, one undo step for the whole batch. Returns how many were moved.
-    Q_INVOKABLE int moveAssetsToFolder(const QStringList &assetIds, const QString &folderId);
-    // Imports a whole directory: mirrors its subfolder tree into the bin (one new bin folder per
-    // filesystem folder, including empty ones) and imports every media file into the bin folder
-    // matching its containing directory. `folderUrl` must be a local (file://) directory. The
-    // directory walk runs off-thread, so this returns as soon as it starts — false means the URL
-    // didn't resolve to a readable directory or an import was already running, and the outcome
-    // arrives as folderImportFinished. Stops after a fixed number of files so a folder picked by
-    // mistake can't queue thousands of probes. Not undoable — like a plain media import, "undo"
-    // is deleting the folder by hand — but still marks the project dirty, so autosave and the
-    // unsaved-changes prompt cover the hierarchy it creates.
-    Q_INVOKABLE bool importFolder(const QUrl &folderUrl);
-    bool importingFolder() const { return m_importingFolder; }
-    // Points an existing bin row at a different file, keeping every clip that uses it where it
-    // is — its position, trim, effects and transitions all survive. Asynchronous: true only means
-    // the probe started, and the outcome arrives as assetReplaceFinished.
-    Q_INVOKABLE bool replaceAssetSource(int assetIndex, const QUrl &url);
-    // Writes an image asset (a freeze frame, typically) out to `url`. The format follows the
-    // destination's extension, so the picker's name filter never has to be reported back.
-    Q_INVOKABLE bool exportAssetImage(int assetIndex, const QUrl &url);
-    // Copies the asset's file to `url` byte for byte. Asynchronous: true only means the copy
-    // started, and the outcome arrives as assetSaveFinished.
-    Q_INVOKABLE bool saveAssetAs(int assetIndex, const QUrl &url);
-    // Rewrites the bin row: trim [inSeconds, outSeconds] and crop in display-normalized 0..1.
-    // outSeconds < 0 means through the end. The original name is kept. Asynchronous; the
-    // outcome arrives as assetEditFinished, and the row is then rebound via replace.
     Q_INVOKABLE bool setClipSourceFrame(const QString &clipId, double x, double y, double w, double h);
-    Q_INVOKABLE bool saveAssetEdit(int assetIndex, double inSeconds, double outSeconds,
-                                   double cropX, double cropY, double cropW, double cropH);
-    Q_INVOKABLE void cancelAssetEdit();
-    // Renders a bin video's trim and crop into a new bin item, "<name> (trimmed)", leaving the
-    // original alone. Reports progress through assetEditChanged like a save; the new item's id
-    // arrives as assetCopyRendered, a failure as assetEditFinished(false, ...).
-    Q_INVOKABLE bool renderAssetCopy(int assetIndex, double inSeconds, double outSeconds,
-                                     double cropX, double cropY, double cropW, double cropH);
-    // "Convert to edit-friendly format": re-encodes each video asset onto a constant, standard
-    // frame rate and swaps it in, one at a time, the same undoable way a crop does, marking the
-    // asset edit-friendly. The original file is left where it was.
-    Q_INVOKABLE void convertAssetsToConstantFrameRate(const QStringList &assetIds);
     Q_INVOKABLE bool trackAcceptsAsset(int trackIndex, int assetIndex) const;
     Q_INVOKABLE QString trackTypeForAsset(int assetIndex) const;
     // The same two questions asked of a bare media kind ("video", "audio", "image", ...) rather
@@ -1204,7 +1128,7 @@ public:
     Q_INVOKABLE bool setEffectColorParam(int trackIndex, int clipIndex, int effectIndex,
                                          const QString &key, const QString &value);
     // File-path params (model3d .glb). Same commit-once path as colour — no preview stream.
-    // Takes a QUrl like replaceAssetSource / importSubtitleFile so the portal and native
+    // Takes a QUrl like bin().replaceSource / importSubtitleFile so the portal and native
     // dialogs hand us a real local path without QML having to call toLocalFile().
     Q_INVOKABLE bool setEffectStringParam(int trackIndex, int clipIndex, int effectIndex,
                                           const QString &key, const QUrl &url);
@@ -1576,7 +1500,6 @@ signals:
     void multicamFramesChanged();
     // Raised by the "multicam" shortcut/action. QML owns the window, as with the file actions.
     void openMulticamWindowRequested();
-    void currentBinFolderIdChanged();
     void selectionChanged();
     void editCapabilitiesChanged();
     void sequenceTabsChanged();
@@ -1607,20 +1530,6 @@ signals:
     // auxiliary windows edit one clip each, so they have nothing left to act on and close.
     void projectReset();
     void transformBlocked(const QString &reason);
-    // Outcome of replaceAssetSource. `message` is a ready-to-show reason on failure and the new
-    // media's name on success. `adjustedClips` counts clips whose source range no longer fitted
-    // the replacement and was pulled back to it.
-    void assetReplaceFinished(bool ok, const QString &message, int adjustedClips);
-    void importingFolderChanged();
-    // Outcome of importFolder: how many bin folders and assets it actually created, how many
-    // files it passed over as unrecognized, and whether the walk stopped at the file limit with
-    // more still on disk.
-    void folderImportFinished(int folders, int files, int skipped, bool truncated);
-    void replacingAssetIdChanged();
-    void assetEditChanged();
-    void assetEditFinished(bool ok, const QString &message);
-    void assetCopyRendered(const QString &assetId);
-    void assetSaveFinished(bool ok, const QString &name);
     void openPasteAttributesRequested();
 
 protected:
@@ -1687,11 +1596,6 @@ protected:
     QString saveEffectStack(const drift::EffectStackPreset &stack, const QString &label);
     static drift::EffectStackPreset effectStackOnClipboard();
     void finishEdit(const QString &message);
-    // Applies a finished replace probe as one undoable transaction, or reports why it cannot be.
-    void finalizeAssetReplace(const QString &assetId, const drift::MediaAsset &filled, bool ok);
-    // Moves every clip bound to `assetId` onto the replacement media. Returns how many had a
-    // source range that no longer fitted and had to be pulled back to it.
-    int rebindClipsToAsset(const QString &assetId, const drift::MediaAsset &asset, int oldBinCorrection);
     // Keeps the keyframe strip's index-addressed hidden series in sync after an effect is removed.
     void dropKeyframeGraphPropertiesForEffect(int removedIndex, bool audio = false);
     // Same idea after a reorder: fx.N.* indices move with the effect.
@@ -1925,9 +1829,6 @@ protected:
     MarketClient *m_marketClient = nullptr;
     JobRegistry *m_jobs = nullptr;
     CloudProviders *m_cloud = nullptr;
-    BinFolderListModel m_binFolderModel;
-    QString m_currentBinFolderId;
-    bool m_importingFolder = false;
     // These trees must outlive m_playback: the compositor thread holds a bare
     // pointer into whichever one is live and may still be mid-composite at
     // teardown. During a multicam session that is m_multicamStaged, otherwise
@@ -1997,19 +1898,6 @@ protected:
     // stops a second tap from starting the copy again. Unused on desktop.
     bool m_sharingExport = false;
     bool m_subtitleGenerating = false;
-    QString m_replacingAssetId;
-    // The content:// URI the in-flight replace picked, held across the probe so it can be put back
-    // on the asset once applyProbedSource has overwritten the struct.
-    QString m_replacingAssetSourceUri;
-    bool m_editingAsset = false;
-    double m_assetEditProgress = 0.0;
-    QString m_assetEditStatus;
-    QString m_assetEditKeepName;
-    QString m_editingAssetId;
-    QAtomicInt m_assetEditCancel = 0;
-    bool m_assetEditIsConversion = false;
-    // Asset ids waiting for convertAssetsToConstantFrameRate; the edit job runs one at a time.
-    QStringList m_conversionQueue;
     double m_subtitleGenProgress = 0.0;
     QString m_subtitleGenStatus;
     QAtomicInt m_subtitleGenCancel = 0;
@@ -2077,6 +1965,7 @@ protected:
     RestoreController *m_restore = nullptr;
     FaceTrackingController *m_faces = nullptr;
     StabilizeController *m_stabilize = nullptr;
+    MediaBinController *m_bin = nullptr;
     TtsController *m_tts = nullptr;
     VoiceLibrary *m_voices = nullptr;
     QStringList m_activeGuideSets{QStringLiteral("thirds")};
@@ -2110,11 +1999,6 @@ protected:
     void emitPreviewFrame();
     void emitPreviewEdit(int trackIndex, int clipIndex, const QStringList &keys);
     void beginImplicitPreviewDrag(const QString &undoText);
-    // Runs spec off-thread and swaps its output in for the asset at assetIndex, reporting through
-    // assetEditChanged/assetEditFinished. The caller has checked no edit is running.
-    void startAssetEditJob(const QString &assetId, const QString &name,
-                           const drift::MediaEditSpec &spec, bool conversion);
-    void startNextConversion();
     void syncTextOverlaySkip();
     struct ClipboardItem
     {
