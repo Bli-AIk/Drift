@@ -12570,7 +12570,7 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     </message>
     <message>
         <source>Speech longer than 30 seconds often ends in gibberish or silence. Split the script into shorter parts.</source>
-        <translation type="unfinished"></translation>
+        <translation>Giọng nói dài hơn 30 giây thường kết thúc bằng âm thanh vô nghĩa hoặc im lặng. Hãy chia kịch bản thành các phần ngắn hơn.</translation>
     </message>
     <message>
         <source>Voice</source>
