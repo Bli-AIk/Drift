@@ -25,7 +25,7 @@ Item {
                                      ? Market.types
                                      : [{ id: "stock", label: qsTr("Stock") }]
 
-    // Android Back, forwarded by AndroidMarket.
+    // Android Back, forwarded by its host.
     function handleBack() {
         if (root.section === "assets")
             return home.handleBack()

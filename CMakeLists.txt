@@ -1162,10 +1162,7 @@ qt_add_qml_module(drift
         src/qml/LayoutPresets.qml
         src/qml/MediaImport.qml
         src/qml/Main.qml
-        src/qml/AndroidHomeNav.qml
         src/qml/AndroidProjectsPage.qml
-        src/qml/AndroidMePage.qml
-        src/qml/AndroidMarket.qml
         src/qml/AndroidShareTargetSheet.qml
         src/qml/AndroidLinkImport.qml
         src/qml/DownloadFormat.qml

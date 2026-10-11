@@ -14,6 +14,16 @@ Item {
     // The project title is the affordance: a wide, self-labelling target in the middle of
     // the bar rather than an unlabelled glyph in the corner.
     signal projectMenuRequested()
+    signal downloadsRequested()
+
+    readonly property int downloadCount: {
+        void Market.downloadsRevision
+        return Market.downloads.length
+    }
+    readonly property int activeDownloadCount: {
+        void Market.downloadsRevision
+        return Market.activeDownloadCount
+    }
 
     // Status bar / camera cutout. Without it the Back, Undo and Export buttons sat
     // underneath the system bar on every edge-to-edge device.
@@ -120,6 +130,17 @@ Item {
                     glyph: Theme.icons.chevronDown
                     iconSize: Theme.iconSizeMd
                     iconColor: Theme.mutedForeground
+
+                    // The update row lives in the project sheet's App section.
+                    Rectangle {
+                        visible: Updates.updateAvailable
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        width: 8
+                        height: 8
+                        radius: 4
+                        color: Theme.destructive
+                    }
                 }
             }
 
@@ -135,6 +156,57 @@ Item {
             anchors.rightMargin: Theme.spacingSm
             anchors.verticalCenter: parent.verticalCenter
             spacing: Theme.spacingXs
+
+            // The way into the downloads sheet, and the only one: the sheet never raises itself,
+            // because the per-tile ring is what lets browsing carry on while things download.
+            IconButton {
+                visible: root.downloadCount > 0
+                buttonSize: Theme.androidIconButtonSize
+                iconSize: Theme.iconSizeLg
+                glyph: Theme.icons.download
+                variant: "text"
+                tooltip: qsTr("Downloads")
+                onClicked: root.downloadsRequested()
+
+                Rectangle {
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.margins: Theme.spacingXs
+                    visible: root.activeDownloadCount > 0
+                    width: Theme.spacingXl
+                    height: width
+                    radius: width / 2
+                    color: Theme.primary
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: String(root.activeDownloadCount)
+                        color: Theme.primaryForeground
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeXs
+                    }
+                }
+            }
+
+            IconButton {
+                buttonSize: Theme.androidIconButtonSize
+                iconSize: Theme.iconSizeLg
+                glyph: Theme.icons.puzzle
+                variant: "text"
+                tooltip: qsTr("Extras")
+                onClicked: Window.window.openExtras()
+
+                Rectangle {
+                    visible: Window.window.addonAttentionNeeded
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.margins: Theme.spacingSm
+                    width: 8
+                    height: 8
+                    radius: 4
+                    color: Theme.destructive
+                }
+            }
 
             // Undo/Redo stay icon-only — the one documented exception, and long-pressable
             // for a label now that IconButton shows its tooltip on touch.

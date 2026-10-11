@@ -1,13 +1,13 @@
 import QtQuick
+import QtQuick.Window
 import Drift
 import "components"
 
 // What the editor's project title opens: everything that acts on the project as a whole.
 //
 // This replaces AndroidTopBar's 14-row overflow popup — a 220dp menu of unlabelled corner
-// affordances that had to scroll in landscape. The other eight rows did not move into a
-// drawer, they went where they belonged: Open and New are tiles on Home → Projects, and
-// theme, Extras, updates and Debug info are rows on Home → Me.
+// affordances that had to scroll in landscape. Open and New are tiles on Home → Projects;
+// the app-level rows (theme, Extras, updates, Debug info) end the list.
 AndroidBottomSheet {
     id: root
 
@@ -19,7 +19,7 @@ AndroidBottomSheet {
     // content lazily on first open, so the column still measures empty when the sheet takes
     // its resting height. Same reasoning as AndroidAddMenu.
     readonly property real desiredHeight: Theme.androidSheetHeaderHeight
-                                          + root.options.length * Theme.androidAddRowHeight
+                                          + root.visibleOptions.length * Theme.androidAddRowHeight
                                           + Theme.spacingLg * 2
                                           + Theme.spacing2xl
                                           + root.safeBottom
@@ -80,12 +80,45 @@ AndroidBottomSheet {
             icon: Theme.icons.shuffle
         },
         {
+            id: "extras",
+            label: qsTr("Extras"),
+            detail: qsTr("Add-ons and model packs"),
+            icon: Theme.icons.puzzle
+        },
+        {
             id: "settings",
-            label: qsTr("App settings"),
+            label: qsTr("Settings"),
             detail: qsTr("Appearance, extras and agent access"),
             icon: Theme.icons.settings
+        },
+        {
+            id: "theme",
+            label: Theme.darkMode ? qsTr("Light mode") : qsTr("Dark mode"),
+            detail: qsTr("Switch the app’s colour scheme"),
+            icon: Theme.darkMode ? Theme.icons.sun : Theme.icons.moon
+        },
+        {
+            id: "desktopLayout",
+            label: qsTr("Switch to desktop layout"),
+            detail: qsTr("Use the wide editor layout"),
+            icon: Theme.icons.monitor
+        },
+        {
+            id: "update",
+            label: qsTr("Update available"),
+            detail: qsTr("A newer version of Drift is ready"),
+            icon: Theme.icons.download,
+            shown: Updates.updateAvailable
+        },
+        {
+            id: "debug",
+            label: qsTr("Debug info"),
+            detail: qsTr("Version, device and logs"),
+            icon: Theme.icons.info
         }
     ]
+
+    readonly property var visibleOptions: options.filter(o => o.shown !== false)
 
     Column {
         id: optionColumn
@@ -96,7 +129,7 @@ AndroidBottomSheet {
         bottomPadding: Theme.spacingLg
 
         Repeater {
-            model: root.options
+            model: root.visibleOptions
 
             delegate: SheetActionRow {
                 required property var modelData
@@ -106,7 +139,9 @@ AndroidBottomSheet {
                 glyph: modelData.icon
                 sideInset: root.safeLeft
                 sideInsetRight: root.safeRight
-                marked: modelData.id === "save" && EditorState.projectFile.hasUnsavedChanges
+                marked: (modelData.id === "save" && EditorState.projectFile.hasUnsavedChanges)
+                        || (modelData.id === "extras" && Window.window.addonAttentionNeeded)
+                        || modelData.id === "update"
 
                 onClicked: {
                     Haptics.select()

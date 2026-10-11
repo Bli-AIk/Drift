@@ -88,6 +88,11 @@ Item {
             fadeSheet.open()
     }
 
+    // A shared link, routed here by AndroidMain once the editor exists.
+    function startLinkImport(url) {
+        linkImportSheet.openFor(url)
+    }
+
     function closeSheets() {
         sheetKind = ""
         rail.activeId = ""
@@ -116,6 +121,14 @@ Item {
         }
         if (packageProgressDialog.visible)
             return true // a package render is running; swallow rather than abandon it
+        if (linkImportSheet.opened) {
+            linkImportSheet.dismiss()
+            return true
+        }
+        if (downloadsSheet.opened) {
+            downloadsSheet.dismiss()
+            return true
+        }
         if (projectSheet.opened) {
             projectSheet.dismiss()
             return true
@@ -232,8 +245,23 @@ Item {
         case "multicam":
             Window.window.openMulticam()
             break
+        case "extras":
+            Window.window.openExtras()
+            break
         case "settings":
             Window.window.openSettings()
+            break
+        case "theme":
+            Theme.toggleDarkMode()
+            break
+        case "desktopLayout":
+            Window.window.switchShell("desktop")
+            break
+        case "update":
+            Window.window.openUpdateDialog()
+            break
+        case "debug":
+            Window.window.openDebugInfo()
             break
         }
     }
@@ -253,6 +281,7 @@ Item {
                 exportProgressDialog.openDialog()
             }
             onProjectMenuRequested: projectSheet.open()
+            onDownloadsRequested: downloadsSheet.open()
         }
 
         SplitView {
@@ -476,6 +505,14 @@ Item {
     AndroidProjectSheet {
         id: projectSheet
         onPicked: (actionId) => root.runProjectAction(actionId)
+    }
+
+    AndroidDownloadsSheet {
+        id: downloadsSheet
+    }
+
+    AndroidLinkImport {
+        id: linkImportSheet
     }
 
     AndroidMoreToolsSheet {

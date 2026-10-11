@@ -277,10 +277,8 @@ ApplicationWindow {
     // A shared link. The marketplace is what knows how to turn a page URL into media, so with no
     // marketplace configured there is nothing to degrade to but saying so.
     //
-    // Handled by the Market destination rather than by a sheet over whatever is on screen: it
-    // ends in a marketplace download and it asks the user to pick a catalog provider, so the
-    // store is where it belongs. Parked when Home is not built yet — a share can cold-start the
-    // app, and this runs from the window's own onCompleted.
+    // Handled by the editor's link-import sheet. Parked until an editor exists: a share can
+    // cold-start the app, and from Home it first opens an empty project to host the sheet.
     property string pendingLinkUrl: ""
 
     function openLinkImport(url) {
@@ -320,13 +318,19 @@ ApplicationWindow {
     function deliverPendingLink() {
         if (window.pendingLinkUrl === "")
             return
-        if (window.inEditor)
-            window.showHome()
-        if (!window.homePage)
+        if (window.editorPage) {
+            const url = window.pendingLinkUrl
+            window.pendingLinkUrl = ""
+            window.editorPage.startLinkImport(url)
             return
-        const url = window.pendingLinkUrl
-        window.pendingLinkUrl = ""
-        window.homePage.startLinkImport(url)
+        }
+        // Editor is being pushed; its onCompleted delivers.
+        if (window.inEditor || !window.homePage)
+            return
+        window.confirmIfDirty(function() {
+            EditorState.projectFile.newProject()
+            window.showEditor()
+        })
     }
 
     function openProjectFile() {
@@ -378,10 +382,6 @@ ApplicationWindow {
             if (window.closeTopModal())
                 return
             if (window.editorPage && window.editorPage.handleBack())
-                return
-            // Home owns a nav stack of its own now: a secondary destination, and any drill-down
-            // inside it, unwinds before Back means "leave".
-            if (!window.inEditor && window.homePage && window.homePage.handleBack())
                 return
             // A SAF copy is running and AssetLibrary has no cancel entry point, so
             // closing the window kills the worker part-way through a file. Swallow
@@ -1065,7 +1065,7 @@ ApplicationWindow {
         id: homeComponent
         AndroidHome {
             // Also flushes a link shared into a cold start: openLinkImport() can run from the
-            // window's onCompleted, before this page exists to route it to.
+            // window's onCompleted, before this page exists to start an editor from.
             Component.onCompleted: {
                 window.homePage = this
                 window.deliverPendingLink()
@@ -1094,7 +1094,10 @@ ApplicationWindow {
     Component {
         id: editorComponent
         AndroidEditor {
-            Component.onCompleted: window.editorPage = this
+            Component.onCompleted: {
+                window.editorPage = this
+                window.deliverPendingLink()
+            }
             Component.onDestruction: if (window.editorPage === this) window.editorPage = null
             onBackRequested: window.goBack()
         }
