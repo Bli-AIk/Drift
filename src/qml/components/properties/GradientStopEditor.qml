@@ -163,8 +163,10 @@ Column {
                     property real pressX: 0
                     property bool moved: false
                     property bool removed: false
+                    property bool pressedByTouch: false
 
                     onPressed: mouse => {
+                        pressedByTouch = mouse.source !== Qt.MouseEventNotSynthesized
                         moved = false
                         removed = false
                         if (mouse.button === Qt.RightButton) {
@@ -213,7 +215,7 @@ Column {
                         }
                     }
                     onPressAndHold: {
-                        if (moved || removed)
+                        if (!pressedByTouch || moved || removed)
                             return
                         removed = true
                         root.removeStop(stopChip.index)

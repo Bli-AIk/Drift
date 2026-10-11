@@ -354,6 +354,21 @@ Item {
                             dragging = true
                             root.beginDrag()
                         }
+                        function select() {
+                            EditorState.selectedSubtitleCue = index
+                            root.cueTapped(index)
+                        }
+                        function moveBy(dx) {
+                            const d = editEnd - editStart
+                            const raw = editStart + dx / root.pxPerSecond
+                            const targets = root.snapTargets(index)
+                            const snS = root.snap(raw, targets)
+                            const snE = root.snap(raw + d, targets) - d
+                            let ns = Math.abs(snS - raw) <= Math.abs(snE - raw) ? snS : snE
+                            ns = root.clampVal(ns, root.loBound(index), root.hiBound(index) - d)
+                            dragX = root.xForSeconds(ns)
+                            root.commitCue(index, ns, ns + d)
+                        }
                         function finishEdit() {
                             dragging = false
                             root.endDrag()
@@ -382,13 +397,15 @@ Item {
 
                             HoverHandler { cursorShape: Qt.OpenHandCursor }
                             TapHandler {
-                                onTapped: {
-                                    EditorState.selectedSubtitleCue = block.index
-                                    root.cueTapped(block.index)
-                                }
+                                // Finger taps land on touchMove below, which takes the press.
+                                acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+                                                 | PointerDevice.Stylus
+                                onTapped: block.select()
                             }
                             DragHandler {
                                 target: null
+                                acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+                                                 | PointerDevice.Stylus
                                 xAxis.enabled: true
                                 yAxis.enabled: false
                                 onActiveChanged: {
@@ -397,17 +414,43 @@ Item {
                                     else
                                         block.finishEdit()
                                 }
-                                onTranslationChanged: {
-                                    const d = block.editEnd - block.editStart
-                                    const raw = block.editStart + translation.x / root.pxPerSecond
-                                    const targets = root.snapTargets(block.index)
-                                    const snS = root.snap(raw, targets)
-                                    const snE = root.snap(raw + d, targets) - d
-                                    let ns = Math.abs(snS - raw) <= Math.abs(snE - raw) ? snS : snE
-                                    ns = root.clampVal(ns, root.loBound(block.index),
-                                                       root.hiBound(block.index) - d)
-                                    block.dragX = root.xForSeconds(ns)
-                                    root.commitCue(block.index, ns, ns + d)
+                                onTranslationChanged: block.moveBy(translation.x)
+                            }
+
+                            // Touchscreen: a finger on the lane pans it, so a cue only
+                            // moves after a hold. Mouse presses are rejected for the DragHandler.
+                            MouseArea {
+                                id: touchMove
+                                anchors.fill: parent
+                                pressAndHoldInterval: Theme.touchLiftInterval
+                                preventStealing: armed
+                                property bool armed: false
+                                property real originX
+                                onPressed: (mouse) => {
+                                    if (mouse.source === Qt.MouseEventNotSynthesized) {
+                                        mouse.accepted = false
+                                        return
+                                    }
+                                    armed = false
+                                }
+                                onPressAndHold: (mouse) => {
+                                    originX = mapToItem(null, mouse.x, 0).x
+                                    armed = true
+                                    Haptics.pickUp()
+                                    block.startEdit()
+                                }
+                                onPositionChanged: (mouse) => {
+                                    if (armed)
+                                        block.moveBy(mapToItem(null, mouse.x, 0).x - originX)
+                                }
+                                onClicked: block.select()
+                                onReleased: finish()
+                                onCanceled: finish()
+                                function finish() {
+                                    if (!armed)
+                                        return
+                                    armed = false
+                                    block.finishEdit()
                                 }
                             }
                         }
@@ -427,6 +470,9 @@ Item {
                             HoverHandler { cursorShape: Qt.SizeHorCursor }
                             DragHandler {
                                 target: null
+                                acceptedDevices: block.isSelected
+                                    ? PointerDevice.AllDevices
+                                    : PointerDevice.Mouse | PointerDevice.TouchPad | PointerDevice.Stylus
                                 xAxis.enabled: true
                                 yAxis.enabled: false
                                 onActiveChanged: {
@@ -463,6 +509,9 @@ Item {
                             HoverHandler { cursorShape: Qt.SizeHorCursor }
                             DragHandler {
                                 target: null
+                                acceptedDevices: block.isSelected
+                                    ? PointerDevice.AllDevices
+                                    : PointerDevice.Mouse | PointerDevice.TouchPad | PointerDevice.Stylus
                                 xAxis.enabled: true
                                 yAxis.enabled: false
                                 onActiveChanged: {

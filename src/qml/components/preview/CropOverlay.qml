@@ -110,7 +110,6 @@ Item {
     // Two-finger zoom and pan, the touch counterpart of the wheel and middle-drag above.
     PinchHandler {
         id: viewPinch
-        enabled: Theme.touchInput
         target: null
         acceptedDevices: PointerDevice.TouchScreen
 

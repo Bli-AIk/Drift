@@ -326,18 +326,24 @@ Column {
                         }
 
                         TapHandler {
-                            // Touch taps arrive through TouchLiftArea below, which
+                            // Finger taps arrive through TouchLiftArea below, which
                             // holds the grab this one would need.
-                            enabled: !presetDrag.active && !Theme.touchUi
+                            enabled: !presetDrag.active
+                            acceptedButtons: Qt.LeftButton
+                            acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad | PointerDevice.Stylus
                             onTapped: root.applyPreset(presetCard.modelData.id)
+                        }
+
+                        TapHandler {
+                            acceptedButtons: Qt.RightButton
+                            onTapped: cardMenu.popup()
                         }
 
                         DragHandler {
                             id: presetDrag
                             target: null
-                            // Touch lifts through TouchDrag instead: a platform
+                            // A finger lifts through TouchDrag instead: a platform
                             // drag has no touch gesture and cannot leave the sheet.
-                            enabled: !Theme.touchUi
                             acceptedButtons: Qt.LeftButton
                             acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad | PointerDevice.Stylus
                         }
@@ -350,7 +356,34 @@ Column {
                             label: presetCard.modelData.label
                             thumbnail: presetCard.thumb
                             glyph: Theme.icons.wand
-                            onLiftTapped: root.applyPreset(presetCard.modelData.id)
+                            onLiftTapped: cardMenu.popup()
+                        }
+
+                        ThemedContextMenu {
+                            id: cardMenu
+
+                            property bool favorited: false
+
+                            onAboutToShow: favorited = EditorState.isAssetFavorite("effects", presetCard.modelData.id)
+
+                            ThemedMenuItem {
+                                text: qsTr("Apply to selected clip")
+                                icon.name: Theme.icons.plus
+                                enabled: EditorState.selectedClip >= 0
+                                onTriggered: root.applyPreset(presetCard.modelData.id)
+                            }
+                            ThemedMenuItem {
+                                text: cardMenu.favorited ? qsTr("Remove from favorites") : qsTr("Add to favorites")
+                                icon.name: Theme.icons.star
+                                onTriggered: EditorState.toggleAssetFavorite("effects", presetCard.modelData.id)
+                            }
+                            ThemedMenuSeparator { visible: presetCard.modelData.user === true }
+                            ThemedMenuItem {
+                                visible: presetCard.modelData.user === true
+                                text: qsTr("Delete from My Effects")
+                                icon.name: Theme.icons.trash
+                                onTriggered: deleteEffectDialog.openFor(presetCard.modelData)
+                            }
                         }
 
                         AssetFavoriteButton {

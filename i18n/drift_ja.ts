@@ -4504,6 +4504,14 @@
         <source>Apply to selected clip</source>
         <translation>選択クリップに適用</translation>
     </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">お気に入りから削除</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">お気に入りに追加</translation>
+    </message>
 </context>
 <context>
     <name>AudioEffectCatalog</name>
@@ -6049,6 +6057,14 @@
         <translation>選択クリップに適用</translation>
     </message>
     <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">お気に入りから削除</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">お気に入りに追加</translation>
+    </message>
+    <message>
         <source>Delete from My Effects</source>
         <translation>マイエフェクトから削除</translation>
     </message>
@@ -6222,6 +6238,14 @@
     <message>
         <source>Nothing in this category.</source>
         <translation>このカテゴリには何もありません。</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">お気に入りから削除</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">お気に入りに追加</translation>
     </message>
     <message>
         <source>Needs cutout</source>
@@ -8510,6 +8534,10 @@
     <message>
         <source>Select a clip first, or drag the mask onto one</source>
         <translation>まずクリップを選択するか、マスクをクリップにドラッグしてください</translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">選択クリップに適用</translation>
     </message>
 </context>
 <context>
@@ -12547,6 +12575,18 @@ If playback stutters, try another.</source>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — クリックして追加、またはタイムラインやプレビューにドラッグ</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">再生ヘッド位置に追加</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">お気に入りから削除</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">お気に入りに追加</translation>
+    </message>
 </context>
 <context>
     <name>ShellSwitchDialog</name>
@@ -13269,6 +13309,18 @@ If playback stutters, try another.</source>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — クリックして追加、またはタイムラインやプレビューにドラッグ</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">再生ヘッド位置に追加</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">お気に入りから削除</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">お気に入りに追加</translation>
+    </message>
 </context>
 <context>
     <name>StockBrowser</name>
@@ -13716,6 +13768,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Built-in</source>
         <translation>組み込み</translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">再生ヘッド位置に追加</translation>
     </message>
     <message>
         <source>Rename text style</source>
@@ -15756,12 +15812,8 @@ If playback stutters, try another.</source>
 <context>
     <name>TransitionsTab</name>
     <message>
-        <source>Touch and hold a transition, then drag it onto where two clips meet.</source>
-        <translation>トランジションを長押しして、2つのクリップが接する部分にドラッグします。</translation>
-    </message>
-    <message>
-        <source>Drag onto where two clips overlap. They fade into each other by default.</source>
-        <translation>2つのクリップが重なる部分にドラッグしてください。デフォルトでは互いにフェードインします。</translation>
+        <source>Drag onto where two clips meet — or, on touch, hold, then drag. They fade into each other by default.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Search transitions</source>
@@ -15830,6 +15882,14 @@ If playback stutters, try another.</source>
     <message>
         <source>%1 — drag onto an overlap between two clips</source>
         <translation>%1 — 2つのクリップの重なりにドラッグ</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">お気に入りから削除</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">お気に入りに追加</translation>
     </message>
 </context>
 <context>

@@ -1372,6 +1372,7 @@ qt_add_qml_module(drift
         src/qml/components/ToastHost.qml
         src/qml/components/EmptyState.qml
         src/qml/components/TouchLiftArea.qml
+        src/qml/components/TouchDragGhost.qml
         src/qml/components/SkeletonBox.qml
         src/qml/components/ThemedSwitch.qml
         src/qml/components/ThemedCheckBox.qml

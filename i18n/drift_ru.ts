@@ -4542,6 +4542,14 @@
         <source>Apply to selected clip</source>
         <translation>Применить к выбранному клипу</translation>
     </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Убрать из избранного</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Добавить в избранное</translation>
+    </message>
 </context>
 <context>
     <name>AudioEffectCatalog</name>
@@ -6099,6 +6107,14 @@
         <translation>Применить к выбранному клипу</translation>
     </message>
     <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Убрать из избранного</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Добавить в избранное</translation>
+    </message>
+    <message>
         <source>Delete from My Effects</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6274,6 +6290,14 @@
     <message>
         <source>Nothing in this category.</source>
         <translation>В этой категории ничего нет.</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Убрать из избранного</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Добавить в избранное</translation>
     </message>
     <message>
         <source>Needs cutout</source>
@@ -8564,6 +8588,10 @@
     <message>
         <source>Select a clip first, or drag the mask onto one</source>
         <translation>Сначала выберите клип или перетащите на него маску</translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">Применить к выбранному клипу</translation>
     </message>
 </context>
 <context>
@@ -12637,6 +12665,18 @@ If playback stutters, try another.</source>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — нажмите, чтобы добавить, или перетащите на таймлайн либо в предпросмотр</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Добавить на позицию курсора воспроизведения</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Убрать из избранного</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Добавить в избранное</translation>
+    </message>
 </context>
 <context>
     <name>ShellSwitchDialog</name>
@@ -13359,6 +13399,18 @@ If playback stutters, try another.</source>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — нажмите, чтобы добавить, или перетащите на таймлайн либо в предпросмотр</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Добавить на позицию курсора воспроизведения</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Убрать из избранного</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Добавить в избранное</translation>
+    </message>
 </context>
 <context>
     <name>StockBrowser</name>
@@ -13812,6 +13864,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Built-in</source>
         <translation>Встроенные</translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Добавить на позицию курсора воспроизведения</translation>
     </message>
     <message>
         <source>Rename text style</source>
@@ -15862,12 +15918,8 @@ If playback stutters, try another.</source>
 <context>
     <name>TransitionsTab</name>
     <message>
-        <source>Touch and hold a transition, then drag it onto where two clips meet.</source>
-        <translation>Нажмите и удерживайте переход, затем перетащите его на стык двух клипов.</translation>
-    </message>
-    <message>
-        <source>Drag onto where two clips overlap. They fade into each other by default.</source>
-        <translation>Перетащите на область перекрытия двух клипов. По умолчанию они плавно сменят друг друга.</translation>
+        <source>Drag onto where two clips meet — or, on touch, hold, then drag. They fade into each other by default.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Search transitions</source>
@@ -15936,6 +15988,14 @@ If playback stutters, try another.</source>
     <message>
         <source>%1 — drag onto an overlap between two clips</source>
         <translation>%1 — перетащите на область перекрытия двух клипов</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Убрать из избранного</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Добавить в избранное</translation>
     </message>
 </context>
 <context>

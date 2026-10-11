@@ -442,7 +442,6 @@ Item {
             }
 
             PinchHandler {
-                enabled: Theme.touchInput
                 target: null
                 acceptedDevices: PointerDevice.TouchScreen
                 property real startHeight: 0
@@ -931,71 +930,127 @@ Item {
 
                             // Touching a key moves focus to its series, which is what arms
                             // that curve's tangent handles.
+                            function remove() {
+                                EditorState.removeClipKeyframe(
+                                    EditorState.selectedTrack,
+                                    EditorState.selectedClip,
+                                    keyDot.modelData.prop,
+                                    keyDot.modelData.seconds
+                                )
+                            }
+
                             TapHandler {
+                                // Finger taps land on touchMove below, which takes the press.
+                                acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+                                                 | PointerDevice.Stylus
                                 onTapped: root.focusedProp = keyDot.modelData.prop
-                                onDoubleTapped: {
-                                    EditorState.removeClipKeyframe(
-                                        EditorState.selectedTrack,
-                                        EditorState.selectedClip,
-                                        keyDot.modelData.prop,
-                                        keyDot.modelData.seconds
-                                    )
-                                }
+                                onDoubleTapped: keyDot.remove()
+                            }
+
+                            function beginMove() {
+                                root.focusedProp = keyDot.modelData.prop
+                                keyDot.editSeconds = keyDot.modelData.seconds
+                                root.frozenSeries = root.series
+                                root.dragProp = keyDot.modelData.prop
+                                root.dragIndex = keyDot.modelData.pointIndex
+                                root.dragSeconds = keyDot.modelData.seconds
+                                root.dragValue = keyDot.modelData.value
+                                root.draggingKey = true
+                                EditorState.beginPreviewDrag(qsTr("Move keyframe"))
+                            }
+                            function endMove() {
+                                // Unfreezing rebuilds the Repeater and destroys this
+                                // delegate mid-handler, so every reset has to land first.
+                                root.dragProp = ""
+                                root.dragIndex = -1
+                                keyDot.dragDx = 0
+                                keyDot.dragDy = 0
+                                EditorState.commitPreviewDrag()
+                                root.draggingKey = false
+                            }
+                            function moveBy(dx, dy) {
+                                const entry = keyDot.entry
+                                const baseSec = keyDot.modelData.seconds
+                                const baseVal = keyDot.modelData.value
+                                // snapTime pulls in beats, clip edges and the playhead,
+                                // and is a no-op when the toolbar's snap toggle is off.
+                                const rawSec = baseSec + dx / root.pxPerSecond
+                                const newSec = Math.max(
+                                    root.clipStart,
+                                    Math.min(root.clipStart + root.clipDuration,
+                                             EditorState.snapTime(rawSec)))
+                                const isShift = (EditorState.keyboardModifiers() & Qt.ShiftModifier) !== 0
+                                const newVal = isShift ? baseVal : Math.max(
+                                    entry.valueMin,
+                                    Math.min(entry.valueMax,
+                                             root.valueForY(
+                                                 root.yForValue(baseVal, entry) + dy,
+                                                 entry)))
+                                EditorState.previewMoveClipKeyframe(
+                                    EditorState.selectedTrack, EditorState.selectedClip,
+                                    keyDot.modelData.prop, keyDot.editSeconds, newSec, newVal)
+                                keyDot.editSeconds = newSec
+                                keyDot.dragDx = root.xForSeconds(newSec) - root.xForSeconds(baseSec)
+                                keyDot.dragDy = root.yForValue(newVal, entry)
+                                              - root.yForValue(baseVal, entry)
+                                root.dragSeconds = newSec
+                                root.dragValue = newVal
                             }
 
                             DragHandler {
                                 target: null
+                                acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+                                                 | PointerDevice.Stylus
                                 onActiveChanged: {
-                                    if (active) {
-                                        root.focusedProp = keyDot.modelData.prop
-                                        keyDot.editSeconds = keyDot.modelData.seconds
-                                        root.frozenSeries = root.series
-                                        root.dragProp = keyDot.modelData.prop
-                                        root.dragIndex = keyDot.modelData.pointIndex
-                                        root.dragSeconds = keyDot.modelData.seconds
-                                        root.dragValue = keyDot.modelData.value
-                                        root.draggingKey = true
-                                        EditorState.beginPreviewDrag(qsTr("Move keyframe"))
-                                    } else {
-                                        // Unfreezing rebuilds the Repeater and destroys this
-                                        // delegate mid-handler, so every reset has to land first.
-                                        root.dragProp = ""
-                                        root.dragIndex = -1
-                                        keyDot.dragDx = 0
-                                        keyDot.dragDy = 0
-                                        EditorState.commitPreviewDrag()
-                                        root.draggingKey = false
-                                    }
+                                    if (active)
+                                        keyDot.beginMove()
+                                    else
+                                        keyDot.endMove()
                                 }
                                 onTranslationChanged: {
-                                    if (!active)
+                                    if (active)
+                                        keyDot.moveBy(translation.x, translation.y)
+                                }
+                            }
+
+                            // Touchscreen: a finger on the lane pans it, so a key only
+                            // moves after a hold. Mouse presses are rejected for the DragHandler.
+                            MouseArea {
+                                id: touchMove
+                                anchors.fill: parent
+                                anchors.margins: -10
+                                pressAndHoldInterval: Theme.touchLiftInterval
+                                preventStealing: armed
+                                property bool armed: false
+                                property point origin
+                                onPressed: (mouse) => {
+                                    if (mouse.source === Qt.MouseEventNotSynthesized) {
+                                        mouse.accepted = false
                                         return
-                                    const entry = keyDot.entry
-                                    const baseSec = keyDot.modelData.seconds
-                                    const baseVal = keyDot.modelData.value
-                                    // snapTime pulls in beats, clip edges and the playhead,
-                                    // and is a no-op when the toolbar's snap toggle is off.
-                                    const rawSec = baseSec + translation.x / root.pxPerSecond
-                                    const newSec = Math.max(
-                                        root.clipStart,
-                                        Math.min(root.clipStart + root.clipDuration,
-                                                 EditorState.snapTime(rawSec)))
-                                    const isShift = (EditorState.keyboardModifiers() & Qt.ShiftModifier) !== 0
-                                    const newVal = isShift ? baseVal : Math.max(
-                                        entry.valueMin,
-                                        Math.min(entry.valueMax,
-                                                 root.valueForY(
-                                                     root.yForValue(baseVal, entry) + translation.y,
-                                                     entry)))
-                                    EditorState.previewMoveClipKeyframe(
-                                        EditorState.selectedTrack, EditorState.selectedClip,
-                                        keyDot.modelData.prop, keyDot.editSeconds, newSec, newVal)
-                                    keyDot.editSeconds = newSec
-                                    keyDot.dragDx = root.xForSeconds(newSec) - root.xForSeconds(baseSec)
-                                    keyDot.dragDy = root.yForValue(newVal, entry)
-                                                  - root.yForValue(baseVal, entry)
-                                    root.dragSeconds = newSec
-                                    root.dragValue = newVal
+                                    }
+                                    armed = false
+                                }
+                                onPressAndHold: (mouse) => {
+                                    origin = mapToItem(null, mouse.x, mouse.y)
+                                    armed = true
+                                    Haptics.pickUp()
+                                    keyDot.beginMove()
+                                }
+                                onPositionChanged: (mouse) => {
+                                    if (!armed)
+                                        return
+                                    const p = mapToItem(null, mouse.x, mouse.y)
+                                    keyDot.moveBy(p.x - origin.x, p.y - origin.y)
+                                }
+                                onClicked: root.focusedProp = keyDot.modelData.prop
+                                onDoubleClicked: keyDot.remove()
+                                onReleased: finish()
+                                onCanceled: finish()
+                                function finish() {
+                                    if (!armed)
+                                        return
+                                    armed = false
+                                    keyDot.endMove()
                                 }
                             }
                         }

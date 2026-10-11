@@ -151,7 +151,15 @@ AbstractButton {
         // Skip when the tooltip is just the visible label again.
         visible: root.tooltip.length > 0 && root.tooltip !== root.text
                  && (root.hovered || root.visualFocus
-                     || (Theme.touchInput && root.pressAndHeld))
+                     || (touchPress.pressed && root.pressAndHeld))
+    }
+
+    // AbstractButton's pressAndHold carries no device; this passive handler tells a
+    // finger's hold (shows the tooltip) from a mouse's.
+    TapHandler {
+        id: touchPress
+        acceptedDevices: PointerDevice.TouchScreen
+        gesturePolicy: TapHandler.DragThreshold
     }
 
     onPressAndHold: root.pressAndHeld = true

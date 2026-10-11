@@ -4504,6 +4504,14 @@
         <source>Apply to selected clip</source>
         <translation>Áp dụng cho clip đã chọn</translation>
     </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Xóa khỏi mục yêu thích</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Thêm vào mục yêu thích</translation>
+    </message>
 </context>
 <context>
     <name>AudioEffectCatalog</name>
@@ -6049,6 +6057,14 @@
         <translation>Áp dụng cho clip đã chọn</translation>
     </message>
     <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Xóa khỏi mục yêu thích</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Thêm vào mục yêu thích</translation>
+    </message>
+    <message>
         <source>Delete from My Effects</source>
         <translation>Xóa khỏi Hiệu ứng của tôi</translation>
     </message>
@@ -6222,6 +6238,14 @@
     <message>
         <source>Nothing in this category.</source>
         <translation>Không có gì trong danh mục này.</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Xóa khỏi mục yêu thích</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Thêm vào mục yêu thích</translation>
     </message>
     <message>
         <source>Needs cutout</source>
@@ -8510,6 +8534,10 @@
     <message>
         <source>Select a clip first, or drag the mask onto one</source>
         <translation>Trước tiên hãy chọn một clip hoặc kéo mặt nạ vào một clip</translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">Áp dụng cho clip đã chọn</translation>
     </message>
 </context>
 <context>
@@ -12547,6 +12575,18 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — nhấp chuột để thêm, hoặc kéo vào dòng thời gian hoặc xem trước</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Thêm vào đầu phát</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Xóa khỏi mục yêu thích</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Thêm vào mục yêu thích</translation>
+    </message>
 </context>
 <context>
     <name>ShellSwitchDialog</name>
@@ -13269,6 +13309,18 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — nhấp chuột để thêm, hoặc kéo vào dòng thời gian hoặc xem trước</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Thêm vào đầu phát</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Xóa khỏi mục yêu thích</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Thêm vào mục yêu thích</translation>
+    </message>
 </context>
 <context>
     <name>StockBrowser</name>
@@ -13716,6 +13768,10 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
     <message>
         <source>Built-in</source>
         <translation>Tích hợp sẵn</translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Thêm vào đầu phát</translation>
     </message>
     <message>
         <source>Rename text style</source>
@@ -15756,12 +15812,8 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
 <context>
     <name>TransitionsTab</name>
     <message>
-        <source>Touch and hold a transition, then drag it onto where two clips meet.</source>
-        <translation>Chạm và giữ một chuyển cảnh, rồi kéo nó vào chỗ hai clip gặp nhau.</translation>
-    </message>
-    <message>
-        <source>Drag onto where two clips overlap. They fade into each other by default.</source>
-        <translation>Kéo vào chỗ hai clip chồng lấn. Chúng mờ dần vào nhau theo mặc định.</translation>
+        <source>Drag onto where two clips meet — or, on touch, hold, then drag. They fade into each other by default.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Search transitions</source>
@@ -15830,6 +15882,14 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
     <message>
         <source>%1 — drag onto an overlap between two clips</source>
         <translation>%1 - kéo vào phần chồng lên nhau giữa hai clip</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Xóa khỏi mục yêu thích</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Thêm vào mục yêu thích</translation>
     </message>
 </context>
 <context>

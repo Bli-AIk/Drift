@@ -128,12 +128,9 @@ Column {
                         payload: stackCard.modelData.id
                         label: stackCard.modelData.label || ""
                         glyph: Theme.icons.layers
+                        hasContextMenu: true
+                        onContextMenuRequested: stackMenu.popup()
                         onTapped: root.applyStack(stackCard.modelData)
-                    }
-
-                    TapHandler {
-                        acceptedButtons: Qt.RightButton
-                        onTapped: stackMenu.popup()
                     }
 
                     // There is no rendered preview for a stack, so the card says what is in it.
@@ -170,7 +167,7 @@ Column {
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.margins: 2
-                        visible: cardDrag.hovered || stackMenu.visible || Theme.touchInput
+                        visible: cardDrag.hovered || stackMenu.visible
                         glyph: Theme.icons.ellipsis
                         variant: "ghost"
                         buttonSize: 20

@@ -4,6 +4,10 @@ import Drift
 // Hold-to-lift gesture for the asset browsers' cards: picks the card up into
 // TouchDrag, follows the finger, and drops it on the timeline underneath.
 //
+// Touchscreen presses only. A real mouse press is rejected so it falls through
+// to the mouse handlers (TapHandler/DragHandler) beside this on the card; which
+// gesture applies follows the device of each press, not Theme.touchUi.
+//
 // A MouseArea rather than a DragHandler because this drag has to outlive the
 // sheet stepping aside — the grab belongs to this item, and it is only still
 // there to hold it because the sheet slides away instead of closing.
@@ -25,7 +29,6 @@ MouseArea {
     signal liftTapped()
 
     anchors.fill: parent
-    enabled: Theme.touchUi
     pressAndHoldInterval: Theme.touchLiftInterval
     // Only once lifted: before that the press still belongs to the grid, which
     // has to be able to scroll out from under a finger that is just resting.
@@ -39,7 +42,11 @@ MouseArea {
         TouchDrag.moveTo(p.x, p.y)
     }
 
-    onPressed: {
+    onPressed: (mouse) => {
+        if (mouse.source === Qt.MouseEventNotSynthesized) {
+            mouse.accepted = false
+            return
+        }
         lifted = false
         suppressTap = false
     }

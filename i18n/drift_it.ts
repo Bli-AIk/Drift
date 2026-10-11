@@ -4523,6 +4523,14 @@
         <source>Apply to selected clip</source>
         <translation>Applica alla clip selezionata</translation>
     </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Rimuovi dai preferiti</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Aggiungi ai preferiti</translation>
+    </message>
 </context>
 <context>
     <name>AudioEffectCatalog</name>
@@ -6074,6 +6082,14 @@
         <translation>Applica alla clip selezionata</translation>
     </message>
     <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Rimuovi dai preferiti</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Aggiungi ai preferiti</translation>
+    </message>
+    <message>
         <source>Delete from My Effects</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6248,6 +6264,14 @@
     <message>
         <source>Nothing in this category.</source>
         <translation>Nessun elemento in questa categoria.</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Rimuovi dai preferiti</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Aggiungi ai preferiti</translation>
     </message>
     <message>
         <source>Needs cutout</source>
@@ -8537,6 +8561,10 @@
     <message>
         <source>Select a clip first, or drag the mask onto one</source>
         <translation>Seleziona prima una clip, o trascina la maschera su di essa</translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">Applica alla clip selezionata</translation>
     </message>
 </context>
 <context>
@@ -12592,6 +12620,18 @@ Se la riproduzione va a scatti, prova un&apos;altra opzione.</translation>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — fai clic per aggiungere o trascina sulla timeline o sull&apos;anteprima</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Aggiungi alla testina di riproduzione</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Rimuovi dai preferiti</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Aggiungi ai preferiti</translation>
+    </message>
 </context>
 <context>
     <name>ShellSwitchDialog</name>
@@ -13314,6 +13354,18 @@ Se la riproduzione va a scatti, prova un&apos;altra opzione.</translation>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — fai clic per aggiungere o trascina sulla timeline o sull&apos;anteprima</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Aggiungi alla testina di riproduzione</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Rimuovi dai preferiti</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Aggiungi ai preferiti</translation>
+    </message>
 </context>
 <context>
     <name>StockBrowser</name>
@@ -13764,6 +13816,10 @@ Se la riproduzione va a scatti, prova un&apos;altra opzione.</translation>
     <message>
         <source>Built-in</source>
         <translation>Integrato</translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Aggiungi alla testina di riproduzione</translation>
     </message>
     <message>
         <source>Rename text style</source>
@@ -15809,12 +15865,8 @@ Se la riproduzione va a scatti, prova un&apos;altra opzione.</translation>
 <context>
     <name>TransitionsTab</name>
     <message>
-        <source>Touch and hold a transition, then drag it onto where two clips meet.</source>
-        <translation>Tocca e tieni premuta una transizione, quindi trascinala nel punto in cui due clip si incontrano.</translation>
-    </message>
-    <message>
-        <source>Drag onto where two clips overlap. They fade into each other by default.</source>
-        <translation>Trascina nel punto in cui due clip si sovrappongono. Per impostazione predefinita viene applicata una dissolvenza incrociata.</translation>
+        <source>Drag onto where two clips meet — or, on touch, hold, then drag. They fade into each other by default.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Search transitions</source>
@@ -15883,6 +15935,14 @@ Se la riproduzione va a scatti, prova un&apos;altra opzione.</translation>
     <message>
         <source>%1 — drag onto an overlap between two clips</source>
         <translation>%1 — trascina su una sovrapposizione tra due clip</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Rimuovi dai preferiti</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Aggiungi ai preferiti</translation>
     </message>
 </context>
 <context>

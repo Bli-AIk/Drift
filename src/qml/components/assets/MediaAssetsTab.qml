@@ -749,9 +749,10 @@ Item {
                 TapHandler {
                     id: leftTap
                     acceptedButtons: Qt.LeftButton
-                    // Touch keeps press-and-hold for the lift below — the menu
+                    // A finger is handled by the lift area below — the menu
                     // is a tap there.
-                    enabled: !Theme.touchUi && !assetDrag.active
+                    acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad | PointerDevice.Stylus
+                    enabled: !assetDrag.active
                     onTapped: {
                         if (cardRoot.isFolder)
                             return
@@ -778,18 +779,17 @@ Item {
                         else if (kind === "composite")
                             EditorState.openCompositeAsset(cardRoot.assetId)
                     }
-                    onLongPressed: cardRoot.isFolder ? folderMenu.popup() : cardMenu.popup()
                 }
                 DragHandler {
                     id: assetDrag
                     // Without target: null the handler moves the card itself,
                     // clobbering the Grid positioner's x/y.
                     target: null
-                    // Touch lifts through TouchDrag instead: a platform drag has
+                    // A finger lifts through TouchDrag instead: a platform drag has
                     // no touch gesture and cannot leave the sheet. Folders aren't
                     // draggable at all — moving an asset into one is a context-menu
                     // action only ("Move to folder…"), not a drag-and-drop target.
-                    enabled: !Theme.touchUi && !cardRoot.isFolder
+                    enabled: !cardRoot.isFolder
                     acceptedButtons: Qt.LeftButton
                     acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad | PointerDevice.Stylus
                     onActiveChanged: {
@@ -1237,7 +1237,8 @@ Item {
                 TapHandler {
                     id: leftRowTap
                     acceptedButtons: Qt.LeftButton
-                    enabled: !Theme.touchUi && !rowDrag.active
+                    acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad | PointerDevice.Stylus
+                    enabled: !rowDrag.active
                     onTapped: {
                         if (listRow.isFolder)
                             return
@@ -1262,12 +1263,11 @@ Item {
                     else if (kind === "composite")
                         EditorState.openCompositeAsset(listRow.assetId)
                 }
-                    onLongPressed: listRow.isFolder ? folderRowMenu.popup() : rowMenu.popup()
                 }
                 DragHandler {
                     id: rowDrag
                     target: null
-                    enabled: !Theme.touchUi && !listRow.isFolder
+                    enabled: !listRow.isFolder
                     acceptedButtons: Qt.LeftButton
                     acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad | PointerDevice.Stylus
                     onActiveChanged: {

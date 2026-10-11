@@ -264,6 +264,8 @@ Item {
 
                             AssetDragSource {
                                 id: maskDrag
+                                hasContextMenu: true
+                                onContextMenuRequested: cardMenu.popup()
                                 anchors.fill: parent
                                 kind: "mask"
                                 payload: maskCard.modelData.id
@@ -274,6 +276,17 @@ Item {
                                         root.applyMask(maskCard.modelData.id)
                                     else
                                         Toasts.info(qsTr("Select a clip first, or drag the mask onto one"))
+                                }
+                            }
+
+                            ThemedContextMenu {
+                                id: cardMenu
+
+                                ThemedMenuItem {
+                                    text: qsTr("Apply to selected clip")
+                                    icon.name: Theme.icons.plus
+                                    enabled: root.hasVisualSelection
+                                    onTriggered: maskDrag.tapped()
                                 }
                             }
                         }

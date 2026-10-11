@@ -65,13 +65,15 @@ QtObject {
 
     function begin(dragKind, dragPayload, opts) {
         const o = opts || {}
-        kind = dragKind
+        // Reset before `kind`: setting it fires activeChanged, and the desktop shell
+        // latches clearOfSource from that handler.
+        overTarget = false
+        clearOfSource = false
         payload = dragPayload
         label = o.label || ""
         thumbnail = o.thumbnail || ""
         glyph = o.glyph || ""
-        overTarget = false
-        clearOfSource = false
+        kind = dragKind
         // The timeline's new-track ghost sizes itself from the dragged asset's
         // track type, which it reads off here exactly as the desktop drop does.
         if (dragKind === "media")

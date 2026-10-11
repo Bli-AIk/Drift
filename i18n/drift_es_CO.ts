@@ -4523,6 +4523,14 @@
         <source>Apply to selected clip</source>
         <translation>Aplicar al clip seleccionado</translation>
     </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Eliminar de favoritos</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Añadir a favoritos</translation>
+    </message>
 </context>
 <context>
     <name>AudioEffectCatalog</name>
@@ -6074,6 +6082,14 @@
         <translation>Aplicar al clip seleccionado</translation>
     </message>
     <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Eliminar de favoritos</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Añadir a favoritos</translation>
+    </message>
+    <message>
         <source>Delete from My Effects</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6248,6 +6264,14 @@
     <message>
         <source>Nothing in this category.</source>
         <translation>Nada en esta categoría.</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Eliminar de favoritos</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Añadir a favoritos</translation>
     </message>
     <message>
         <source>Needs cutout</source>
@@ -8537,6 +8561,10 @@
     <message>
         <source>Select a clip first, or drag the mask onto one</source>
         <translation>Selecciona primero un clip o arrastra la máscara a uno</translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">Aplicar al clip seleccionado</translation>
     </message>
 </context>
 <context>
@@ -12592,6 +12620,18 @@ Si la reproducción se corta, prueba con otra opción.</translation>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — haz clic para añadir, o arrastra a la línea de tiempo o a la vista previa</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Añadir en el cabezal de reproducción</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Eliminar de favoritos</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Añadir a favoritos</translation>
+    </message>
 </context>
 <context>
     <name>ShellSwitchDialog</name>
@@ -13314,6 +13354,18 @@ Si la reproducción se corta, prueba con otra opción.</translation>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — haz clic para añadir, o arrastra a la línea de tiempo o a la vista previa</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Añadir en el cabezal de reproducción</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Eliminar de favoritos</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Añadir a favoritos</translation>
+    </message>
 </context>
 <context>
     <name>StockBrowser</name>
@@ -13764,6 +13816,10 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     <message>
         <source>Built-in</source>
         <translation>Integrado</translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Añadir en el cabezal de reproducción</translation>
     </message>
     <message>
         <source>Rename text style</source>
@@ -15809,12 +15865,8 @@ Si la reproducción se corta, prueba con otra opción.</translation>
 <context>
     <name>TransitionsTab</name>
     <message>
-        <source>Touch and hold a transition, then drag it onto where two clips meet.</source>
-        <translation>Mantén pulsada una transición y arrástrala hasta donde se unan dos clips.</translation>
-    </message>
-    <message>
-        <source>Drag onto where two clips overlap. They fade into each other by default.</source>
-        <translation>Arrastra hasta donde se superpongan dos clips. Se fundirán entre sí por defecto.</translation>
+        <source>Drag onto where two clips meet — or, on touch, hold, then drag. They fade into each other by default.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Search transitions</source>
@@ -15883,6 +15935,14 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     <message>
         <source>%1 — drag onto an overlap between two clips</source>
         <translation>%1 — arrastra sobre la superposición entre dos clips</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Eliminar de favoritos</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Añadir a favoritos</translation>
     </message>
 </context>
 <context>

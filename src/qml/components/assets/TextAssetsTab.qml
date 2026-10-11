@@ -161,22 +161,19 @@ Item {
                                 payload: userCard.modelData.id
                                 label: userCard.modelData.label
                                 glyph: Theme.icons.type
+                                hasContextMenu: true
+                                onContextMenuRequested: cardMenu.popup()
                                 onTapped: {
                                     EditorState.addTextClip("", -1, userCard.modelData.id)
                                     root.added()
                                 }
                             }
 
-                            TapHandler {
-                                acceptedButtons: Qt.RightButton
-                                onTapped: cardMenu.popup()
-                            }
-
                             IconButton {
                                 anchors.top: parent.top
                                 anchors.right: parent.right
                                 anchors.margins: 2
-                                visible: userDrag.hovered || cardMenu.visible || Theme.touchInput
+                                visible: userDrag.hovered || cardMenu.visible
                                 glyph: Theme.icons.ellipsis
                                 variant: "ghost"
                                 buttonSize: 20
@@ -260,6 +257,8 @@ Item {
 
                 AssetDragSource {
                     id: packDrag
+                    hasContextMenu: true
+                    onContextMenuRequested: cardMenu.popup()
                     anchors.fill: parent
                     kind: "textStyle"
                     payload: packCard.modelData.id
@@ -268,6 +267,16 @@ Item {
                     onTapped: {
                         EditorState.addTextClip("", -1, packCard.modelData.id)
                         root.added()
+                    }
+                }
+
+                ThemedContextMenu {
+                    id: cardMenu
+
+                    ThemedMenuItem {
+                        text: qsTr("Add at playhead")
+                        icon.name: Theme.icons.plus
+                        onTriggered: packDrag.tapped()
                     }
                 }
             }

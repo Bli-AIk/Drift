@@ -550,7 +550,6 @@ Item {
                         onTapped: effectCardMenu.popup()
                     }
                     TapHandler {
-                        enabled: Theme.touchInput
                         acceptedDevices: PointerDevice.TouchScreen
                         onLongPressed: effectCardMenu.popup(parent, point.position.x, point.position.y)
                     }

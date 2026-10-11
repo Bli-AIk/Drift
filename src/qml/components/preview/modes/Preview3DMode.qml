@@ -116,7 +116,6 @@ Item {
 
     // Touch has no middle or right button: one finger orbits, two dolly and pan.
     DragHandler {
-        enabled: Theme.touchInput
         target: null
         acceptedDevices: PointerDevice.TouchScreen
         maximumPointCount: 1
@@ -139,7 +138,6 @@ Item {
     }
 
     PinchHandler {
-        enabled: Theme.touchInput
         target: null
         acceptedDevices: PointerDevice.TouchScreen
 

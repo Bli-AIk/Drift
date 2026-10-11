@@ -158,7 +158,7 @@ Item {
 
     // A finger leaves no cursor position behind, so the menu opens where the press landed.
     function popupContextMenu(menu) {
-        if (Theme.touchInput && !touchMode && trackClips)
+        if (trackClips && trackClips.lastPressTouch && !touchMode)
             menu.popup(trackClips, trackClips.dragPointer.x, trackClips.dragPointer.y)
         else
             menu.popup()
@@ -241,9 +241,9 @@ Item {
 
     function beginEdgeGesture(area, mouse) {
         const p = area.mapToItem(null, mouse.x, mouse.y)
-        // Desktop has a pointer and a scroll wheel and never needed this; starting it already
-        // decided keeps every branch below dead there.
-        edgeAxis = touchMode ? 0 : 1
+        // A pointer has a scroll wheel and never needed this; starting it already decided keeps
+        // every branch below dead for it. A finger on the desktop timeline arbitrates too.
+        edgeAxis = (touchMode || mouse.source !== Qt.MouseEventNotSynthesized) ? 0 : 1
         edgePressSceneX = p.x
         edgePressSceneY = p.y
         edgeLastSceneY = p.y

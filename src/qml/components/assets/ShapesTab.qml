@@ -182,6 +182,8 @@ Item {
 
                         AssetDragSource {
                             id: shapeDrag
+                            hasContextMenu: true
+                            onContextMenuRequested: cardMenu.popup()
                             anchors.fill: parent
                             kind: "shape"
                             payload: shapeCard.modelData.id
@@ -190,6 +192,25 @@ Item {
                             onTapped: {
                                 EditorState.addShapeClip(shapeCard.modelData.id, -1)
                                 root.added()
+                            }
+                        }
+
+                        ThemedContextMenu {
+                            id: cardMenu
+
+                            property bool favorited: false
+
+                            onAboutToShow: favorited = EditorState.isAssetFavorite("shapes", shapeCard.modelData.id)
+
+                            ThemedMenuItem {
+                                text: qsTr("Add at playhead")
+                                icon.name: Theme.icons.plus
+                                onTriggered: shapeDrag.tapped()
+                            }
+                            ThemedMenuItem {
+                                text: cardMenu.favorited ? qsTr("Remove from favorites") : qsTr("Add to favorites")
+                                icon.name: Theme.icons.star
+                                onTriggered: EditorState.toggleAssetFavorite("shapes", shapeCard.modelData.id)
                             }
                         }
 

@@ -390,26 +390,30 @@ Item {
                 // Touch only: the hold was recognised, so this row is now draggable.
                 // Letting go without moving asks for the context menu instead.
                 property bool armed: false
+                // Latched per press: the device that pressed decides, not Theme.touchInput.
+                property bool pressedByTouch: false
+                readonly property bool touchHold: root.touchMode || pressedByTouch
                 readonly property real threshold: 4
 
                 // On touch the reorder waits for a hold. Arming on press meant any 4px
                 // of finger travel reordered the tracks, and the header column could
                 // never be used to scroll the timeline vertically.
                 pressAndHoldInterval: 400
-                preventStealing: root.touchHold ? armed : true
+                preventStealing: touchHold ? armed : true
 
                 onPressed: (mouse) => {
+                    pressedByTouch = mouse.source !== Qt.MouseEventNotSynthesized
                     pressY = mouse.y
                     moved = false
                     armed = false
-                    if (root.touchHold)
+                    if (touchHold)
                         return
                     root.draggingTrackFrom = index
                     root.draggingTrackTo = index
                     root.draggingTrackSlot = -1
                 }
                 onPressAndHold: (mouse) => {
-                    if (!root.touchHold || moved)
+                    if (!touchHold || moved)
                         return
                     pressY = mouse.y
                     armed = true
@@ -434,7 +438,7 @@ Item {
                                                root.draggingTrackSlot)
                 }
                 onReleased: {
-                    const wantsMenu = root.touchHold && armed && !moved
+                    const wantsMenu = touchHold && armed && !moved
                     armed = false
                     if (wantsMenu) {
                         root.clearTrackDrag()

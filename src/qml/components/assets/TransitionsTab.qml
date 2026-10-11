@@ -72,9 +72,7 @@ Item {
             horizontalAlignment: Text.AlignHCenter
             maximumLineCount: 3
             elide: Text.ElideRight
-            text: Theme.touchUi
-                  ? qsTr("Touch and hold a transition, then drag it onto where two clips meet.")
-                  : qsTr("Drag onto where two clips overlap. They fade into each other by default.")
+            text: qsTr("Drag onto where two clips meet — or, on touch, hold, then drag. They fade into each other by default.")
             color: Theme.mutedForeground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
@@ -275,12 +273,16 @@ Item {
                             visible: transitionHover.hovered
                         }
 
+                        TapHandler {
+                            acceptedButtons: Qt.RightButton
+                            onTapped: cardMenu.popup()
+                        }
+
                         DragHandler {
                             id: transitionDrag
                             target: null
-                            // Touch lifts through TouchDrag instead: a platform
+                            // A finger lifts through TouchDrag instead: a platform
                             // drag has no touch gesture and cannot leave the sheet.
-                            enabled: !Theme.touchUi
                             acceptedButtons: Qt.LeftButton
                             acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad | PointerDevice.Stylus
                         }
@@ -293,6 +295,21 @@ Item {
                             payload: transitionCard.modelData.kind
                             label: transitionCard.modelData.label
                             glyph: Theme.icons.chevronsRight
+                            onLiftTapped: cardMenu.popup()
+                        }
+
+                        ThemedContextMenu {
+                            id: cardMenu
+
+                            property bool favorited: false
+
+                            onAboutToShow: favorited = EditorState.isAssetFavorite("transitions", transitionCard.modelData.kind)
+
+                            ThemedMenuItem {
+                                text: cardMenu.favorited ? qsTr("Remove from favorites") : qsTr("Add to favorites")
+                                icon.name: Theme.icons.star
+                                onTriggered: EditorState.toggleAssetFavorite("transitions", transitionCard.modelData.kind)
+                            }
                         }
 
                         AssetFavoriteButton {

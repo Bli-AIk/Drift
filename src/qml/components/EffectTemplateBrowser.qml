@@ -316,12 +316,34 @@ Column {
                         // timeline or in the preview.
                         AssetDragSource {
                             id: templateDrag
+                            hasContextMenu: true
+                            onContextMenuRequested: cardMenu.popup()
                             anchors.fill: parent
                             kind: "template"
                             payload: templateCard.modelData.id
                             label: templateCard.modelData.label
                             glyph: Theme.icons.layers
                             onTapped: root.applyTemplate(templateCard.modelData.id)
+                        }
+
+                        ThemedContextMenu {
+                            id: cardMenu
+
+                            property bool favorited: false
+
+                            onAboutToShow: favorited = EditorState.isAssetFavorite("templates", templateCard.modelData.id)
+
+                            ThemedMenuItem {
+                                text: qsTr("Apply to selected clip")
+                                icon.name: Theme.icons.plus
+                                enabled: EditorState.selectedClip >= 0
+                                onTriggered: templateDrag.tapped()
+                            }
+                            ThemedMenuItem {
+                                text: cardMenu.favorited ? qsTr("Remove from favorites") : qsTr("Add to favorites")
+                                icon.name: Theme.icons.star
+                                onTriggered: EditorState.toggleAssetFavorite("templates", templateCard.modelData.id)
+                            }
                         }
 
                         Rectangle {

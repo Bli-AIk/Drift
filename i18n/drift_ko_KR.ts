@@ -4504,6 +4504,14 @@
         <source>Apply to selected clip</source>
         <translation>선택한 클립에 적용</translation>
     </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">즐겨찾기에서 제거</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">즐겨찾기에 추가</translation>
+    </message>
 </context>
 <context>
     <name>AudioEffectCatalog</name>
@@ -6049,6 +6057,14 @@
         <translation>선택한 클립에 적용</translation>
     </message>
     <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">즐겨찾기에서 제거</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">즐겨찾기에 추가</translation>
+    </message>
+    <message>
         <source>Delete from My Effects</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6222,6 +6238,14 @@
     <message>
         <source>Nothing in this category.</source>
         <translation>이 카테고리에는 항목이 없습니다.</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">즐겨찾기에서 제거</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">즐겨찾기에 추가</translation>
     </message>
     <message>
         <source>Needs cutout</source>
@@ -8510,6 +8534,10 @@
     <message>
         <source>Select a clip first, or drag the mask onto one</source>
         <translation>먼저 클립을 선택하거나 마스크를 클립에 드래그하세요</translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">선택한 클립에 적용</translation>
     </message>
 </context>
 <context>
@@ -12540,6 +12568,18 @@ If playback stutters, try another.</source>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — 클릭하여 추가하거나 타임라인 또는 미리보기로 드래그</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">재생 헤드 위치에 추가</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">즐겨찾기에서 제거</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">즐겨찾기에 추가</translation>
+    </message>
 </context>
 <context>
     <name>ShellSwitchDialog</name>
@@ -13261,6 +13301,18 @@ If playback stutters, try another.</source>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — 클릭하여 추가하거나 타임라인 또는 미리보기로 드래그</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">재생 헤드 위치에 추가</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">즐겨찾기에서 제거</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">즐겨찾기에 추가</translation>
+    </message>
 </context>
 <context>
     <name>StockBrowser</name>
@@ -13708,6 +13760,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Built-in</source>
         <translation>기본 제공</translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">재생 헤드 위치에 추가</translation>
     </message>
     <message>
         <source>Rename text style</source>
@@ -15748,12 +15804,8 @@ If playback stutters, try another.</source>
 <context>
     <name>TransitionsTab</name>
     <message>
-        <source>Touch and hold a transition, then drag it onto where two clips meet.</source>
-        <translation>전환을 길게 누른 다음 두 클립이 만나는 곳으로 드래그하세요.</translation>
-    </message>
-    <message>
-        <source>Drag onto where two clips overlap. They fade into each other by default.</source>
-        <translation>두 클립이 겹치는 곳으로 드래그하세요. 기본적으로 서로에게 페이드됩니다.</translation>
+        <source>Drag onto where two clips meet — or, on touch, hold, then drag. They fade into each other by default.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Search transitions</source>
@@ -15822,6 +15874,14 @@ If playback stutters, try another.</source>
     <message>
         <source>%1 — drag onto an overlap between two clips</source>
         <translation>%1 — 두 클립이 겹치는 곳으로 드래그</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">즐겨찾기에서 제거</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">즐겨찾기에 추가</translation>
     </message>
 </context>
 <context>

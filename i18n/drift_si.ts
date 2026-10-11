@@ -4523,6 +4523,14 @@
         <source>Apply to selected clip</source>
         <translation>තෝරාගත් ක්ලිපයට යොදන්න</translation>
     </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">ප්‍රියතමයන්ගෙන් ඉවත් කරන්න</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">ප්‍රියතමයන්ට එක් කරන්න</translation>
+    </message>
 </context>
 <context>
     <name>AudioEffectCatalog</name>
@@ -6074,6 +6082,14 @@
         <translation>තෝරාගත් ක්ලිපයට යොදන්න</translation>
     </message>
     <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">ප්‍රියතමයන්ගෙන් ඉවත් කරන්න</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">ප්‍රියතමයන්ට එක් කරන්න</translation>
+    </message>
+    <message>
         <source>Delete from My Effects</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6248,6 +6264,14 @@
     <message>
         <source>Nothing in this category.</source>
         <translation>මෙම ප්‍රවර්ගයේ කිසිවක් නැත.</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">ප්‍රියතමයන්ගෙන් ඉවත් කරන්න</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">ප්‍රියතමයන්ට එක් කරන්න</translation>
     </message>
     <message>
         <source>Needs cutout</source>
@@ -8537,6 +8561,10 @@
     <message>
         <source>Select a clip first, or drag the mask onto one</source>
         <translation>පළමුව ක්ලිපයක් තෝරන්න, නැතහොත් ආවරණය එය මතට අදින්න</translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">තෝරාගත් ක්ලිපයට යොදන්න</translation>
     </message>
 </context>
 <context>
@@ -12592,6 +12620,18 @@ If playback stutters, try another.</source>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — එක් කිරීමට ක්ලික් කරන්න, නැතහොත් කාලරේඛාව හෝ පෙරදසුන වෙත අදින්න</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">ප්ලේහෙඩ් එක ඇති තැනට එක් කරන්න</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">ප්‍රියතමයන්ගෙන් ඉවත් කරන්න</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">ප්‍රියතමයන්ට එක් කරන්න</translation>
+    </message>
 </context>
 <context>
     <name>ShellSwitchDialog</name>
@@ -13314,6 +13354,18 @@ If playback stutters, try another.</source>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — එක් කිරීමට ක්ලික් කරන්න, නැතහොත් කාලරේඛාව හෝ පෙරදසුන වෙත අදින්න</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">ප්ලේහෙඩ් එක ඇති තැනට එක් කරන්න</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">ප්‍රියතමයන්ගෙන් ඉවත් කරන්න</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">ප්‍රියතමයන්ට එක් කරන්න</translation>
+    </message>
 </context>
 <context>
     <name>StockBrowser</name>
@@ -13764,6 +13816,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Built-in</source>
         <translation>බිල්ට්-ඉන්</translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">ප්ලේහෙඩ් එක ඇති තැනට එක් කරන්න</translation>
     </message>
     <message>
         <source>Rename text style</source>
@@ -15809,12 +15865,8 @@ If playback stutters, try another.</source>
 <context>
     <name>TransitionsTab</name>
     <message>
-        <source>Touch and hold a transition, then drag it onto where two clips meet.</source>
-        <translation>සංක්‍රාන්තියක් ස්පර්ශ කරගෙන සිටින්න, ඉන්පසු එය ක්ලිප් දෙකක් හමුවන තැනට අදින්න.</translation>
-    </message>
-    <message>
-        <source>Drag onto where two clips overlap. They fade into each other by default.</source>
-        <translation>ක්ලිප් දෙකක් එකිනෙක මත පිහිටන තැනට අදින්න. ඒවා පෙරනිමියෙන් එකිනෙකට Fade වේ.</translation>
+        <source>Drag onto where two clips meet — or, on touch, hold, then drag. They fade into each other by default.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Search transitions</source>
@@ -15883,6 +15935,14 @@ If playback stutters, try another.</source>
     <message>
         <source>%1 — drag onto an overlap between two clips</source>
         <translation>%1 — ක්ලිප් දෙකක් අතර අතිච්ඡාදනය වන තැනට අදින්න</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">ප්‍රියතමයන්ගෙන් ඉවත් කරන්න</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">ප්‍රියතමයන්ට එක් කරන්න</translation>
     </message>
 </context>
 <context>

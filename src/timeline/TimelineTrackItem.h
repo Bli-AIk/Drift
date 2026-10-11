@@ -71,6 +71,7 @@ class TimelineTrackItem : public QQuickItem
     Q_PROPERTY(bool touchDragging READ touchDragging NOTIFY draggingChanged)
     // Touch only: a clip is picked up (held, or being dragged). The panel stops panning for it.
     Q_PROPERTY(bool lifted READ lifted NOTIFY draggingChanged)
+    Q_PROPERTY(bool lastPressTouch READ lastPressTouch NOTIFY lastPressTouchChanged)
     Q_PROPERTY(QPointF dragPointer READ dragPointer NOTIFY dragPointerChanged)
     Q_PROPERTY(QString hoverToolTip READ hoverToolTip NOTIFY hoverToolTipChanged)
     Q_PROPERTY(QRectF hoverToolTipRect READ hoverToolTipRect NOTIFY hoverToolTipChanged)
@@ -101,6 +102,7 @@ public:
     bool dragging() const { return m_drag.moving; }
     bool touchDragging() const;
     bool lifted() const;
+    bool lastPressTouch() const { return m_lastPressTouch; }
     QPointF dragPointer() const { return m_drag.pointer; }
     QString hoverToolTip() const { return m_hoverToolTip; }
     QRectF hoverToolTipRect() const { return m_hoverToolTipRect; }
@@ -124,6 +126,7 @@ signals:
     void servicesChanged();
     void draggingChanged();
     void dragPointerChanged();
+    void lastPressTouchChanged();
     void hoverToolTipChanged();
 
     // Body gestures that need the panel's policy (landing preview, cross-track drop rules).
@@ -190,7 +193,7 @@ private:
         bool armed = false;
         bool didDrag = false;
         bool rightButton = false;
-        bool touchMenu = false; // finger on a pointer-style (desktop) timeline: hold opens the menu
+        bool touch = false; // this press came from a finger (or the touch-only Android timeline)
         bool menuOpened = false;
         int clipIndex = -1;
         QString clipId;
@@ -266,6 +269,7 @@ private:
     QRectF m_hoverToolTipRect;
     DragState m_drag;
     QTimer m_longPress;
+    bool m_lastPressTouch = false;
 
     // Built on the GUI thread in updatePolish, consumed by updatePaintNode. Coordinates are
     // relative to m_originX so vertices stay small on a long timeline.

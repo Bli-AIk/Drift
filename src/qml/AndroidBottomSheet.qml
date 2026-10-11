@@ -568,72 +568,9 @@ Popup {
         // The lifted card, following the finger. It lives out here rather than in
         // the panel so it survives the panel stepping aside — that is the whole
         // point of the gesture: the sheet leaves, the item you picked up does not.
-        Item {
-            id: dragGhost
-            readonly property real ghostSize: Math.round(Theme.assetCardWidth * 0.62)
+        TouchDragGhost {
             visible: root.opened && TouchDrag.active
             z: 100
-            width: ghostSize
-            height: ghostSize
-            // Lifted clear of the fingertip, or the thing being placed is under the
-            // hand placing it.
-            x: sheetRoot.mapFromItem(null, TouchDrag.sceneX, TouchDrag.sceneY).x - width / 2
-            y: sheetRoot.mapFromItem(null, TouchDrag.sceneX, TouchDrag.sceneY).y
-               - height - Theme.spacingLg
-            scale: visible ? 1 : 0.8
-
-            Behavior on scale {
-                NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: Theme.radiusSm
-                color: Theme.panelAccent
-                clip: true
-                border.width: TouchDrag.overTarget ? 2 : Theme.borderWidth
-                border.color: TouchDrag.overTarget ? Theme.primary : Theme.panelBorder
-                opacity: 0.94
-
-                Behavior on border.width {
-                    NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                }
-                Behavior on border.color {
-                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                }
-
-                Image {
-                    id: ghostImage
-                    anchors.fill: parent
-                    visible: TouchDrag.thumbnail.length > 0 && status === Image.Ready
-                    source: TouchDrag.thumbnail.length > 0
-                            ? EditorState.imageUrl(TouchDrag.thumbnail) : ""
-                    fillMode: Image.PreserveAspectCrop
-                    asynchronous: true
-                }
-
-                IconGlyph {
-                    anchors.centerIn: parent
-                    visible: !ghostImage.visible && TouchDrag.glyph.length > 0
-                    glyph: TouchDrag.glyph
-                    iconSize: Theme.iconSizeXl
-                    iconColor: Theme.panelForeground
-                }
-
-                Text {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    anchors.margins: Theme.spacingXs
-                    visible: !ghostImage.visible && TouchDrag.label.length > 0
-                    text: TouchDrag.label
-                    color: Theme.panelForeground
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeXs
-                    horizontalAlignment: Text.AlignHCenter
-                    elide: Text.ElideRight
-                }
-            }
         }
     }
 }

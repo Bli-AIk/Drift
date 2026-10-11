@@ -884,7 +884,6 @@ Item {
                                     TapHandler {
                                         id: tipTap1088
                                         acceptedDevices: PointerDevice.TouchScreen
-                                        enabled: Theme.touchInput
                                         onLongPressed: tip1088.held = true
                                         onPressedChanged: if (!pressed) tip1088.held = false
                                     }
@@ -914,7 +913,6 @@ Item {
                                     TapHandler {
                                         id: tipTap1109
                                         acceptedDevices: PointerDevice.TouchScreen
-                                        enabled: Theme.touchInput
                                         onLongPressed: tip1109.held = true
                                         onPressedChanged: if (!pressed) tip1109.held = false
                                     }
@@ -961,7 +959,6 @@ Item {
                                     TapHandler {
                                         id: tipTapHlPad
                                         acceptedDevices: PointerDevice.TouchScreen
-                                        enabled: Theme.touchInput
                                         onLongPressed: tipHlPad.held = true
                                         onPressedChanged: if (!pressed) tipHlPad.held = false
                                     }
@@ -1066,7 +1063,6 @@ Item {
                                     TapHandler {
                                         id: tipTapUnderlineOffset
                                         acceptedDevices: PointerDevice.TouchScreen
-                                        enabled: Theme.touchInput
                                         onLongPressed: tipUnderlineOffset.held = true
                                         onPressedChanged: if (!pressed) tipUnderlineOffset.held = false
                                     }
@@ -1172,7 +1168,6 @@ Item {
                             TapHandler {
                                 id: tipTapAccentSize
                                 acceptedDevices: PointerDevice.TouchScreen
-                                enabled: Theme.touchInput
                                 onLongPressed: tipAccentSize.held = true
                                 onPressedChanged: if (!pressed) tipAccentSize.held = false
                             }
@@ -1486,7 +1481,6 @@ Item {
                             TapHandler {
                                 id: staggerTap
                                 acceptedDevices: PointerDevice.TouchScreen
-                                enabled: Theme.touchInput
                                 onLongPressed: staggerTip.held = true
                                 onPressedChanged: if (!pressed) staggerTip.held = false
                             }

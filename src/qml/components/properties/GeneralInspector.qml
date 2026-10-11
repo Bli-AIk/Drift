@@ -478,7 +478,6 @@ Item {
                 TapHandler {
                     id: tipTap1217
                     acceptedDevices: PointerDevice.TouchScreen
-                    enabled: Theme.touchInput
                     onLongPressed: tip1217.held = true
                     onPressedChanged: if (!pressed) tip1217.held = false
                 }
@@ -501,7 +500,6 @@ Item {
                         TapHandler {
                             id: tipTap1231
                             acceptedDevices: PointerDevice.TouchScreen
-                            enabled: Theme.touchInput
                             onLongPressed: tip1231.held = true
                             onPressedChanged: if (!pressed) tip1231.held = false
                         }
@@ -531,7 +529,6 @@ Item {
                         TapHandler {
                             id: tipTap1252
                             acceptedDevices: PointerDevice.TouchScreen
-                            enabled: Theme.touchInput
                             onLongPressed: tip1252.held = true
                             onPressedChanged: if (!pressed) tip1252.held = false
                         }
@@ -583,7 +580,6 @@ Item {
                 TapHandler {
                     id: pathTap
                     acceptedDevices: PointerDevice.TouchScreen
-                    enabled: Theme.touchInput
                     onLongPressed: pathTip.held = true
                     onPressedChanged: if (!pressed) pathTip.held = false
                 }

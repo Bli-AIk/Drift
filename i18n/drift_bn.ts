@@ -4523,6 +4523,14 @@
         <source>Apply to selected clip</source>
         <translation type="unfinished">নির্বাচিত ক্লিপে প্রয়োগ করুন</translation>
     </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">পছন্দ থেকে সরান</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">ফেভারিটে যোগ করুন</translation>
+    </message>
 </context>
 <context>
     <name>AudioEffectCatalog</name>
@@ -6074,6 +6082,14 @@
         <translation type="unfinished">নির্বাচিত ক্লিপে প্রয়োগ করুন</translation>
     </message>
     <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">পছন্দ থেকে সরান</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">ফেভারিটে যোগ করুন</translation>
+    </message>
+    <message>
         <source>Delete from My Effects</source>
         <translation type="unfinished">My Effects থেকে মুছুন</translation>
     </message>
@@ -6248,6 +6264,14 @@
     <message>
         <source>Nothing in this category.</source>
         <translation type="unfinished">এই বিভাগে কিছুই নেই.</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">পছন্দ থেকে সরান</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">ফেভারিটে যোগ করুন</translation>
     </message>
     <message>
         <source>Needs cutout</source>
@@ -8537,6 +8561,10 @@
     <message>
         <source>Select a clip first, or drag the mask onto one</source>
         <translation type="unfinished">প্রথমে একটি ক্লিপ নির্বাচন করুন বা মাস্কটিকে একটিতে টেনে আনুন।</translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">নির্বাচিত ক্লিপে প্রয়োগ করুন</translation>
     </message>
 </context>
 <context>
@@ -12592,6 +12620,18 @@ If playback stutters, try another.</source>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — যোগ করতে ক্লিক করুন, অথবা টাইমলাইন বা প্রিভিউতে টেনে আনুন</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">প্লেহেডে যোগ করুন</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">পছন্দ থেকে সরান</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">ফেভারিটে যোগ করুন</translation>
+    </message>
 </context>
 <context>
     <name>ShellSwitchDialog</name>
@@ -13314,6 +13354,18 @@ If playback stutters, try another.</source>
         <source>%1 — click to add, or drag to the timeline or preview</source>
         <translation>%1 — যোগ করতে ক্লিক করুন, অথবা টাইমলাইন বা প্রিভিউতে টেনে আনুন</translation>
     </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">প্লেহেডে যোগ করুন</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">পছন্দ থেকে সরান</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">ফেভারিটে যোগ করুন</translation>
+    </message>
 </context>
 <context>
     <name>StockBrowser</name>
@@ -13764,6 +13816,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Built-in</source>
         <translation type="unfinished">অন্তর্নির্মিত</translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">প্লেহেডে যোগ করুন</translation>
     </message>
     <message>
         <source>Rename text style</source>
@@ -15809,12 +15865,8 @@ If playback stutters, try another.</source>
 <context>
     <name>TransitionsTab</name>
     <message>
-        <source>Touch and hold a transition, then drag it onto where two clips meet.</source>
-        <translation type="unfinished">একটি ট্রানজিশন স্পর্শ করুন এবং ধরে রাখুন, তারপরে যেখানে দুটি ক্লিপ মিলিত হয় সেখানে টেনে আনুন.</translation>
-    </message>
-    <message>
-        <source>Drag onto where two clips overlap. They fade into each other by default.</source>
-        <translation type="unfinished">যেখানে দুটি ক্লিপ ওভারল্যাপ হয় সেখানে টেনে আনুন। তারা ডিফল্টরূপে একে অপরের মধ্যে ফেড.</translation>
+        <source>Drag onto where two clips meet — or, on touch, hold, then drag. They fade into each other by default.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Search transitions</source>
@@ -15883,6 +15935,14 @@ If playback stutters, try another.</source>
     <message>
         <source>%1 — drag onto an overlap between two clips</source>
         <translation type="unfinished">%1 — দুটি ক্লিপের মধ্যে একটি ওভারল্যাপে টেনে আনুন</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">পছন্দ থেকে সরান</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">ফেভারিটে যোগ করুন</translation>
     </message>
 </context>
 <context>

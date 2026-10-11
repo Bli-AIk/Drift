@@ -1985,6 +1985,20 @@ ApplicationWindow {
         }
     }
 
+    // Desktop has no sheet to step aside, so the drop target is live from the lift.
+    Connections {
+        target: TouchDrag
+        function onActiveChanged() {
+            if (TouchDrag.active)
+                TouchDrag.clearOfSource = true
+        }
+    }
+
+    TouchDragGhost {
+        visible: TouchDrag.active
+        z: 10000
+    }
+
     // Notification host — above all panels, so any message lands in one place.
     ToastHost { }
 }

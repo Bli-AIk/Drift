@@ -196,6 +196,7 @@ Column {
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         pressAndHoldInterval: 450
                         property bool heldMenu: false
+                        property bool pressedByTouch: false
 
                         function openMenu() {
                             if (!propTile.modelData.removable)
@@ -205,8 +206,13 @@ Column {
                             propMenu.popup()
                         }
 
-                        onPressed: heldMenu = false
+                        onPressed: (mouse) => {
+                            heldMenu = false
+                            pressedByTouch = mouse.source !== Qt.MouseEventNotSynthesized
+                        }
                         onPressAndHold: {
+                            if (!pressedByTouch)
+                                return
                             heldMenu = true
                             openMenu()
                         }

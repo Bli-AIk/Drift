@@ -156,10 +156,14 @@ ToolWindow {
                              && !EditorState.segmentation.encoding && !EditorState.segmentation.running
                     pressAndHoldInterval: 400
                     property bool heldExclude: false
-                    onPressed: heldExclude = false
+                    property bool pressedByTouch: false
+                    onPressed: (mouse) => {
+                        heldExclude = false
+                        pressedByTouch = mouse.source !== Qt.MouseEventNotSynthesized
+                    }
                     // Touch has no right button: hold to mark what to exclude.
                     onPressAndHold: function (mouse) {
-                        if (!Theme.touchInput || !(mouse.buttons & Qt.LeftButton))
+                        if (!pressedByTouch || !(mouse.buttons & Qt.LeftButton))
                             return
                         const nx = (mouse.x - stage.fitX) / stage.fitW
                         const ny = (mouse.y - stage.fitY) / stage.fitH

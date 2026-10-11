@@ -64,7 +64,11 @@ PanelFrame {
     readonly property real maxZoom: 40.0
     readonly property real pxPerSecond: Theme.pixelsPerSecondBase * zoom
     onPxPerSecondChanged: EditorState.setSnapRadius(8, pxPerSecond)
-    Component.onCompleted: EditorState.setSnapRadius(8, pxPerSecond)
+    Component.onCompleted: {
+        TouchDrag.registerTarget(root)
+        EditorState.setSnapRadius(8, pxPerSecond)
+    }
+    Component.onDestruction: TouchDrag.unregisterTarget(root)
     // Exposed for clip filmstrip viewport culling (Flickable ids are local).
     readonly property real timelineViewX: flick.contentX
     readonly property real timelineViewW: flick.width
@@ -142,7 +146,6 @@ PanelFrame {
         viewW: root.timelineViewW
         pxPerSecond: root.pxPerSecond
         touchMode: false
-        touchContextMenu: Theme.touchInput
         multiSelectActive: root.multiSelectActive === true
         totalTracksHeight: root.totalTracksHeightCached
         moveFollowActive: root.moveFollowActive
@@ -1100,6 +1103,103 @@ PanelFrame {
         easing.type: Theme.easingInOut
     }
 
+    // --- TouchDrag drop target ------------------------------------------------
+
+    function touchDropContains(sceneX, sceneY) {
+        return touchDropPoint(sceneX, sceneY).inside
+    }
+
+    // Scene point -> { inside, x (content px), y (track-column px), viewX, viewY }.
+    // The ruler strip is pinned to the top of the viewport, so anything under it is
+    // ruler, not track, however far the tracks have been scrolled.
+    function touchDropPoint(sceneX, sceneY) {
+        const p = flick.mapFromItem(null, sceneX, sceneY)
+        const inside = p.x >= 0 && p.x <= flick.width
+                       && p.y >= flick.headerHeight && p.y <= flick.height
+        return { "inside": inside,
+                 "x": p.x + flick.contentX,
+                 "y": p.y + flick.contentY - flick.headerHeight,
+                 "viewX": p.x,
+                 "viewY": p.y }
+    }
+
+    function clearTouchDrop() {
+        clearLandingPreview()
+        clearEffectDropHighlight()
+        pendingDropKind = ""
+        touchDropEdgeScroll.stop()
+    }
+
+    function updateTouchDrop(kind, payload, sceneX, sceneY) {
+        const pt = touchDropPoint(sceneX, sceneY)
+        if (!pt.inside) {
+            clearTouchDrop()
+            return false
+        }
+
+        touchDropEdgeScroll.viewX = pt.viewX
+        touchDropEdgeScroll.viewY = pt.viewY
+        touchDropEdgeScroll.start()
+
+        if (kind === "media") {
+            clearEffectDropHighlight()
+            updateAssetDropPreview(payload, pt.x, pt.y)
+            return true
+        }
+        return dropRouter.hover(kind, payload, pt.x, pt.y)
+    }
+
+    function performTouchDrop(kind, payload, sceneX, sceneY) {
+        const pt = touchDropPoint(sceneX, sceneY)
+        clearTouchDrop()
+        if (!pt.inside)
+            return
+
+        if (kind === "media") {
+            performAssetDrop(payload, pt.x, pt.y)
+            return
+        }
+        dropRouter.drop(kind, payload, TouchDrag.label, pt.x, pt.y)
+    }
+
+    // The pane shows only a few tracks and seconds, so without this a lifted card
+    // could only land on what happened to be on screen.
+    Timer {
+        id: touchDropEdgeScroll
+        interval: 16
+        repeat: true
+        property real viewX: 0
+        property real viewY: 0
+        readonly property real band: 48
+        readonly property real speed: 12
+
+        onTriggered: {
+            if (!TouchDrag.active) {
+                stop()
+                return
+            }
+            var dx = 0
+            var dy = 0
+            if (viewX < band)
+                dx = -speed * (1 - viewX / band)
+            else if (viewX > flick.width - band)
+                dx = speed * (1 - (flick.width - viewX) / band)
+            if (viewY < flick.headerHeight + band)
+                dy = -speed * (1 - (viewY - flick.headerHeight) / band)
+            else if (viewY > flick.height - band)
+                dy = speed * (1 - (flick.height - viewY) / band)
+            if (dx === 0 && dy === 0)
+                return
+            const applied = root.dragEdgeScroll(dx, dy)
+            if (applied.x === 0 && applied.y === 0)
+                return
+            // Re-resolve against the view that just moved, or the landing outline
+            // would stay pinned to the content the finger has scrolled away from.
+            root.updateTouchDrop(TouchDrag.kind, TouchDrag.payload,
+                                 TouchDrag.sceneX, TouchDrag.sceneY)
+        }
+    }
+
     function panTimelineBy(dx, dy) {
         contentXAnimation.stop()
         const maxX = Math.max(0, flick.contentWidth - flick.width)
@@ -1108,6 +1208,20 @@ PanelFrame {
             flick.contentX = Math.max(0, Math.min(maxX, flick.contentX - dx))
         if (dy)
             flick.contentY = Math.max(0, Math.min(maxY, flick.contentY - dy))
+    }
+
+    // Viewport geometry read by TimelineTrackArea's lifted-clip autoscroll (same names as AndroidTimeline).
+    readonly property real seekHeaderHeight: flick.headerHeight
+    readonly property real timelineViewY: flick.contentY
+    readonly property real timelineViewH: flick.height
+
+    // Touch-lift autoscroll and edge-strip scrolling in TimelineTrackArea / TimelineClipItem call
+    // this by name. Returns how far the view actually moved.
+    function dragEdgeScroll(dx, dy) {
+        const beforeX = flick.contentX
+        const beforeY = flick.contentY
+        panTimelineBy(-dx, -dy)
+        return { "x": flick.contentX - beforeX, "y": flick.contentY - beforeY }
     }
 
     function beginTimelinePan(item, mouse) {
@@ -1281,7 +1395,6 @@ PanelFrame {
 
                 PinchHandler {
                     id: pinch
-                    enabled: Theme.touchInput
                     target: null
                     acceptedDevices: PointerDevice.TouchScreen
                     property real startZoom: 1
@@ -1517,10 +1630,11 @@ PanelFrame {
                                         property bool heldOpen: false
                                         property real dragSeconds: modelData.seconds
                                         property real pressX: 0
+                                        property bool pressedByTouch: false
 
                                         pressAndHoldInterval: 400
                                         onPressAndHold: (mouse) => {
-                                            if (!Theme.touchInput || didDrag
+                                            if (!pressedByTouch || didDrag
                                                     || !(mouse.buttons & Qt.LeftButton))
                                                 return
                                             heldOpen = true
@@ -1533,6 +1647,7 @@ PanelFrame {
                                         onPressed: (mouse) => {
                                             if (mouse.button !== Qt.LeftButton)
                                                 return
+                                            pressedByTouch = mouse.source !== Qt.MouseEventNotSynthesized
                                             heldOpen = false
                                             didDrag = false
                                             dragging = false
@@ -1705,18 +1820,19 @@ PanelFrame {
                         z: 0
                         enabled: root.timelineTool === ""
                         acceptedButtons: Qt.LeftButton
-                        // CapCut: empty-space drag is marquee, not flick-scroll. On touch there is
-                        // no marquee: the same drag pans the timeline instead.
-                        preventStealing: !Theme.touchInput
+                        // CapCut: empty-space drag is marquee, not flick-scroll. A finger has no
+                        // marquee: the same drag pans the timeline instead, so only a real
+                        // mouse press sets preventStealing (in onPressed, undone on release).
                         cursorShape: pressed ? Qt.CrossCursor : Qt.ArrowCursor
 
                         onPressed: (mouse) => {
                             root.forceActiveFocus()
-                            if (Theme.touchInput) {
+                            if (mouse.source !== Qt.MouseEventNotSynthesized) {
                                 if (!(mouse.modifiers & (Qt.ShiftModifier | Qt.ControlModifier)))
                                     EditorState.clearSelection()
                                 return
                             }
+                            preventStealing = true
                             root.marqueeAdditive = (mouse.modifiers & (Qt.ShiftModifier | Qt.ControlModifier)) !== 0
                             root.marqueeOriginX = mouse.x
                             root.marqueeOriginY = mouse.y
@@ -1734,8 +1850,14 @@ PanelFrame {
                             if (root.marqueeWidth > 2 || root.marqueeHeight > 2)
                                 root.applyMarqueeSelection()
                         }
-                        onReleased: root.endMarquee(true)
-                        onCanceled: root.endMarquee(false)
+                        onReleased: {
+                            preventStealing = false
+                            root.endMarquee(true)
+                        }
+                        onCanceled: {
+                            preventStealing = false
+                            root.endMarquee(false)
+                        }
                     }
 
                     TransformCoverageOverlay {
@@ -2268,7 +2390,6 @@ PanelFrame {
                                         // A handler rather than a left-button MouseArea, so the press
                                         // still reaches the marquee/pan area underneath.
                                         TapHandler {
-                                            enabled: Theme.touchInput
                                             acceptedDevices: PointerDevice.TouchScreen
                                             onLongPressed: root.openGapMenu(trackRow.trackIndex,
                                                                             gapItem.modelData.start,
