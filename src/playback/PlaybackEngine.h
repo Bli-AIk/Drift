@@ -137,9 +137,6 @@ public:
     // test, or before the item enters a scene — which falls the engine back to the timer.
     void setDisplayRefreshRate(double hz);
 
-    // Id of the text clip currently edited in place on the preview; that clip is
-    // omitted from the composited frame so the QML inline editor stands in for it.
-    void setEditingClipId(const QString &id);
     // The inline text editor's caret, selection and preedit; an empty clipId clears it. The edited
     // clip's text itself reaches the compositor through the project like any edit; a caller that is
     // about to notifyProjectEdited() anyway passes refresh = false to render once.
@@ -260,7 +257,6 @@ private:
     // a restart by bumping the generation below rather than reaching into its state.
     drift::ClipAudioRetimer m_rateRetimer;
     std::atomic<quint64> m_audioStreamGeneration{1};
-    QString m_editingClipId;
     FrameCompositor::RenderOptions::TextEditDecor m_textEditDecor;
     FrameCompositor::RenderOptions::EditorView m_editorView;
     int m_previewRenderWidth = 0;

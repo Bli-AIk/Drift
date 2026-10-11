@@ -284,7 +284,6 @@ private slots:
     void compositorRendersShapeClip();
     void compositorRendersCompositeClip();
     void audioMixerPlaysCompositeClip();
-    void compositorSkipsClipBeingEdited();
     void adjustmentEffectContrastCatalogEntry();
     void effectPresetStableIds();
     void effectParamTypesMatchShaderUniforms();
@@ -8118,52 +8117,6 @@ void EngineTest::compositorRendersShapeClip()
     QVERIFY(!frame.isNull());
     QVERIFY(frame.pixelColor(64, 64).red() > 200);
     QVERIFY(frame.pixelColor(0, 0) == QColor(0, 0, 0));
-}
-
-// RenderOptions::skipClipId omits one clip from the frame. Used by in-place text
-// editing on the preview, where the QML editor stands in for the baked raster.
-void EngineTest::compositorSkipsClipBeingEdited()
-{
-    if (!GpuCompositor::isAvailable())
-        QSKIP("No GPU compositor available");
-
-    drift::Project project;
-    project.setResolution(128, 128);
-    project.tracks().clear();
-    project.tracks().append(drift::Track{.type = drift::TrackType::Shape});
-
-    drift::Clip clip;
-    clip.id = QStringLiteral("edited");
-    clip.type = drift::ClipType::Shape;
-    clip.timelineStart = 0;
-    clip.timelineDuration = drift::secondsToUs(1.0);
-    clip.shapeStyle.kind = drift::ShapeKind::Rectangle;
-    clip.shapeStyle.setSolidFill(QColor(255, 0, 0));
-    clip.transformX.setKeyframe(0, 32.0);
-    clip.transformY.setKeyframe(0, 32.0);
-    clip.transformW.setKeyframe(0, 64.0);
-    clip.transformH.setKeyframe(0, 64.0);
-    project.tracks()[0].clips.append(clip);
-
-    FrameCompositor compositor;
-    compositor.setProject(&project);
-
-    // Rendered normally the clip covers the centre.
-    const QImage shown = compositor.compositeAt(0);
-    QVERIFY(!shown.isNull());
-    QVERIFY(shown.pixelColor(64, 64).red() > 200);
-
-    // Skipping it leaves the background showing through.
-    FrameCompositor::RenderOptions options;
-    options.skipClipId = QStringLiteral("edited");
-    const QImage hidden = compositor.compositeAt(0, options);
-    QVERIFY(!hidden.isNull());
-    QCOMPARE(hidden.pixelColor(64, 64), QColor(0, 0, 0));
-
-    // An unrelated id must not hide anything.
-    options.skipClipId = QStringLiteral("someone-else");
-    const QImage untouched = compositor.compositeAt(0, options);
-    QVERIFY(untouched.pixelColor(64, 64).red() > 200);
 }
 
 void EngineTest::adjustmentEffectContrastCatalogEntry()

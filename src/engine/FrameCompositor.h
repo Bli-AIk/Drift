@@ -28,9 +28,6 @@ public:
         // time. Only realtime playback sets it; a paused preview would just be
         // decoding frames an edit is about to invalidate.
         drift::TimeUs readAheadUs = 0;
-        // Clip id to omit from the frame (the text clip being edited in place on
-        // the preview). Empty renders everything.
-        QString skipClipId;
         // Read low-res preview proxies where they exist. Only live playback sets it; export and
         // every other caller must see the original pixels.
         bool allowProxies = false;

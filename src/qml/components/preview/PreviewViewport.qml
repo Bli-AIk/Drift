@@ -21,6 +21,7 @@ Item {
 
     readonly property alias canvas: canvasRect
     readonly property alias toolHost: toolHost
+    readonly property alias textEditor: textEditor
 
     readonly property real aspect: {
         void EditorState.tracksRevision
@@ -133,6 +134,14 @@ Item {
         id: toolHost
         anchors.fill: parent
         z: 100
+        canvas: canvasRect
+        // The editor takes the pointer and the compositor draws the text; the grips would sit on it.
+        visible: !textEditor.active
+    }
+
+    InlineTextEditor {
+        id: textEditor
+        z: 150
         canvas: canvasRect
     }
 }

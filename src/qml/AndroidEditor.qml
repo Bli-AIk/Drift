@@ -18,7 +18,8 @@ Item {
     readonly property real nonBlockingSheetHeight: Math.max(
         (propertiesSheet.opened && !propertiesSheet.blocking) ? propertiesSheet.panelHeight : 0,
         Window.window.nonBlockingSheetHeight,
-        composer.coveredHeight)
+        composer.coveredHeight,
+        textEditBar.coveredHeight)
 
     // Fullscreen preview: the timeline pane, top bar and rail step aside and
     // AndroidPreview takes the page. Readable from outside so AndroidMain's Back
@@ -33,6 +34,7 @@ Item {
 
     function openAssetsTab(tabId) {
         composer.close()
+        preview.textEditor.commit()
         sheetKind = "assets"
         rail.activeId = tabId
         assetsPanel.showTab(tabId)
@@ -48,6 +50,7 @@ Item {
     // two sheets to dismiss to get back to the timeline.
     function openAddMenu() {
         composer.close()
+        preview.textEditor.commit()
         sheetKind = ""
         rail.activeId = ""
         if (assetsSheet.opened)
@@ -60,6 +63,7 @@ Item {
 
     function openPropertiesSheet() {
         composer.close()
+        preview.textEditor.commit()
         sheetKind = "properties"
         rail.activeId = "edit"
         if (!propertiesSheet.opened)
@@ -72,6 +76,7 @@ Item {
     // not something to stack on top.
     function openMoreTools() {
         composer.close()
+        preview.textEditor.commit()
         if (assetsSheet.opened)
             assetsSheet.dismiss()
         if (propertiesSheet.opened)
@@ -84,6 +89,7 @@ Item {
 
     function openFadeSheet() {
         composer.close()
+        preview.textEditor.commit()
         if (assetsSheet.opened)
             assetsSheet.dismiss()
         if (propertiesSheet.opened)
@@ -94,11 +100,13 @@ Item {
             fadeSheet.open()
     }
 
-    // Typing on a phone happens in the composer above the keyboard, not in a sheet: the sheets
-    // are put away so they do not sit under it, and the preview stays up to show the result.
-    function openTextComposer(track, clip, selectAllText) {
+    // Typing on a phone happens on the clip in the preview, with a slim bar above the keyboard:
+    // the sheets are put away so they do not sit under it, and the preview shrinks into the
+    // space the keyboard leaves.
+    function startInlineTextEdit(track, clip, selectAllText) {
         root.closeSheets()
-        composer.openForText(track, clip, selectAllText)
+        composer.close()
+        preview.textEditor.start(track, clip, selectAllText)
     }
 
     function openCueComposer(index) {
@@ -139,6 +147,10 @@ Item {
         }
         if (packageProgressDialog.visible)
             return true // a package render is running; swallow rather than abandon it
+        if (preview.textEditor.active) {
+            preview.textEditor.commit()
+            return true
+        }
         if (composer.active) {
             composer.close()
             return true
@@ -438,8 +450,8 @@ Item {
                     panel: timeline
                     onMoreRequested: root.openMoreTools()
                     onFadeRequested: root.openFadeSheet()
-                    onEditTextRequested: root.openTextComposer(EditorState.selectedTrack,
-                                                               EditorState.selectedClip, false)
+                    onEditTextRequested: root.startInlineTextEdit(EditorState.selectedTrack,
+                                                                  EditorState.selectedClip, false)
                 }
 
                 Item {
@@ -611,6 +623,66 @@ Item {
         z: 10
     }
 
+    // Only the buttons: the text is edited on the preview itself, which stays visible above this.
+    Rectangle {
+        id: textEditBar
+        readonly property bool editing: preview.textEditor.active
+        readonly property real coveredHeight: editing ? height + anchors.bottomMargin : 0
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: root.SafeArea.margins.left
+        anchors.rightMargin: root.SafeArea.margins.right
+        anchors.bottomMargin: Math.max(root.SafeArea.margins.bottom, Theme.keyboardInset)
+        height: Theme.iconButtonSize + Theme.spacingMd * 2
+        visible: editing
+        color: Theme.panelBackground
+        z: 10
+
+        Rectangle {
+            anchors.top: parent.top
+            width: parent.width
+            height: Theme.borderWidth
+            color: Theme.panelBorder
+        }
+
+        // Swallows touches that miss a control so they do not fall through to the timeline below.
+        MouseArea {
+            anchors.fill: parent
+        }
+
+        IconButton {
+            id: cancelEditButton
+            anchors.left: parent.left
+            anchors.leftMargin: Theme.spacingMd
+            anchors.verticalCenter: parent.verticalCenter
+            focusPolicy: Qt.NoFocus
+            glyph: Theme.icons.x
+            tooltip: qsTr("Cancel")
+            onClicked: preview.textEditor.cancel()
+        }
+
+        ThemedButton {
+            anchors.left: cancelEditButton.right
+            anchors.leftMargin: Theme.spacingMd
+            anchors.verticalCenter: parent.verticalCenter
+            focusPolicy: Qt.NoFocus
+            text: qsTr("Select all")
+            onClicked: preview.textEditor.selectAll()
+        }
+
+        ThemedButton {
+            anchors.right: parent.right
+            anchors.rightMargin: Theme.spacingMd
+            anchors.verticalCenter: parent.verticalCenter
+            focusPolicy: Qt.NoFocus
+            variant: "primary"
+            glyph: Theme.icons.check
+            text: qsTr("Done")
+            onClicked: preview.textEditor.commit()
+        }
+    }
+
     ExportDialog {
         id: exportDialog
     }
@@ -627,10 +699,10 @@ Item {
 
     Connections {
         target: EditorState
-        // A text clip added with no text is typed straight into the composer; the assets sheet
+        // A text clip added with no text is typed straight onto the preview; the assets sheet
         // it was added from is put away first.
         function onInlineTextEditRequested(trackIndex, clipIndex) {
-            root.openTextComposer(trackIndex, clipIndex, true)
+            root.startInlineTextEdit(trackIndex, clipIndex, true)
         }
         function onExportInProgressChanged() {
             if (EditorState.exportInProgress) {

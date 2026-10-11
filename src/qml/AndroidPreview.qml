@@ -18,6 +18,9 @@ Item {
 
     property bool optionsOpen: false
 
+    // Typing on the clip itself: the compositor draws the text and caret, a hidden field takes input.
+    readonly property alias textEditor: viewport.textEditor
+
     // PointerHandlers (clip DragHandler, view pinch) hit-test their parent's
     // bounds, not z-order. A sheet in Overlay is visually on top of this preview
     // but is not an ancestor of those handlers, so a press on a sheet button that
@@ -462,7 +465,9 @@ Item {
 
     Component {
         id: transformTool
-        AndroidTransformOverlay { }
+        AndroidTransformOverlay {
+            onTextEditRequested: (track, clip) => viewport.textEditor.start(track, clip, false)
+        }
     }
 
     Component {

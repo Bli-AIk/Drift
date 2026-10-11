@@ -792,14 +792,7 @@ public:
     Q_INVOKABLE void setClipTextContent(int trackIndex, int clipIndex, const QString &text);
     // Display label on the timeline / inspector. Does not rename the source file.
     Q_INVOKABLE void setClipName(int trackIndex, int clipIndex, const QString &name);
-    // Live text edits (preview drag) keep the canvas and properties panel in sync
-    // while typing; commitTextEdit trims and pushes undo.
-    Q_INVOKABLE void previewSetClipTextContent(int trackIndex, int clipIndex, const QString &text);
     Q_INVOKABLE void commitTextEdit(int trackIndex, int clipIndex, const QString &text);
-    // In-place text editing on the preview: hide the clip's baked raster while the
-    // QML inline editor is shown, then restore it. Commit via commitTextEdit.
-    Q_INVOKABLE void beginTextEdit(int trackIndex, int clipIndex);
-    Q_INVOKABLE void endTextEdit();
     bool inlineTextEditing() const { return m_inlineTextEditing; }
 
     // In-place editing where the compositor's render is the only visible text. A hidden QML
@@ -2057,7 +2050,6 @@ protected:
     void emitPreviewFrame();
     void emitPreviewEdit(int trackIndex, int clipIndex, const QStringList &keys);
     void beginImplicitPreviewDrag(const QString &undoText);
-    void syncTextOverlaySkip();
     struct ClipboardItem
     {
         drift::Clip clip;

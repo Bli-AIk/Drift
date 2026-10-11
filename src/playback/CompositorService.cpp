@@ -249,7 +249,6 @@ bool CompositorService::isRedundantRequest(drift::TimeUs time,
            && options.previewScale == last.previewScale
            && options.maxTimeEchoHistoryFrames == last.maxTimeEchoHistoryFrames
            && options.readAheadUs == last.readAheadUs
-           && options.skipClipId == last.skipClipId
            && options.textEdit == last.textEdit
            && options.allowProxies == last.allowProxies
            && options.editor.active == last.editor.active

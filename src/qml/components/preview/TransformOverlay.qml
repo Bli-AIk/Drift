@@ -5,8 +5,7 @@ import Drift
 import ".."
 
 // Transform overlay: resize/rotate grips for the clips visible at the playhead.
-// (The in-place text editor is still wired up but no longer reachable: the
-// properties panel owns text editing until the editor matches the render.) Sits outside the (clipped) canvas rect,
+// Sits outside the (clipped) canvas rect,
 // mirroring its geometry, so grips on a clip that runs past a canvas edge stay
 // drawn and grabbable instead of being cut away with the frame. Geometry
 // and visibility are driven by PreviewToolHost.
@@ -17,9 +16,10 @@ Item {
     // True while a handle is being dragged. Rebuilding the model
     // mid-drag would destroy the delegate that owns the active
     // grab, so refreshes are suppressed until the drag ends.
-    // (Also held true while a text clip is edited in place, so
-    // the inline editor delegate is not destroyed mid-edit.)
     property bool interacting: false
+
+    // A text clip was double-clicked: the panel opens its inline editor.
+    signal textEditRequested(int track, int clip)
 
     // In 3D mode the scene camera, as a gizmo box at its eye (see previewCameraBox).
     property var cameraBox: null
@@ -70,14 +70,6 @@ Item {
         }
         return null
     }
-
-    // "track:clip" of the text clip currently edited in place,
-    // or "" when no inline edit is active.
-    property string editingKey: ""
-
-    // "track:clip" of a freshly added placeholder text clip that
-    // should open its editor as soon as its box exists.
-    property string pendingEditKey: ""
 
     // True when two overlay models describe the same boxes. Text/name
     // updates still reach delegates via liveStyle, so rebuilding
@@ -274,81 +266,6 @@ Item {
             // A camera reframes every box, flat ones included, so the outline and grips have to go
             // through the pose matrix rather than straight onto the canvas.
             readonly property bool viaCamera: box.cameraActive === true
-            readonly property bool editing: root.editingKey
-                                                    === (box.track + ":" + box.clip)
-            // True when this clip was just added with no text and should
-            // open with an empty editor instead of the placeholder string.
-            property bool openAsPlaceholder: false
-            // Live clip style — tracks EditorState so property-panel edits
-            // apply to the inline editor in real time.
-            readonly property var liveStyle: {
-                void EditorState.tracksRevision
-                const info = EditorState.clipAt(box.track, box.clip)
-                return info && info.textStyle ? info.textStyle : null
-            }
-            readonly property var liveClip: {
-                void EditorState.tracksRevision
-                return EditorState.clipAt(box.track, box.clip)
-            }
-
-            function enterEdit() {
-                root.editingKey = box.track + ":" + box.clip
-                root.interacting = true
-                EditorState.selectClip(box.track, box.clip)
-                EditorState.beginTextEdit(box.track, box.clip)
-                const info = EditorState.clipAt(box.track, box.clip)
-                if (handle.openAsPlaceholder) {
-                    editor.text = ""
-                    EditorState.previewSetClipTextContent(box.track, box.clip, "")
-                    handle.openAsPlaceholder = false
-                } else {
-                    editor.text = info.textContent || ""
-                }
-                editor.forceActiveFocus()
-                editor.selectAll()
-            }
-
-            function commitEdit() {
-                if (!handle.editing)
-                    return
-                EditorState.commitTextEdit(box.track, box.clip, editor.text)
-                handle.finishEdit()
-            }
-
-            function cancelEdit() {
-                if (!handle.editing)
-                    return
-                EditorState.cancelPreviewDrag()
-                handle.finishEdit()
-            }
-
-            function finishEdit() {
-                root.editingKey = ""
-                EditorState.endTextEdit()
-                root.interacting = false
-                Qt.callLater(root.refreshOverlay)
-            }
-
-            // A just-added placeholder clip opens its own editor.
-            // Checked both on creation and when the key arrives,
-            // since either can happen first.
-            function claimPendingEdit() {
-                if (!handle.isText || handle.editing)
-                    return
-                if (root.pendingEditKey
-                        !== (box.track + ":" + box.clip))
-                    return
-                root.pendingEditKey = ""
-                handle.openAsPlaceholder = true
-                Qt.callLater(handle.enterEdit)
-            }
-
-            Component.onCompleted: handle.claimPendingEdit()
-
-            Connections {
-                target: root
-                function onPendingEditKeyChanged() { handle.claimPendingEdit() }
-            }
 
             readonly property real canvasW: Math.max(1, box.canvasWidth)
             readonly property real canvasH: Math.max(1, box.canvasHeight)
@@ -378,10 +295,8 @@ Item {
             // wins click hit-testing over boxes behind it. The clip
             // selected on the timeline is raised above all of them, so a
             // box that lies under a full-frame clip on an upper track is
-            // still the one the pointer reaches. The clip being edited
-            // jumps above everything so its editor and the click-away
-            // catcher order correctly.
-            z: handle.editing ? 1000 : handle.selected ? 900 : -box.track
+            // still the one the pointer reaches.
+            z: handle.selected ? 900 : -box.track
             transformOrigin: Item.Center
             readonly property real layoutRotation: gizmoPose ? gizmoPose.rotation
                                                    : liveRotation < 1e8 ? liveRotation : box.rotation
@@ -457,7 +372,7 @@ Item {
             // tracksChanged refresh would steal focus from property-panel fields.
             // Focus is taken explicitly when the user clicks or drags the box.
             Keys.onPressed: function(event) {
-                if (!handle.selected || handle.editing || root.mode3d)
+                if (!handle.selected || root.mode3d)
                     return
                 const step = (event.modifiers & Qt.ShiftModifier) ? 10 : 1
                 let dx = 0
@@ -479,24 +394,10 @@ Item {
                 event.accepted = true
             }
 
-            Connections {
-                target: EditorState
-                function onSelectedClipDataChanged() {
-                    if (!handle.editing || editor.activeFocus)
-                        return
-                    const info = EditorState.clipAt(box.track, box.clip)
-                    if (!info)
-                        return
-                    const next = info.textContent || ""
-                    if (editor.text !== next)
-                        editor.text = next
-                }
-            }
-
             Rectangle {
                 anchors.fill: parent
                 color: "transparent"
-                border.width: (handle.selected || handle.editing)
+                border.width: handle.selected
                               ? Theme.borderWidthFocus : Theme.borderWidth
                 border.color: handle.selected ? (handle.isTransform ? Theme.clipTransform : Theme.primary)
                               : handle.coveredBySelectedLayer ? Theme.clipTransform
@@ -511,57 +412,11 @@ Item {
                 }
             }
 
-            // In-place text editor (Canva-style). Shown over the
-            // box while editing; the baked raster is hidden by the
-            // compositor via beginTextEdit. Plain TextArea (not a
-            // Themed* control): this is canvas content that must
-            // match the rendered text, not app chrome.
-            TextArea {
-                id: editor
-                anchors.fill: parent
-                visible: handle.editing
-                enabled: handle.editing
-                background: null
-                renderType: TextEdit.NativeRendering
-                padding: handle.liveStyle && handle.liveStyle.boxEnabled
-                          ? Math.max(0, handle.liveStyle.boxPadding * handle.sy) : 0
-                selectByMouse: true
-                color: handle.liveStyle ? handle.liveStyle.color : "white"
-                font.family: handle.liveStyle ? handle.liveStyle.fontFamily : Theme.fontFamily
-                font.pixelSize: handle.liveStyle
-                                ? Math.max(1, Math.round(handle.liveStyle.pixelSize * handle.sy))
-                                : 16
-                font.weight: handle.liveStyle ? handle.liveStyle.fontWeight : Font.Normal
-                font.italic: handle.liveStyle ? handle.liveStyle.italic : false
-                font.letterSpacing: handle.liveStyle ? handle.liveStyle.letterSpacing * handle.sy : 0
-                wrapMode: (handle.liveStyle && handle.liveStyle.wordWrap === false)
-                          ? TextEdit.NoWrap : TextEdit.WordWrap
-                horizontalAlignment: !handle.liveStyle ? TextEdit.AlignHCenter
-                                     : handle.liveStyle.align === "left" ? TextEdit.AlignLeft
-                                     : handle.liveStyle.align === "right" ? TextEdit.AlignRight
-                                     : TextEdit.AlignHCenter
-                verticalAlignment: !handle.liveStyle ? TextEdit.AlignVCenter
-                                   : handle.liveStyle.valign === "top" ? TextEdit.AlignTop
-                                   : handle.liveStyle.valign === "bottom" ? TextEdit.AlignBottom
-                                   : TextEdit.AlignVCenter
-                onTextChanged: {
-                    if (!handle.editing)
-                        return
-                    EditorState.previewSetClipTextContent(
-                        handle.box.track,
-                        handle.box.clip,
-                        text)
-                }
-                Keys.onEscapePressed: handle.cancelEdit()
-                onActiveFocusChanged: if (!activeFocus && handle.editing) handle.commitEdit()
-            }
-
             HoverHandler {
                 id: hover
             }
 
             TapHandler {
-                enabled: !handle.editing
                 onTapped: (eventPoint) => {
                     // Tapping inside a selected layer's frame picks the clip under the pointer,
                     // so the group's children stay one tap away.
@@ -576,6 +431,8 @@ Item {
                     }
                     EditorState.selectClip(handle.box.track, handle.box.clip)
                     handle.forceActiveFocus()
+                    if (tapCount === 2 && handle.isText && !root.mode3d)
+                        root.textEditRequested(handle.box.track, handle.box.clip)
                 }
             }
 
@@ -609,7 +466,7 @@ Item {
                 // Off while a grip is held too: a handler on the parent item can
                 // otherwise take the grab from the grip once the drag threshold
                 // is passed, turning a resize into a move.
-                enabled: handle.selected && !handle.editing && !handle.resizing && !root.mode3d
+                enabled: handle.selected && !handle.resizing && !root.mode3d
                 cursorShape: Qt.SizeAllCursor
 
                 // Press point in canvas px. The box rides the cursor as it moves, so the
@@ -680,7 +537,7 @@ Item {
             // (-1 = left/top, +1 = right/bottom, 0 = stays put). The opposite
             // edge or corner is the anchor and does not move.
             Repeater {
-                model: (handle.selected && !handle.editing && !root.mode3d)
+                model: (handle.selected && !root.mode3d)
                        ? [
                            { dx: -1, dy:  0, cursor: Qt.SizeHorCursor },
                            { dx:  1, dy:  0, cursor: Qt.SizeHorCursor },
@@ -955,7 +812,7 @@ Item {
 
             // Rotation handle above the box (a 3D layer turns with the gizmo's rings instead)
             Item {
-                visible: handle.selected && !handle.editing && !root.mode3d
+                visible: handle.selected && !root.mode3d
                 width: 14
                 height: 14
                 x: handle.width / 2 - width / 2
@@ -1150,19 +1007,5 @@ Item {
         height: 1
         color: Theme.primary
         z: 400
-    }
-
-    // Click-away catcher: while a text clip is edited in place,
-    // a press outside the (raised) editor box drops focus, which
-    // commits the edit via the editor's onActiveFocusChanged.
-    MouseArea {
-        anchors.fill: parent
-        z: 500
-        visible: root.editingKey !== ""
-        enabled: visible
-        onPressed: (mouse) => {
-            root.forceActiveFocus()
-            mouse.accepted = true
-        }
     }
 }

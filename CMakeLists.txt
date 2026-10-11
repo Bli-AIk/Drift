@@ -1199,6 +1199,7 @@ qt_add_qml_module(drift
         src/qml/components/preview/PreviewViewport.qml
         src/qml/components/preview/PreviewStatusLayer.qml
         src/qml/components/preview/PreviewToolHost.qml
+        src/qml/components/preview/InlineTextEditor.qml
         src/qml/components/preview/PreviewOsd.qml
         src/qml/components/preview/PreviewModeSwitch.qml
         src/qml/components/preview/Preview3DTools.qml

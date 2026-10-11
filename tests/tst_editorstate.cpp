@@ -5592,9 +5592,6 @@ void EditorStateTest::compositorRequestDedupKeepsEveryOption()
     QVERIFY(!CompositorService::isRedundantRequest(1000, exact, 1000, approx));
     QVERIFY(CompositorService::isRedundantRequest(1000, approx, 1000, exact));
 
-    FrameCompositor::RenderOptions skipping = exact;
-    skipping.skipClipId = QStringLiteral("text-clip");
-    QVERIFY(!CompositorService::isRedundantRequest(1000, skipping, 1000, exact));
     FrameCompositor::RenderOptions noProxies = exact;
     noProxies.allowProxies = false;
     QVERIFY(!CompositorService::isRedundantRequest(1000, noProxies, 1000, exact));

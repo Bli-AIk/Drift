@@ -983,11 +983,6 @@ FrameCompositor::RenderOptions PlaybackEngine::playbackRenderOptions() const
     // editing is thrown away by the next edit.
     options.readAheadUs = m_playing ? kReadAheadUs : 0;
 
-    // Hide the text clip being edited in place so the QML inline editor stands in
-    // for it. Never applies while playing (no inline edit during playback).
-    if (!m_playing)
-        options.skipClipId = m_editingClipId;
-
     // Never while playing: the editor is a paused-preview tool, and the rest pose would be wrong.
     if (!m_playing)
         options.textEdit = m_textEditDecor;
@@ -1020,15 +1015,6 @@ void PlaybackEngine::setEditorView(const FrameCompositor::RenderOptions::EditorV
         && m_editorView.navigating == view.navigating)
         return;
     m_editorView = view;
-    if (!m_playing)
-        refreshFrame();
-}
-
-void PlaybackEngine::setEditingClipId(const QString &id)
-{
-    if (m_editingClipId == id)
-        return;
-    m_editingClipId = id;
     if (!m_playing)
         refreshFrame();
 }

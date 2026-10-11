@@ -3,19 +3,18 @@ import QtQuick.Controls.Basic
 import Drift
 import "components"
 
-// The phone's text entry: a bar pinned directly above the soft keyboard, used for a text clip's
-// content and for one subtitle cue at a time. It is an Item rather than a Popup so the preview
+// The phone's subtitle entry: a bar pinned directly above the soft keyboard, used for one
+// subtitle cue at a time. It is an Item rather than a Popup so the preview
 // above it stays visible and live — AndroidEditor reads `coveredHeight` to keep the frame out
 // from under it. The page anchors it; it only has to size itself.
 //
 // Whatever is typed is committed when the composer closes, when the selection moves to another
-// clip, and when stepping between cues: losing typed text is worse than an undo step.
+// clip, and when stepping between cues: losing typed text is worse than an undo step. Text clips
+// are edited on the preview itself (InlineTextEditor).
 Item {
     id: root
 
     property bool active: false
-    // "text" | "cue"
-    property string mode: ""
     property int trackIndex: -1
     property int clipIndex: -1
     property string clipId: ""
@@ -30,15 +29,15 @@ Item {
 
     readonly property var cue: {
         void EditorState.tracksRevision
-        return (root.active && root.mode === "cue") ? root.cueAt(root.cueIndex) : null
+        return root.active ? root.cueAt(root.cueIndex) : null
     }
     readonly property int cueCount: {
         void EditorState.tracksRevision
-        return (root.active && root.mode === "cue") ? root.cuesOf().length : 0
+        return root.active ? root.cuesOf().length : 0
     }
     readonly property double localPlayhead: {
         void EditorState.inspectorPlayheadSeconds
-        return (root.active && root.mode === "cue")
+        return root.active
             ? EditorState.subtitleLocalPlayheadSeconds(root.trackIndex, root.clipIndex) : -1
     }
 
@@ -80,26 +79,6 @@ Item {
         })
     }
 
-    // `selectAllText` is for a clip that was just added: its placeholder is replaced by the first
-    // keystroke, as it was in the content field of the Text tab.
-    function openForText(track, clip, selectAllText) {
-        const data = EditorState.clipAt(track, clip)
-        if (!data || data.kind !== "text")
-            return
-        root.commit()
-        root.mode = "text"
-        root.trackIndex = track
-        root.clipIndex = clip
-        root.clipId = data.id
-        root.cueIndex = -1
-        field.text = data.textContent || ""
-        root.begin()
-        if (selectAllText)
-            Qt.callLater(field.selectAll)
-        else
-            Qt.callLater(function () { field.cursorPosition = field.length })
-    }
-
     // The cue is one of the selected subtitle clip's.
     function openForCue(index) {
         const track = EditorState.selectedTrack
@@ -108,7 +87,6 @@ Item {
         if (!data || data.kind !== "subtitle")
             return
         root.commit()
-        root.mode = "cue"
         root.trackIndex = track
         root.clipIndex = clip
         root.clipId = data.id
@@ -137,15 +115,9 @@ Item {
     function commit() {
         if (!root.active)
             return
-        if (root.mode === "text") {
-            const clip = root.targetClip()
-            if (clip && field.text !== (clip.textContent || ""))
-                EditorState.commitTextEdit(root.trackIndex, root.clipIndex, field.text)
-        } else if (root.mode === "cue") {
-            const c = root.cueAt(root.cueIndex)
-            if (c && field.text !== (c.text || ""))
-                root.patchCue({ text: field.text })
-        }
+        const c = root.cueAt(root.cueIndex)
+        if (c && field.text !== (c.text || ""))
+            root.patchCue({ text: field.text })
     }
 
     function close() {
@@ -201,7 +173,7 @@ Item {
         }
         function onSelectedSubtitleCueChanged() {
             const i = EditorState.selectedSubtitleCue
-            if (root.active && root.mode === "cue" && i >= 0 && i !== root.cueIndex) {
+            if (root.active && i >= 0 && i !== root.cueIndex) {
                 root.commit()
                 root.cueIndex = i
                 field.text = (root.cueAt(i) || {}).text || ""
@@ -245,7 +217,6 @@ Item {
 
             Row {
                 id: navRow
-                visible: root.mode === "cue"
                 spacing: Theme.spacingSm
 
                 IconButton {
@@ -264,14 +235,12 @@ Item {
             }
 
             Text {
-                anchors.left: navRow.visible ? navRow.right : parent.left
+                anchors.left: navRow.right
                 anchors.leftMargin: Theme.spacingSm
                 anchors.right: doneButton.left
                 anchors.rightMargin: Theme.spacingSm
                 anchors.verticalCenter: parent.verticalCenter
-                text: root.mode === "cue"
-                      ? qsTr("Caption %1 / %2").arg(root.cueIndex + 1).arg(root.cueCount)
-                      : qsTr("Edit text")
+                text: qsTr("Caption %1 / %2").arg(root.cueIndex + 1).arg(root.cueCount)
                 color: Theme.mutedForeground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
@@ -304,7 +273,7 @@ Item {
                 id: field
                 width: fieldFlick.width
                 height: Math.max(implicitHeight, fieldFlick.contentHeight)
-                placeholderText: root.mode === "cue" ? qsTr("Type subtitle…") : qsTr("Type your text…")
+                placeholderText: qsTr("Type subtitle…")
                 inputMethodHints: Qt.ImhNone
                 onCursorRectangleChanged: {
                     const r = cursorRectangle
@@ -318,7 +287,6 @@ Item {
 
         Row {
             id: timing
-            visible: root.mode === "cue"
             width: parent.width
 
             Repeater {
