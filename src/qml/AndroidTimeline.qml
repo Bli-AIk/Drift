@@ -54,6 +54,7 @@ Item {
 
     signal openMediaRequested()
     signal openPropertiesRequested()
+    signal subtitleCueTapped(int index)
 
     function openClipProperties() {
         openPropertiesRequested()
@@ -1137,6 +1138,7 @@ Item {
             labelsWidth: root.labelsWidth
             contentX: flick.contentX
             contentWidth: flick.contentWidth
+            onCueTapped: index => root.subtitleCueTapped(index)
         }
 
         // Not a Row: a Row positioner assigns x to every child, which silently

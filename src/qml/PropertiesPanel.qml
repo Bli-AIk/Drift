@@ -17,6 +17,8 @@ PanelFrame {
     // Raised by the Effects / Audio empty states; Main wires them to the
     // assets panel so the browse CTAs actually take the user somewhere.
     signal browseEffectsRequested()
+    // Sheet mode only: a subtitle row was tapped and its text is edited in the keyboard composer.
+    signal cueEditRequested(int index)
 
     // -1 while the prompt is saving the whole stack; otherwise the one effect it was raised on.
     property int savePresetEffectIndex: -1
@@ -861,6 +863,8 @@ PanelFrame {
                 SubtitleEditor {
                     clip: root.hasSelection ? root.clipData : null
                     formatSeconds: root.formatSeconds
+                    compactEdit: root.sheetMode
+                    onCueEditRequested: index => root.cueEditRequested(index)
                 }
             }
         }

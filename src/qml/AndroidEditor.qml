@@ -17,7 +17,8 @@ Item {
     // The canvas sheet is hosted by the window, the properties sheet by this page.
     readonly property real nonBlockingSheetHeight: Math.max(
         (propertiesSheet.opened && !propertiesSheet.blocking) ? propertiesSheet.panelHeight : 0,
-        Window.window.nonBlockingSheetHeight)
+        Window.window.nonBlockingSheetHeight,
+        composer.coveredHeight)
 
     // Fullscreen preview: the timeline pane, top bar and rail step aside and
     // AndroidPreview takes the page. Readable from outside so AndroidMain's Back
@@ -31,6 +32,7 @@ Item {
     readonly property var projectFilter: [qsTr("Drift project (*.drift)")]
 
     function openAssetsTab(tabId) {
+        composer.close()
         sheetKind = "assets"
         rail.activeId = tabId
         assetsPanel.showTab(tabId)
@@ -45,6 +47,7 @@ Item {
     // the way to one of them, and stacking it over an open Media sheet would leave
     // two sheets to dismiss to get back to the timeline.
     function openAddMenu() {
+        composer.close()
         sheetKind = ""
         rail.activeId = ""
         if (assetsSheet.opened)
@@ -56,6 +59,7 @@ Item {
     }
 
     function openPropertiesSheet() {
+        composer.close()
         sheetKind = "properties"
         rail.activeId = "edit"
         if (!propertiesSheet.opened)
@@ -67,6 +71,7 @@ Item {
     // The toolbar's fourth slot. Clears the browsers first: the sheet is a peer of them,
     // not something to stack on top.
     function openMoreTools() {
+        composer.close()
         if (assetsSheet.opened)
             assetsSheet.dismiss()
         if (propertiesSheet.opened)
@@ -78,6 +83,7 @@ Item {
     }
 
     function openFadeSheet() {
+        composer.close()
         if (assetsSheet.opened)
             assetsSheet.dismiss()
         if (propertiesSheet.opened)
@@ -86,6 +92,18 @@ Item {
             moreToolsSheet.dismiss()
         if (!fadeSheet.opened)
             fadeSheet.open()
+    }
+
+    // Typing on a phone happens in the composer above the keyboard, not in a sheet: the sheets
+    // are put away so they do not sit under it, and the preview stays up to show the result.
+    function openTextComposer(track, clip, selectAllText) {
+        root.closeSheets()
+        composer.openForText(track, clip, selectAllText)
+    }
+
+    function openCueComposer(index) {
+        root.closeSheets()
+        composer.openForCue(index)
     }
 
     // A shared link, routed here by AndroidMain once the editor exists.
@@ -121,6 +139,10 @@ Item {
         }
         if (packageProgressDialog.visible)
             return true // a package render is running; swallow rather than abandon it
+        if (composer.active) {
+            composer.close()
+            return true
+        }
         if (linkImportSheet.opened) {
             linkImportSheet.dismiss()
             return true
@@ -413,6 +435,8 @@ Item {
                     panel: timeline
                     onMoreRequested: root.openMoreTools()
                     onFadeRequested: root.openFadeSheet()
+                    onEditTextRequested: root.openTextComposer(EditorState.selectedTrack,
+                                                               EditorState.selectedClip, false)
                 }
 
                 Item {
@@ -427,6 +451,7 @@ Item {
                         anchors.fill: parent
                         onOpenMediaRequested: root.openAssetsTab("media")
                         onOpenPropertiesRequested: root.openPropertiesSheet()
+                        onSubtitleCueTapped: index => root.openCueComposer(index)
                     }
 
                     Rectangle {
@@ -568,7 +593,19 @@ Item {
             sheetMode: true
             onBrowseEffectsRequested: root.openAssetsTab("effects")
             onBrowseAudioEffectsRequested: root.openAssetsTab("sounds")
+            onCueEditRequested: index => root.openCueComposer(index)
         }
+    }
+
+    AndroidTextComposer {
+        id: composer
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: root.SafeArea.margins.left
+        anchors.rightMargin: root.SafeArea.margins.right
+        anchors.bottomMargin: Math.max(root.SafeArea.margins.bottom, Theme.keyboardInset)
+        z: 10
     }
 
     ExportDialog {
@@ -587,10 +624,10 @@ Item {
 
     Connections {
         target: EditorState
-        // A text clip added with no text is edited in the properties sheet, which the assets
-        // sheet it was added from is covering.
-        function onInlineTextEditRequested() {
-            root.openPropertiesSheet()
+        // A text clip added with no text is typed straight into the composer; the assets sheet
+        // it was added from is put away first.
+        function onInlineTextEditRequested(trackIndex, clipIndex) {
+            root.openTextComposer(trackIndex, clipIndex, true)
         }
         function onExportInProgressChanged() {
             if (EditorState.exportInProgress) {

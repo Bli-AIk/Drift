@@ -15,6 +15,11 @@ Item {
     property int trackIndex: EditorState.selectedTrack
     property int clipIndex: EditorState.selectedClip
 
+    // The phone's properties sheet: a cue is edited in the keyboard composer instead of the
+    // panel below the list, so a tap on a row asks the editor page to open it.
+    property bool compactEdit: false
+    signal cueEditRequested(int index)
+
     readonly property double defaultCueDuration: 3.0
 
     // The cue being edited, shared with the timeline cue lane. Follows the active cue
@@ -300,7 +305,9 @@ Item {
         Text {
             width: parent.width
             wrapMode: Text.WordWrap
-            text: qsTr("Play the timeline — the line on screen lights up. Click any line to jump to it and edit it below.")
+            text: root.compactEdit
+                  ? qsTr("Play the timeline — the line on screen lights up. Tap any line to edit it.")
+                  : qsTr("Play the timeline — the line on screen lights up. Click any line to jump to it and edit it below.")
             color: Theme.mutedForeground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
@@ -408,7 +415,11 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: root.selectCue(cueDelegate.index)
+                    onClicked: {
+                        root.selectCue(cueDelegate.index)
+                        if (root.compactEdit)
+                            root.cueEditRequested(cueDelegate.index)
+                    }
                 }
 
                 Column {
@@ -456,7 +467,8 @@ Item {
                     variant: "ghost"
                     iconSize: Theme.iconSizeSm
                     tooltip: qsTr("Delete this subtitle")
-                    opacity: (rowHover.containsMouse || cueDelegate.isSelected || visualFocus) ? 1 : 0
+                    opacity: (rowHover.containsMouse || cueDelegate.isSelected || visualFocus
+                              || Theme.touchInput) ? 1 : 0
                     enabled: opacity > 0
                     onClicked: root.removeCue(cueDelegate.index)
 
@@ -555,7 +567,7 @@ Item {
                 Column {
                     width: parent.width
                     spacing: 8
-                    visible: root.selectedCue !== null
+                    visible: root.selectedCue !== null && !root.compactEdit
 
                     Row {
                         width: parent.width

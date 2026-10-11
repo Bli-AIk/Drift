@@ -20,6 +20,10 @@ Item {
 
     readonly property real minCueDur: 0.1
 
+    // A tap on a cue block, after it has been selected. The phone editor opens its text
+    // composer from it.
+    signal cueTapped(int index)
+
     readonly property var clip: {
         void EditorState.selectedClipData
         return EditorState.selectedClipData
@@ -312,6 +316,14 @@ Item {
                         readonly property bool isSelected: index === EditorState.selectedSubtitleCue
                         readonly property bool isActive: index === root.activeCueIndex
                         readonly property real gripW: Math.min(8, Math.max(3, width / 4))
+                        // A finger cannot land on an 8px grip, so touch gets a 24px hit area centred
+                        // on the edge. Below three of them the cue has no body left to drag, so the
+                        // edges take the outer thirds, inside the block, and the middle stays the body.
+                        readonly property bool narrowTouch: Theme.touchInput && width < 72
+                        readonly property real edgeHitW: !Theme.touchInput ? gripW
+                                                         : (narrowTouch ? width / 3 : 24)
+                        readonly property real bodyInset: !Theme.touchInput ? gripW
+                                                          : (narrowTouch ? width / 3 : 12)
 
                         property bool dragging: false
                         property real dragX: 0
@@ -365,12 +377,15 @@ Item {
                         // Body: click to select, drag to move (keeps duration).
                         Item {
                             anchors.fill: parent
-                            anchors.leftMargin: block.gripW
-                            anchors.rightMargin: block.gripW
+                            anchors.leftMargin: block.bodyInset
+                            anchors.rightMargin: block.bodyInset
 
                             HoverHandler { cursorShape: Qt.OpenHandCursor }
                             TapHandler {
-                                onTapped: EditorState.selectedSubtitleCue = block.index
+                                onTapped: {
+                                    EditorState.selectedSubtitleCue = block.index
+                                    root.cueTapped(block.index)
+                                }
                             }
                             DragHandler {
                                 target: null
@@ -404,6 +419,11 @@ Item {
                             height: parent.height
                             color: block.isSelected ? Theme.primary : "transparent"
                             opacity: 0.6
+                        }
+                        Item {
+                            x: (Theme.touchInput && !block.narrowTouch) ? -block.edgeHitW / 2 : 0
+                            width: block.edgeHitW
+                            height: parent.height
                             HoverHandler { cursorShape: Qt.SizeHorCursor }
                             DragHandler {
                                 target: null
@@ -434,6 +454,12 @@ Item {
                             height: parent.height
                             color: block.isSelected ? Theme.primary : "transparent"
                             opacity: 0.6
+                        }
+                        Item {
+                            x: parent.width - ((Theme.touchInput && !block.narrowTouch)
+                                               ? block.edgeHitW / 2 : block.edgeHitW)
+                            width: block.edgeHitW
+                            height: parent.height
                             HoverHandler { cursorShape: Qt.SizeHorCursor }
                             DragHandler {
                                 target: null

@@ -18,6 +18,7 @@ Item {
 
     signal moreRequested()
     signal fadeRequested()
+    signal editTextRequested()
 
     readonly property bool hasSelection: {
         void EditorState.selectionRevision
@@ -32,6 +33,12 @@ Item {
         void EditorState.selectionRevision
         const data = root.hasSelection ? EditorState.selectedClipData : ({})
         return data.kind === "adjustment" && data.adjustmentKind === "transform"
+    }
+
+    readonly property bool textClipSelected: {
+        void EditorState.selectionRevision
+        const data = root.hasSelection ? EditorState.selectedClipData : ({})
+        return data.kind === "text"
     }
 
     // The strip runs the full width of an edge-to-edge window, so in landscape the system
@@ -65,6 +72,19 @@ Item {
         if (root.hasSelection && root.multiSelection && EditorState.transformTogetherAvailable) {
             return [
                 { id: "transformTogether", label: qsTr("Transform together"), icon: Theme.icons.group },
+                { id: "duplicate", label: qsTr("Duplicate"), icon: Theme.icons.copyPlus },
+                { id: "delete", label: qsTr("Delete"), icon: Theme.icons.trash,
+                  destructive: true, gutter: true },
+                { id: "more", label: qsTr("More"), icon: Theme.icons.ellipsis }
+            ]
+        }
+        // Typing is the edit a text clip wants most, and Speed means nothing to it, so Edit
+        // text takes that slot rather than a seventh one the width cannot spare.
+        if (root.hasSelection && root.textClipSelected) {
+            return [
+                { id: "editText", label: qsTr("Edit text"), icon: Theme.icons.type },
+                { id: "split", label: qsTr("Split"), icon: Theme.icons.scissors },
+                { id: "fade", label: qsTr("Fade"), icon: Theme.icons.blend },
                 { id: "duplicate", label: qsTr("Duplicate"), icon: Theme.icons.copyPlus },
                 { id: "delete", label: qsTr("Delete"), icon: Theme.icons.trash,
                   destructive: true, gutter: true },
@@ -109,6 +129,9 @@ Item {
                 Toasts.info(qsTr("Move the playhead over the clip to split it"))
             break
         }
+        case "editText":
+            root.editTextRequested()
+            break
         case "fade":
             root.fadeRequested()
             break
