@@ -113,6 +113,7 @@
 #include <QAudioDevice>
 #include <QThreadPool>
 #include <QSaveFile>
+#include <QTemporaryDir>
 #include <QTemporaryFile>
 #include <QElapsedTimer>
 #include <QSettings>
@@ -11518,6 +11519,80 @@ QVariantList AppController::fontCatalog() const
         });
     }
     return out;
+}
+
+QStringList AppController::systemFontFamilies() const
+{
+    static QStringList cached;
+    static bool ready = false;
+    if (!ready) {
+        for (const QString &family : ::systemFontFamilies()) {
+            if (!::fontFamilyForName(family))
+                cached.append(family);
+        }
+        ready = true;
+    }
+    return cached;
+}
+
+QStringList AppController::userFonts() const
+{
+    return ::userFontFamilies();
+}
+
+QStringList AppController::importFontFile(const QUrl &fileUrl)
+{
+    QString path;
+    std::unique_ptr<QTemporaryDir> staging;
+#ifdef Q_OS_ANDROID
+    if (AndroidUri::isContentUri(fileUrl)) {
+        std::unique_ptr<QFile> src = AndroidUri::openForRead(fileUrl);
+        staging = std::make_unique<QTemporaryDir>();
+        const QString name = QFileInfo(AndroidUri::displayName(fileUrl)).fileName();
+        QFile dst(staging->filePath(name));
+        if (!src || !staging->isValid() || name.isEmpty() || !dst.open(QIODevice::WriteOnly)
+            || dst.write(src->readAll()) < 0) {
+            setLastMessage(tr("Could not import the font"), QStringLiteral("error"));
+            return {};
+        }
+        dst.close();
+        path = dst.fileName();
+    } else
+#endif
+    {
+        path = fileUrl.isLocalFile() ? fileUrl.toLocalFile() : fileUrl.toString();
+    }
+    if (path.isEmpty())
+        return {};
+
+    QString error;
+    const QStringList families = ::importUserFontFile(path, &error);
+    if (families.isEmpty()) {
+        setLastMessage(error.isEmpty() ? tr("Could not import the font") : error, QStringLiteral("error"));
+        return {};
+    }
+    drift::text::clearLayoutCache();
+#ifdef DRIFT_WITH_SKIA
+    drift::skia::clearTextGeometryCache();
+#endif
+    emitPreviewFrame();
+    emit userFontsChanged();
+    setLastMessage(tr("Added %1").arg(families.join(QStringLiteral(", "))), QStringLiteral("success"));
+    return families;
+}
+
+bool AppController::removeUserFont(const QString &family)
+{
+    if (!::removeUserFont(family))
+        return false;
+    drift::text::clearLayoutCache();
+#ifdef DRIFT_WITH_SKIA
+    drift::skia::clearTextGeometryCache();
+#endif
+    emitPreviewFrame();
+    emit userFontsChanged();
+    setLastMessage(tr("Removed %1").arg(family), QStringLiteral("success"));
+    return true;
 }
 
 void AppController::previewSetTextRect(int trackIndex, int clipIndex, double xPixels, double yPixels,

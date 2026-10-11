@@ -3,11 +3,13 @@
 #include "GpuPackageParse.h"
 #ifdef DRIFT_WITH_SKIA
 #include "SkiaFontCollection.h"
+#include "SkiaFonts.h"
 #endif
 
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QFontDatabase>
 #include <QHash>
 #include <QJsonArray>
@@ -15,6 +17,7 @@
 #include <QJsonObject>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QStandardPaths>
 
 #include <algorithm>
 #include <cstdlib>
@@ -203,6 +206,152 @@ const FontFamilyEntry *fontFamilyForName(const QString &family)
     if (it == g_familyIndex.constEnd())
         return nullptr;
     return &g_catalog.at(it.value());
+}
+
+namespace {
+
+struct UserFont
+{
+    QString path;
+    QStringList families;
+    int qtId = -1;
+};
+
+QList<UserFont> g_userFonts;
+QMutex g_userMutex;
+
+bool isFontFile(const QString &path)
+{
+    static const QStringList suffixes = {QStringLiteral("ttf"), QStringLiteral("otf"), QStringLiteral("ttc"),
+                                         QStringLiteral("otc")};
+    return suffixes.contains(QFileInfo(path).suffix().toLower());
+}
+
+// Registers one stored file with Qt and Skia. Empty families means neither could read it.
+bool registerUserFile(const QString &path, QStringList *families, int *qtId)
+{
+    *qtId = QFontDatabase::addApplicationFont(path);
+    if (*qtId < 0)
+        return false;
+    *families = QFontDatabase::applicationFontFamilies(*qtId);
+#ifdef DRIFT_WITH_SKIA
+    // Skia's own family names are what the layout asks for, and they can differ from Qt's.
+    const QStringList skia = drift::skia::registerFontFaces(drift::skia::FontGroup::User, path);
+    if (skia.isEmpty()) {
+        QFontDatabase::removeApplicationFont(*qtId);
+        return false;
+    }
+    *families = skia;
+#endif
+    return !families->isEmpty();
+}
+
+} // namespace
+
+QString userFontDir()
+{
+    const QString base = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (base.isEmpty())
+        return {};
+    return QDir(base).filePath(QStringLiteral("fonts/user"));
+}
+
+void reloadUserFonts()
+{
+    QMutexLocker lock(&g_userMutex);
+    for (const UserFont &font : g_userFonts) {
+        QFontDatabase::removeApplicationFont(font.qtId);
+#ifdef DRIFT_WITH_SKIA
+        drift::skia::unregisterFontFile(drift::skia::FontGroup::User, font.path);
+#endif
+    }
+    g_userFonts.clear();
+
+    const QDir dir(userFontDir());
+    for (const QString &name : dir.entryList(QDir::Files, QDir::Name)) {
+        const QString path = dir.filePath(name);
+        UserFont font;
+        font.path = path;
+        if (isFontFile(path) && registerUserFile(path, &font.families, &font.qtId))
+            g_userFonts.append(font);
+        else
+            qWarning("FontCatalog: could not load user font %s", qPrintable(path));
+    }
+}
+
+QStringList importUserFontFile(const QString &path, QString *error)
+{
+    auto fail = [&](const QString &message) {
+        if (error)
+            *error = message;
+        return QStringList();
+    };
+
+    if (!isFontFile(path))
+        return fail(QCoreApplication::translate("FontCatalog", "Choose a .ttf, .otf or .ttc font file"));
+    const QString dirPath = userFontDir();
+    if (dirPath.isEmpty() || !QDir().mkpath(dirPath))
+        return fail(QCoreApplication::translate("FontCatalog", "Could not create the fonts folder"));
+
+    const QFileInfo source(path);
+    const QDir dir(dirPath);
+    QString target = dir.filePath(source.fileName());
+    for (int n = 2; QFile::exists(target); ++n)
+        target = dir.filePath(QStringLiteral("%1-%2.%3").arg(source.completeBaseName()).arg(n).arg(source.suffix()));
+    if (!QFile::copy(path, target))
+        return fail(QCoreApplication::translate("FontCatalog", "Could not copy the font file"));
+
+    UserFont font;
+    font.path = target;
+    if (!registerUserFile(target, &font.families, &font.qtId)) {
+        QFile::remove(target);
+        return fail(QCoreApplication::translate("FontCatalog", "That file is not a usable font"));
+    }
+    QMutexLocker lock(&g_userMutex);
+    g_userFonts.append(font);
+    return font.families;
+}
+
+bool removeUserFont(const QString &family)
+{
+    QMutexLocker lock(&g_userMutex);
+    bool removed = false;
+    for (int i = g_userFonts.size() - 1; i >= 0; --i) {
+        const UserFont &font = g_userFonts.at(i);
+        if (!font.families.contains(family))
+            continue;
+        QFontDatabase::removeApplicationFont(font.qtId);
+#ifdef DRIFT_WITH_SKIA
+        drift::skia::unregisterFontFile(drift::skia::FontGroup::User, font.path);
+#endif
+        QFile::remove(font.path);
+        g_userFonts.removeAt(i);
+        removed = true;
+    }
+    return removed;
+}
+
+QStringList systemFontFamilies()
+{
+#ifdef DRIFT_WITH_SKIA
+    return drift::skia::systemFontFamilies();
+#else
+    return QFontDatabase::families();
+#endif
+}
+
+QStringList userFontFamilies()
+{
+    QMutexLocker lock(&g_userMutex);
+    QStringList out;
+    for (const UserFont &font : g_userFonts) {
+        for (const QString &family : font.families) {
+            if (!out.contains(family))
+                out.append(family);
+        }
+    }
+    out.sort(Qt::CaseInsensitive);
+    return out;
 }
 
 QList<QPair<QString, QString>> fontCategories()

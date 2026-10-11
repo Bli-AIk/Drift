@@ -3,6 +3,8 @@
 #include <functional>
 
 #include <QFontDatabase>
+#include <QStandardPaths>
+#include <QTemporaryDir>
 #include <QOpenGLExtraFunctions>
 
 #include "core/Project.h"
@@ -293,6 +295,8 @@ private slots:
     void compositorDrawsShapeThroughSkia();
     void textPainterCacheKeys();
     void keyframedTextGrowsOverTime();
+    void userFontImportResolvesAndRemoves();
+    void systemFontFamiliesAreListed();
     void gradientFillSweepsTheBlock();
     void pathBendArchesTheLine();
     void emojiOutlineDrawsARing();
@@ -1609,6 +1613,65 @@ void SkiaTest::complexScriptsShapeWithoutMissingGlyphs()
               qPrintable(text::firstFontFamily(*laid.paragraph)));
         QVERIFY(!laid.words.first().inkRect.isEmpty());
     }
+}
+
+// An imported font file is matched by family until it is removed again.
+void SkiaTest::userFontImportResolvesAndRemoves()
+{
+    QStandardPaths::setTestModeEnabled(true);
+    QTemporaryDir emptyRoot;
+    QVERIFY(emptyRoot.isValid());
+    reloadFontCatalog({emptyRoot.path()});
+    reloadUserFonts();
+    for (const QString &family : userFontFamilies())
+        removeUserFont(family);
+
+    const QString source = QString::fromUtf8(DRIFT_TEST_FONTS_DIR) + QStringLiteral("/anton/Anton-400.ttf");
+    QTemporaryDir staging;
+    QVERIFY(staging.isValid());
+    const QString copy = staging.filePath(QStringLiteral("picked.ttf"));
+    QVERIFY(QFile::copy(source, copy));
+
+    TextStyle style = layoutTestStyle();
+    style.fontFamily = QStringLiteral("Anton");
+    auto resolved = [&] {
+        const text::TextLayoutResult laid =
+            text::layoutStyledText(QStringLiteral("Hello"), style, 1.0, 600.0, 120.0, -1, text::WordSplit::Whole);
+        return laid.paragraph ? text::firstFontFamily(*laid.paragraph) : QString();
+    };
+    if (resolved() == QLatin1String("Anton"))
+        QSKIP("Anton is installed system-wide");
+
+    QString error;
+    const QStringList families = importUserFontFile(copy, &error);
+    QVERIFY2(!families.isEmpty(), qPrintable(error));
+    QVERIFY(families.contains(QStringLiteral("Anton")));
+    QVERIFY(userFontFamilies().contains(QStringLiteral("Anton")));
+    QCOMPARE(resolved(), QStringLiteral("Anton"));
+
+    QVERIFY(removeUserFont(QStringLiteral("Anton")));
+    QVERIFY(!userFontFamilies().contains(QStringLiteral("Anton")));
+    text::clearLayoutCache();
+    QVERIFY(resolved() != QLatin1String("Anton"));
+
+    const QString notAFont = staging.filePath(QStringLiteral("bad.ttf"));
+    QFile bad(notAFont);
+    QVERIFY(bad.open(QIODevice::WriteOnly));
+    bad.write("not a font");
+    bad.close();
+    QVERIFY(importUserFontFile(notAFont, &error).isEmpty());
+    QVERIFY(!error.isEmpty());
+    QVERIFY(userFontFamilies().isEmpty());
+    QStandardPaths::setTestModeEnabled(false);
+}
+
+void SkiaTest::systemFontFamiliesAreListed()
+{
+#ifdef Q_OS_LINUX
+    QVERIFY(!systemFontFamilies().isEmpty());
+#else
+    QSKIP("system font list is only asserted on Linux");
+#endif
 }
 
 // A character split may not cut a shaping cluster, even where UAX #29 has a boundary.

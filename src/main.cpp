@@ -632,6 +632,7 @@ int main(int argc, char *argv[])
     // Registering the bundled fonts needs a QGuiApplication, and must happen before the compositor
     // thread starts touching QFontDatabase.
     reloadFontCatalog();
+    reloadUserFonts();
     reloadEmojiCatalog();
 
     // Noise-removal A/B snippets are scratch. Anything still here is from a previous session that

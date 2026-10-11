@@ -139,6 +139,7 @@ int runHeadless(int argc, char *argv[])
     // Text and caption clips resolve their faces through these, so they are needed even
     // with nothing on screen.
     reloadFontCatalog();
+    reloadUserFonts();
     reloadEmojiCatalog();
     drift::sweepDenoisePreviews();
     drift::ReverseProxyCache::instance().load();

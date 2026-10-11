@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
+import QtQuick.Layouts
 import QtQuick.Window
 import Drift
 
@@ -24,29 +25,56 @@ Item {
 
     // True while no font addon is installed, which is the state of a fresh install.
     property bool usingSystemFonts: false
+    property string filter: ""
+
+    function addFont() {
+        const url = FileDialogs.openFile(qsTr("Add font"), [qsTr("Fonts (*.ttf *.otf *.ttc *.otc)")])
+        if (url.toString().length === 0)
+            return
+        const families = EditorState.importFontFile(url)
+        if (families.length > 0)
+            root.familyPicked(families[0])
+    }
 
     function rebuild() {
         familyModel.clear()
+        const needle = root.filter
+        const matches = (name) => needle === "" || name.toLowerCase().indexOf(needle) >= 0
+
         const catalog = EditorState.fontCatalog()
+        root.usingSystemFonts = catalog.length === 0
         for (let i = 0; i < catalog.length; ++i) {
+            if (!matches(catalog[i].family))
+                continue
             familyModel.append({
                 "name": catalog[i].family,
                 "previewFamily": catalog[i].qtFamily,
-                "group": catalog[i].categoryLabel
+                "group": catalog[i].categoryLabel,
+                "removable": false
             })
         }
-        root.usingSystemFonts = familyModel.count === 0
-        if (!root.usingSystemFonts)
-            return
 
-        // Fonts are an addon now, so an empty catalog is the normal starting state — fall back to
-        // whatever the system has and offer the pack.
-        const system = Qt.fontFamilies()
-        for (let i = 0; i < system.length; ++i)
-            familyModel.append({ "name": system[i], "previewFamily": system[i], "group": "System fonts" })
+        const user = EditorState.userFonts()
+        for (let i = 0; i < user.length; ++i) {
+            if (matches(user[i]))
+                familyModel.append({ "name": user[i], "previewFamily": user[i], "group": qsTr("My fonts"), "removable": true })
+        }
+
+        // Fonts are an addon, so an empty catalog is the normal starting state; the system list
+        // is always offered and the header suggests the pack.
+        const system = EditorState.systemFontFamilies()
+        for (let i = 0; i < system.length; ++i) {
+            if (matches(system[i]))
+                familyModel.append({ "name": system[i], "previewFamily": system[i], "group": qsTr("System fonts"), "removable": false })
+        }
     }
 
     Component.onCompleted: root.rebuild()
+
+    Connections {
+        target: EditorState
+        function onUserFontsChanged() { root.rebuild() }
+    }
 
     Connections {
         target: Addons
@@ -178,17 +206,27 @@ Item {
         implicitHeight: 320
         padding: 1
 
-        contentItem: ListView {
-            id: list
-            clip: true
-            reuseItems: true
-            model: familyModel
+        onClosed: filterField.text = ""
 
-            header: Rectangle {
-                width: list.width
-                height: root.usingSystemFonts ? 40 : 0
-                visible: root.usingSystemFonts
-                color: Theme.panelSecondaryBg
+        contentItem: ColumnLayout {
+            spacing: 0
+
+            ThemedTextField {
+                id: filterField
+                Layout.fillWidth: true
+                Layout.margins: 4
+                placeholderText: qsTr("Search fonts")
+                font.family: Theme.fontFamily
+                onTextChanged: {
+                    root.filter = text.trim().toLowerCase()
+                    root.rebuild()
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 34
+                color: addMouse.containsMouse ? Theme.panelAccent : "transparent"
 
                 Text {
                     anchors.left: parent.left
@@ -196,9 +234,7 @@ Item {
                     anchors.right: parent.right
                     anchors.rightMargin: 8
                     anchors.verticalCenter: parent.verticalCenter
-                    // The count was baked into the translated string, so it could
-                    // not be updated or pluralised.
-                    text: qsTr("Install the font pack for curated families →")
+                    text: qsTr("Add font file…")
                     color: Theme.primary
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeSm
@@ -206,75 +242,129 @@ Item {
                 }
 
                 MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        popup.close()
-                        root.Window.window.openAddonManager("fonts")
-                    }
-                }
-            }
-            currentIndex: -1
-            ScrollBar.vertical: AppScrollBar {}
-
-            section.property: "group"
-            section.delegate: Rectangle {
-                required property string section
-                width: list.width
-                height: 24
-                color: Theme.panelSecondaryBg
-
-                Text {
-                    anchors.left: parent.left
-                    anchors.leftMargin: 8
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: parent.section
-                    color: Theme.mutedForeground
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeXs
-                }
-            }
-
-            // Roles come in as required properties. Declaring any required property puts the
-            // delegate in required-properties mode, where the `model` context object is not
-            // injected — so every role the delegate reads has to be declared here.
-            delegate: Rectangle {
-                id: row
-                required property string name
-                required property string previewFamily
-
-                width: list.width
-                height: 34
-                color: rowMouse.containsMouse ? Theme.panelAccent
-                                              : (row.name === root.family ? Theme.panelSecondaryBg
-                                                                          : "transparent")
-
-                Behavior on color {
-                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                }
-
-                Text {
-                    anchors.left: parent.left
-                    anchors.leftMargin: 8
-                    anchors.right: parent.right
-                    anchors.rightMargin: 8
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: row.name
-                    font.family: row.previewFamily
-                    font.pixelSize: 18
-                    color: Theme.panelForeground
-                    elide: Text.ElideRight
-                }
-
-                MouseArea {
-                    id: rowMouse
+                    id: addMouse
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        root.forceActiveFocus()
-                        root.familyPicked(row.name)
-                        popup.close()
+                    onClicked: root.addFont()
+                }
+            }
+
+            ListView {
+                id: list
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                reuseItems: true
+                model: familyModel
+
+                header: Rectangle {
+                    width: list.width
+                    height: root.usingSystemFonts ? 40 : 0
+                    visible: root.usingSystemFonts
+                    color: Theme.panelSecondaryBg
+
+                    Text {
+                        anchors.left: parent.left
+                        anchors.leftMargin: 8
+                        anchors.right: parent.right
+                        anchors.rightMargin: 8
+                        anchors.verticalCenter: parent.verticalCenter
+                        // The count was baked into the translated string, so it could
+                        // not be updated or pluralised.
+                        text: qsTr("Install the font pack for curated families →")
+                        color: Theme.primary
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeSm
+                        elide: Text.ElideRight
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            popup.close()
+                            root.Window.window.openAddonManager("fonts")
+                        }
+                    }
+                }
+                currentIndex: -1
+                ScrollBar.vertical: AppScrollBar {}
+
+                section.property: "group"
+                section.delegate: Rectangle {
+                    required property string section
+                    width: list.width
+                    height: 24
+                    color: Theme.panelSecondaryBg
+
+                    Text {
+                        anchors.left: parent.left
+                        anchors.leftMargin: 8
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: parent.section
+                        color: Theme.mutedForeground
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeXs
+                    }
+                }
+
+                // Roles come in as required properties. Declaring any required property puts the
+                // delegate in required-properties mode, where the `model` context object is not
+                // injected — so every role the delegate reads has to be declared here.
+                delegate: Rectangle {
+                    id: row
+                    required property string name
+                    required property string previewFamily
+                    required property bool removable
+
+                    width: list.width
+                    height: 34
+                    color: rowMouse.containsMouse ? Theme.panelAccent
+                                                  : (row.name === root.family ? Theme.panelSecondaryBg
+                                                                              : "transparent")
+
+                    Behavior on color {
+                        ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                    }
+
+                    Text {
+                        anchors.left: parent.left
+                        anchors.leftMargin: 8
+                        anchors.right: removeButton.visible ? removeButton.left : parent.right
+                        anchors.rightMargin: 8
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: row.name
+                        font.family: row.previewFamily
+                        font.pixelSize: 18
+                        color: Theme.panelForeground
+                        elide: Text.ElideRight
+                    }
+
+                    MouseArea {
+                        id: rowMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            root.forceActiveFocus()
+                            root.familyPicked(row.name)
+                            popup.close()
+                        }
+                    }
+
+                    IconButton {
+                        id: removeButton
+                        visible: row.removable
+                        anchors.right: parent.right
+                        anchors.rightMargin: 4
+                        anchors.verticalCenter: parent.verticalCenter
+                        glyph: Theme.icons.x
+                        variant: "ghost"
+                        buttonSize: 24
+                        iconSize: 12
+                        tooltip: qsTr("Remove font")
+                        onClicked: EditorState.removeUserFont(row.name)
                     }
                 }
             }

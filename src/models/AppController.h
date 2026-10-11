@@ -859,6 +859,12 @@ public:
     Q_INVOKABLE bool importUserTextPreset(const QUrl &fileUrl);
     Q_INVOKABLE QVariantList fontCatalog() const;
     Q_INVOKABLE QVariantList fontCategories() const;
+    // Families of the system fonts not already offered by the font catalog; computed once.
+    Q_INVOKABLE QStringList systemFontFamilies() const;
+    Q_INVOKABLE QStringList userFonts() const;
+    // The families the file provides (empty on failure, with a toast).
+    Q_INVOKABLE QStringList importFontFile(const QUrl &fileUrl);
+    Q_INVOKABLE bool removeUserFont(const QString &family);
     Q_INVOKABLE void setClipBlendMode(int trackIndex, int clipIndex, const QString &mode);
     Q_INVOKABLE bool setClipSpeed(int trackIndex, int clipIndex, double speed);
     Q_INVOKABLE void setClipReverse(int trackIndex, int clipIndex, bool reverse);
@@ -1523,6 +1529,7 @@ signals:
     void shortcutsChanged();
     void assetFavoritesChanged();
     void userTextPresetsChanged();
+    void userFontsChanged();
     void userEffectPresetsChanged();
     void facePropsChanged();
     void projectLayoutChosenChanged();

@@ -43,6 +43,22 @@ QList<QPair<QString, QString>> fontCategories(); // id + label, display order
 // main()/tools/tests rather than relying on the lazy path.
 void reloadFontCatalog(const QStringList &packageRoots = {});
 
+// Fonts the user brought in (.ttf/.otf/.ttc/.otc), kept under <AppDataLocation>/fonts/user. They
+// are registered with Qt and with Skia (by family name, so every face of a family is matched on
+// weight and italic) and shadow the system fonts. Call from the GUI thread.
+void reloadUserFonts();
+// Copies `path` into the store and registers it. Returns the families it provides; empty with
+// `error` set when the file is not a usable font.
+QStringList importUserFontFile(const QString &path, QString *error = nullptr);
+// Unregisters the family and deletes the files that provide it.
+bool removeUserFont(const QString &family);
+QStringList userFontFamilies(); // sorted
+QString userFontDir();
+
+// Families the platform font manager enumerates (the Skia manager's list when built with Skia,
+// else Qt's), sorted. Computed once.
+QStringList systemFontFamilies();
+
 // Resolve a style to a concrete face at pixelSizePx. Falls through to the system font database for
 // families that are not in the catalog, so projects written before the bundle still render.
 QFont fontForStyle(const drift::TextStyle &style, int pixelSizePx);

@@ -6,9 +6,10 @@
 #include "modules/skparagraph/include/FontCollection.h"
 #include "modules/skparagraph/include/Paragraph.h"
 
-#include <mutex>
+#include <QString>
+#include <QStringList>
 
-class QString;
+#include <mutex>
 
 // The font bridge between QFontDatabase and SkParagraph. Every font file the app registers with
 // Qt (the bundled catalog, addon fonts, the emoji face) is also registered here under the name
@@ -17,10 +18,15 @@ class QString;
 
 namespace drift::skia {
 
-enum class FontGroup { Catalog, Emoji };
+enum class FontGroup { Catalog, Emoji, User };
 
 // Load `path` and make it resolvable as the family `alias`. Thread-safe.
 void registerFontFile(FontGroup group, const QString &path, const QString &alias);
+// Register every face in `path` (all of a .ttc) under its own family name. Returns the family
+// names, empty when Skia cannot read the file. Thread-safe.
+QStringList registerFontFaces(FontGroup group, const QString &path);
+// Drop the faces one file registered, wherever they were registered from.
+void unregisterFontFile(FontGroup group, const QString &path);
 // Drop everything a group registered (the catalog is rebuilt from scratch on reload).
 void clearRegisteredFonts(FontGroup group);
 // The typeface registered under `alias`, or null.
