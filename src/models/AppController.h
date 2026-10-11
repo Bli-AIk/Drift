@@ -2059,6 +2059,11 @@ protected:
     // Begun by a setter rather than a press (keyboard nudges); commits once the nudges stop.
     bool m_previewDragAuto = false;
     QTimer *m_previewAutoCommit = nullptr;
+    // Set while commitPreviewDrag pushes its undo step and finishes the edit. The push then skips
+    // the undo stack's full refresh, which finishEdit repeats anyway, and finishEdit skips
+    // selectionChanged when the drag left the selection on the same clip.
+    bool m_quietUndoPush = false;
+    bool m_quietSelection = false;
     void emitPreviewFrame();
     void emitPreviewEdit(int trackIndex, int clipIndex, const QStringList &keys);
     void beginImplicitPreviewDrag(const QString &undoText);

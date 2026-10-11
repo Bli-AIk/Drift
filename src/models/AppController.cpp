@@ -120,6 +120,7 @@
 #include <QByteArray>
 #include <QSet>
 #include <QStandardPaths>
+#include <QScopedValueRollback>
 #include <QTimer>
 #include <QUrl>
 #include <QDebug>
@@ -635,6 +636,12 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
     m_mcpController = new McpController(this, this);
     connect(&m_undoStack, &QUndoStack::indexChanged, this, &AppController::undoStackChanged);
     connect(&m_undoStack, &QUndoStack::indexChanged, this, [this] {
+        // commitPreviewDrag's push: finishEdit follows with the refresh, and a drag touches
+        // neither the asset table nor the bin.
+        if (m_quietUndoPush) {
+            m_projectFile->setDirty(true);
+            return;
+        }
         // Undo/redo swaps the whole project, including the asset table the
         // media bin reads through; without this an undone removal leaves the
         // model with a stale row count.
@@ -6197,8 +6204,12 @@ void AppController::finishEdit(const QString &message)
     if (!m_beatAnalysis.isEmpty() && audioLayoutFingerprint() != m_beatAudioFingerprint)
         clearBeatAnalysis();
     notifyTracksChanged();
-    notifySelectionChanged();
-    emit selectedClipDataChanged();
+    if (!m_quietSelection)
+        notifySelectionChanged();
+    // tracksChanged already carries selectedClipDataChanged (see the constructor); only a batch
+    // holding tracksChanged back leaves it unsent.
+    if (m_tracksBatchDepth > 0)
+        emit selectedClipDataChanged();
     // Routine edits used to announce themselves here ("Clip moved", "Split
     // clip", ...), which surfaced as a toast for every drag and cut. The
     // timeline already shows the result and the label lives on in the undo
@@ -10858,8 +10869,21 @@ void AppController::commitPreviewDrag()
     m_previewDragDirty = false;
 
     const QString text = m_previewDragText.isEmpty() ? tr("Edit clip") : m_previewDragText;
-    if (!m_mcpController->undoSuspended())
+    // A drag edits the selected clip in place; when the clip under the selection is the one that
+    // was there at the press, nothing about the selection needs announcing.
+    const auto selectedId = [this](const drift::Project &project) {
+        if (m_selectedTrack < 0 || m_selectedTrack >= project.tracks().size())
+            return QString();
+        const drift::Track &track = project.tracks().at(m_selectedTrack);
+        return m_selectedClip >= 0 && m_selectedClip < track.clips.size() ? track.clips.at(m_selectedClip).id
+                                                                          : QString();
+    };
+    const QString before = selectedId(m_previewDragBefore);
+    const QScopedValueRollback quietSelection(m_quietSelection, !before.isEmpty() && before == selectedId(m_project));
+    if (!m_mcpController->undoSuspended()) {
+        const QScopedValueRollback quietPush(m_quietUndoPush, true);
         m_undoStack.push(new drift::ProjectSnapshotCommand(&m_project, m_previewDragBefore, m_project, text));
+    }
     finishEdit(text);
 }
 
