@@ -167,16 +167,18 @@ public:
     // parameters resolved at the playhead. Empty when there is nothing to show.
     Q_INVOKABLE QVariantMap depthEffectEditorState() const;
 
-    // The selected clip's 3D Relight lights as the 3D view stands them over the clip's relief, in
-    // canvas px: one {effect, light, x, y, z, spot, aimX, aimY, color} per enabled light, z being
-    // the light's own near/far parameter. Empty outside 3D mode or when the clip has no depth to
-    // stand them on.
+    // The selected clip's lights as the 3D view stands them, in canvas px: a model clip's own
+    // lights, or 3D Relight's over a clip's relief. One {effect, light, prefix, x, y, z, zMin, zMax,
+    // spot, aimX, aimY, color} per enabled light: `effect` is the Relight's index on the stack (-1
+    // for a model's lights), `prefix` the keyframe key its parameters sit under ("fx.2.light1_",
+    // "model3d.light1_"), and z the light's own near/far parameter within [zMin, zMax]. Empty
+    // outside 3D mode or when the clip has nothing to light.
     Q_INVOKABLE QVariantList depthLights3d() const;
     // A light dragged to canvas (x, y), kept at the distance from the view it was at, as the
     // light's {x, y, z} parameters. Empty when the light cannot be found.
     Q_INVOKABLE QVariantMap moveDepthLight3d(int effectIndex, int light, double canvasX, double canvasY) const;
-    // Where a spot aimed at canvas (x, y) points: the {aimX, aimY} of the relief under the pointer.
-    // Empty when the pointer is off the clip.
+    // Where a spot aimed at canvas (x, y) points, as its {aimX, aimY}: on the relief under the
+    // pointer, or for a model on the plane through its centre. Empty when the pointer is off it.
     Q_INVOKABLE QVariantMap aimDepthLight3d(int effectIndex, double canvasX, double canvasY) const;
 
     // The viewpoint every preview overlay is drawn through, world -> homogeneous canvas px at
@@ -209,6 +211,9 @@ private:
     // The selected clip's relief in 3D mode, as the compositor lays it out. False when there is none.
     struct SelectedRelief;
     bool selectedRelief(SelectedRelief *out) const;
+    // The selected model clip's lights in 3D mode, as the compositor places them.
+    struct SelectedModelLights;
+    bool selectedModelLights(SelectedModelLights *out) const;
     // Hands the current mode and viewpoint to the preview renderer.
     void pushView();
     void setView(const drift::EditorView3d &view);

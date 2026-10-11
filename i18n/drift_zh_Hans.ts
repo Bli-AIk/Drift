@@ -9251,31 +9251,47 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Move light</source>
+        <source>Drag the lights in the 3D view, or set them here. They move and scale with the clip; turning the model turns it under them.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Drag the light around the sphere. The light stays fixed to the camera, not the model.</source>
+        <source>Light %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Behind</source>
+        <source>Light %1 colour</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Put the light on the far side of the model for a rim light</source>
+        <source>Left / right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Direction</source>
+        <source>Up / down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Elevation</source>
+        <source>Near / far</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Intensity</source>
+        <source>Brightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reach</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spot angle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aim left / right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aim up / down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9286,19 +9302,43 @@
 <context>
     <name>Model3dSource</name>
     <message>
-        <source>Light direction</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Light elevation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Light intensity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ambient light</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>left / right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>up / down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>near / far</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>brightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>reach</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>spot angle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>aim left / right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>aim up / down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light %1 %2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

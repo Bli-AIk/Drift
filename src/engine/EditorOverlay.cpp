@@ -31,6 +31,36 @@ void addLoop(QList<EditorLine> &out, const QList<QVector3D> &points, const QColo
         addLine(out, points.at(i), points.at((i + 1) % points.size()), color, width);
 }
 
+void addDashed(QList<EditorLine> &out, const QVector3D &a, const QVector3D &b, const QColor &color,
+               float width, float dash)
+{
+    const float length = (b - a).length();
+    if (length <= 0.f || dash <= 0.f)
+        return;
+    const int pieces = std::clamp(int(length / dash), 1, 64);
+    for (int i = 0; i < pieces; i += 2)
+        addLine(out, a + (b - a) * (float(i) / pieces), a + (b - a) * (float(i + 1) / pieces), color, width);
+}
+
+void addCircle(QList<EditorLine> &out, const QVector3D &centre, const QVector3D &u, const QVector3D &v,
+               float radius, const QColor &color, float width, int segments = 32)
+{
+    for (int i = 0; i < segments; ++i) {
+        const double a0 = 2.0 * M_PI * i / segments;
+        const double a1 = 2.0 * M_PI * (i + 1) / segments;
+        addLine(out, centre + (u * float(std::cos(a0)) + v * float(std::sin(a0))) * radius,
+                centre + (u * float(std::cos(a1)) + v * float(std::sin(a1))) * radius, color, width);
+    }
+}
+
+// Two unit vectors spanning the plane square to `axis`.
+void planeBasis(const QVector3D &axis, QVector3D *u, QVector3D *v)
+{
+    const QVector3D helper = std::abs(axis.y()) < 0.9f ? QVector3D(0.f, 1.f, 0.f) : QVector3D(1.f, 0.f, 0.f);
+    *u = QVector3D::crossProduct(axis, helper).normalized();
+    *v = QVector3D::crossProduct(axis, *u).normalized();
+}
+
 // A grid step near a tenth of the canvas height, rounded to 1, 2 or 5 times a power of ten.
 double gridStep(double height)
 {
@@ -125,6 +155,62 @@ QList<EditorLine> buildEditorOverlay(const EditorOverlayInput &input)
         }
     }
     return out;
+}
+
+void addLightGuides(QList<EditorLine> &out, const QList<LightGuide> &lights, const QVector3D &eye,
+                    bool selected)
+{
+    const float width = selected ? 2.f : 1.5f;
+    for (const LightGuide &light : lights) {
+        QColor color = light.color;
+        color.setAlpha(selected ? 235 : 150);
+        QColor faint = color;
+        faint.setAlpha(selected ? 150 : 90);
+
+        const QVector3D at = light.position;
+        // A ring that faces the viewer and keeps about the same size on screen, as Blender's does.
+        QVector3D toEye = eye - at;
+        const float distance = toEye.length();
+        if (distance < 1e-3f)
+            continue;
+        toEye /= distance;
+        QVector3D u;
+        QVector3D v;
+        planeBasis(toEye, &u, &v);
+        const float ring = distance * 0.018f;
+        addCircle(out, at, u, v, ring, color, width);
+        addCircle(out, at, u, v, ring * 0.3f, color, width, 12);
+
+        if (light.hasDrop) {
+            addDashed(out, at, light.drop, faint, 1.f, ring * 0.6f);
+            QVector3D bu;
+            QVector3D bv;
+            planeBasis(light.dropNormal, &bu, &bv);
+            addLine(out, light.drop - bu * ring * 0.5f, light.drop + bu * ring * 0.5f, faint, 1.f);
+            addLine(out, light.drop - bv * ring * 0.5f, light.drop + bv * ring * 0.5f, faint, 1.f);
+        }
+
+        if (!light.spot)
+            continue;
+        const QVector3D axisVector = light.aim - at;
+        const float length = axisVector.length();
+        if (length < 1e-3f)
+            continue;
+        const QVector3D axis = axisVector / length;
+        // Past about 75 degrees off the axis the cone's mouth runs off towards the horizon, so the
+        // drawing stops widening there.
+        const double half = std::min(light.cone * 0.5, 75.0) * M_PI / 180.0;
+        const float mouth = length * float(std::tan(half));
+        QVector3D cu;
+        QVector3D cv;
+        planeBasis(axis, &cu, &cv);
+        addCircle(out, light.aim, cu, cv, mouth, color, width, 48);
+        for (int i = 0; i < 8; ++i) {
+            const double a = 2.0 * M_PI * i / 8;
+            addLine(out, at, light.aim + (cu * float(std::cos(a)) + cv * float(std::sin(a))) * mouth, faint, 1.f);
+        }
+        addDashed(out, at, light.aim, color, 1.f, ring * 0.6f);
+    }
 }
 
 bool clipEditorSegment(const QMatrix4x4 &viewProj, const QVector3D &a, const QVector3D &b,

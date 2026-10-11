@@ -4,12 +4,15 @@
 #include "Time.h"
 #include "VectorSource.h"
 
+#include <QColor>
 #include <QJsonObject>
 #include <QList>
 #include <QMap>
 #include <QString>
 #include <QStringList>
 #include <QVector3D>
+
+#include <array>
 
 namespace drift {
 
@@ -25,6 +28,28 @@ struct Model3dAnimationRef
     TimeUs durationUs = 0;
 };
 
+// One of a model clip's lights, placed the way 3D Relight places its own: x and y across the
+// clip's rect (0..1 spans it), z in clip heights from the model's centre (negative is nearer the
+// viewer), and its reach in clip heights. The frame follows the clip's position and size but not
+// its rotation, so turning the model moves the light across it. A spot (cone under 180 degrees)
+// points at (aimX, aimY) on the plane through the model's centre. See modelLightFrame.
+struct ModelLight
+{
+    bool enabled = false;
+    double x = 0.5;
+    double y = 0.5;
+    double z = -1.5;
+    QColor color = QColor(Qt::white);
+    double intensity = 1.0;
+    double radius = 3.0;
+    double cone = 180.0;
+    double aimX = 0.5;
+    double aimY = 0.5;
+};
+
+inline constexpr int kModelLightCount = 4;
+std::array<ModelLight, kModelLightCount> defaultModelLights();
+
 struct Model3dSource
 {
     QString path; // kept equal to Clip::path (remapProjectPaths re-points both)
@@ -39,10 +64,10 @@ struct Model3dSource
     VectorLoop loop = VectorLoop::Loop;
     TimeUs startOffsetUs = 0;
 
-    // Keyframeable statics. Keys in keyframes are exactly these member names.
-    double lightYaw = 30.0;
-    double lightPitch = 20.0;
-    double lightIntensity = 1.0;
+    // Keyframeable statics, keyed in `keyframes` by model3dKeyframeProperties(): "ambient" and
+    // "light<n>_<x|y|z|intensity|radius|cone|aimX|aimY>". A light's on switch and colour are
+    // plain values (setModel3dLightOption).
+    std::array<ModelLight, kModelLightCount> lights = defaultModelLights();
     double ambient = 0.35;
     QMap<QString, KeyframeTrack<double>> keyframes; // clip-relative times
 
@@ -71,11 +96,14 @@ struct Model3dSource
     static Model3dSource fromJson(const QJsonObject &o);
 };
 
-// Fixed order: lightYaw, lightPitch, lightIntensity, ambient.
+// Fixed order: ambient, then each light's x, y, z, intensity, radius, cone, aimX, aimY.
 const QStringList &model3dKeyframeProperties();
 bool model3dScalar(const Model3dSource &source, const QString &key, double *out);
 // Clamps into the value's valid range. False for an unknown key.
 bool setModel3dScalar(Model3dSource &source, const QString &key, double value);
 QString model3dKeyframeLabel(const QString &key);
+// "light<n>_enabled" (bool) and "light<n>_color" (a colour name). False for any other key or an
+// invalid colour.
+bool setModel3dLightOption(Model3dSource &source, const QString &key, const QVariant &value);
 
 } // namespace drift

@@ -9289,32 +9289,48 @@
         <translation>Iluminación</translation>
     </message>
     <message>
-        <source>Move light</source>
-        <translation>Mover luz</translation>
+        <source>Drag the lights in the 3D view, or set them here. They move and scale with the clip; turning the model turns it under them.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Drag the light around the sphere. The light stays fixed to the camera, not the model.</source>
-        <translation>Arrastra la luz alrededor de la esfera. La luz permanece fija a la cámara, no al modelo.</translation>
+        <source>Light %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Behind</source>
-        <translation>Detrás</translation>
+        <source>Light %1 colour</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Put the light on the far side of the model for a rim light</source>
-        <translation>Coloca la luz en el lado opuesto del modelo para obtener una luz de contorno</translation>
+        <source>Left / right</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Direction</source>
-        <translation>Dirección</translation>
+        <source>Up / down</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Elevation</source>
-        <translation>Elevación</translation>
+        <source>Near / far</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Intensity</source>
-        <translation>Intensidad</translation>
+        <source>Brightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reach</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spot angle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aim left / right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aim up / down</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Ambient</source>
@@ -9324,20 +9340,44 @@
 <context>
     <name>Model3dSource</name>
     <message>
-        <source>Light direction</source>
-        <translation>Dirección de la luz</translation>
-    </message>
-    <message>
-        <source>Light elevation</source>
-        <translation>Elevación de la luz</translation>
-    </message>
-    <message>
-        <source>Light intensity</source>
-        <translation>Intensidad de la luz</translation>
-    </message>
-    <message>
         <source>Ambient light</source>
         <translation>Luz ambiental</translation>
+    </message>
+    <message>
+        <source>left / right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>up / down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>near / far</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>brightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>reach</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>spot angle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>aim left / right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>aim up / down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light %1 %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

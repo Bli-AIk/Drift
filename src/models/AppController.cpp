@@ -2046,6 +2046,11 @@ QVariantMap model3dSourceToMap(const drift::Model3dSource &m, drift::TimeUs time
         drift::model3dScalar(m, key, &v);
         map.insert(key, v);
     }
+    for (int n = 0; n < drift::kModelLightCount; ++n) {
+        const QString prefix = QStringLiteral("light%1_").arg(n + 1);
+        map.insert(prefix + QLatin1String("enabled"), m.lights[size_t(n)].enabled);
+        map.insert(prefix + QLatin1String("color"), m.lights[size_t(n)].color.name());
+    }
     if (!keyframes.isEmpty())
         map.insert(QStringLiteral("keyframes"), keyframes);
     const QString warning = drift::modelAssetWarning(m.path);
@@ -2216,7 +2221,7 @@ QStringList applyModel3dOptions(drift::Clip &clip, const QVariantMap &opts, doub
                 if (drift::KeyframeTrack<double> *track = transformTrackForProp(clip, write.first))
                     writeKeyframeValue(*track, 0, write.second, false, false);
             }
-        } else if (!drift::setModel3dScalar(m, key, it->toDouble())) {
+        } else if (!drift::setModel3dLightOption(m, key, *it) && !drift::setModel3dScalar(m, key, it->toDouble())) {
             unknown.append(key);
         }
     }

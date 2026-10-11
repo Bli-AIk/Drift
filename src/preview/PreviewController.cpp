@@ -6,6 +6,7 @@
 #include "engine/DepthRelief.h"
 #include "engine/DepthSidecar.h"
 #include "engine/EffectCatalog.h"
+#include "engine/ModelClipTransform.h"
 #include "engine/PreviewSnap.h"
 #include "engine/TransformLayer.h"
 #include "models/AppController.h"
@@ -1245,6 +1246,50 @@ bool PreviewController::selectedRelief(SelectedRelief *out) const
     return viewProjection(&out->view);
 }
 
+struct PreviewController::SelectedModelLights
+{
+    drift::ModelLightFrame frame;
+    // The clip's own world to the world its transform layers put it in.
+    QMatrix4x4 parent;
+    drift::Model3dSource source; // resolved at the playhead
+    QMatrix4x4 view;
+
+    QVector3D lightWorld(const drift::ModelLight &light) const
+    {
+        return parent.map(frame.toWorld(QVector3D(float(light.x), float(light.y), float(light.z))));
+    }
+};
+
+bool PreviewController::selectedModelLights(SelectedModelLights *out) const
+{
+    if (m_mode != QLatin1String("3d") || !m_app.isValidClipIndex(m_app.m_selectedTrack, m_app.m_selectedClip))
+        return false;
+    const drift::Clip &clip = m_app.m_project.tracks().at(m_app.m_selectedTrack).clips.at(m_app.m_selectedClip);
+    if (clip.type != drift::ClipType::Model3d || !clip.containsTime(m_app.m_playheadUs))
+        return false;
+    const QSizeF canvas(m_app.m_project.width(), m_app.m_project.height());
+    const drift::TimeUs relative = m_app.m_playheadUs - clip.timelineStart;
+    const QRectF rect(clipTransformValue(clip.transformX, relative, 0.0),
+                      clipTransformValue(clip.transformY, relative, 0.0),
+                      clipTransformValue(clip.transformW, relative, canvas.width()),
+                      clipTransformValue(clip.transformH, relative, canvas.height()));
+    if (rect.width() < 1.0 || rect.height() < 1.0)
+        return false;
+    drift::ClipPose3d pose;
+    pose.positionZ = clipTransformValue(clip.positionZ, relative, 0.0);
+    out->frame = drift::modelLightFrame(rect, pose, canvas);
+    const QList<drift::TransformParent> parents =
+        drift::transformParentsAt(m_app.m_project, m_app.m_playheadUs, 1.0);
+    if (!parents.isEmpty() && parents.at(m_app.m_selectedTrack).hasParent) {
+        const QTransform &parent = parents.at(m_app.m_selectedTrack).matrix;
+        if (!parent.isAffine())
+            return false;
+        out->parent = drift::worldParentFromAffine(parent, canvas);
+    }
+    out->source = clip.model3d.resolvedAt(relative);
+    return viewProjection(&out->view);
+}
+
 namespace {
 
 bool projectToCanvas(const QMatrix4x4 &view, const QVector3D &world, QPointF *canvas)
@@ -1253,6 +1298,40 @@ bool projectToCanvas(const QMatrix4x4 &view, const QVector3D &world, QPointF *ca
     if (h.w() <= 1e-6f)
         return false;
     *canvas = QPointF(h.x() / h.w(), h.y() / h.w());
+    return true;
+}
+
+// Canvas (x, y) taken back into the world at the depth `world` already has in the view: a point
+// dragged there slides across the screen the way Blender's grab does, and an orbit is what moves
+// it nearer or farther.
+bool unprojectAtDepth(const QMatrix4x4 &view, const QVector3D &world, double canvasX, double canvasY,
+                      QVector3D *out)
+{
+    const QVector4D h = view.map(QVector4D(world, 1.f));
+    bool invertible = false;
+    const QMatrix4x4 inverse = view.inverted(&invertible);
+    if (h.w() <= 1e-6f || !invertible)
+        return false;
+    const QVector4D moved = inverse.map(QVector4D(float(canvasX) * h.w(), float(canvasY) * h.w(), h.z(), h.w()));
+    if (std::abs(moved.w()) < 1e-9f)
+        return false;
+    *out = moved.toVector3DAffine();
+    return true;
+}
+
+// Two world points on the ray through canvas (x, y).
+bool canvasRay(const QMatrix4x4 &view, double canvasX, double canvasY, QVector3D *nearPoint, QVector3D *farPoint)
+{
+    bool invertible = false;
+    const QMatrix4x4 inverse = view.inverted(&invertible);
+    if (!invertible)
+        return false;
+    const QVector4D a = inverse.map(QVector4D(float(canvasX), float(canvasY), -1.f, 1.f));
+    const QVector4D b = inverse.map(QVector4D(float(canvasX), float(canvasY), 0.f, 1.f));
+    if (std::abs(a.w()) < 1e-9f || std::abs(b.w()) < 1e-9f)
+        return false;
+    *nearPoint = a.toVector3DAffine();
+    *farPoint = b.toVector3DAffine();
     return true;
 }
 
@@ -1269,11 +1348,50 @@ double effectDepthRange(const QList<drift::Effect> &effects, int index)
                               .toDouble());
 }
 
+// A model light's parameter clamped to its range, through the same setter a write takes.
+double clampedModelLightValue(int light, const QString &name, double value)
+{
+    drift::Model3dSource probe;
+    const QString key = QStringLiteral("light%1_%2").arg(light).arg(name);
+    drift::setModel3dScalar(probe, key, value);
+    drift::model3dScalar(probe, key, &value);
+    return value;
+}
+
 } // namespace
 
 QVariantList PreviewController::depthLights3d() const
 {
     QVariantList out;
+    SelectedModelLights model;
+    if (selectedModelLights(&model)) {
+        for (int n = 0; n < drift::kModelLightCount; ++n) {
+            const drift::ModelLight &light = model.source.lights[size_t(n)];
+            QPointF at;
+            if (!light.enabled || !projectToCanvas(model.view, model.lightWorld(light), &at))
+                continue;
+            QVariantMap entry{{QStringLiteral("effect"), -1},
+                              {QStringLiteral("light"), n + 1},
+                              {QStringLiteral("prefix"), QStringLiteral("model3d.light%1_").arg(n + 1)},
+                              {QStringLiteral("x"), at.x()},
+                              {QStringLiteral("y"), at.y()},
+                              {QStringLiteral("z"), light.z},
+                              {QStringLiteral("zMin"), clampedModelLightValue(n + 1, QStringLiteral("z"), -1e9)},
+                              {QStringLiteral("zMax"), clampedModelLightValue(n + 1, QStringLiteral("z"), 1e9)},
+                              {QStringLiteral("spot"), false},
+                              {QStringLiteral("color"), light.color.name()}};
+            QPointF aim;
+            if (light.cone < 179.5
+                && projectToCanvas(model.view, model.parent.map(model.frame.aimWorld(light.aimX, light.aimY)), &aim)) {
+                entry.insert(QStringLiteral("spot"), true);
+                entry.insert(QStringLiteral("aimX"), aim.x());
+                entry.insert(QStringLiteral("aimY"), aim.y());
+            }
+            out.append(entry);
+        }
+        return out;
+    }
+
     SelectedRelief relief;
     if (!selectedRelief(&relief))
         return out;
@@ -1286,9 +1404,12 @@ QVariantList PreviewController::depthLights3d() const
                                                           effectDepthRange(relief.effects, light.effectIndex));
         QVariantMap entry{{QStringLiteral("effect"), light.effectIndex},
                           {QStringLiteral("light"), light.light},
+                          {QStringLiteral("prefix"), QStringLiteral("fx.%1.light%2_").arg(light.effectIndex).arg(light.light)},
                           {QStringLiteral("x"), at.x()},
                           {QStringLiteral("y"), at.y()},
                           {QStringLiteral("z"), params.z()},
+                          {QStringLiteral("zMin"), -1.0},
+                          {QStringLiteral("zMax"), 1.0},
                           {QStringLiteral("spot"), false},
                           {QStringLiteral("color"), light.color.name()}};
         QPointF aim;
@@ -1304,6 +1425,24 @@ QVariantList PreviewController::depthLights3d() const
 
 QVariantMap PreviewController::moveDepthLight3d(int effectIndex, int light, double canvasX, double canvasY) const
 {
+    if (effectIndex < 0) {
+        SelectedModelLights model;
+        if (light < 1 || light > drift::kModelLightCount || !selectedModelLights(&model))
+            return {};
+        QVector3D world;
+        bool invertible = false;
+        const QMatrix4x4 fromParent = model.parent.inverted(&invertible);
+        if (!invertible
+            || !unprojectAtDepth(model.view, model.lightWorld(model.source.lights[size_t(light - 1)]), canvasX,
+                                 canvasY, &world)) {
+            return {};
+        }
+        const QVector3D params = model.frame.fromWorld(fromParent.map(world));
+        return {{QStringLiteral("x"), clampedModelLightValue(light, QStringLiteral("x"), params.x())},
+                {QStringLiteral("y"), clampedModelLightValue(light, QStringLiteral("y"), params.y())},
+                {QStringLiteral("z"), clampedModelLightValue(light, QStringLiteral("z"), params.z())}};
+    }
+
     SelectedRelief relief;
     if (!selectedRelief(&relief))
         return {};
@@ -1311,19 +1450,10 @@ QVariantMap PreviewController::moveDepthLight3d(int effectIndex, int light, doub
          drift::reliefLights(relief.effects, relief.frame.get(), relief.placement.aspect)) {
         if (candidate.effectIndex != effectIndex || candidate.light != light)
             continue;
-        // Unprojected at the depth the light already has in the view: it slides across the
-        // screen the way Blender's grab does, and an orbit is what moves it nearer or farther.
-        const QVector4D h = relief.view.map(QVector4D(relief.placement.toWorld(candidate.position), 1.f));
-        bool invertible = false;
-        const QMatrix4x4 inverse = relief.view.inverted(&invertible);
-        if (h.w() <= 1e-6f || !invertible)
+        QVector3D world;
+        if (!unprojectAtDepth(relief.view, relief.placement.toWorld(candidate.position), canvasX, canvasY, &world))
             return {};
-        const QVector4D world =
-            inverse.map(QVector4D(float(canvasX) * h.w(), float(canvasY) * h.w(), h.z(), h.w()));
-        if (std::abs(world.w()) < 1e-9f)
-            return {};
-        const QVector3D params = drift::reliefLightParams(relief.placement.fromWorld(world.toVector3DAffine()),
-                                                          relief.placement.aspect,
+        const QVector3D params = drift::reliefLightParams(relief.placement.fromWorld(world), relief.placement.aspect,
                                                           effectDepthRange(relief.effects, effectIndex));
         return {{QStringLiteral("x"), params.x()}, {QStringLiteral("y"), params.y()}, {QStringLiteral("z"), params.z()}};
     }
@@ -1332,20 +1462,35 @@ QVariantMap PreviewController::moveDepthLight3d(int effectIndex, int light, doub
 
 QVariantMap PreviewController::aimDepthLight3d(int effectIndex, double canvasX, double canvasY) const
 {
+    if (effectIndex < 0) {
+        SelectedModelLights model;
+        if (!selectedModelLights(&model))
+            return {};
+        QVector3D nearPoint;
+        QVector3D farPoint;
+        bool invertible = false;
+        const QMatrix4x4 fromParent = model.parent.inverted(&invertible);
+        if (!invertible || !canvasRay(model.view, canvasX, canvasY, &nearPoint, &farPoint))
+            return {};
+        // Onto the plane through the model's centre, where a spot's aim point lies.
+        const QVector3D a = model.frame.fromWorld(fromParent.map(nearPoint));
+        const QVector3D b = model.frame.fromWorld(fromParent.map(farPoint));
+        if (std::abs(b.z() - a.z()) < 1e-9f)
+            return {};
+        const float t = -a.z() / (b.z() - a.z());
+        const QVector3D hit = a + (b - a) * t;
+        return {{QStringLiteral("aimX"), std::clamp(double(hit.x()), 0.0, 1.0)},
+                {QStringLiteral("aimY"), std::clamp(double(hit.y()), 0.0, 1.0)}};
+    }
+
     SelectedRelief relief;
-    if (!selectedRelief(&relief))
-        return {};
-    bool invertible = false;
-    const QMatrix4x4 inverse = relief.view.inverted(&invertible);
-    if (!invertible)
-        return {};
-    const QVector4D nearPoint = inverse.map(QVector4D(float(canvasX), float(canvasY), -1.f, 1.f));
-    const QVector4D farPoint = inverse.map(QVector4D(float(canvasX), float(canvasY), 0.f, 1.f));
-    if (std::abs(nearPoint.w()) < 1e-9f || std::abs(farPoint.w()) < 1e-9f)
+    QVector3D nearPoint;
+    QVector3D farPoint;
+    if (!selectedRelief(&relief) || !canvasRay(relief.view, canvasX, canvasY, &nearPoint, &farPoint))
         return {};
     QPointF uv;
     if (!drift::reliefRayHit(relief.placement, relief.frame.get(), effectDepthRange(relief.effects, effectIndex),
-                             nearPoint.toVector3DAffine(), farPoint.toVector3DAffine(), &uv)) {
+                             nearPoint, farPoint, &uv)) {
         return {};
     }
     return {{QStringLiteral("aimX"), std::clamp(uv.x(), 0.0, 1.0)}, {QStringLiteral("aimY"), std::clamp(uv.y(), 0.0, 1.0)}};

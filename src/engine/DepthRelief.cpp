@@ -21,41 +21,6 @@ QColor colorParam(const QVariant &value)
     return c.isValid() ? c : QColor(Qt::white);
 }
 
-void addLine(QList<EditorLine> &out, const QVector3D &a, const QVector3D &b, const QColor &color, float width)
-{
-    out.append(EditorLine{a, b, color, width, false});
-}
-
-void addDashed(QList<EditorLine> &out, const QVector3D &a, const QVector3D &b, const QColor &color,
-               float width, float dash)
-{
-    const float length = (b - a).length();
-    if (length <= 0.f || dash <= 0.f)
-        return;
-    const int pieces = std::clamp(int(length / dash), 1, 64);
-    for (int i = 0; i < pieces; i += 2)
-        addLine(out, a + (b - a) * (float(i) / pieces), a + (b - a) * (float(i + 1) / pieces), color, width);
-}
-
-void addCircle(QList<EditorLine> &out, const QVector3D &centre, const QVector3D &u, const QVector3D &v,
-               float radius, const QColor &color, float width, int segments = 32)
-{
-    for (int i = 0; i < segments; ++i) {
-        const double a0 = 2.0 * M_PI * i / segments;
-        const double a1 = 2.0 * M_PI * (i + 1) / segments;
-        addLine(out, centre + (u * float(std::cos(a0)) + v * float(std::sin(a0))) * radius,
-                centre + (u * float(std::cos(a1)) + v * float(std::sin(a1))) * radius, color, width);
-    }
-}
-
-// Two unit vectors spanning the plane square to `axis`.
-void planeBasis(const QVector3D &axis, QVector3D *u, QVector3D *v)
-{
-    const QVector3D helper = std::abs(axis.y()) < 0.9f ? QVector3D(0.f, 1.f, 0.f) : QVector3D(1.f, 0.f, 0.f);
-    *u = QVector3D::crossProduct(axis, helper).normalized();
-    *v = QVector3D::crossProduct(axis, *u).normalized();
-}
-
 } // namespace
 
 QVector3D ReliefPlacement::toQuad(const QVector3D &relief) const
@@ -213,62 +178,25 @@ void addReliefLightGuides(QList<EditorLine> &out, const QList<ReliefLight> &ligh
                           const ReliefPlacement &placement, const DepthFrame *frame, double depthRange,
                           const QVector3D &eye, bool selected)
 {
-    const float width = selected ? 2.f : 1.5f;
+    QList<LightGuide> guides;
     for (const ReliefLight &light : lights) {
-        QColor color = light.color;
-        color.setAlpha(selected ? 235 : 150);
-        QColor faint = color;
-        faint.setAlpha(selected ? 150 : 90);
-
-        const QVector3D at = placement.toWorld(light.position);
-        // A ring that faces the viewer and keeps about the same size on screen, as Blender's does.
-        QVector3D toEye = eye - at;
-        const float distance = toEye.length();
-        if (distance < 1e-3f)
-            continue;
-        toEye /= distance;
-        QVector3D u;
-        QVector3D v;
-        planeBasis(toEye, &u, &v);
-        const float ring = distance * 0.018f;
-        addCircle(out, at, u, v, ring, color, width);
-        addCircle(out, at, u, v, ring * 0.3f, color, width, 12);
-
+        LightGuide guide;
+        guide.position = placement.toWorld(light.position);
+        guide.color = light.color;
+        guide.spot = light.spot;
+        guide.cone = light.cone;
+        guide.aim = placement.toWorld(light.aim);
         // Straight back along the frame to the surface it hangs over, so its place in the depth map
         // reads from any angle.
         const QPointF uv(light.position.x() / placement.aspect + 0.5, light.position.y() + 0.5);
         if (uv.x() >= 0.0 && uv.x() <= 1.0 && uv.y() >= 0.0 && uv.y() <= 1.0) {
-            const QVector3D below = placement.toWorld(reliefSurfacePoint(frame, uv, placement.aspect, depthRange));
-            addDashed(out, at, below, faint, 1.f, ring * 0.6f);
-            QVector3D bu;
-            QVector3D bv;
-            planeBasis(placement.quadToWorld.mapVector(QVector3D(0.f, 0.f, 1.f)).normalized(), &bu, &bv);
-            addLine(out, below - bu * ring * 0.5f, below + bu * ring * 0.5f, faint, 1.f);
-            addLine(out, below - bv * ring * 0.5f, below + bv * ring * 0.5f, faint, 1.f);
+            guide.hasDrop = true;
+            guide.drop = placement.toWorld(reliefSurfacePoint(frame, uv, placement.aspect, depthRange));
+            guide.dropNormal = placement.quadToWorld.mapVector(QVector3D(0.f, 0.f, 1.f)).normalized();
         }
-
-        if (!light.spot)
-            continue;
-        const QVector3D aim = placement.toWorld(light.aim);
-        const QVector3D axisVector = aim - at;
-        const float length = axisVector.length();
-        if (length < 1e-3f)
-            continue;
-        const QVector3D axis = axisVector / length;
-        // Past about 75 degrees off the axis the cone's mouth runs off towards the horizon, so the
-        // drawing stops widening there.
-        const double half = std::min(light.cone * 0.5, 75.0) * M_PI / 180.0;
-        const float mouth = length * float(std::tan(half));
-        QVector3D cu;
-        QVector3D cv;
-        planeBasis(axis, &cu, &cv);
-        addCircle(out, aim, cu, cv, mouth, color, width, 48);
-        for (int i = 0; i < 8; ++i) {
-            const double a = 2.0 * M_PI * i / 8;
-            addLine(out, at, aim + (cu * float(std::cos(a)) + cv * float(std::sin(a))) * mouth, faint, 1.f);
-        }
-        addDashed(out, at, aim, color, 1.f, ring * 0.6f);
+        guides.append(guide);
     }
+    addLightGuides(out, guides, eye, selected);
 }
 
 } // namespace drift

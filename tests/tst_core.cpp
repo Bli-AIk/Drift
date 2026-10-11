@@ -124,6 +124,7 @@ private slots:
     void model3dSourceSerialization();
     void model3dScalarClampsAndResolves();
     void model3dPoseMigratesToTransform();
+    void model3dKeyLightKeysMigrate();
     void foldVectorTimeTable_data();
     void foldVectorTimeTable();
     void effectCatalogIdSerialization();
@@ -1884,12 +1885,21 @@ void CoreTest::model3dSourceSerialization()
     clip.model3d.animation = 1;
     clip.model3d.loop = drift::VectorLoop::PingPong;
     clip.model3d.startOffsetUs = drift::secondsToUs(0.25);
-    clip.model3d.lightYaw = 60.0;
-    clip.model3d.lightPitch = -10.0;
-    clip.model3d.lightIntensity = 1.5;
+    drift::ModelLight &spot = clip.model3d.lights[1];
+    spot.enabled = true;
+    spot.x = 0.2;
+    spot.y = 0.7;
+    spot.z = 1.0;
+    spot.color = QColor(QStringLiteral("#123456"));
+    spot.intensity = 2.0;
+    spot.radius = 1.5;
+    spot.cone = 40.0;
+    spot.aimX = 0.3;
+    spot.aimY = 0.6;
+    clip.model3d.lights[0].enabled = false;
     clip.model3d.ambient = 0.1;
-    clip.model3d.keyframes[QStringLiteral("lightYaw")].setKeyframe(0, 0.0);
-    clip.model3d.keyframes[QStringLiteral("lightYaw")].setKeyframe(drift::secondsToUs(2.0), 360.0);
+    clip.model3d.keyframes[QStringLiteral("light2_intensity")].setKeyframe(0, 0.0);
+    clip.model3d.keyframes[QStringLiteral("light2_intensity")].setKeyframe(drift::secondsToUs(2.0), 2.0);
     project.tracks()[0].clips.append(clip);
 
     // Non-model clips must not grow a model3d key.
@@ -1923,12 +1933,21 @@ void CoreTest::model3dSourceSerialization()
     QCOMPARE(c.model3d.animationDurationUs(), drift::secondsToUs(0.5));
     QCOMPARE(c.model3d.loop, drift::VectorLoop::PingPong);
     QCOMPARE(c.model3d.startOffsetUs, drift::secondsToUs(0.25));
-    QCOMPARE(c.model3d.lightYaw, 60.0);
-    QCOMPARE(c.model3d.lightPitch, -10.0);
-    QCOMPARE(c.model3d.lightIntensity, 1.5);
+    QVERIFY(!c.model3d.lights[0].enabled);
+    const drift::ModelLight &loadedSpot = c.model3d.lights[1];
+    QVERIFY(loadedSpot.enabled);
+    QCOMPARE(loadedSpot.x, 0.2);
+    QCOMPARE(loadedSpot.y, 0.7);
+    QCOMPARE(loadedSpot.z, 1.0);
+    QCOMPARE(loadedSpot.color, QColor(QStringLiteral("#123456")));
+    QCOMPARE(loadedSpot.intensity, 2.0);
+    QCOMPARE(loadedSpot.radius, 1.5);
+    QCOMPARE(loadedSpot.cone, 40.0);
+    QCOMPARE(loadedSpot.aimX, 0.3);
+    QCOMPARE(loadedSpot.aimY, 0.6);
     QCOMPARE(c.model3d.ambient, 0.1);
     QCOMPARE(c.model3d.keyframes.size(), 1);
-    QCOMPARE(c.model3d.keyframes.value(QStringLiteral("lightYaw")).evaluateAt(drift::secondsToUs(1.0)), 180.0);
+    QCOMPARE(c.model3d.keyframes.value(QStringLiteral("light2_intensity")).evaluateAt(drift::secondsToUs(1.0)), 1.0);
     // A current file carries no legacy pose, so nothing is migrated on the way back in.
     QVERIFY(!c.model3d.legacyPose.present);
     QVERIFY(c.model3d.isAnimated());
@@ -1958,7 +1977,8 @@ void CoreTest::model3dSourceSerialization()
 void CoreTest::model3dScalarClampsAndResolves()
 {
     drift::Model3dSource m;
-    QCOMPARE(drift::model3dKeyframeProperties().size(), 4);
+    // Ambient, then eight numbers for each of the four lights.
+    QCOMPARE(drift::model3dKeyframeProperties().size(), 1 + 4 * 8);
     for (const QString &key : drift::model3dKeyframeProperties()) {
         double v = -1.0;
         QVERIFY2(drift::model3dScalar(m, key, &v), qPrintable(key));
@@ -1971,25 +1991,42 @@ void CoreTest::model3dScalarClampsAndResolves()
 
     QVERIFY(drift::setModel3dScalar(m, QStringLiteral("ambient"), -1.0));
     QCOMPARE(m.ambient, 0.0);
-    QVERIFY(drift::setModel3dScalar(m, QStringLiteral("lightIntensity"), -1.0));
-    QCOMPARE(m.lightIntensity, 0.0);
-    QVERIFY(drift::setModel3dScalar(m, QStringLiteral("lightYaw"), 720.0));
-    QCOMPARE(m.lightYaw, 720.0);
+    QVERIFY(drift::setModel3dScalar(m, QStringLiteral("light1_intensity"), -1.0));
+    QCOMPARE(m.lights[0].intensity, 0.0);
+    QVERIFY(drift::setModel3dScalar(m, QStringLiteral("light2_z"), 9.0));
+    QCOMPARE(m.lights[1].z, 3.0);
+    QVERIFY(drift::setModel3dScalar(m, QStringLiteral("light3_cone"), 1.0));
+    QCOMPARE(m.lights[2].cone, 10.0);
+    QVERIFY(drift::setModel3dScalar(m, QStringLiteral("light4_aimX"), 0.25));
+    QCOMPARE(m.lights[3].aimX, 0.25);
+    QVERIFY(!drift::setModel3dScalar(m, QStringLiteral("light5_x"), 0.5));
+    QVERIFY(!drift::setModel3dScalar(m, QStringLiteral("light1_enabled"), 1.0));
+    // The old key light is gone.
+    QVERIFY(!drift::setModel3dScalar(m, QStringLiteral("lightYaw"), 1.0));
+
+    // The switch and the colour are plain options, not numbers.
+    QVERIFY(drift::setModel3dLightOption(m, QStringLiteral("light3_enabled"), true));
+    QVERIFY(m.lights[2].enabled);
+    QVERIFY(drift::setModel3dLightOption(m, QStringLiteral("light3_color"), QStringLiteral("#ff0000")));
+    QCOMPARE(m.lights[2].color, QColor(Qt::red));
+    QVERIFY(!drift::setModel3dLightOption(m, QStringLiteral("light3_color"), QStringLiteral("nope")));
+    QVERIFY(!drift::setModel3dLightOption(m, QStringLiteral("light3_x"), 0.5));
 
     QVERIFY(!m.isAnimated());
-    m.keyframes[QStringLiteral("lightPitch")].setKeyframe(0, 20.0);
-    m.keyframes[QStringLiteral("lightPitch")].setKeyframe(drift::secondsToUs(1.0), 60.0);
+    m.keyframes[QStringLiteral("light1_y")].setKeyframe(0, 0.2);
+    m.keyframes[QStringLiteral("light1_y")].setKeyframe(drift::secondsToUs(1.0), 0.6);
     QVERIFY(m.isAnimated());
     const drift::Model3dSource baked = m.resolvedAt(drift::secondsToUs(0.5));
-    QCOMPARE(baked.lightPitch, 40.0);
+    QCOMPARE(baked.lights[0].y, 0.4);
     QVERIFY(baked.keyframes.isEmpty());
     QVERIFY(!baked.isAnimated());
-    QCOMPARE(baked.lightYaw, 720.0);
+    QCOMPARE(baked.lights[3].aimX, 0.25);
 
     // A disabled track leaves the static value alone.
-    m.keyframes[QStringLiteral("lightPitch")].setEnabled(false);
+    const double staticY = m.lights[0].y;
+    m.keyframes[QStringLiteral("light1_y")].setEnabled(false);
     QVERIFY(!m.isAnimated());
-    QCOMPARE(m.resolvedAt(drift::secondsToUs(0.5)).lightPitch, 20.0);
+    QCOMPARE(m.resolvedAt(drift::secondsToUs(0.5)).lights[0].y, staticY);
 
     m.animations = {{QStringLiteral("a"), drift::secondsToUs(1.0)}};
     m.animation = 5;
@@ -2060,9 +2097,59 @@ void CoreTest::model3dPoseMigratesToTransform()
     // The old lens put the eye height / (2 * depth) from the model.
     QCOMPARE(c.perspective.evaluateAt(0), 1080.0 / 0.5);
     QVERIFY(c.layer3d);
-    QCOMPARE(c.model3d.lightYaw, 45.0);
+    // The old key light (yaw 45, the default pitch 20) stands 2.5 clip heights out along its
+    // direction as light 1, in a frame twice as wide as it is tall.
+    const drift::ModelLight &key = c.model3d.lights[0];
+    QVERIFY(key.enabled);
+    const double yaw = 45.0 * M_PI / 180.0;
+    const double pitch = 20.0 * M_PI / 180.0;
+    QVERIFY(std::abs(key.x - (0.5 + 2.5 * std::sin(yaw) * std::cos(pitch) / 2.0)) < 1e-6);
+    QVERIFY(std::abs(key.y - (0.5 - 2.5 * std::sin(pitch))) < 1e-6);
+    QVERIFY(std::abs(key.z - (-2.5 * std::cos(yaw) * std::cos(pitch))) < 1e-6);
+    QCOMPARE(key.radius, 5.0);
+    QCOMPARE(key.intensity, 1.25);
+    QVERIFY(!c.model3d.lights[1].enabled);
     QVERIFY(c.model3d.keyframes.isEmpty());
     QVERIFY(!c.model3d.legacyPose.present);
+}
+
+void CoreTest::model3dKeyLightKeysMigrate()
+{
+    // Before format 15: one key light, its yaw swept a quarter turn.
+    drift::KeyframeTrack<double> sweep;
+    sweep.setKeyframe(0, 0.0);
+    sweep.setKeyframe(drift::secondsToUs(1.0), 90.0);
+    drift::KeyframeTrack<double> fade;
+    fade.setKeyframe(0, 1.0);
+    fade.setKeyframe(drift::secondsToUs(1.0), 0.0);
+    const drift::Model3dSource m = drift::Model3dSource::fromJson(QJsonObject{
+        {QStringLiteral("path"), QStringLiteral("/media/robot.glb")},
+        {QStringLiteral("lightYaw"), 0.0},
+        {QStringLiteral("lightPitch"), 0.0},
+        {QStringLiteral("lightIntensity"), 1.0},
+        {QStringLiteral("keyframes"), QJsonObject{{QStringLiteral("lightYaw"), drift::keyframesToJson(sweep)},
+                                                  {QStringLiteral("lightIntensity"), drift::keyframesToJson(fade)}}},
+    });
+    QVERIFY(m.lights[0].enabled);
+    QVERIFY(!m.keyframes.contains(QStringLiteral("lightYaw")));
+    QVERIFY(!m.keyframes.contains(QStringLiteral("lightIntensity")));
+    // Straight at the viewer at the start, off to the right (and clamped there) at the end.
+    const drift::KeyframeTrack<double> x = m.keyframes.value(QStringLiteral("light1_x"));
+    const drift::KeyframeTrack<double> z = m.keyframes.value(QStringLiteral("light1_z"));
+    QCOMPARE(x.keyframes().size(), 2);
+    QCOMPARE(x.evaluateAt(0), 0.5);
+    QCOMPARE(z.evaluateAt(0), -2.5);
+    QCOMPARE(x.evaluateAt(drift::secondsToUs(1.0)), 2.0);
+    QVERIFY(std::abs(z.evaluateAt(drift::secondsToUs(1.0))) < 1e-6);
+    const drift::KeyframeTrack<double> brightness = m.keyframes.value(QStringLiteral("light1_intensity"));
+    QCOMPARE(brightness.evaluateAt(0), 1.25);
+    QCOMPARE(brightness.evaluateAt(drift::secondsToUs(1.0)), 0.0);
+
+    // A current file is read as written, old key or not.
+    QJsonObject current = m.toJson();
+    QVERIFY(current.contains(QStringLiteral("light1_enabled")));
+    current.insert(QStringLiteral("lightYaw"), 90.0);
+    QCOMPARE(drift::Model3dSource::fromJson(current).lights[0].x, m.lights[0].x);
 }
 
 void CoreTest::foldVectorTimeTable_data()

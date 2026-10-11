@@ -1544,6 +1544,33 @@ GpuScene buildGpuScene(const drift::Project &project, drift::TimeUs timelineUs, 
                                     placement, layer.depth.get(), depthRange, editorEye,
                                     clip.id == options.editor.selectedClipId);
     };
+    // A model clip's own lights, over the model.
+    const auto placeModelLights = [&](const drift::Clip &clip, const GpuLayer &layer) {
+        if (!editorView || !layer.model3d || (layer.hasParent && !layer.parent.isAffine()))
+            return;
+        const drift::model3d::ModelDrawRequest &model = *layer.model3d;
+        const QSizeF canvas(width, height);
+        const drift::ModelLightFrame frame =
+            drift::modelLightFrame(model.rect, model.pose3d, model.canvas.isEmpty() ? canvas : model.canvas);
+        const QMatrix4x4 parent = layer.hasParent ? drift::worldParentFromAffine(layer.parent, canvas) : QMatrix4x4();
+        QList<drift::LightGuide> lights;
+        for (const drift::ModelLight &light : model.params.lights) {
+            if (!light.enabled)
+                continue;
+            drift::LightGuide guide;
+            guide.position = parent.map(frame.toWorld(QVector3D(float(light.x), float(light.y), float(light.z))));
+            guide.color = light.color;
+            guide.spot = light.cone < 179.5;
+            guide.cone = light.cone;
+            guide.aim = parent.map(frame.aimWorld(light.aimX, light.aimY));
+            // Back to the plane through the model's centre.
+            guide.hasDrop = true;
+            guide.drop = parent.map(frame.toWorld(QVector3D(float(light.x), float(light.y), 0.f)));
+            guide.dropNormal = parent.mapVector(QVector3D(0.f, 0.f, 1.f)).normalized();
+            lights.append(guide);
+        }
+        drift::addLightGuides(reliefGuides, lights, editorEye, clip.id == options.editor.selectedClipId);
+    };
     const QSizeF layoutCanvas = editorView ? QSizeF(width, height) : QSizeF();
     const auto applyCamera = [&sceneView, sceneViewActive, layoutCanvas](GpuLayer &layer) {
         layer.viewProj = sceneView;
@@ -1669,6 +1696,7 @@ GpuScene buildGpuScene(const drift::Project &project, drift::TimeUs timelineUs, 
             applyCamera(item.layer);
             noteSelection(clip, item.layer);
             placeRelief(clip, item.layer);
+            placeModelLights(clip, item.layer);
             applyDepthOcclusion(project, scene, item.layer, nearestOccluder, occluders);
             scene.items.append(item);
             if (editingText)

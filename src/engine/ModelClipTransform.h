@@ -9,16 +9,31 @@
 #include <QSizeF>
 #include <QVector3D>
 
+#include <array>
+
 namespace drift {
 
 // Resolved light knobs for one model clip draw.
 struct ModelClipParams
 {
-    double lightYaw = 30.0;
-    double lightPitch = 20.0;
-    double lightIntensity = 1.0;
+    std::array<ModelLight, kModelLightCount> lights = defaultModelLights();
     double ambient = 0.35;
 };
+
+// The frame a model clip's lights are placed in (see ModelLight), in world space: the clip's rect
+// laid flat at the model's centre depth, unturned by the clip's rotations.
+struct ModelLightFrame
+{
+    QVector3D origin; // light (0, 0, 0): the rect's top-left corner at the centre's depth
+    double width = 1.0;
+    double height = 1.0;
+
+    QVector3D toWorld(const QVector3D &light) const;
+    QVector3D fromWorld(const QVector3D &world) const;
+    // Where a spot aimed at (aimX, aimY) points.
+    QVector3D aimWorld(double aimX, double aimY) const { return toWorld(QVector3D(float(aimX), float(aimY), 0.f)); }
+};
+ModelLightFrame modelLightFrame(const QRectF &rect, const ClipPose3d &pose, const QSizeF &canvas);
 
 ModelClipParams modelClipParamsFromSource(const Model3dSource &source);
 
@@ -31,11 +46,6 @@ ModelClipParams modelClipParamsFromSource(const Model3dSource &source);
 // belongs to whoever views the world.
 QMatrix4x4 modelClipWorld(const QRectF &rect, double rotation, const ClipPose3d &pose,
                           const QVector3D &aabbMin, const QVector3D &aabbMax, const QSizeF &canvas);
-
-// The light frame of a model draw: world space with y flipped up, the frame screenLightDir's
-// yaw/pitch are measured in. Normals go model -> world -> here, so the light stays put in the
-// world whichever way the model or the viewer turns.
-QMatrix3x3 modelClipNormalMatrix(const QMatrix4x4 &world);
 
 // The size a model's bounding box front face gets when the largest rest extent spans `span` px.
 QSizeF modelClipFaceSize(const QVector3D &aabbMin, const QVector3D &aabbMax, double span);

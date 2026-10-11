@@ -171,6 +171,17 @@ QString localPath(const QString &raw)
     return trimmed;
 }
 
+// A model clip's `lights` array flattened into the light<n>_<field> options setModel3dOptions takes.
+void insertModel3dLights(const QJsonObject &args, QVariantMap *opts)
+{
+    const QJsonArray lights = args.value(QStringLiteral("lights")).toArray();
+    for (int i = 0; i < lights.size(); ++i) {
+        const QJsonObject light = lights.at(i).toObject();
+        for (auto it = light.constBegin(); it != light.constEnd(); ++it)
+            opts->insert(QStringLiteral("light%1_%2").arg(i + 1).arg(it.key()), it.value().toVariant());
+    }
+}
+
 QJsonObject compactCatalogItem(const QVariantMap &item)
 {
     QJsonObject o;
@@ -1418,10 +1429,11 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
                               : m_controller->playheadSeconds();
         QVariantMap opts;
         for (const char *key : {"duration", "animation", "loop", "offset", "name", "scale", "depth", "rotX",
-                                "rotY", "rotZ", "lightYaw", "lightPitch", "lightIntensity", "ambient"}) {
+                                "rotY", "rotZ", "ambient"}) {
             if (args.contains(QLatin1String(key)))
                 opts.insert(QString::fromUtf8(key), args.value(QLatin1String(key)).toVariant());
         }
+        insertModel3dLights(args, &opts);
         const QVariantMap reply = m_controller->addModel3dClip(
             path, jsonInt(args.value(QStringLiteral("track"))), at, opts);
         if (!reply.value(QStringLiteral("ok")).toBool())
@@ -1473,10 +1485,11 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
             return clipRefError(args);
         QVariantMap opts;
         for (const char *key : {"animation", "loop", "offset", "name", "scale", "depth", "rotX", "rotY", "rotZ",
-                                "lightYaw", "lightPitch", "lightIntensity", "ambient"}) {
+                                "ambient"}) {
             if (args.contains(QLatin1String(key)))
                 opts.insert(QString::fromUtf8(key), args.value(QLatin1String(key)).toVariant());
         }
+        insertModel3dLights(args, &opts);
         const QString error = m_controller->setModel3dOptions(ref.track, ref.clip, opts);
         if (!error.isEmpty())
             return err("bad_args", error);

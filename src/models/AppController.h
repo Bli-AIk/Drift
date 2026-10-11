@@ -1067,9 +1067,10 @@ public:
     Q_INVOKABLE QVariantMap inspectVectorClip(int trackIndex, int clipIndex) const;
     Q_INVOKABLE QString vectorSourceText(int trackIndex, int clipIndex) const;
     // 3D model (.glb) clips. opts keys: animation (index), loop, offset (seconds), name, duration
-    // (seconds; default = the first animation's length, 5 s for a static model), and the pose /
-    // light statics (scale, depth, rotX, rotY, rotZ, lightYaw, lightPitch, lightIntensity,
-    // ambient) as plain values — keyframe them through setClipKeyframe with "model3d.<key>".
+    // (seconds; default = the first animation's length, 5 s for a static model), the legacy pose
+    // keys (scale, depth, rotX, rotY, rotZ), the light switches light<n>_enabled and colours
+    // light<n>_color, and the light statics (ambient, light<n>_<x|y|z|intensity|radius|cone|aimX|
+    // aimY>) as plain values — keyframe the statics through setClipKeyframe with "model3d.<key>".
     Q_INVOKABLE QVariantMap addModel3dClip(const QString &path, int trackIndex, double atSeconds,
                                            const QVariantMap &opts = {});
     Q_INVOKABLE QVariantMap setModel3dSource(int trackIndex, int clipIndex, const QString &path,

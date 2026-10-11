@@ -17,9 +17,7 @@ Item {
     readonly property bool hasModel: hasSelection && clipData.kind === "model3d" && !!clipData.model3d
     readonly property var model3d: hasModel ? clipData.model3d : ({
                                                  "path": "", "animations": [], "animation": 0,
-                                                 "loop": "loop", "offset": 0,
-                                                 "lightYaw": 30, "lightPitch": 20,
-                                                 "lightIntensity": 1, "ambient": 0.35
+                                                 "loop": "loop", "offset": 0, "ambient": 0.35
                                              })
     readonly property var animations: (root.model3d && root.model3d.animations) || []
     readonly property var keyframes: (root.model3d && root.model3d.keyframes) || ({})
@@ -196,206 +194,148 @@ Item {
         }
 
         // ----- Lighting ----------------------------------------------------
+        // Four lights placed like 3D Relight's: across the clip's rect, near or far of the model's
+        // centre. The 3D view draws them and drags them; these are the same keyframeable values.
         Column {
             width: parent.width
             spacing: Theme.spacingMd
 
             ThemedLabel { text: qsTr("Lighting") }
 
-            // The light orb: a sphere seen from the camera with the key light as a dot on it.
-            // Dragging the dot orbits the light, writing the same keyframeable yaw/pitch the
-            // sliders below edit. The front hemisphere is the face of the disk; "Behind" puts
-            // the light on the far side for rim lighting.
-            Row {
+            ThemedLabel {
                 width: parent.width
-                spacing: Theme.spacingMd
+                opacity: 0.8
+                wrapMode: Text.Wrap
+                text: qsTr("Drag the lights in the 3D view, or set them here. They move and scale with the clip; turning the model turns it under them.")
+            }
 
-                Item {
-                    id: lightOrb
-                    width: 96
-                    height: 96
-                    readonly property real radius: width / 2 - 4
-                    readonly property real yaw: {
-                        void root.clipDataRevision
-                        return orbDrag.dragging ? orbDrag.liveYaw
-                                                : EditorState.propertyValueAt(EditorState.selectedTrack, EditorState.selectedClip,
-                                                                              "model3d.lightYaw", EditorState.inspectorPlayheadSeconds,
-                                                                              Number(root.model3d.lightYaw) || 0)
-                    }
-                    readonly property real pitch: {
-                        void root.clipDataRevision
-                        return orbDrag.dragging ? orbDrag.livePitch
-                                                : EditorState.propertyValueAt(EditorState.selectedTrack, EditorState.selectedClip,
-                                                                              "model3d.lightPitch", EditorState.inspectorPlayheadSeconds,
-                                                                              Number(root.model3d.lightPitch) || 0)
-                    }
-                    // Same mapping as the renderer's screenLightDir: +x right, +y up, +z toward
-                    // the camera.
-                    readonly property real dirX: Math.sin(yaw * Math.PI / 180) * Math.cos(pitch * Math.PI / 180)
-                    readonly property real dirY: Math.sin(pitch * Math.PI / 180)
-                    readonly property real dirZ: Math.cos(yaw * Math.PI / 180) * Math.cos(pitch * Math.PI / 180)
-                    readonly property bool behind: dirZ < 0
+            PropertyKeyframeRow {
+                width: parent.width
+                propDef: root.knob("ambient", qsTr("Ambient"), 2)
+                keyframeList: root.knobKeyframes("ambient")
+                useSlider: true
+                sliderFrom: 0
+                sliderTo: 1
+                percent: true
+            }
 
-                    onDirXChanged: sphere.requestPaint()
-                    onDirYChanged: sphere.requestPaint()
-                    onDirZChanged: sphere.requestPaint()
+            Repeater {
+                model: 4
 
-                    Canvas {
-                        id: sphere
-                        anchors.fill: parent
-                        onPaint: {
-                            const ctx = getContext("2d")
-                            ctx.reset()
-                            const cx = width / 2
-                            const cy = height / 2
-                            const r = lightOrb.radius
-                            // Highlight where the light hits the front of the sphere; a light
-                            // behind it only leaves a faint rim.
-                            const hx = cx + lightOrb.dirX * r * 0.6
-                            const hy = cy - lightOrb.dirY * r * 0.6
-                            const g = ctx.createRadialGradient(hx, hy, 2, cx, cy, r)
-                            const bright = lightOrb.behind ? 0.25 : 1.0
-                            g.addColorStop(0, Qt.rgba(0.85 * bright + 0.1, 0.85 * bright + 0.1, 0.9 * bright + 0.1, 1))
-                            g.addColorStop(0.7, Qt.rgba(0.3, 0.32, 0.36, 1))
-                            g.addColorStop(1, Qt.rgba(0.12, 0.13, 0.15, 1))
-                            ctx.fillStyle = g
-                            ctx.beginPath()
-                            ctx.arc(cx, cy, r, 0, Math.PI * 2)
-                            ctx.fill()
-                            if (lightOrb.behind) {
-                                ctx.strokeStyle = Qt.rgba(0.9, 0.9, 0.95, 0.8)
-                                ctx.lineWidth = 2
-                                ctx.beginPath()
-                                ctx.arc(cx, cy, r - 1, 0, Math.PI * 2)
-                                ctx.stroke()
-                            }
-                        }
-                        Component.onCompleted: requestPaint()
-                    }
+                delegate: Column {
+                    id: lightGroup
+                    required property int index
+                    readonly property string prefix: "light" + (index + 1) + "_"
+                    readonly property bool on: !!root.model3d[prefix + "enabled"]
+                    readonly property bool spot: (Number(root.model3d[prefix + "cone"]) || 180) < 179.5
 
-                    // The light itself.
-                    Rectangle {
-                        width: 12
-                        height: 12
-                        radius: 6
-                        x: parent.width / 2 + lightOrb.dirX * lightOrb.radius - width / 2
-                        y: parent.height / 2 - lightOrb.dirY * lightOrb.radius - height / 2
-                        color: lightOrb.behind ? "transparent" : Theme.primary
-                        border.width: 2
-                        border.color: lightOrb.behind ? Theme.primary : Theme.onMedia
-                    }
-
-                    MouseArea {
-                        id: orbDrag
-                        anchors.fill: parent
-                        preventStealing: true
-                        cursorShape: Qt.CrossCursor
-                        property bool dragging: false
-                        property real liveYaw: 0
-                        property real livePitch: 0
-
-                        function apply(mx, my) {
-                            const r = lightOrb.radius
-                            let nx = (mx - width / 2) / r
-                            let ny = -(my - height / 2) / r
-                            const len = Math.sqrt(nx * nx + ny * ny)
-                            if (len > 1) {
-                                nx /= len
-                                ny /= len
-                            }
-                            const nz = Math.sqrt(Math.max(0, 1 - nx * nx - ny * ny)) * (behindChip.selected ? -1 : 1)
-                            liveYaw = Math.atan2(nx, nz) * 180 / Math.PI
-                            livePitch = Math.asin(Math.max(-1, Math.min(1, ny))) * 180 / Math.PI
-                            EditorState.previewSetClipKeyframe(EditorState.selectedTrack, EditorState.selectedClip,
-                                                               "model3d.lightYaw", EditorState.playheadSeconds, liveYaw)
-                            EditorState.previewSetClipKeyframe(EditorState.selectedTrack, EditorState.selectedClip,
-                                                               "model3d.lightPitch", EditorState.playheadSeconds, livePitch)
-                        }
-                        onPressed: mouse => {
-                            dragging = true
-                            EditorState.beginPreviewDrag(qsTr("Move light"))
-                            apply(mouse.x, mouse.y)
-                        }
-                        onPositionChanged: mouse => { if (dragging) apply(mouse.x, mouse.y) }
-                        onReleased: {
-                            if (!dragging)
-                                return
-                            EditorState.commitPreviewDrag()
-                            dragging = false
-                        }
-                    }
-                }
-
-                Column {
-                    width: parent.width - lightOrb.width - parent.spacing
+                    width: parent.width
                     spacing: Theme.spacingXs
-                    anchors.verticalCenter: parent.verticalCenter
-                    ThemedLabel {
+
+                    Row {
                         width: parent.width
-                        opacity: 0.8
-                        wrapMode: Text.Wrap
-                        text: qsTr("Drag the light around the sphere. The light stays fixed to the camera, not the model.")
-                    }
-                    ThemedChip {
-                        id: behindChip
-                        text: qsTr("Behind")
-                        tooltip: qsTr("Put the light on the far side of the model for a rim light")
-                        selected: lightOrb.behind
-                        onClicked: {
-                            // Mirror through the disk: same x/y on the sphere, opposite side.
-                            const yaw = lightOrb.yaw
-                            const flipped = yaw > 0 ? 180 - yaw : -180 - yaw
-                            EditorState.beginPreviewDrag(qsTr("Move light"))
-                            EditorState.previewSetClipKeyframe(EditorState.selectedTrack, EditorState.selectedClip,
-                                                               "model3d.lightYaw", EditorState.playheadSeconds, flipped)
-                            EditorState.commitPreviewDrag()
+                        spacing: 8
+
+                        Text {
+                            width: parent.width - lightSwatch.width - lightSwitch.width - 2 * parent.spacing
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: qsTr("Light %1").arg(lightGroup.index + 1)
+                            color: Theme.panelForeground
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontSizeSm
+                            font.weight: Font.Medium
+                        }
+                        ColorSwatchField {
+                            id: lightSwatch
+                            anchors.verticalCenter: parent.verticalCenter
+                            hex: root.model3d[lightGroup.prefix + "color"] || "#ffffff"
+                            tooltip: qsTr("Light %1 colour").arg(lightGroup.index + 1)
+                            onEdited: value => root.setOption(lightGroup.prefix + "color", value)
+                        }
+                        ThemedSwitch {
+                            id: lightSwitch
+                            anchors.verticalCenter: parent.verticalCenter
+                            checked: lightGroup.on
+                            onToggled: root.setOption(lightGroup.prefix + "enabled", checked)
                         }
                     }
-                }
-            }
 
-            Row {
-                width: parent.width
-                spacing: 8
-                PropertyKeyframeRow {
-                    width: (parent.width - parent.spacing) / 2
-                    propDef: root.knob("lightYaw", qsTr("Direction"), 0)
-                    keyframeList: root.knobKeyframes("lightYaw")
-                    useSlider: true
-                    sliderFrom: -180
-                    sliderTo: 180
-                    unit: "°"
-                }
-                PropertyKeyframeRow {
-                    width: (parent.width - parent.spacing) / 2
-                    propDef: root.knob("lightPitch", qsTr("Elevation"), 0)
-                    keyframeList: root.knobKeyframes("lightPitch")
-                    useSlider: true
-                    sliderFrom: -90
-                    sliderTo: 90
-                    unit: "°"
-                }
-            }
+                    Grid {
+                        visible: lightGroup.on
+                        width: parent.width
+                        columns: 2
+                        columnSpacing: 8
+                        rowSpacing: Theme.spacingXs
+                        readonly property real cellWidth: (width - columnSpacing) / 2
 
-            Row {
-                width: parent.width
-                spacing: 8
-                PropertyKeyframeRow {
-                    width: (parent.width - parent.spacing) / 2
-                    propDef: root.knob("lightIntensity", qsTr("Intensity"), 2)
-                    keyframeList: root.knobKeyframes("lightIntensity")
-                    useSlider: true
-                    sliderFrom: 0
-                    sliderTo: 3
-                }
-                PropertyKeyframeRow {
-                    width: (parent.width - parent.spacing) / 2
-                    propDef: root.knob("ambient", qsTr("Ambient"), 2)
-                    keyframeList: root.knobKeyframes("ambient")
-                    useSlider: true
-                    sliderFrom: 0
-                    sliderTo: 1
-                    percent: true
+                        PropertyKeyframeRow {
+                            width: parent.cellWidth
+                            propDef: root.knob(lightGroup.prefix + "x", qsTr("Left / right"), 2)
+                            keyframeList: root.knobKeyframes(lightGroup.prefix + "x")
+                            useSlider: true
+                            sliderFrom: -1
+                            sliderTo: 2
+                        }
+                        PropertyKeyframeRow {
+                            width: parent.cellWidth
+                            propDef: root.knob(lightGroup.prefix + "y", qsTr("Up / down"), 2)
+                            keyframeList: root.knobKeyframes(lightGroup.prefix + "y")
+                            useSlider: true
+                            sliderFrom: -1
+                            sliderTo: 2
+                        }
+                        PropertyKeyframeRow {
+                            width: parent.cellWidth
+                            propDef: root.knob(lightGroup.prefix + "z", qsTr("Near / far"), 2)
+                            keyframeList: root.knobKeyframes(lightGroup.prefix + "z")
+                            useSlider: true
+                            sliderFrom: -3
+                            sliderTo: 3
+                        }
+                        PropertyKeyframeRow {
+                            width: parent.cellWidth
+                            propDef: root.knob(lightGroup.prefix + "intensity", qsTr("Brightness"), 2)
+                            keyframeList: root.knobKeyframes(lightGroup.prefix + "intensity")
+                            useSlider: true
+                            sliderFrom: 0
+                            sliderTo: 4
+                        }
+                        PropertyKeyframeRow {
+                            width: parent.cellWidth
+                            propDef: root.knob(lightGroup.prefix + "radius", qsTr("Reach"), 2)
+                            keyframeList: root.knobKeyframes(lightGroup.prefix + "radius")
+                            useSlider: true
+                            sliderFrom: 0.05
+                            sliderTo: 5
+                        }
+                        PropertyKeyframeRow {
+                            width: parent.cellWidth
+                            propDef: root.knob(lightGroup.prefix + "cone", qsTr("Spot angle"), 0)
+                            keyframeList: root.knobKeyframes(lightGroup.prefix + "cone")
+                            useSlider: true
+                            sliderFrom: 10
+                            sliderTo: 180
+                            unit: "°"
+                        }
+                        PropertyKeyframeRow {
+                            visible: lightGroup.spot
+                            width: parent.cellWidth
+                            propDef: root.knob(lightGroup.prefix + "aimX", qsTr("Aim left / right"), 2)
+                            keyframeList: root.knobKeyframes(lightGroup.prefix + "aimX")
+                            useSlider: true
+                            sliderFrom: 0
+                            sliderTo: 1
+                        }
+                        PropertyKeyframeRow {
+                            visible: lightGroup.spot
+                            width: parent.cellWidth
+                            propDef: root.knob(lightGroup.prefix + "aimY", qsTr("Aim up / down"), 2)
+                            keyframeList: root.knobKeyframes(lightGroup.prefix + "aimY")
+                            useSlider: true
+                            sliderFrom: 0
+                            sliderTo: 1
+                        }
+                    }
                 }
             }
         }

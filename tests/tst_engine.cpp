@@ -3240,10 +3240,15 @@ void EngineTest::modelClipWorldFitsTheRect()
     // And the model's +x edge rides the quad's right edge.
     QVERIFY((spun.map(QVector3D(1.f, 0.25f, 0.f)) - quad.map(QVector3D(1.f, 0.f, 0.f))).length() < 1e-3f);
 
-    // Normals land in the light frame (world with y up again): at rest, model up stays up.
-    const QMatrix3x3 n = drift::modelClipNormalMatrix(world);
-    const QVector3D up = QVector3D(n(0, 1), n(1, 1), n(2, 1)).normalized();
-    QVERIFY((up - QVector3D(0.f, 1.f, 0.f)).length() < 1e-4f);
+    // The lights' frame is the rect laid flat at the model's centre, unturned by its rotations:
+    // its middle is the box centre, and z counts clip heights away from the viewer.
+    const drift::ModelLightFrame lights = drift::modelLightFrame(rect, turned, canvas);
+    QVERIFY((lights.toWorld(QVector3D(0.5f, 0.5f, 0.f)) - spun.map((aabbMin + aabbMax) * 0.5f)).length() < 1e-3f);
+    QVERIFY((lights.toWorld(QVector3D(0.5f, 0.5f, -1.f)) - lights.toWorld(QVector3D(0.5f, 0.5f, 0.f))
+             - QVector3D(0.f, 0.f, float(rect.height()))).length() < 1e-3f);
+    QVERIFY((lights.fromWorld(lights.toWorld(QVector3D(0.2f, 1.3f, -0.7f))) - QVector3D(0.2f, 1.3f, -0.7f)).length()
+            < 1e-5f);
+    QVERIFY((lights.aimWorld(1.0, 0.0) - lights.toWorld(QVector3D(1.f, 0.f, 0.f))).length() < 1e-5f);
 
     // Seen through a viewpoint, a model vertex and a quad point at the same world place share a
     // depth, which is what lets the two occlude each other in one depth buffer.
@@ -3264,12 +3269,14 @@ void EngineTest::modelClipDrawRequestFollowsLoopMode()
     request.rotation = 12.0;
     request.pose.rotationY = 45.0;
     request.source.path = path;
-    request.source.lightYaw = 75.0;
+    request.source.lights[2].enabled = true;
+    request.source.lights[2].x = 1.75;
 
     const auto draw = drift::model3d::makeDrawRequest(request);
     QVERIFY(draw);
     QVERIFY(draw->asset);
-    QCOMPARE(draw->params.lightYaw, 75.0);
+    QVERIFY(draw->params.lights[2].enabled);
+    QCOMPARE(draw->params.lights[2].x, 1.75);
     QCOMPARE(draw->rect, request.rect);
     QCOMPARE(draw->rotation, 12.0);
     QCOMPARE(draw->pose3d.rotationY, 45.0);
@@ -3282,8 +3289,7 @@ namespace {
 
 // A model centred with half the canvas across, tipped toward the viewer, seen through an eye
 // `size / (2 * depth)` px away (the old "depth" lens).
-GpuScene modelClipScene(const QString &path, int size, double rotY = 0.0, double lightPitch = 20.0,
-                        double depth = 0.5)
+GpuScene modelClipScene(const QString &path, int size, double rotY = 0.0, double depth = 0.5)
 {
     drift::model3d::RenderRequest request;
     request.path = path;
@@ -3292,7 +3298,6 @@ GpuScene modelClipScene(const QString &path, int size, double rotY = 0.0, double
     request.pose.rotationY = rotY;
     request.pose.perspective = size / (2.0 * depth);
     request.source.path = path;
-    request.source.lightPitch = lightPitch;
 
     GpuLayer layer;
     layer.model3d = drift::model3d::makeDrawRequest(request);
@@ -3331,7 +3336,7 @@ void EngineTest::modelClipRendersCube()
     // Rows land with v=0 at the image top: the tilt brings the cube's top toward the viewer, so
     // under perspective the top of the picture is the wider (nearer) end. The
     // cube's shared vertices have no per-face normals, so lighting cannot tell faces apart.
-    const QImage tipped = GpuCompositor::render(modelClipScene(path, 64, 0.0, 20.0, 1.0));
+    const QImage tipped = GpuCompositor::render(modelClipScene(path, 64, 0.0, 1.0));
     QVERIFY(!tipped.isNull());
     auto coveredWidth = [&](int y) {
         int n = 0;

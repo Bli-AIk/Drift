@@ -42,6 +42,23 @@ struct EditorOverlayInput
 
 QList<EditorLine> buildEditorOverlay(const EditorOverlayInput &input);
 
+// A light as the 3D view draws it, Blender-style: a ring facing the viewer, a dashed drop to the
+// surface it hangs over, and for a spot its cone out to where it is aimed. World space.
+struct LightGuide
+{
+    QVector3D position;
+    QColor color;
+    bool spot = false;
+    double cone = 180.0; // full angle, degrees
+    QVector3D aim;
+    bool hasDrop = false;
+    QVector3D drop;       // the point below the light
+    QVector3D dropNormal; // the surface's facing there, for the cross marking it
+};
+
+void addLightGuides(QList<EditorLine> &out, const QList<LightGuide> &lights, const QVector3D &eye,
+                    bool selected);
+
 // The part of segment a-b in front of the viewpoint's near plane, in canvas px. False when all of
 // it is behind.
 bool clipEditorSegment(const QMatrix4x4 &viewProj, const QVector3D &a, const QVector3D &b,

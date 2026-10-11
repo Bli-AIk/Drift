@@ -83,7 +83,7 @@ QJsonObject animPropProp()
         "geometry knobs shape.<cornerRadius|points|innerRatio|headSize|thickness|tailX|tailSize>. On "
         "an SVG vector clip the svg.* overrides: vector.svg.<strokeWidth|opacity>, "
         "vector.svg.<fill|stroke>.<r|g|b|a>, or the same under vector.svg.<elementId>. On a 3D "
-        "model clip model3d.<lightYaw|lightPitch|lightIntensity|ambient>; a model is placed by its "
+        "model clip model3d.<ambient|light<n>_<x|y|z|intensity|radius|cone|aimX|aimY>> (n 1..4); a model is placed by its "
         "transform like any 3D layer (x, y, width, height, z, rotationX, rotationY, rotation, "
         "perspective), and the older model3d.<scale|depth|rotX|rotY|rotZ> are still accepted as "
         "shorthands that write those. "
@@ -421,6 +421,25 @@ QJsonObject speedPointSchema()
         {QStringLiteral("outDy"), numberProp(QStringLiteral("Outgoing tangent dy"))},
         {QStringLiteral("corner"), boolProp(QStringLiteral("Break tangent collinearity"))},
     });
+}
+
+// One entry of a model clip's `lights`; the array's index is the light's (1..4).
+QJsonObject model3dLightsProp()
+{
+    return arrayProp(
+        objectSchema({
+            {QStringLiteral("enabled"), boolProp(QStringLiteral("Light on"))},
+            {QStringLiteral("x"), numberProp(QStringLiteral("Across the clip's rect, 0 left .. 1 right"), -1.0, 2.0)},
+            {QStringLiteral("y"), numberProp(QStringLiteral("Down the clip's rect, 0 top .. 1 bottom"), -1.0, 2.0)},
+            {QStringLiteral("z"), numberProp(QStringLiteral("Clip heights from the model's centre; negative is nearer the viewer"), -3.0, 3.0)},
+            {QStringLiteral("color"), stringProp(QStringLiteral("#rrggbb"))},
+            {QStringLiteral("intensity"), numberProp(QStringLiteral("Brightness"), 0.0, 4.0)},
+            {QStringLiteral("radius"), numberProp(QStringLiteral("Reach in clip heights"), 0.05, 5.0)},
+            {QStringLiteral("cone"), numberProp(QStringLiteral("Spot angle in degrees; 180 is a point light"), 10.0, 180.0)},
+            {QStringLiteral("aimX"), numberProp(QStringLiteral("Where a spot points, across the rect 0..1 on the plane through the model's centre"), 0.0, 1.0)},
+            {QStringLiteral("aimY"), numberProp(QStringLiteral("Where a spot points, down the rect 0..1"), 0.0, 1.0)},
+        }),
+        QStringLiteral("Up to four lights, by index; give only the fields to change, or null to leave a light alone"));
 }
 
 QJsonObject exportSettingsProps()

@@ -25,11 +25,33 @@ QVector3D flooredExtent(const QVector3D &aabbMin, const QVector3D &aabbMax)
 ModelClipParams modelClipParamsFromSource(const Model3dSource &source)
 {
     ModelClipParams p;
-    p.lightYaw = source.lightYaw;
-    p.lightPitch = source.lightPitch;
-    p.lightIntensity = source.lightIntensity;
+    p.lights = source.lights;
     p.ambient = source.ambient;
     return p;
+}
+
+QVector3D ModelLightFrame::toWorld(const QVector3D &light) const
+{
+    // z runs away from the viewer in clip heights; world z runs toward it.
+    return origin + QVector3D(float(light.x() * width), float(light.y() * height), float(-light.z() * height));
+}
+
+QVector3D ModelLightFrame::fromWorld(const QVector3D &world) const
+{
+    const QVector3D d = world - origin;
+    return QVector3D(float(d.x() / std::max(1e-6, width)), float(d.y() / std::max(1e-6, height)),
+                     float(-d.z() / std::max(1e-6, height)));
+}
+
+ModelLightFrame modelLightFrame(const QRectF &rect, const ClipPose3d &pose, const QSizeF &canvas)
+{
+    // modelClipWorld centres the box on the rect's centre at positionZ.
+    ModelLightFrame frame;
+    frame.origin = QVector3D(float(rect.x() - canvas.width() * 0.5), float(rect.y() - canvas.height() * 0.5),
+                             float(pose.positionZ));
+    frame.width = rect.width();
+    frame.height = rect.height();
+    return frame;
 }
 
 QMatrix4x4 modelClipWorld(const QRectF &rect, double rotation, const ClipPose3d &pose,
@@ -52,14 +74,6 @@ QMatrix4x4 modelClipWorld(const QRectF &rect, double rotation, const ClipPose3d 
     m.scale(1.f, -1.f, 1.f);
     m.translate(-(aabbMin + aabbMax) * 0.5f);
     return m;
-}
-
-QMatrix3x3 modelClipNormalMatrix(const QMatrix4x4 &world)
-{
-    QMatrix3x3 n = world.normalMatrix();
-    for (int c = 0; c < 3; ++c)
-        n(1, c) = -n(1, c);
-    return n;
 }
 
 QSizeF modelClipFaceSize(const QVector3D &aabbMin, const QVector3D &aabbMax, double span)

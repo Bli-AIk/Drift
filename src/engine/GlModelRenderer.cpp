@@ -13,7 +13,9 @@
 #include <QOpenGLShaderProgram>
 #include <QtMath>
 #include <QVector>
+#include <QVector2D>
 #include <QVector3D>
+#include <QVector4D>
 
 #include <cmath>
 #include <cstring>
@@ -50,38 +52,6 @@ void main() {
     v_uv = a_uv;
     gl_Position = u_mvp * vec4(a_pos, 1.0);
     gl_Position.z *= u_flipDepth;
-}
-)";
-
-// Skinned variant for model clips: every vertex blends up to four palette rows (a rigid vertex
-// has one row at weight one), read from a 4×N RGBA32F texture so the joint count is bounded by
-// texture height rather than the vertex uniform budget. `highp` on the sampler is explicit:
-// ESSL defaults vertex-stage samplers to lowp, and the ES preamble only patches fragment shaders.
-constexpr const char *kModelSkinVert = R"(#version 330 core
-layout(location = 0) in vec3 a_pos;
-layout(location = 1) in vec3 a_nrm;
-layout(location = 2) in vec2 a_uv;
-layout(location = 3) in vec4 a_joints;
-layout(location = 4) in vec4 a_weights;
-uniform mat4 u_post;          // projection * view * user transform, applied after skinning
-uniform mat3 u_normalMatrix;  // mat3(view * user transform)
-uniform highp sampler2D u_palette;
-out vec3 v_nrm;
-out vec2 v_uv;
-mat4 paletteRow(int i) {
-    return mat4(texelFetch(u_palette, ivec2(0, i), 0),
-                texelFetch(u_palette, ivec2(1, i), 0),
-                texelFetch(u_palette, ivec2(2, i), 0),
-                texelFetch(u_palette, ivec2(3, i), 0));
-}
-void main() {
-    mat4 skin = a_weights.x * paletteRow(int(a_joints.x + 0.5))
-              + a_weights.y * paletteRow(int(a_joints.y + 0.5))
-              + a_weights.z * paletteRow(int(a_joints.z + 0.5))
-              + a_weights.w * paletteRow(int(a_joints.w + 0.5));
-    v_nrm = normalize(u_normalMatrix * (mat3(skin) * a_nrm));
-    v_uv = a_uv;
-    gl_Position = u_post * (skin * vec4(a_pos, 1.0));
 }
 )";
 
@@ -122,6 +92,122 @@ void main() {
     vec3 specCol = mix(vec3(0.04), base.rgb, clamp(u_metallic, 0.0, 1.0));
     vec3 specular = specCol * (u_lightIntensity * pow(ndoth, specPower));
     vec3 rgb = diffuse + specular + u_emissive;
+    float a = (u_alphaMode > 1.5) ? base.a : 1.0;
+    fragColor = vec4(rgb * a, a);
+}
+)";
+
+// Model clips light in world space from the clip's own lights (ModelLight), so their vertex
+// stages also hand on the world position. The face-prop effect keeps the screen-space key light
+// above and must not change.
+constexpr const char *kModelClipVert = R"(#version 330 core
+layout(location = 0) in vec3 a_pos;
+layout(location = 1) in vec3 a_nrm;
+layout(location = 2) in vec2 a_uv;
+uniform mat4 u_mvp;
+uniform mat4 u_world;
+uniform mat3 u_normalMatrix;
+out vec3 v_nrm;
+out vec3 v_world;
+out vec2 v_uv;
+void main() {
+    v_nrm = normalize(u_normalMatrix * a_nrm);
+    v_world = (u_world * vec4(a_pos, 1.0)).xyz;
+    v_uv = a_uv;
+    gl_Position = u_mvp * vec4(a_pos, 1.0);
+}
+)";
+
+// Skinned: every vertex blends up to four palette rows (a rigid vertex has one row at weight one),
+// read from a 4×N RGBA32F texture so the joint count is bounded by texture height rather than the
+// vertex uniform budget. `highp` on the sampler is explicit: ESSL defaults vertex-stage samplers to
+// lowp, and the ES preamble only patches fragment shaders.
+constexpr const char *kModelClipSkinVert = R"(#version 330 core
+layout(location = 0) in vec3 a_pos;
+layout(location = 1) in vec3 a_nrm;
+layout(location = 2) in vec2 a_uv;
+layout(location = 3) in vec4 a_joints;
+layout(location = 4) in vec4 a_weights;
+uniform mat4 u_post;
+uniform mat4 u_world;
+uniform mat3 u_normalMatrix;
+uniform highp sampler2D u_palette;
+out vec3 v_nrm;
+out vec3 v_world;
+out vec2 v_uv;
+mat4 paletteRow(int i) {
+    return mat4(texelFetch(u_palette, ivec2(0, i), 0),
+                texelFetch(u_palette, ivec2(1, i), 0),
+                texelFetch(u_palette, ivec2(2, i), 0),
+                texelFetch(u_palette, ivec2(3, i), 0));
+}
+void main() {
+    mat4 skin = a_weights.x * paletteRow(int(a_joints.x + 0.5))
+              + a_weights.y * paletteRow(int(a_joints.y + 0.5))
+              + a_weights.z * paletteRow(int(a_joints.z + 0.5))
+              + a_weights.w * paletteRow(int(a_joints.w + 0.5));
+    vec4 posed = skin * vec4(a_pos, 1.0);
+    v_nrm = normalize(u_normalMatrix * (mat3(skin) * a_nrm));
+    v_world = (u_world * posed).xyz;
+    v_uv = a_uv;
+    gl_Position = u_post * posed;
+}
+)";
+
+// kModelFrag's material with 3D Relight's lights: inverse-square-ish falloff over each light's
+// reach, a soft-edged spot cone, Lambert diffuse and a Blinn highlight per light.
+constexpr const char *kModelClipFrag = R"(#version 330 core
+in vec3 v_nrm;
+in vec3 v_world;
+in vec2 v_uv;
+out vec4 fragColor;
+uniform vec4 u_baseColorFactor;
+uniform sampler2D u_baseColorTexture;
+uniform float u_hasBaseColorTexture;
+uniform float u_metallic;
+uniform float u_roughness;
+uniform vec3 u_emissive;
+uniform float u_alphaCutoff;
+uniform float u_alphaMode; // 0 opaque, 1 mask, 2 blend
+uniform float u_ambient;
+// The viewer: a point (w = 1), or for a parallel view the direction toward it (w = 0).
+uniform vec4 u_eye;
+uniform vec4 u_lightPos[4];    // world xyz, w = 1 when the light is on
+uniform vec3 u_lightColor[4];  // colour times brightness
+uniform float u_lightReach[4]; // world px
+uniform vec3 u_lightAxis[4];   // a spot's direction
+uniform vec2 u_lightCone[4];   // a spot's cos(outer), cos(inner); x < -1 for a point light
+void main() {
+    vec4 base = u_baseColorFactor;
+    if (u_hasBaseColorTexture > 0.5)
+        base *= texture(u_baseColorTexture, v_uv);
+    if (u_alphaMode > 0.5 && u_alphaMode < 1.5 && base.a < u_alphaCutoff)
+        discard;
+
+    vec3 n = normalize(v_nrm);
+    if (!gl_FrontFacing) n = -n;
+    vec3 v = u_eye.w > 0.5 ? normalize(u_eye.xyz - v_world) : normalize(u_eye.xyz);
+    float specPower = mix(64.0, 4.0, clamp(u_roughness, 0.0, 1.0));
+    vec3 diffuse = vec3(0.0);
+    vec3 shine = vec3(0.0);
+    for (int i = 0; i < 4; ++i) {
+        if (u_lightPos[i].w < 0.5)
+            continue;
+        vec3 toLight = u_lightPos[i].xyz - v_world;
+        float dist = length(toLight);
+        vec3 l = toLight / max(dist, 1e-4);
+        float ndotl = dot(n, l);
+        if (ndotl <= 0.0)
+            continue;
+        float reach = max(u_lightReach[i], 1e-4);
+        float amount = 1.0 / (1.0 + (dist * dist) / (reach * reach));
+        if (u_lightCone[i].x >= -1.0)
+            amount *= smoothstep(u_lightCone[i].x, u_lightCone[i].y, dot(-l, u_lightAxis[i]));
+        diffuse += u_lightColor[i] * ndotl * amount;
+        shine += u_lightColor[i] * pow(max(dot(n, normalize(l + v)), 0.0), specPower) * amount;
+    }
+    vec3 specCol = mix(vec3(0.04), base.rgb, clamp(u_metallic, 0.0, 1.0));
+    vec3 rgb = base.rgb * (u_ambient + diffuse) + specCol * shine + u_emissive;
     float a = (u_alphaMode > 1.5) ? base.a : 1.0;
     fragColor = vec4(rgb * a, a);
 }
@@ -1007,6 +1093,53 @@ GlTarget resolveFaceOverlay(GlRuntime &rt, QOpenGLExtraFunctions *gl, GlTarget &
     return result;
 }
 
+namespace {
+
+// kModelClipFrag's lights and viewer, in the world the model is placed in. `viewProjection` is the
+// one the model is drawn through, so its viewer is the one the highlights face.
+void setModelClipLights(QOpenGLShaderProgram *prog, const model3d::ModelDrawRequest &request,
+                        const QMatrix4x4 &viewProjection, const QSizeF &canvas)
+{
+    // The viewer is where the projection sends nothing to the image plane: clip (0, 0, z, 0).
+    bool invertible = false;
+    const QVector4D eye = viewProjection.inverted(&invertible).map(QVector4D(0.f, 0.f, 1.f, 0.f));
+    if (!invertible || std::abs(eye.w()) < 1e-9f)
+        prog->setUniformValue("u_eye", QVector4D(0.f, 0.f, 1.f, 0.f));
+    else
+        prog->setUniformValue("u_eye", QVector4D(eye.toVector3DAffine(), 1.f));
+
+    const ModelLightFrame frame = modelLightFrame(request.rect, request.pose3d, canvas);
+    QVector4D positions[kModelLightCount];
+    QVector3D colors[kModelLightCount];
+    GLfloat reaches[kModelLightCount];
+    QVector3D axes[kModelLightCount];
+    QVector2D cones[kModelLightCount];
+    for (int i = 0; i < kModelLightCount; ++i) {
+        const ModelLight &light = request.params.lights[size_t(i)];
+        const QVector3D at = frame.toWorld(QVector3D(float(light.x), float(light.y), float(light.z)));
+        positions[i] = QVector4D(at, light.enabled && light.intensity > 0.0 ? 1.f : 0.f);
+        colors[i] = QVector3D(float(light.color.redF()), float(light.color.greenF()), float(light.color.blueF()))
+                    * float(light.intensity);
+        reaches[i] = float(light.radius * frame.height);
+        cones[i] = QVector2D(-2.f, -2.f);
+        axes[i] = QVector3D(0.f, 0.f, -1.f);
+        const QVector3D axis = frame.aimWorld(light.aimX, light.aimY) - at;
+        if (light.cone < 179.5 && axis.lengthSquared() > 1e-6f) {
+            axes[i] = axis.normalized();
+            // The same edge 3D Relight draws: soft over the outer quarter of the half-angle.
+            const double half = light.cone * 0.5 * M_PI / 180.0;
+            cones[i] = QVector2D(float(std::cos(half)), float(std::cos(half * 0.75)));
+        }
+    }
+    prog->setUniformValueArray("u_lightPos", positions, kModelLightCount);
+    prog->setUniformValueArray("u_lightColor", colors, kModelLightCount);
+    prog->setUniformValueArray("u_lightReach", reaches, kModelLightCount, 1);
+    prog->setUniformValueArray("u_lightAxis", axes, kModelLightCount);
+    prog->setUniformValueArray("u_lightCone", cones, kModelLightCount);
+}
+
+} // namespace
+
 GlTarget drawModelClip(GlRuntime &rt, QOpenGLExtraFunctions *gl,
                        const model3d::ModelDrawRequest &request, const QSize &canvasSize,
                        const QMatrix4x4 &viewProjection, GlTarget *depthOut)
@@ -1054,10 +1187,10 @@ GlTarget drawModelClip(GlRuntime &rt, QOpenGLExtraFunctions *gl,
     // take) draws the baked buffer with the face effect's program.
     const bool useRig = model->cpu->rig && ensureRigGpu(rt, gl, *model);
     QOpenGLShaderProgram *prog =
-        useRig ? rt.builtinProgram(QStringLiteral("model_clip_skin"), kModelSkinVert, kModelFrag)
-               : rt.builtinProgram(QStringLiteral("face_model"), kModelVert, kModelFrag);
+        useRig ? rt.builtinProgram(QStringLiteral("model_clip_lit_skin"), kModelClipSkinVert, kModelClipFrag)
+               : rt.builtinProgram(QStringLiteral("model_clip_lit"), kModelClipVert, kModelClipFrag);
     if (!prog && useRig)
-        prog = rt.builtinProgram(QStringLiteral("face_model"), kModelVert, kModelFrag);
+        prog = rt.builtinProgram(QStringLiteral("model_clip_lit"), kModelClipVert, kModelClipFrag);
     QOpenGLShaderProgram *resolve = rt.builtinProgram(QStringLiteral("model_clip_resolve"),
                                                       kQuadVertexShader, kModelClipResolveFrag);
     if (!prog || !resolve) {
@@ -1112,14 +1245,13 @@ GlTarget drawModelClip(GlRuntime &rt, QOpenGLExtraFunctions *gl,
             prog->setUniformValue("u_post", mvp);
         } else {
             prog->setUniformValue("u_mvp", mvp);
-            prog->setUniformValue("u_flipDepth", 1.f);
         }
-        prog->setUniformValue("u_normalMatrix", modelClipNormalMatrix(world));
-        prog->setUniformValue("u_lightDir",
-                              screenLightDir(request.params.lightYaw, request.params.lightPitch));
-        prog->setUniformValue("u_lightIntensity", float(request.params.lightIntensity));
+        prog->setUniformValue("u_world", world);
+        prog->setUniformValue("u_normalMatrix", world.normalMatrix());
         prog->setUniformValue("u_ambient", float(request.params.ambient));
         prog->setUniformValue("u_baseColorTexture", 0);
+        setModelClipLights(prog, request, viewProjection,
+                           request.canvas.isEmpty() ? QSizeF(canvasSize) : request.canvas);
 
         gl->glBindVertexArray(skinning ? model->rigVao : model->vao);
         drawModelPrimitives(gl, prog, skinning ? cpu.rig->primitives : cpu.primitives,

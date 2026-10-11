@@ -608,8 +608,10 @@
           "the canvas height. scale/depth/rotX/rotY/rotZ are older shorthands still accepted: scale "
           "resizes the box about its centre to that fraction of canvas height, depth sets the "
           "perspective, rotX/rotY/rotZ set the rotations about the model's glTF axes (+y up). "
-          "lightYaw/lightPitch/lightIntensity/ambient light it and are keyframable as "
-          "model3d.<key>. An animated file plays its first animation at its own length unless "
+          "It is lit by ambient plus up to four point or spot lights (lights), placed like 3D "
+          "Relight's across the clip's rect and near or far of the model's centre; they follow the "
+          "clip's position and size but not its rotation. Their numbers are keyframable as "
+          "model3d.ambient and model3d.light<n>_<x|y|z|intensity|radius|cone|aimX|aimY>. An animated file plays its first animation at its own length unless "
           "duration is given; loop decides what happens past the end. Returns {id, track, index, "
           "animations:[{name, durationSec}], vertexCount, warning?, model3d:{…}}.",
           objectSchema({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute path to a .glb file"))},
@@ -625,9 +627,7 @@
                         {QStringLiteral("rotX"), numberProp(QStringLiteral("Shorthand: degrees about the model's X axis; writes rotationX = -rotX"))},
                         {QStringLiteral("rotY"), numberProp(QStringLiteral("Shorthand: degrees about the model's up axis; writes rotationY"))},
                         {QStringLiteral("rotZ"), numberProp(QStringLiteral("Shorthand: degrees about the model's Z axis; writes rotation = -rotZ"))},
-                        {QStringLiteral("lightYaw"), numberProp(QStringLiteral("Key light direction, degrees (default 30)"))},
-                        {QStringLiteral("lightPitch"), numberProp(QStringLiteral("Key light elevation, degrees (default 20)"))},
-                        {QStringLiteral("lightIntensity"), numberProp(QStringLiteral("Key light strength (default 1)"), 0.0, 10.0)},
+                        {QStringLiteral("lights"), model3dLightsProp()},
                         {QStringLiteral("ambient"), numberProp(QStringLiteral("Ambient light 0..1 (default 0.35)"), 0.0, 1.0)},
                         {QStringLiteral("name"), stringProp(QStringLiteral("Clip name (default: the file name)"))}},
                        {QStringLiteral("path")}) },
@@ -660,9 +660,7 @@
                                    {QStringLiteral("rotX"), numberProp(QStringLiteral("Shorthand: writes rotationX = -rotX"))},
                                    {QStringLiteral("rotY"), numberProp(QStringLiteral("Shorthand: writes rotationY"))},
                                    {QStringLiteral("rotZ"), numberProp(QStringLiteral("Shorthand: writes rotation = -rotZ"))},
-                                   {QStringLiteral("lightYaw"), numberProp(QStringLiteral("Key light direction, degrees"))},
-                                   {QStringLiteral("lightPitch"), numberProp(QStringLiteral("Key light elevation, degrees"))},
-                                   {QStringLiteral("lightIntensity"), numberProp(QStringLiteral("Key light strength"), 0.0, 10.0)},
+                                   {QStringLiteral("lights"), model3dLightsProp()},
                                    {QStringLiteral("ambient"), numberProp(QStringLiteral("Ambient light 0..1"), 0.0, 1.0)},
                                    {QStringLiteral("name"), stringProp(QStringLiteral("Clip name"))}},
                                   clipRefProps())) },

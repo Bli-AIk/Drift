@@ -2,15 +2,15 @@ import QtQuick
 import Drift
 import ".."
 
-// The 3D view's grips for the selected clip's 3D Relight lights. The lights themselves (rings,
-// spot cones, the drop to the surface) are drawn by the renderer over the clip's relief; this only
-// puts a knob on each light and a ring on each spot's aim, at the canvas points the engine
-// projects them to.
+// The 3D view's grips for the selected clip's lights: a model clip's own, or 3D Relight's over a
+// clip's relief. The lights themselves (rings, spot cones, the drop to the surface) are drawn by
+// the renderer; this only puts a knob on each light and a ring on each spot's aim, at the canvas
+// points the engine projects them to.
 //
 // Dragging a knob slides the light across the view at the distance it already has, the way
 // Blender's grab does, so orbiting is what moves it nearer or farther; the wheel steps it along
-// the clip's own near/far axis as in 2D. Dragging an aim ring lays it on the relief under the
-// pointer. Only the grips take the pointer.
+// the clip's own near/far axis as in 2D. Dragging an aim ring lays it on the relief, or the plane
+// through a model's centre, under the pointer. Only the grips take the pointer.
 Item {
     id: root
 
@@ -29,7 +29,7 @@ Item {
             return
         const next = EditorState.preview.depthLights3d()
         lights = next
-        const signature = next.map(l => l.effect + ":" + l.light + ":" + l.spot).join("|")
+        const signature = next.map(l => l.prefix + ":" + l.spot).join("|")
         if (signature === lightSignature)
             return
         lightSignature = signature
@@ -42,9 +42,9 @@ Item {
         Qt.callLater(refreshOverlay)
     }
 
-    function writeParam(effectIndex, key, value) {
-        EditorState.previewSetClipKeyframe(EditorState.selectedTrack, EditorState.selectedClip,
-                                           "fx." + effectIndex + "." + key,
+    // `key` is the light's prefix plus the parameter: "fx.2.light1_x", "model3d.light1_x".
+    function writeParam(key, value) {
+        EditorState.previewSetClipKeyframe(EditorState.selectedTrack, EditorState.selectedClip, key,
                                            EditorState.playheadSeconds, value)
     }
 
@@ -85,7 +85,7 @@ Item {
             required property var modelData
             // Values from the latest refresh; modelData only fixes which light this is.
             readonly property var values: root.lights[index] || modelData
-            readonly property string prefix: "light" + modelData.light + "_"
+            readonly property string prefix: modelData.prefix
 
             // Where the grips sit while dragged, in overlay px, so they follow the pointer without
             // waiting for a refresh.
@@ -142,8 +142,8 @@ Item {
                             return
                         handle.liveAimX = p.x
                         handle.liveAimY = p.y
-                        root.writeParam(handle.modelData.effect, handle.prefix + "aimX", aim.aimX)
-                        root.writeParam(handle.modelData.effect, handle.prefix + "aimY", aim.aimY)
+                        root.writeParam(handle.prefix + "aimX", aim.aimX)
+                        root.writeParam(handle.prefix + "aimY", aim.aimY)
                     }
                     onReleased: { handle.clearLive(); root.endInteraction() }
                     onCanceled: { handle.clearLive(); root.endInteraction() }
@@ -198,9 +198,9 @@ Item {
                             return
                         handle.liveX = x
                         handle.liveY = y
-                        root.writeParam(handle.modelData.effect, handle.prefix + "x", moved.x)
-                        root.writeParam(handle.modelData.effect, handle.prefix + "y", moved.y)
-                        root.writeParam(handle.modelData.effect, handle.prefix + "z", moved.z)
+                        root.writeParam(handle.prefix + "x", moved.x)
+                        root.writeParam(handle.prefix + "y", moved.y)
+                        root.writeParam(handle.prefix + "z", moved.z)
                     }
                     onReleased: { handle.clearLive(); root.endInteraction() }
                     onCanceled: { handle.clearLive(); root.endInteraction() }
@@ -208,9 +208,10 @@ Item {
                     // Scrolling up brings the light towards the viewer; Shift for fine steps.
                     onWheel: (wheel) => {
                         const step = (wheel.modifiers & Qt.ShiftModifier) !== 0 ? 0.01 : 0.05
-                        const z = Math.max(-1, Math.min(1, (handle.values.z || 0) - Math.sign(wheel.angleDelta.y) * step))
+                        const z = Math.max(handle.values.zMin, Math.min(handle.values.zMax,
+                                           (handle.values.z || 0) - Math.sign(wheel.angleDelta.y) * step))
                         EditorState.beginPreviewDrag(qsTr("Move light"))
-                        root.writeParam(handle.modelData.effect, handle.prefix + "z", z)
+                        root.writeParam(handle.prefix + "z", z)
                         EditorState.commitPreviewDrag()
                         wheel.accepted = true
                     }
