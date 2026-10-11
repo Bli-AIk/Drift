@@ -514,8 +514,11 @@ int main(int argc, char *argv[])
     QSurfaceFormat androidFormat;
     androidFormat.setRenderableType(QSurfaceFormat::OpenGLES);
     androidFormat.setVersion(3, 0);
-    androidFormat.setDepthBufferSize(0);
-    androidFormat.setStencilBufferSize(0);
+    // Qt Quick draws opaque items front to back against the depth buffer and clips rotated items
+    // with the stencil. With neither, a flat opaque item lost to whatever opaque item sat behind
+    // it (the start screen's background showed the editor through).
+    androidFormat.setDepthBufferSize(24);
+    androidFormat.setStencilBufferSize(8);
     QSurfaceFormat::setDefaultFormat(androidFormat);
 #else
     // On NVIDIA/Wayland, leaving the API unspecified makes EGL interpret 3.3
