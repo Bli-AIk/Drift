@@ -2700,6 +2700,7 @@ void EditorStateTest::projectPersistenceRoundTrip()
 
     state.projectFile()->saveProject(QUrl::fromLocalFile(tempFile.fileName()));
     state.projectFile()->loadProject(QUrl::fromLocalFile(tempFile.fileName()));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
 
     QVERIFY(state.durationSeconds() > 0.0);
     QCOMPARE(state.tracks().size(), 2);
@@ -2757,11 +2758,13 @@ void EditorStateTest::saveProjectAsDuplicatesProject()
 
     // And the original still opens as it was, under its own id and name.
     state.projectFile()->loadProject(QUrl::fromLocalFile(originalPath));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
     QCOMPARE(state.project()->id(), originalId);
     QCOMPARE(state.projectFile()->projectName(), QStringLiteral("Wedding"));
     QCOMPARE(clipCount(), 1); // without the clip that was only ever added to the copy
 
     state.projectFile()->loadProject(QUrl::fromLocalFile(copyPath));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
     QCOMPARE(state.projectFile()->projectName(), QStringLiteral("wedding-short"));
     QCOMPARE(clipCount(), 2);
 }
@@ -2796,6 +2799,7 @@ void EditorStateTest::projectJsonExportImportRoundTrip()
     QVERIFY(state.projectFile()->currentProjectPath().isEmpty());
 
     state.projectFile()->loadProjectJson(QUrl::fromLocalFile(jsonPath));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
     QCOMPARE(state.lastMessage(), QStringLiteral("Project JSON loaded"));
     QCOMPARE(state.projectFile()->projectMetadata().value(QStringLiteral("title")).toString(),
              QStringLiteral("FromJson"));
@@ -2812,6 +2816,7 @@ void EditorStateTest::projectJsonExportImportRoundTrip()
     // loadProject sniffs JSON so a dropped file, CLI arg or MCP load_project works.
     state.projectFile()->newProject();
     state.projectFile()->loadProject(QUrl::fromLocalFile(jsonPath));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
     QCOMPARE(state.lastMessage(), QStringLiteral("Project JSON loaded"));
     QCOMPARE(state.projectFile()->projectMetadata().value(QStringLiteral("title")).toString(),
              QStringLiteral("FromJson"));
@@ -2877,6 +2882,7 @@ void EditorStateTest::guidesTravelWithProject()
 
     state.preview()->setGuidesEnabled(false);
     state.projectFile()->loadProjectJson(QUrl::fromLocalFile(jsonPath));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
     QVERIFY(state.preview()->guidesEnabled());
     const QVariantList items = state.guideItems();
     QCOMPARE(items.size(), 1);
@@ -3005,6 +3011,7 @@ void EditorStateTest::projectJsonImportRejectsGarbageAndLeavesTimeline()
     }
 
     state.projectFile()->loadProjectJson(QUrl::fromLocalFile(path));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
     QCOMPARE(state.lastMessageSeverity(), QStringLiteral("error"));
     QCOMPARE(state.lastMessage(), QStringLiteral("This file isn’t a Drift project."));
     QCOMPARE(state.tracks().size(), 2);
@@ -3073,6 +3080,7 @@ void EditorStateTest::legacyStabilizedRenderBecomesBinAsset()
     AssetLibrary library;
     AppController state(&library);
     state.projectFile()->loadProjectJson(QUrl::fromLocalFile(jsonPath));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
     const drift::Project &loaded = *state.project();
     QCOMPARE(loaded.assetOrder().size(), 2);
 

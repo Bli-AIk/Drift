@@ -647,6 +647,10 @@
         <translation>Трансформировать вместе</translation>
     </message>
     <message>
+        <source>Edit text</source>
+        <translation type="unfinished">Редактировать текст</translation>
+    </message>
+    <message>
         <source>Fade</source>
         <translation>Плавный переход</translation>
     </message>
@@ -763,6 +767,14 @@
         <source>Done</source>
         <translation>Готово</translation>
     </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <source>Select all</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AndroidFadeSheet</name>
@@ -805,21 +817,6 @@
     <message>
         <source>Curve</source>
         <translation>Кривая</translation>
-    </message>
-</context>
-<context>
-    <name>AndroidHomeNav</name>
-    <message>
-        <source>Projects</source>
-        <translation>Проекты</translation>
-    </message>
-    <message>
-        <source>Market</source>
-        <translation>Магазин</translation>
-    </message>
-    <message>
-        <source>Me</source>
-        <translation>Профиль</translation>
     </message>
 </context>
 <context>
@@ -997,60 +994,6 @@
     <message>
         <source>Imported from the marketplace.</source>
         <translation>Импортировано из магазина.</translation>
-    </message>
-</context>
-<context>
-    <name>AndroidMarket</name>
-    <message>
-        <source>Market</source>
-        <translation>Магазин</translation>
-    </message>
-    <message>
-        <source>Downloads</source>
-        <translation>Загрузки</translation>
-    </message>
-</context>
-<context>
-    <name>AndroidMePage</name>
-    <message>
-        <source>Me</source>
-        <translation>Профиль</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n coin(s)</source>
-        <translation>
-            <numerusform>%n монета</numerusform>
-            <numerusform>%n монеты</numerusform>
-            <numerusform>%n монет</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Light mode</source>
-        <translation>Светлая тема</translation>
-    </message>
-    <message>
-        <source>Dark mode</source>
-        <translation>Тёмная тема</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>Настройки</translation>
-    </message>
-    <message>
-        <source>Switch to desktop layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Extras</source>
-        <translation>Дополнения</translation>
-    </message>
-    <message>
-        <source>Update available</source>
-        <translation>Доступно обновление</translation>
-    </message>
-    <message>
-        <source>Debug info</source>
-        <translation>Отладочная информация</translation>
     </message>
 </context>
 <context>
@@ -1645,8 +1588,60 @@
         <translation>Синхронизировать ракурсы и переключаться между ними</translation>
     </message>
     <message>
-        <source>App settings</source>
-        <translation>Настройки приложения</translation>
+        <source>Extras</source>
+        <translation type="unfinished">Дополнения</translation>
+    </message>
+    <message>
+        <source>Add-ons and model packs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished">Настройки</translation>
+    </message>
+    <message>
+        <source>Light mode</source>
+        <translation type="unfinished">Светлая тема</translation>
+    </message>
+    <message>
+        <source>Dark mode</source>
+        <translation type="unfinished">Тёмная тема</translation>
+    </message>
+    <message>
+        <source>Switch the app’s colour scheme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to desktop layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the wide editor layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update available</source>
+        <translation type="unfinished">Доступно обновление</translation>
+    </message>
+    <message>
+        <source>A newer version of Drift is ready</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Debug info</source>
+        <translation type="unfinished">Отладочная информация</translation>
+    </message>
+    <message>
+        <source>Version, device and logs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About Drift</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version, licence and credits</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Appearance, extras and agent access</source>
@@ -1729,6 +1724,53 @@
     <message>
         <source>Start a new project from this clip</source>
         <translation>Создать проект из этого клипа</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidTextComposer</name>
+    <message>
+        <source>Previous caption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next caption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caption %1 / %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">Готово</translation>
+    </message>
+    <message>
+        <source>Type subtitle…</source>
+        <translation type="unfinished">Введите текст субтитров…</translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished">Начало</translation>
+    </message>
+    <message>
+        <source>Set start to current time</source>
+        <translation type="unfinished">Установить начало на текущее время</translation>
+    </message>
+    <message>
+        <source>End</source>
+        <translation type="unfinished">Конец</translation>
+    </message>
+    <message>
+        <source>Set end to current time</source>
+        <translation type="unfinished">Установить конец на текущее время</translation>
+    </message>
+    <message>
+        <source>Back one frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward one frame</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1883,6 +1925,14 @@
     <message>
         <source>Untitled</source>
         <translation>Без названия</translation>
+    </message>
+    <message>
+        <source>Downloads</source>
+        <translation type="unfinished">Загрузки</translation>
+    </message>
+    <message>
+        <source>Extras</source>
+        <translation type="unfinished">Дополнения</translation>
     </message>
     <message>
         <source>Undo</source>
@@ -2836,6 +2886,18 @@
     <message>
         <source>Text style imported</source>
         <translation>Стиль текста импортирован</translation>
+    </message>
+    <message>
+        <source>Could not import the font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Added %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Removed %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Resize text</source>
@@ -5012,6 +5074,10 @@
         <source>Click a colour to pick it. Esc cancels.</source>
         <translation>Нажмите на цвет, чтобы выбрать его. Esc — отмена.</translation>
     </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
 </context>
 <context>
     <name>ColorSwatchField</name>
@@ -7055,6 +7121,22 @@
 <context>
     <name>FontCatalog</name>
     <message>
+        <source>Choose a .ttf, .otf or .ttc font file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create the fonts folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not copy the font file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>That file is not a usable font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>High-Impact &amp; Bold</source>
         <translation>Выразительные и жирные</translation>
     </message>
@@ -7074,8 +7156,36 @@
 <context>
     <name>FontPicker</name>
     <message>
+        <source>Add font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fonts (*.ttf *.otf *.ttc *.otc)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My fonts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System fonts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search fonts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add font file…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Install the font pack for curated families →</source>
         <translation>Установите пакет шрифтов для подборки гарнитур →</translation>
+    </message>
+    <message>
+        <source>Remove font</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10412,6 +10522,17 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>ProjectLoadDialog</name>
+    <message>
+        <source>Opening project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unpacking project media…</source>
+        <translation type="unfinished">Распаковка медиафайлов проекта…</translation>
+    </message>
+</context>
+<context>
     <name>ProjectPropertiesDialog</name>
     <message>
         <source>Project properties</source>
@@ -11551,6 +11672,10 @@ If playback stutters, try another.</source>
     <message>
         <source>s</source>
         <translation>с</translation>
+    </message>
+    <message>
+        <source>Tap marks the subject, press and hold marks what to exclude. Tap a marker to remove it.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Left-click marks the subject, right-click marks what to exclude. Click a marker to remove it.</source>
@@ -13439,6 +13564,10 @@ If playback stutters, try another.</source>
     <message>
         <source>%1 captions</source>
         <translation>Записей субтитров: %1</translation>
+    </message>
+    <message>
+        <source>Play the timeline — the line on screen lights up. Tap any line to edit it.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Play the timeline — the line on screen lights up. Click any line to jump to it and edit it below.</source>

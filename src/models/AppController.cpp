@@ -20132,27 +20132,46 @@ void AppController::resetSessionState()
 
 bool AppController::applyProjectJson(const QByteArray &data, QString *error)
 {
+    std::optional<ParsedProject> parsed = parseProjectJson(data, error);
+    if (!parsed)
+        return false;
+    applyParsedProject(std::move(*parsed));
+    return true;
+}
+
+std::optional<AppController::ParsedProject> AppController::parseProjectJson(const QByteArray &data,
+                                                                             QString *error)
+{
     const QJsonDocument document = QJsonDocument::fromJson(data);
     if (!document.isObject()) {
         if (error)
             *error = QStringLiteral("Invalid project file");
-        return false;
+        return std::nullopt;
     }
+    return parseProjectJson(document.object(), error);
+}
 
-    const QJsonObject root = document.object();
-
+std::optional<AppController::ParsedProject> AppController::parseProjectJson(const QJsonObject &root,
+                                                                             QString *error)
+{
     // Parse into a local and check before touching anything: a project we end up rejecting must
     // leave the open one exactly as it was, session state included.
     QString parseError;
-    drift::Project parsed = drift::Project::fromJson(root, &parseError);
+    drift::Project project = drift::Project::fromJson(root, &parseError);
     if (!parseError.isEmpty()) {
         if (error)
             *error = parseError;
-        return false;
+        return std::nullopt;
     }
+    return ParsedProject{std::move(project), root};
+}
+
+void AppController::applyParsedProject(ParsedProject parsed)
+{
+    const QJsonObject &root = parsed.root;
 
     resetSessionState();
-    m_project = std::move(parsed);
+    m_project = std::move(parsed.project);
 
     // Stickers moved out of the QRC and into an addon, so projects saved before that store paths
     // like ":/qt/qml/Drift/resources/stickers/grinning.png" that no longer resolve. Repoint them
@@ -20261,7 +20280,6 @@ bool AppController::applyProjectJson(const QByteArray &data, QString *error)
     emit m_projectFile->projectMetadataChanged();
     emit m_projectFile->backgroundChanged();
     emit guidesChanged();
-    return true;
 }
 
 

@@ -14,9 +14,11 @@
 
 #include "models/AppController.h"
 #include "models/AssetLibrary.h"
+#include "models/ProjectFileController.h"
 
 #include <QByteArray>
 #include <QDir>
+#include <QEventLoop>
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonArray>
@@ -24,6 +26,7 @@
 #include <QSet>
 #include <QStringList>
 #include <QTemporaryDir>
+#include <QTimer>
 #include <QUrl>
 #include <QVariantList>
 #include <QVariantMap>
@@ -649,7 +652,33 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
         const QString path = localPath(argString(args, QStringLiteral("path")));
         if (path.isEmpty())
             return err("bad_args", QStringLiteral("path required"));
-        m_controller->projectFile()->loadProject(QUrl::fromLocalFile(path));
+        ProjectFileController *projectFile = m_controller->projectFile();
+        if (projectFile->projectLoadPending())
+            return err("busy", QStringLiteral("Another project is still opening"));
+
+        // The load runs on a worker; answer once the document is in, so the agent's next call
+        // sees it rather than the project it replaced.
+        bool loaded = false;
+        QString message;
+        QEventLoop loop;
+        QTimer timeout;
+        timeout.setSingleShot(true);
+        QObject::connect(&timeout, &QTimer::timeout, &loop, &QEventLoop::quit);
+        QObject::connect(projectFile, &ProjectFileController::projectLoadFinished, &loop,
+                         [&](bool success, const QString &text) {
+                             loaded = success;
+                             message = text;
+                             loop.quit();
+                         });
+        projectFile->loadProject(QUrl::fromLocalFile(path));
+        if (projectFile->projectLoadPending()) {
+            timeout.start(300000);
+            loop.exec();
+        }
+        if (projectFile->projectLoadPending())
+            return err("load_timeout", QStringLiteral("Project is still opening"));
+        if (!loaded)
+            return err("load_failed", message);
         return ok({{QStringLiteral("path"), path}});
     }
 

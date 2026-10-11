@@ -14,6 +14,7 @@
 #include <QVariantList>
 #include <QVariantMap>
 
+#include <memory>
 #include <optional>
 
 class QTimer;
@@ -33,12 +34,14 @@ class ProjectFileController : public QObject
     Q_PROPERTY(double packageProgress READ packageProgress NOTIFY packageProgressChanged)
     Q_PROPERTY(bool collectingMedia READ collectingMedia NOTIFY collectingMediaChanged)
     Q_PROPERTY(double collectMediaProgress READ collectMediaProgress NOTIFY collectMediaProgressChanged)
-    // True from the moment loadProject()/loadProjectJson() is called — by the header,
+    // True from the moment loadProject()/loadProjectJson()/restoreAutosave() is called — by the header,
     // the start screen, an external open, or a startup restore — until projectLoadFinished
     // fires. Tracked here rather than by each QML call site so a load kicked off from C++
     // (consumeStartupProject, restoreLastSessionIfEnabled) is just as visible as one QML
     // started itself; nothing else may replace the document while this is true.
     Q_PROPERTY(bool projectLoadPending READ projectLoadPending NOTIFY projectLoadPendingChanged)
+    // Fraction of embedded media unpacked; 0 while the load has no measurable work.
+    Q_PROPERTY(double projectLoadProgress READ projectLoadProgress NOTIFY projectLoadProgressChanged)
     Q_PROPERTY(bool hasUnsavedChanges READ hasUnsavedChanges NOTIFY dirtyChanged)
     Q_PROPERTY(QString currentProjectPath READ currentProjectPath NOTIFY currentProjectPathChanged)
     Q_PROPERTY(bool recoveryAvailable READ recoveryAvailable NOTIFY recoveryChanged)
@@ -69,6 +72,7 @@ public:
     bool collectingMedia() const { return m_collectingMedia; }
     double collectMediaProgress() const { return m_collectMediaProgress; }
     bool projectLoadPending() const { return m_projectLoadPending; }
+    double projectLoadProgress() const { return m_projectLoadProgress; }
     bool hasUnsavedChanges() const { return m_dirty; }
     QString currentProjectPath() const { return m_currentProjectPath; }
     bool recoveryAvailable() const { return m_recoveryAvailable; }
@@ -172,7 +176,7 @@ signals:
     // Addons the freshly opened project needs but that are not installed. Each entry is
     // id / name / version / kinds, for MissingAddonsDialog.
     void missingAddons(const QVariantList &addons);
-    // Terminal result of loadProject()/loadProjectJson(): exactly one per call that
+    // Terminal result of loadProject()/loadProjectJson()/restoreAutosave(): exactly one per call that
     // reaches a load generation still current when it finishes. A bundle with embedded
     // media raises the "Unpacking project media…" lastMessage first and this only once
     // extraction and apply are done — QML waiting to know whether an open landed (e.g.
@@ -180,6 +184,7 @@ signals:
     // which fires for that progress message too.
     void projectLoadFinished(bool ok, const QString &message);
     void projectLoadPendingChanged();
+    void projectLoadProgressChanged();
     void backgroundChanged();
     void dirtyChanged();
     void currentProjectPathChanged();
@@ -192,18 +197,19 @@ signals:
     void saveAsRequested();
 
 private:
-    // Bracket every loadProject()/loadProjectJson() call, sync or async, success or
+    // Bracket every loadProject()/loadProjectJson()/restoreAutosave() call, sync or async, success or
     // failure, so projectLoadPending is accurate regardless of what triggered the load.
     // beginProjectLoad() returns false (and acquires nothing) when a load already owns
     // the flag — the caller must bail out without touching m_projectLoadPending itself,
     // so a second, unrelated request can never clear the first one's pending state.
     bool beginProjectLoad();
     void finishProjectLoad(bool ok, const QString &message);
-    // The actual body of loadProjectJson(), run once beginProjectLoad() has succeeded.
-    // loadProject() delegates here directly for a JSON file — it already owns the
-    // pending flag from its own beginProjectLoad(), so the JSON path must not try to
-    // acquire it again (that would just no-op) nor release it early on failure.
-    void loadProjectJsonInternal(const QUrl &url);
+    // What the load worker hands back to the GUI thread. Defined in the .cpp: it holds an
+    // AppController::ParsedProject, and this header only forward-declares AppController.
+    struct LoadResult;
+    // Applies a finished load unless a newer one has started since, then releases the
+    // pending flag either way the load went.
+    void finishLoad(int generation, const QUrl &url, const std::shared_ptr<LoadResult> &result);
     // Shared by saveProject and packageProject. `embedSource` forces every source asset into the
     // bundle; otherwise each keeps whatever mode it had, tracked in m_embeddedSources. GUI thread
     // only — packageProject builds the request here and hands the finished copy to its worker.
@@ -242,6 +248,7 @@ private:
     QAtomicInt m_collectMediaCancel = 0;
     int m_loadGeneration = 0; // bumped per loadProject; stale extracts are dropped
     bool m_projectLoadPending = false;
+    double m_projectLoadProgress = 0.0;
 
     // Save state / autosave / crash recovery.
     QString m_currentProjectPath;

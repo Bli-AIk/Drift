@@ -658,14 +658,43 @@ bool fileStartsWithJsonObject(const QString &path)
     return false;
 }
 
+// Thread-safe: runs on the load worker.
+std::optional<AppController::ParsedProject> readProjectJsonFile(const QString &path, QString *error)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        *error = QCoreApplication::translate("ProjectFileController", "Couldn’t read %1: %2")
+                     .arg(QFileInfo(path).fileName(), file.errorString());
+        return std::nullopt;
+    }
+    return AppController::parseProjectJson(file.readAll(), error);
+}
+
 } // namespace
+
+struct ProjectFileController::LoadResult
+{
+    enum class Kind { Bundle, Json, Recovery };
+
+    QString error;
+    Kind kind = Kind::Bundle;
+    // Empty on failure, with `error` saying why.
+    std::optional<AppController::ParsedProject> parsed;
+    // Recovery loads only: the file the snapshot was taken of.
+    QString originalPath;
+    // Bundle loads only.
+    drift::bundle::BundleInfo bundle;
+    QHash<QString, QString> remap;
+};
 
 bool ProjectFileController::beginProjectLoad()
 {
     if (m_projectLoadPending)
         return false;
     m_projectLoadPending = true;
+    m_projectLoadProgress = 0.0;
     emit projectLoadPendingChanged();
+    emit projectLoadProgressChanged();
     return true;
 }
 
@@ -686,11 +715,7 @@ void ProjectFileController::loadProjectJson(const QUrl &url)
                        QStringLiteral("warning"));
         return;
     }
-    loadProjectJsonInternal(url);
-}
 
-void ProjectFileController::loadProjectJsonInternal(const QUrl &url)
-{
     const QString path = AndroidUri::filePath(url);
     if (path.isEmpty()) {
         const QString message = tr("That project location isn’t valid");
@@ -699,39 +724,16 @@ void ProjectFileController::loadProjectJsonInternal(const QUrl &url)
         return;
     }
 
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly)) {
-        const QString message = tr("Couldn’t read %1: %2").arg(QFileInfo(path).fileName(),
-                                                               file.errorString());
-        m_app->setLastMessage(message, QStringLiteral("error"));
-        finishProjectLoad(false, message);
-        return;
-    }
-
-    const QByteArray data = file.readAll();
-    file.close();
-
     // Drop an in-flight bundle extract so it cannot land on top of this document.
-    ++m_loadGeneration;
-
-    QString error;
-    if (!m_app->applyProjectJson(data, &error)) {
-        m_app->setLastMessage(error, QStringLiteral("error"));
-        finishProjectLoad(false, error);
-        return;
-    }
-
-    // Referenced media only — a previous packaged project's extraction paths must not hitch a
-    // ride into the next Save.
-    m_embeddedSources.clear();
-    // Untitled: Save must not write a .drift bundle over this .json, and recents stay .drift.
-    setCurrentProjectPath(QString());
-    setDirty(true);
-    deleteRecoveryFile();
-    m_app->setProjectLayoutChosen(true);
-    const QString message = tr("Project JSON loaded");
-    m_app->setLastMessage(message, QStringLiteral("success"));
-    finishProjectLoad(true, message);
+    const int generation = ++m_loadGeneration;
+    (void)QtConcurrent::run([this, url, path, generation]() {
+        auto result = std::make_shared<LoadResult>();
+        result->kind = LoadResult::Kind::Json;
+        result->parsed = readProjectJsonFile(path, &result->error);
+        QMetaObject::invokeMethod(
+            this, [this, generation, url, result]() { finishLoad(generation, url, result); },
+            Qt::QueuedConnection);
+    });
 }
 
 void ProjectFileController::loadPremiereProject(const QUrl &url)
@@ -1162,144 +1164,191 @@ void ProjectFileController::loadProject(const QUrl &url)
         return;
     }
 
-    // The bundle reader seeks through its input and hands media paths to FFmpeg, so a SAF document
-    // is staged to a real file first. The JSON branch below needs no such thing and takes the URL.
-    const QString path = readTargetPath(url);
-    if (path.isEmpty()) {
-        const QString message = tr("That project location isn’t valid");
-        m_app->setLastMessage(message, QStringLiteral("error"));
-        finishProjectLoad(false, message);
-        return;
-    }
-
-    // Disabled: external project imports (Premiere Pro, DaVinci Resolve/FCPXML, Kdenlive/Shotcut,
-    // .mogrt, EDL, OTIO) landed in the last two weeks but need more fixing before they ship. Leave
-    // the branches commented out; uncomment to re-enable once the readers are stable.
-    // if (path.endsWith(QLatin1String(".prproj"), Qt::CaseInsensitive)
-    //     || path.endsWith(QLatin1String(".xml"), Qt::CaseInsensitive)
-    //     || drift::prproj::isPremiereProject(path)) {
-    //     loadPremiereProject(url);
-    //     return;
-    // }
-    //
-    // if (path.endsWith(QLatin1String(".drp"), Qt::CaseInsensitive)
-    //     || path.endsWith(QLatin1String(".fcpxml"), Qt::CaseInsensitive)
-    //     || drift::resolve::isResolveProject(path)) {
-    //     loadResolveProject(url);
-    //     return;
-    // }
-    //
-    // if (path.endsWith(QLatin1String(".mogrt"), Qt::CaseInsensitive)
-    //     || drift::mogrt::isMogrtFile(path)) {
-    //     importMogrt(url);
-    //     return;
-    // }
-    //
-    // if (path.endsWith(QLatin1String(".kdenlive"), Qt::CaseInsensitive)
-    //     || path.endsWith(QLatin1String(".mlt"), Qt::CaseInsensitive)
-    //     || drift::kdenlive::isKdenliveProject(path)) {
-    //     loadKdenliveProject(url);
-    //     return;
-    // }
-    //
-    // if (path.endsWith(QLatin1String(".edl"), Qt::CaseInsensitive)
-    //     || drift::edl::isEdlTimeline(path)) {
-    //     loadEdlTimeline(url);
-    //     return;
-    // }
-    //
-    // if (path.endsWith(QLatin1String(".otio"), Qt::CaseInsensitive)
-    //     || drift::otio::isOtioTimeline(path)) {
-    //     loadOtioTimeline(url);
-    //     return;
-    // }
-
-    if (fileStartsWithJsonObject(path)) {
-        // Not loadProjectJson(): this call already owns the pending flag via the
-        // beginProjectLoad() above, and loadProjectJson()'s own gate would see it
-        // already held and reject its own request.
-        loadProjectJsonInternal(url);
-        return;
-    }
-
-    QString error;
-    const std::optional<drift::bundle::BundleInfo> info =
-        drift::bundle::readManifest(path, &error);
-    if (!info) {
-        m_app->setLastMessage(error, QStringLiteral("error"));
-        finishProjectLoad(false, error);
-        return;
-    }
-
-    // Named by the project's own id, which survives the round-trip, so reopening the same bundle
-    // lands on the files it already unpacked.
     const QString base = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    const QString destDir =
-        QDir(base).filePath(QStringLiteral("projects/%1/media").arg(info->projectId));
-
+    // Drop an in-flight bundle extract so it cannot land on top of this document.
     const int generation = ++m_loadGeneration;
-    const drift::bundle::BundleInfo bundle = *info;
 
-    auto finishLoad = [this, url, bundle, generation](const QHash<QString, QString> &remap,
-                                                      const QString &extractError, bool extractOk) {
-        if (generation != m_loadGeneration)
-            return;
-        if (!extractOk) {
-            m_app->setLastMessage(extractError, QStringLiteral("error"));
-            finishProjectLoad(false, extractError);
-            return;
-        }
+    // Staging, reading, unpacking and parsing all run here; only applying the parsed document
+    // touches the controllers, and that waits for the GUI thread in finishLoad.
+    (void)QtConcurrent::run([this, url, base, generation]() {
+        auto result = std::make_shared<LoadResult>();
+        const auto deliver = [this, url, generation, result]() {
+            QMetaObject::invokeMethod(
+                this, [this, generation, url, result]() { finishLoad(generation, url, result); },
+                Qt::QueuedConnection);
+        };
 
-        m_pendingPathRemap = remap;
-        QString applyError;
-        if (!m_app->applyProjectJson(QJsonDocument(bundle.document).toJson(QJsonDocument::Compact),
-                              &applyError)) {
-            m_pendingPathRemap.clear();
-            m_app->setLastMessage(applyError, QStringLiteral("error"));
-            finishProjectLoad(false, applyError);
+        // The bundle reader seeks through its input and hands media paths to FFmpeg, so a SAF
+        // document is staged to a real file first.
+        const QString path = readTargetPath(url);
+        if (path.isEmpty()) {
+            result->error = tr("That project location isn’t valid");
+            deliver();
             return;
         }
 
+        // Disabled: external project imports (Premiere Pro, DaVinci Resolve/FCPXML, Kdenlive/Shotcut,
+        // .mogrt, EDL, OTIO) landed in the last two weeks but need more fixing before they ship. Leave
+        // the branches commented out; uncomment to re-enable once the readers are stable.
+        // This is the load worker now and those importers apply on the spot, so hop them back to
+        // the GUI thread when they return.
+        // if (path.endsWith(QLatin1String(".prproj"), Qt::CaseInsensitive)
+        //     || path.endsWith(QLatin1String(".xml"), Qt::CaseInsensitive)
+        //     || drift::prproj::isPremiereProject(path)) {
+        //     loadPremiereProject(url);
+        //     return;
+        // }
+        //
+        // if (path.endsWith(QLatin1String(".drp"), Qt::CaseInsensitive)
+        //     || path.endsWith(QLatin1String(".fcpxml"), Qt::CaseInsensitive)
+        //     || drift::resolve::isResolveProject(path)) {
+        //     loadResolveProject(url);
+        //     return;
+        // }
+        //
+        // if (path.endsWith(QLatin1String(".mogrt"), Qt::CaseInsensitive)
+        //     || drift::mogrt::isMogrtFile(path)) {
+        //     importMogrt(url);
+        //     return;
+        // }
+        //
+        // if (path.endsWith(QLatin1String(".kdenlive"), Qt::CaseInsensitive)
+        //     || path.endsWith(QLatin1String(".mlt"), Qt::CaseInsensitive)
+        //     || drift::kdenlive::isKdenliveProject(path)) {
+        //     loadKdenliveProject(url);
+        //     return;
+        // }
+        //
+        // if (path.endsWith(QLatin1String(".edl"), Qt::CaseInsensitive)
+        //     || drift::edl::isEdlTimeline(path)) {
+        //     loadEdlTimeline(url);
+        //     return;
+        // }
+        //
+        // if (path.endsWith(QLatin1String(".otio"), Qt::CaseInsensitive)
+        //     || drift::otio::isOtioTimeline(path)) {
+        //     loadOtioTimeline(url);
+        //     return;
+        // }
+
+        if (fileStartsWithJsonObject(path)) {
+            result->kind = LoadResult::Kind::Json;
+            result->parsed = readProjectJsonFile(path, &result->error);
+            deliver();
+            return;
+        }
+
+        const std::optional<drift::bundle::BundleInfo> info =
+            drift::bundle::readManifest(path, &result->error);
+        if (!info) {
+            deliver();
+            return;
+        }
+        result->bundle = *info;
+
+        if (info->embeddedBytes > 0) {
+            QMetaObject::invokeMethod(
+                this,
+                [this, generation]() {
+                    if (generation == m_loadGeneration)
+                        m_app->setLastMessage(tr("Unpacking project media…"));
+                },
+                Qt::QueuedConnection);
+            const auto progress = [this, generation](qint64 done, qint64 total) {
+                const double fraction = total > 0 ? double(done) / double(total) : 0.0;
+                QMetaObject::invokeMethod(
+                    this,
+                    [this, fraction, generation]() {
+                        if (generation != m_loadGeneration)
+                            return;
+                        m_projectLoadProgress = fraction;
+                        emit projectLoadProgressChanged();
+                    },
+                    Qt::QueuedConnection);
+                return true;
+            };
+            // Named by the project's own id, which survives the round-trip, so reopening the same
+            // bundle lands on the files it already unpacked.
+            const QString destDir =
+                QDir(base).filePath(QStringLiteral("projects/%1/media").arg(info->projectId));
+            if (!drift::bundle::extract(path, destDir, progress, &result->remap, &result->error)) {
+                deliver();
+                return;
+            }
+        }
+
+        result->parsed = AppController::parseProjectJson(info->document, &result->error);
+        deliver();
+    });
+}
+
+void ProjectFileController::finishLoad(int generation, const QUrl &url,
+                                       const std::shared_ptr<LoadResult> &result)
+{
+    if (generation != m_loadGeneration)
+        return;
+    if (!result->parsed) {
+        m_app->setLastMessage(result->error, QStringLiteral("error"));
+        finishProjectLoad(false, result->error);
+        return;
+    }
+
+    if (result->kind == LoadResult::Kind::Recovery) {
+        m_app->applyParsedProject(std::move(*result->parsed));
+        // Restore the association with the original file (if any) and mark unsaved so
+        // the user is nudged to re-save; keep the recovery file until the next save.
+        setCurrentProjectPath(result->originalPath);
+        setDirty(true);
+        m_recoveryAvailable = false;
+        m_recoveryInfo.clear();
+        emit recoveryChanged();
+        m_app->setProjectLayoutChosen(true);
+        const QString message = tr("Recovered unsaved work");
+        m_app->setLastMessage(message, QStringLiteral("success"));
+        finishProjectLoad(true, message);
+        return;
+    }
+
+    if (result->kind == LoadResult::Kind::Json) {
+        m_app->applyParsedProject(std::move(*result->parsed));
+        // Referenced media only — a previous packaged project's extraction paths must not hitch a
+        // ride into the next Save.
         m_embeddedSources.clear();
-        for (const drift::bundle::MediaEntry &entry : bundle.media) {
-            if (entry.embedded && entry.role == drift::bundle::MediaRole::Source
-                && entry.resourceOf.isEmpty())
-                m_embeddedSources.insert(remap.value(entry.originalPath, entry.originalPath));
-        }
-
-        // Not the staged path: on Android that lives in the cache the startup sweep clears, and
-        // Save-in-place has to write back to the document the user actually opened. projectLocation
-        // upgrades the picker's one-shot grant to a persistable read+write one on the way.
-        const QString location = projectLocation(url);
-        setCurrentProjectPath(location);
-        addRecentProject(location);
+        // Untitled: Save must not write a .drift bundle over this .json, and recents stay .drift.
+        setCurrentProjectPath(QString());
+        setDirty(true);
         deleteRecoveryFile();
         m_app->setProjectLayoutChosen(true);
-        const QString message = tr("Project loaded");
+        const QString message = tr("Project JSON loaded");
         m_app->setLastMessage(message, QStringLiteral("success"));
-        reportMissingAddons(bundle.addons);
         finishProjectLoad(true, message);
-    };
-
-    if (bundle.embeddedBytes <= 0) {
-        finishLoad({}, {}, true);
         return;
     }
 
-    m_app->setLastMessage(tr("Unpacking project media…"));
-    (void)QtConcurrent::run([this, path, destDir, generation, finishLoad]() {
-        QString error;
-        QHash<QString, QString> remap;
-        const bool ok = drift::bundle::extract(path, destDir, {}, &remap, &error);
-        QMetaObject::invokeMethod(
-            this,
-            [finishLoad, remap, error, ok, generation, this]() {
-                if (generation != m_loadGeneration)
-                    return;
-                finishLoad(remap, error, ok);
-            },
-            Qt::QueuedConnection);
-    });
+    const drift::bundle::BundleInfo &bundle = result->bundle;
+    const QHash<QString, QString> &remap = result->remap;
+    m_pendingPathRemap = remap;
+    m_app->applyParsedProject(std::move(*result->parsed));
+
+    m_embeddedSources.clear();
+    for (const drift::bundle::MediaEntry &entry : bundle.media) {
+        if (entry.embedded && entry.role == drift::bundle::MediaRole::Source
+            && entry.resourceOf.isEmpty())
+            m_embeddedSources.insert(remap.value(entry.originalPath, entry.originalPath));
+    }
+
+    // Not the staged path: on Android that lives in the cache the startup sweep clears, and
+    // Save-in-place has to write back to the document the user actually opened. projectLocation
+    // upgrades the picker's one-shot grant to a persistable read+write one on the way.
+    const QString location = projectLocation(url);
+    setCurrentProjectPath(location);
+    addRecentProject(location);
+    deleteRecoveryFile();
+    m_app->setProjectLayoutChosen(true);
+    const QString message = tr("Project loaded");
+    m_app->setLastMessage(message, QStringLiteral("success"));
+    reportMissingAddons(bundle.addons);
+    finishProjectLoad(true, message);
 }
 
 void ProjectFileController::reportMissingAddons(const QList<drift::bundle::AddonRef> &addons)
@@ -1727,31 +1776,27 @@ void ProjectFileController::detectRecoveryFile()
 void ProjectFileController::restoreAutosave()
 {
     const QString path = recoveryFilePath();
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly)) {
+    if (!QFileInfo::exists(path)) {
         m_app->setLastMessage(tr("No recovery file found"), QStringLiteral("warning"));
         return;
     }
-
-    const QByteArray data = file.readAll();
-    file.close();
-
-    const QString originalPath = m_recoveryInfo.value(QStringLiteral("originalPath")).toString();
-    QString error;
-    if (!m_app->applyProjectJson(data, &error)) {
-        m_app->setLastMessage(error, QStringLiteral("error"));
+    if (!beginProjectLoad()) {
+        m_app->setLastMessage(tr("Still opening a project — try again in a moment."),
+                       QStringLiteral("warning"));
         return;
     }
 
-    // Restore the association with the original file (if any) and mark unsaved so
-    // the user is nudged to re-save; keep the recovery file until the next save.
-    setCurrentProjectPath(originalPath);
-    setDirty(true);
-    m_recoveryAvailable = false;
-    m_recoveryInfo.clear();
-    emit recoveryChanged();
-    m_app->setProjectLayoutChosen(true);
-    m_app->setLastMessage(tr("Recovered unsaved work"), QStringLiteral("success"));
+    const QString originalPath = m_recoveryInfo.value(QStringLiteral("originalPath")).toString();
+    const int generation = ++m_loadGeneration;
+    (void)QtConcurrent::run([this, path, originalPath, generation]() {
+        auto result = std::make_shared<LoadResult>();
+        result->kind = LoadResult::Kind::Recovery;
+        result->originalPath = originalPath;
+        result->parsed = readProjectJsonFile(path, &result->error);
+        QMetaObject::invokeMethod(
+            this, [this, generation, result]() { finishLoad(generation, QUrl(), result); },
+            Qt::QueuedConnection);
+    });
 }
 
 void ProjectFileController::discardAutosave()

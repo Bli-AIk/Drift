@@ -1356,6 +1356,7 @@ qt_add_qml_module(drift
         src/qml/components/ShellSwitchDialog.qml
         src/qml/components/PasteAttributesDialog.qml
         src/qml/components/PackageProgressDialog.qml
+        src/qml/components/ProjectLoadDialog.qml
         src/qml/components/ExportDialog.qml
         src/qml/components/ExportProgressDialog.qml
         src/qml/components/CollectMediaDialog.qml

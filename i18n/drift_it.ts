@@ -647,6 +647,10 @@
         <translation>Trasforma insieme</translation>
     </message>
     <message>
+        <source>Edit text</source>
+        <translation type="unfinished">Modifica testo</translation>
+    </message>
+    <message>
         <source>Fade</source>
         <translation>Dissolvenza</translation>
     </message>
@@ -763,6 +767,14 @@
         <source>Done</source>
         <translation>Fatto</translation>
     </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annulla</translation>
+    </message>
+    <message>
+        <source>Select all</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AndroidFadeSheet</name>
@@ -805,21 +817,6 @@
     <message>
         <source>Curve</source>
         <translation>Curva</translation>
-    </message>
-</context>
-<context>
-    <name>AndroidHomeNav</name>
-    <message>
-        <source>Projects</source>
-        <translation>Progetti</translation>
-    </message>
-    <message>
-        <source>Market</source>
-        <translation>Marketplace</translation>
-    </message>
-    <message>
-        <source>Me</source>
-        <translation>Profilo</translation>
     </message>
 </context>
 <context>
@@ -997,59 +994,6 @@
     <message>
         <source>Imported from the marketplace.</source>
         <translation>Importato dal marketplace.</translation>
-    </message>
-</context>
-<context>
-    <name>AndroidMarket</name>
-    <message>
-        <source>Market</source>
-        <translation>Marketplace</translation>
-    </message>
-    <message>
-        <source>Downloads</source>
-        <translation>Download</translation>
-    </message>
-</context>
-<context>
-    <name>AndroidMePage</name>
-    <message>
-        <source>Me</source>
-        <translation>Profilo</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n coin(s)</source>
-        <translation>
-            <numerusform>%n moneta</numerusform>
-            <numerusform>%n monete</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Light mode</source>
-        <translation>Tema chiaro</translation>
-    </message>
-    <message>
-        <source>Dark mode</source>
-        <translation>Tema scuro</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>Impostazioni</translation>
-    </message>
-    <message>
-        <source>Switch to desktop layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Extras</source>
-        <translation>Extra</translation>
-    </message>
-    <message>
-        <source>Update available</source>
-        <translation>Aggiornamento disponibile</translation>
-    </message>
-    <message>
-        <source>Debug info</source>
-        <translation>Informazioni di debug</translation>
     </message>
 </context>
 <context>
@@ -1644,8 +1588,60 @@
         <translation>Sincronizza e passa da un&apos;angolazione all&apos;altra</translation>
     </message>
     <message>
-        <source>App settings</source>
-        <translation>Impostazioni app</translation>
+        <source>Extras</source>
+        <translation type="unfinished">Extra</translation>
+    </message>
+    <message>
+        <source>Add-ons and model packs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished">Impostazioni</translation>
+    </message>
+    <message>
+        <source>Light mode</source>
+        <translation type="unfinished">Tema chiaro</translation>
+    </message>
+    <message>
+        <source>Dark mode</source>
+        <translation type="unfinished">Tema scuro</translation>
+    </message>
+    <message>
+        <source>Switch the app’s colour scheme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to desktop layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the wide editor layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update available</source>
+        <translation type="unfinished">Aggiornamento disponibile</translation>
+    </message>
+    <message>
+        <source>A newer version of Drift is ready</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Debug info</source>
+        <translation type="unfinished">Informazioni di debug</translation>
+    </message>
+    <message>
+        <source>Version, device and logs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About Drift</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version, licence and credits</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Appearance, extras and agent access</source>
@@ -1728,6 +1724,53 @@
     <message>
         <source>Start a new project from this clip</source>
         <translation>Avvia un nuovo progetto da questa clip</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidTextComposer</name>
+    <message>
+        <source>Previous caption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next caption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caption %1 / %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">Fatto</translation>
+    </message>
+    <message>
+        <source>Type subtitle…</source>
+        <translation type="unfinished">Digita sottotitolo…</translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished">Inizio</translation>
+    </message>
+    <message>
+        <source>Set start to current time</source>
+        <translation type="unfinished">Imposta inizio alla posizione corrente</translation>
+    </message>
+    <message>
+        <source>End</source>
+        <translation type="unfinished">Fine</translation>
+    </message>
+    <message>
+        <source>Set end to current time</source>
+        <translation type="unfinished">Imposta fine alla posizione corrente</translation>
+    </message>
+    <message>
+        <source>Back one frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward one frame</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1881,6 +1924,14 @@
     <message>
         <source>Untitled</source>
         <translation>Senza titolo</translation>
+    </message>
+    <message>
+        <source>Downloads</source>
+        <translation type="unfinished">Download</translation>
+    </message>
+    <message>
+        <source>Extras</source>
+        <translation type="unfinished">Extra</translation>
     </message>
     <message>
         <source>Undo</source>
@@ -2830,6 +2881,18 @@
     <message>
         <source>Text style imported</source>
         <translation>Stile di testo importato</translation>
+    </message>
+    <message>
+        <source>Could not import the font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Added %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Removed %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Resize text</source>
@@ -4992,6 +5055,10 @@
         <source>Click a colour to pick it. Esc cancels.</source>
         <translation>Fai clic su un colore per selezionarlo. Esc annulla.</translation>
     </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annulla</translation>
+    </message>
 </context>
 <context>
     <name>ColorSwatchField</name>
@@ -7028,6 +7095,22 @@
 <context>
     <name>FontCatalog</name>
     <message>
+        <source>Choose a .ttf, .otf or .ttc font file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create the fonts folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not copy the font file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>That file is not a usable font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>High-Impact &amp; Bold</source>
         <translation>Alto impatto e grassetto</translation>
     </message>
@@ -7047,8 +7130,36 @@
 <context>
     <name>FontPicker</name>
     <message>
+        <source>Add font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fonts (*.ttf *.otf *.ttc *.otc)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My fonts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System fonts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search fonts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add font file…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Install the font pack for curated families →</source>
         <translation>Installa il pacchetto di caratteri per raccolte selezionate →</translation>
+    </message>
+    <message>
+        <source>Remove font</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10367,6 +10478,17 @@ Se la riproduzione va a scatti, prova un&apos;altra opzione.</translation>
     </message>
 </context>
 <context>
+    <name>ProjectLoadDialog</name>
+    <message>
+        <source>Opening project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unpacking project media…</source>
+        <translation type="unfinished">Estrazione elementi multimediali del progetto in corso…</translation>
+    </message>
+</context>
+<context>
     <name>ProjectPropertiesDialog</name>
     <message>
         <source>Project properties</source>
@@ -11505,6 +11627,10 @@ Se la riproduzione va a scatti, prova un&apos;altra opzione.</translation>
     <message>
         <source>s</source>
         <translation>s</translation>
+    </message>
+    <message>
+        <source>Tap marks the subject, press and hold marks what to exclude. Tap a marker to remove it.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Left-click marks the subject, right-click marks what to exclude. Click a marker to remove it.</source>
@@ -13390,6 +13516,10 @@ Se la riproduzione va a scatti, prova un&apos;altra opzione.</translation>
     <message>
         <source>%1 captions</source>
         <translation>%1 sottotitoli</translation>
+    </message>
+    <message>
+        <source>Play the timeline — the line on screen lights up. Tap any line to edit it.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Play the timeline — the line on screen lights up. Click any line to jump to it and edit it below.</source>

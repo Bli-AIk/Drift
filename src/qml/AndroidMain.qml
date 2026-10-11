@@ -399,6 +399,9 @@ ApplicationWindow {
     // without this Back left them on screen and walked out of the editor behind them.
     // Ordered by how they stack: newest-opened first.
     function closeTopModal() {
+        // A project open has no cancel; Back must not reach whatever sits under the dialog.
+        if (projectLoadDialog.visible)
+            return true
         // Not in the list below: it is a sheet, so it goes out through dismiss() — close()
         // would take the panel off screen in the frame Back is pressed instead of sliding it.
         if (layoutSheet.opened) {
@@ -541,9 +544,16 @@ ApplicationWindow {
     // hosting it here is what gives that bar's overflow something to open.
     ProjectPropertiesDialog { id: projectPropertiesDialog }
 
+    Connections {
+        target: EditorState.projectFile
+        function onProjectLoadFinished() { window.openPendingLaunch() }
+    }
+
     function openProjectProperties() {
         projectPropertiesDialog.openDialog()
     }
+
+    ProjectLoadDialog { id: projectLoadDialog }
 
     RecoveryDialog {
         id: recoveryDialog
@@ -564,6 +574,10 @@ ApplicationWindow {
     function openPendingLaunch() {
         if (window._pendingLaunchUrl === "")
             return false
+        // A recovery restore is still landing; onProjectLoadFinished comes back here so the
+        // unsaved prompt sees the recovered work.
+        if (EditorState.projectFile.projectLoadPending)
+            return true
         const url = window._pendingLaunchUrl
         window._pendingLaunchUrl = ""
         window.confirmIfDirty(function () {

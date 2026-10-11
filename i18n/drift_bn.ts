@@ -647,6 +647,10 @@
         <translation>একসঙ্গে ট্রান্সফর্ম করুন</translation>
     </message>
     <message>
+        <source>Edit text</source>
+        <translation type="unfinished">টেক্সট সম্পাদনা করুন</translation>
+    </message>
+    <message>
         <source>Fade</source>
         <translation>ফেড</translation>
     </message>
@@ -763,6 +767,14 @@
         <source>Done</source>
         <translation>সম্পন্ন</translation>
     </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">বাতিল করুন</translation>
+    </message>
+    <message>
+        <source>Select all</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AndroidFadeSheet</name>
@@ -805,21 +817,6 @@
     <message>
         <source>Curve</source>
         <translation>কার্ভ</translation>
-    </message>
-</context>
-<context>
-    <name>AndroidHomeNav</name>
-    <message>
-        <source>Projects</source>
-        <translation>প্রকল্প</translation>
-    </message>
-    <message>
-        <source>Market</source>
-        <translation>মার্কেট</translation>
-    </message>
-    <message>
-        <source>Me</source>
-        <translation>আমার প্রোফাইল</translation>
     </message>
 </context>
 <context>
@@ -997,59 +994,6 @@
     <message>
         <source>Imported from the marketplace.</source>
         <translation type="unfinished">মার্কেটপ্লেস থেকে ইমপোর্ট করা.</translation>
-    </message>
-</context>
-<context>
-    <name>AndroidMarket</name>
-    <message>
-        <source>Market</source>
-        <translation>মার্কেট</translation>
-    </message>
-    <message>
-        <source>Downloads</source>
-        <translation>ডাউনলোড</translation>
-    </message>
-</context>
-<context>
-    <name>AndroidMePage</name>
-    <message>
-        <source>Me</source>
-        <translation>আমার প্রোফাইল</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n coin(s)</source>
-        <translation>
-            <numerusform>%nটি কয়েন</numerusform>
-            <numerusform>%nটি কয়েন</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Light mode</source>
-        <translation>লাইট মোড</translation>
-    </message>
-    <message>
-        <source>Dark mode</source>
-        <translation>ডার্ক মোড</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>সেটিংস</translation>
-    </message>
-    <message>
-        <source>Switch to desktop layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Extras</source>
-        <translation>অতিরিক্ত প্যাক</translation>
-    </message>
-    <message>
-        <source>Update available</source>
-        <translation>আপডেট পাওয়া গেছে</translation>
-    </message>
-    <message>
-        <source>Debug info</source>
-        <translation>ডিবাগ তথ্য</translation>
     </message>
 </context>
 <context>
@@ -1644,8 +1588,60 @@
         <translation type="unfinished">সিঙ্ক করুন এবং কোণগুলির মধ্যে স্যুইচ করুন।</translation>
     </message>
     <message>
-        <source>App settings</source>
-        <translation>অ্যাপের সেটিংস</translation>
+        <source>Extras</source>
+        <translation type="unfinished">অতিরিক্ত প্যাক</translation>
+    </message>
+    <message>
+        <source>Add-ons and model packs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished">সেটিংস</translation>
+    </message>
+    <message>
+        <source>Light mode</source>
+        <translation type="unfinished">লাইট মোড</translation>
+    </message>
+    <message>
+        <source>Dark mode</source>
+        <translation type="unfinished">ডার্ক মোড</translation>
+    </message>
+    <message>
+        <source>Switch the app’s colour scheme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to desktop layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the wide editor layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update available</source>
+        <translation type="unfinished">আপডেট পাওয়া গেছে</translation>
+    </message>
+    <message>
+        <source>A newer version of Drift is ready</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Debug info</source>
+        <translation type="unfinished">ডিবাগ তথ্য</translation>
+    </message>
+    <message>
+        <source>Version, device and logs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About Drift</source>
+        <translation type="unfinished">Drift সম্পর্কে</translation>
+    </message>
+    <message>
+        <source>Version, licence and credits</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Appearance, extras and agent access</source>
@@ -1728,6 +1724,53 @@
     <message>
         <source>Start a new project from this clip</source>
         <translation type="unfinished">এই ক্লিপ থেকে একটি নতুন প্রকল্প শুরু করুন।</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidTextComposer</name>
+    <message>
+        <source>Previous caption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next caption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caption %1 / %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">সম্পন্ন</translation>
+    </message>
+    <message>
+        <source>Type subtitle…</source>
+        <translation type="unfinished">সাবটাইটেল টাইপ করুন…</translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished">শুরু করুন</translation>
+    </message>
+    <message>
+        <source>Set start to current time</source>
+        <translation type="unfinished">বর্তমান সময়ে শুরু সেট করুন</translation>
+    </message>
+    <message>
+        <source>End</source>
+        <translation type="unfinished">শেষ</translation>
+    </message>
+    <message>
+        <source>Set end to current time</source>
+        <translation type="unfinished">বর্তমান সময়ে শেষ সেট করুন</translation>
+    </message>
+    <message>
+        <source>Back one frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward one frame</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1881,6 +1924,14 @@
     <message>
         <source>Untitled</source>
         <translation>শিরোনামহীন</translation>
+    </message>
+    <message>
+        <source>Downloads</source>
+        <translation type="unfinished">ডাউনলোড</translation>
+    </message>
+    <message>
+        <source>Extras</source>
+        <translation type="unfinished">অতিরিক্ত প্যাক</translation>
     </message>
     <message>
         <source>Undo</source>
@@ -2830,6 +2881,18 @@
     <message>
         <source>Text style imported</source>
         <translation type="unfinished">টেক্সট শৈলী ইমপোর্ট করা হয়েছে</translation>
+    </message>
+    <message>
+        <source>Could not import the font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Added %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Removed %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Resize text</source>
@@ -4992,6 +5055,10 @@
         <source>Click a colour to pick it. Esc cancels.</source>
         <translation type="unfinished">একটি রঙ বাছাই করতে ক্লিক করুন। Esc বাতিল করে.</translation>
     </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">বাতিল করুন</translation>
+    </message>
 </context>
 <context>
     <name>ColorSwatchField</name>
@@ -7028,6 +7095,22 @@
 <context>
     <name>FontCatalog</name>
     <message>
+        <source>Choose a .ttf, .otf or .ttc font file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create the fonts folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not copy the font file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>That file is not a usable font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>High-Impact &amp; Bold</source>
         <translation type="unfinished">উচ্চ-ইফেক্ট এবং সাহসী</translation>
     </message>
@@ -7047,8 +7130,36 @@
 <context>
     <name>FontPicker</name>
     <message>
+        <source>Add font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fonts (*.ttf *.otf *.ttc *.otc)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My fonts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System fonts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search fonts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add font file…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Install the font pack for curated families →</source>
         <translation type="unfinished">কিউরেটেড পরিবারের জন্য ফন্ট প্যাক ইনস্টল করুন →</translation>
+    </message>
+    <message>
+        <source>Remove font</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10367,6 +10478,17 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>ProjectLoadDialog</name>
+    <message>
+        <source>Opening project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unpacking project media…</source>
+        <translation type="unfinished">প্রকল্প মিডিয়া আনপ্যাক করা হচ্ছে…</translation>
+    </message>
+</context>
+<context>
     <name>ProjectPropertiesDialog</name>
     <message>
         <source>Project properties</source>
@@ -11505,6 +11627,10 @@ If playback stutters, try another.</source>
     <message>
         <source>s</source>
         <translation type="unfinished">সে</translation>
+    </message>
+    <message>
+        <source>Tap marks the subject, press and hold marks what to exclude. Tap a marker to remove it.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Left-click marks the subject, right-click marks what to exclude. Click a marker to remove it.</source>
@@ -13390,6 +13516,10 @@ If playback stutters, try another.</source>
     <message>
         <source>%1 captions</source>
         <translation type="unfinished">%1 ক্যাপশন</translation>
+    </message>
+    <message>
+        <source>Play the timeline — the line on screen lights up. Tap any line to edit it.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Play the timeline — the line on screen lights up. Click any line to jump to it and edit it below.</source>

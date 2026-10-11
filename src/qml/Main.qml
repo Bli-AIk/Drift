@@ -814,6 +814,8 @@ ApplicationWindow {
         }
     }
 
+    ProjectLoadDialog { }
+
     LazyLoader {
         id: recoveryDialogLoader
         sourceComponent: Component {
@@ -1364,6 +1366,10 @@ ApplicationWindow {
     function openPendingLaunch() {
         if (window._pendingLaunchUrl === "")
             return
+        // A recovery restore is still landing; onProjectLoadFinished comes back here so the
+        // unsaved prompt sees the recovered work.
+        if (EditorState.projectFile.projectLoadPending)
+            return
         const url = window._pendingLaunchUrl
         window._pendingLaunchUrl = ""
         window.openLaunchedProject(url)
@@ -1531,6 +1537,7 @@ ApplicationWindow {
         function onProjectLoadFinished(ok) {
             if (ok)
                 window.showStartScreen = false
+            window.openPendingLaunch()
         }
 
         function onMissingAddons(addons) {

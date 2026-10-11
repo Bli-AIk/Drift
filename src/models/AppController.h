@@ -44,6 +44,7 @@
 
 #include <memory>
 #include <optional>
+#include <optional>
 
 struct EffectTemplateEntry;
 struct MediaInfo;
@@ -297,6 +298,15 @@ class AppController : public QObject
 public:
     explicit AppController(AssetLibrary *assetLibrary, QObject *parent = nullptr);
     ~AppController() override;
+
+    // The first half of applyProjectJson. Touches no controller state, so a load runs it on a
+    // worker and hands the result to applyParsedProject on the GUI thread.
+    struct ParsedProject {
+        drift::Project project;
+        QJsonObject root;
+    };
+    static std::optional<ParsedProject> parseProjectJson(const QByteArray &data, QString *error);
+    static std::optional<ParsedProject> parseProjectJson(const QJsonObject &root, QString *error);
 
     AssetLibrary *assetLibrary() const { return m_assetLibrary; }
     CloudProviders *cloudProviders() const { return m_cloud; }
@@ -1843,6 +1853,8 @@ protected:
 
     QByteArray serializeProjectJson() const;
     bool applyProjectJson(const QByteArray &data, QString *error);
+    // Second half of applyProjectJson, on the GUI thread; parseProjectJson is the first.
+    void applyParsedProject(ParsedProject parsed);
     // Persist the save-picker folder and encode/scale choices for the next Export dialog.
     // Empty `outputPath` updates settings only and leaves lastExportFolder unchanged.
     void rememberExportChoice(const QString &outputPath, const QVariantMap &settings);
