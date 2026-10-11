@@ -4362,10 +4362,6 @@
         <translation>미디어를 읽고 썸네일을 생성하는 중입니다.</translation>
     </message>
     <message>
-        <source>More emoji</source>
-        <translation>더 많은 이모지</translation>
-    </message>
-    <message>
         <source>More import options</source>
         <translation>추가 가져오기 옵션</translation>
     </message>
@@ -4449,20 +4445,8 @@
         <translation>오디오 효과 설치</translation>
     </message>
     <message>
-        <source>Drag a preset onto a clip, or click to apply to the selection</source>
-        <translation>프리셋을 클립에 드래그하거나 클릭하여 선택 항목에 적용</translation>
-    </message>
-    <message>
-        <source>Drag a preset onto a clip in the timeline</source>
-        <translation>타임라인의 클립에 프리셋을 드래그하세요</translation>
-    </message>
-    <message>
         <source>Search audio effects</source>
         <translation>오디오 효과 검색</translation>
-    </message>
-    <message>
-        <source>Import audio effect</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Install a custom audio effect or effect from a .driftfx file made in Drift Forge</source>
@@ -4499,6 +4483,14 @@
     <message>
         <source>Import</source>
         <translation type="unfinished">가져오기</translation>
+    </message>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — drag onto a clip in the timeline</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Apply to selected clip</source>
@@ -5993,24 +5985,8 @@
         <translation>추가 기능 받기</translation>
     </message>
     <message>
-        <source>Drag a preset onto a clip, or click to apply to the selection</source>
-        <translation>프리셋을 클립에 드래그하거나 클릭하여 선택 항목에 적용</translation>
-    </message>
-    <message>
-        <source>Click to add as adjustment layer, or drag onto a clip</source>
-        <translation>클릭하여 보정 레이어로 추가하거나 클립에 드래그</translation>
-    </message>
-    <message>
         <source>Search effects</source>
         <translation>효과 검색</translation>
-    </message>
-    <message>
-        <source>Add adjustment layer</source>
-        <translation>보정 레이어 추가</translation>
-    </message>
-    <message>
-        <source>Add an adjustment layer to apply effects across all clips underneath, or drag it to where it should go</source>
-        <translation>아래의 모든 클립에 효과를 적용하려면 보정 레이어를 추가하거나 원하는 위치로 드래그하세요</translation>
     </message>
     <message>
         <source>Adjustment layer</source>
@@ -6022,6 +5998,10 @@
     </message>
     <message>
         <source>Install a custom effect or transition from a .driftfx file made in Drift Forge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add adjustment layer — click, or drag it onto a track</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6050,6 +6030,14 @@
     </message>
     <message>
         <source>Import a .driftfx file made in Drift Forge to add your own.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to add as an adjustment layer, or drag onto a clip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6157,16 +6145,16 @@
         <translation>효과 스택 내보내기</translation>
     </message>
     <message>
-        <source>My presets</source>
-        <translation>내 프리셋</translation>
-    </message>
-    <message>
-        <source>Import an effect stack…</source>
-        <translation>효과 스택 가져오기…</translation>
+        <source>No saved presets</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Tune a clip&apos;s effects, then use “Save as preset…” in the properties Effects tab to keep them here.</source>
         <translation>클립의 효과를 조정한 다음 속성의 효과 탭에서 “프리셋으로 저장…”을 사용하면 여기에 보관할 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished">가져오기</translation>
     </message>
     <message>
         <source>+%1 more</source>
@@ -6216,16 +6204,16 @@
         <translation>추가 기능 받기</translation>
     </message>
     <message>
-        <source>Click a template to apply music-synced effects to the selection</source>
-        <translation>템플릿을 클릭하여 선택 항목에 음악에 맞춘 효과 적용</translation>
-    </message>
-    <message>
-        <source>Select a clip, then click a template to apply</source>
-        <translation>클립을 선택한 다음 템플릿을 클릭하여 적용</translation>
-    </message>
-    <message>
         <source>Search templates</source>
         <translation>템플릿 검색</translation>
+    </message>
+    <message>
+        <source>Import an effect stack…</source>
+        <translation type="unfinished">효과 스택 가져오기…</translation>
+    </message>
+    <message>
+        <source>My presets</source>
+        <translation type="unfinished">내 프리셋</translation>
     </message>
     <message>
         <source>No templates match “%1”.</source>
@@ -6238,6 +6226,14 @@
     <message>
         <source>Nothing in this category.</source>
         <translation>이 카테고리에는 항목이 없습니다.</translation>
+    </message>
+    <message>
+        <source>%1 — click to apply music-synced effects to the selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — select a clip, then click to apply</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove from favorites</source>
@@ -13262,6 +13258,10 @@ If playback stutters, try another.</source>
         <translation>스티커 검색</translation>
     </message>
     <message>
+        <source>More emoji</source>
+        <translation type="unfinished">더 많은 이모지</translation>
+    </message>
+    <message>
         <source>No sticker packs installed</source>
         <translation>설치된 스티커 팩이 없습니다</translation>
     </message>
@@ -13726,10 +13726,6 @@ If playback stutters, try another.</source>
         <translation>텍스트 스타일 내보내기</translation>
     </message>
     <message>
-        <source>Click a style to add text at the playhead. Double-click it on the preview to edit.</source>
-        <translation>스타일을 클릭하여 재생 헤드에 텍스트를 추가하세요. 미리보기에서 두 번 클릭하면 편집할 수 있습니다.</translation>
-    </message>
-    <message>
         <source>My styles</source>
         <translation>내 스타일</translation>
     </message>
@@ -13762,8 +13758,24 @@ If playback stutters, try another.</source>
         <translation>기본 제공</translation>
     </message>
     <message>
+        <source>My styles · %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Add at playhead</source>
         <translation type="unfinished">재생 헤드 위치에 추가</translation>
+    </message>
+    <message>
+        <source>No saved styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished">가져오기</translation>
     </message>
     <message>
         <source>Rename text style</source>
@@ -15804,16 +15816,8 @@ If playback stutters, try another.</source>
 <context>
     <name>TransitionsTab</name>
     <message>
-        <source>Drag onto where two clips meet — or, on touch, hold, then drag. They fade into each other by default.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Search transitions</source>
         <translation>전환 검색</translation>
-    </message>
-    <message>
-        <source>Import transition</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Install a custom transition or effect from a .driftfx file made in Drift Forge</source>
@@ -15872,8 +15876,8 @@ If playback stutters, try another.</source>
         <translation type="unfinished">가져오기</translation>
     </message>
     <message>
-        <source>%1 — drag onto an overlap between two clips</source>
-        <translation>%1 — 두 클립이 겹치는 곳으로 드래그</translation>
+        <source>%1 — drag onto where two clips meet, or on touch hold then drag</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove from favorites</source>

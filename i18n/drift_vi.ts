@@ -4362,10 +4362,6 @@
         <translation>Đang đọc phương tiện và tạo hình thu nhỏ.</translation>
     </message>
     <message>
-        <source>More emoji</source>
-        <translation>Thêm biểu tượng cảm xúc</translation>
-    </message>
-    <message>
         <source>More import options</source>
         <translation>Nhiều tùy chọn nhập hơn</translation>
     </message>
@@ -4449,20 +4445,8 @@
         <translation>Cài đặt hiệu ứng âm thanh</translation>
     </message>
     <message>
-        <source>Drag a preset onto a clip, or click to apply to the selection</source>
-        <translation>Kéo một preset vào một đoạn video hoặc nhấp chuột để áp dụng cho vùng chọn</translation>
-    </message>
-    <message>
-        <source>Drag a preset onto a clip in the timeline</source>
-        <translation>Kéo một preset vào một clip trên dòng thời gian</translation>
-    </message>
-    <message>
         <source>Search audio effects</source>
         <translation>Tìm hiệu ứng âm thanh</translation>
-    </message>
-    <message>
-        <source>Import audio effect</source>
-        <translation>Nhập hiệu ứng âm thanh</translation>
     </message>
     <message>
         <source>Install a custom audio effect or effect from a .driftfx file made in Drift Forge</source>
@@ -4499,6 +4483,14 @@
     <message>
         <source>Import</source>
         <translation>Nhập</translation>
+    </message>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — drag onto a clip in the timeline</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Apply to selected clip</source>
@@ -5993,24 +5985,8 @@
         <translation>Tải gói bổ trợ</translation>
     </message>
     <message>
-        <source>Drag a preset onto a clip, or click to apply to the selection</source>
-        <translation>Kéo preset vào clip hoặc nhấp để áp dụng cho lựa chọn</translation>
-    </message>
-    <message>
-        <source>Click to add as adjustment layer, or drag onto a clip</source>
-        <translation>Nhấp để thêm làm lớp điều chỉnh hoặc kéo vào clip</translation>
-    </message>
-    <message>
         <source>Search effects</source>
         <translation>Tìm hiệu ứng</translation>
-    </message>
-    <message>
-        <source>Add adjustment layer</source>
-        <translation>Thêm lớp điều chỉnh</translation>
-    </message>
-    <message>
-        <source>Add an adjustment layer to apply effects across all clips underneath, or drag it to where it should go</source>
-        <translation>Thêm lớp điều chỉnh để áp dụng hiệu ứng cho tất cả các clip bên dưới hoặc kéo nó đến nơi cần đến</translation>
     </message>
     <message>
         <source>Adjustment layer</source>
@@ -6023,6 +5999,10 @@
     <message>
         <source>Install a custom effect or transition from a .driftfx file made in Drift Forge</source>
         <translation>Cài đặt một hiệu ứng hoặc hiệu ứng âm thanh tùy chỉnh từ tệp .driftfx được tạo trong Drift Forge</translation>
+    </message>
+    <message>
+        <source>Add adjustment layer — click, or drag it onto a track</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>My Effects</source>
@@ -6051,6 +6031,14 @@
     <message>
         <source>Import a .driftfx file made in Drift Forge to add your own.</source>
         <translation>Nhập tệp .driftfx được tạo trong Drift Forge để thêm tệp của riêng bạn.</translation>
+    </message>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to add as an adjustment layer, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Apply to selected clip</source>
@@ -6157,16 +6145,16 @@
         <translation>Xuất ngăn xếp hiệu ứng</translation>
     </message>
     <message>
-        <source>My presets</source>
-        <translation>Preset của tôi</translation>
-    </message>
-    <message>
-        <source>Import an effect stack…</source>
-        <translation>Nhập ngăn xếp hiệu ứng…</translation>
+        <source>No saved presets</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Tune a clip&apos;s effects, then use “Save as preset…” in the properties Effects tab to keep them here.</source>
         <translation>Điều chỉnh các hiệu ứng của clip, sau đó sử dụng “Lưu làm preset…” trong thẻ thuộc tính Hiệu ứng để giữ chúng ở đây.</translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished">Nhập</translation>
     </message>
     <message>
         <source>+%1 more</source>
@@ -6216,16 +6204,16 @@
         <translation>Tải gói bổ trợ</translation>
     </message>
     <message>
-        <source>Click a template to apply music-synced effects to the selection</source>
-        <translation>Nhấp vào mẫu để áp dụng các hiệu ứng được đồng bộ hóa với nhạc cho vùng chọn</translation>
-    </message>
-    <message>
-        <source>Select a clip, then click a template to apply</source>
-        <translation>Chọn một clip, sau đó nhấp vào mẫu để áp dụng</translation>
-    </message>
-    <message>
         <source>Search templates</source>
         <translation>Tìm kiếm mẫu</translation>
+    </message>
+    <message>
+        <source>Import an effect stack…</source>
+        <translation type="unfinished">Nhập ngăn xếp hiệu ứng…</translation>
+    </message>
+    <message>
+        <source>My presets</source>
+        <translation type="unfinished">Preset của tôi</translation>
     </message>
     <message>
         <source>No templates match “%1”.</source>
@@ -6238,6 +6226,14 @@
     <message>
         <source>Nothing in this category.</source>
         <translation>Không có gì trong danh mục này.</translation>
+    </message>
+    <message>
+        <source>%1 — click to apply music-synced effects to the selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — select a clip, then click to apply</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove from favorites</source>
@@ -13270,6 +13266,10 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
         <translation>Tìm nhãn dán</translation>
     </message>
     <message>
+        <source>More emoji</source>
+        <translation type="unfinished">Thêm biểu tượng cảm xúc</translation>
+    </message>
+    <message>
         <source>No sticker packs installed</source>
         <translation>Không có gói nhãn dán nào được cài đặt</translation>
     </message>
@@ -13734,10 +13734,6 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
         <translation>Xuất kiểu văn bản</translation>
     </message>
     <message>
-        <source>Click a style to add text at the playhead. Double-click it on the preview to edit.</source>
-        <translation>Nhấp vào một kiểu để thêm văn bản vào vị trí đầu phát. Nhấp đúp vào văn bản đó trên bản xem trước để chỉnh sửa.</translation>
-    </message>
-    <message>
         <source>My styles</source>
         <translation>Kiểu của tôi</translation>
     </message>
@@ -13770,8 +13766,24 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
         <translation>Tích hợp sẵn</translation>
     </message>
     <message>
+        <source>My styles · %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Add at playhead</source>
         <translation type="unfinished">Thêm vào đầu phát</translation>
+    </message>
+    <message>
+        <source>No saved styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished">Nhập</translation>
     </message>
     <message>
         <source>Rename text style</source>
@@ -15812,16 +15824,8 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
 <context>
     <name>TransitionsTab</name>
     <message>
-        <source>Drag onto where two clips meet — or, on touch, hold, then drag. They fade into each other by default.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Search transitions</source>
         <translation>Tìm hiệu ứng chuyển cảnh</translation>
-    </message>
-    <message>
-        <source>Import transition</source>
-        <translation>Nhập chuyển cảnh</translation>
     </message>
     <message>
         <source>Install a custom transition or effect from a .driftfx file made in Drift Forge</source>
@@ -15880,8 +15884,8 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
         <translation>Nhập</translation>
     </message>
     <message>
-        <source>%1 — drag onto an overlap between two clips</source>
-        <translation>%1 - kéo vào phần chồng lên nhau giữa hai clip</translation>
+        <source>%1 — drag onto where two clips meet, or on touch hold then drag</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove from favorites</source>

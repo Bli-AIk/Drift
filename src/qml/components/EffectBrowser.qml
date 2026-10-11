@@ -89,47 +89,15 @@ Column {
         height: parent.height
         spacing: 0
 
-        Text {
-            id: browserTip
-            width: parent.width - 24
-            leftPadding: 12
-            rightPadding: 12
-            topPadding: 8
-            bottomPadding: 4
-            wrapMode: Text.WordWrap
-            horizontalAlignment: Text.AlignHCenter
-            text: EditorState.selectedClip >= 0
-                  ? qsTr("Drag a preset onto a clip, or click to apply to the selection")
-                  : qsTr("Click to add as adjustment layer, or drag onto a clip")
-            color: Theme.mutedForeground
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSizeXs
-        }
-
-        ThemedTextField {
+        AssetSearchBar {
             id: search
-            width: parent.width - 24
-            x: 12
             placeholderText: qsTr("Search effects")
-            font.family: Theme.fontFamily
-        }
 
-        Item {
-            width: 1
-            height: Theme.spacingSm
-        }
-
-        Row {
-            width: parent.width - 24
-            x: 12
-            spacing: Theme.spacingSm
-
-            ThemedButton {
-                width: parent.width - importButton.width - parent.spacing
-                text: qsTr("Add adjustment layer")
+            IconButton {
                 glyph: Theme.icons.wand
-                variant: "secondary"
-                tooltip: qsTr("Add an adjustment layer to apply effects across all clips underneath, or drag it to where it should go")
+                variant: "ghost"
+                buttonSize: Theme.controlHeight
+                tooltip: qsTr("Add adjustment layer — click, or drag it onto a track")
                 down: adjustmentDrag.pressed
 
                 // Tap adds at the playhead as before; drag places it on a track.
@@ -144,11 +112,10 @@ Column {
                 }
             }
 
-            ThemedButton {
-                id: importButton
-                text: qsTr("Import")
+            IconButton {
                 glyph: Theme.icons.download
-                variant: "secondary"
+                variant: "ghost"
+                buttonSize: Theme.controlHeight
                 tooltip: qsTr("Install a custom effect or transition from a .driftfx file made in Drift Forge")
                 onClicked: root.Window.window.importUserPackage("")
             }
@@ -156,7 +123,7 @@ Column {
 
         Item {
             width: 1
-            height: Theme.spacingMd
+            height: Theme.spacingSm
         }
 
         AssetCategoryChips {
@@ -172,7 +139,7 @@ Column {
 
         Item {
             width: parent.width
-            height: Math.max(0, parent.height - browserTip.height - search.height - Theme.spacingMd
+            height: Math.max(0, parent.height - search.height - Theme.spacingSm
                              - categoryChips.height)
 
             Text {
@@ -297,6 +264,13 @@ Column {
                         }
 
                         HoverHandler { id: cardHover }
+
+                        ThemedToolTip {
+                            text: EditorState.selectedClip >= 0
+                                  ? qsTr("%1 — click to apply to the selection, or drag onto a clip").arg(presetCard.modelData.label)
+                                  : qsTr("%1 — click to add as an adjustment layer, or drag onto a clip").arg(presetCard.modelData.label)
+                            visible: cardHover.hovered && !presetDrag.active
+                        }
 
                         Image {
                             anchors.fill: parent

@@ -50,22 +50,14 @@ Item {
         anchors.fill: parent
         spacing: 0
 
-        Item {
-            width: 1
-            height: Theme.pagePadding
-        }
-
-        ThemedTextField {
+        AssetSearchBar {
             id: search
-            width: parent.width - Theme.pagePadding * 2
-            x: Theme.pagePadding
             placeholderText: qsTr("Search shapes")
-            font.family: Theme.fontFamily
         }
 
         Item {
             width: 1
-            height: Theme.spacingMd
+            height: Theme.spacingSm
         }
 
         AssetCategoryChips {
@@ -79,8 +71,7 @@ Item {
 
         Item {
             width: parent.width
-            height: Math.max(0, parent.height - Theme.pagePadding - search.height
-                             - Theme.spacingMd - categoryChips.height)
+            height: Math.max(0, parent.height - search.height - Theme.spacingSm - categoryChips.height)
 
             Text {
                 id: emptySearchHint

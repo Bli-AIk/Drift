@@ -4447,10 +4447,6 @@
         <translation>جارٍ قراءة الوسائط وإنشاء الصور المصغرة.</translation>
     </message>
     <message>
-        <source>More emoji</source>
-        <translation>المزيد من الرموز التعبيرية</translation>
-    </message>
-    <message>
         <source>More import options</source>
         <translation>المزيد من خيارات الاستيراد</translation>
     </message>
@@ -4544,20 +4540,8 @@
         <translation>تثبيت التأثيرات الصوتية</translation>
     </message>
     <message>
-        <source>Drag a preset onto a clip, or click to apply to the selection</source>
-        <translation>اسحب إعدادًا مسبقًا إلى مقطع، أو انقر لتطبيقه على التحديد</translation>
-    </message>
-    <message>
-        <source>Drag a preset onto a clip in the timeline</source>
-        <translation>اسحب إعدادًا مسبقًا إلى مقطع في المخطط الزمني</translation>
-    </message>
-    <message>
         <source>Search audio effects</source>
         <translation>البحث في التأثيرات الصوتية</translation>
-    </message>
-    <message>
-        <source>Import audio effect</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Install a custom audio effect or effect from a .driftfx file made in Drift Forge</source>
@@ -4594,6 +4578,14 @@
     <message>
         <source>Import</source>
         <translation type="unfinished">استيراد</translation>
+    </message>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — drag onto a clip in the timeline</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Apply to selected clip</source>
@@ -6118,24 +6110,8 @@
         <translation>الحصول على إضافات</translation>
     </message>
     <message>
-        <source>Drag a preset onto a clip, or click to apply to the selection</source>
-        <translation>اسحب إعدادًا مسبقًا إلى مقطع، أو انقر للتطبيق على التحديد</translation>
-    </message>
-    <message>
-        <source>Click to add as adjustment layer, or drag onto a clip</source>
-        <translation>انقر للإضافة كطبقة ضبط، أو اسحب إلى مقطع</translation>
-    </message>
-    <message>
         <source>Search effects</source>
         <translation>البحث في التأثيرات</translation>
-    </message>
-    <message>
-        <source>Add adjustment layer</source>
-        <translation>إضافة طبقة ضبط</translation>
-    </message>
-    <message>
-        <source>Add an adjustment layer to apply effects across all clips underneath, or drag it to where it should go</source>
-        <translation>أضف طبقة ضبط لتطبيق التأثيرات على جميع المقاطع أدناها، أو اسحبها إلى الموضع المطلوب</translation>
     </message>
     <message>
         <source>Adjustment layer</source>
@@ -6147,6 +6123,10 @@
     </message>
     <message>
         <source>Install a custom effect or transition from a .driftfx file made in Drift Forge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add adjustment layer — click, or drag it onto a track</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6175,6 +6155,14 @@
     </message>
     <message>
         <source>Import a .driftfx file made in Drift Forge to add your own.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to add as an adjustment layer, or drag onto a clip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6287,16 +6275,16 @@
         <translation>تصدير مجموعة التأثيرات</translation>
     </message>
     <message>
-        <source>My presets</source>
-        <translation>إعداداتي المسبقة</translation>
-    </message>
-    <message>
-        <source>Import an effect stack…</source>
-        <translation>استيراد مجموعة تأثيرات…</translation>
+        <source>No saved presets</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Tune a clip&apos;s effects, then use “Save as preset…” in the properties Effects tab to keep them here.</source>
         <translation>اضبط تأثيرات المقطع، ثم استخدم “حفظ كإعداد مسبق…” في علامة تبويب التأثيرات بالخصائص للاحتفاظ بها هنا.</translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished">استيراد</translation>
     </message>
     <message>
         <source>+%1 more</source>
@@ -6346,16 +6334,16 @@
         <translation>الحصول على الإضافات</translation>
     </message>
     <message>
-        <source>Click a template to apply music-synced effects to the selection</source>
-        <translation>انقر على قالب لتطبيق تأثيرات متزامنة مع الموسيقى على التحديد</translation>
-    </message>
-    <message>
-        <source>Select a clip, then click a template to apply</source>
-        <translation>حدد مقطعًا، ثم انقر على قالب لتطبيقه</translation>
-    </message>
-    <message>
         <source>Search templates</source>
         <translation>البحث في القوالب</translation>
+    </message>
+    <message>
+        <source>Import an effect stack…</source>
+        <translation type="unfinished">استيراد مجموعة تأثيرات…</translation>
+    </message>
+    <message>
+        <source>My presets</source>
+        <translation type="unfinished">إعداداتي المسبقة</translation>
     </message>
     <message>
         <source>No templates match “%1”.</source>
@@ -6368,6 +6356,14 @@
     <message>
         <source>Nothing in this category.</source>
         <translation>لا يوجد شيء في هذه الفئة.</translation>
+    </message>
+    <message>
+        <source>%1 — click to apply music-synced effects to the selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — select a clip, then click to apply</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove from favorites</source>
@@ -13495,6 +13491,10 @@ If playback stutters, try another.</source>
         <translation>البحث في الملصقات</translation>
     </message>
     <message>
+        <source>More emoji</source>
+        <translation type="unfinished">المزيد من الرموز التعبيرية</translation>
+    </message>
+    <message>
         <source>No sticker packs installed</source>
         <translation>لم يتم تثبيت أي حزم ملصقات</translation>
     </message>
@@ -13974,10 +13974,6 @@ If playback stutters, try another.</source>
         <translation>تصدير نمط النص</translation>
     </message>
     <message>
-        <source>Click a style to add text at the playhead. Double-click it on the preview to edit.</source>
-        <translation>انقر على أحد الأنماط لإضافة نص عند مؤشر التشغيل. انقر عليه نقرًا مزدوجًا في المعاينة لتعديله.</translation>
-    </message>
-    <message>
         <source>My styles</source>
         <translation>أنماطي</translation>
     </message>
@@ -14010,8 +14006,24 @@ If playback stutters, try another.</source>
         <translation>مدمج</translation>
     </message>
     <message>
+        <source>My styles · %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Add at playhead</source>
         <translation type="unfinished">إضافة عند مؤشر التشغيل</translation>
+    </message>
+    <message>
+        <source>No saved styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished">استيراد</translation>
     </message>
     <message>
         <source>Rename text style</source>
@@ -16077,16 +16089,8 @@ If playback stutters, try another.</source>
 <context>
     <name>TransitionsTab</name>
     <message>
-        <source>Drag onto where two clips meet — or, on touch, hold, then drag. They fade into each other by default.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Search transitions</source>
         <translation>البحث في الانتقالات</translation>
-    </message>
-    <message>
-        <source>Import transition</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Install a custom transition or effect from a .driftfx file made in Drift Forge</source>
@@ -16145,8 +16149,8 @@ If playback stutters, try another.</source>
         <translation type="unfinished">استيراد</translation>
     </message>
     <message>
-        <source>%1 — drag onto an overlap between two clips</source>
-        <translation>%1 — اسحب إلى موضع التداخل بين مقطعين</translation>
+        <source>%1 — drag onto where two clips meet, or on touch hold then drag</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove from favorites</source>

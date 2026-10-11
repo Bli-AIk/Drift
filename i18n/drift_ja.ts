@@ -4362,10 +4362,6 @@
         <translation>メディアを読み込み、サムネイルを生成中。</translation>
     </message>
     <message>
-        <source>More emoji</source>
-        <translation>その他の絵文字</translation>
-    </message>
-    <message>
         <source>More import options</source>
         <translation>その他のインポートオプション</translation>
     </message>
@@ -4449,20 +4445,8 @@
         <translation>オーディオエフェクトをインストール</translation>
     </message>
     <message>
-        <source>Drag a preset onto a clip, or click to apply to the selection</source>
-        <translation>プリセットをクリップにドラッグするか、クリックして選択範囲に適用</translation>
-    </message>
-    <message>
-        <source>Drag a preset onto a clip in the timeline</source>
-        <translation>プリセットをタイムライン上のクリップにドラッグ</translation>
-    </message>
-    <message>
         <source>Search audio effects</source>
         <translation>オーディオエフェクトを検索</translation>
-    </message>
-    <message>
-        <source>Import audio effect</source>
-        <translation>オーディオエフェクトをインポート</translation>
     </message>
     <message>
         <source>Install a custom audio effect or effect from a .driftfx file made in Drift Forge</source>
@@ -4499,6 +4483,14 @@
     <message>
         <source>Import</source>
         <translation>インポート</translation>
+    </message>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — drag onto a clip in the timeline</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Apply to selected clip</source>
@@ -5993,24 +5985,8 @@
         <translation>拡張機能を入手</translation>
     </message>
     <message>
-        <source>Drag a preset onto a clip, or click to apply to the selection</source>
-        <translation>プリセットをクリップにドラッグするか、クリックして選択範囲に適用</translation>
-    </message>
-    <message>
-        <source>Click to add as adjustment layer, or drag onto a clip</source>
-        <translation>クリックして調整レイヤーとして追加するか、クリップ上にドラッグしてください</translation>
-    </message>
-    <message>
         <source>Search effects</source>
         <translation>エフェクトを検索</translation>
-    </message>
-    <message>
-        <source>Add adjustment layer</source>
-        <translation>調整レイヤーを追加</translation>
-    </message>
-    <message>
-        <source>Add an adjustment layer to apply effects across all clips underneath, or drag it to where it should go</source>
-        <translation>下にあるすべてのクリップにエフェクトを適用するには調整レイヤーを追加するか、配置したい場所にドラッグしてください</translation>
     </message>
     <message>
         <source>Adjustment layer</source>
@@ -6023,6 +5999,10 @@
     <message>
         <source>Install a custom effect or transition from a .driftfx file made in Drift Forge</source>
         <translation>Drift Forge で作成した .driftfx ファイルから、カスタムエフェクトまたはトランジションをインストールします</translation>
+    </message>
+    <message>
+        <source>Add adjustment layer — click, or drag it onto a track</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>My Effects</source>
@@ -6051,6 +6031,14 @@
     <message>
         <source>Import a .driftfx file made in Drift Forge to add your own.</source>
         <translation>Drift Forge で作成した .driftfx ファイルをインポートして、独自のものを追加してください。</translation>
+    </message>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to add as an adjustment layer, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Apply to selected clip</source>
@@ -6157,16 +6145,16 @@
         <translation>エフェクトスタックをエクスポート</translation>
     </message>
     <message>
-        <source>My presets</source>
-        <translation>マイプリセット</translation>
-    </message>
-    <message>
-        <source>Import an effect stack…</source>
-        <translation>エフェクトスタックをインポート…</translation>
+        <source>No saved presets</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Tune a clip&apos;s effects, then use “Save as preset…” in the properties Effects tab to keep them here.</source>
         <translation>クリップのエフェクトを調整し、プロパティのエフェクトタブで「プリセットとして保存…」を使用してここに保存します。</translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished">インポート</translation>
     </message>
     <message>
         <source>+%1 more</source>
@@ -6216,16 +6204,16 @@
         <translation>拡張機能を入手</translation>
     </message>
     <message>
-        <source>Click a template to apply music-synced effects to the selection</source>
-        <translation>テンプレートをクリックして、音楽に同期したエフェクトを選択範囲に適用</translation>
-    </message>
-    <message>
-        <source>Select a clip, then click a template to apply</source>
-        <translation>クリップを選択し、テンプレートをクリックして適用</translation>
-    </message>
-    <message>
         <source>Search templates</source>
         <translation>テンプレートを検索</translation>
+    </message>
+    <message>
+        <source>Import an effect stack…</source>
+        <translation type="unfinished">エフェクトスタックをインポート…</translation>
+    </message>
+    <message>
+        <source>My presets</source>
+        <translation type="unfinished">マイプリセット</translation>
     </message>
     <message>
         <source>No templates match “%1”.</source>
@@ -6238,6 +6226,14 @@
     <message>
         <source>Nothing in this category.</source>
         <translation>このカテゴリには何もありません。</translation>
+    </message>
+    <message>
+        <source>%1 — click to apply music-synced effects to the selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — select a clip, then click to apply</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove from favorites</source>
@@ -13270,6 +13266,10 @@ If playback stutters, try another.</source>
         <translation>スタンプを検索</translation>
     </message>
     <message>
+        <source>More emoji</source>
+        <translation type="unfinished">その他の絵文字</translation>
+    </message>
+    <message>
         <source>No sticker packs installed</source>
         <translation>スタンプパックがインストールされていません</translation>
     </message>
@@ -13734,10 +13734,6 @@ If playback stutters, try another.</source>
         <translation>テキストスタイルをエクスポート</translation>
     </message>
     <message>
-        <source>Click a style to add text at the playhead. Double-click it on the preview to edit.</source>
-        <translation>スタイルをクリックして再生ヘッド位置にテキストを追加。プレビュー上でダブルクリックして編集します。</translation>
-    </message>
-    <message>
         <source>My styles</source>
         <translation>マイスタイル</translation>
     </message>
@@ -13770,8 +13766,24 @@ If playback stutters, try another.</source>
         <translation>組み込み</translation>
     </message>
     <message>
+        <source>My styles · %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Add at playhead</source>
         <translation type="unfinished">再生ヘッド位置に追加</translation>
+    </message>
+    <message>
+        <source>No saved styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished">インポート</translation>
     </message>
     <message>
         <source>Rename text style</source>
@@ -15812,16 +15824,8 @@ If playback stutters, try another.</source>
 <context>
     <name>TransitionsTab</name>
     <message>
-        <source>Drag onto where two clips meet — or, on touch, hold, then drag. They fade into each other by default.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Search transitions</source>
         <translation>トランジションを検索</translation>
-    </message>
-    <message>
-        <source>Import transition</source>
-        <translation>トランジションをインポート</translation>
     </message>
     <message>
         <source>Install a custom transition or effect from a .driftfx file made in Drift Forge</source>
@@ -15880,8 +15884,8 @@ If playback stutters, try another.</source>
         <translation>インポート</translation>
     </message>
     <message>
-        <source>%1 — drag onto an overlap between two clips</source>
-        <translation>%1 — 2つのクリップの重なりにドラッグ</translation>
+        <source>%1 — drag onto where two clips meet, or on touch hold then drag</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove from favorites</source>

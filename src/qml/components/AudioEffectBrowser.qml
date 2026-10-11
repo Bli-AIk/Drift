@@ -82,50 +82,22 @@ Column {
         height: parent.height
         spacing: 0
 
-        Text {
-            id: browserTip
-            width: parent.width - 24
-            leftPadding: 12
-            rightPadding: 12
-            topPadding: 8
-            bottomPadding: 4
-            wrapMode: Text.WordWrap
-            horizontalAlignment: Text.AlignHCenter
-            text: EditorState.selectedClip >= 0
-                  ? qsTr("Drag a preset onto a clip, or click to apply to the selection")
-                  : qsTr("Drag a preset onto a clip in the timeline")
-            color: Theme.mutedForeground
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSizeXs
-        }
-
-        ThemedTextField {
+        AssetSearchBar {
             id: search
-            width: parent.width - 24
-            x: 12
             placeholderText: qsTr("Search audio effects")
-            font.family: Theme.fontFamily
+
+            IconButton {
+                glyph: Theme.icons.download
+                variant: "ghost"
+                buttonSize: Theme.controlHeight
+                tooltip: qsTr("Install a custom audio effect or effect from a .driftfx file made in Drift Forge")
+                onClicked: root.Window.window.importUserPackage("")
+            }
         }
 
         Item {
             width: 1
             height: Theme.spacingSm
-        }
-
-        ThemedButton {
-            id: importButton
-            width: parent.width - 24
-            x: 12
-            text: qsTr("Import audio effect")
-            glyph: Theme.icons.download
-            variant: "secondary"
-            tooltip: qsTr("Install a custom audio effect or effect from a .driftfx file made in Drift Forge")
-            onClicked: root.Window.window.importUserPackage("")
-        }
-
-        Item {
-            width: 1
-            height: Theme.spacingMd
         }
 
         AssetCategoryChips {
@@ -141,8 +113,8 @@ Column {
 
         Item {
             width: parent.width
-            height: Math.max(0, parent.height - browserTip.height - search.height - Theme.spacingSm
-                             - importButton.height - Theme.spacingMd - categoryChips.height)
+            height: Math.max(0, parent.height - search.height - Theme.spacingSm
+                             - categoryChips.height)
 
             Text {
                 id: emptySearchHint
@@ -255,6 +227,13 @@ Column {
                         }
 
                         HoverHandler { id: cardHover }
+
+                        ThemedToolTip {
+                            text: EditorState.selectedClip >= 0
+                                  ? qsTr("%1 — click to apply to the selection, or drag onto a clip").arg(presetCard.modelData.label)
+                                  : qsTr("%1 — drag onto a clip in the timeline").arg(presetCard.modelData.label)
+                            visible: cardHover.hovered && !presetDrag.active
+                        }
 
                         Image {
                             id: presetThumb

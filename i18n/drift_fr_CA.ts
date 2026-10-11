@@ -4381,10 +4381,6 @@
         <translation>Lecture des médias et génération de vignettes.</translation>
     </message>
     <message>
-        <source>More emoji</source>
-        <translation>Plus d&apos;émojis</translation>
-    </message>
-    <message>
         <source>More import options</source>
         <translation>Plus de paramètres d&apos;importation</translation>
     </message>
@@ -4470,20 +4466,8 @@
         <translation>Installer les effets audio</translation>
     </message>
     <message>
-        <source>Drag a preset onto a clip, or click to apply to the selection</source>
-        <translation>Faites glisser un préréglage sur un clip, ou cliquez pour l&apos;appliquer à la sélection</translation>
-    </message>
-    <message>
-        <source>Drag a preset onto a clip in the timeline</source>
-        <translation>Faites glisser un préréglage sur un clip dans la ligne de temps</translation>
-    </message>
-    <message>
         <source>Search audio effects</source>
         <translation>Rechercher des effets audio</translation>
-    </message>
-    <message>
-        <source>Import audio effect</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Install a custom audio effect or effect from a .driftfx file made in Drift Forge</source>
@@ -4520,6 +4504,14 @@
     <message>
         <source>Import</source>
         <translation type="unfinished">Importer</translation>
+    </message>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — drag onto a clip in the timeline</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Apply to selected clip</source>
@@ -6020,24 +6012,8 @@
         <translation>Obtenir des extras</translation>
     </message>
     <message>
-        <source>Drag a preset onto a clip, or click to apply to the selection</source>
-        <translation>Faites glisser un préréglage sur un clip, ou cliquez pour l&apos;appliquer à la sélection</translation>
-    </message>
-    <message>
-        <source>Click to add as adjustment layer, or drag onto a clip</source>
-        <translation>Cliquer pour ajouter comme calque d&apos;ajustement ou glisser sur un clip</translation>
-    </message>
-    <message>
         <source>Search effects</source>
         <translation>Rechercher des effets</translation>
-    </message>
-    <message>
-        <source>Add adjustment layer</source>
-        <translation>Ajouter un calque d&apos;ajustement</translation>
-    </message>
-    <message>
-        <source>Add an adjustment layer to apply effects across all clips underneath, or drag it to where it should go</source>
-        <translation>Ajoutez un calque d&apos;ajustement pour appliquer des effets à tous les clips situés en dessous, ou faites-le glisser à l&apos;endroit souhaité</translation>
     </message>
     <message>
         <source>Adjustment layer</source>
@@ -6049,6 +6025,10 @@
     </message>
     <message>
         <source>Install a custom effect or transition from a .driftfx file made in Drift Forge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add adjustment layer — click, or drag it onto a track</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6077,6 +6057,14 @@
     </message>
     <message>
         <source>Import a .driftfx file made in Drift Forge to add your own.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to add as an adjustment layer, or drag onto a clip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6185,16 +6173,16 @@
         <translation>Exporter la pile d’effets</translation>
     </message>
     <message>
-        <source>My presets</source>
-        <translation>Mes préréglages</translation>
-    </message>
-    <message>
-        <source>Import an effect stack…</source>
-        <translation>Importer une pile d’effets…</translation>
+        <source>No saved presets</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Tune a clip&apos;s effects, then use “Save as preset…” in the properties Effects tab to keep them here.</source>
         <translation>Ajustez les effets d’un clip, puis utilisez « Enregistrer comme préréglage… » dans l’onglet Effets des propriétés pour les garder ici.</translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished">Importer</translation>
     </message>
     <message>
         <source>+%1 more</source>
@@ -6244,16 +6232,16 @@
         <translation>Obtenir des extras</translation>
     </message>
     <message>
-        <source>Click a template to apply music-synced effects to the selection</source>
-        <translation>Cliquez sur un modèle pour appliquer des effets synchronisés avec la musique à la sélection</translation>
-    </message>
-    <message>
-        <source>Select a clip, then click a template to apply</source>
-        <translation>Sélectionnez un clip, puis cliquez sur un modèle pour l&apos;appliquer</translation>
-    </message>
-    <message>
         <source>Search templates</source>
         <translation>Rechercher des modèles</translation>
+    </message>
+    <message>
+        <source>Import an effect stack…</source>
+        <translation type="unfinished">Importer une pile d’effets…</translation>
+    </message>
+    <message>
+        <source>My presets</source>
+        <translation type="unfinished">Mes préréglages</translation>
     </message>
     <message>
         <source>No templates match “%1”.</source>
@@ -6266,6 +6254,14 @@
     <message>
         <source>Nothing in this category.</source>
         <translation>Rien dans cette catégorie.</translation>
+    </message>
+    <message>
+        <source>%1 — click to apply music-synced effects to the selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — select a clip, then click to apply</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove from favorites</source>
@@ -13318,6 +13314,10 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <translation>Rechercher des autocollants</translation>
     </message>
     <message>
+        <source>More emoji</source>
+        <translation type="unfinished">Plus d&apos;émojis</translation>
+    </message>
+    <message>
         <source>No sticker packs installed</source>
         <translation>Aucune extension d&apos;autocollants installé</translation>
     </message>
@@ -13786,10 +13786,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <translation>Exporter style de texte</translation>
     </message>
     <message>
-        <source>Click a style to add text at the playhead. Double-click it on the preview to edit.</source>
-        <translation>Cliquez sur un style pour ajouter du texte à la tête de lecture. Double-cliquez dessus dans l&apos;aperçu pour modifier.</translation>
-    </message>
-    <message>
         <source>My styles</source>
         <translation>Mes styles</translation>
     </message>
@@ -13823,8 +13819,24 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <translation>Intégré</translation>
     </message>
     <message>
+        <source>My styles · %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Add at playhead</source>
         <translation type="unfinished">Ajouter à la tête de lecture</translation>
+    </message>
+    <message>
+        <source>No saved styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished">Importer</translation>
     </message>
     <message>
         <source>Rename text style</source>
@@ -15870,16 +15882,8 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
 <context>
     <name>TransitionsTab</name>
     <message>
-        <source>Drag onto where two clips meet — or, on touch, hold, then drag. They fade into each other by default.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Search transitions</source>
         <translation>Rechercher des transitions</translation>
-    </message>
-    <message>
-        <source>Import transition</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Install a custom transition or effect from a .driftfx file made in Drift Forge</source>
@@ -15938,8 +15942,8 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <translation type="unfinished">Importer</translation>
     </message>
     <message>
-        <source>%1 — drag onto an overlap between two clips</source>
-        <translation>%1 — faites glisser sur un chevauchement entre deux clips</translation>
+        <source>%1 — drag onto where two clips meet, or on touch hold then drag</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove from favorites</source>

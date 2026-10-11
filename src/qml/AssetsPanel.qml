@@ -693,7 +693,7 @@ PanelFrame {
             tab.searchText = saved.search
         if (saved.category === undefined || !tab.categories)
             return
-        if (saved.category === "__favorites__"
+        if (saved.category === "__favorites__" || saved.category === "__mine__"
                 || tab.categories.some(category => category.id === saved.category))
             tab.activeCategory = saved.category
     }
@@ -874,12 +874,15 @@ PanelFrame {
             Rectangle {
                 id: assetsHeader
                 // In a sheet the title is the sheet's own, so this bar only earns its height when
-                // the tab has actions to put in it (emoji picker, media import); otherwise it was
-                // an empty band between the sheet title and the content.
+                // the tab has actions to put in it (media import); otherwise it was an empty band
+                // between the sheet title and the content. The catalog tabs never show it: their
+                // search field names the tab and carries its actions.
                 readonly property string tabId: tabsModel.get(root.activeTab).tabId
-                readonly property bool hasActions: tabId === "stickers" || kindsForTab(tabId).length > 0
+                readonly property bool hasActions: kindsForTab(tabId).length > 0
+                readonly property bool searchBarTab: ["text", "stickers", "shapes", "effects", "templates",
+                                                      "transitions", "sounds"].indexOf(tabId) >= 0
                 width: parent.width
-                height: root.sheetMode && !hasActions ? 0 : Theme.panelHeaderHeight
+                height: searchBarTab || (root.sheetMode && !hasActions) ? 0 : Theme.panelHeaderHeight
                 visible: height > 0
                 // Matches the surrounding PanelFrame; it used to paint the app
                 // background, so the header read as a different surface than the
@@ -903,21 +906,6 @@ PanelFrame {
                     color: Theme.mutedForeground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeSm
-                }
-
-                // The sticker packs are a curated subset of the emoji set, so the rest live behind
-                // this button rather than being unreachable.
-                IconButton {
-                    id: emojiPickerButton
-                    anchors.right: parent.right
-                    anchors.rightMargin: 8
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: tabsModel.get(root.activeTab).tabId === "stickers"
-                    glyph: Theme.icons.plus
-                    variant: "ghost"
-                    tooltip: qsTr("More emoji")
-                    active: emojiPicker.opened
-                    onClicked: emojiPicker.opened ? emojiPicker.close() : emojiPicker.open()
                 }
 
                 Row {
@@ -1034,10 +1022,10 @@ PanelFrame {
 
             EmojiPicker {
                 id: emojiPicker
-                // Hangs off the button at the panel's right edge, and slides back rather than
-                // running off-window when the panel is dragged narrow.
-                x: Math.max(-Theme.tabRailWidth, assetsContent.width - width - 8)
-                y: Theme.panelHeaderHeight + 4
+                // Hangs off the stickers search bar's + at the panel's right edge, and slides back
+                // rather than running off-window when the panel is dragged narrow.
+                x: Math.max(-Theme.tabRailWidth, assetsContent.width - width - Theme.pagePadding)
+                y: assetsHeader.height + Theme.pagePadding + Theme.controlHeight + 4
                 onAddonManagerRequested: root.Window.window.openAddonManager("stickers")
                 onAdded: root.addCompleted()
             }
@@ -1052,6 +1040,12 @@ PanelFrame {
                 opacity: root.tabOpacity
                 sourceComponent: Component {
                     TextAssetsTab {
+                        Component.onCompleted: {
+                            const saved = root.tabState["text"] || {}
+                            if (saved.section)
+                                section = saved.section
+                        }
+                        onSectionChanged: root.rememberTab("text", "section", section)
                         onAdded: root.addCompleted()
                     }
                 }
@@ -1104,6 +1098,8 @@ PanelFrame {
                 opacity: root.tabOpacity
                 sourceComponent: Component {
                     StickersTab {
+                        emojiPickerOpen: emojiPicker.opened
+                        onEmojiPickerRequested: emojiPicker.opened ? emojiPicker.close() : emojiPicker.open()
                         onAdded: root.addCompleted()
                         Component.onCompleted: root.restoreBrowserTab(this, "stickers")
                         onSearchTextChanged: root.rememberTab("stickers", "search", searchText)

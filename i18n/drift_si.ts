@@ -4379,10 +4379,6 @@
         <translation>මාධ්‍ය කියවමින් සහ සිඟිති රූ ජනනය කරමින්.</translation>
     </message>
     <message>
-        <source>More emoji</source>
-        <translation>තවත් ඉමෝජි</translation>
-    </message>
-    <message>
         <source>More import options</source>
         <translation>තවත් ආයාත විකල්ප</translation>
     </message>
@@ -4468,20 +4464,8 @@
         <translation>ශ්‍රව්‍ය ප්‍රයෝග ස්ථාපනය කරන්න</translation>
     </message>
     <message>
-        <source>Drag a preset onto a clip, or click to apply to the selection</source>
-        <translation>ක්ලිපයක් මතට පෙරසැකසුමක් අදින්න, නැතහොත් තේරීමට යෙදීමට ක්ලික් කරන්න</translation>
-    </message>
-    <message>
-        <source>Drag a preset onto a clip in the timeline</source>
-        <translation>කාලරේඛාවේ ඇති ක්ලිපයක් මතට පෙරසැකසුමක් අදින්න</translation>
-    </message>
-    <message>
         <source>Search audio effects</source>
         <translation>ශ්‍රව්‍ය ප්‍රයෝග සොයන්න</translation>
-    </message>
-    <message>
-        <source>Import audio effect</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Install a custom audio effect or effect from a .driftfx file made in Drift Forge</source>
@@ -4518,6 +4502,14 @@
     <message>
         <source>Import</source>
         <translation type="unfinished">ආයාත කරන්න</translation>
+    </message>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — drag onto a clip in the timeline</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Apply to selected clip</source>
@@ -6018,24 +6010,8 @@
         <translation>අමතර අංග ලබාගන්න</translation>
     </message>
     <message>
-        <source>Drag a preset onto a clip, or click to apply to the selection</source>
-        <translation>ක්ලිපයක් මතට පෙරසැකසුමක් අදින්න, නැතහොත් තේරීමට යෙදීමට ක්ලික් කරන්න</translation>
-    </message>
-    <message>
-        <source>Click to add as adjustment layer, or drag onto a clip</source>
-        <translation>ගැලපුම් ස්තරයක් ලෙස එක් කිරීමට ක්ලික් කරන්න, නැතහොත් ක්ලිපයක් මතට අදින්න</translation>
-    </message>
-    <message>
         <source>Search effects</source>
         <translation>ප්‍රයෝග සොයන්න</translation>
-    </message>
-    <message>
-        <source>Add adjustment layer</source>
-        <translation>ගැලපුම් ස්තරයක් එක් කරන්න</translation>
-    </message>
-    <message>
-        <source>Add an adjustment layer to apply effects across all clips underneath, or drag it to where it should go</source>
-        <translation>යටින් ඇති සියලු ක්ලිප් වෙත ප්‍රයෝග යෙදීමට ගැළපුම් ස්තරයක් එක් කරන්න, නැතහොත් එය තිබිය යුතු ස්ථානයට අදින්න</translation>
     </message>
     <message>
         <source>Adjustment layer</source>
@@ -6047,6 +6023,10 @@
     </message>
     <message>
         <source>Install a custom effect or transition from a .driftfx file made in Drift Forge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add adjustment layer — click, or drag it onto a track</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6075,6 +6055,14 @@
     </message>
     <message>
         <source>Import a .driftfx file made in Drift Forge to add your own.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to add as an adjustment layer, or drag onto a clip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6183,16 +6171,16 @@
         <translation>ප්‍රයෝග ස්ටැක් නිර්යාත කරන්න</translation>
     </message>
     <message>
-        <source>My presets</source>
-        <translation>මගේ පෙරසැකසුම්</translation>
-    </message>
-    <message>
-        <source>Import an effect stack…</source>
-        <translation>ප්‍රයෝග ස්ටැක් එකක් ආයාත කරන්න…</translation>
+        <source>No saved presets</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Tune a clip&apos;s effects, then use “Save as preset…” in the properties Effects tab to keep them here.</source>
         <translation>ක්ලිප් එකක ප්‍රයෝග සකසා, ඒවා මෙහි තබා ගැනීමට ගුණාංග වල ඇති ප්‍රයෝග පටිත්තෙහි “පෙරසැකසුමක් ලෙස සුරකින්න…” භාවිත කරන්න.</translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished">ආයාත කරන්න</translation>
     </message>
     <message>
         <source>+%1 more</source>
@@ -6242,16 +6230,16 @@
         <translation>අමතර අංග ලබාගන්න</translation>
     </message>
     <message>
-        <source>Click a template to apply music-synced effects to the selection</source>
-        <translation>සංගීතය සමඟ සමමුහුර්ත ප්‍රයෝග තේරීමට යෙදීමට ආකෘතියක් ක්ලික් කරන්න</translation>
-    </message>
-    <message>
-        <source>Select a clip, then click a template to apply</source>
-        <translation>ක්ලිපයක් තෝරා, පසුව යෙදීමට ආකෘතියක් ක්ලික් කරන්න</translation>
-    </message>
-    <message>
         <source>Search templates</source>
         <translation>ආකෘති සොයන්න</translation>
+    </message>
+    <message>
+        <source>Import an effect stack…</source>
+        <translation type="unfinished">ප්‍රයෝග ස්ටැක් එකක් ආයාත කරන්න…</translation>
+    </message>
+    <message>
+        <source>My presets</source>
+        <translation type="unfinished">මගේ පෙරසැකසුම්</translation>
     </message>
     <message>
         <source>No templates match “%1”.</source>
@@ -6264,6 +6252,14 @@
     <message>
         <source>Nothing in this category.</source>
         <translation>මෙම ප්‍රවර්ගයේ කිසිවක් නැත.</translation>
+    </message>
+    <message>
+        <source>%1 — click to apply music-synced effects to the selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — select a clip, then click to apply</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove from favorites</source>
@@ -13315,6 +13311,10 @@ If playback stutters, try another.</source>
         <translation>ස්ටිකර් සොයන්න</translation>
     </message>
     <message>
+        <source>More emoji</source>
+        <translation type="unfinished">තවත් ඉමෝජි</translation>
+    </message>
+    <message>
         <source>No sticker packs installed</source>
         <translation>ස්ටිකර් පැකේජ ස්ථාපනය කර නැත</translation>
     </message>
@@ -13782,10 +13782,6 @@ If playback stutters, try another.</source>
         <translation>පෙළ විලාසය නිර්යාත කරන්න</translation>
     </message>
     <message>
-        <source>Click a style to add text at the playhead. Double-click it on the preview to edit.</source>
-        <translation>ධාවන ශීර්ෂය ඇති තැනට පෙළ එක් කිරීමට විලාසයක් ක්ලික් කරන්න. එය සංස්කරණය කිරීමට පෙරදසුන මත දෙවරක් ක්ලික් කරන්න.</translation>
-    </message>
-    <message>
         <source>My styles</source>
         <translation>මගේ විලාසයන්</translation>
     </message>
@@ -13818,8 +13814,24 @@ If playback stutters, try another.</source>
         <translation>බිල්ට්-ඉන්</translation>
     </message>
     <message>
+        <source>My styles · %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Add at playhead</source>
         <translation type="unfinished">ප්ලේහෙඩ් එක ඇති තැනට එක් කරන්න</translation>
+    </message>
+    <message>
+        <source>No saved styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished">ආයාත කරන්න</translation>
     </message>
     <message>
         <source>Rename text style</source>
@@ -15865,16 +15877,8 @@ If playback stutters, try another.</source>
 <context>
     <name>TransitionsTab</name>
     <message>
-        <source>Drag onto where two clips meet — or, on touch, hold, then drag. They fade into each other by default.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Search transitions</source>
         <translation>සංක්‍රාන්ති සොයන්න</translation>
-    </message>
-    <message>
-        <source>Import transition</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Install a custom transition or effect from a .driftfx file made in Drift Forge</source>
@@ -15933,8 +15937,8 @@ If playback stutters, try another.</source>
         <translation type="unfinished">ආයාත කරන්න</translation>
     </message>
     <message>
-        <source>%1 — drag onto an overlap between two clips</source>
-        <translation>%1 — ක්ලිප් දෙකක් අතර අතිච්ඡාදනය වන තැනට අදින්න</translation>
+        <source>%1 — drag onto where two clips meet, or on touch hold then drag</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove from favorites</source>

@@ -5,13 +5,15 @@ import ".."
 
 // Text tab: click a style pack to drop a styled text clip on the timeline
 // (placeholder copy + inline edit). Timed captions live under Subtitles.
-// Styles the user saved from the properties Text tab head the list under "My styles".
+// Styles the user saved from the properties Text tab sit behind the "My styles" chip.
 Item {
     id: root
 
     // A clip landed on the timeline. The phone shell closes the sheet on this —
     // the thing you came for is behind it.
     signal added()
+
+    property string section: "builtin"
 
     readonly property var presets: EditorState.textPresets()
 
@@ -32,8 +34,10 @@ Item {
 
     function importStyle() {
         const url = FileDialogs.openFile(qsTr("Import text style"), [root.styleFileFilter])
-        if (url.toString().length > 0)
+        if (url.toString().length > 0) {
             EditorState.importUserTextPreset(url)
+            root.section = "mine"
+        }
     }
 
     function exportStyle(preset) {
@@ -43,15 +47,48 @@ Item {
             EditorState.exportUserTextPreset(preset.id, url)
     }
 
-    FontMetrics {
-        id: labelMetrics
-        font.family: Theme.fontFamily
-        font.pixelSize: Theme.fontSizeXs
+    Item {
+        id: toolbar
+        width: parent.width
+        height: Theme.pagePadding + Theme.controlHeight
+
+        Row {
+            x: Theme.pagePadding
+            y: Theme.pagePadding
+            height: Theme.controlHeight
+            spacing: Theme.spacingSm
+
+            ThemedChip {
+                anchors.verticalCenter: parent.verticalCenter
+                text: qsTr("Built-in")
+                variant: "outline"
+                selected: root.section === "builtin"
+                onClicked: root.section = "builtin"
+            }
+
+            ThemedChip {
+                anchors.verticalCenter: parent.verticalCenter
+                text: root.userPresets.length > 0 ? qsTr("My styles · %1").arg(root.userPresets.length)
+                                                  : qsTr("My styles")
+                variant: "outline"
+                selected: root.section === "mine"
+                onClicked: root.section = "mine"
+            }
+        }
+
+        IconButton {
+            anchors.right: parent.right
+            anchors.rightMargin: Theme.pagePadding
+            y: Theme.pagePadding
+            buttonSize: Theme.controlHeight
+            glyph: Theme.icons.folderInput
+            variant: "ghost"
+            tooltip: qsTr("Import a text style…")
+            onClicked: root.importStyle()
+        }
     }
 
-    // The built-in packs recycle; everything above them (intro, the user's own styles)
-    // rides along as the header. One trailing gap wider than the padded area, so the
-    // cards pack from the left exactly as the old Grid did.
+    // Built-in packs and the user's own styles are separate grids, switched from the toolbar.
     GridView {
         id: packGrid
         // As many columns as fit at the nominal card size, rounded, with the cards stretched or
@@ -59,8 +96,9 @@ Item {
         readonly property int columnCount: Math.max(1, Math.round(width / (Theme.assetCardWidth + Theme.assetCardGap)))
         readonly property real cardSize: Math.floor(width / columnCount) - Theme.assetCardGap
         x: Theme.pagePadding
+        y: toolbar.height + Theme.spacingSm
         width: parent.width - Theme.pagePadding * 2 + Theme.assetCardGap
-        height: parent.height
+        height: parent.height - y
         bottomMargin: Theme.spacing3xl
         clip: true
         reuseItems: true
@@ -70,172 +108,8 @@ Item {
         cellWidth: Math.floor(width / columnCount)
         cellHeight: Math.round(cardSize * 0.55) + Theme.spacingSm
                     + Math.ceil(labelMetrics.height) + Theme.assetCardGap
+        visible: root.section === "builtin"
         model: root.presets
-
-        header: Column {
-            id: textColumn
-            width: packGrid.width - Theme.assetCardGap
-            spacing: Theme.spacingMd
-            topPadding: Theme.pagePadding
-            bottomPadding: Theme.spacingMd
-
-            Text {
-                width: parent.width
-                wrapMode: Text.WordWrap
-                text: qsTr("Click a style to add text at the playhead. Double-click it on the preview to edit.")
-                color: Theme.mutedForeground
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSizeXs
-            }
-
-            Item {
-                width: parent.width
-                height: Math.max(myStylesLabel.implicitHeight, importButton.height)
-
-                Text {
-                    id: myStylesLabel
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("My styles")
-                    color: Theme.panelForeground
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeXs
-                    font.weight: Font.Medium
-                }
-
-                IconButton {
-                    id: importButton
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    glyph: Theme.icons.folderInput
-                    variant: "ghost"
-                    tooltip: qsTr("Import a text style…")
-                    onClicked: root.importStyle()
-                }
-            }
-
-            Text {
-                width: parent.width
-                visible: root.userPresets.length === 0
-                wrapMode: Text.WordWrap
-                text: qsTr("Style some text, then use “Save style…” in the properties Text tab to keep it here.")
-                color: Theme.mutedForeground
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSizeXs
-            }
-
-            Grid {
-                id: userGrid
-                width: parent.width
-                visible: root.userPresets.length > 0
-                // Same column count and card size as the pack grid below, so the two line up.
-                columns: packGrid.columnCount
-                readonly property real cardSize: packGrid.cardSize
-                columnSpacing: Theme.assetCardGap
-                rowSpacing: Theme.assetCardGap
-
-                Repeater {
-                    model: root.userPresets
-                    delegate: Column {
-                        id: userCard
-                        required property var modelData
-                        width: userGrid.cardSize
-                        spacing: Theme.spacingSm
-
-                        opacity: userDrag.active ? 0.85 : 1
-                        scale: userDrag.active ? 1.04 : userDrag.pressed ? 0.97 : (userDrag.hovered ? 1.02 : 1.0)
-                        Behavior on scale {
-                            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                        }
-
-                        TextStylePackThumb {
-                            width: parent.width
-                            height: Math.round(width * 0.55)
-                            presetId: userCard.modelData.id
-                            hovered: userDrag.hovered
-
-                            AssetDragSource {
-                                id: userDrag
-                                anchors.fill: parent
-                                kind: "textStyle"
-                                payload: userCard.modelData.id
-                                label: userCard.modelData.label
-                                glyph: Theme.icons.type
-                                hasContextMenu: true
-                                onContextMenuRequested: cardMenu.popup()
-                                onTapped: {
-                                    EditorState.addTextClip("", -1, userCard.modelData.id)
-                                    root.added()
-                                }
-                            }
-
-                            IconButton {
-                                anchors.top: parent.top
-                                anchors.right: parent.right
-                                anchors.margins: 2
-                                visible: userDrag.hovered || cardMenu.visible
-                                glyph: Theme.icons.ellipsis
-                                variant: "ghost"
-                                buttonSize: 20
-                                iconSize: 12
-                                tooltip: qsTr("Style options")
-                                onClicked: cardMenu.popup()
-                            }
-
-                            ThemedContextMenu {
-                                id: cardMenu
-
-                                ThemedMenuItem {
-                                    text: qsTr("Rename…")
-                                    icon.name: Theme.icons.pencil
-                                    onTriggered: renameDialog.openFor(userCard.modelData)
-                                }
-                                ThemedMenuItem {
-                                    text: qsTr("Export…")
-                                    icon.name: Theme.icons.folderOutput
-                                    onTriggered: root.exportStyle(userCard.modelData)
-                                }
-                                ThemedMenuSeparator { }
-                                ThemedMenuItem {
-                                    text: qsTr("Delete")
-                                    icon.name: Theme.icons.trash
-                                    onTriggered: deleteDialog.openFor(userCard.modelData)
-                                }
-                            }
-                        }
-
-                        Text {
-                            width: parent.width
-                            text: userCard.modelData.label
-                            elide: Text.ElideRight
-                            horizontalAlignment: Text.AlignHCenter
-                            color: userDrag.hovered ? Theme.panelForeground : Theme.mutedForeground
-                            font.family: Theme.fontFamily
-                            font.pixelSize: Theme.fontSizeXs
-
-                            Behavior on color {
-                                ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                            }
-                        }
-                    }
-                }
-            }
-
-            Rectangle {
-                width: parent.width
-                height: Theme.borderWidth
-                color: Theme.panelBorder
-            }
-
-            Text {
-                width: parent.width
-                text: qsTr("Built-in")
-                color: Theme.panelForeground
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSizeXs
-                font.weight: Font.Medium
-            }
-        }
 
         delegate: Column {
             id: packCard
@@ -270,6 +144,11 @@ Item {
                     }
                 }
 
+                ThemedToolTip {
+                    text: qsTr("%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.").arg(packCard.modelData.label)
+                    visible: packDrag.hovered && !packDrag.active
+                }
+
                 ThemedContextMenu {
                     id: cardMenu
 
@@ -295,6 +174,130 @@ Item {
                 }
             }
         }
+    }
+
+    GridView {
+        id: userGrid
+        // As many columns as fit at the nominal card size, rounded, with the cards stretched or
+        // squeezed a little to fill the row — a fixed card left a column's worth of empty space.
+        readonly property int columnCount: Math.max(1, Math.round(width / (Theme.assetCardWidth + Theme.assetCardGap)))
+        readonly property real cardSize: Math.floor(width / columnCount) - Theme.assetCardGap
+        x: Theme.pagePadding
+        y: toolbar.height + Theme.spacingSm
+        width: parent.width - Theme.pagePadding * 2 + Theme.assetCardGap
+        height: parent.height - y
+        bottomMargin: Theme.spacing3xl
+        clip: true
+        reuseItems: true
+        boundsBehavior: Flickable.StopAtBounds
+        acceptedButtons: Theme.touchUi ? Qt.LeftButton : Qt.NoButton
+        ScrollBar.vertical: AppScrollBar { }
+        cellWidth: Math.floor(width / columnCount)
+        cellHeight: Math.round(cardSize * 0.55) + Theme.spacingSm
+                    + Math.ceil(labelMetrics.height) + Theme.assetCardGap
+        visible: root.section === "mine" && root.userPresets.length > 0
+        model: root.userPresets
+
+        delegate: Column {
+            id: userCard
+            required property var modelData
+            width: userGrid.cardSize
+            spacing: Theme.spacingSm
+
+            opacity: userDrag.active ? 0.85 : 1
+            scale: userDrag.active ? 1.04 : userDrag.pressed ? 0.97 : (userDrag.hovered ? 1.02 : 1.0)
+            Behavior on scale {
+                NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+            }
+
+            TextStylePackThumb {
+                width: parent.width
+                height: Math.round(width * 0.55)
+                presetId: userCard.modelData.id
+                hovered: userDrag.hovered
+
+                AssetDragSource {
+                    id: userDrag
+                    anchors.fill: parent
+                    kind: "textStyle"
+                    payload: userCard.modelData.id
+                    label: userCard.modelData.label
+                    glyph: Theme.icons.type
+                    hasContextMenu: true
+                    onContextMenuRequested: cardMenu.popup()
+                    onTapped: {
+                        EditorState.addTextClip("", -1, userCard.modelData.id)
+                        root.added()
+                    }
+                }
+
+                ThemedToolTip {
+                    text: qsTr("%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.").arg(userCard.modelData.label)
+                    visible: userDrag.hovered && !userDrag.active
+                }
+
+                IconButton {
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    anchors.margins: 2
+                    visible: userDrag.hovered || cardMenu.visible
+                    glyph: Theme.icons.ellipsis
+                    variant: "ghost"
+                    buttonSize: 20
+                    iconSize: 12
+                    tooltip: qsTr("Style options")
+                    onClicked: cardMenu.popup()
+                }
+
+                ThemedContextMenu {
+                    id: cardMenu
+
+                    ThemedMenuItem {
+                        text: qsTr("Rename…")
+                        icon.name: Theme.icons.pencil
+                        onTriggered: renameDialog.openFor(userCard.modelData)
+                    }
+                    ThemedMenuItem {
+                        text: qsTr("Export…")
+                        icon.name: Theme.icons.folderOutput
+                        onTriggered: root.exportStyle(userCard.modelData)
+                    }
+                    ThemedMenuSeparator { }
+                    ThemedMenuItem {
+                        text: qsTr("Delete")
+                        icon.name: Theme.icons.trash
+                        onTriggered: deleteDialog.openFor(userCard.modelData)
+                    }
+                }
+            }
+
+            Text {
+                width: parent.width
+                text: userCard.modelData.label
+                elide: Text.ElideRight
+                horizontalAlignment: Text.AlignHCenter
+                color: userDrag.hovered ? Theme.panelForeground : Theme.mutedForeground
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSizeXs
+
+                Behavior on color {
+                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
+            }
+        }
+    }
+
+    EmptyState {
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: toolbar.height + Math.max(0, (parent.height - toolbar.height - height) / 2)
+        width: Math.min(parent.width - Theme.spacing3xl, 260)
+        visible: root.section === "mine" && root.userPresets.length === 0
+        compact: true
+        glyph: Theme.icons.type
+        title: qsTr("No saved styles")
+        hint: qsTr("Style some text, then use “Save style…” in the properties Text tab to keep it here.")
+        actionText: qsTr("Import")
+        onActionTriggered: root.importStyle()
     }
 
     NameDialog {

@@ -22,7 +22,7 @@ Item {
 
     width: parent ? parent.width : 0
     height: visible ? Theme.controlHeightSm : 0
-    visible: !searching && categories.length > 0
+    visible: !searching && (categories.length > 0 || showMine)
 
     Row {
         id: row
