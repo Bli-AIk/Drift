@@ -399,7 +399,7 @@ Item {
         acceptText: qsTr("Save")
         showAccept: saveReady
 
-        function reset(defaultName) {
+        function openWithName(defaultName) {
             nameField.text = defaultName
             rightsBox.checked = false
             offset = 0
@@ -414,12 +414,12 @@ Item {
             sourcePath = data.path
             sourceIn = data.inPoint
             sourceOut = data.outPoint
-            reset(data.name || qsTr("My voice"))
+            openWithName(data.name || qsTr("My voice"))
         }
 
         function openForMic() {
             mode = "mic"
-            reset(qsTr("My voice"))
+            openWithName(qsTr("My voice"))
         }
 
         function openForFile() {
@@ -430,7 +430,7 @@ Item {
                 return
             mode = "file"
             sourcePath = url.toString()
-            reset(decodeURIComponent(sourcePath.split("/").pop().replace(/\.[^.]*$/, "")))
+            openWithName(decodeURIComponent(sourcePath.split("/").pop().replace(/\.[^.]*$/, "")))
         }
 
         onAccepted: {

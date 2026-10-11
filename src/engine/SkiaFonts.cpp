@@ -13,11 +13,13 @@
 #if defined(SK_FONTMGR_FONTCONFIG_AVAILABLE)
 #include "include/ports/SkFontMgr_fontconfig.h"
 #include "include/ports/SkFontScanner_FreeType.h"
+// CoreText before Android: Skia compiles the Android port wherever expat and FreeType are on,
+// macOS included, where it finds no font config files and lists nothing.
+#elif defined(SK_FONTMGR_CORETEXT_AVAILABLE)
+#include "include/ports/SkFontMgr_mac_ct.h"
 #elif defined(SK_FONTMGR_ANDROID_AVAILABLE)
 #include "include/ports/SkFontMgr_android.h"
 #include "include/ports/SkFontScanner_FreeType.h"
-#elif defined(SK_FONTMGR_CORETEXT_AVAILABLE)
-#include "include/ports/SkFontMgr_mac_ct.h"
 #elif defined(SK_FONTMGR_FREETYPE_DIRECTORY_AVAILABLE)
 #include "include/ports/SkFontMgr_directory.h"
 #include "include/core/SkFontStyle.h"
@@ -216,10 +218,10 @@ sk_sp<SkFontMgr> systemFontMgr()
     std::call_once(once, [] {
 #if defined(SK_FONTMGR_FONTCONFIG_AVAILABLE)
         mgr = SkFontMgr_New_FontConfig(nullptr, SkFontScanner_Make_FreeType());
-#elif defined(SK_FONTMGR_ANDROID_AVAILABLE)
-        mgr = SkFontMgr_New_Android(nullptr, SkFontScanner_Make_FreeType());
 #elif defined(SK_FONTMGR_CORETEXT_AVAILABLE)
         mgr = SkFontMgr_New_CoreText(nullptr);
+#elif defined(SK_FONTMGR_ANDROID_AVAILABLE)
+        mgr = SkFontMgr_New_Android(nullptr, SkFontScanner_Make_FreeType());
 #elif defined(SK_FONTMGR_FREETYPE_DIRECTORY_AVAILABLE)
         mgr = makeDirectoryMgr();
 #endif

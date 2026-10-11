@@ -219,9 +219,11 @@ Popup {
                     cursorShape: Qt.PointingHandCursor
                     onEntered: root.highlightIndex = trackTypeRow.index
                     onClicked: {
+                        // Adding a track rebuilds trackTypes and destroys this delegate,
+                        // so close first while root is still reachable.
                         Haptics.confirm()
-                        root.addTrackOfType(trackTypeRow.modelData.type)
                         root.close()
+                        root.addTrackOfType(trackTypeRow.modelData.type)
                     }
                 }
             }
