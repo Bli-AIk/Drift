@@ -260,11 +260,12 @@ esac
 
 BUILD="${SKIA_BUILD_DIR:-$SKIA_SRC/out/$TARGET}"
 # A platform value replaces the common one rather than following it, so each key is assigned once.
-declare -A PLATFORM_KEYS=()
-for arg in "${PLATFORM_ARGS[@]}"; do PLATFORM_KEYS[${arg%%=*}]=1; done
+# A space-delimited list rather than an associative array: macOS still ships bash 3.2.
+PLATFORM_KEYS=" "
+for arg in "${PLATFORM_ARGS[@]}"; do PLATFORM_KEYS+="${arg%%=*} "; done
 BASE_ARGS=()
 for arg in "${COMMON_ARGS[@]}"; do
-  [ -n "${PLATFORM_KEYS[${arg%%=*}]:-}" ] || BASE_ARGS+=("$arg")
+  case "$PLATFORM_KEYS" in *" ${arg%%=*} "*) ;; *) BASE_ARGS+=("$arg") ;; esac
 done
 GN_ARGS="${BASE_ARGS[*]} ${PLATFORM_ARGS[*]}"
 echo "==> gn gen $BUILD"
