@@ -755,7 +755,10 @@ QVariantMap AddonManager::inspectUserPackage(const QUrl &url)
         return {{QStringLiteral("error"), tr("This is not a Drift effect file (%1).").arg(error)}};
     }
     m_userPackagePath = staged;
+    const PackageProvide &provide = info->provides.first();
     return {
+        {QStringLiteral("id"), info->id},
+        {QStringLiteral("folder"), info->files.first().path.mid(provide.root.size() + 1).section(QLatin1Char('/'), 0, 0)},
         {QStringLiteral("name"), info->name},
         {QStringLiteral("kind"), info->provides.first().kind},
         {QStringLiteral("version"), info->version},

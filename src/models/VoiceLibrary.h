@@ -51,9 +51,11 @@ public:
     bool encoding() const { return m_encoding; }
 
     // [inSeconds, outSeconds) of any audio or video file; a longer range keeps its first 20 s.
-    Q_INVOKABLE void addFromMedia(const QString &path, double inSeconds, double outSeconds,
-                                  const QString &name);
-    Q_INVOKABLE void addFromFile(const QString &path, const QString &name);
+    // Both return the encode job id, or empty when nothing was started (error() says why). The
+    // job result is {voice, name}.
+    Q_INVOKABLE QString addFromMedia(const QString &path, double inSeconds, double outSeconds,
+                                     const QString &name);
+    Q_INVOKABLE QString addFromFile(const QString &path, const QString &name);
     Q_INVOKABLE void rename(const QString &id, const QString &name);
     Q_INVOKABLE void remove(const QString &id);
     // Where the reference recording can be played from; empty when the voice has none.
@@ -88,8 +90,8 @@ private:
         bool builtIn = false;
     };
 
-    void addVoice(const QString &path, double inSeconds, double outSeconds, const QString &name,
-                  const QString &source, bool removeSource);
+    QString addVoice(const QString &path, double inSeconds, double outSeconds, const QString &name,
+                     const QString &source, bool removeSource);
     void setEncoding(bool encoding);
 
     AppController *m_app = nullptr;

@@ -10398,31 +10398,69 @@ QVariantMap AppController::dropAsset(const QString &kind, const QString &payload
 
 QVariantMap AppController::cameraStateAtPlayhead() const
 {
-    const QList<drift::Track> &tracks = m_project.tracks();
-    const int trackIndex = drift::cameraTrackIndex(tracks);
-    if (trackIndex >= 0 && !tracks.at(trackIndex).hidden) {
-        for (int c = 0; c < tracks.at(trackIndex).clips.size(); ++c) {
-            const drift::Clip &clip = tracks.at(trackIndex).clips.at(c);
-            if (!drift::isCameraClip(clip) || !clip.containsTime(m_playheadUs))
-                continue;
-            const drift::SceneCamera3d camera = drift::sceneCameraFromClip(clip, m_playheadUs, 1.0);
-            return QVariantMap{
-                {QStringLiteral("active"), true},
-                {QStringLiteral("track"), trackIndex},
-                {QStringLiteral("clip"), c},
-                {QStringLiteral("x"), camera.positionX},
-                {QStringLiteral("y"), camera.positionY},
-                {QStringLiteral("z"), camera.positionZ},
-                {QStringLiteral("rotationX"), camera.rotationX},
-                {QStringLiteral("rotationY"), camera.rotationY},
-                {QStringLiteral("rotation"), camera.rotationZ},
-                {QStringLiteral("perspective"), camera.perspective},
-            };
-        }
-    }
-    return QVariantMap{{QStringLiteral("active"), false}};
+    return cameraStateAt(drift::usToSeconds(m_playheadUs));
 }
 
+QVariantMap AppController::cameraStateAt(double seconds, int trackIndex, int clipIndex) const
+{
+    const QList<drift::Track> &tracks = m_project.tracks();
+    const drift::TimeUs timeUs = drift::secondsToUs(seconds);
+    const drift::Clip *found = nullptr;
+    if (trackIndex >= 0 && isValidClipIndex(trackIndex, clipIndex)) {
+        const drift::Clip &clip = tracks.at(trackIndex).clips.at(clipIndex);
+        if (drift::isCameraClip(clip)) {
+            found = &clip;
+        }
+    } else {
+        trackIndex = drift::cameraTrackIndex(tracks);
+        if (trackIndex >= 0 && !tracks.at(trackIndex).hidden) {
+            for (int c = 0; c < tracks.at(trackIndex).clips.size(); ++c) {
+                const drift::Clip &clip = tracks.at(trackIndex).clips.at(c);
+                if (drift::isCameraClip(clip) && clip.containsTime(timeUs)) {
+                    found = &clip;
+                    clipIndex = c;
+                    break;
+                }
+            }
+        }
+    }
+    if (!found)
+        return QVariantMap{{QStringLiteral("active"), false}};
+    const drift::SceneCamera3d camera = drift::sceneCameraFromClip(*found, timeUs, 1.0);
+    const QVector3D eye = drift::sceneCameraEye(camera);
+    return QVariantMap{
+        {QStringLiteral("active"), true},
+        {QStringLiteral("track"), trackIndex},
+        {QStringLiteral("clip"), clipIndex},
+        {QStringLiteral("start"), drift::usToSeconds(found->timelineStart)},
+        {QStringLiteral("dur"), drift::usToSeconds(found->timelineDuration)},
+        {QStringLiteral("x"), camera.positionX},
+        {QStringLiteral("y"), camera.positionY},
+        {QStringLiteral("z"), camera.positionZ},
+        {QStringLiteral("rotationX"), camera.rotationX},
+        {QStringLiteral("rotationY"), camera.rotationY},
+        {QStringLiteral("rotation"), camera.rotationZ},
+        {QStringLiteral("perspective"), camera.perspective},
+        {QStringLiteral("eye"), QVariantList{eye.x(), eye.y(), eye.z()}},
+    };
+}
+
+QVariantList AppController::clipWorldCentreAt(int trackIndex, int clipIndex, double seconds) const
+{
+    if (!isValidClipIndex(trackIndex, clipIndex))
+        return {};
+    const drift::Clip &clip = m_project.tracks().at(trackIndex).clips.at(clipIndex);
+    const drift::TimeUs relative = qBound<drift::TimeUs>(0, drift::secondsToUs(seconds) - clip.timelineStart,
+                                                          clip.timelineDuration);
+    const auto value = [&](const drift::KeyframeTrack<double> &kt, double fallback) {
+        return kt.isEmpty() ? fallback : kt.evaluateAt(relative);
+    };
+    const double w = value(clip.transformW, m_project.width());
+    const double h = value(clip.transformH, m_project.height());
+    return QVariantList{value(clip.transformX, 0.0) + w / 2.0 - m_project.width() / 2.0,
+                        value(clip.transformY, 0.0) + h / 2.0 - m_project.height() / 2.0,
+                        value(clip.positionZ, 0.0)};
+}
 
 // Crop rect is given in current-canvas pixels; it may extend outside the canvas
 // (negative origin / oversized extent) to grow the frame on that side.
@@ -14171,6 +14209,35 @@ QVariantMap AppController::inspectModel3dClip(int trackIndex, int clipIndex) con
     const drift::Clip &clip = m_project.tracks().at(trackIndex).clips.at(clipIndex);
     QVariantMap out = inspectModel3dPath(clip.model3d.path);
     out.insert(QStringLiteral("model3d"), model3dSourceToMap(clip.model3d, clip.timelineStart));
+    return out;
+}
+
+QVariantMap AppController::inspectPdf(const QString &path) const
+{
+    if (path.isEmpty() || !QFileInfo::exists(path))
+        return {{QStringLiteral("ok"), false}, {QStringLiteral("error"), QStringLiteral("file not found")}};
+    if (!AssetLibrary::isPdfPath(path))
+        return {{QStringLiteral("ok"), false}, {QStringLiteral("error"), QStringLiteral("not a .pdf file")}};
+    drift::PdfSource source;
+    source.path = QFileInfo(path).absoluteFilePath();
+    drift::probePdfSource(source);
+    return {{QStringLiteral("ok"), true},
+            {QStringLiteral("path"), source.path},
+            {QStringLiteral("pageCount"), source.pageCount},
+            {QStringLiteral("addonAvailable"), drift::pdfium::available()},
+            {QStringLiteral("addonId"), QString::fromLatin1(drift::pdfium::kPdfiumKind)}};
+}
+
+QVariantMap AppController::inspectPdfClip(int trackIndex, int clipIndex) const
+{
+    if (!isValidClipIndex(trackIndex, clipIndex)
+        || m_project.tracks().at(trackIndex).clips.at(clipIndex).type != drift::ClipType::Pdf) {
+        return {{QStringLiteral("ok"), false}, {QStringLiteral("error"), QStringLiteral("not a PDF clip")}};
+    }
+    const drift::Clip &clip = m_project.tracks().at(trackIndex).clips.at(clipIndex);
+    QVariantMap out = pdfSourceToMap(clip.pdf, clip.timelineStart);
+    out.insert(QStringLiteral("ok"), true);
+    out.insert(QStringLiteral("addonId"), QString::fromLatin1(drift::pdfium::kPdfiumKind));
     return out;
 }
 

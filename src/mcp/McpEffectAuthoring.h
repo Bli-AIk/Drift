@@ -14,8 +14,9 @@ namespace drift::mcp::authoring {
 QJsonObject guide(const QString &kind);
 QJsonObject create(AppController *controller, const QJsonObject &args);
 QJsonObject update(AppController *controller, const QJsonObject &args);
-QJsonObject source(const QJsonObject &args);
+QJsonObject source(AppController *controller, const QJsonObject &args);
 QJsonObject remove(AppController *controller, const QJsonObject &args);
 QJsonObject exportPackage(const QJsonObject &args);
+QJsonObject importPackage(AppController *controller, const QJsonObject &args);
 
 } // namespace drift::mcp::authoring

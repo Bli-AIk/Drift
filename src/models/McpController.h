@@ -99,7 +99,9 @@ public:
     bool undoSuspended() const { return m_undoSuspended; }
     const drift::Project &batchBefore() const { return m_batchBefore; }
     bool setClipCanvas(int trackIndex, int clipIndex, const QVariantMap &patch);
-    QJsonObject captureFrame(double atSeconds, bool full);
+    // editor3d: the preview's free 3D viewpoint (or the overview when never placed) instead of the
+    // composition.
+    QJsonObject captureFrame(double atSeconds, bool full, bool editor3d = false);
 
     // Perception for agents: a labelled contact sheet and a text profile of change over time.
     // Both block on the captureFrame pattern.
@@ -193,6 +195,13 @@ public:
     QJsonObject ttsGenerate(const QJsonObject &args);
     QJsonObject sfxGenerate(const QJsonObject &args);
     QJsonObject listVoices(const QJsonObject &args) const;
+    QJsonObject localTtsStatus(bool warmUp);
+    QJsonObject listLocalVoices() const;
+    // track/clip >= 0 takes the sample from that clip's source range; otherwise args.path.
+    QJsonObject addVoice(const QJsonObject &args, int trackIndex, int clipIndex);
+    QJsonObject renameVoice(const QString &id, const QString &name);
+    QJsonObject removeVoice(const QString &id);
+    QJsonObject voiceoverFromSubtitles(int trackIndex, int clipIndex, const QJsonObject &args);
     QJsonObject cloudProviderStatus() const;
     QJsonObject getJob(const QString &id) const;
     QJsonObject cancelJob(const QString &id);
@@ -230,6 +239,9 @@ private:
     void rebuildClipIndexIfNeeded() const;
     // An error object when `provider` can't be used yet (no key, no consent); empty when it can.
     QJsonObject cloudUnavailable(const QString &provider) const;
+    QJsonObject ttsGenerateLocal(const QJsonObject &args);
+    // An error object when local TTS can't start right now; empty when it can.
+    QJsonObject localTtsUnavailable() const;
     // Imports a generated file into the bin, records what made it, optionally places it.
     QJsonObject importGeneratedAudio(const QString &path, const QJsonObject &generator, const QJsonValue &place);
     // Lands a finished transcript on its asset, unless the asset is gone or its file changed.

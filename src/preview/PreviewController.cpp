@@ -398,6 +398,20 @@ void PreviewController::pushView()
     m_app.m_playback.setEditorView(request);
 }
 
+drift::EditorView3d PreviewController::currentView() const
+{
+    return m_viewPlaced ? m_view
+                        : drift::EditorView3d::overview(QSizeF(m_app.m_project.width(), m_app.m_project.height()));
+}
+
+void PreviewController::placeView()
+{
+    if (m_viewPlaced)
+        return;
+    m_viewPlaced = true;
+    m_view = drift::EditorView3d::overview(QSizeF(m_app.m_project.width(), m_app.m_project.height()));
+}
+
 void PreviewController::setView(const drift::EditorView3d &view)
 {
     m_view = view;
@@ -515,6 +529,7 @@ void PreviewController::setNavigating(bool navigating)
 
 void PreviewController::resetView()
 {
+    m_viewPlaced = true;
     setView(drift::EditorView3d::overview(QSizeF(m_app.m_project.width(), m_app.m_project.height())));
 }
 

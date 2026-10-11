@@ -16019,6 +16019,10 @@ Si la reproducción se corta, prueba con otra opción.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Speech added to the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Select a subtitle clip first</source>
         <translation type="unfinished"></translation>
     </message>

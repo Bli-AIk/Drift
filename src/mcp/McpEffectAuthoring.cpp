@@ -15,6 +15,7 @@
 
 #include <QDir>
 #include <QDirIterator>
+#include <QEventLoop>
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonArray>
@@ -22,6 +23,7 @@
 #include <QMap>
 #include <QRegularExpression>
 #include <QStandardPaths>
+#include <QTimer>
 #include <QUrl>
 
 #include <optional>
@@ -510,7 +512,7 @@ QJsonObject update(AppController *controller, const QJsonObject &args)
     return installPackage(controller, *kind, QDir::cleanPath(dir), id, args);
 }
 
-QJsonObject source(const QJsonObject &args)
+QJsonObject source(AppController *controller, const QJsonObject &args)
 {
     const QString kindName = args.value(QStringLiteral("kind")).toString();
     const auto kind = kindFor(kindName);
@@ -543,12 +545,15 @@ QJsonObject source(const QJsonObject &args)
             binaries.append(rel);
         }
     }
-    return ok({{QStringLiteral("id"), id},
-               {QStringLiteral("kind"), kind->name},
-               {QStringLiteral("user"), isUserDir(*kind, dir)},
-               {QStringLiteral("manifest"), manifest},
-               {QStringLiteral("files"), files},
-               {QStringLiteral("binaryFiles"), binaries}});
+    QJsonObject reply{{QStringLiteral("id"), id},
+                      {QStringLiteral("kind"), kind->name},
+                      {QStringLiteral("user"), isUserDir(*kind, dir)},
+                      {QStringLiteral("manifest"), manifest},
+                      {QStringLiteral("files"), files},
+                      {QStringLiteral("binaryFiles"), binaries}};
+    if (isUserDir(*kind, dir))
+        reply.insert(QStringLiteral("uses"), usesInProject(controller, *kind, id));
+    return ok(reply);
 }
 
 QJsonObject remove(AppController *controller, const QJsonObject &args)
@@ -637,6 +642,67 @@ QJsonObject exportPackage(const QJsonObject &args)
     return ok({{QStringLiteral("path"), fallback},
                {QStringLiteral("fellBack"), !requested.isEmpty()},
                {QStringLiteral("reason"), reason}});
+}
+
+QJsonObject importPackage(AppController *controller, const QJsonObject &args)
+{
+    QString path = args.value(QStringLiteral("path")).toString().trimmed();
+    if (path.startsWith(QLatin1String("file:")))
+        path = QUrl(path).toLocalFile();
+    if (path.isEmpty() || !QDir::isAbsolutePath(path))
+        return err("bad_args", QStringLiteral("path must be absolute"));
+    if (!QFileInfo::exists(path))
+        return err("not_found", QStringLiteral("%1 does not exist").arg(path));
+    AddonManager *manager = controller ? controller->addonManager() : nullptr;
+    if (!manager)
+        return err("bad_args", QStringLiteral("Addon manager is only available in the running editor"));
+
+    const QVariantMap info = manager->inspectUserPackage(QUrl::fromLocalFile(path));
+    if (info.contains(QStringLiteral("error")))
+        return err("bad_package", info.value(QStringLiteral("error")).toString());
+
+    const QString addonKind = info.value(QStringLiteral("kind")).toString();
+    const Kind *kind = nullptr;
+    static const Kind kinds[] = {*kindFor(QStringLiteral("effect")), *kindFor(QStringLiteral("transition")),
+                                 *kindFor(QStringLiteral("audio_effect"))};
+    for (const Kind &k : kinds) {
+        if (k.subdir == addonKind)
+            kind = &k;
+    }
+    if (!kind)
+        return err("bad_package", QStringLiteral("unsupported package kind %1").arg(addonKind));
+
+    const QString folder = info.value(QStringLiteral("folder")).toString();
+    const QString destination = QDir(userRoot(*kind)).filePath(folder);
+    if (QFileInfo::exists(destination) && !args.value(QStringLiteral("overwrite")).toBool())
+        return err("exists", QStringLiteral("%1 is already installed in My Effects; pass overwrite:true to replace it")
+                                 .arg(info.value(QStringLiteral("name")).toString()));
+
+    QString installError;
+    QEventLoop loop;
+    QTimer timeout;
+    timeout.setSingleShot(true);
+    installError = QStringLiteral("timed out");
+    QObject::connect(manager, &AddonManager::userPackageInstalled, &loop, [&](const QString &, const QString &error) {
+        installError = error;
+        loop.quit();
+    });
+    QObject::connect(&timeout, &QTimer::timeout, &loop, &QEventLoop::quit);
+    timeout.start(30000);
+    manager->installUserPackage();
+    loop.exec();
+    if (!installError.isEmpty())
+        return err("io_error", installError);
+
+    QFile manifestFile(QDir(destination).filePath(kind->manifest));
+    QString id;
+    if (manifestFile.open(QIODevice::ReadOnly))
+        id = QJsonDocument::fromJson(manifestFile.readAll()).object().value(QStringLiteral("id")).toString();
+    if (id.isEmpty())
+        id = QStringLiteral("user.") + folder;
+    return ok({{QStringLiteral("ids"), QJsonArray{id}},
+               {QStringLiteral("kind"), kind->name},
+               {QStringLiteral("name"), info.value(QStringLiteral("name")).toString()}});
 }
 
 } // namespace drift::mcp::authoring

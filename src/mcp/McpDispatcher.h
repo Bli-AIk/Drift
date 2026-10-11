@@ -110,6 +110,13 @@ private:
     QJsonObject opClearSpeedCurve(const QJsonObject &args);
     QJsonObject opSplitOnBeats(const QJsonObject &args);
     QJsonObject opSnapClipsToBeats(const QJsonObject &args);
+    QJsonObject opGetCameraState(const QJsonObject &args);
+    QJsonObject opResetCamera(const QJsonObject &args);
+    QJsonObject opCameraLookAt(const QJsonObject &args);
+    QJsonObject opCameraMove(const QJsonObject &args);
+    // The camera clip a camera tool acts on: the named one, else the one covering `at`. Fills
+    // `state` (cameraStateAt) and returns an error object, or {} on success.
+    QJsonObject resolveCamera(const QJsonObject &args, double at, QVariantMap *state);
     QJsonObject opSplitOnScenes(const QJsonObject &args);
     QJsonObject opGetUiPreferences() const;
     QJsonObject opSetTheme(const QJsonObject &args);

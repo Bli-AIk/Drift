@@ -5,9 +5,12 @@
 #include "mcp/McpServer.h"
 #endif
 #include "models/AppController.h"
+#include "preview/PreviewController.h"
 #include "McpDetail.h"
 #include "MarketClient.h"
 #include "models/JobRegistry.h"
+#include "models/TtsController.h"
+#include "models/VoiceLibrary.h"
 #include "engine/AudioMixer.h"
 #include "engine/ClipReaderPool.h"
 #include "engine/FrameCompositor.h"
@@ -618,6 +621,7 @@ QJsonObject McpController::inspect(const InspectOptions &options) const
         {QStringLiteral("dur"), drift::usToSeconds(m_app->m_project.durationUs())},
         {QStringLiteral("playhead"), m_app->playheadSeconds()},
         {QStringLiteral("playing"), m_app->playing()},
+        {QStringLiteral("preview_mode"), m_app->preview()->mode()},
         {QStringLiteral("overlap"), m_app->m_allowClipOverlap},
         {QStringLiteral("clips"), clipCount},
         {QStringLiteral("tracks"), trackRows},
@@ -629,6 +633,8 @@ QJsonObject McpController::inspect(const InspectOptions &options) const
          QJsonObject{{QStringLiteral("active"), m_app->m_exportInProgress},
                      {QStringLiteral("progress"), m_app->m_exportProgress}}},
     };
+    if (m_app->preview()->mode() == QLatin1String("3d"))
+        extra.insert(QStringLiteral("look_through"), m_app->preview()->lookThrough());
     if (detail) {
         QJsonArray marks;
         for (const QVariant &v : m_app->bookmarks()) {
@@ -830,7 +836,7 @@ bool McpController::setClipCanvas(int trackIndex, int clipIndex, const QVariantM
     return true;
 }
 
-QJsonObject McpController::captureFrame(double atSeconds, bool full)
+QJsonObject McpController::captureFrame(double atSeconds, bool full, bool editor3d)
 {
     using namespace drift::mcp;
     m_app->setPlaying(false);
@@ -843,6 +849,10 @@ QJsonObject McpController::captureFrame(double atSeconds, bool full)
         const int longEdge = qMax(snapshot->width(), snapshot->height());
         if (longEdge > 1280)
             options.previewScale = 1280.0 / double(longEdge);
+    }
+    if (editor3d) {
+        options.editor.active = true;
+        options.editor.view = m_app->preview()->currentView();
     }
 
     auto frame = std::make_shared<QImage>();
@@ -864,6 +874,8 @@ QJsonObject McpController::captureFrame(double atSeconds, bool full)
         {QStringLiteral("h"), frame->height()},
         {QStringLiteral("full"), full},
     });
+    if (editor3d)
+        meta.insert(QStringLiteral("view"), QStringLiteral("editor3d"));
     if (timeUs > snapshot->durationUs()) {
         meta.insert(QStringLiteral("beyond_end"), true);
         meta.insert(QStringLiteral("dur"), drift::usToSeconds(snapshot->durationUs()));
@@ -3935,8 +3947,10 @@ QJsonObject McpController::ttsGenerate(const QJsonObject &args)
 {
     using namespace drift::mcp;
     const QString provider = args.value(QStringLiteral("provider")).toString(QString::fromLatin1(CloudProviders::kElevenLabs));
+    if (provider == QLatin1String("local"))
+        return ttsGenerateLocal(args);
     if (provider != QLatin1String(CloudProviders::kElevenLabs) && provider != QLatin1String(CloudProviders::kFish))
-        return err("bad_args", QStringLiteral("provider must be elevenlabs or fish"));
+        return err("bad_args", QStringLiteral("provider must be elevenlabs, fish or local"));
     const QString text = args.value(QStringLiteral("text")).toString().trimmed();
     if (text.isEmpty())
         return err("bad_args", QStringLiteral("text required"));
@@ -3996,6 +4010,210 @@ QJsonObject McpController::ttsGenerate(const QJsonObject &args)
             imported.remove(QStringLiteral("ok"));
             return imported;
         });
+    return ok({{QStringLiteral("job_id"), id}});
+}
+
+QJsonObject McpController::localTtsUnavailable() const
+{
+    using namespace drift::mcp;
+    if (!m_app->m_tts->available())
+        return err("addon_missing", QStringLiteral("Local voices need the tts-model addon and ONNX Runtime: "
+                                                   "list_addons, then install_addon."));
+    if (m_app->m_tts->running())
+        return err("busy", QStringLiteral("A voiceover is already being generated; poll get_job or cancel_job it first"));
+    return {};
+}
+
+QJsonObject McpController::ttsGenerateLocal(const QJsonObject &args)
+{
+    using namespace drift::mcp;
+    TtsController *tts = m_app->m_tts;
+    const QString text = args.value(QStringLiteral("text")).toString().trimmed();
+    if (text.isEmpty())
+        return err("bad_args", QStringLiteral("text required"));
+    if (text.size() > 5000)
+        return err("bad_args", QStringLiteral("text is over 5000 characters; split it into several calls"));
+    QString voice = args.value(QStringLiteral("voice")).toString().trimmed();
+    if (voice.isEmpty())
+        voice = tts->lastVoice();
+    if (m_app->m_voices->indexOfId(voice) < 0)
+        return err("not_found", QStringLiteral("Unknown voice %1 (list_local_voices)").arg(voice));
+    QString language = args.value(QStringLiteral("language")).toString().trimmed();
+    if (language.isEmpty())
+        language = tts->lastLanguage();
+    if (!drift::ChatterboxTts::supportedLanguages().contains(language))
+        return err("bad_args", QStringLiteral("Unsupported language %1 (local_tts_status lists them)").arg(language));
+    const double exaggeration = args.contains(QStringLiteral("exaggeration"))
+                                    ? args.value(QStringLiteral("exaggeration")).toDouble()
+                                    : tts->lastExaggeration();
+    if (exaggeration < 0.25 || exaggeration > 2.0)
+        return err("bad_args", QStringLiteral("exaggeration must be 0.25-2"));
+    const QJsonValue place = args.value(QStringLiteral("place"));
+    const bool doPlace = !(place.isUndefined() || place.isNull() || (place.isBool() && !place.toBool()));
+    const QJsonObject where = place.toObject();
+    const double at = where.contains(QStringLiteral("at")) ? where.value(QStringLiteral("at")).toDouble() : -1.0;
+    const int track = where.contains(QStringLiteral("track")) ? where.value(QStringLiteral("track")).toInt() : -1;
+    const QJsonObject unavailable = localTtsUnavailable();
+    if (!unavailable.isEmpty())
+        return unavailable;
+    const QString id = tts->generate(text, voice, language, exaggeration, doPlace, at, track);
+    if (id.isEmpty())
+        return err("internal", QStringLiteral("Could not start the voiceover"));
+    return ok({{QStringLiteral("job_id"), id}});
+}
+
+QJsonObject McpController::localTtsStatus(bool warmUp)
+{
+    using namespace drift::mcp;
+    TtsController *tts = m_app->m_tts;
+    if (warmUp)
+        tts->warmUp();
+    QJsonArray languages;
+    for (const QVariant &v : tts->languageOptions()) {
+        const QVariantMap m = v.toMap();
+        languages.append(QJsonObject{{QStringLiteral("code"), m.value(QStringLiteral("code")).toString()},
+                                     {QStringLiteral("label"), m.value(QStringLiteral("label")).toString()}});
+    }
+    return ok({{QStringLiteral("available"), tts->available()},
+               {QStringLiteral("model_loaded"), tts->modelLoaded()},
+               {QStringLiteral("loading"), tts->loading()},
+               {QStringLiteral("running"), tts->running()},
+               {QStringLiteral("addon_id"), QStringLiteral("tts-model")},
+               {QStringLiteral("languages"), languages},
+               {QStringLiteral("last_voice"), tts->lastVoice()},
+               {QStringLiteral("last_language"), tts->lastLanguage()},
+               {QStringLiteral("last_exaggeration"), tts->lastExaggeration()}});
+}
+
+QJsonObject McpController::listLocalVoices() const
+{
+    using namespace drift::mcp;
+    const VoiceLibrary *voices = m_app->m_voices;
+    QJsonArray list;
+    for (int i = 0; i < voices->rowCount(); ++i) {
+        const QModelIndex row = voices->index(i);
+        list.append(QJsonObject{{QStringLiteral("id"), voices->data(row, VoiceLibrary::IdRole).toString()},
+                                {QStringLiteral("name"), voices->data(row, VoiceLibrary::NameRole).toString()},
+                                {QStringLiteral("built_in"), voices->data(row, VoiceLibrary::BuiltInRole).toBool()},
+                                {QStringLiteral("source"), voices->data(row, VoiceLibrary::SourceRole).toString()}});
+    }
+    return ok({{QStringLiteral("voices"), list}});
+}
+
+QJsonObject McpController::addVoice(const QJsonObject &args, int trackIndex, int clipIndex)
+{
+    using namespace drift::mcp;
+    const QString name = args.value(QStringLiteral("name")).toString().trimmed();
+    if (name.isEmpty())
+        return err("bad_args", QStringLiteral("name required"));
+    QString path;
+    double in = 0.0;
+    double out = -1.0;
+    const bool fromClip = trackIndex >= 0 && clipIndex >= 0;
+    if (fromClip) {
+        const drift::Clip &clip = m_app->m_project.tracks().at(trackIndex).clips.at(clipIndex);
+        const drift::MediaAsset *asset = m_app->m_project.asset(clip.assetId);
+        if (!asset || asset->path.isEmpty() || (asset->hasAudioKnown && !asset->hasAudio))
+            return err("type_mismatch", QStringLiteral("That clip has no audio"));
+        path = asset->path;
+        in = drift::usToSeconds(clip.srcIn);
+        out = drift::usToSeconds(clip.srcOut);
+        if (args.contains(QStringLiteral("in")))
+            in = args.value(QStringLiteral("in")).toDouble();
+        if (args.contains(QStringLiteral("out")))
+            out = args.value(QStringLiteral("out")).toDouble();
+    } else {
+        path = args.value(QStringLiteral("path")).toString().trimmed();
+        if (path.isEmpty())
+            return err("bad_args", QStringLiteral("path or clip required"));
+        if (args.contains(QStringLiteral("in")))
+            in = args.value(QStringLiteral("in")).toDouble();
+        if (args.contains(QStringLiteral("out")))
+            out = args.value(QStringLiteral("out")).toDouble();
+    }
+    const QUrl url(path);
+    const QString local = url.isLocalFile() ? url.toLocalFile() : path;
+    if (!QFileInfo::exists(local))
+        return err("not_found", QStringLiteral("No such file: %1").arg(local));
+    if (in < 0.0 || (out >= 0.0 && out - in < VoiceLibrary::kMinReferenceSeconds))
+        return err("bad_args", QStringLiteral("The sample must be %1-%2 seconds of speech")
+                                   .arg(VoiceLibrary::kMinReferenceSeconds).arg(VoiceLibrary::kMaxReferenceSeconds));
+    const QJsonObject unavailable = localTtsUnavailable();
+    if (!unavailable.isEmpty())
+        return unavailable;
+    VoiceLibrary *voices = m_app->m_voices;
+    if (voices->encoding())
+        return err("busy", QStringLiteral("Another voice is still being prepared"));
+    QString failure;
+    const QMetaObject::Connection conn = connect(voices, &VoiceLibrary::error, this,
+                                                 [&failure](const QString &message) { failure = message; });
+    const QString id = (fromClip || args.contains(QStringLiteral("in")) || args.contains(QStringLiteral("out")))
+                           ? voices->addFromMedia(local, in, out, name)
+                           : voices->addFromFile(local, name);
+    disconnect(conn);
+    if (id.isEmpty())
+        return err("internal", failure.isEmpty() ? QStringLiteral("Could not start preparing the voice") : failure);
+    return ok({{QStringLiteral("job_id"), id}});
+}
+
+QJsonObject McpController::renameVoice(const QString &id, const QString &name)
+{
+    using namespace drift::mcp;
+    VoiceLibrary *voices = m_app->m_voices;
+    if (voices->indexOfId(id) < 0)
+        return err("not_found", QStringLiteral("Unknown voice %1 (list_local_voices)").arg(id));
+    if (id == QLatin1String("default"))
+        return err("bad_args", QStringLiteral("The built-in voice can't be renamed"));
+    if (name.trimmed().isEmpty())
+        return err("bad_args", QStringLiteral("name required"));
+    voices->rename(id, name);
+    return ok({{QStringLiteral("id"), id}, {QStringLiteral("name"), voices->nameFor(id)}});
+}
+
+QJsonObject McpController::removeVoice(const QString &id)
+{
+    using namespace drift::mcp;
+    VoiceLibrary *voices = m_app->m_voices;
+    if (voices->indexOfId(id) < 0)
+        return err("not_found", QStringLiteral("Unknown voice %1 (list_local_voices)").arg(id));
+    if (id == QLatin1String("default"))
+        return err("bad_args", QStringLiteral("The built-in voice can't be removed"));
+    voices->remove(id);
+    return ok({{QStringLiteral("removed"), id}});
+}
+
+QJsonObject McpController::voiceoverFromSubtitles(int trackIndex, int clipIndex, const QJsonObject &args)
+{
+    using namespace drift::mcp;
+    TtsController *tts = m_app->m_tts;
+    if (m_app->m_project.tracks().at(trackIndex).clips.at(clipIndex).type != drift::ClipType::Subtitle)
+        return err("type_mismatch", QStringLiteral("clip must be a subtitle clip"));
+    QString voice = args.value(QStringLiteral("voice")).toString().trimmed();
+    if (voice.isEmpty())
+        voice = tts->lastVoice();
+    if (m_app->m_voices->indexOfId(voice) < 0)
+        return err("not_found", QStringLiteral("Unknown voice %1 (list_local_voices)").arg(voice));
+    QString language = args.value(QStringLiteral("language")).toString().trimmed();
+    if (language.isEmpty())
+        language = tts->lastLanguage();
+    if (!drift::ChatterboxTts::supportedLanguages().contains(language))
+        return err("bad_args", QStringLiteral("Unsupported language %1 (local_tts_status lists them)").arg(language));
+    const double exaggeration = args.contains(QStringLiteral("exaggeration"))
+                                    ? args.value(QStringLiteral("exaggeration")).toDouble()
+                                    : tts->lastExaggeration();
+    if (exaggeration < 0.25 || exaggeration > 2.0)
+        return err("bad_args", QStringLiteral("exaggeration must be 0.25-2"));
+    bool hasText = false;
+    for (const drift::SubtitleCue &cue : m_app->m_project.tracks().at(trackIndex).clips.at(clipIndex).subtitleCues)
+        hasText = hasText || !cue.text.simplified().isEmpty();
+    if (!hasText)
+        return err("bad_args", QStringLiteral("This subtitle clip has no text to speak"));
+    const QJsonObject unavailable = localTtsUnavailable();
+    if (!unavailable.isEmpty())
+        return unavailable;
+    const QString id = tts->voiceoverFromSubtitles(trackIndex, clipIndex, voice, language, exaggeration);
+    if (id.isEmpty())
+        return err("internal", QStringLiteral("Could not start the voiceover"));
     return ok({{QStringLiteral("job_id"), id}});
 }
 

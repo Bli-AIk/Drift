@@ -197,15 +197,15 @@ void TtsController::cancel()
         m_app->m_jobs->cancel(m_jobId);
 }
 
-void TtsController::generate(const QString &text, const QString &voiceId, const QString &lang,
-                             double exaggeration)
+QString TtsController::generate(const QString &text, const QString &voiceId, const QString &lang,
+                                double exaggeration, bool place, double atSeconds, int track)
 {
     const QString script = text.trimmed();
     if (m_running || script.isEmpty())
-        return;
+        return {};
     if (!m_available) {
         emit finished(false, tr("Install the voice model first"));
-        return;
+        return {};
     }
     remember(voiceId, lang, exaggeration);
     const QString path = speechPath(script);
@@ -249,7 +249,7 @@ void TtsController::generate(const QString &text, const QString &voiceId, const 
                 return ctx.fail(QStringLiteral("internal"), err);
             ctx.succeed({});
         },
-        [self, path, generator](const QJsonObject &job) {
+        [self, path, generator, place, atSeconds, track](const QJsonObject &job) {
             if (!self)
                 return QJsonObject{};
             self->endJob();
@@ -261,32 +261,38 @@ void TtsController::generate(const QString &text, const QString &voiceId, const 
                 return QJsonObject{};
             }
             const AppController::GeneratedAudioImport imported = self->m_app->importGeneratedAudio(
-                path, generator, true, self->m_app->playheadSeconds(), -1);
+                path, generator, place, atSeconds >= 0.0 ? atSeconds : self->m_app->playheadSeconds(), track);
             if (!imported.ok) {
                 self->setStatus(imported.error);
                 emit self->finished(false, imported.error);
                 return QJsonObject{};
             }
-            self->setStatus(tr("Speech added to the timeline"));
+            self->setStatus(place ? tr("Speech added to the timeline") : tr("Speech added to the media bin"));
             emit self->finished(true, self->m_status);
-            return QJsonObject{};
+            QJsonObject result{{QStringLiteral("asset"), imported.assetId}, {QStringLiteral("path"), path}};
+            if (imported.durationSeconds >= 0.0)
+                result.insert(QStringLiteral("duration"), imported.durationSeconds);
+            if (!imported.clipId.isEmpty())
+                result.insert(QStringLiteral("clip"), imported.clipId);
+            return result;
         });
     m_poll.start();
+    return m_jobId;
 }
 
-void TtsController::voiceoverFromSubtitles(int trackIndex, int clipIndex, const QString &voiceId,
-                                           const QString &lang, double exaggeration)
+QString TtsController::voiceoverFromSubtitles(int trackIndex, int clipIndex, const QString &voiceId,
+                                              const QString &lang, double exaggeration)
 {
     if (m_running)
-        return;
+        return {};
     if (!m_available) {
         emit finished(false, tr("Install the voice model first"));
-        return;
+        return {};
     }
     if (!m_app->isValidClipIndex(trackIndex, clipIndex)
         || m_app->m_project.tracks().at(trackIndex).clips.at(clipIndex).type != drift::ClipType::Subtitle) {
         emit finished(false, tr("Select a subtitle clip first"));
-        return;
+        return {};
     }
     const drift::Clip &clip = m_app->m_project.tracks().at(trackIndex).clips.at(clipIndex);
     const drift::TimeUs clipStartUs = clip.timelineStart;
@@ -299,7 +305,7 @@ void TtsController::voiceoverFromSubtitles(int trackIndex, int clipIndex, const 
     }
     if (lines->isEmpty()) {
         emit finished(false, tr("This subtitle clip has no text to speak"));
-        return;
+        return {};
     }
     remember(voiceId, lang, exaggeration);
     const QString voiceName = m_voices->nameFor(voiceId);
@@ -381,7 +387,8 @@ void TtsController::voiceoverFromSubtitles(int trackIndex, int clipIndex, const 
                 message += tr("; %n ran longer than their captions", nullptr, longer);
             self->setStatus(message);
             emit self->finished(true, message);
-            return QJsonObject{};
+            return QJsonObject{{QStringLiteral("placed"), placed}, {QStringLiteral("longer"), longer}};
         });
     m_poll.start();
+    return m_jobId;
 }

@@ -665,6 +665,27 @@
                                    {QStringLiteral("name"), stringProp(QStringLiteral("Clip name"))}},
                                   clipRefProps())) },
 
+        { "inspect_pdf", "media", "Page count of a PDF, and whether the viewer addon is installed",
+          "Read-only. Give path for a file, or clip for a PDF clip already on the timeline (adds its "
+          "options: firstPage, lastPage, layout, gridColumns, gap, scrollX, scrollY, zoom, keyframes). "
+          "Returns pageCount (0 when the pdfium addon is missing), addonAvailable and addonId; "
+          "install_addon with that id when it is missing.",
+          objectSchema(mergeProps({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute .pdf path"))}},
+                                  clipRefProps())),
+          true, false, true },
+        { "set_pdf_options", "media", "Pages shown and layout of a PDF clip",
+          "Choose which pages a PDF clip shows and how they are laid out; only supplied keys change. "
+          "Pages are 1-based and clamp to the document once its page count is known. Scrolling and "
+          "zoom are not set here: keyframe pdf.scrollX, pdf.scrollY (page units) and pdf.zoom "
+          "(0.1..10) with set_keyframe.",
+          objectSchema(mergeProps({{QStringLiteral("firstPage"), integerProp(QStringLiteral("First page shown, 1-based"), 1, 9999)},
+                                   {QStringLiteral("lastPage"), integerProp(QStringLiteral("Last page shown; 0 = through the last page"), 0, 9999)},
+                                   {QStringLiteral("layout"), enumProp(QStringLiteral("Pages stacked in a column, side by side in a row, or in a grid"),
+                                                                        {QStringLiteral("column"), QStringLiteral("row"), QStringLiteral("grid")})},
+                                   {QStringLiteral("gridColumns"), integerProp(QStringLiteral("Columns of the grid layout"), 1, 20)},
+                                   {QStringLiteral("gap"), numberProp(QStringLiteral("Space between pages in PDF points (default 12)"), 0.0, 200.0)}},
+                                  clipRefProps())) },
+
         { "add_subtitle_clip", "subtitles", "Empty subtitle lane",
           "Add an empty subtitle clip, creating a subtitle track when needed. Returns {id, track, index}. "
           "Fill it with set_subtitle_cues or import_subtitle_into_clip.",
@@ -1251,6 +1272,93 @@
                         {QStringLiteral("reopenLastProject"), boolProp(QStringLiteral("Reopen last project on launch"))},
                         {QStringLiteral("followSystem"), boolProp(QStringLiteral("true clears the theme override so the OS theme wins; false is a no-op"))}}) },
 
+        { "get_camera_state", "timeline", "Read the scene camera's pose at a time",
+          "The camera clip covering `at` (default the playhead), or `clip`, as it is posed then, "
+          "keyframes included. Returns {active, at, clip, track, x, y, z, rotationX, rotationY, "
+          "rotation, perspective, eye:[x,y,z]}; active:false when no camera covers that time. Units: "
+          "x/y/z are camera translation in canvas px (+x moves the camera right so the picture goes "
+          "left, +y down, +z back from the scene); rotationX/Y pitch/yaw in degrees (+rotationX "
+          "tips the camera's top away from the scene, -rotationX looks up; +rotationY looks left); "
+          "rotation is roll in degrees, clockwise on screen; perspective is the eye distance in px "
+          "(the lens). eye is the viewpoint in world px about the canvas centre (y down, +z toward "
+          "the viewer). Read-only.",
+          objectSchema(mergeProps({{QStringLiteral("at"), numberProp(QStringLiteral("Timeline seconds (default: the playhead)"))}},
+                                  clipRefProps())),
+          true, false, true },
+        { "reset_camera", "timeline", "Return the scene camera to rest",
+          "Clears the camera clip's pan, dolly, pitch, yaw and roll, keyframes included, so it looks "
+          "exactly like no camera; the lens (perspective) is kept. One undo step. `clip` defaults to "
+          "the camera covering the playhead; not_found when there is no camera (add_camera).",
+          objectSchema(clipRefProps()) },
+        { "camera_look_at", "timeline", "Aim the scene camera at a clip or point",
+          "Turns the camera in place (its eye stays put) so `target` lands at the canvas centre, by "
+          "setting rotationX/rotationY and re-solving x/y/z to hold the eye; roll and lens are kept. "
+          "target is a clip id (its centre in the 3D world, including z; transform-layer parents "
+          "are ignored) or a world point {x,y,z} in canvas px about the canvas centre (y down, +z "
+          "toward the viewer; z defaults to 0). `at` (default the playhead) is where the aim is "
+          "computed and, with keyframe:true, where keys are written; a property that is already "
+          "animated always takes a key, otherwise the plain value is written (like set_transform). "
+          "One undo step. Returns the new pose and eye. Needs a camera: add_camera first.",
+          objectSchema(mergeProps(
+              {{QStringLiteral("target"), QJsonObject{{QStringLiteral("type"), QJsonArray{QStringLiteral("string"), QStringLiteral("object")}},
+                                                      {QStringLiteral("description"), QStringLiteral("Clip id to look at, or a world point {x,y,z} in canvas px about the canvas centre")}}},
+               {QStringLiteral("at"), numberProp(QStringLiteral("Timeline seconds (default: the playhead)"))},
+               {QStringLiteral("keyframe"), boolProp(QStringLiteral("Write keyframes at `at` instead of plain values"))}},
+              clipRefProps()),
+                       {QStringLiteral("target")}) },
+        { "camera_move", "timeline", "Animate a classic camera move",
+          "Writes a start and an end keyframe on the camera props the move changes, from the pose "
+          "at `start`; one undo step. Moves and `amount` (default): dolly_in/dolly_out along the view "
+          "direction (px, 300); truck_left/truck_right sideways (px, 200); crane_up/crane_down "
+          "(px, 200); pan_left/pan_right and tilt_up/tilt_down turn the camera in place (degrees, 20 and "
+          "15); orbit_left/orbit_right circle `target` about the vertical axis while keeping it "
+          "centred (degrees, 45; target is a clip id or {x,y,z} world point, default the canvas "
+          "centre); push_in/pull_out change the lens (perspective x(1-amount) or x(1+amount), a "
+          "fraction 0..0.9, default 0.35) — that is perspective strength, not framing; use dolly to "
+          "move closer. Orbit keys interpolate pose linearly, so an orbit past ~90 degrees is a "
+          "chord rather than an arc; split it. easing is ease (default) or linear. start..end must "
+          "lie inside the camera clip (default: the one covering `start`). Needs add_camera first.",
+          objectSchema(mergeProps(
+              {{QStringLiteral("move"), enumProp(QStringLiteral("The move"),
+                                                {QStringLiteral("dolly_in"), QStringLiteral("dolly_out"), QStringLiteral("push_in"),
+                                                 QStringLiteral("pull_out"), QStringLiteral("pan_left"), QStringLiteral("pan_right"),
+                                                 QStringLiteral("tilt_up"), QStringLiteral("tilt_down"), QStringLiteral("truck_left"),
+                                                 QStringLiteral("truck_right"), QStringLiteral("crane_up"), QStringLiteral("crane_down"),
+                                                 QStringLiteral("orbit_left"), QStringLiteral("orbit_right")})},
+               {QStringLiteral("start"), numberProp(QStringLiteral("Timeline seconds the move begins"))},
+               {QStringLiteral("end"), numberProp(QStringLiteral("Timeline seconds the move ends"))},
+               {QStringLiteral("amount"), numberProp(QStringLiteral("Size: px, degrees or lens fraction depending on the move"))},
+               {QStringLiteral("easing"), enumProp(QStringLiteral("Interpolation between the two keys"),
+                                                  {QStringLiteral("ease"), QStringLiteral("linear")})},
+               {QStringLiteral("target"), QJsonObject{{QStringLiteral("type"), QJsonArray{QStringLiteral("string"), QStringLiteral("object")}},
+                                                      {QStringLiteral("description"), QStringLiteral("Orbit centre: clip id or {x,y,z} world point (default the canvas centre)")}}}},
+              clipRefProps()),
+                       {QStringLiteral("move"), QStringLiteral("start"), QStringLiteral("end")}) },
+
+        { "set_preview_view", "ui", "Move the preview's 2D/3D mode and free 3D viewpoint",
+          "Drive the preview panel's view; only supplied keys act, in this order: mode, reset, axis, "
+          "frame_selection, orbit, pan, dolly, look_through. mode switches the preview between the "
+          "camera's picture (2d) and the world from a free viewpoint with the scene camera and stage "
+          "drawn in it (3d). reset returns to the overview. axis snaps to a standard view of the "
+          "current target (leaves look_through). frame_selection frames the selected clip, or the "
+          "whole stage when none. orbit [dx,dy] is degrees, pan [dx,dy] canvas px, dolly wheel steps "
+          "(+ toward the target). look_through true views through the scene camera (what exports), "
+          "false returns to the free viewpoint. Navigation changes the viewpoint even in 2d mode but "
+          "is only seen in 3d. Editor state: not part of the project, not undoable. Returns {mode, "
+          "look_through, target:[x,y,z], yaw, pitch, distance, fov, eye:[x,y,z]} in world px about the "
+          "canvas centre. See it with capture({view:\"editor3d\"}).",
+          objectSchema({{QStringLiteral("mode"), enumProp(QStringLiteral("2d is the camera's picture, 3d the free viewpoint"),
+                                                         {QStringLiteral("2d"), QStringLiteral("3d")})},
+                        {QStringLiteral("axis"), enumProp(QStringLiteral("Standard view of the current target"),
+                                                         {QStringLiteral("front"), QStringLiteral("back"), QStringLiteral("left"),
+                                                          QStringLiteral("right"), QStringLiteral("top"), QStringLiteral("bottom")})},
+                        {QStringLiteral("orbit"), arrayProp(numberProp(QStringLiteral("Degrees")), QStringLiteral("[dx, dy] degrees of yaw and pitch"))},
+                        {QStringLiteral("pan"), arrayProp(numberProp(QStringLiteral("Canvas px")), QStringLiteral("[dx, dy] canvas px the scene follows"))},
+                        {QStringLiteral("dolly"), numberProp(QStringLiteral("Wheel steps; + moves toward the target"))},
+                        {QStringLiteral("frame_selection"), boolProp(QStringLiteral("Frame the selected clip, or the whole stage"))},
+                        {QStringLiteral("look_through"), boolProp(QStringLiteral("true = through the scene camera, false = free viewpoint"))},
+                        {QStringLiteral("reset"), boolProp(QStringLiteral("Return to the overview viewpoint"))}}) },
+
         { "set_ripple", "timeline", "Ripple delete and trim",
           "Project setting. When on, deleting or shortening a clip pulls later clips on that track "
           "left to close the hole. Off (default): every delete leaves a gap. Not undoable.",
@@ -1397,10 +1505,33 @@
                                   clipRefProps()),
                        {QStringLiteral("preset")}) },
         { "save_effect_preset", "effects", "Save this clip's effects",
-          "Save the clip's current video+audio effect stack as a user preset. Returns {id, label}.",
-          objectSchema(mergeProps({{QStringLiteral("label"), stringProp(QStringLiteral("Preset name"))}},
+          "Save the clip's current video+audio effect stack as a user preset, or with effect_index "
+          "just that one effect (audio:true for an audio effect). Returns {id, label}.",
+          objectSchema(mergeProps({{QStringLiteral("label"), stringProp(QStringLiteral("Preset name"))},
+                                   {QStringLiteral("effect_index"), effectIndexProp()},
+                                   {QStringLiteral("audio"), boolProp(QStringLiteral("effect_index is in the audio effect stack"))}},
                                   clipRefProps()),
                        {QStringLiteral("label")}) },
+        { "rename_effect_preset", "effects", "Rename a saved effect stack",
+          "Rename a preset from list_user_effect_presets. Not a project edit, so not undoable.",
+          objectSchema({{QStringLiteral("preset"), stringProp(QStringLiteral("Preset id from list_user_effect_presets"))},
+                        {QStringLiteral("label"), stringProp(QStringLiteral("New name"))}},
+                       {QStringLiteral("preset"), QStringLiteral("label")}) },
+        { "delete_effect_preset", "effects", "Delete a saved effect stack",
+          "Delete a preset from disk. Clips that used it keep their effects. Not undoable.",
+          objectSchema({{QStringLiteral("preset"), stringProp(QStringLiteral("Preset id from list_user_effect_presets"))}},
+                       {QStringLiteral("preset")}),
+          false, true, true },
+        { "export_effect_preset", "effects", "Write a saved effect stack to a file",
+          "Export a preset as a JSON file. Returns {path}.",
+          objectSchema({{QStringLiteral("preset"), stringProp(QStringLiteral("Preset id from list_user_effect_presets"))},
+                        {QStringLiteral("path"), stringProp(QStringLiteral("Absolute destination path"))}},
+                       {QStringLiteral("preset"), QStringLiteral("path")}),
+          false, false, true },
+        { "import_effect_preset", "effects", "Load an effect stack file as a preset",
+          "Import a file written by export_effect_preset. Returns {id, label}. Not undoable.",
+          objectSchema({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute path to the file"))}},
+                       {QStringLiteral("path")}) },
         { "effect_authoring_guide", "effects", "How to write a custom effect",
           "Read before create_effect. Returns {guide} — manifest grammar for effects, transitions and "
           "audio effects, every parameter type and the inspector control it becomes, GLSL rules and "
@@ -1436,11 +1567,19 @@
                        {QStringLiteral("kind"), QStringLiteral("id"), QStringLiteral("manifest")}),
           false, false, true },
         { "get_effect_source", "effects", "Read an effect's manifest and shaders",
-          "Returns {id, kind, user, manifest, files:{name: source}, binaryFiles:[names]} for any "
-          "package-backed effect, transition or audio effect — bundled ones too, to learn from or fork.",
+          "Returns {id, kind, user, uses, manifest, files:{name: source}, binaryFiles:[names]} for any "
+          "package-backed effect, transition or audio effect — bundled ones too, to learn from or fork. uses (user packages only) is how many times the project uses it.",
           objectSchema({{QStringLiteral("kind"), effectKindProp()},
                         {QStringLiteral("id"), stringProp(QStringLiteral("Id from list_effects / list_transitions / list_audio_effects"))}},
                        {QStringLiteral("kind"), QStringLiteral("id")}), true, false, true },
+        { "import_effect", "effects", "Install a .driftfx file",
+          "Install an effect, transition or audio effect package exported by export_effect or Drift "
+          "Forge into My Effects. Returns {ids, kind, name}; the id works with add_effect / "
+          "add_transition / add_audio_effect. Fails exists when that package is already installed "
+          "unless overwrite:true. Not undoable.",
+          objectSchema({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute path to the .driftfx file"))},
+                        {QStringLiteral("overwrite"), boolProp(QStringLiteral("Replace an installed package with the same folder"))}},
+                       {QStringLiteral("path")}) },
         { "delete_effect", "effects", "Remove a My Effects package",
           "Delete a user effect, transition or audio effect. Refuses with in_use when the project "
           "uses it unless force:true (those uses then render as passthrough). Not undoable.",
@@ -1542,12 +1681,15 @@
           "onto the timeline with place). BILLABLE on the user's account. Needs a key and the user's "
           "consent (errors not_configured / consent_required tell you what to ask for). Async: "
           "returns {job_id}; the job result has {asset, clip?, duration, path}. Voice ids come from "
-          "list_voices; omitted = the default set in Settings.",
-          objectSchema({{QStringLiteral("provider"), propWithDefault(enumProp(QStringLiteral("Voice service"), {QStringLiteral("elevenlabs"), QStringLiteral("fish")}), QStringLiteral("elevenlabs"))},
+          "list_voices; omitted = the default set in Settings. provider \"local\" runs Chatterbox on "
+          "this machine instead: free, no key, needs the tts-model addon (local_tts_status); voice is "
+          "a list_local_voices id, language/exaggeration apply, and place defaults to off (bin only).",
+          objectSchema({{QStringLiteral("provider"), propWithDefault(enumProp(QStringLiteral("Voice service"), {QStringLiteral("elevenlabs"), QStringLiteral("fish"), QStringLiteral("local")}), QStringLiteral("elevenlabs"))},
                         {QStringLiteral("text"), stringProp(QStringLiteral("What to say (≤5000 characters)"))},
-                        {QStringLiteral("voice"), stringProp(QStringLiteral("Voice id (ElevenLabs voice_id / Fish reference_id)"))},
+                        {QStringLiteral("voice"), stringProp(QStringLiteral("Voice id (ElevenLabs voice_id / Fish reference_id / local list_local_voices id)"))},
                         {QStringLiteral("model"), stringProp(QStringLiteral("Model id; omitted = Settings default (eleven_multilingual_v2 / s2.1-pro)"))},
-                        {QStringLiteral("language"), stringProp(QStringLiteral("ElevenLabs: ISO language code to enforce"))},
+                        {QStringLiteral("language"), stringProp(QStringLiteral("ElevenLabs: ISO language code to enforce. local: Chatterbox language code (local_tts_status), default the last used"))},
+                        {QStringLiteral("exaggeration"), numberProp(QStringLiteral("local only: expressiveness, default the last used (0.5 at first)"), 0.25, 2)},
                         {QStringLiteral("speed"), numberProp(QStringLiteral("Speaking rate (ElevenLabs 0.7–1.2, Fish 0.5–2)"))},
                         {QStringLiteral("stability"), numberProp(QStringLiteral("ElevenLabs voice setting"), 0, 1)},
                         {QStringLiteral("similarity_boost"), numberProp(QStringLiteral("ElevenLabs voice setting"), 0, 1)},
@@ -1576,8 +1718,50 @@
           "For elevenlabs and fish: {configured, key_source, consent, tts_model, default_voice, "
           "stt_model}. Keys are never returned.",
           objectSchema({}), true, false, true },
+        { "local_tts_status", "voice", "Is local TTS ready",
+          "Local Chatterbox voice model: {available, model_loaded, loading, running, addon_id, "
+          "languages:[{code,label}], last_voice, last_language, last_exaggeration}. available false = "
+          "install addon_id first. warm_up starts loading the model now (about a minute) so the next "
+          "generation doesn't wait; it returns at once.",
+          objectSchema({{QStringLiteral("warm_up"), propWithDefault(boolProp(QStringLiteral("Start loading the model if it isn't loaded")), false)}}),
+          false, false, true },
+        { "list_local_voices", "voice", "Local voice library",
+          "Voices for tts_generate provider local and voiceover_from_subtitles: {voices:[{id, name, "
+          "built_in, source}]}. The built-in voice has id \"default\".",
+          objectSchema({}), true, false, true },
+        { "add_voice", "voice", "Clone a voice from a sample",
+          "Add a voice to the local library from 3-20 s of clean speech: a file (path, absolute) or "
+          "a clip's source audio (clip; the clip's trimmed range unless in/out are given). in/out are "
+          "seconds in the source file; a longer range keeps its first 20 s. Needs the tts-model addon. "
+          "Async: returns {job_id}; the job result has {voice, name}.",
+          objectSchema(mergeProps(clipRefProps(),
+                       {{QStringLiteral("path"), stringProp(QStringLiteral("Absolute path of an audio or video file (instead of clip)"))},
+                        {QStringLiteral("name"), stringProp(QStringLiteral("Name for the voice"))},
+                        {QStringLiteral("in"), numberProp(QStringLiteral("Sample start, seconds in the source file"))},
+                        {QStringLiteral("out"), numberProp(QStringLiteral("Sample end, seconds in the source file"))}}),
+                       {QStringLiteral("name")}) },
+        { "rename_voice", "voice", "Rename a local voice",
+          "Rename a cloned voice. The built-in voice can't be renamed.",
+          objectSchema({{QStringLiteral("voice"), stringProp(QStringLiteral("Voice id from list_local_voices"))},
+                        {QStringLiteral("name"), stringProp(QStringLiteral("New name"))}},
+                       {QStringLiteral("voice"), QStringLiteral("name")}),
+          false, false, true },
+        { "remove_voice", "voice", "Delete a local voice",
+          "Delete a cloned voice and its stored sample. The built-in voice can't be removed.",
+          objectSchema({{QStringLiteral("voice"), stringProp(QStringLiteral("Voice id from list_local_voices"))}},
+                       {QStringLiteral("voice")}),
+          false, true },
+        { "voiceover_from_subtitles", "voice", "Speak a subtitle clip",
+          "Speak every caption of a subtitle clip with a local voice, each line placed at its cue "
+          "time on new audio tracks (one undo step). Needs the tts-model addon. Async: returns "
+          "{job_id}; the job result has {placed, longer} (longer = lines that ran past their caption).",
+          objectSchema(mergeProps(clipRefProps(),
+                       {{QStringLiteral("voice"), stringProp(QStringLiteral("list_local_voices id; omitted = the last used"))},
+                        {QStringLiteral("language"), stringProp(QStringLiteral("Chatterbox language code (local_tts_status); omitted = the last used"))},
+                        {QStringLiteral("exaggeration"), numberProp(QStringLiteral("Expressiveness; omitted = the last used"), 0.25, 2)}}),
+                       {}) },
         { "get_job", "ai", "Progress of a background job",
-          "State of a job started by transcribe, diarize, tts_generate or sfx_generate: {id, kind, "
+          "State of a job started by transcribe, diarize, tts_generate, sfx_generate, add_voice or voiceover_from_subtitles: {id, kind, "
           "target, active, progress, status}; once active is false, ok plus result or error. "
           "inspect({detail:true}).jobs.list shows every recent job.",
           objectSchema({{QStringLiteral("id"), stringProp(QStringLiteral("Job id"))}}, {QStringLiteral("id")}),

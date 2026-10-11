@@ -174,18 +174,18 @@ bool VoiceLibrary::writeFlac24k(const QString &path, const std::vector<float> &p
     return writer.finish(err);
 }
 
-void VoiceLibrary::addFromMedia(const QString &path, double inSeconds, double outSeconds, const QString &name)
+QString VoiceLibrary::addFromMedia(const QString &path, double inSeconds, double outSeconds, const QString &name)
 {
-    addVoice(path, inSeconds, outSeconds, name, QStringLiteral("clip"), false);
+    return addVoice(path, inSeconds, outSeconds, name, QStringLiteral("clip"), false);
 }
 
-void VoiceLibrary::addFromFile(const QString &path, const QString &name)
+QString VoiceLibrary::addFromFile(const QString &path, const QString &name)
 {
-    addVoice(path, 0.0, -1.0, name, QStringLiteral("file"), false);
+    return addVoice(path, 0.0, -1.0, name, QStringLiteral("file"), false);
 }
 
-void VoiceLibrary::addVoice(const QString &mediaPath, double inSeconds, double outSeconds, const QString &name,
-                            const QString &source, bool removeSource)
+QString VoiceLibrary::addVoice(const QString &mediaPath, double inSeconds, double outSeconds, const QString &name,
+                               const QString &source, bool removeSource)
 {
     struct Outcome
     {
@@ -197,11 +197,11 @@ void VoiceLibrary::addVoice(const QString &mediaPath, double inSeconds, double o
     const QString trimmed = name.trimmed();
     if (m_encoding) {
         emit error(tr("Another voice is still being prepared"));
-        return;
+        return {};
     }
     if (trimmed.isEmpty() || path.isEmpty()) {
         emit error(tr("A voice needs a name and a recording"));
-        return;
+        return {};
     }
     const QString id = QUuid::createUuid().toString(QUuid::WithoutBraces);
     const QDateTime created = QDateTime::currentDateTimeUtc();
@@ -209,7 +209,7 @@ void VoiceLibrary::addVoice(const QString &mediaPath, double inSeconds, double o
     setEncoding(true);
     const QPointer<VoiceLibrary> self(this);
     TtsController *tts = m_tts;
-    m_app->m_jobs->start(
+    return m_app->m_jobs->start(
         QStringLiteral("voice-encode"), QStringLiteral("chatterbox"), JobRegistry::Lane::Model,
         [=](JobContext &ctx) {
             ctx.progress(0.05, QStringLiteral("Reading the recording…"));
@@ -269,7 +269,7 @@ void VoiceLibrary::addVoice(const QString &mediaPath, double inSeconds, double o
             self->m_entries.append({id, trimmed, source, created, false});
             self->endInsertRows();
             emit self->voiceAdded(id);
-            return QJsonObject{};
+            return QJsonObject{{QStringLiteral("voice"), id}, {QStringLiteral("name"), trimmed}};
         });
 }
 

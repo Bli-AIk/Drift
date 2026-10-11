@@ -6,6 +6,7 @@
 #include <QVector4D>
 
 #include <algorithm>
+#include <cmath>
 
 namespace drift {
 
@@ -48,6 +49,54 @@ QMatrix4x4 sceneCameraWorld(const SceneCamera3d &camera)
 QVector3D sceneCameraEye(const SceneCamera3d &camera)
 {
     return sceneCameraWorld(camera).map(QVector3D(0.f, 0.f, float(std::max(1.0, camera.perspective))));
+}
+
+namespace {
+
+// `camera` with the given pitch/yaw and the position that puts its eye at `eye`. The eye is
+// RxRy · (Rz · (px, py, 0) + (0, 0, pz + d)), so undo the pitch/yaw and then the roll.
+SceneCamera3d turnedWithEyeAt(const SceneCamera3d &camera, const QVector3D &eye, double rotationX,
+                              double rotationY)
+{
+    SceneCamera3d out = camera;
+    out.rotationX = rotationX;
+    out.rotationY = rotationY;
+    QMatrix4x4 turn;
+    turn.rotate(float(rotationX), 1.f, 0.f, 0.f);
+    turn.rotate(float(rotationY), 0.f, 1.f, 0.f);
+    const QVector3D local = turn.inverted().map(eye);
+    QMatrix4x4 rollBack;
+    rollBack.rotate(float(-camera.rotationZ), 0.f, 0.f, 1.f);
+    const QVector3D lateral = rollBack.map(QVector3D(local.x(), local.y(), 0.f));
+    out.positionX = lateral.x();
+    out.positionY = lateral.y();
+    out.positionZ = double(local.z()) - std::max(1.0, camera.perspective);
+    return out;
+}
+
+} // namespace
+
+SceneCamera3d rotatedKeepingEye(const SceneCamera3d &camera, double rotationX, double rotationY)
+{
+    return turnedWithEyeAt(camera, sceneCameraEye(camera), rotationX, rotationY);
+}
+
+SceneCamera3d aimAt(const SceneCamera3d &camera, const QVector3D &eye, const QVector3D &target)
+{
+    const QVector3D back = eye - target;
+    if (back.lengthSquared() < 1e-6f)
+        return camera;
+    const QVector3D u = back.normalized();
+    // The camera's +z axis in world is RxRy·ẑ = (sinY, -cosY·sinX, cosY·cosX), and the target sits
+    // along -z from the eye, so the eye-to-target direction pins both angles.
+    const double yaw = std::asin(std::clamp(double(u.x()), -1.0, 1.0)) * 180.0 / M_PI;
+    const double pitch = std::atan2(-double(u.y()), double(u.z())) * 180.0 / M_PI;
+    return turnedWithEyeAt(camera, eye, pitch, yaw);
+}
+
+SceneCamera3d aimAt(const SceneCamera3d &camera, const QVector3D &target)
+{
+    return aimAt(camera, sceneCameraEye(camera), target);
 }
 
 QMatrix4x4 worldParentFromAffine(const QTransform &parent, const QSizeF &canvas)

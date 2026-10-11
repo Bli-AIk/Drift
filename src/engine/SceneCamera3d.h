@@ -60,6 +60,18 @@ struct SceneCamera3d
 QMatrix4x4 sceneCameraWorld(const SceneCamera3d &camera);
 QVector3D sceneCameraEye(const SceneCamera3d &camera);
 
+// The camera turned to rotationX/rotationY with its eye held where it was: positionX/Y/Z are
+// re-solved so the eye (sceneCameraEye) is unchanged. A bare rotation orbits the eye about the
+// canvas centre; this is the turn-in-place a pan or tilt means. Roll and lens are kept.
+SceneCamera3d rotatedKeepingEye(const SceneCamera3d &camera, double rotationX, double rotationY);
+
+// The camera standing at `eye` and turned so `target` lands on the canvas centre. Rotation is
+// pitch/yaw only (roll and lens are kept), and the position is solved so the eye really is `eye`.
+// Eye and target coinciding leaves the camera unchanged.
+SceneCamera3d aimAt(const SceneCamera3d &camera, const QVector3D &eye, const QVector3D &target);
+// The same with the eye where the camera already has it: it turns to face `target` in place.
+SceneCamera3d aimAt(const SceneCamera3d &camera, const QVector3D &target);
+
 struct Clip;
 
 // The viewpoint a Camera clip describes at `timelineUs`, reading the clip's ordinary transform

@@ -60,6 +60,10 @@ public:
     QString mode() const { return m_mode; }
     void setMode(const QString &mode);
     bool lookThrough() const { return m_view.lookThrough; }
+    // The free viewpoint, or the overview a fresh 3D view starts from when it was never placed.
+    drift::EditorView3d currentView() const;
+    // Settles the never-placed viewpoint onto the overview, so navigation starts from it.
+    void placeView();
     int viewRevision() const { return int(m_viewSerial); }
     QString gizmoTool() const { return m_gizmoTool; }
     void setGizmoTool(const QString &tool);

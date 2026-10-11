@@ -135,6 +135,8 @@ class EngineTest : public QObject
 
 private slots:
     void initTestCase();
+    void aimAtCentresTheTargetAndHoldsTheEye();
+    void rotatedKeepingEyeTurnsInPlace();
     void chatterboxTokenizerMatchesReference();
     void chatterboxSplitsSentencesForSynthesis();
     void chatterboxVoiceConditioningRoundTrips();
@@ -15386,4 +15388,61 @@ void EngineTest::waveformSheetDrawsWordLane()
 }
 
 QTEST_MAIN(EngineTest)
+namespace {
+
+QPointF projectedPoint(const drift::SceneCamera3d &camera, const QSizeF &canvas, const QVector3D &world)
+{
+    const QVector4D p = drift::cameraViewProjection(camera, canvas).map(QVector4D(world, 1.f));
+    return QPointF(p.x() / p.w(), p.y() / p.w());
+}
+
+} // namespace
+
+void EngineTest::aimAtCentresTheTargetAndHoldsTheEye()
+{
+    const QSizeF canvas(1920, 1080);
+    drift::SceneCamera3d camera;
+    camera.rotationZ = 10.0;
+    camera.positionX = 40.0;
+    camera.rotationY = 12.0;
+    const QVector3D eye = drift::sceneCameraEye(camera);
+    for (const QVector3D target : {QVector3D(300, -150, 0), QVector3D(-500, 200, 120), QVector3D(0, 0, 0)}) {
+        const drift::SceneCamera3d aimed = drift::aimAt(camera, target);
+        const QVector3D after = drift::sceneCameraEye(aimed);
+        QVERIFY(qAbs(after.x() - eye.x()) < 0.05f && qAbs(after.y() - eye.y()) < 0.05f && qAbs(after.z() - eye.z()) < 0.05f);
+        const QPointF px = projectedPoint(aimed, canvas, target);
+        QVERIFY2(qAbs(px.x() - 960.0) < 0.05 && qAbs(px.y() - 540.0) < 0.05, qPrintable(QStringLiteral("%1,%2").arg(px.x()).arg(px.y())));
+        QCOMPARE(aimed.rotationZ, camera.rotationZ);
+        QCOMPARE(aimed.perspective, camera.perspective);
+    }
+    // Off to the right of a default camera: it yaws that way (the eye stays at +z, so +x target needs -yaw).
+    const drift::SceneCamera3d right = drift::aimAt(drift::SceneCamera3d{}, QVector3D(400, 0, 0));
+    QVERIFY(right.rotationY < 0.0 && qFuzzyIsNull(right.rotationX));
+    const drift::SceneCamera3d up = drift::aimAt(drift::SceneCamera3d{}, QVector3D(0, -400, 0));
+    QVERIFY(up.rotationX < 0.0 && qFuzzyIsNull(up.rotationY));
+    // Standing on the target there is nothing to aim at.
+    const drift::SceneCamera3d same = drift::aimAt(camera, eye, eye);
+    QCOMPARE(same.rotationX, camera.rotationX);
+    QCOMPARE(same.rotationY, camera.rotationY);
+}
+
+void EngineTest::rotatedKeepingEyeTurnsInPlace()
+{
+    const QSizeF canvas(1000, 1000);
+    drift::SceneCamera3d camera;
+    const QVector3D eye = drift::sceneCameraEye(camera);
+    // A bare yaw swings the eye round the canvas centre; keeping the eye turns the view instead.
+    drift::SceneCamera3d swung = camera;
+    swung.rotationY = 20.0;
+    QVERIFY(qAbs(drift::sceneCameraEye(swung).x() - eye.x()) > 100.f);
+    const drift::SceneCamera3d turned = drift::rotatedKeepingEye(camera, 0.0, 20.0);
+    QVERIFY(qAbs(drift::sceneCameraEye(turned).x() - eye.x()) < 0.05f);
+    QVERIFY(qAbs(drift::sceneCameraEye(turned).z() - eye.z()) < 0.05f);
+    // +rotationY looks left, so a point ahead of the camera slides right on screen.
+    QVERIFY(projectedPoint(turned, canvas, QVector3D(0, 0, 0)).x() > 500.0);
+    // -rotationX looks up, so the scene slides down.
+    const drift::SceneCamera3d tilted = drift::rotatedKeepingEye(camera, -10.0, 0.0);
+    QVERIFY(projectedPoint(tilted, canvas, QVector3D(0, 0, 0)).y() > 500.0);
+}
+
 #include "tst_engine.moc"

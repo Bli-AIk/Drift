@@ -681,6 +681,13 @@ public:
     // seven values, all at the playhead. Taken once when a drag starts, so the drag solves from a
     // fixed starting point instead of accumulating its own rounding.
     Q_INVOKABLE QVariantMap cameraStateAtPlayhead() const;
+    // The same at any time. With trackIndex >= 0 it reads that camera clip even when it does not
+    // cover `seconds` (its keys clamp to the clip's ends); otherwise the camera covering `seconds`.
+    // Adds start/dur (the clip's span, seconds) and eye:[x,y,z], the viewpoint in world px.
+    QVariantMap cameraStateAt(double seconds, int trackIndex = -1, int clipIndex = -1) const;
+    // Where a clip's centre sits in the camera's world (canvas px about the canvas centre, y down,
+    // +z toward the viewer) at `seconds`. Ignores any transform-layer parent.
+    QVariantList clipWorldCentreAt(int trackIndex, int clipIndex, double seconds) const;
 
     // Asset drag-and-drop. One resolver for every kind a browser can lift (AssetDrag.qml has
     // the list; media keeps its own asset-index path), shared by the desktop and phone
@@ -1079,6 +1086,8 @@ public:
     Q_INVOKABLE QString setModel3dOptions(int trackIndex, int clipIndex, const QVariantMap &opts);
     Q_INVOKABLE QVariantMap inspectModel3d(const QString &path) const;
     Q_INVOKABLE QVariantMap inspectModel3dClip(int trackIndex, int clipIndex) const;
+    Q_INVOKABLE QVariantMap inspectPdf(const QString &path) const;
+    Q_INVOKABLE QVariantMap inspectPdfClip(int trackIndex, int clipIndex) const;
     Q_INVOKABLE void setClipFade(int trackIndex, int clipIndex, double fadeInSeconds, double fadeOutSeconds);
     Q_INVOKABLE void setClipFadeCurve(int trackIndex, int clipIndex, const QString &curve);
     // which: "animIn" | "animOut". Partial patch: kind / duration / curve (or legacy ease).

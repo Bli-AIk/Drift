@@ -50,11 +50,14 @@ public:
     Q_INVOKABLE QVariantList languageOptions() const;
     Q_INVOKABLE void warmUp();
     Q_INVOKABLE void cancel();
-    Q_INVOKABLE void generate(const QString &text, const QString &voiceId, const QString &lang,
-                              double exaggeration);
+    // Returns the job id, or empty when nothing was started. atSeconds < 0 means the playhead and
+    // track < 0 the first audio lane with room.
+    Q_INVOKABLE QString generate(const QString &text, const QString &voiceId, const QString &lang,
+                                 double exaggeration, bool place = true, double atSeconds = -1.0,
+                                 int track = -1);
     // The subtitle clip at (trackIndex, clipIndex): one voiced clip per caption, on new audio tracks.
-    Q_INVOKABLE void voiceoverFromSubtitles(int trackIndex, int clipIndex, const QString &voiceId,
-                                            const QString &lang, double exaggeration);
+    Q_INVOKABLE QString voiceoverFromSubtitles(int trackIndex, int clipIndex, const QString &voiceId,
+                                               const QString &lang, double exaggeration);
 
     // Model-lane workers only: loads on first use, then reuses the session.
     bool ensureLoaded(QString *err);

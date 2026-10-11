@@ -86,7 +86,8 @@ QJsonObject animPropProp()
         "model clip model3d.<ambient|light<n>_<x|y|z|intensity|radius|cone|aimX|aimY>> (n 1..4); a model is placed by its "
         "transform like any 3D layer (x, y, width, height, z, rotationX, rotationY, rotation, "
         "perspective), and the older model3d.<scale|depth|rotX|rotY|rotZ> are still accepted as "
-        "shorthands that write those. "
+        "shorthands that write those. On a PDF clip pdf.scrollX and pdf.scrollY (page units: 1 moves "
+        "one page, or one grid row/column) and pdf.zoom (0.1..10). "
         "Note width/height here vs w/h in set_transform. Spellings live in this "
 "schema — list_animated_properties returns only properties that already have keys (empty on a "
         "fresh clip), so do not use it to learn names."));
@@ -898,7 +899,7 @@ const QList<Op> &ops()
         { "list_animated_properties", "keyframes", "See what already has keys",
           "Returns {props:[…]} — only the properties that already carry keyframes on this clip. Empty "
           "on a fresh clip. Property spellings live in the `prop` schema of the other keyframes ops "
-          "(x, y, width, height, rotation, opacity, volume, fx.<i>.<key>, afx.<i>.<key>, mask.<key>, text.<key>, shape.<key>, vector.svg.<key>, model3d.<key>), not here.",
+          "(x, y, width, height, rotation, opacity, volume, fx.<i>.<key>, afx.<i>.<key>, mask.<key>, text.<key>, shape.<key>, vector.svg.<key>, model3d.<key>, pdf.<key>), not here.",
           objectSchema(clipRefProps()), true, false, true },
         { "list_keyframes", "keyframes", "Read keys for one property",
           "Returns {prop, enabled, keys:[{seconds, value, inDx, inDy, outDx, outDy, corner, hold, "
@@ -1107,7 +1108,7 @@ QStringList undoExemptOps()
         QStringLiteral("set_overlap"),         QStringLiteral("set_ripple"),
         QStringLiteral("set_snap"),            QStringLiteral("set_loop_work_area"),
         QStringLiteral("export_video"),
-        QStringLiteral("save_project"),        QStringLiteral("set_theme"),
+        QStringLiteral("save_project"),        QStringLiteral("set_theme"),        QStringLiteral("set_preview_view"),
         QStringLiteral("set_shortcut"),        QStringLiteral("reset_shortcuts"),
         QStringLiteral("set_beat_layers"),     QStringLiteral("detect_beats"),
         QStringLiteral("list_speed_curve"),    QStringLiteral("list_fade_curve"),
@@ -1119,12 +1120,17 @@ QStringList undoExemptOps()
         // Background work and stored analysis: nothing on the timeline changes.
         QStringLiteral("transcribe"),          QStringLiteral("diarize"),
         QStringLiteral("cancel_job"),          QStringLiteral("tts_generate"),
-        QStringLiteral("sfx_generate"),
+        QStringLiteral("sfx_generate"),        QStringLiteral("local_tts_status"),
+        QStringLiteral("add_voice"),           QStringLiteral("rename_voice"),
+        QStringLiteral("remove_voice"),        QStringLiteral("voiceover_from_subtitles"),
         // Preset stores live on disk, outside the project and its history.
         QStringLiteral("rename_user_text_preset"),      QStringLiteral("delete_user_text_preset"),
         QStringLiteral("export_user_text_preset"),      QStringLiteral("import_user_text_preset"),
         QStringLiteral("rename_text_animation_preset"), QStringLiteral("delete_text_animation_preset"),
         QStringLiteral("export_text_animation_preset"),
+        QStringLiteral("import_effect"),                QStringLiteral("rename_effect_preset"),
+        QStringLiteral("delete_effect_preset"),         QStringLiteral("export_effect_preset"),
+        QStringLiteral("import_effect_preset"),
     };
     return k;
 }
@@ -1201,7 +1207,7 @@ QString agentGuideText()
         "- detect_scenes     -> jobs.sceneDetect.{active,progress,status}\n"
         "- set_clip_reverse  -> jobs.reverseRender.{active,progress,status}\n"
         "- market_download   -> jobs.market.active (count), or market_downloads for per-job status\n"
-        "- transcribe, diarize, tts_generate, sfx_generate return {job_id}: poll get_job({id});\n"
+        "- transcribe, diarize, tts_generate, sfx_generate, add_voice, voiceover_from_subtitles return {job_id}: poll get_job({id});\n"
         "  inspect({detail:true}).jobs.list shows recent ones, finished included.\n"
         "jobs.* keys exist only while a job runs. Segmentation, denoise, and face detection report\n"
         "through the app's status only; re-read inspect({clips:true,detail:true}) and compare.\n"
@@ -1302,7 +1308,7 @@ QJsonObject catalogPayload(const QJsonObject &args)
         {"multicam", "Multi-camera session: set up angles, switch at the playhead, save separate or combined."},
         {"market", "Stock media from the Cutwire marketplace: search or resolve a link, download into the bin. Needs the user's one-time consent in the app; downloads spend a per-machine quota."},
         {"transcript", "Transcript-first editing: transcribe once, read phrases/words with times, cut by words or by source ranges, assemble takes, label speakers."},
-        {"voice", "Cloud voices: ElevenLabs / Fish Audio text-to-speech, ElevenLabs sound effects, voice lists, provider status. Billable; needs the user's API key."},
+        {"voice", "Voices: ElevenLabs / Fish Audio text-to-speech and ElevenLabs sound effects (billable, need the user's API key), plus local Chatterbox TTS with a cloneable voice library and subtitle voiceovers (free, needs the tts-model addon)."},
     };
 
     const bool brief = args.value(QStringLiteral("brief")).toBool();
@@ -1447,9 +1453,12 @@ QJsonArray homepageTools()
                      {QStringLiteral("ops")})));
     tools.append(toolDef(
         QStringLiteral("capture"),
-        QStringLiteral("When: Verify visually. Still of the composition at `at`, defaulting to the playhead. Pauses playback first. By default returns an inline JPEG scaled to a 1280px long edge plus {at, w, h, full}; full=true instead writes a full-resolution PNG next to the project's frame captures and returns its path in the reply. beyond_end:true and dur are added when `at` is past the end of the timeline. Cannot be used inside apply."),
+        QStringLiteral("When: Verify visually. Still of the composition at `at`, defaulting to the playhead. Pauses playback first. By default returns an inline JPEG scaled to a 1280px long edge plus {at, w, h, full}; full=true instead writes a full-resolution PNG next to the project's frame captures and returns its path in the reply. beyond_end:true and dur are added when `at` is past the end of the timeline. view:\"editor3d\" instead renders the preview's free 3D viewpoint (the one set_preview_view moves; the overview if never placed) with the scene camera and stage drawn in it, and adds view to the reply. Cannot be used inside apply."),
         objectSchema({{QStringLiteral("at"), numberProp(QStringLiteral("Timeline seconds (default: playhead)"))},
-                      {QStringLiteral("full"), boolProp(QStringLiteral("Full-res PNG on disk instead of inline JPEG"))}}),
+                      {QStringLiteral("full"), boolProp(QStringLiteral("Full-res PNG on disk instead of inline JPEG"))},
+                      {QStringLiteral("view"), propWithDefault(enumProp(QStringLiteral("program is the composition; editor3d is the preview's free 3D viewpoint"),
+                                                                   {QStringLiteral("program"), QStringLiteral("editor3d")}),
+                                                          QStringLiteral("program"))}}),
         toolAnnotations(true, false, true)));
     tools.append(toolDef(
         QStringLiteral("frames"),

@@ -104,6 +104,8 @@ QJsonObject compactCatalogItem(const QVariantMap &item)
     const QString category = item.value(QStringLiteral("category")).toString();
     if (!category.isEmpty())
         o.insert(QStringLiteral("cat"), category);
+    if (item.value(QStringLiteral("user")).toBool())
+        o.insert(QStringLiteral("user"), true);
     const QVariantList params = item.value(QStringLiteral("params")).toList();
     if (!params.isEmpty()) {
         QJsonArray compactParams;
@@ -852,7 +854,10 @@ QJsonObject McpDispatcher::capture(const QJsonObject &args)
                           ? jsonNumber(args.value(QStringLiteral("at")), -1.0)
                           : -1.0;
     const bool full = jsonBool(args.value(QStringLiteral("full")));
-    return m_controller->mcp()->captureFrame(at, full);
+    const QString view = args.value(QStringLiteral("view")).toString(QStringLiteral("program"));
+    if (view != QLatin1String("program") && view != QLatin1String("editor3d"))
+        return textResult(err("bad_args", QStringLiteral("view must be program or editor3d")), true);
+    return m_controller->mcp()->captureFrame(at, full, view == QLatin1String("editor3d"));
 }
 
 QJsonObject McpDispatcher::frames(const QJsonObject &args)
