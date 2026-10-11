@@ -407,7 +407,7 @@ ApplicationWindow {
         }
         // debugInfoDialog before settingsDialog: it opens from inside Settings, so it is the
         // one on top whenever both are up.
-        const modals = [shellSwitchDialogLoader.item, debugInfoDialogLoader.item, settingsDialogLoader.item, projectPropertiesDialog,
+        const modals = [shellSwitchDialogLoader.item, aboutDialogLoader.item, debugInfoDialogLoader.item, settingsDialogLoader.item, projectPropertiesDialog,
                         recoveryDialog, unsavedDialog, addonStartupDialog, addonManagerDialogLoader.item,
                         missingAddonsDialogLoader.item, updateDialogLoader.item,
                         reverseProgressDialogLoader.item, subtitleProgressDialogLoader.item]
@@ -610,6 +610,7 @@ ApplicationWindow {
     LazyLoader { id: debugInfoDialogLoader; keepLoaded: true; sourceComponent: Component { DebugInfoDialog { } } }
 
     LazyLoader { id: settingsDialogLoader; sourceComponent: Component { SettingsDialog { } } }
+    LazyLoader { id: aboutDialogLoader; sourceComponent: Component { AboutDialog { } } }
     LazyLoader { id: shellSwitchDialogLoader; sourceComponent: Component { ShellSwitchDialog { } } }
     LazyLoader { id: subtitleProgressDialogLoader; sourceComponent: Component { SubtitleProgressDialog { } } }
     LazyLoader { id: reverseProgressDialogLoader; sourceComponent: Component { ReverseProgressDialog { } } }
@@ -731,6 +732,10 @@ ApplicationWindow {
 
     function openDebugInfo() {
         debugInfoDialogLoader.ensure().open()
+    }
+
+    function openAboutDialog() {
+        aboutDialogLoader.ensure().open()
     }
 
     readonly property alias addonAttentionNeeded: addonStartupDialog.needsAttention

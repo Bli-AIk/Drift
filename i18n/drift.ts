@@ -1628,6 +1628,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>About Drift</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version, licence and credits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Appearance, extras and agent access</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5033,6 +5041,10 @@
     </message>
     <message>
         <source>Click a colour to pick it. Esc cancels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

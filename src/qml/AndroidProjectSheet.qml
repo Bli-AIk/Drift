@@ -115,6 +115,12 @@ AndroidBottomSheet {
             label: qsTr("Debug info"),
             detail: qsTr("Version, device and logs"),
             icon: Theme.icons.info
+        },
+        {
+            id: "about",
+            label: qsTr("About Drift"),
+            detail: qsTr("Version, licence and credits"),
+            icon: Theme.icons.info
         }
     ]
 

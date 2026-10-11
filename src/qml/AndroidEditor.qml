@@ -285,6 +285,9 @@ Item {
         case "debug":
             Window.window.openDebugInfo()
             break
+        case "about":
+            Window.window.openAboutDialog()
+            break
         }
     }
 

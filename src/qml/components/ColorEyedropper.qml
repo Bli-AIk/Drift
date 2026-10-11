@@ -5,7 +5,8 @@ import QtQuick.Window
 import Drift
 
 // Full-window colour picker over the app's own window, with a magnifying loupe. Pointer: hover
-// to aim, click to pick. Touch: drag to aim, lift to pick. Escape, Back or a right click cancel.
+// to aim, click to pick. Touch: drag to aim, lift to pick. Escape, Back, a right click or the
+// hint's cancel button (touch only) cancel.
 // Samples a periodic grab of the window rather than a single one, so a preview that re-renders
 // after opening (an effect bypassed for the pick) is what gets sampled.
 Popup {
@@ -105,6 +106,7 @@ Popup {
             y: Theme.spacing2xl + ((Overlay.overlay && Overlay.overlay.SafeArea)
                                    ? Overlay.overlay.SafeArea.margins.top : 0)
             width: hintText.implicitWidth + Theme.spacing2xl * 2
+                   + (cancelButton.visible ? cancelButton.width : 0)
             height: Theme.controlHeight
             radius: height / 2
             color: Theme.panelBackground
@@ -113,12 +115,25 @@ Popup {
 
             Text {
                 id: hintText
-                anchors.centerIn: parent
+                anchors.verticalCenter: parent.verticalCenter
+                x: Theme.spacing2xl
                 text: Theme.touchUi ? qsTr("Drag to a colour and lift to pick it")
                                     : qsTr("Click a colour to pick it. Esc cancels.")
                 color: Theme.panelForeground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
+            }
+
+            // A finger has no right click and maybe no Back key (the desktop layout on a tablet).
+            IconButton {
+                id: cancelButton
+                visible: Theme.touchUi
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                buttonSize: parent.height
+                glyph: Theme.icons.x
+                tooltip: qsTr("Cancel")
+                onClicked: root.close()
             }
         }
 
