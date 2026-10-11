@@ -18,6 +18,10 @@
 </p>
 
 <p align="center">
+  <a href="https://www.opensourcealternatives.to"><img src="https://www.opensourcealternatives.to/badge-osa.svg" alt="Listed on Open Source Alternatives"></a>
+</p>
+
+<p align="center">
   <a href="https://cutwire.org/drift"><strong>cutwire.org/drift</strong></a>
 </p>
 
