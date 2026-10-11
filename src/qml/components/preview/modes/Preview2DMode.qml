@@ -45,6 +45,40 @@ Item {
         }
     }
 
+    // Two-finger zoom and pan, the touch counterpart of the wheel and middle-drag above.
+    PinchHandler {
+        id: viewPinch
+        enabled: Theme.touchInput
+        target: null
+        acceptedDevices: PointerDevice.TouchScreen
+
+        property real lastScale: 1
+        property point lastCentroid
+
+        // Both signals fire for the same event; consuming the deltas makes the second call a no-op.
+        function step() {
+            if (!active)
+                return
+            const c = centroid.position
+            if (activeScale !== lastScale && lastScale > 0) {
+                mode.viewport.zoomAt(c.x, c.y, activeScale / lastScale)
+                lastScale = activeScale
+            }
+            mode.viewport.panX += c.x - lastCentroid.x
+            mode.viewport.panY += c.y - lastCentroid.y
+            lastCentroid = c
+        }
+
+        onActiveChanged: {
+            if (!active)
+                return
+            lastScale = activeScale
+            lastCentroid = centroid.position
+        }
+        onActiveScaleChanged: step()
+        onCentroidChanged: step()
+    }
+
     // Drawn on the canvas itself, so it is clipped to the frame and sits under the status text.
     GuideLayer {
         parent: mode.viewport ? mode.viewport.canvas : mode

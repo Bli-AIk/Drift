@@ -508,10 +508,12 @@ ToolWindow {
                     property real baseG: 0
 
                     TapHandler {
+                        margin: Theme.touchInput ? 9 : 0
                         onTapped: root.selectedPoint = knob.index
                     }
 
                     DragHandler {
+                        margin: Theme.touchInput ? 9 : 0
                         // Corner rails stay at (0,0) and (1,1); only interior knobs move.
                         enabled: !knob.isEnd
                         target: null
@@ -567,10 +569,12 @@ ToolWindow {
                     property real baseY: 0
 
                     TapHandler {
+                        margin: Theme.touchInput ? 9 : 0
                         onTapped: root.selectedHandle = handleKnob.index
                     }
 
                     DragHandler {
+                        margin: Theme.touchInput ? 9 : 0
                         target: null
                         cursorShape: Qt.PointingHandCursor
                         onActiveChanged: {

@@ -21,6 +21,8 @@ class TimelineViewState : public QObject
     Q_PROPERTY(double viewW READ viewW WRITE setViewW NOTIFY viewChanged)
     Q_PROPERTY(double pxPerSecond READ pxPerSecond WRITE setPxPerSecond NOTIFY viewChanged)
     Q_PROPERTY(bool touchMode READ touchMode WRITE setTouchMode NOTIFY viewChanged)
+    // Desktop shell on a touch-only device: a press-and-hold on a clip body opens its context menu.
+    Q_PROPERTY(bool touchContextMenu MEMBER m_touchContextMenu NOTIFY gestureChanged)
     Q_PROPERTY(bool multiSelectActive MEMBER m_multiSelectActive NOTIFY gestureChanged)
     Q_PROPERTY(double totalTracksHeight MEMBER m_totalTracksHeight NOTIFY gestureChanged)
 
@@ -117,6 +119,7 @@ public:
     const Style &styleValues() const { return m_style; }
 
     bool multiSelectActive() const { return m_multiSelectActive; }
+    bool touchContextMenu() const { return m_touchContextMenu; }
     double totalTracksHeight() const { return m_totalTracksHeight; }
     bool moveFollowActive() const { return m_moveFollowActive; }
     int moveLeaderTrack() const { return m_moveLeaderTrack; }
@@ -156,6 +159,7 @@ private:
     double m_viewW = 0.0;
     double m_pxPerSecond = 100.0;
     bool m_touchMode = false;
+    bool m_touchContextMenu = false;
     bool m_multiSelectActive = false;
     double m_totalTracksHeight = 0.0;
     bool m_moveFollowActive = false;

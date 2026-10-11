@@ -438,6 +438,19 @@ Item {
                 }
             }
 
+            PinchHandler {
+                enabled: Theme.touchInput
+                target: null
+                acceptedDevices: PointerDevice.TouchScreen
+                property real startHeight: 0
+                onActiveChanged: if (active) startHeight = root.laneHeight
+                onActiveScaleChanged: {
+                    if (active)
+                        root.laneHeight = Math.max(root.minLaneHeight,
+                                                   Math.min(root.maxLaneHeight, startHeight * activeScale))
+                }
+            }
+
             TapHandler {
                 onDoubleTapped: root.toggleExpanded()
             }

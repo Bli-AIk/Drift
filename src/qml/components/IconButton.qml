@@ -26,6 +26,19 @@ AbstractButton {
     // phone could reach. A long press surfaces it; the latch clears when the press ends.
     property bool pressAndHeld: false
 
+    // Small buttons keep their drawn size on a touchscreen; only the area that accepts a
+    // finger grows, up to Theme.iconButtonSize. Zero with a pointer.
+    property real touchHitPadding: Theme.touchInput
+                                   ? Math.max(0, (Theme.iconButtonSize - Math.min(width, height)) / 2)
+                                   : 0
+    containmentMask: touchHitPadding > 0 ? touchHitArea : null
+
+    Item {
+        id: touchHitArea
+        anchors.fill: parent
+        anchors.margins: -root.touchHitPadding
+    }
+
     readonly property bool hasLabel: text.length > 0
     readonly property color _fg: active ? Theme.panelSecondaryForeground : Theme.mutedForeground
     readonly property color _labelFg: active ? Theme.panelSecondaryForeground : Theme.foreground

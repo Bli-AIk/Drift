@@ -570,10 +570,12 @@ ToolWindow {
                         property real baseSpeed: 1
 
                         TapHandler {
+                            margin: Theme.touchInput ? 11 : 0
                             onTapped: root.selectedPoint = knob.index
                         }
 
                         DragHandler {
+                            margin: Theme.touchInput ? 11 : 0
                             target: null
                             onActiveChanged: {
                                 if (active) {
@@ -633,6 +635,7 @@ ToolWindow {
                         y: root.yForSpeed(root.selected.speed + dy, plot.height) - height / 2
 
                         DragHandler {
+                            margin: Theme.touchInput ? 12 : 0
                             target: null
                             onActiveChanged: {
                                 if (active) {

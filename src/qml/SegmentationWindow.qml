@@ -154,7 +154,23 @@ ToolWindow {
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                     enabled: EditorState.segmentation.sessionActive && EditorState.segmentation.backendUsesPoints
                              && !EditorState.segmentation.encoding && !EditorState.segmentation.running
+                    pressAndHoldInterval: 400
+                    property bool heldExclude: false
+                    onPressed: heldExclude = false
+                    // Touch has no right button: hold to mark what to exclude.
+                    onPressAndHold: function (mouse) {
+                        if (!Theme.touchInput || !(mouse.buttons & Qt.LeftButton))
+                            return
+                        const nx = (mouse.x - stage.fitX) / stage.fitW
+                        const ny = (mouse.y - stage.fitY) / stage.fitH
+                        if (nx < 0 || nx > 1 || ny < 0 || ny > 1)
+                            return
+                        heldExclude = true
+                        EditorState.segmentation.addPoint(nx, ny, false)
+                    }
                     onClicked: function (mouse) {
+                        if (heldExclude)
+                            return
                         const nx = (mouse.x - stage.fitX) / stage.fitW
                         const ny = (mouse.y - stage.fitY) / stage.fitH
                         if (nx < 0 || nx > 1 || ny < 0 || ny > 1)
@@ -181,6 +197,7 @@ ToolWindow {
 
                         MouseArea {
                             anchors.fill: parent
+                            anchors.margins: Theme.touchInput ? -9 : 0
                             enabled: !EditorState.segmentation.running
                             onClicked: EditorState.segmentation.removePoint(parent.index)
                         }
@@ -251,7 +268,9 @@ ToolWindow {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: EditorState.segmentation.backendUsesPoints
-                      ? qsTr("Left-click marks the subject, right-click marks what to exclude. Click a marker to remove it.")
+                      ? (Theme.touchInput
+                         ? qsTr("Tap marks the subject, press and hold marks what to exclude. Tap a marker to remove it.")
+                         : qsTr("Left-click marks the subject, right-click marks what to exclude. Click a marker to remove it."))
                       : qsTr("Everyone in the shot is cut out automatically — there is nothing to click.")
             }
 

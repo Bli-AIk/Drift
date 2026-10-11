@@ -11543,6 +11543,10 @@ If playback stutters, try another.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Tap marks the subject, press and hold marks what to exclude. Tap a marker to remove it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Left-click marks the subject, right-click marks what to exclude. Click a marker to remove it.</source>
         <translation type="unfinished"></translation>
     </message>

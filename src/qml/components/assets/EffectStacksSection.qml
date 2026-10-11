@@ -170,7 +170,7 @@ Column {
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.margins: 2
-                        visible: cardDrag.hovered || stackMenu.visible
+                        visible: cardDrag.hovered || stackMenu.visible || Theme.touchInput
                         glyph: Theme.icons.ellipsis
                         variant: "ghost"
                         buttonSize: 20

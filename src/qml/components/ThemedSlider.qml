@@ -31,7 +31,7 @@ Slider {
     from: 0
     to: 1
     live: true
-    implicitHeight: 22
+    implicitHeight: Theme.touchInput ? 32 : 22
     padding: 0
     topPadding: 0
     bottomPadding: 0
@@ -122,8 +122,8 @@ Slider {
         id: handleRect
         x: root.leftPadding + root.visualPosition * (root.availableWidth - width)
         y: root.topPadding + root.availableHeight / 2 - height / 2
-        width: Theme.iconSizeMd
-        height: Theme.iconSizeMd
+        width: Theme.touchInput ? 20 : Theme.iconSizeMd
+        height: width
         radius: width / 2
         color: root.pressed ? Theme.panelSecondaryForeground
                             : (root.hovered ? Qt.lighter(Theme.primary, 1.25) : Qt.lighter(Theme.primary, 1.15))

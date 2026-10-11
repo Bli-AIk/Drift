@@ -142,6 +142,7 @@ PanelFrame {
         viewW: root.timelineViewW
         pxPerSecond: root.pxPerSecond
         touchMode: false
+        touchContextMenu: Theme.touchInput
         multiSelectActive: root.multiSelectActive === true
         totalTracksHeight: root.totalTracksHeightCached
         moveFollowActive: root.moveFollowActive
@@ -1281,6 +1282,28 @@ PanelFrame {
                 ScrollBar.horizontal: AppScrollBar { policy: ScrollBar.AlwaysOn }
                 ScrollBar.vertical: AppScrollBar { }
 
+                PinchHandler {
+                    id: pinch
+                    enabled: Theme.touchInput
+                    target: null
+                    acceptedDevices: PointerDevice.TouchScreen
+                    property real startZoom: 1
+                    property real anchorSeconds: 0
+
+                    onActiveChanged: {
+                        if (!active)
+                            return
+                        startZoom = root.zoom
+                        anchorSeconds = Math.max(0, (flick.contentX + centroid.position.x)
+                                                    / root.pxPerSecond)
+                    }
+                    onScaleChanged: {
+                        if (active)
+                            root.setZoomAround(startZoom * activeScale, anchorSeconds,
+                                               centroid.position.x)
+                    }
+                }
+
                 Item {
                     id: timelineContent
                     width: flick.contentWidth
@@ -1494,12 +1517,26 @@ PanelFrame {
 
                                         property bool dragging: false
                                         property bool didDrag: false
+                                        property bool heldOpen: false
                                         property real dragSeconds: modelData.seconds
                                         property real pressX: 0
+
+                                        pressAndHoldInterval: 400
+                                        onPressAndHold: (mouse) => {
+                                            if (!Theme.touchInput || didDrag
+                                                    || !(mouse.buttons & Qt.LeftButton))
+                                                return
+                                            heldOpen = true
+                                            bookmarkContextMenu.bookmarkIndex = index
+                                            bookmarkContextMenu.bookmarkLabel = modelData.label
+                                            bookmarkContextMenu.bookmarkSeconds = modelData.seconds
+                                            bookmarkContextMenu.popup(bookmarkMouse, mouse.x, mouse.y)
+                                        }
 
                                         onPressed: (mouse) => {
                                             if (mouse.button !== Qt.LeftButton)
                                                 return
+                                            heldOpen = false
                                             didDrag = false
                                             dragging = false
                                             pressX = mouse.x
@@ -1533,7 +1570,7 @@ PanelFrame {
                                                 bookmarkContextMenu.popup()
                                                 return
                                             }
-                                            if (!didDrag)
+                                            if (!didDrag && !heldOpen)
                                                 EditorState.goToBookmark(index)
                                         }
                                         onDoubleClicked: (mouse) => {
@@ -1671,12 +1708,18 @@ PanelFrame {
                         z: 0
                         enabled: root.timelineTool === ""
                         acceptedButtons: Qt.LeftButton
-                        // CapCut: empty-space drag is marquee, not flick-scroll.
-                        preventStealing: true
+                        // CapCut: empty-space drag is marquee, not flick-scroll. On touch there is
+                        // no marquee: the same drag pans the timeline instead.
+                        preventStealing: !Theme.touchInput
                         cursorShape: pressed ? Qt.CrossCursor : Qt.ArrowCursor
 
                         onPressed: (mouse) => {
                             root.forceActiveFocus()
+                            if (Theme.touchInput) {
+                                if (!(mouse.modifiers & (Qt.ShiftModifier | Qt.ControlModifier)))
+                                    EditorState.clearSelection()
+                                return
+                            }
                             root.marqueeAdditive = (mouse.modifiers & (Qt.ShiftModifier | Qt.ControlModifier)) !== 0
                             root.marqueeOriginX = mouse.x
                             root.marqueeOriginY = mouse.y
@@ -2223,6 +2266,17 @@ PanelFrame {
                                             acceptedButtons: Qt.RightButton
                                             onPressed: root.openGapMenu(trackRow.trackIndex,
                                                                         gapItem.modelData.start)
+                                        }
+
+                                        // A handler rather than a left-button MouseArea, so the press
+                                        // still reaches the marquee/pan area underneath.
+                                        TapHandler {
+                                            enabled: Theme.touchInput
+                                            acceptedDevices: PointerDevice.TouchScreen
+                                            onLongPressed: root.openGapMenu(trackRow.trackIndex,
+                                                                            gapItem.modelData.start,
+                                                                            gapItem, point.position.x,
+                                                                            point.position.y)
                                         }
                                     }
                                 }
@@ -2849,10 +2903,13 @@ PanelFrame {
     // One gap menu for the whole timeline, rather than one built up front inside every gap.
     property int gapMenuTrack: -1
     property real gapMenuStart: 0
-    function openGapMenu(trackIndex, start) {
+    function openGapMenu(trackIndex, start, anchor, ax, ay) {
         gapMenuTrack = trackIndex
         gapMenuStart = start
-        gapContextMenu.popup()
+        if (anchor)
+            gapContextMenu.popup(anchor, ax, ay)
+        else
+            gapContextMenu.popup()
     }
 
     ThemedContextMenu {

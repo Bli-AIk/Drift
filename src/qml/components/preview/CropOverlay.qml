@@ -107,6 +107,42 @@ Item {
         }
     }
 
+    // Two-finger zoom and pan, the touch counterpart of the wheel and middle-drag above.
+    PinchHandler {
+        id: viewPinch
+        enabled: Theme.touchInput
+        target: null
+        acceptedDevices: PointerDevice.TouchScreen
+
+        property real lastScale: 1
+        property point lastCentroid
+
+        // Both signals fire for the same event; consuming the deltas makes the second call a no-op.
+        function step() {
+            if (!active)
+                return
+            const c = centroid.position
+            if (activeScale !== lastScale && lastScale > 0) {
+                root.previewViewport.zoomAt(c.x, c.y, activeScale / lastScale)
+                lastScale = activeScale
+            }
+            root.previewViewport.panX += c.x - lastCentroid.x
+            root.previewViewport.panY += c.y - lastCentroid.y
+            lastCentroid = c
+            root.didZoom = true
+            root.didPan = true
+        }
+
+        onActiveChanged: {
+            if (!active)
+                return
+            lastScale = activeScale
+            lastCentroid = centroid.position
+        }
+        onActiveScaleChanged: step()
+        onCentroidChanged: step()
+    }
+
     // Everything outside the crop frame is discarded, so dim it.
     // Four bands rather than a mask: no shader, no clipping cost.
     Rectangle {

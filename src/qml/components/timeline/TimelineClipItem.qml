@@ -150,10 +150,18 @@ Item {
     // closing.
     function openContextMenu() {
         if (clipContextMenuLoader.active && clipContextMenuLoader.item) {
-            clipContextMenuLoader.item.popup()
+            popupContextMenu(clipContextMenuLoader.item)
             return
         }
         clipContextMenuLoader.active = true
+    }
+
+    // A finger leaves no cursor position behind, so the menu opens where the press landed.
+    function popupContextMenu(menu) {
+        if (Theme.touchInput && !touchMode && trackClips)
+            menu.popup(trackClips, trackClips.dragPointer.x, trackClips.dragPointer.y)
+        else
+            menu.popup()
     }
 
     // Premiere-style trim pointer (vertical bar + arrow), sized to this clip.
@@ -303,7 +311,7 @@ Item {
         active: false
         asynchronous: false
         sourceComponent: clipContextMenuComponent
-        onLoaded: item.popup()
+        onLoaded: clipItem.popupContextMenu(item)
     }
 
     Component {

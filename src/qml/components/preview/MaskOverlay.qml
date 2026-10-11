@@ -581,6 +581,17 @@ Item {
 
                             onReleased: finish()
                             onCanceled: finish()
+
+                            // Touch has no right button: hold a vertex still to delete it.
+                            onPressAndHold: (mouse) => {
+                                if (!Theme.touchInput || vertex.liveVx > -1e11
+                                        || !(mouse.buttons & Qt.LeftButton))
+                                    return
+                                EditorState.cancelPreviewDrag()
+                                root.interacting = false
+                                EditorState.removeMaskPoint(maskBox.layerTrack,
+                                                            maskBox.layerClip, vertex.index)
+                            }
                         }
                     }
                 }

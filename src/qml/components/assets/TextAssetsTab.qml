@@ -176,7 +176,7 @@ Item {
                                 anchors.top: parent.top
                                 anchors.right: parent.right
                                 anchors.margins: 2
-                                visible: userDrag.hovered || cardMenu.visible
+                                visible: userDrag.hovered || cardMenu.visible || Theme.touchInput
                                 glyph: Theme.icons.ellipsis
                                 variant: "ghost"
                                 buttonSize: 20

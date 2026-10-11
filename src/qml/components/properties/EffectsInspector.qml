@@ -549,6 +549,11 @@ Item {
                         acceptedButtons: Qt.RightButton
                         onTapped: effectCardMenu.popup()
                     }
+                    TapHandler {
+                        enabled: Theme.touchInput
+                        acceptedDevices: PointerDevice.TouchScreen
+                        onLongPressed: effectCardMenu.popup(parent, point.position.x, point.position.y)
+                    }
                     ThemedContextMenu {
                         id: effectCardMenu
                         ThemedMenuItem {

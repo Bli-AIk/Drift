@@ -63,7 +63,7 @@ ApplicationWindow {
     Binding {
         target: Theme
         property: "inputModeOverride"
-        value: "pointer"
+        value: PointerDevices.mousePresent ? "pointer" : "touch"
         when: Qt.platform.os === "android"
     }
 
@@ -74,6 +74,19 @@ ApplicationWindow {
 
     // Set true after the unsaved prompt resolves so onClosing can finish quit.
     property bool forceClose: false
+
+    // How many Overlay-hosted dialogs/tool windows are open. Touch only: PointerHandlers on
+    // the editor hit-test their parent bounds, not z-order, so a finger on empty dialog chrome
+    // would still reach the timeline; this count drives a guard over the page.
+    property int overlayModalCount: 0
+
+    function pushOverlayModal() {
+        overlayModalCount++
+    }
+
+    function popOverlayModal() {
+        overlayModalCount = Math.max(0, overlayModalCount - 1)
+    }
     property bool manualUpdateCheck: false
 
     // On macOS, instantiate a native MenuBar via Qt.labs.platform.
@@ -1931,6 +1944,37 @@ ApplicationWindow {
                     }
                 }
             }
+        }
+    }
+
+    // Under the Overlay, over the page. Overlay popups stay interactive; the editor cannot.
+    MouseArea {
+        id: overlayInputGuard
+        anchors.fill: parent
+        z: 11
+        visible: Theme.touchInput && window.overlayModalCount > 0
+        acceptedButtons: Qt.AllButtons
+        hoverEnabled: true
+        preventStealing: true
+        onPressed: (mouse) => { mouse.accepted = true }
+        onWheel: (wheel) => { wheel.accepted = true }
+
+        readonly property int _stealHandlers: PointerHandler.CanTakeOverFromHandlersOfSameType
+                                            | PointerHandler.CanTakeOverFromHandlersOfDifferentType
+
+        TapHandler {
+            acceptedButtons: Qt.AllButtons
+            grabPermissions: overlayInputGuard._stealHandlers
+        }
+
+        PinchHandler {
+            target: null
+            grabPermissions: overlayInputGuard._stealHandlers
+        }
+
+        DragHandler {
+            target: null
+            grabPermissions: overlayInputGuard._stealHandlers
         }
     }
 

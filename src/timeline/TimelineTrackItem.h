@@ -190,6 +190,8 @@ private:
         bool armed = false;
         bool didDrag = false;
         bool rightButton = false;
+        bool touchMenu = false; // finger on a pointer-style (desktop) timeline: hold opens the menu
+        bool menuOpened = false;
         int clipIndex = -1;
         QString clipId;
         QRectF pressRect;

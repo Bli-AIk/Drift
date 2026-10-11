@@ -353,6 +353,13 @@ TimelineTrackItem::TimelineTrackItem(QQuickItem *parent)
     connect(&m_longPress, &QTimer::timeout, this, [this] {
         if (!m_drag.pressed || m_drag.moving || m_drag.didDrag || m_drag.rightButton)
             return;
+        if (m_drag.touchMenu) {
+            m_drag.menuOpened = true;
+            updateActiveSet();
+            callHaptic("pickUp");
+            emit contextMenuRequested(m_drag.clipIndex);
+            return;
+        }
         if (!m_viewState || !m_viewState->touchMode() || m_viewState->multiSelectActive())
             return;
         m_drag.armed = true;
@@ -1397,6 +1404,8 @@ void TimelineTrackItem::mousePressEvent(QMouseEvent *event)
     m_drag.pointer = event->position();
     m_drag.wasSelected = wasSelected;
     m_drag.rightButton = event->button() == Qt::RightButton;
+    m_drag.touchMenu = !touch && m_viewState->touchContextMenu()
+                       && event->source() != Qt::MouseEventNotSynthesized;
 
     if (m_drag.rightButton) {
         if (!wasSelected)
@@ -1411,7 +1420,7 @@ void TimelineTrackItem::mousePressEvent(QMouseEvent *event)
     // On a pointer the clip owns the press outright; on touch the Flickable may still take it
     // for a pan until a press-and-hold picks the clip up. 400 ms is Android's own long-press.
     setKeepMouseGrab(!touch);
-    m_longPress.start(touch ? 400 : 800);
+    m_longPress.start(touch || m_drag.touchMenu ? 400 : 800);
 
     // Touch selects on release instead: a pan that happens to start on a clip is someone
     // scrolling, and selecting on touch-down made every such pan select whatever it began on.
@@ -1482,10 +1491,17 @@ void TimelineTrackItem::mouseMoveEvent(QMouseEvent *event)
         event->ignore();
         return;
     }
+    if (m_drag.menuOpened) {
+        event->accept();
+        return;
+    }
     const QPointF delta = mapFromScene(event->scenePosition()) - m_drag.pressItemPos;
     if (!m_drag.moving) {
         const bool touch = m_viewState->touchMode();
-        const bool pastThreshold = std::abs(delta.x()) > 2.0 || std::abs(delta.y()) > 2.0;
+        // A finger never holds still, so it gets the drag distance rather than 2 px before the
+        // press-and-hold can fire.
+        const double threshold = m_drag.touchMenu ? QGuiApplication::styleHints()->startDragDistance() : 2.0;
+        const bool pastThreshold = std::abs(delta.x()) > threshold || std::abs(delta.y()) > threshold;
         if (touch) {
             if (!m_drag.armed) {
                 // Not picked up yet: this is someone panning. Let it go, and do not let the
@@ -1536,7 +1552,7 @@ void TimelineTrackItem::finishPress(bool canceled)
         return;
     }
     scheduleRebuild();
-    if (canceled || !m_editor)
+    if (canceled || !m_editor || drag.menuOpened)
         return;
 
     const bool touch = m_viewState && m_viewState->touchMode();

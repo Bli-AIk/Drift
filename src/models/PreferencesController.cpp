@@ -10,6 +10,7 @@
 #include <QLibraryInfo>
 #include <QLocale>
 #include <QProcess>
+#include <QScreen>
 #include <QSettings>
 #include <QTranslator>
 #include <QVariantMap>
@@ -500,6 +501,12 @@ QString PreferencesController::resolveInterfaceShell(const QString &shell)
     if (shell == QLatin1String("desktop") || shell == QLatin1String("mobile"))
         return shell;
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+    // Tablets (smallest logical side >= 600 dp) get the desktop shell; phones the touch one.
+    if (const QScreen *screen = QGuiApplication::primaryScreen()) {
+        const QSize size = screen->size();
+        if (qMin(size.width(), size.height()) >= 600)
+            return QStringLiteral("desktop");
+    }
     return QStringLiteral("mobile");
 #else
     return QStringLiteral("desktop");

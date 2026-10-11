@@ -114,6 +114,63 @@ Item {
         }
     }
 
+    // Touch has no middle or right button: one finger orbits, two dolly and pan.
+    DragHandler {
+        enabled: Theme.touchInput
+        target: null
+        acceptedDevices: PointerDevice.TouchScreen
+        maximumPointCount: 1
+
+        property point last
+
+        onActiveChanged: {
+            if (active) {
+                last = Qt.point(0, 0)
+                mode.viewport.forceActiveFocus()
+            }
+            EditorState.preview.setNavigating(active)
+        }
+        onTranslationChanged: {
+            if (!active)
+                return
+            EditorState.preview.orbit((translation.x - last.x) * 0.4, (translation.y - last.y) * 0.4)
+            last = Qt.point(translation.x, translation.y)
+        }
+    }
+
+    PinchHandler {
+        enabled: Theme.touchInput
+        target: null
+        acceptedDevices: PointerDevice.TouchScreen
+
+        property real lastScale: 1
+        property point lastCentroid
+
+        function step() {
+            if (!active)
+                return
+            const c = centroid.position
+            if (activeScale !== lastScale && lastScale > 0) {
+                // dolly() scales the distance by 0.85 per step.
+                EditorState.preview.dolly(Math.log(activeScale / lastScale) / 0.1625)
+                lastScale = activeScale
+            }
+            EditorState.preview.pan((c.x - lastCentroid.x) / mode.perCanvas,
+                                    (c.y - lastCentroid.y) / mode.perCanvas)
+            lastCentroid = c
+        }
+
+        onActiveChanged: {
+            if (!active)
+                return
+            lastScale = activeScale
+            lastCentroid = centroid.position
+            mode.viewport.forceActiveFocus()
+        }
+        onActiveScaleChanged: step()
+        onCentroidChanged: step()
+    }
+
     TapHandler {
         enabled: !EditorState.playing
         onTapped: (eventPoint) => {
