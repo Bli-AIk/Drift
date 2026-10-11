@@ -204,7 +204,7 @@ Item {
                 Grid {
                     id: recentGrid
                     width: parent.width
-                    columns: 2
+                    columns: Math.max(2, Math.floor(width / 220))
                     spacing: Theme.spacingMd
                     visible: EditorState.projectFile.recentProjects.length > 0
 

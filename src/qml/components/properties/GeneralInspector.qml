@@ -475,7 +475,14 @@ Item {
             Text {
                 text: qsTr("Trim")
                 HoverHandler { id: tipHover1217 }
-                ThemedToolTip { text: qsTr("Which part of the original file this clip plays"); visible: tipHover1217.hovered }
+                TapHandler {
+                    id: tipTap1217
+                    acceptedDevices: PointerDevice.TouchScreen
+                    enabled: Theme.touchInput
+                    onLongPressed: tip1217.held = true
+                    onPressedChanged: if (!pressed) tip1217.held = false
+                }
+                ThemedToolTip { id: tip1217; property bool held: false; text: qsTr("Which part of the original file this clip plays"); visible: tipHover1217.hovered || held }
                 color: Theme.mutedForeground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
@@ -491,7 +498,14 @@ Item {
                     Text {
                         text: qsTr("From")
                         HoverHandler { id: tipHover1231 }
-                        ThemedToolTip { text: qsTr("Seconds into the file where this clip starts"); visible: tipHover1231.hovered }
+                        TapHandler {
+                            id: tipTap1231
+                            acceptedDevices: PointerDevice.TouchScreen
+                            enabled: Theme.touchInput
+                            onLongPressed: tip1231.held = true
+                            onPressedChanged: if (!pressed) tip1231.held = false
+                        }
+                        ThemedToolTip { id: tip1231; property bool held: false; text: qsTr("Seconds into the file where this clip starts"); visible: tipHover1231.hovered || held }
                         color: Theme.mutedForeground
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
@@ -514,7 +528,14 @@ Item {
                     Text {
                         text: qsTr("To")
                         HoverHandler { id: tipHover1252 }
-                        ThemedToolTip { text: qsTr("Seconds into the file where this clip ends"); visible: tipHover1252.hovered }
+                        TapHandler {
+                            id: tipTap1252
+                            acceptedDevices: PointerDevice.TouchScreen
+                            enabled: Theme.touchInput
+                            onLongPressed: tip1252.held = true
+                            onPressedChanged: if (!pressed) tip1252.held = false
+                        }
+                        ThemedToolTip { id: tip1252; property bool held: false; text: qsTr("Seconds into the file where this clip ends"); visible: tipHover1252.hovered || held }
                         color: Theme.mutedForeground
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
@@ -559,10 +580,19 @@ Item {
                 elide: Text.ElideRight
 
                 HoverHandler { id: pathHover }
+                TapHandler {
+                    id: pathTap
+                    acceptedDevices: PointerDevice.TouchScreen
+                    enabled: Theme.touchInput
+                    onLongPressed: pathTip.held = true
+                    onPressedChanged: if (!pressed) pathTip.held = false
+                }
 
                 ThemedToolTip {
+                    id: pathTip
+                    property bool held: false
                     text: root.clipData.path || ""
-                    visible: pathHover.hovered && (root.clipData.path || "").length > 0
+                    visible: (pathHover.hovered || held) && (root.clipData.path || "").length > 0
                 }
             }
         }

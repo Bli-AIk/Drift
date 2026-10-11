@@ -9,7 +9,7 @@ import "components/timeline"
 // plus the keyframe, subtitle-cue and beat lanes and transition chrome.
 // Omits the marquee and library drops — neither has a touch gesture; box-select is
 // replaced by the long-press multi-select mode below.
-// Edit tools live in AndroidEditActions (above the bottom rail), not on this panel.
+// Edit tools live in AndroidClipToolbar (above the bottom rail), not on this panel.
 Item {
     id: root
 
@@ -305,7 +305,7 @@ Item {
     }
     readonly property real labelsWidth: Theme.androidTrackLabelsWidth
 
-    // Beat analysis is triggered from AndroidEditActions (the music button, which sets
+    // Beat analysis is triggered from AndroidMoreToolsSheet (the beat toggle, which sets
     // beatGridVisible / onsetsVisible and calls analyzeBeats over the whole timeline);
     // this panel only draws what came back.
     readonly property var beatData: EditorState.beatAnalysis
@@ -1566,7 +1566,7 @@ Item {
                         }
 
                         // Beat / onset markers. Analysis itself is triggered from
-                        // AndroidEditActions; this lane only appears once a result is in
+                        // AndroidMoreToolsSheet; this lane only appears once a result is in
                         // and the corresponding layer is switched on.
                         Canvas {
                             id: beatLane

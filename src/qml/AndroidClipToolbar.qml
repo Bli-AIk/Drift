@@ -214,14 +214,18 @@ Item {
 
         Row {
             id: toolRow
-            anchors.right: parent.right
             anchors.top: parent.top
             anchors.bottom: parent.bottom
+            // Full row centres so wide screens don't leave it hugging one edge; the
+            // two-slot hint state stays right-hand where Fit and More always sit.
+            x: root.entries.length >= 4
+               ? Math.round((barBody.width - width) / 2)
+               : barBody.width - width
 
             // Four slots divide the bar; the two-slot hint state keeps them at a fixed
             // width so Fit and More sit where they always sit rather than sprawling.
             readonly property real slotWidth: root.entries.length >= 4
-                                              ? Math.floor(barBody.width / root.entries.length)
+                                              ? Math.min(Math.floor(barBody.width / root.entries.length), 120)
                                               : Theme.androidMinTouchTarget + Theme.spacing2xl
 
             Repeater {
