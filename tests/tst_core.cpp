@@ -1415,7 +1415,8 @@ void CoreTest::textPresetsAreWellFormed()
         // Every slot names a catalogue preset that offers that slot, and none of them recolours
         // the fill (an animator fillColor would flatten a gradient or effect to a solid).
         const drift::TextAnimationSet &anim = preset.style.animation;
-        QVERIFY2(anim.in.isActive() && anim.out.isActive(), qPrintable(preset.id));
+        // Plain and Bold are deliberately static; everything else animates both ways.
+        QVERIFY2(anim.in.isActive() == anim.out.isActive(), qPrintable(preset.id));
         const auto check = [&](const drift::TextAnimationSlot &slot, drift::TextAnimSlotKind kind) {
             if (!slot.isActive())
                 return;
