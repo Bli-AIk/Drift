@@ -1622,7 +1622,10 @@ protected:
     // re-notify a selection it has nothing to do with.
     void notifyStabilizeStateChanged(const QString &clipId);
 
+    // Records the edit for undo. The timeline and selection refresh is left to finishEdit; an
+    // edit that does not call it calls settleUndoRefresh() instead.
     void pushProjectEdit(const drift::Project &before, const QString &text);
+    void settleUndoRefresh();
 
     // Lifts one effect, one audio effect, or the whole stack off a clip. Every copy and
     // save-as-preset entry point funnels through this, so all of them produce one payload shape.
@@ -2059,10 +2062,13 @@ protected:
     // Begun by a setter rather than a press (keyboard nudges); commits once the nudges stop.
     bool m_previewDragAuto = false;
     QTimer *m_previewAutoCommit = nullptr;
-    // Set while commitPreviewDrag pushes its undo step and finishes the edit. The push then skips
-    // the undo stack's full refresh, which finishEdit repeats anyway, and finishEdit skips
-    // selectionChanged when the drag left the selection on the same clip.
+    // Set while an edit pushes its own undo step: the undo stack's handler then leaves the
+    // timeline and selection refresh owed (m_undoRefreshOwed) for finishEdit to send, instead of
+    // sending it twice.
     bool m_quietUndoPush = false;
+    bool m_undoRefreshOwed = false;
+    // Set while commitPreviewDrag finishes a drag that left the selection on the same clip:
+    // finishEdit then skips selectionChanged.
     bool m_quietSelection = false;
     void emitPreviewFrame();
     void emitPreviewEdit(int trackIndex, int clipIndex, const QStringList &keys);

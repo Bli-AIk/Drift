@@ -636,12 +636,6 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
     m_mcpController = new McpController(this, this);
     connect(&m_undoStack, &QUndoStack::indexChanged, this, &AppController::undoStackChanged);
     connect(&m_undoStack, &QUndoStack::indexChanged, this, [this] {
-        // commitPreviewDrag's push: finishEdit follows with the refresh, and a drag touches
-        // neither the asset table nor the bin.
-        if (m_quietUndoPush) {
-            m_projectFile->setDirty(true);
-            return;
-        }
         // Undo/redo swaps the whole project, including the asset table the
         // media bin reads through; without this an undone removal leaves the
         // model with a stale row count.
@@ -656,12 +650,15 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
         normalizeSelection();
         reconcileSequenceTabs();
         m_projectFile->setDirty(true);
-        notifyTracksChanged();
         emit bookmarksChanged();
         emit workAreaChanged();
         emit m_projectFile->projectNameChanged();
-        notifySelectionChanged();
         emit m_projectFile->backgroundChanged();
+        // The timeline and selection refresh is the expensive part. An edit's own push leaves it
+        // to finishEdit, which sends it anyway; undo and redo send it here.
+        m_undoRefreshOwed = true;
+        if (!m_quietUndoPush)
+            settleUndoRefresh();
     });
 
     m_audioOutputDeviceId =
@@ -4734,6 +4731,7 @@ bool AppController::removeAsset(int assetIndex)
     // start now points at the wrong asset.
     setDraggingAssetIndex(-1);
     pushProjectEdit(before, tr("Media removed"));
+    settleUndoRefresh();
     return true;
 }
 
@@ -4774,6 +4772,7 @@ int AppController::removeAssets(const QStringList &assetIds)
 
     setDraggingAssetIndex(-1);
     pushProjectEdit(before, removed == 1 ? tr("Media removed") : tr("%n items removed", "", removed));
+    settleUndoRefresh();
     return removed;
 }
 
@@ -4895,6 +4894,7 @@ bool AppController::setAssetRotation(int assetIndex, int degrees)
         return false;
 
     pushProjectEdit(before, tr("Media rotated"));
+    settleUndoRefresh();
     return true;
 }
 
@@ -6168,7 +6168,23 @@ void AppController::pushProjectEdit(const drift::Project &before, const QString 
     m_durationCacheValid = false;
     if (m_mcpController->undoSuspended())
         return;
-    m_undoStack.push(new drift::ProjectSnapshotCommand(&m_project, before, m_project, text));
+    {
+        const QScopedValueRollback quietPush(m_quietUndoPush, true);
+        m_undoStack.push(new drift::ProjectSnapshotCommand(&m_project, before, m_project, text));
+    }
+    // Normally finishEdit settles it straight after; this catches an edit that never calls it.
+    if (m_undoRefreshOwed)
+        QTimer::singleShot(0, this, &AppController::settleUndoRefresh);
+}
+
+void AppController::settleUndoRefresh()
+{
+    if (!m_undoRefreshOwed)
+        return;
+    m_undoRefreshOwed = false;
+    normalizeSelection();
+    notifyTracksChanged();
+    notifySelectionChanged();
 }
 
 void AppController::finishEdit(const QString &message)
@@ -6203,6 +6219,7 @@ void AppController::finishEdit(const QString &message)
     // up, and it runs through here too.
     if (!m_beatAnalysis.isEmpty() && audioLayoutFingerprint() != m_beatAudioFingerprint)
         clearBeatAnalysis();
+    m_undoRefreshOwed = false;
     notifyTracksChanged();
     if (!m_quietSelection)
         notifySelectionChanged();

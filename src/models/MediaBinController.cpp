@@ -55,6 +55,7 @@ QString MediaBinController::createFolder(const QString &name, const QString &par
     const drift::Project before = m_app->m_project;
     const QString id = m_folderModel.createFolder(trimmed, parentId);
     m_app->pushProjectEdit(before, tr("Folder created"));
+    m_app->settleUndoRefresh();
     return id;
 }
 
@@ -73,6 +74,7 @@ bool MediaBinController::renameFolder(const QString &folderId, const QString &na
         return false;
 
     m_app->pushProjectEdit(before, tr("Folder renamed"));
+    m_app->settleUndoRefresh();
     return true;
 }
 
@@ -87,6 +89,7 @@ bool MediaBinController::moveFolder(const QString &folderId, const QString &newP
         return false;
 
     m_app->pushProjectEdit(before, tr("Folder moved"));
+    m_app->settleUndoRefresh();
     return true;
 }
 
@@ -107,6 +110,7 @@ bool MediaBinController::deleteFolder(const QString &folderId)
         setCurrentFolderId(parentId);
 
     m_app->pushProjectEdit(before, tr("Folder deleted"));
+    m_app->settleUndoRefresh();
     return true;
 }
 
@@ -124,6 +128,7 @@ bool MediaBinController::moveAssetToFolder(int assetIndex, const QString &folder
         return false;
 
     m_app->pushProjectEdit(before, tr("Media moved"));
+    m_app->settleUndoRefresh();
     return true;
 }
 
@@ -146,6 +151,7 @@ int MediaBinController::moveAssetsToFolder(const QStringList &assetIds, const QS
 
     m_app->pushProjectEdit(before,
                            moved == 1 ? tr("Media moved") : tr("%n items moved", "", moved));
+    m_app->settleUndoRefresh();
     return moved;
 }
 
@@ -571,6 +577,7 @@ bool MediaBinController::saveEdit(int assetIndex, double inSeconds, double outSe
             return true;
         }
         m_app->pushProjectEdit(before, tr("Media trimmed"));
+        m_app->settleUndoRefresh();
         m_app->setLastMessage(tr("Trim saved"));
         emit editFinished(true, tr("Trim saved"));
         return true;
