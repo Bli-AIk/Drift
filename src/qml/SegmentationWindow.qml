@@ -9,7 +9,7 @@ import "components"
 //
 // SAM2 is prompted and cuts out anything; RVM finds people on its own and has nothing to click, so
 // the prompt overlay is bound to segmentBackendUsesPoints rather than shown unconditionally.
-Window {
+ToolWindow {
     id: root
 
     property int trackIndex: -1

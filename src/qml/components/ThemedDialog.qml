@@ -33,10 +33,13 @@ Dialog {
     readonly property real safeBottom: _safeMargins ? _safeMargins.bottom : 0
     readonly property real safeLeft: _safeMargins ? _safeMargins.left : 0
     readonly property real safeRight: _safeMargins ? _safeMargins.right : 0
+    // The soft keyboard covers the bottom of the window but is not a system bar, so SafeArea
+    // does not report it; whichever is taller is what the dialog has to stay clear of.
+    readonly property real clearBottom: Math.max(safeBottom, Theme.keyboardInset)
     readonly property real safeWidth: Math.max(
         0, (Overlay.overlay ? Overlay.overlay.width : preferredWidth) - safeLeft - safeRight)
     readonly property real safeHeight: Math.max(
-        0, (Overlay.overlay ? Overlay.overlay.height : 720) - safeTop - safeBottom)
+        0, (Overlay.overlay ? Overlay.overlay.height : 720) - safeTop - clearBottom)
 
     modal: true
     // A popup positions itself relative to the item it is declared in, so a dialog owned by
@@ -49,10 +52,16 @@ Dialog {
     // whichever bar was the taller.
     x: Math.round(root.safeLeft + (root.safeWidth - width) / 2)
     y: Math.round(root.safeTop + (root.safeHeight - height) / 2)
+
+    Behavior on y {
+        enabled: root.opened
+        NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+    }
     standardButtons: Dialog.NoButton
     padding: Theme.spacing2xl
 
-    width: Math.min(preferredWidth, root.safeWidth - Theme.dialogMargin)
+    width: Theme.compact ? root.safeWidth - Theme.dialogMargin
+                         : Math.min(preferredWidth, root.safeWidth - Theme.dialogMargin)
 
     // Height was never clamped, only width. A tall dialog centered in the overlay
     // therefore overflowed both edges, and since the footer is the last thing laid

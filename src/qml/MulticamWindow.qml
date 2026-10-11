@@ -8,7 +8,7 @@ import "components"
 //
 // This window holds no state of its own. Playhead, transport and the staged program all bind
 // onto the EditorState singleton the main window uses.
-Window {
+ToolWindow {
     id: root
 
     width: 1180

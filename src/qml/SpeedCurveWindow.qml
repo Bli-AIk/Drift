@@ -12,7 +12,7 @@ import "components"
 //
 // A window rather than a dialog so the timeline stays visible, matching SegmentationWindow and
 // DenoiseWindow.
-Window {
+ToolWindow {
     id: root
 
     property int trackIndex: -1

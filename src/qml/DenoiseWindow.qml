@@ -7,7 +7,7 @@ import "components"
 // Audition surface for noise removal. Opened for one clip: a short window of it is run through the
 // model, the original and the result are compared side by side, and only then is the whole clip
 // rendered. A window rather than a dialog so the timeline stays visible, matching SegmentationWindow.
-Window {
+ToolWindow {
     id: root
 
     property int trackIndex: -1

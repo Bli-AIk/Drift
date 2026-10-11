@@ -23,6 +23,17 @@ ApplicationWindow {
     // from whichever root is live. Screen is the wrong source: it ignores tiling and split view.
     onWidthChanged: Theme.windowWidth = width
 
+    Binding {
+        target: Theme
+        property: "keyboardInset"
+        value: {
+            if (Qt.platform.os !== "android" && Qt.platform.os !== "ios")
+                return 0
+            const r = Qt.inputMethod.keyboardRectangle
+            return Qt.inputMethod.visible && r.height > 0 ? Math.max(0, window.height - r.y) : 0
+        }
+    }
+
     // Qt creates some chrome itself — most visibly the Undo/Cut/Copy/Paste menu on every
     // TextField and TextArea (Basic/TextField.qml declares ContextMenu.menu). Drift styles
     // none of that, so it fell through to the palette the platform theme supplies and picked
@@ -603,9 +614,8 @@ ApplicationWindow {
     LazyLoader { id: subtitleProgressDialogLoader; sourceComponent: Component { SubtitleProgressDialog { } } }
     LazyLoader { id: reverseProgressDialogLoader; sourceComponent: Component { ReverseProgressDialog { } } }
 
-    // Long-running clip tools. These are top-level Windows on desktop; on Android the
-    // platform gives each one the whole screen, so they read as full-screen pages that
-    // the system Back key dismisses (see the Back shortcut above).
+    // Long-running clip tools. ToolWindow hosts each as a full-screen popup in this window,
+    // so they read as pages that the system Back key dismisses (see the Back shortcut above).
     LazyLoader { id: segmentationWindowLoader; sourceComponent: Component { SegmentationWindow { } } }
     LazyLoader { id: denoiseWindowLoader; sourceComponent: Component { DenoiseWindow { } } }
     LazyLoader { id: speedCurveWindowLoader; sourceComponent: Component { SpeedCurveWindow { } } }

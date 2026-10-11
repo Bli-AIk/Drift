@@ -7,7 +7,7 @@ import "components"
 // Compression removal and upscaling for one clip's used range, or a whole bin video. One frame can
 // be previewed first, original and enhanced split by a draggable divider under a shared zoom; the
 // full run adds the result to the media bin as a new item and leaves the source alone.
-Window {
+ToolWindow {
     id: root
 
     // The main window, for its addon manager.

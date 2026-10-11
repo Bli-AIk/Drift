@@ -1330,6 +1330,7 @@ qt_add_qml_module(drift
         src/qml/components/VfrWarning.qml
         src/qml/components/ThemedLabel.qml
         src/qml/components/ThemedDialog.qml
+        src/qml/components/ToolWindow.qml
         src/qml/components/LazyLoader.qml
         src/qml/components/AndroidLifecycle.qml
         src/qml/components/AddonManagerDialog.qml

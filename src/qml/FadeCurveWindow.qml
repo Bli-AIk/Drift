@@ -7,7 +7,7 @@ import "components"
 // Two modes share it: "fade" edits a clip's edge-fade gain (silent at the bottom, full at the
 // top) and "transition" edits a transition's progress curve. The geometry is identical, only the
 // session it drives differs, so the editor is parameterised rather than duplicated.
-Window {
+ToolWindow {
     id: root
 
     property int trackIndex: -1

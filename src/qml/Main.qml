@@ -447,6 +447,17 @@ ApplicationWindow {
         Theme.windowWidth = width
         geometrySettleTimer.restart()
     }
+
+    Binding {
+        target: Theme
+        property: "keyboardInset"
+        value: {
+            if (Qt.platform.os !== "android" && Qt.platform.os !== "ios")
+                return 0
+            const r = Qt.inputMethod.keyboardRectangle
+            return Qt.inputMethod.visible && r.height > 0 ? Math.max(0, window.height - r.y) : 0
+        }
+    }
     onHeightChanged: geometrySettleTimer.restart()
 
     // System-bar and cutout insets. Desktop windows have none, so this stays 0 there.

@@ -37,6 +37,8 @@ Popup {
     closePolicy: Popup.CloseOnEscape
     parent: Overlay.overlay
     width: Overlay.overlay ? Overlay.overlay.width : 0
+    // Stays the full overlay height: the keyboard moves the panel, not this popup, so its
+    // appearing never reads as a resize to the re-snap in onHeightChanged.
     height: Overlay.overlay ? Overlay.overlay.height : 0
     x: 0
     y: 0
@@ -52,12 +54,23 @@ Popup {
     readonly property real safeLeft: sheetRoot.SafeArea.margins.left
     readonly property real safeRight: sheetRoot.SafeArea.margins.right
 
+    // The keyboard covers the gesture bar, so while it is up it replaces that inset rather
+    // than adding to it. Lift is animated so the panel rides up with the keyboard.
+    readonly property real keyboardInset: Theme.keyboardInset
+    property real _lift: keyboardInset
+    Behavior on _lift {
+        NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+    }
+    // Room above the keyboard that the panel may occupy.
+    readonly property real usableHeight: Math.max(0, height - keyboardInset)
+
     readonly property real collapsedHeight: Math.round(height * sheetHeightFraction)
     // 92% of the screen clears the status bar on a plain device but not one with a
     // cutout, where the sheet header slid underneath it. Clamped against the real inset.
     readonly property real expandedHeight:
         Math.round(Math.min(height * sheetExpandedFraction,
-                            height - safeTop - Theme.spacingLg))
+                            height - safeTop - Theme.spacingLg,
+                            usableHeight - Theme.spacingLg))
     readonly property real dismissHeight: Math.round(height * Theme.androidSheetDismissFraction)
 
     // Source of truth for panel height (drag + snap both write here).
@@ -216,6 +229,7 @@ Popup {
         expanded = false
         _dragging = false
         steppedAside = false
+        _detentBeforeKeyboard = null
         heightAnimation.stop()
         closeAnimation.stop()
         // From zero, not straight to the resting height: the sheet has to be seen to
@@ -223,6 +237,37 @@ Popup {
         // timeline with no hint of where it came from or how to put it back.
         panelHeight = 0
         animateTo(collapsedHeight)
+    }
+
+    // The panel's resting detent from before the keyboard came up, null while it is not up.
+    property var _detentBeforeKeyboard: null
+
+    // The panel sits above the keyboard, so a field in a collapsed sheet would be a sliver
+    // of room; take the expanded detent while typing and put it back afterwards.
+    onKeyboardInsetChanged: {
+        if (!opened)
+            return
+        if (keyboardInset > 0) {
+            const item = root.contentItem && root.contentItem.Window.window
+                         ? root.contentItem.Window.window.activeFocusItem : null
+            let inside = false
+            for (let p = item; p; p = p.parent) {
+                if (p === contentHost) {
+                    inside = true
+                    break
+                }
+            }
+            if (inside && root._detentBeforeKeyboard === null) {
+                root._detentBeforeKeyboard = root.expanded
+                if (!root.expanded)
+                    root.expand()
+            }
+        } else if (root._detentBeforeKeyboard !== null) {
+            const wasExpanded = root._detentBeforeKeyboard
+            root._detentBeforeKeyboard = null
+            if (!wasExpanded && root.expanded)
+                root.collapse()
+        }
     }
 
     onHeightChanged: {
@@ -374,7 +419,8 @@ Popup {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            height: root.panelHeight
+            anchors.bottomMargin: root._lift
+            height: Math.min(root.panelHeight, root.usableHeight)
             color: Theme.panelBackground
             radius: Theme.radiusMd
 
@@ -511,7 +557,7 @@ Popup {
                 anchors.bottom: parent.bottom
                 // The sheet is anchored to the screen edge, so its last row and its
                 // side edges sit under the gesture bar and any landscape cutout.
-                anchors.bottomMargin: root.safeBottom
+                anchors.bottomMargin: root.keyboardInset > 0 ? 0 : root.safeBottom
                 anchors.leftMargin: root.safeLeft
                 anchors.rightMargin: root.safeRight
                 clip: true

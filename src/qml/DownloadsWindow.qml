@@ -12,7 +12,7 @@ import "components"
 //
 // History is session-only by design. The files themselves land in the media bin and in the
 // folder the user picked, so the list is a progress view, not a record to preserve.
-Window {
+ToolWindow {
     id: root
 
     width: 620
