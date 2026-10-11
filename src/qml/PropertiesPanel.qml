@@ -130,7 +130,7 @@ PanelFrame {
         { id: "effects", label: qsTr("Effects"), icon: Theme.icons.wand, group: 2,
           needs: ["adj:videoEffects"], opens: "adj:videoEffects", keyframes: true },
         { id: "audioEffects", label: qsTr("Audio FX"), icon: Theme.icons.audioLines, group: 2,
-          needs: ["adj:audioEffects"], opens: "adj:audioEffects" },
+          needs: ["adj:audioEffects"], opens: "adj:audioEffects", keyframes: true },
         { id: "transition", label: qsTr("Transition"), icon: Theme.icons.chevronsRight, group: 2,
           needs: ["transitionable"] }
     ]

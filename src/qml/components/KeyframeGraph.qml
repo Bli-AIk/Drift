@@ -30,19 +30,27 @@ Item {
         return EditorState.selectedClipData
     }
 
-    // Effect parameters are addressed as "fx.<effectIndex>.<paramKey>"; the label, range and
-    // color all come from the effect's own param spec on the selected clip.
+    // Effect parameters are addressed as "fx.<effectIndex>.<paramKey>", and audio effect ones as
+    // "afx.<effectIndex>.<paramKey>"; the label, range and color all come from the effect's own
+    // param spec on the selected clip.
     function effectParam(id) {
-        if (!clip || !clip.effects || id.substring(0, 3) !== "fx.")
+        if (!clip)
             return null
-        const dot = id.indexOf(".", 3)
+        const audio = id.substring(0, 4) === "afx."
+        if (!audio && id.substring(0, 3) !== "fx.")
+            return null
+        const stack = audio ? clip.audioEffects : clip.effects
+        const start = audio ? 4 : 3
+        if (!stack)
+            return null
+        const dot = id.indexOf(".", start)
         if (dot < 0)
             return null
-        const effectIndex = parseInt(id.substring(3, dot))
+        const effectIndex = parseInt(id.substring(start, dot))
         const key = id.substring(dot + 1)
-        if (isNaN(effectIndex) || effectIndex < 0 || effectIndex >= clip.effects.length)
+        if (isNaN(effectIndex) || effectIndex < 0 || effectIndex >= stack.length)
             return null
-        const effect = clip.effects[effectIndex]
+        const effect = stack[effectIndex]
         const params = effect.params || []
         for (let i = 0; i < params.length; ++i) {
             if (params[i].key === key)
@@ -110,7 +118,7 @@ Item {
             return fx.param.label.substring(0, 3)
         return id
     }
-    // Volume only exists on clips that carry audio; the rest are visual.
+    // Volume and audio effects only exist on clips that carry audio; the rest are visual.
     function supportsProperty(id) {
         if (!clip)
             return false
@@ -118,6 +126,8 @@ Item {
             return clip.kind === "audio" || clip.kind === "video"
         if (id.substring(0, 3) === "fx.")
             return clip.kind !== "audio" && effectParam(id) !== null
+        if (id.substring(0, 4) === "afx.")
+            return effectParam(id) !== null
         // A mask lives on the clip's lane, so the strip offers it for the same clips the Masks
         // tab does. There is no per-id validation to do: the id set is fixed and closed.
         if (id.substring(0, 5) === "mask.")
