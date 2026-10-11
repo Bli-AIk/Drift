@@ -140,6 +140,12 @@ public:
     // Id of the text clip currently edited in place on the preview; that clip is
     // omitted from the composited frame so the QML inline editor stands in for it.
     void setEditingClipId(const QString &id);
+    // The inline text editor's caret, selection and preedit; an empty clipId clears it. The edited
+    // clip's text itself reaches the compositor through the project like any edit; a caller that is
+    // about to notifyProjectEdited() anyway passes refresh = false to render once.
+    // The preview's current render scale (canvas px per project px), for layouts that must match it.
+    double previewRenderScale() const { return playbackRenderOptions().previewScale; }
+    void setTextEditDecor(const FrameCompositor::RenderOptions::TextEditDecor &decor, bool refresh = true);
     // The preview's 3D mode and its free viewpoint; inactive renders the camera's picture.
     void setEditorView(const FrameCompositor::RenderOptions::EditorView &view);
     // The panel's size in device px, as the preview last reported it.
@@ -255,6 +261,7 @@ private:
     drift::ClipAudioRetimer m_rateRetimer;
     std::atomic<quint64> m_audioStreamGeneration{1};
     QString m_editingClipId;
+    FrameCompositor::RenderOptions::TextEditDecor m_textEditDecor;
     FrameCompositor::RenderOptions::EditorView m_editorView;
     int m_previewRenderWidth = 0;
     int m_previewRenderHeight = 0;

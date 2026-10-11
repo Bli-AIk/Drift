@@ -31,6 +31,7 @@
 #include <QPair>
 #include <QSet>
 #include <QStringList>
+#include <QTransform>
 #include <QUndoStack>
 #include <QUrl>
 #include <QVariantList>
@@ -800,6 +801,32 @@ public:
     Q_INVOKABLE void beginTextEdit(int trackIndex, int clipIndex);
     Q_INVOKABLE void endTextEdit();
     bool inlineTextEditing() const { return m_inlineTextEditing; }
+
+    // In-place editing where the compositor's render is the only visible text. A hidden QML
+    // TextEdit feeds the keyboard and the input method; every change re-renders the clip live with
+    // a caret, a selection and a preedit underline drawn over it. The clip stays visible and rests
+    // (no in/out/loop animation). One undo step covers the whole edit.
+    //
+    // Offsets are UTF-16 into the model text, the editor's own, which never holds the preedit; the
+    // preedit is inserted at `cursor` for rendering only.
+    Q_INVOKABLE void beginInlineTextEdit(int trackIndex, int clipIndex);
+    Q_INVOKABLE void updateInlineTextEdit(int trackIndex, int clipIndex, const QString &text, int cursor,
+                                          int selStart, int selEnd, const QString &preeditText);
+    // commit: one undo step (no step when nothing changed); otherwise the original text returns.
+    Q_INVOKABLE void endInlineTextEdit(bool commit);
+    // Geometry in canvas (project pixel) coordinates, rotation included. A quad is four points,
+    // top-left, top-right, bottom-right, bottom-left of the clip's unrotated box, then rotated.
+    // The caret's quad is the bar as drawn. Empty when no inline edit is active.
+    Q_INVOKABLE QVariantList inlineCaretQuad() const;
+    Q_INVOKABLE QVariantList inlineSelectionQuads() const;
+    // Canvas point -> model offset (the nearest caret stop; never inside the preedit).
+    Q_INVOKABLE int inlineHitTest(const QPointF &canvasPoint) const;
+    // {start, end} around the model offset.
+    Q_INVOKABLE QVariantMap inlineWordAt(int pos) const;
+    // Up/Down: remembers the column across consecutive moves.
+    Q_INVOKABLE int inlineMoveCaretLines(int pos, int deltaLines);
+    // Home/End of the line holding pos.
+    Q_INVOKABLE int inlineLineEdge(int pos, bool toEnd) const;
     Q_INVOKABLE void setSubtitleCues(int trackIndex, int clipIndex, const QVariantList &cues);
     Q_INVOKABLE void previewSetSubtitleCues(int trackIndex, int clipIndex, const QVariantList &cues);
     Q_INVOKABLE double subtitleLocalPlayheadSeconds(int trackIndex, int clipIndex) const;
@@ -1450,6 +1477,8 @@ signals:
     // editor so the user can type straight onto the canvas.
     void inlineTextEditRequested(int trackIndex, int clipIndex);
     void inlineTextEditingChanged();
+    // The inline editor's text was laid out again: caret and selection geometry moved.
+    void inlineEditGeometryChanged();
     void externalProjectOpenRequested(const QUrl &url);
     void tracksChanged();
     // A drag wrote these properties in place without announcing tracksChanged; the full refresh
@@ -1990,6 +2019,28 @@ protected:
     QString m_lastMessage;
     QString m_lastMessageSeverity = QStringLiteral("info");
     bool m_inlineTextEditing = false;
+    struct InlineTextEdit
+    {
+        bool active = false;
+        int track = -1;
+        int clip = -1;
+        QString clipId;
+        QString original;
+        QString text;   // model text, no preedit
+        int cursor = 0;
+        int selStart = -1;
+        int selEnd = -1;
+        QString preedit;
+        double preferredX = 0.0;
+        int preferredFor = -1;
+    };
+    InlineTextEdit m_inlineEdit;
+    drift::Clip *inlineEditClip();
+    const drift::Clip *inlineEditClip() const;
+    // The clip's laid-out block, and block-local render px -> canvas project px.
+    bool inlineEditLayout(FrameCompositor::TextEditGeometry *geometry, QTransform *toCanvas, double *scale) const;
+    int inlineRenderedPos(int modelPos) const;
+    int inlineModelPos(int renderedPos) const;
     bool m_previewDragActive = false;
     drift::Clip *textClipAt(int trackIndex, int clipIndex);
     // A text, subtitle or shape clip: anything that carries a shading stack.

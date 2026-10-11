@@ -1048,6 +1048,17 @@ void fillGpuLayerMasks(GpuLayer &layer, const drift::Clip &host,
 // `laneMasks` is the whole mask stack the clip's track contributes at this instant. Masks live on
 // the track's lanes rather than on the clip, so one spanning a cut reaches both clips and each
 // rasterizes it in its own frame space.
+#ifdef DRIFT_WITH_SKIA
+std::shared_ptr<const drift::text::FragmentSet> textFragments(const drift::TextStyle &style, const QString &text,
+                                                              const QRectF &layoutRect, double renderScale,
+                                                              int activeWordIndex)
+{
+    const drift::ResolvedTextAnimation anim = drift::resolveTextAnimation(style.animation);
+    return drift::text::fragmentsFor(text, style, layoutRect.width(), layoutRect.height(), renderScale,
+                                     activeWordIndex, drift::text::splitFor(anim.resolved, style));
+}
+#endif
+
 // The pixels of a text block at this instant: the layout's fragments, the animator engine's
 // frame for them and the Skia painter. Returns the destination rect (layout rect grown by the
 // bleed) and the whole-block motion that rides on the layer; the layer is left without pixels
@@ -1055,22 +1066,25 @@ void fillGpuLayerMasks(GpuLayer &layer, const drift::Clip &host,
 QRectF fillTextLayer(GpuLayer &layer, const drift::TextStyle &style, const QString &text,
                      const QRectF &layoutRect, double renderScale, int activeWordIndex,
                      drift::TimeUs windowStartUs, drift::TimeUs windowDurationUs, drift::TimeUs timelineUs,
-                     drift::textanim::BlockProps *block)
+                     drift::textanim::BlockProps *block, bool atRest = false)
 {
     *block = drift::textanim::BlockProps{};
 #ifdef DRIFT_WITH_SKIA
     const drift::ResolvedTextAnimation anim = drift::resolveTextAnimation(style.animation);
     drift::skia::TextPaintRequest request;
     request.style = style;
-    request.set = drift::text::fragmentsFor(text, style, layoutRect.width(), layoutRect.height(), renderScale,
-                                            activeWordIndex, drift::text::splitFor(anim.resolved, style));
+    request.set = textFragments(style, text, layoutRect, renderScale, activeWordIndex);
     if (!request.set || request.set->frags.isEmpty())
         return {};
-    const drift::textanim::EvalContext ctx = drift::text::evalContextFor(
-        style, layoutRect, renderScale, windowStartUs, windowDurationUs, timelineUs, activeWordIndex);
-    request.frame = drift::textanim::evaluateTextAnimation(anim.set, anim.resolved, request.set->infos,
-                                                           request.set->domains, ctx);
-    request.envelope = drift::textanim::animationBounds(anim.resolved, ctx);
+    // The inline editor shows the text as it will rest: the default frame is the identity, with
+    // nothing hidden, wiped or typed out. Keyframed style properties were resolved by the caller.
+    if (!atRest) {
+        const drift::textanim::EvalContext ctx = drift::text::evalContextFor(
+            style, layoutRect, renderScale, windowStartUs, windowDurationUs, timelineUs, activeWordIndex);
+        request.frame = drift::textanim::evaluateTextAnimation(anim.set, anim.resolved, request.set->infos,
+                                                               request.set->domains, ctx);
+        request.envelope = drift::textanim::animationBounds(anim.resolved, ctx);
+    }
     request.layoutRect = layoutRect;
     request.renderScale = renderScale;
     request.timeSec = drift::usToSeconds(qMax<drift::TimeUs>(0, timelineUs - windowStartUs));
@@ -1113,6 +1127,19 @@ void applyTextBlockMotion(GpuLayer &layer, const drift::textanim::BlockProps &bl
     }
 }
 
+// A layer that draws nothing, holding a place for the editor's decorations on empty text.
+class BlankPainter final : public drift::skia::VectorPainter
+{
+public:
+    explicit BlankPainter(QSize size) : m_size(size) {}
+    QSize size() const override { return m_size; }
+    quint64 cacheKey() const override { return 1; }
+    void paint(SkCanvas &) const override {}
+
+private:
+    QSize m_size;
+};
+
 GpuScene buildGpuScene(const drift::Project &project, drift::TimeUs timelineUs, int width, int height,
                        double renderScale, const FrameCompositor::RenderOptions &options,
                        bool nested = false);
@@ -1122,7 +1149,8 @@ GpuLayer buildGpuLayer(const drift::Project &project, const drift::Clip &clip,
                        int projectHeight, double renderScale, int canvasWidth, int canvasHeight,
                        int projectFps, int maxTimeEchoHistoryFrames,
                        const QList<drift::Effect> &laneEffects = {},
-                       const QList<drift::LaneMask> &laneMasks = {})
+                       const QList<drift::LaneMask> &laneMasks = {},
+                       bool editingText = false)
 {
     GpuLayer layer;
 
@@ -1174,10 +1202,18 @@ GpuLayer buildGpuLayer(const drift::Project &project, const drift::Clip &clip,
         // The painter's image carries a bleed margin for the strokes, shadows, box and the
         // animation envelope, so its destination rect is wider than the layout rect.
         drift::textanim::BlockProps block;
-        const QRectF rasterRect =
-            fillTextLayer(layer, textClip->textStyle, clip.textContent.isEmpty() ? clip.name : clip.textContent,
-                          layoutRect, renderScale, karaokeWordIndex(clip, timelineUs), clip.timelineStart,
-                          clip.timelineDuration, timelineUs, &block);
+        // Being edited, the text is what the editor holds, empty or not: the clip name is only
+        // the stand-in for a clip that has never had text.
+        QRectF rasterRect =
+            fillTextLayer(layer, textClip->textStyle,
+                          editingText || !clip.textContent.isEmpty() ? clip.textContent : clip.name, layoutRect,
+                          renderScale, karaokeWordIndex(clip, timelineUs), clip.timelineStart,
+                          clip.timelineDuration, timelineUs, &block, editingText);
+        if (editingText && !layer.hasPixels()) {
+            // Empty or blank text paints nothing, but the layer must exist for the caret's.
+            layer.vector = std::make_shared<BlankPainter>(QSize(layoutW, layoutH));
+            rasterRect = layoutRect;
+        }
         layer.effects = resolvedClipEffects(clip, clipTimeUs);
         destRect = rasterRect;
         applyTextBlockMotion(layer, block, &destRect, &opacity, &rotation);
@@ -1277,7 +1313,8 @@ GpuLayer buildGpuLayer(const drift::Project &project, const drift::Clip &clip,
     if (!layer.hasPixels())
         return layer;
 
-    applyClipBodyAnimation(clip, timelineUs, w, h, &destRect, &opacity, &rotation);
+    if (!editingText)
+        applyClipBodyAnimation(clip, timelineUs, w, h, &destRect, &opacity, &rotation);
 
     fillGpuLayerMasks(layer, clip, laneMasks, timelineUs, canvasWidth, canvasHeight);
     layer.rect = destRect;
@@ -1306,6 +1343,57 @@ GpuLayer buildGpuLayer(const drift::Project &project, const drift::Clip &clip,
     layer.depth = depthFrameForClip(clip, layer.effects, timelineUs);
     layer.valid = true;
     return layer;
+}
+
+// The editor's caret, selection and preedit underline as a layer of their own, placed exactly
+// where the text layer is but with none of its effects, masks or fades: a blurred or glowing clip
+// still gets a crisp caret. It follows the text layer's transform, parent and camera by copying
+// them; only the rect differs, because the decorations have their own bleed.
+void appendTextEditDecor(GpuScene &scene, const GpuItem &textItem, const drift::Clip &clip,
+                         const FrameCompositor::RenderOptions::TextEditDecor &edit, drift::TimeUs timelineUs,
+                         int projectWidth, int projectHeight, double renderScale)
+{
+#ifdef DRIFT_WITH_SKIA
+    const FrameCompositor::TextEditGeometry geometry = FrameCompositor::textEditGeometry(
+        clip, clip.textContent, timelineUs, projectWidth, projectHeight, renderScale);
+    drift::skia::TextEditPaintRequest request;
+    request.set = geometry.set;
+    request.layoutRect = geometry.layoutRect;
+    request.renderScale = renderScale;
+    request.cursor = edit.cursor;
+    request.selStart = edit.selStart;
+    request.selEnd = edit.selEnd;
+    request.preeditStart = edit.preeditStart;
+    request.preeditLength = edit.preeditLength;
+    request.caretColor = edit.caretColor;
+    request.selectionColor = edit.selectionColor;
+    const drift::skia::TextPainterResult painted = drift::skia::makeTextEditPainter(request);
+    if (!painted.painter)
+        return;
+
+    GpuItem item = textItem;
+    GpuLayer &layer = item.layer;
+    layer.vector = painted.painter;
+    layer.source = QImage();
+    layer.effects.clear();
+    layer.masks.clear();
+    layer.maskMedia.clear();
+    layer.fgr = {};
+    layer.faceSlots.clear();
+    layer.depth.reset();
+    layer.depthOcclude = false;
+    layer.emitDepthCanvas = false;
+    layer.occluderItem = -1;
+    layer.opacity = 1.0;
+    item.blend = drift::BlendMode::Normal;
+    QRectF rect = painted.rect;
+    rect.moveCenter(textItem.layer.rect.center());
+    layer.rect = rect;
+    scene.items.append(item);
+#else
+    Q_UNUSED(scene); Q_UNUSED(textItem); Q_UNUSED(clip); Q_UNUSED(edit); Q_UNUSED(timelineUs);
+    Q_UNUSED(projectWidth); Q_UNUSED(projectHeight); Q_UNUSED(renderScale);
+#endif
 }
 
 // `nested` builds a composite's timeline: its layer sits on the parent's canvas, so the project
@@ -1543,12 +1631,14 @@ GpuScene buildGpuScene(const drift::Project &project, drift::TimeUs timelineUs, 
                 continue;
             }
 
+            const bool editingText = !nested && clip.type == drift::ClipType::Text && options.textEdit.active()
+                                     && options.textEdit.clipId == clip.id;
             GpuItem item;
             item.blend = clip.blendMode;
             item.layer = buildGpuLayer(project, clip, timelineUs, projectWidth, projectHeight, renderScale, width,
                                        height, fps, options.maxTimeEchoHistoryFrames,
                                        laneAdjustmentEffects(project, ti, timelineUs, clip.id),
-                                       drift::laneMasksAt(project, ti, timelineUs, clip.id));
+                                       drift::laneMasksAt(project, ti, timelineUs, clip.id), editingText);
             if (!item.layer.valid)
                 continue;
             applyParent(item.layer, ti);
@@ -1556,6 +1646,9 @@ GpuScene buildGpuScene(const drift::Project &project, drift::TimeUs timelineUs, 
             noteSelection(clip, item.layer);
             applyDepthOcclusion(project, scene, item.layer, nearestOccluder, occluders);
             scene.items.append(item);
+            if (editingText)
+                appendTextEditDecor(scene, item, clip, options.textEdit, timelineUs, projectWidth, projectHeight,
+                                    renderScale);
             if (clip.type == drift::ClipType::Video || clip.type == drift::ClipType::Image) {
                 nearestOccluder = {int(scene.items.size()) - 1,
                                    drift::loadDepthSidecarCached(clip.depthPath),
@@ -1571,6 +1664,29 @@ GpuScene buildGpuScene(const drift::Project &project, drift::TimeUs timelineUs, 
 }
 
 } // namespace
+
+FrameCompositor::TextEditGeometry FrameCompositor::textEditGeometry(const drift::Clip &clip,
+                                                                    const QString &renderedText,
+                                                                    drift::TimeUs timelineUs, int projectWidth,
+                                                                    int projectHeight, double renderScale)
+{
+    TextEditGeometry out;
+    double x = 0.0, y = 0.0, w = 0.0, h = 0.0;
+    layoutRectForClip(clip, timelineUs, projectWidth, projectHeight, renderScale, 1.0, &x, &y, &w, &h,
+                      &out.rotation);
+    out.layoutRect = QRectF(x, y, w, h);
+#ifdef DRIFT_WITH_SKIA
+    if (w <= 0.5 || h <= 0.5)
+        return out;
+    const drift::TextStyle style = clip.textStyle.isAnimated()
+                                       ? clip.textStyle.resolvedAt(timelineUs - clip.timelineStart)
+                                       : clip.textStyle;
+    out.set = textFragments(style, renderedText, out.layoutRect, renderScale, karaokeWordIndex(clip, timelineUs));
+#else
+    Q_UNUSED(renderedText);
+#endif
+    return out;
+}
 
 void FrameCompositor::clearStillImageCache()
 {

@@ -680,7 +680,103 @@ private:
     double m_strokeWidthPx = 0.0;
 };
 
+// Selection, preedit underline and caret over a laid-out block; see TextEditPaintRequest.
+class TextEditPainter final : public VectorPainter
+{
+public:
+    TextEditPainter(QSize size, double bleed, const TextEditPaintRequest &request, QList<QRectF> selection,
+                    QList<QRectF> preedit, QRectF caret, double emPx)
+        : m_size(size), m_bleed(bleed), m_request(request), m_selection(std::move(selection)),
+          m_preedit(std::move(preedit)), m_caret(caret), m_emPx(emPx)
+    {
+        m_request.set.reset();
+    }
+
+    QSize size() const override { return m_size; }
+    quint64 cacheKey() const override { return 0; }
+
+    void paint(SkCanvas &canvas) const override
+    {
+        canvas.translate(float(m_bleed), float(m_bleed));
+        const double scale = m_request.renderScale;
+        SkPaint paint;
+        paint.setAntiAlias(true);
+
+        QColor selectionColor = m_request.selectionColor;
+        if (!selectionColor.isValid())
+            selectionColor = QColor(0x3D, 0x7C, 0xFF, 89);
+        paint.setColor(toSkColor(selectionColor));
+        for (const QRectF &rect : m_selection)
+            canvas.drawRect(toSkRect(rect), paint);
+
+        QColor caretColor = m_request.caretColor.isValid() ? m_request.caretColor : QColor(Qt::white);
+        if (!m_preedit.isEmpty()) {
+            const double thickness = qMax(1.5, qMax(2.0 * scale, 0.04 * m_emPx) * 0.5);
+            paint.setColor(toSkColor(caretColor));
+            for (const QRectF &rect : m_preedit)
+                canvas.drawRect(toSkRect(QRectF(rect.left(), rect.bottom() - thickness * 2.0, rect.width(), thickness)),
+                                paint);
+        }
+
+        if (m_request.cursor >= 0 && m_caret.height() > 0.0) {
+            // Never thinner than a device pixel and a half, whatever the preview scale.
+            const double width = qMax(1.5, qMax(2.0 * scale, 0.06 * m_emPx));
+            const QRectF bar(m_caret.x() - width * 0.5, m_caret.y(), width, m_caret.height());
+            paint.setColor(SkColorSetARGB(160, 0, 0, 0));
+            canvas.drawRect(toSkRect(bar.adjusted(-1.0, -1.0, 1.0, 1.0)), paint);
+            paint.setColor(toSkColor(caretColor));
+            canvas.drawRect(toSkRect(bar), paint);
+        }
+    }
+
+private:
+    QSize m_size;
+    double m_bleed;
+    TextEditPaintRequest m_request;
+    QList<QRectF> m_selection;
+    QList<QRectF> m_preedit;
+    QRectF m_caret;
+    double m_emPx;
+};
+
 } // namespace
+
+TextPainterResult makeTextEditPainter(const TextEditPaintRequest &request)
+{
+    if (!request.set || !request.set->paragraph || request.layoutRect.width() < 1.0 || request.layoutRect.height() < 1.0)
+        return {};
+    const text::FragmentSet &set = *request.set;
+    QList<QRectF> selection;
+    if (request.selStart >= 0 && request.selEnd >= 0 && request.selStart != request.selEnd)
+        selection = text::selectionRects(set, request.selStart, request.selEnd);
+    QList<QRectF> preedit;
+    if (request.preeditStart >= 0 && request.preeditLength > 0)
+        preedit = text::selectionRects(set, request.preeditStart, request.preeditStart + request.preeditLength);
+    const QRectF caret = request.cursor >= 0 ? text::caretRect(set, request.cursor) : QRectF();
+
+    // The decorations may sit outside the layout rect (an overflowing line, a caret at its edge),
+    // so the image grows to hold them.
+    const QRectF box(0.0, 0.0, request.layoutRect.width(), request.layoutRect.height());
+    QRectF reach = box;
+    for (const QRectF &rect : selection)
+        reach = reach.united(rect);
+    for (const QRectF &rect : preedit)
+        reach = reach.united(rect);
+    if (!caret.isNull() || caret.height() > 0.0)
+        reach = reach.united(caret);
+    const double emPx = set.paragraph->emPx;
+    const double bleed = std::ceil(qMax(qMax(-reach.left(), reach.right() - box.width()),
+                                        qMax(-reach.top(), reach.bottom() - box.height()))
+                                   + qMax(2.0 * request.renderScale, 0.06 * emPx) + 3.0);
+    const int imageW = qMax(1, qRound(box.width() + bleed * 2.0));
+    const int imageH = qMax(1, qRound(box.height() + bleed * 2.0));
+
+    TextPainterResult result;
+    result.rect = QRectF(request.layoutRect.x() - bleed, request.layoutRect.y() - bleed, imageW, imageH);
+    result.painter = std::make_shared<TextEditPainter>(QSize(imageW, imageH), bleed, request, std::move(selection),
+                                                       std::move(preedit), caret, emPx);
+    return result;
+}
 
 TextPainterResult makeTextPainter(const TextPaintRequest &request)
 {

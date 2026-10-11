@@ -4,7 +4,9 @@
 #include "EditorView3d.h"
 #include "core/Project.h"
 #include "core/Time.h"
+#include "TextLayout.h"
 
+#include <QColor>
 #include <QHash>
 #include <QImage>
 #include <QString>
@@ -57,7 +59,41 @@ public:
             QSize target;
         };
         EditorView editor;
+
+        // The text clip being edited in place on the preview. It stays visible, at rest (no
+        // in/out/loop animation), with a caret, a selection and a preedit underline drawn over
+        // it by a separate layer that the clip's effects do not touch. Offsets are UTF-16 into
+        // the text as rendered, preedit included. Only the preview sets it; export never does.
+        struct TextEditDecor
+        {
+            QString clipId;
+            int cursor = -1;
+            int selStart = -1;
+            int selEnd = -1;
+            int preeditStart = -1;
+            int preeditLength = 0;
+            QColor caretColor;     // invalid = white
+            QColor selectionColor; // invalid = translucent blue
+
+            bool active() const { return !clipId.isEmpty(); }
+            bool operator==(const TextEditDecor &other) const = default;
+        };
+        TextEditDecor textEdit;
     };
+
+    // How a text clip is laid out at `timelineUs`, as the compositor will draw it: the layout rect
+    // (canvas px at renderScale, before any rotation about its centre) and the shaped block for
+    // `renderedText`. The inline editor maps its caret and selection geometry through this, so
+    // the two cannot disagree.
+    struct TextEditGeometry
+    {
+        std::shared_ptr<const drift::text::FragmentSet> set;
+        QRectF layoutRect;
+        double rotation = 0.0; // degrees clockwise about layoutRect.center()
+    };
+    static TextEditGeometry textEditGeometry(const drift::Clip &clip, const QString &renderedText,
+                                             drift::TimeUs timelineUs, int projectWidth, int projectHeight,
+                                             double renderScale);
 
     void setProject(const drift::Project *project) { m_project = project; }
     // Nested sequence views are built from the project and reused across composites of it. The

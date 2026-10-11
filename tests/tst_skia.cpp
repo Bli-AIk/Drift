@@ -307,6 +307,14 @@ private slots:
     void gradientOffsetShiftsColour();
     void wipeMaskRevealsBottomUp();
     void caretDrawsAfterLastVisibleFragment();
+    void inlineCaretIsMonotonicOnALatinLine();
+    void inlineCaretRunsRightToLeftInArabic();
+    void inlineCaretNeverStopsInsideASinhalaConjunct();
+    void inlineHitTestInvertsCaretRect();
+    void inlineCaretOnEmptyAndBlankLines();
+    void inlineSelectionSpansWrappedLines();
+    void inlineLineAndWordNavigation();
+    void inlineDecorRendersAndExportNeverCarriesIt();
     void arabicTextShapesRightToLeft();
     void layoutIsDeterministic();
     void textRangesRoundTripUtf16();
@@ -1720,6 +1728,243 @@ void SkiaTest::caretDrawsAfterLastVisibleFragment()
     const Ink off = inkOf(skiaTextAt(clip, text, layout, 1.0, 250000));
     const Ink offBare = inkOf(skiaTextAt(noCaret, text, layout, 1.0, 250000));
     QVERIFY2(qAbs(off.count - offBare.count) < 10, qPrintable(describe(offBare, off)));
+}
+
+namespace {
+
+std::shared_ptr<const text::FragmentSet> editSet(const QString &string, bool wrap, double width = 600.0,
+                                                 double height = 300.0, const QString &family = QString())
+{
+    TextStyle style = layoutTestStyle();
+    style.wordWrap = wrap;
+    style.align = TextAlign::Left;
+    style.valign = TextVAlign::Top;
+    if (!family.isEmpty())
+        style.fontFamily = family;
+    return text::fragmentsFor(string, style, width, height, 1.0, -1, text::WordSplit::Whole);
+}
+
+} // namespace
+
+void SkiaTest::inlineCaretIsMonotonicOnALatinLine()
+{
+    reloadFontCatalog({QString::fromUtf8(DRIFT_TEST_FONTS_DIR)});
+    SKIP_WITHOUT_FONTS();
+    const auto set = editSet(QStringLiteral("Hello world"), false);
+    QVERIFY(set && set->paragraph);
+    const QList<int> &stops = text::caretStops(*set);
+    QCOMPARE(stops.size(), 12);
+    double previous = -1.0;
+    for (const int stop : stops) {
+        const QRectF caret = text::caretRect(*set, stop);
+        QVERIFY2(caret.height() > 20.0, qPrintable(QString::number(stop)));
+        QVERIFY2(caret.x() > previous, qPrintable(QStringLiteral("stop %1 x %2 after %3").arg(stop).arg(caret.x()).arg(previous)));
+        previous = caret.x();
+    }
+    QVERIFY(qAbs(text::caretRect(*set, 0).x()) < 1.0);
+}
+
+void SkiaTest::inlineCaretRunsRightToLeftInArabic()
+{
+    const QStringList families = QFontDatabase::families(QFontDatabase::Arabic);
+    if (families.isEmpty())
+        QSKIP("no Arabic font installed");
+    const auto set = editSet(QString::fromUtf8("مرحبا بكم"), false, 900.0, 200.0, families.first());
+    QVERIFY(set && set->paragraph);
+    const QList<int> &stops = text::caretStops(*set);
+    QVERIFY(stops.size() > 3);
+    for (int i = 1; i < stops.size(); ++i) {
+        QVERIFY2(text::caretRect(*set, stops.at(i)).x() < text::caretRect(*set, stops.at(i - 1)).x() + 0.01,
+                 qPrintable(QStringLiteral("stop %1").arg(stops.at(i))));
+    }
+    QVERIFY(text::caretRect(*set, 0).x() > text::caretRect(*set, stops.last()).x() + 20.0);
+}
+
+void SkiaTest::inlineCaretNeverStopsInsideASinhalaConjunct()
+{
+    if (!hasScriptFont(QFontDatabase::Sinhala))
+        QSKIP("no Sinhala font installed");
+    const QString conjunct = QString::fromUtf8("ශ්‍රී");
+    const auto set = editSet(conjunct, false, 600.0, 200.0, QFontDatabase::families(QFontDatabase::Sinhala).first());
+    QVERIFY(set && set->paragraph);
+    QCOMPARE(text::caretStops(*set), (QList<int>{0, int(conjunct.size())}));
+    // Clicking anywhere across it lands on one end or the other.
+    const QRectF end = text::caretRect(*set, int(conjunct.size()));
+    for (double x = 0.0; x <= end.x(); x += end.x() / 8.0) {
+        const int pos = text::hitTest(*set, QPointF(x, end.center().y()));
+        QVERIFY2(pos == 0 || pos == conjunct.size(), qPrintable(QString::number(pos)));
+    }
+}
+
+void SkiaTest::inlineHitTestInvertsCaretRect()
+{
+    reloadFontCatalog({QString::fromUtf8(DRIFT_TEST_FONTS_DIR)});
+    SKIP_WITHOUT_FONTS();
+    const auto set = editSet(QStringLiteral("alpha beta gamma delta epsilon zeta"), true, 330.0, 300.0);
+    QVERIFY(set && set->paragraph);
+    QVERIFY(set->paragraph->lineStart.size() >= 2);
+    for (const int stop : text::caretStops(*set)) {
+        const QRectF caret = text::caretRect(*set, stop);
+        const QPointF centre(caret.x(), caret.center().y());
+        QCOMPARE(text::hitTest(*set, centre), stop);
+    }
+    // The start of a wrapped line is drawn on that line, not at the end of the one above.
+    const int wrapped = set->paragraph->lineStart.at(1);
+    QVERIFY(text::caretRect(*set, wrapped).y() > text::caretRect(*set, wrapped - 1).y() + 10.0);
+    // The end of the text belongs to the last line.
+    const int size = int(set->paragraph->text.size());
+    QCOMPARE(text::caretRect(*set, size).y(), set->paragraph->lineBaseline.last() - set->paragraph->lineAscent.last());
+    // Clicks above and below the block pick the first and the last line.
+    QCOMPARE(text::hitTest(*set, QPointF(0, -500)), 0);
+    QVERIFY(text::hitTest(*set, QPointF(5000, 5000)) >= wrapped);
+}
+
+void SkiaTest::inlineCaretOnEmptyAndBlankLines()
+{
+    reloadFontCatalog({QString::fromUtf8(DRIFT_TEST_FONTS_DIR)});
+    SKIP_WITHOUT_FONTS();
+    const auto empty = editSet(QString(), true);
+    QVERIFY(empty && empty->paragraph);
+    QVERIFY(empty->frags.isEmpty());
+    const QRectF emptyCaret = text::caretRect(*empty, 0);
+    QVERIFY(emptyCaret.height() > 20.0);
+    QVERIFY(qIsFinite(emptyCaret.x()) && qIsFinite(emptyCaret.y()));
+    QCOMPARE(text::hitTest(*empty, QPointF(10, 10)), 0);
+
+    const auto blank = editSet(QStringLiteral("  "), true);
+    QVERIFY(blank && blank->paragraph);
+    QVERIFY(blank->frags.isEmpty());
+    QVERIFY(text::caretRect(*blank, 1).x() > text::caretRect(*blank, 0).x());
+
+    // After a trailing newline, and between two newlines, the caret sits on a line of its own.
+    const auto trailing = editSet(QStringLiteral("ab\n"), true);
+    QCOMPARE(trailing->paragraph->lineStart.size(), 2);
+    QVERIFY(text::caretRect(*trailing, 3).y() > text::caretRect(*trailing, 0).y() + 10.0);
+    QVERIFY(qAbs(text::caretRect(*trailing, 3).x()) < 1.0);
+    const auto between = editSet(QStringLiteral("a\n\nb"), true);
+    QCOMPARE(between->paragraph->lineStart.size(), 3);
+    const double y0 = text::caretRect(*between, 0).y();
+    const double y1 = text::caretRect(*between, 2).y();
+    const double y2 = text::caretRect(*between, 3).y();
+    QVERIFY(y1 > y0 + 10.0 && y2 > y1 + 10.0);
+}
+
+void SkiaTest::inlineSelectionSpansWrappedLines()
+{
+    reloadFontCatalog({QString::fromUtf8(DRIFT_TEST_FONTS_DIR)});
+    SKIP_WITHOUT_FONTS();
+    const auto set = editSet(QStringLiteral("alpha beta gamma delta epsilon zeta"), true, 330.0, 300.0);
+    QVERIFY(set && set->paragraph && set->paragraph->lineStart.size() >= 2);
+    const int wrapped = set->paragraph->lineStart.at(1);
+    const QList<QRectF> across = text::selectionRects(*set, wrapped - 3, wrapped + 3);
+    QCOMPARE(across.size(), 2);
+    QVERIFY(across.at(1).y() > across.at(0).y() + 10.0);
+    QVERIFY(across.at(0).width() > 1.0 && across.at(1).width() > 1.0);
+    QCOMPARE(text::selectionRects(*set, 2, 5).size(), 1);
+    QVERIFY(text::selectionRects(*set, 4, 4).isEmpty());
+    // Reversed ends select the same span.
+    QCOMPARE(text::selectionRects(*set, wrapped + 3, wrapped - 3), across);
+}
+
+void SkiaTest::inlineLineAndWordNavigation()
+{
+    reloadFontCatalog({QString::fromUtf8(DRIFT_TEST_FONTS_DIR)});
+    SKIP_WITHOUT_FONTS();
+    const QString string = QString::fromUtf8("alpha \U0001F600 beta gamma delta epsilon zeta");
+    const auto set = editSet(string, true, 330.0, 300.0);
+    QVERIFY(set && set->paragraph && set->paragraph->lineStart.size() >= 2);
+    const text::ParagraphLayout &layout = *set->paragraph;
+
+    const std::pair<int, int> word = text::wordAt(*set, string.indexOf(QStringLiteral("beta")) + 1);
+    QCOMPARE(string.mid(word.first, word.second - word.first), QStringLiteral("beta"));
+    // Past the emoji (a surrogate pair) the offsets are still UTF-16.
+    const std::pair<int, int> gamma = text::wordAt(*set, string.indexOf(QStringLiteral("gamma")));
+    QCOMPARE(string.mid(gamma.first, gamma.second - gamma.first), QStringLiteral("gamma"));
+
+    QCOMPARE(text::lineEdge(*set, 2, false), 0);
+    const int lineEnd = text::lineEdge(*set, 2, true);
+    QCOMPARE(lineEnd, layout.lineVisibleEnd.at(0));
+    // End of a wrapped line stays on it.
+    QCOMPARE(text::caretRect(*set, lineEnd).y(), text::caretRect(*set, 0).y());
+    QCOMPARE(text::lineEdge(*set, int(string.size()), true), int(string.size()));
+    QCOMPARE(text::lineEdge(*set, layout.lineStart.at(1) + 1, false), layout.lineStart.at(1));
+
+    const int down = text::lineMoveCaret(*set, 3, 1);
+    QVERIFY(down >= layout.lineStart.at(1));
+    QVERIFY(qAbs(text::caretRect(*set, down).x() - text::caretRect(*set, 3).x()) < 40.0);
+    const int back = text::lineMoveCaret(*set, down, -1, text::caretRect(*set, 3).x());
+    QCOMPARE(back, 3);
+    QCOMPARE(text::lineMoveCaret(*set, 3, -1), 0);
+    QCOMPARE(text::lineMoveCaret(*set, 3, 99), int(string.size()));
+}
+
+// The decorations are a layer of their own over a clip that rests while it is edited; export
+// builds its options from scratch and so never carries them.
+void SkiaTest::inlineDecorRendersAndExportNeverCarriesIt()
+{
+    reloadFontCatalog({QString::fromUtf8(DRIFT_TEST_FONTS_DIR)});
+    SKIP_WITHOUT_FONTS();
+    QVERIFY(!FrameCompositor::RenderOptions{}.textEdit.active());
+    if (!GpuCompositor::isAvailable())
+        QSKIP("GL unavailable");
+
+    TextStyle style;
+    style.fontFamily = QStringLiteral("Inter");
+    style.pixelSize = 60;
+    style.align = TextAlign::Left;
+    style.animation.in = legacyTextAnimationSlot(QStringLiteral("typewriter"), 0, QStringLiteral("linear"),
+                                                 QStringLiteral("character"), 1000000, QStringLiteral("forward"));
+    Project project;
+    project.setResolution(400, 160);
+    project.tracks().clear();
+    project.tracks().append(Track{.type = TrackType::Text});
+    Clip clip;
+    clip.id = QStringLiteral("edited");
+    clip.type = ClipType::Text;
+    clip.textContent = QStringLiteral("Hello");
+    clip.textStyle = style;
+    clip.timelineStart = 0;
+    clip.timelineDuration = secondsToUs(3.0);
+    clip.transformX.setKeyframe(0, 0.0);
+    clip.transformY.setKeyframe(0, 0.0);
+    clip.transformW.setKeyframe(0, 400.0);
+    clip.transformH.setKeyframe(0, 160.0);
+    project.tracks()[0].clips.append(clip);
+    FrameCompositor compositor;
+    compositor.setProject(&project);
+
+    const auto bright = [](const QImage &image) {
+        int count = 0;
+        for (int y = 0; y < image.height(); ++y)
+            for (int x = 0; x < image.width(); ++x)
+                count += qRed(image.pixel(x, y)) > 150 ? 1 : 0;
+        return count;
+    };
+    // Mid-typewriter nothing has been typed yet; the edited clip rests, so the text is whole.
+    const QImage plain = compositor.compositeAt(0);
+    FrameCompositor::RenderOptions options;
+    options.textEdit.clipId = clip.id;
+    options.textEdit.cursor = 5;
+    const QImage resting = compositor.compositeAt(0, options);
+    QVERIFY(bright(resting) > bright(plain) + 200);
+
+    // A selection tints behind the word; the picture changes with the selection alone.
+    options.textEdit.selStart = 1;
+    options.textEdit.selEnd = 4;
+    options.textEdit.selectionColor = QColor(0, 0, 255, 160);
+    const QImage selected = compositor.compositeAt(0, options);
+    QVERIFY(selected != resting);
+
+    // The caret on empty text still draws.
+    project.tracks()[0].clips[0].textContent.clear();
+    project.tracks()[0].clips[0].name.clear();
+    compositor.clearNestedViewCache();
+    options.textEdit.selStart = options.textEdit.selEnd = -1;
+    options.textEdit.cursor = 0;
+    const QImage emptyPlain = compositor.compositeAt(0);
+    const QImage emptyCaret = compositor.compositeAt(0, options);
+    QVERIFY(emptyCaret != emptyPlain);
+    QVERIFY(bright(emptyCaret) > 10);
 }
 
 // Every SkSL effect compiles, and a shine layer renders as ink over its base.

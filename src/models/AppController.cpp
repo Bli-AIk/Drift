@@ -11011,6 +11011,265 @@ void AppController::endTextEdit()
     syncTextOverlaySkip();
 }
 
+drift::Clip *AppController::inlineEditClip()
+{
+    return const_cast<drift::Clip *>(std::as_const(*this).inlineEditClip());
+}
+
+const drift::Clip *AppController::inlineEditClip() const
+{
+    if (!m_inlineEdit.active)
+        return nullptr;
+    const auto &tracks = m_project.tracks();
+    if (m_inlineEdit.track >= 0 && m_inlineEdit.track < tracks.size()) {
+        const drift::Track &track = tracks.at(m_inlineEdit.track);
+        if (m_inlineEdit.clip >= 0 && m_inlineEdit.clip < track.clips.size()
+            && track.clips.at(m_inlineEdit.clip).id == m_inlineEdit.clipId)
+            return &track.clips.at(m_inlineEdit.clip);
+    }
+    return nullptr;
+}
+
+int AppController::inlineRenderedPos(int modelPos) const
+{
+    return modelPos >= m_inlineEdit.cursor ? modelPos + int(m_inlineEdit.preedit.size()) : modelPos;
+}
+
+int AppController::inlineModelPos(int renderedPos) const
+{
+    const int at = m_inlineEdit.cursor;
+    const int length = int(m_inlineEdit.preedit.size());
+    if (renderedPos <= at)
+        return renderedPos;
+    return renderedPos >= at + length ? renderedPos - length : at;
+}
+
+bool AppController::inlineEditLayout(FrameCompositor::TextEditGeometry *geometry, QTransform *toCanvas,
+                                     double *scale) const
+{
+    const drift::Clip *clip = inlineEditClip();
+    if (!clip)
+        return false;
+    // The preview's scale, so the layout is the one already cached for the render.
+    *scale = m_playback.previewRenderScale();
+    *geometry = FrameCompositor::textEditGeometry(*clip, clip->textContent, m_playheadUs, m_project.width(),
+                                                  m_project.height(), *scale);
+    if (!geometry->set)
+        return false;
+    // Block-local render px -> canvas project px: into the layout rect, turned about its centre
+    // the way the layer is, then back from render scale.
+    const QPointF centre = geometry->layoutRect.center();
+    QTransform transform;
+    transform.scale(1.0 / *scale, 1.0 / *scale);
+    transform.translate(centre.x(), centre.y());
+    transform.rotate(geometry->rotation);
+    transform.translate(-centre.x(), -centre.y());
+    transform.translate(geometry->layoutRect.x(), geometry->layoutRect.y());
+    *toCanvas = transform;
+    return true;
+}
+
+void AppController::beginInlineTextEdit(int trackIndex, int clipIndex)
+{
+    drift::Clip *clip = textClipAt(trackIndex, clipIndex);
+    if (!clip || clip->type != drift::ClipType::Text)
+        return;
+    if (m_inlineEdit.active)
+        endInlineTextEdit(true);
+
+    if (!m_previewDragActive)
+        beginPreviewDrag(tr("Edit text"));
+
+    m_inlineEdit = InlineTextEdit{};
+    m_inlineEdit.active = true;
+    m_inlineEdit.track = trackIndex;
+    m_inlineEdit.clip = clipIndex;
+    m_inlineEdit.clipId = clip->id;
+    m_inlineEdit.original = clip->textContent;
+    m_inlineEdit.text = clip->textContent;
+    m_inlineEdit.cursor = int(clip->textContent.size());
+    if (!m_inlineTextEditing) {
+        m_inlineTextEditing = true;
+        emit inlineTextEditingChanged();
+    }
+
+    FrameCompositor::RenderOptions::TextEditDecor decor;
+    decor.clipId = clip->id;
+    decor.cursor = m_inlineEdit.cursor;
+    m_playback.setTextEditDecor(decor);
+    emit inlineEditGeometryChanged();
+}
+
+void AppController::updateInlineTextEdit(int trackIndex, int clipIndex, const QString &text, int cursor,
+                                         int selStart, int selEnd, const QString &preeditText)
+{
+    drift::Clip *clip = inlineEditClip();
+    if (!clip || trackIndex != m_inlineEdit.track || clipIndex != m_inlineEdit.clip)
+        return;
+
+    const int size = int(text.size());
+    cursor = qBound(0, cursor, size);
+    const bool selected = selStart >= 0 && selEnd >= 0 && selStart != selEnd;
+    const int low = selected ? qBound(0, qMin(selStart, selEnd), size) : -1;
+    const int high = selected ? qBound(0, qMax(selStart, selEnd), size) : -1;
+    selStart = low;
+    selEnd = high;
+    m_inlineEdit.text = text;
+    m_inlineEdit.cursor = cursor;
+    m_inlineEdit.selStart = selStart;
+    m_inlineEdit.selEnd = selEnd;
+    m_inlineEdit.preedit = preeditText;
+
+    // The preedit goes into the rendered text only; the model text stays the editor's.
+    const QString rendered = text.left(cursor) + preeditText + text.mid(cursor);
+    const bool textChanged = clip->textContent != rendered;
+    if (textChanged) {
+        clip->textContent = rendered;
+        clip->name = rendered.left(32);
+    }
+
+    FrameCompositor::RenderOptions::TextEditDecor decor;
+    decor.clipId = clip->id;
+    decor.cursor = inlineRenderedPos(cursor);
+    if (selected) {
+        decor.selStart = inlineRenderedPos(selStart);
+        decor.selEnd = inlineRenderedPos(selEnd);
+    }
+    if (!preeditText.isEmpty()) {
+        decor.preeditStart = cursor;
+        decor.preeditLength = int(preeditText.size());
+    }
+    // One render: a text change goes out with the project edit, a caret move on its own.
+    m_playback.setTextEditDecor(decor, !textChanged);
+    if (textChanged)
+        emitPreviewFrame();
+    emit inlineEditGeometryChanged();
+}
+
+void AppController::endInlineTextEdit(bool commit)
+{
+    if (!m_inlineEdit.active)
+        return;
+
+    drift::Clip *clip = inlineEditClip();
+    const int track = m_inlineEdit.track;
+    const int clipIndex = m_inlineEdit.clip;
+    const QString text = m_inlineEdit.text;
+    const QString original = m_inlineEdit.original;
+    m_inlineEdit = InlineTextEdit{};
+
+    m_playback.setTextEditDecor({}, false);
+    if (m_inlineTextEditing) {
+        m_inlineTextEditing = false;
+        emit inlineTextEditingChanged();
+    }
+
+    if (clip && commit && text != original) {
+        commitTextEdit(track, clipIndex, text);
+    } else if (m_previewDragActive) {
+        // Nothing changed or the edit was abandoned: the snapshot taken at the start is the
+        // original, and no undo step is pushed.
+        cancelPreviewDrag();
+    } else if (clip) {
+        clip->textContent = original;
+        clip->name = original.left(32);
+        emitPreviewFrame();
+    }
+    emit inlineEditGeometryChanged();
+}
+
+QVariantList AppController::inlineCaretQuad() const
+{
+    FrameCompositor::TextEditGeometry geometry;
+    QTransform toCanvas;
+    double scale = 1.0;
+    if (!inlineEditLayout(&geometry, &toCanvas, &scale))
+        return {};
+    const QRectF caret = drift::text::caretRect(*geometry.set, inlineRenderedPos(m_inlineEdit.cursor));
+    if (caret.height() <= 0.0)
+        return {};
+    // The bar the painter draws: 2 project px or 0.06 em, whichever is wider.
+    const double width = qMax(2.0 * scale, 0.06 * geometry.set->paragraph->emPx);
+    const QRectF bar(caret.x() - width * 0.5, caret.y(), width, caret.height());
+    QVariantList quad;
+    for (const QPointF &corner : {bar.topLeft(), bar.topRight(), bar.bottomRight(), bar.bottomLeft()})
+        quad.append(toCanvas.map(corner));
+    return quad;
+}
+
+QVariantList AppController::inlineSelectionQuads() const
+{
+    FrameCompositor::TextEditGeometry geometry;
+    QTransform toCanvas;
+    double scale = 1.0;
+    if (m_inlineEdit.selStart < 0 || !inlineEditLayout(&geometry, &toCanvas, &scale))
+        return {};
+    QVariantList quads;
+    for (const QRectF &rect : drift::text::selectionRects(*geometry.set, inlineRenderedPos(m_inlineEdit.selStart),
+                                                          inlineRenderedPos(m_inlineEdit.selEnd))) {
+        QVariantList quad;
+        for (const QPointF &corner : {rect.topLeft(), rect.topRight(), rect.bottomRight(), rect.bottomLeft()})
+            quad.append(toCanvas.map(corner));
+        quads.append(QVariant(quad));
+    }
+    return quads;
+}
+
+int AppController::inlineHitTest(const QPointF &canvasPoint) const
+{
+    FrameCompositor::TextEditGeometry geometry;
+    QTransform toCanvas;
+    double scale = 1.0;
+    if (!inlineEditLayout(&geometry, &toCanvas, &scale))
+        return m_inlineEdit.cursor;
+    bool invertible = false;
+    const QTransform toLocal = toCanvas.inverted(&invertible);
+    if (!invertible)
+        return m_inlineEdit.cursor;
+    return inlineModelPos(drift::text::hitTest(*geometry.set, toLocal.map(canvasPoint)));
+}
+
+QVariantMap AppController::inlineWordAt(int pos) const
+{
+    FrameCompositor::TextEditGeometry geometry;
+    QTransform toCanvas;
+    double scale = 1.0;
+    QVariantMap out{{QStringLiteral("start"), pos}, {QStringLiteral("end"), pos}};
+    if (!inlineEditLayout(&geometry, &toCanvas, &scale))
+        return out;
+    const std::pair<int, int> word = drift::text::wordAt(*geometry.set, inlineRenderedPos(pos));
+    out.insert(QStringLiteral("start"), inlineModelPos(word.first));
+    out.insert(QStringLiteral("end"), inlineModelPos(word.second));
+    return out;
+}
+
+int AppController::inlineMoveCaretLines(int pos, int deltaLines)
+{
+    FrameCompositor::TextEditGeometry geometry;
+    QTransform toCanvas;
+    double scale = 1.0;
+    if (!inlineEditLayout(&geometry, &toCanvas, &scale))
+        return pos;
+    const int rendered = inlineRenderedPos(pos);
+    // Consecutive moves keep the column they started from, as a text field does.
+    if (pos != m_inlineEdit.preferredFor)
+        m_inlineEdit.preferredX = drift::text::caretRect(*geometry.set, rendered).x();
+    const int moved = inlineModelPos(drift::text::lineMoveCaret(*geometry.set, rendered, deltaLines,
+                                                                m_inlineEdit.preferredX));
+    m_inlineEdit.preferredFor = moved;
+    return moved;
+}
+
+int AppController::inlineLineEdge(int pos, bool toEnd) const
+{
+    FrameCompositor::TextEditGeometry geometry;
+    QTransform toCanvas;
+    double scale = 1.0;
+    if (!inlineEditLayout(&geometry, &toCanvas, &scale))
+        return pos;
+    return inlineModelPos(drift::text::lineEdge(*geometry.set, inlineRenderedPos(pos), toEnd));
+}
+
 void AppController::syncTextOverlaySkip()
 {
     // Inline edit owns the skip id until it ends. Outside of it the composited

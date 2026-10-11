@@ -8,7 +8,9 @@
 #include <QRectF>
 #include <QString>
 
+#include <limits>
 #include <memory>
+#include <utility>
 
 // The layout half of text rendering: word/grapheme splitting, SkParagraph line breaking and
 // shaping, placement, accent resolution, bleed and cache keys. The Skia painter (SkiaTextPainter)
@@ -69,6 +71,16 @@ struct ParagraphLayout
     // boundaries that are also shaping-cluster boundaries, so a Sinhala conjunct or a
     // consonant plus its pre-base vowel is never split.
     QList<int> caretStops;
+
+    // What the inline editor's geometry needs without going back to Skia for the basics.
+    QString text;
+    double emPx = 0.0;            // the base font size at this render scale
+    QList<double> lineAscent;     // per line: the band above the baseline (the font's, or the line's
+    QList<double> lineDescent;    //   own when an accent scales it) and below it
+    QList<int> lineStart;         // per line: first UTF-16 offset
+    QList<int> lineEnd;           // per line: offset of its newline, or of the text end
+    QList<int> lineVisibleEnd;    // per line: lineEnd, less the spaces a soft wrap leaves behind
+    QList<bool> lineHardBreak;
 };
 
 // Glyphs no font in the collection could draw (the missing-glyph boxes), and the family the
@@ -113,6 +125,28 @@ WordSplit splitFor(const textanim::ResolvedSlots &resolved, const TextStyle &sty
 textanim::EvalContext evalContextFor(const TextStyle &style, const QRectF &layoutRect, double renderScale,
                                      TimeUs windowStartUs, TimeUs windowDurationUs, TimeUs timelineUs,
                                      int activeWordIndex);
+
+// Inline-editor geometry. Offsets are UTF-16 into the text the set was laid out from; rectangles
+// are block-local, the space StyledWord::cellRect is in (0,0 = layout rect top-left, render px),
+// so the manual alignment offsets and the valign shift are already in them. The block is treated
+// as unbent: a pathBend arc is not mapped back, so on a bent line the editor's geometry sits on
+// the straight baseline the glyphs were laid out on. All of these are no-ops (an empty result)
+// on a set without a paragraph.
+const QList<int> &caretStops(const FragmentSet &set);
+// The caret at `pos`: x at the stop, zero wide, spanning its line's ascent..descent band. At a soft
+// wrap the start of the next line wins; the end of the text belongs to the last line.
+QRectF caretRect(const FragmentSet &set, int pos);
+// One band-tall rectangle per line (and per visually contiguous run on it) covering [from, to).
+QList<QRectF> selectionRects(const FragmentSet &set, int from, int to);
+// The caret stop nearest `local`; above or below the block picks the first or last line.
+int hitTest(const FragmentSet &set, const QPointF &local);
+// The word around `pos` as [start, end), snapped to caret stops.
+std::pair<int, int> wordAt(const FragmentSet &set, int pos);
+// Up/Down: the stop `deltaLines` away at `preferredX` (block-local; NaN keeps the caret's own x).
+// Moving off the first line lands on 0, off the last on the text end.
+int lineMoveCaret(const FragmentSet &set, int pos, int deltaLines, double preferredX = std::numeric_limits<double>::quiet_NaN());
+// Home/End on the caret's line. End stops before the spaces a soft wrap leaves behind.
+int lineEdge(const FragmentSet &set, int pos, bool end);
 
 // Margin (project px) the style can paint outside the layout rect: strokes, shadows, glows,
 // extrusions, box, pills, underline, scaled accents and the bend rise. The animation envelope is

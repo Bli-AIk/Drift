@@ -5,6 +5,7 @@
 #include "core/Clip.h"
 #include "core/TextAnimator.h"
 
+#include <QColor>
 #include <QList>
 #include <QRectF>
 #include <QString>
@@ -40,6 +41,27 @@ struct TextPaintRequest
 };
 
 TextPainterResult makeTextPainter(const TextPaintRequest &request);
+
+// The inline editor's decorations for a text block, drawn apart from the glyphs so the clip's
+// effects never touch them: the selection, the preedit underline and the caret. Offsets are
+// UTF-16 into the text `set` was laid out from; -1 / empty ranges draw nothing.
+struct TextEditPaintRequest
+{
+    std::shared_ptr<const text::FragmentSet> set;
+    QRectF layoutRect;
+    double renderScale = 1.0;
+    int cursor = -1;
+    int selStart = -1;
+    int selEnd = -1;
+    int preeditStart = -1;
+    int preeditLength = 0;
+    QColor caretColor;     // invalid = white
+    QColor selectionColor; // invalid = translucent blue
+};
+
+// The painter's rect is the layout rect grown evenly on every side, so a layer that rotates about
+// its centre turns it the same way the text's own layer turns.
+TextPainterResult makeTextEditPainter(const TextEditPaintRequest &request);
 
 // Lays the text out and evaluates its animation at clipTimeUs inside the clip's own window (3 s
 // when the clip has no duration); -1 picks the middle of the hold. For thumbnails and tests.

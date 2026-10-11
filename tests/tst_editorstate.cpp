@@ -113,6 +113,7 @@ private slots:
     void channelCountIsKnownBeforeAnythingDecodes();
     void separateAudioCarriesAudioEffectsAndSpeedCurve();
     void addTextClip();
+    void inlineTextEditCommitsOneUndoStepAndCancelRestores();
     void audioAdjustmentTrackArrivesWithAClip();
     void dropShapeOnNewTrackIsOneUndo();
     void dropShapeOnTrackUsesThatTrack();
@@ -601,6 +602,60 @@ void EditorStateTest::addTextClip()
     state.addTextClip(QStringLiteral("Hello"), 0.0);
     QVERIFY(state.durationSeconds() > 0.0);
     QCOMPARE(state.selectedClip(), 0);
+}
+
+// The inline editor: live text with the preedit rendered but never stored, geometry in canvas
+// px, one undo step on commit and none on cancel.
+void EditorStateTest::inlineTextEditCommitsOneUndoStepAndCancelRestores()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Hello"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const auto textOf = [&] { return state.clipAt(track, clip).value(QStringLiteral("textContent")).toString(); };
+    QSignalSpy geometry(&state, &AppController::inlineEditGeometryChanged);
+
+    QVERIFY(state.inlineCaretQuad().isEmpty());
+    state.beginInlineTextEdit(track, clip);
+    QVERIFY(state.inlineTextEditing());
+    QVERIFY(state.previewDragActive());
+
+    // Typing with a preedit: the clip renders it, the model text does not hold it.
+    state.updateInlineTextEdit(track, clip, QStringLiteral("Hello w"), 7, -1, -1, QStringLiteral("or"));
+    QCOMPARE(textOf(), QStringLiteral("Hello wor"));
+    QVERIFY(geometry.count() >= 2);
+    QCOMPARE(state.inlineCaretQuad().size(), 4);
+    QVERIFY(state.inlineSelectionQuads().isEmpty());
+
+    state.updateInlineTextEdit(track, clip, QStringLiteral("Hello world"), 11, 6, 11, QString());
+    QCOMPARE(textOf(), QStringLiteral("Hello world"));
+    QCOMPARE(state.inlineSelectionQuads().size(), 1);
+    QCOMPARE(state.inlineSelectionQuads().first().toList().size(), 4);
+
+    // The caret's quad maps back to its own offset.
+    const QVariantList quad = state.inlineCaretQuad();
+    const QPointF centre = (quad.at(0).toPointF() + quad.at(2).toPointF()) / 2.0;
+    QCOMPARE(state.inlineHitTest(centre), 11);
+    QCOMPARE(state.inlineLineEdge(3, false), 0);
+    QCOMPARE(state.inlineLineEdge(3, true), 11);
+    QCOMPARE(state.inlineWordAt(8).value(QStringLiteral("start")).toInt(), 6);
+
+    state.endInlineTextEdit(true);
+    QVERIFY(!state.inlineTextEditing());
+    QVERIFY(!state.previewDragActive());
+    QCOMPARE(textOf(), QStringLiteral("Hello world"));
+    state.undo();
+    QCOMPARE(textOf(), QStringLiteral("Hello"));
+
+    // Cancelled, the original comes back and nothing is left to undo to.
+    state.beginInlineTextEdit(track, clip);
+    state.updateInlineTextEdit(track, clip, QStringLiteral("Gone"), 4, -1, -1, QString());
+    QCOMPARE(textOf(), QStringLiteral("Gone"));
+    state.endInlineTextEdit(false);
+    QCOMPARE(textOf(), QStringLiteral("Hello"));
+    state.undo();
+    QVERIFY(state.clipAt(track, clip).isEmpty());
 }
 
 // Adding with no text drops in a placeholder clip and asks the preview to open

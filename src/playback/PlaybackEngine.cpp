@@ -988,6 +988,10 @@ FrameCompositor::RenderOptions PlaybackEngine::playbackRenderOptions() const
     if (!m_playing)
         options.skipClipId = m_editingClipId;
 
+    // Never while playing: the editor is a paused-preview tool, and the rest pose would be wrong.
+    if (!m_playing)
+        options.textEdit = m_textEditDecor;
+
     options.allowProxies = true;
     options.editor = m_editorView;
     // The 3D view fills the panel, and is antialiased by rendering it at twice the panel's
@@ -1026,6 +1030,15 @@ void PlaybackEngine::setEditingClipId(const QString &id)
         return;
     m_editingClipId = id;
     if (!m_playing)
+        refreshFrame();
+}
+
+void PlaybackEngine::setTextEditDecor(const FrameCompositor::RenderOptions::TextEditDecor &decor, bool refresh)
+{
+    if (m_textEditDecor == decor)
+        return;
+    m_textEditDecor = decor;
+    if (refresh && !m_playing)
         refreshFrame();
 }
 

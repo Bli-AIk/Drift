@@ -268,9 +268,9 @@ TextLayoutResult layoutStyledText(const QString &text, const drift::TextStyle &s
 {
     const QString &source = text;
 
+    // No early-out for text without words: the inline editor still needs the paragraph to place a
+    // caret in empty or whitespace-only text. Such a set has no pieces, so nothing paints.
     const QList<WordRange> ranges = wordRanges(source);
-    if (ranges.isEmpty())
-        return {};
 
     int longestIndex = 0;
     for (int i = 1; i < ranges.size(); ++i) {
@@ -368,9 +368,10 @@ TextLayoutResult layoutStyledText(const QString &text, const drift::TextStyle &s
 
     std::vector<skt::LineMetrics> lines;
     paragraph->getLineMetrics(lines);
+    // An empty paragraph may report no line at all; the caret still sits on one.
+    if (lines.empty())
+        lines.emplace_back(size_t(0), size_t(0), size_t(0), size_t(0), true);
     const int lineCount = int(lines.size());
-    if (lineCount == 0)
-        return {};
 
     std::vector<RunData> runs;
     paragraph->visit([&](int line, const skt::Paragraph::VisitorInfo *info) {
@@ -412,6 +413,8 @@ TextLayoutResult layoutStyledText(const QString &text, const drift::TextStyle &s
 
     auto layoutData = std::make_shared<ParagraphLayout>();
     layoutData->paragraph = paragraph;
+    layoutData->text = source;
+    layoutData->emPx = basePx;
     for (const int stop : graphemes) {
         if (validStop(stop))
             layoutData->caretStops.append(stop);
@@ -477,6 +480,13 @@ TextLayoutResult layoutStyledText(const QString &text, const drift::TextStyle &s
         const double baseline = blockTop + lineTop + (mixedSizes ? lm.fAscent : baseMetrics.ascent);
         layoutData->lineX.append(lineX);
         layoutData->lineBaseline.append(baseline);
+        layoutData->lineAscent.append(mixedSizes ? lm.fAscent : baseMetrics.ascent);
+        layoutData->lineDescent.append(mixedSizes ? lm.fDescent : baseMetrics.descent);
+        layoutData->lineStart.append(qMin(int(lm.fStartIndex), int(source.size())));
+        layoutData->lineEnd.append(qMin(int(lm.fEndIndex), int(source.size())));
+        layoutData->lineVisibleEnd.append(lm.fHardBreak ? qMin(int(lm.fEndIndex), int(source.size()))
+                                                         : qMin(int(lm.fEndExcludingWhitespaces), int(source.size())));
+        layoutData->lineHardBreak.append(lm.fHardBreak);
 
         // LineMetrics indexes are UTF-16, unlike the visitor's and the cluster queries'.
         const int start = int(lm.fStartIndex);
@@ -644,6 +654,245 @@ QString firstFontFamily(const ParagraphLayout &layout)
     return QString::fromUtf8(family.c_str());
 }
 
+// ---------------------------------------------------------------------------------------------
+// Inline-editor geometry
+
+namespace {
+
+skt::Paragraph *paragraphIn(const FragmentSet &set)
+{
+    return set.paragraph ? drift::skia::paragraphOf(*set.paragraph) : nullptr;
+}
+
+int lineOf(const ParagraphLayout &layout, int pos)
+{
+    int line = 0;
+    for (int i = 0; i < layout.lineStart.size() && layout.lineStart.at(i) <= pos; ++i)
+        line = i;
+    return line;
+}
+
+// The caret stop at or below / above / nearest `pos`.
+int stopBelow(const QList<int> &stops, int pos)
+{
+    const auto it = std::upper_bound(stops.cbegin(), stops.cend(), pos);
+    return it == stops.cbegin() ? (stops.isEmpty() ? pos : stops.first()) : *(it - 1);
+}
+
+int stopAbove(const QList<int> &stops, int pos)
+{
+    const auto it = std::lower_bound(stops.cbegin(), stops.cend(), pos);
+    return it == stops.cend() ? (stops.isEmpty() ? pos : stops.last()) : *it;
+}
+
+int stopNearest(const QList<int> &stops, int pos)
+{
+    const int below = stopBelow(stops, pos);
+    const int above = stopAbove(stops, pos);
+    return pos - below <= above - pos ? below : above;
+}
+
+// The paragraph-space band of a line is [baseline - ascent, baseline + descent]; a box belongs to
+// the line its vertical middle falls in.
+int lineOfBox(const std::vector<skt::LineMetrics> &lines, const skt::TextBox &box)
+{
+    const double mid = (box.rect.top() + box.rect.bottom()) * 0.5;
+    int best = 0;
+    double bestDistance = std::numeric_limits<double>::max();
+    for (int i = 0; i < int(lines.size()); ++i) {
+        const double distance = std::abs(mid - (lines[i].fBaseline - lines[i].fAscent * 0.5 + lines[i].fDescent * 0.5));
+        if (distance < bestDistance) {
+            bestDistance = distance;
+            best = i;
+        }
+    }
+    return best;
+}
+
+double caretX(skt::Paragraph &paragraph, const ParagraphLayout &layout, const std::vector<skt::LineMetrics> &lines,
+              int line, int pos)
+{
+    const skt::LineMetrics &lm = lines[size_t(line)];
+    const double lineX = layout.lineX.at(line);
+    const auto boxOnLine = [&](int from, int to, skt::TextBox *out) {
+        for (const skt::TextBox &box :
+             paragraph.getRectsForRange(unsigned(from), unsigned(to), skt::RectHeightStyle::kMax,
+                                        skt::RectWidthStyle::kTight)) {
+            if (lineOfBox(lines, box) == line) {
+                *out = box;
+                return true;
+            }
+        }
+        return false;
+    };
+    const QList<int> &stops = layout.caretStops;
+    const int next = stopAbove(stops, pos + 1);
+    const auto before = std::lower_bound(stops.cbegin(), stops.cend(), pos);
+    skt::TextBox box(SkRect::MakeEmpty(), skt::TextDirection::kLtr);
+    // The grapheme after the caret, when it is on this line: its leading edge is the caret.
+    if (next > pos && next <= layout.lineEnd.at(line) && boxOnLine(pos, next, &box))
+        return lineX + (box.direction == skt::TextDirection::kLtr ? box.rect.left() : box.rect.right());
+    if (before != stops.cbegin() && *(before - 1) >= layout.lineStart.at(line) && boxOnLine(*(before - 1), pos, &box))
+        return lineX + (box.direction == skt::TextDirection::kLtr ? box.rect.right() : box.rect.left());
+    return lineX + (rightToLeft(layout.text) ? lm.fWidth : 0.0);
+}
+
+} // namespace
+
+const QList<int> &caretStops(const FragmentSet &set)
+{
+    static const QList<int> kNone;
+    return set.paragraph ? set.paragraph->caretStops : kNone;
+}
+
+QRectF caretRect(const FragmentSet &set, int pos)
+{
+    std::lock_guard<std::recursive_mutex> lock(drift::skia::textLayoutMutex());
+    skt::Paragraph *paragraph = paragraphIn(set);
+    if (!paragraph || set.paragraph->lineStart.isEmpty())
+        return {};
+    const ParagraphLayout &layout = *set.paragraph;
+    std::vector<skt::LineMetrics> lines;
+    paragraph->getLineMetrics(lines);
+    if (lines.empty())
+        lines.emplace_back(size_t(0), size_t(0), size_t(0), size_t(0), true);
+    pos = qBound(0, pos, int(layout.text.size()));
+    const int line = qMin(lineOf(layout, pos), int(lines.size()) - 1);
+    const double top = layout.lineBaseline.at(line) - layout.lineAscent.at(line);
+    return QRectF(caretX(*paragraph, layout, lines, line, pos), top, 0.0,
+                  layout.lineAscent.at(line) + layout.lineDescent.at(line));
+}
+
+QList<QRectF> selectionRects(const FragmentSet &set, int from, int to)
+{
+    std::lock_guard<std::recursive_mutex> lock(drift::skia::textLayoutMutex());
+    skt::Paragraph *paragraph = paragraphIn(set);
+    if (!paragraph || set.paragraph->lineStart.isEmpty())
+        return {};
+    const ParagraphLayout &layout = *set.paragraph;
+    from = qBound(0, from, int(layout.text.size()));
+    to = qBound(0, to, int(layout.text.size()));
+    if (from > to)
+        std::swap(from, to);
+    if (from == to)
+        return {};
+    std::vector<skt::LineMetrics> lines;
+    paragraph->getLineMetrics(lines);
+    if (lines.empty())
+        return {};
+
+    QMap<int, QList<QPair<double, double>>> spans; // line -> [left, right]
+    for (const skt::TextBox &box : paragraph->getRectsForRange(unsigned(from), unsigned(to),
+                                                               skt::RectHeightStyle::kMax,
+                                                               skt::RectWidthStyle::kTight)) {
+        if (box.rect.width() < 0.01f)
+            continue;
+        const int line = qMin(lineOfBox(lines, box), int(layout.lineX.size()) - 1);
+        const double x = layout.lineX.at(line);
+        spans[line].append({x + box.rect.left(), x + box.rect.right()});
+    }
+    QList<QRectF> out;
+    for (auto it = spans.begin(); it != spans.end(); ++it) {
+        QList<QPair<double, double>> &list = it.value();
+        std::sort(list.begin(), list.end());
+        const double top = layout.lineBaseline.at(it.key()) - layout.lineAscent.at(it.key());
+        const double height = layout.lineAscent.at(it.key()) + layout.lineDescent.at(it.key());
+        double left = list.first().first;
+        double right = list.first().second;
+        for (int i = 1; i < list.size(); ++i) {
+            if (list.at(i).first > right + 0.5) {
+                out.append(QRectF(left, top, right - left, height));
+                left = list.at(i).first;
+            }
+            right = qMax(right, list.at(i).second);
+        }
+        out.append(QRectF(left, top, right - left, height));
+    }
+    return out;
+}
+
+int hitTest(const FragmentSet &set, const QPointF &local)
+{
+    std::lock_guard<std::recursive_mutex> lock(drift::skia::textLayoutMutex());
+    skt::Paragraph *paragraph = paragraphIn(set);
+    if (!paragraph || set.paragraph->lineStart.isEmpty())
+        return 0;
+    const ParagraphLayout &layout = *set.paragraph;
+    if (layout.text.isEmpty())
+        return 0;
+    std::vector<skt::LineMetrics> lines;
+    paragraph->getLineMetrics(lines);
+    if (lines.empty())
+        return 0;
+
+    int line = 0;
+    double bestDistance = std::numeric_limits<double>::max();
+    for (int i = 0; i < layout.lineBaseline.size() && i < int(lines.size()); ++i) {
+        const double mid = layout.lineBaseline.at(i) + (layout.lineDescent.at(i) - layout.lineAscent.at(i)) * 0.5;
+        const double distance = std::abs(local.y() - mid);
+        if (distance < bestDistance) {
+            bestDistance = distance;
+            line = i;
+        }
+    }
+    const skt::LineMetrics &lm = lines[size_t(line)];
+    const double y = lm.fBaseline - layout.lineAscent.at(line) * 0.5 + layout.lineDescent.at(line) * 0.5;
+    int pos = int(paragraph->getGlyphPositionAtCoordinate(float(local.x() - layout.lineX.at(line)), float(y)).position);
+    pos = qBound(layout.lineStart.at(line), pos, int(layout.text.size()));
+    // Past the end of a soft-wrapped line Skia answers with the next line's first offset, which
+    // would put the caret on that line; stay before the spaces the wrap left.
+    if (line + 1 < layout.lineStart.size() && pos >= layout.lineStart.at(line + 1))
+        pos = qMax(layout.lineStart.at(line), layout.lineVisibleEnd.at(line));
+    return stopNearest(layout.caretStops, pos);
+}
+
+std::pair<int, int> wordAt(const FragmentSet &set, int pos)
+{
+    std::lock_guard<std::recursive_mutex> lock(drift::skia::textLayoutMutex());
+    skt::Paragraph *paragraph = paragraphIn(set);
+    if (!paragraph || !set.paragraph || set.paragraph->text.isEmpty())
+        return {0, 0};
+    const ParagraphLayout &layout = *set.paragraph;
+    pos = qBound(0, pos, int(layout.text.size()) - 1);
+    const auto range = paragraph->getWordBoundary(unsigned(pos));
+    int start = qBound(0, int(range.start), int(layout.text.size()));
+    int end = qBound(start, int(range.end), int(layout.text.size()));
+    return {stopBelow(layout.caretStops, start), stopAbove(layout.caretStops, end)};
+}
+
+int lineMoveCaret(const FragmentSet &set, int pos, int deltaLines, double preferredX)
+{
+    std::lock_guard<std::recursive_mutex> lock(drift::skia::textLayoutMutex());
+    if (!set.paragraph || set.paragraph->lineStart.isEmpty())
+        return pos;
+    const ParagraphLayout &layout = *set.paragraph;
+    pos = qBound(0, pos, int(layout.text.size()));
+    const int target = lineOf(layout, pos) + deltaLines;
+    if (target < 0)
+        return 0;
+    if (target >= layout.lineStart.size())
+        return int(layout.text.size());
+    if (std::isnan(preferredX))
+        preferredX = caretRect(set, pos).x();
+    const double mid = layout.lineBaseline.at(target) + (layout.lineDescent.at(target) - layout.lineAscent.at(target)) * 0.5;
+    return hitTest(set, QPointF(preferredX, mid));
+}
+
+int lineEdge(const FragmentSet &set, int pos, bool end)
+{
+    if (!set.paragraph || set.paragraph->lineStart.isEmpty())
+        return pos;
+    const ParagraphLayout &layout = *set.paragraph;
+    const int line = lineOf(layout, qBound(0, pos, int(layout.text.size())));
+    if (!end)
+        return stopBelow(layout.caretStops, layout.lineStart.at(line));
+    const bool last = line + 1 >= layout.lineStart.size();
+    const int target = last || layout.lineHardBreak.at(line)
+                           ? layout.lineEnd.at(line)
+                           : qMax(layout.lineStart.at(line), layout.lineVisibleEnd.at(line));
+    return stopBelow(layout.caretStops, target);
+}
+
 #else
 
 int unresolvedGlyphs(const ParagraphLayout &)
@@ -660,6 +909,42 @@ TextLayoutResult layoutStyledText(const QString &, const drift::TextStyle &, dou
                                   WordSplit)
 {
     return {};
+}
+
+const QList<int> &caretStops(const FragmentSet &)
+{
+    static const QList<int> kNone;
+    return kNone;
+}
+
+QRectF caretRect(const FragmentSet &, int)
+{
+    return {};
+}
+
+QList<QRectF> selectionRects(const FragmentSet &, int, int)
+{
+    return {};
+}
+
+int hitTest(const FragmentSet &, const QPointF &)
+{
+    return 0;
+}
+
+std::pair<int, int> wordAt(const FragmentSet &, int)
+{
+    return {0, 0};
+}
+
+int lineMoveCaret(const FragmentSet &, int pos, int, double)
+{
+    return pos;
+}
+
+int lineEdge(const FragmentSet &, int pos, bool)
+{
+    return pos;
 }
 
 #endif // DRIFT_WITH_SKIA
