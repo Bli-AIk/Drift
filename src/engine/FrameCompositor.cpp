@@ -4,6 +4,7 @@
 
 #include "ClipReaderPool.h"
 #include "CompositorFrameHistory.h"
+#include "DepthRelief.h"
 #include "EffectCatalog.h"
 #include "EffectProcessor.h"
 #include "FaceTrack.h"
@@ -1516,6 +1517,33 @@ GpuScene buildGpuScene(const drift::Project &project, drift::TimeUs timelineUs, 
         guides.selectedQuad = parent * drift::clipQuadToWorld(layer.rect, layer.rotation, false, false,
                                                               layer.pose3d, canvas);
     };
+    // A clip with a depth effect stands in the 3D view as a relief, its lights placed over it.
+    QList<drift::EditorLine> reliefGuides;
+    QVector3D editorEye;
+    if (editorView) {
+        editorEye = options.editor.view.lookThrough ? drift::sceneCameraEye(sceneCamera)
+                                                    : drift::editorViewEye(options.editor.view) * float(renderScale);
+    }
+    const auto placeRelief = [&](const drift::Clip &clip, GpuLayer &layer) {
+        if (!editorView || !layer.depth || layer.model3d || layer.nested
+            || (layer.hasParent && !layer.parent.isAffine()) || layer.rect.height() < 1.0) {
+            return;
+        }
+        const QSizeF canvas(width, height);
+        const double depthRange = drift::reliefDepthRange(layer.effects);
+        drift::ReliefPlacement placement;
+        placement.quadToWorld = drift::clipQuadToWorld(layer.rect, layer.rotation, layer.flipH, layer.flipV,
+                                                       layer.pose3d, canvas);
+        if (layer.hasParent)
+            placement.quadToWorld = drift::worldParentFromAffine(layer.parent, canvas) * placement.quadToWorld;
+        placement.aspect = layer.rect.width() / layer.rect.height();
+        placement.heightPx = layer.rect.height();
+        layer.reliefDepth = float(depthRange * placement.heightPx);
+        drift::addReliefLightGuides(reliefGuides,
+                                    drift::reliefLights(layer.effects, layer.depth.get(), placement.aspect),
+                                    placement, layer.depth.get(), depthRange, editorEye,
+                                    clip.id == options.editor.selectedClipId);
+    };
     const QSizeF layoutCanvas = editorView ? QSizeF(width, height) : QSizeF();
     const auto applyCamera = [&sceneView, sceneViewActive, layoutCanvas](GpuLayer &layer) {
         layer.viewProj = sceneView;
@@ -1640,6 +1668,7 @@ GpuScene buildGpuScene(const drift::Project &project, drift::TimeUs timelineUs, 
             applyParent(item.layer, ti);
             applyCamera(item.layer);
             noteSelection(clip, item.layer);
+            placeRelief(clip, item.layer);
             applyDepthOcclusion(project, scene, item.layer, nearestOccluder, occluders);
             scene.items.append(item);
             if (editingText)
@@ -1655,7 +1684,7 @@ GpuScene buildGpuScene(const drift::Project &project, drift::TimeUs timelineUs, 
     }
 
     if (editorView)
-        scene.editorLines = drift::buildEditorOverlay(guides);
+        scene.editorLines = drift::buildEditorOverlay(guides) + reliefGuides;
     return scene;
 }
 

@@ -107,6 +107,9 @@ struct GpuLayer
     // This frame's depth map, when the chain has a "requires": "depth" effect and the clip has
     // been estimated. Shared, not copied: the sidecar's frame cache owns it.
     std::shared_ptr<const drift::DepthFrame> depth;
+    // The 3D view only: draw the layer as a relief pushed back by `depth`, by this many quad-local
+    // z units (world px) where the depth map is farthest. 0 draws the flat card. See DepthRelief.
+    float reliefDepth = 0.f;
     // Depth occlusion ("depth.occlude"). On an occluder, emitDepthCanvas asks the compositor to
     // lay `depth` out on the canvas once the layer is drawn. On an occluded layer, occluderItem
     // is the scene index of that occluder, and wherever it is nearer than occludeDepth this layer

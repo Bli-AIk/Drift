@@ -5489,6 +5489,17 @@
     </message>
 </context>
 <context>
+    <name>DepthLight3dOverlay</name>
+    <message>
+        <source>Aim light</source>
+        <translation type="unfinished">লক্ষ্য আলো</translation>
+    </message>
+    <message>
+        <source>Move light</source>
+        <translation type="unfinished">আলো সরান</translation>
+    </message>
+</context>
+<context>
     <name>DownloadFormat</name>
     <message>
         <source>%1 B</source>

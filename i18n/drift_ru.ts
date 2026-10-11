@@ -5508,6 +5508,17 @@
     </message>
 </context>
 <context>
+    <name>DepthLight3dOverlay</name>
+    <message>
+        <source>Aim light</source>
+        <translation type="unfinished">Направить свет</translation>
+    </message>
+    <message>
+        <source>Move light</source>
+        <translation type="unfinished">Переместить свет</translation>
+    </message>
+</context>
+<context>
     <name>DownloadFormat</name>
     <message>
         <source>%1 B</source>

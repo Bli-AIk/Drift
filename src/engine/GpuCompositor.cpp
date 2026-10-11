@@ -24,6 +24,7 @@
 #include <QScopeGuard>
 #include <QVector2D>
 
+#include <algorithm>
 #include <cmath>
 #include <map>
 #include <vector>
@@ -42,6 +43,22 @@ out vec2 v_texCoord;
 void main() {
     v_texCoord = a_texCoord;
     gl_Position = u_model * vec4(a_position, 0.0, 1.0);
+}
+)";
+
+// kLayerVertexShader for a relief (the 3D view's depth-effect clips): the quad is a grid, each
+// vertex pushed back along the quad's z by how far its depth says it is.
+constexpr const char *kReliefVertexShader = R"(#version 330 core
+layout(location = 0) in vec2 a_position;
+layout(location = 1) in vec2 a_texCoord;
+uniform mat4 u_model;
+uniform sampler2D u_relief;
+uniform float u_reliefDepth;
+out vec2 v_texCoord;
+void main() {
+    v_texCoord = a_texCoord;
+    float d = textureLod(u_relief, a_texCoord, 0.0).r;
+    gl_Position = u_model * vec4(a_position, -(1.0 - d) * u_reliefDepth, 1.0);
 }
 )";
 
@@ -657,6 +674,57 @@ void bindQuad(GlRuntime &rt, QOpenGLExtraFunctions *gl)
     gl->glBindVertexArray(0);
 }
 
+// The unit quad as a grid fine enough to follow a depth map of `depthSize`, laid out like the
+// quad (position, then uv) and drawn at once.
+void drawReliefGrid(QOpenGLExtraFunctions *gl, const QSize &depthSize)
+{
+    const int cols = std::clamp(depthSize.width(), 2, 384);
+    const int rows = std::clamp(depthSize.height() * cols / std::max(1, depthSize.width()), 2, 384);
+    std::vector<float> vertices;
+    vertices.reserve(size_t(cols + 1) * size_t(rows + 1) * 4);
+    for (int j = 0; j <= rows; ++j) {
+        const float v = float(j) / rows;
+        for (int i = 0; i <= cols; ++i) {
+            const float u = float(i) / cols;
+            vertices.insert(vertices.end(), {u * 2.f - 1.f, v * 2.f - 1.f, u, v});
+        }
+    }
+    std::vector<GLuint> indices;
+    indices.reserve(size_t(cols) * size_t(rows) * 6);
+    for (int j = 0; j < rows; ++j) {
+        for (int i = 0; i < cols; ++i) {
+            const GLuint a = GLuint(j * (cols + 1) + i);
+            const GLuint b = a + 1;
+            const GLuint c = a + GLuint(cols + 1);
+            const GLuint d = c + 1;
+            indices.insert(indices.end(), {a, b, c, b, d, c});
+        }
+    }
+
+    GLuint vao = 0;
+    GLuint buffers[2] = {0, 0};
+    gl->glGenVertexArrays(1, &vao);
+    gl->glGenBuffers(2, buffers);
+    gl->glBindVertexArray(vao);
+    gl->glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+    gl->glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(vertices.size() * sizeof(float)), vertices.data(),
+                     GL_STREAM_DRAW);
+    gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
+    gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(indices.size() * sizeof(GLuint)), indices.data(),
+                     GL_STREAM_DRAW);
+    gl->glEnableVertexAttribArray(0);
+    gl->glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
+    gl->glEnableVertexAttribArray(1);
+    gl->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+                              reinterpret_cast<void *>(2 * sizeof(float)));
+    gl->glDrawElements(GL_TRIANGLES, GLsizei(indices.size()), GL_UNSIGNED_INT, nullptr);
+    gl->glBindVertexArray(0);
+    gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
+    gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    gl->glDeleteBuffers(2, buffers);
+    gl->glDeleteVertexArrays(1, &vao);
+}
+
 // Straight alpha → premultiplied, so a mip chain can be averaged without the
 // transparent texels dragging the colour toward black.
 constexpr const char *kPremultiplyFragShader = R"(#version 330 core
@@ -1109,11 +1177,16 @@ void drawLayerOnCanvas(GlRuntime &rt, QOpenGLExtraFunctions *gl, GlTarget &canva
     if (isFixedFunctionBlend(blend)) {
         const bool ownDepth = layerDepth && layer.depthOcclude && canvas.hasDepth
                               && write == CanvasWrite::Over && blend == drift::BlendMode::Normal;
+        const GLuint reliefTex = layer.reliefDepth > 0.f && layer.depth && write == CanvasWrite::Over
+                                     ? depthTexture(rt, gl, *layer.depth)
+                                     : 0u;
         QOpenGLShaderProgram *program =
-            ownDepth ? rt.builtinProgram(QStringLiteral("__layer_depth__"), kLayerVertexShader,
-                                         layerDepthFragShader())
-                     : rt.builtinProgram(QStringLiteral("__layer__"), kLayerVertexShader,
-                                         kLayerFragShader);
+            ownDepth    ? rt.builtinProgram(QStringLiteral("__layer_depth__"), kLayerVertexShader,
+                                            layerDepthFragShader())
+            : reliefTex ? rt.builtinProgram(QStringLiteral("__layer_relief__"), kReliefVertexShader,
+                                            kLayerFragShader)
+                        : rt.builtinProgram(QStringLiteral("__layer__"), kLayerVertexShader,
+                                            kLayerFragShader);
         if (!program)
             return;
 
@@ -1132,7 +1205,9 @@ void drawLayerOnCanvas(GlRuntime &rt, QOpenGLExtraFunctions *gl, GlTarget &canva
         // plain source-over draw — the erase/add passes of a see-through adjustment are not a
         // picture's depth. Layers that did not opt in never enable the test and never write depth,
         // so they keep drawing in track order exactly as before.
-        const bool depthWrite = layer.depthOcclude && canvas.hasDepth
+        //
+        // A relief always does, so its near parts cover its far ones whatever order they draw in.
+        const bool depthWrite = (layer.depthOcclude || reliefTex) && canvas.hasDepth
                                 && write == CanvasWrite::Over
                                 && blend == drift::BlendMode::Normal;
         if (depthWrite) {
@@ -1158,11 +1233,20 @@ void drawLayerOnCanvas(GlRuntime &rt, QOpenGLExtraFunctions *gl, GlTarget &canva
             gl->glActiveTexture(GL_TEXTURE5);
             gl->glBindTexture(GL_TEXTURE_2D, layerDepth);
         }
+        if (reliefTex) {
+            program->setUniformValue("u_relief", 6);
+            program->setUniformValue("u_reliefDepth", layer.reliefDepth);
+            gl->glActiveTexture(GL_TEXTURE6);
+            gl->glBindTexture(GL_TEXTURE_2D, reliefTex);
+        }
         gl->glActiveTexture(GL_TEXTURE0);
         gl->glBindTexture(GL_TEXTURE_2D, layerTex);
         gl->glActiveTexture(GL_TEXTURE1);
         gl->glBindTexture(GL_TEXTURE_2D, maskTex);
-        bindQuad(rt, gl);
+        if (reliefTex)
+            drawReliefGrid(gl, layer.depth->size);
+        else
+            bindQuad(rt, gl);
         program->release();
         gl->glDisable(GL_BLEND);
         if (depthWrite) {
@@ -1410,7 +1494,7 @@ void composeOnGlThread(GlRuntime &rt, const GpuScene &scene, GlTarget &outCanvas
     bool wantsDepth = false;
     for (const GpuItem &item : scene.items) {
         wantsDepth = wantsDepth || item.layer.depthOcclude || item.from.depthOcclude
-                     || item.to.depthOcclude;
+                     || item.to.depthOcclude || item.layer.reliefDepth > 0.f;
     }
     GlTarget depthScratch;
     if (wantsDepth) {

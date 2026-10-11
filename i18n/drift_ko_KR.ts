@@ -5470,6 +5470,17 @@
     </message>
 </context>
 <context>
+    <name>DepthLight3dOverlay</name>
+    <message>
+        <source>Aim light</source>
+        <translation type="unfinished">조명 조준</translation>
+    </message>
+    <message>
+        <source>Move light</source>
+        <translation type="unfinished">조명 이동</translation>
+    </message>
+</context>
+<context>
     <name>DownloadFormat</name>
     <message>
         <source>%1 B</source>

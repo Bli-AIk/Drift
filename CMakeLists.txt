@@ -719,6 +719,8 @@ add_library(driftengine STATIC
     src/engine/EditorView3d.cpp
     src/engine/EditorOverlay.h
     src/engine/EditorOverlay.cpp
+    src/engine/DepthRelief.h
+    src/engine/DepthRelief.cpp
     src/engine/GlEditorOverlay.h
     src/engine/GlEditorOverlay.cpp
     src/engine/PreviewSnap.cpp
@@ -1216,6 +1218,7 @@ qt_add_qml_module(drift
         src/qml/components/preview/GuideEditOverlay.qml
         src/qml/components/preview/MaskOverlay.qml
         src/qml/components/preview/DepthEffectOverlay.qml
+        src/qml/components/preview/DepthLight3dOverlay.qml
         src/qml/components/preview/Checkerboard.qml
         src/qml/components/preview/AndroidTransformOverlay.qml
         src/qml/components/preview/AndroidCropOverlay.qml

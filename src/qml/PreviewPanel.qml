@@ -228,6 +228,15 @@ PanelFrame {
                 visible: EditorState.preview.handlesVisible && !root.mode3d
             }
 
+            // The same lights in the 3D view, standing over the clip's relief.
+            DepthLight3dOverlay {
+                x: panelViewport.canvas.x
+                y: panelViewport.canvas.y
+                width: panelViewport.canvas.width
+                height: panelViewport.canvas.height
+                visible: EditorState.preview.handlesVisible && root.mode3d
+            }
+
             // Assets dragged from the browsers land here as overlays at the playhead, or onto the
             // clip under the pointer. Above the transform handles so a drag passing over a
             // selected clip still reaches it.

@@ -167,6 +167,18 @@ public:
     // parameters resolved at the playhead. Empty when there is nothing to show.
     Q_INVOKABLE QVariantMap depthEffectEditorState() const;
 
+    // The selected clip's 3D Relight lights as the 3D view stands them over the clip's relief, in
+    // canvas px: one {effect, light, x, y, z, spot, aimX, aimY, color} per enabled light, z being
+    // the light's own near/far parameter. Empty outside 3D mode or when the clip has no depth to
+    // stand them on.
+    Q_INVOKABLE QVariantList depthLights3d() const;
+    // A light dragged to canvas (x, y), kept at the distance from the view it was at, as the
+    // light's {x, y, z} parameters. Empty when the light cannot be found.
+    Q_INVOKABLE QVariantMap moveDepthLight3d(int effectIndex, int light, double canvasX, double canvasY) const;
+    // Where a spot aimed at canvas (x, y) points: the {aimX, aimY} of the relief under the pointer.
+    // Empty when the pointer is off the clip.
+    Q_INVOKABLE QVariantMap aimDepthLight3d(int effectIndex, double canvasX, double canvasY) const;
+
     // The viewpoint every preview overlay is drawn through, world -> homogeneous canvas px at
     // project scale: the free view in 3D mode, else the scene camera when one covers the playhead.
     // False for the plain per-clip eye.
@@ -194,6 +206,9 @@ private:
     // The viewpoint the gizmo is drawn and solved from: the scene camera when one covers the
     // playhead, otherwise none (each clip's own eye).
     drift::gizmo::View gizmoView() const;
+    // The selected clip's relief in 3D mode, as the compositor lays it out. False when there is none.
+    struct SelectedRelief;
+    bool selectedRelief(SelectedRelief *out) const;
     // Hands the current mode and viewpoint to the preview renderer.
     void pushView();
     void setView(const drift::EditorView3d &view);

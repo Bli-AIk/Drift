@@ -3,6 +3,8 @@
 #include "core/TimelineOps.h"
 #include "engine/ClipGizmo.h"
 #include "engine/ClipTransform3d.h"
+#include "engine/DepthRelief.h"
+#include "engine/DepthSidecar.h"
 #include "engine/EffectCatalog.h"
 #include "engine/PreviewSnap.h"
 #include "engine/TransformLayer.h"
@@ -1174,6 +1176,179 @@ QVariantMap PreviewController::depthEffectEditorState() const
     out.insert(QStringLiteral("hasDepth"), !media.depthPath.isEmpty());
     out.insert(QStringLiteral("effects"), effects);
     return out;
+}
+
+struct PreviewController::SelectedRelief
+{
+    drift::ReliefPlacement placement;
+    std::shared_ptr<const drift::DepthFrame> frame;
+    // The stack's effects resolved at the playhead, at the indices the inspector writes through.
+    QList<drift::Effect> effects;
+    QMatrix4x4 view;
+};
+
+bool PreviewController::selectedRelief(SelectedRelief *out) const
+{
+    if (m_mode != QLatin1String("3d"))
+        return false;
+    // Resolved as depthEffectEditorState does: the stack may sit on a pinned adjustment, the depth
+    // on the media clip under it.
+    const drift::ClipRef source = m_app.sourceClipRef(m_app.m_selectedTrack, m_app.m_selectedClip);
+    if (source.trackIndex < 0 || source.trackIndex >= m_app.m_project.tracks().size())
+        return false;
+    const drift::Track &track = m_app.m_project.tracks().at(source.trackIndex);
+    if (source.clipIndex < 0 || source.clipIndex >= track.clips.size())
+        return false;
+    const drift::Clip &media = track.clips.at(source.clipIndex);
+    if (media.type == drift::ClipType::Adjustment || !media.containsTime(m_app.m_playheadUs)
+        || media.depthPath.isEmpty()) {
+        return false;
+    }
+    const auto sidecar = drift::loadDepthSidecarCached(media.depthPath);
+    if (!sidecar)
+        return false;
+    out->frame = sidecar->frameAt(media.timelineToSourceUs(m_app.m_playheadUs));
+    if (!out->frame)
+        return false;
+    const drift::Clip *host =
+        m_app.effectHostClip(source.trackIndex, source.clipIndex, drift::AdjustmentKind::VideoEffects);
+    const drift::Clip &stack = host ? *host : media;
+    for (const drift::Effect &effect : stack.effects)
+        out->effects.append(effect.resolvedAt(m_app.m_playheadUs - stack.timelineStart));
+
+    const QSizeF canvas(m_app.m_project.width(), m_app.m_project.height());
+    const drift::TimeUs relative = m_app.m_playheadUs - media.timelineStart;
+    const QRectF rect(clipTransformValue(media.transformX, relative, 0.0),
+                      clipTransformValue(media.transformY, relative, 0.0),
+                      clipTransformValue(media.transformW, relative, canvas.width()),
+                      clipTransformValue(media.transformH, relative, canvas.height()));
+    if (rect.width() < 1.0 || rect.height() < 1.0)
+        return false;
+    drift::ClipPose3d pose;
+    pose.rotationX = clipTransformValue(media.rotationX, relative, 0.0);
+    pose.rotationY = clipTransformValue(media.rotationY, relative, 0.0);
+    pose.positionZ = clipTransformValue(media.positionZ, relative, 0.0);
+    pose.perspective = clipTransformValue(media.perspective, relative, drift::kDefaultClipPerspective);
+    out->placement.quadToWorld = drift::clipQuadToWorld(rect, clipTransformValue(media.rotation, relative, 0.0),
+                                                        media.flipH, media.flipV, pose, canvas);
+    const QList<drift::TransformParent> parents =
+        drift::transformParentsAt(m_app.m_project, m_app.m_playheadUs, 1.0);
+    if (!parents.isEmpty() && parents.at(source.trackIndex).hasParent) {
+        // A tilted transform layer flattens the clip into a picture; the compositor draws no relief.
+        const QTransform &parent = parents.at(source.trackIndex).matrix;
+        if (!parent.isAffine())
+            return false;
+        out->placement.quadToWorld = drift::worldParentFromAffine(parent, canvas) * out->placement.quadToWorld;
+    }
+    out->placement.aspect = rect.width() / rect.height();
+    out->placement.heightPx = rect.height();
+    return viewProjection(&out->view);
+}
+
+namespace {
+
+bool projectToCanvas(const QMatrix4x4 &view, const QVector3D &world, QPointF *canvas)
+{
+    const QVector4D h = view.map(QVector4D(world, 1.f));
+    if (h.w() <= 1e-6f)
+        return false;
+    *canvas = QPointF(h.x() / h.w(), h.y() / h.w());
+    return true;
+}
+
+// 3D Relight's "Scene depth" on one effect of the stack.
+double effectDepthRange(const QList<drift::Effect> &effects, int index)
+{
+    if (index < 0 || index >= effects.size())
+        return 1.0;
+    const EffectPresetEntry *def = effectDefForId(effects.at(index).catalogId);
+    if (!def)
+        return 1.0;
+    return std::max(0.01, resolvedEffectParameters(effects.at(index), *def)
+                              .value(QStringLiteral("depthRange"), 1.0)
+                              .toDouble());
+}
+
+} // namespace
+
+QVariantList PreviewController::depthLights3d() const
+{
+    QVariantList out;
+    SelectedRelief relief;
+    if (!selectedRelief(&relief))
+        return out;
+    for (const drift::ReliefLight &light :
+         drift::reliefLights(relief.effects, relief.frame.get(), relief.placement.aspect)) {
+        QPointF at;
+        if (!projectToCanvas(relief.view, relief.placement.toWorld(light.position), &at))
+            continue;
+        const QVector3D params = drift::reliefLightParams(light.position, relief.placement.aspect,
+                                                          effectDepthRange(relief.effects, light.effectIndex));
+        QVariantMap entry{{QStringLiteral("effect"), light.effectIndex},
+                          {QStringLiteral("light"), light.light},
+                          {QStringLiteral("x"), at.x()},
+                          {QStringLiteral("y"), at.y()},
+                          {QStringLiteral("z"), params.z()},
+                          {QStringLiteral("spot"), false},
+                          {QStringLiteral("color"), light.color.name()}};
+        QPointF aim;
+        if (light.spot && projectToCanvas(relief.view, relief.placement.toWorld(light.aim), &aim)) {
+            entry.insert(QStringLiteral("spot"), true);
+            entry.insert(QStringLiteral("aimX"), aim.x());
+            entry.insert(QStringLiteral("aimY"), aim.y());
+        }
+        out.append(entry);
+    }
+    return out;
+}
+
+QVariantMap PreviewController::moveDepthLight3d(int effectIndex, int light, double canvasX, double canvasY) const
+{
+    SelectedRelief relief;
+    if (!selectedRelief(&relief))
+        return {};
+    for (const drift::ReliefLight &candidate :
+         drift::reliefLights(relief.effects, relief.frame.get(), relief.placement.aspect)) {
+        if (candidate.effectIndex != effectIndex || candidate.light != light)
+            continue;
+        // Unprojected at the depth the light already has in the view: it slides across the
+        // screen the way Blender's grab does, and an orbit is what moves it nearer or farther.
+        const QVector4D h = relief.view.map(QVector4D(relief.placement.toWorld(candidate.position), 1.f));
+        bool invertible = false;
+        const QMatrix4x4 inverse = relief.view.inverted(&invertible);
+        if (h.w() <= 1e-6f || !invertible)
+            return {};
+        const QVector4D world =
+            inverse.map(QVector4D(float(canvasX) * h.w(), float(canvasY) * h.w(), h.z(), h.w()));
+        if (std::abs(world.w()) < 1e-9f)
+            return {};
+        const QVector3D params = drift::reliefLightParams(relief.placement.fromWorld(world.toVector3DAffine()),
+                                                          relief.placement.aspect,
+                                                          effectDepthRange(relief.effects, effectIndex));
+        return {{QStringLiteral("x"), params.x()}, {QStringLiteral("y"), params.y()}, {QStringLiteral("z"), params.z()}};
+    }
+    return {};
+}
+
+QVariantMap PreviewController::aimDepthLight3d(int effectIndex, double canvasX, double canvasY) const
+{
+    SelectedRelief relief;
+    if (!selectedRelief(&relief))
+        return {};
+    bool invertible = false;
+    const QMatrix4x4 inverse = relief.view.inverted(&invertible);
+    if (!invertible)
+        return {};
+    const QVector4D nearPoint = inverse.map(QVector4D(float(canvasX), float(canvasY), -1.f, 1.f));
+    const QVector4D farPoint = inverse.map(QVector4D(float(canvasX), float(canvasY), 0.f, 1.f));
+    if (std::abs(nearPoint.w()) < 1e-9f || std::abs(farPoint.w()) < 1e-9f)
+        return {};
+    QPointF uv;
+    if (!drift::reliefRayHit(relief.placement, relief.frame.get(), effectDepthRange(relief.effects, effectIndex),
+                             nearPoint.toVector3DAffine(), farPoint.toVector3DAffine(), &uv)) {
+        return {};
+    }
+    return {{QStringLiteral("aimX"), std::clamp(uv.x(), 0.0, 1.0)}, {QStringLiteral("aimY"), std::clamp(uv.y(), 0.0, 1.0)}};
 }
 
 QVariantMap PreviewController::maskEditorState() const
