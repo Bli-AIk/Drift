@@ -13,7 +13,7 @@ PanelFrame {
     property real keyframeLaneHeight: 88
 
     property real zoom: 1.0
-    property string propertiesTab: ""
+    property bool keyframesTab: false
 
     // Timeline tool mode (CapCut-style exclusive modes). One of:
     //   ""          Select — normal editing (toolbar pointer / V)
@@ -1160,15 +1160,12 @@ PanelFrame {
             Loader {
                 id: keyframesBar
                 width: parent.width - (audioMixer.visible ? audioMixer.width : 0)
-                active: (root.propertiesTab === "transform" || root.propertiesTab === "effects"
-                         || root.propertiesTab === "stabilize" || root.propertiesTab === "masks"
-                         || root.propertiesTab === "audio")
-                        && EditorState.selectedTrack >= 0 && EditorState.selectedClip >= 0
+                active: root.keyframesTab && EditorState.selectedTrack >= 0 && EditorState.selectedClip >= 0
                 sourceComponent: Component {
                     KeyframeGraph {
                         pxPerSecond: root.pxPerSecond
                         labelsWidth: EditorState.preferences.trackLabelsWidth
-                        propertiesTab: root.propertiesTab
+                        keyframesTab: root.keyframesTab
                         // Keep keys/playhead lined up with the track scroll view below.
                         contentX: flick.contentX
                         contentWidth: flick.contentWidth

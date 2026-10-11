@@ -4652,14 +4652,6 @@
         <translation>Слов в субтитре: %1</translation>
     </message>
     <message>
-        <source>No audio</source>
-        <translation>Нет аудио</translation>
-    </message>
-    <message>
-        <source>This clip has no audio track.</source>
-        <translation>У этого клипа нет звуковой дорожки.</translation>
-    </message>
-    <message>
         <source>Pan</source>
         <translation>Панорама</translation>
     </message>
@@ -4903,14 +4895,6 @@
 </context>
 <context>
     <name>BlendingInspector</name>
-    <message>
-        <source>Video only</source>
-        <translation>Только видео</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>Эта вкладка не относится к аудиоклипам.</translation>
-    </message>
     <message>
         <source>Blend mode</source>
         <translation>Режим наложения</translation>
@@ -13031,14 +13015,6 @@ If playback stutters, try another.</source>
 <context>
     <name>SpeedFadeInspector</name>
     <message>
-        <source>Not available</source>
-        <translation>Недоступно</translation>
-    </message>
-    <message>
-        <source>Speed applies to video, audio and composite clips.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Playback speed</source>
         <translation>Скорость воспроизведения</translation>
     </message>
@@ -15498,14 +15474,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Perspective</source>
         <translation>Перспектива</translation>
-    </message>
-    <message>
-        <source>Video only</source>
-        <translation>Только видео</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>Эта вкладка неприменима к аудиоклипам.</translation>
     </message>
     <message>
         <source>Also moved by %1</source>

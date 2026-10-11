@@ -4633,14 +4633,6 @@
         <translation>උපසිරැසියකට වචන %1ක්</translation>
     </message>
     <message>
-        <source>No audio</source>
-        <translation>ශ්‍රව්‍ය නැත</translation>
-    </message>
-    <message>
-        <source>This clip has no audio track.</source>
-        <translation>මෙම ක්ලිපයේ ශ්‍රව්‍ය ට්‍රැකයක් නැත.</translation>
-    </message>
-    <message>
         <source>Pan</source>
         <translation>Pan</translation>
     </message>
@@ -4884,14 +4876,6 @@
 </context>
 <context>
     <name>BlendingInspector</name>
-    <message>
-        <source>Video only</source>
-        <translation>වීඩියෝ සඳහා පමණි</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>මෙම ටැබය ශ්‍රව්‍ය ක්ලිප් සඳහා අදාළ නොවේ.</translation>
-    </message>
     <message>
         <source>Blend mode</source>
         <translation>මුසු කිරීමේ ප්‍රකාරය</translation>
@@ -12986,14 +12970,6 @@ If playback stutters, try another.</source>
 <context>
     <name>SpeedFadeInspector</name>
     <message>
-        <source>Not available</source>
-        <translation>ලබාගත නොහැක</translation>
-    </message>
-    <message>
-        <source>Speed applies to video, audio and composite clips.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Playback speed</source>
         <translation>ධාවන වේගය</translation>
     </message>
@@ -15449,14 +15425,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Perspective</source>
         <translation>පර්යාලෝකය</translation>
-    </message>
-    <message>
-        <source>Video only</source>
-        <translation>වීඩියෝ සඳහා පමණි</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>මෙම ටැබය ශ්‍රව්‍ය ක්ලිප් සඳහා අදාළ නොවේ.</translation>
     </message>
     <message>
         <source>Also moved by %1</source>

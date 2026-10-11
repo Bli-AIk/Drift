@@ -4614,14 +4614,6 @@
         <translation>캡션당 %1단어</translation>
     </message>
     <message>
-        <source>No audio</source>
-        <translation>오디오 없음</translation>
-    </message>
-    <message>
-        <source>This clip has no audio track.</source>
-        <translation>이 클립에는 오디오 트랙이 없습니다.</translation>
-    </message>
-    <message>
         <source>Pan</source>
         <translation>패닝</translation>
     </message>
@@ -4865,14 +4857,6 @@
 </context>
 <context>
     <name>BlendingInspector</name>
-    <message>
-        <source>Video only</source>
-        <translation>동영상만</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>이 탭은 오디오 클립에 적용되지 않습니다.</translation>
-    </message>
     <message>
         <source>Blend mode</source>
         <translation>혼합 모드</translation>
@@ -12934,14 +12918,6 @@ If playback stutters, try another.</source>
 <context>
     <name>SpeedFadeInspector</name>
     <message>
-        <source>Not available</source>
-        <translation>사용할 수 없음</translation>
-    </message>
-    <message>
-        <source>Speed applies to video, audio and composite clips.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Playback speed</source>
         <translation>재생 속도</translation>
     </message>
@@ -15392,14 +15368,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Perspective</source>
         <translation>원근</translation>
-    </message>
-    <message>
-        <source>Video only</source>
-        <translation>동영상만</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>이 탭은 오디오 클립에 적용되지 않습니다.</translation>
     </message>
     <message>
         <source>Also moved by %1</source>

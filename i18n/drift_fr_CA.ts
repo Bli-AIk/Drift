@@ -4635,14 +4635,6 @@
         <translation>%1 mots par sous-titre</translation>
     </message>
     <message>
-        <source>No audio</source>
-        <translation>Pas de son</translation>
-    </message>
-    <message>
-        <source>This clip has no audio track.</source>
-        <translation>Ce clip n&apos;a pas de piste audio.</translation>
-    </message>
-    <message>
         <source>Pan</source>
         <translation>Panoramique</translation>
     </message>
@@ -4886,14 +4878,6 @@
 </context>
 <context>
     <name>BlendingInspector</name>
-    <message>
-        <source>Video only</source>
-        <translation>Vidéo uniquement</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>Cet onglet ne s&apos;applique pas aux clips audio.</translation>
-    </message>
     <message>
         <source>Blend mode</source>
         <translation>Mode de fusion</translation>
@@ -12989,14 +12973,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
 <context>
     <name>SpeedFadeInspector</name>
     <message>
-        <source>Not available</source>
-        <translation>Non disponible</translation>
-    </message>
-    <message>
-        <source>Speed applies to video, audio and composite clips.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Playback speed</source>
         <translation>Vitesse de lecture</translation>
     </message>
@@ -15454,14 +15430,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>Perspective</source>
         <translation>Perspective</translation>
-    </message>
-    <message>
-        <source>Video only</source>
-        <translation>Vidéo uniquement</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>Cet onglet ne s&apos;applique pas aux clips audio.</translation>
     </message>
     <message>
         <source>Also moved by %1</source>

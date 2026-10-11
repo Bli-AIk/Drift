@@ -1892,7 +1892,7 @@ ApplicationWindow {
                     TimelinePanel {
                         id: timelinePanel
                         visible: !window.previewFullscreen
-                        propertiesTab: propertiesPanel.currentTabId
+                        keyframesTab: propertiesPanel.keyframesTab
                         SplitView.preferredHeight: Math.max(0, outerSplit.height * 0.5)
                         SplitView.minimumHeight: Math.min(140, Math.max(0, outerSplit.height * 0.2))
                     }

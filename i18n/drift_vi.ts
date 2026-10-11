@@ -4614,14 +4614,6 @@
         <translation>%1 từ cho mỗi phụ đề</translation>
     </message>
     <message>
-        <source>No audio</source>
-        <translation>Không có âm thanh</translation>
-    </message>
-    <message>
-        <source>This clip has no audio track.</source>
-        <translation>Clip này không có track âm thanh.</translation>
-    </message>
-    <message>
         <source>Pan</source>
         <translation>Xoay</translation>
     </message>
@@ -4865,14 +4857,6 @@
 </context>
 <context>
     <name>BlendingInspector</name>
-    <message>
-        <source>Video only</source>
-        <translation>Chỉ video</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>Thẻ này không áp dụng cho các clip âm thanh.</translation>
-    </message>
     <message>
         <source>Blend mode</source>
         <translation>Chế độ hòa trộn</translation>
@@ -12941,14 +12925,6 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
 <context>
     <name>SpeedFadeInspector</name>
     <message>
-        <source>Not available</source>
-        <translation>Không khả dụng</translation>
-    </message>
-    <message>
-        <source>Speed applies to video, audio and composite clips.</source>
-        <translation>Tốc độ áp dụng cho video, âm thanh và tổ hợp clip.</translation>
-    </message>
-    <message>
         <source>Playback speed</source>
         <translation>Tốc độ phát lại</translation>
     </message>
@@ -15404,14 +15380,6 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
     <message>
         <source>Perspective</source>
         <translation>Phối cảnh</translation>
-    </message>
-    <message>
-        <source>Video only</source>
-        <translation>Chỉ video</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>Thẻ này không áp dụng cho các clip âm thanh.</translation>
     </message>
     <message>
         <source>Also moved by %1</source>

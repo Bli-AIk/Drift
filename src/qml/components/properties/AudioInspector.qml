@@ -14,7 +14,6 @@ Item {
     }
     readonly property bool hasSelection: !!clipData && Object.keys(clipData).length > 0
     readonly property string clipKind: hasSelection ? (clipData.kind || "") : ""
-    readonly property bool audible: clipKind === "audio" || clipKind === "video" || clipKind === "composite"
     // Read straight from a media file: stream choice, denoise and transcription need one.
     readonly property bool fileAudio: (clipKind === "audio" || clipKind === "video") && !clipData.sequenceId
     readonly property var propVolume: { "key": "volume", "label": qsTr("Volume"), "def": 1.0, "decimals": 2 }
@@ -46,18 +45,8 @@ Item {
         width: root.width
         spacing: Theme.spacingXl
 
-        EmptyState {
-            visible: root.clipKind !== "audio" && root.clipKind !== "video"
-            width: parent.width
-            compact: true
-            glyph: Theme.icons.volumeOff
-            title: qsTr("No audio")
-            hint: qsTr("This clip has no audio track.")
-        }
-
         PropertyKeyframeRow {
             width: root.width
-            visible: root.audible
             propDef: root.propVolume
             keyframeList: (root.clipData.keyframes && root.clipData.keyframes.volume && root.clipData.keyframes.volume.points) || []
             useSlider: true
@@ -72,7 +61,6 @@ Item {
             id: panSection
             width: parent.width
             spacing: Theme.spacingSm
-            visible: root.audible
 
             readonly property real panValue: {
                 void root.clipDataRevision

@@ -4709,14 +4709,6 @@
         <translation>%1 كلمة لكل تسمية توضيحية</translation>
     </message>
     <message>
-        <source>No audio</source>
-        <translation>لا يوجد صوت</translation>
-    </message>
-    <message>
-        <source>This clip has no audio track.</source>
-        <translation>لا يحتوي هذا المقطع على مسار صوتي.</translation>
-    </message>
-    <message>
         <source>Pan</source>
         <translation>التوزيع الصوتي</translation>
     </message>
@@ -4960,14 +4952,6 @@
 </context>
 <context>
     <name>BlendingInspector</name>
-    <message>
-        <source>Video only</source>
-        <translation>الفيديو فقط</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>لا تنطبق علامة التبويب هذه على مقاطع الصوت.</translation>
-    </message>
     <message>
         <source>Blend mode</source>
         <translation>وضع المزج</translation>
@@ -13166,14 +13150,6 @@ If playback stutters, try another.</source>
 <context>
     <name>SpeedFadeInspector</name>
     <message>
-        <source>Not available</source>
-        <translation>غير متاح</translation>
-    </message>
-    <message>
-        <source>Speed applies to video, audio and composite clips.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Playback speed</source>
         <translation>سرعة التشغيل</translation>
     </message>
@@ -15645,14 +15621,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Perspective</source>
         <translation>المنظور</translation>
-    </message>
-    <message>
-        <source>Video only</source>
-        <translation>الفيديو فقط</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>لا تنطبق علامة التبويب هذه على المقاطع الصوتية.</translation>
     </message>
     <message>
         <source>Also moved by %1</source>

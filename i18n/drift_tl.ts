@@ -4633,14 +4633,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No audio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This clip has no audio track.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Pan</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4884,14 +4876,6 @@
 </context>
 <context>
     <name>BlendingInspector</name>
-    <message>
-        <source>Video only</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Blend mode</source>
         <translation type="unfinished"></translation>
@@ -12979,14 +12963,6 @@ If playback stutters, try another.</source>
 <context>
     <name>SpeedFadeInspector</name>
     <message>
-        <source>Not available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Speed applies to video, audio and composite clips.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Playback speed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -15440,14 +15416,6 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>Perspective</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Video only</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

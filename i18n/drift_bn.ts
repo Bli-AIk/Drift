@@ -4633,14 +4633,6 @@
         <translation>প্রতি ক্যাপশনে %1টি শব্দ</translation>
     </message>
     <message>
-        <source>No audio</source>
-        <translation type="unfinished">কোন অডিও নেই</translation>
-    </message>
-    <message>
-        <source>This clip has no audio track.</source>
-        <translation type="unfinished">এই ক্লিপটিতে কোনো অডিও ট্র্যাক নেই.</translation>
-    </message>
-    <message>
         <source>Pan</source>
         <translation type="unfinished">প্যান</translation>
     </message>
@@ -4884,14 +4876,6 @@
 </context>
 <context>
     <name>BlendingInspector</name>
-    <message>
-        <source>Video only</source>
-        <translation type="unfinished">শুধুমাত্র ভিডিও</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation type="unfinished">এই ট্যাবটি অডিও ক্লিপগুলিতে প্রযোজ্য নয়.</translation>
-    </message>
     <message>
         <source>Blend mode</source>
         <translation type="unfinished">ব্লেন্ড মোড</translation>
@@ -12986,14 +12970,6 @@ If playback stutters, try another.</source>
 <context>
     <name>SpeedFadeInspector</name>
     <message>
-        <source>Not available</source>
-        <translation>পাওয়া যাচ্ছে না</translation>
-    </message>
-    <message>
-        <source>Speed applies to video, audio and composite clips.</source>
-        <translation type="unfinished">গতি ভিডিও, অডিও এবং কম্পোজিট ক্লিপগুলিতে প্রযোজ্য.</translation>
-    </message>
-    <message>
         <source>Playback speed</source>
         <translation type="unfinished">প্লেব্যাক গতি</translation>
     </message>
@@ -15449,14 +15425,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Perspective</source>
         <translation type="unfinished">দৃষ্টিকোণ</translation>
-    </message>
-    <message>
-        <source>Video only</source>
-        <translation type="unfinished">শুধুমাত্র ভিডিও</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation type="unfinished">এই ট্যাবটি অডিও ক্লিপগুলিতে প্রযোজ্য নয়.</translation>
     </message>
     <message>
         <source>Also moved by %1</source>

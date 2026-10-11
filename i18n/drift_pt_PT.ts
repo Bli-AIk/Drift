@@ -4633,14 +4633,6 @@
         <translation>%1 palavras por legenda</translation>
     </message>
     <message>
-        <source>No audio</source>
-        <translation>Sem áudio</translation>
-    </message>
-    <message>
-        <source>This clip has no audio track.</source>
-        <translation>Este clipe não tem faixa de áudio.</translation>
-    </message>
-    <message>
         <source>Pan</source>
         <translation>Panorâmica</translation>
     </message>
@@ -4884,14 +4876,6 @@
 </context>
 <context>
     <name>BlendingInspector</name>
-    <message>
-        <source>Video only</source>
-        <translation>Somente vídeo</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>Esta aba não se aplica a clipes de áudio.</translation>
-    </message>
     <message>
         <source>Blend mode</source>
         <translation>Modo de mesclagem</translation>
@@ -12986,14 +12970,6 @@ Se a reprodução travar, experimente outro.</translation>
 <context>
     <name>SpeedFadeInspector</name>
     <message>
-        <source>Not available</source>
-        <translation>Não disponível</translation>
-    </message>
-    <message>
-        <source>Speed applies to video, audio and composite clips.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Playback speed</source>
         <translation>Velocidade de reprodução</translation>
     </message>
@@ -15449,14 +15425,6 @@ Se a reprodução travar, experimente outro.</translation>
     <message>
         <source>Perspective</source>
         <translation>Perspectiva</translation>
-    </message>
-    <message>
-        <source>Video only</source>
-        <translation>Somente vídeo</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>Esta aba não se aplica a clipes de áudio.</translation>
     </message>
     <message>
         <source>Also moved by %1</source>

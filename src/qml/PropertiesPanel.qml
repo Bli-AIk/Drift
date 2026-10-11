@@ -36,9 +36,9 @@ PanelFrame {
     readonly property bool hasTransitionSelection: !!transition && Object.keys(transition).length > 0
     readonly property int transitionTabIndex: tabIndexOf("transition")
     readonly property string clipKind: hasSelection ? (root.clipData.kind || "") : ""
-    readonly property bool hasTextStyle: hasSelection
-                                         && (clipKind === "text" || clipKind === "subtitle")
-                                         && !!root.clipData.textStyle
+    // What the selected clip supports, from AppController's inspectorCaps(). Tabs list the caps
+    // they need in `tabs` below.
+    readonly property var caps: hasSelection ? (root.clipData.caps || []) : []
 
     // Inspector view state that outlives the tab being unloaded.
     QtObject {
@@ -53,7 +53,8 @@ PanelFrame {
     }
 
     property int activeTab: 0
-    readonly property string currentTabId: tabsModel.get(activeTab).tabId
+    readonly property string currentTabId: tabs[activeTab].id
+    readonly property bool keyframesTab: !!tabs[activeTab].keyframes
 
     // Kept for SubtitleEditor, which formats cue times through it.
     function formatSeconds(value) {
@@ -64,17 +65,12 @@ PanelFrame {
         target: EditorState
         function onSelectionChanged() {
             root.clipDataRevision++
-            root.syncSubtitlesTab()
-            root.syncShapeTab()
-            root.syncTextTab()
-            root.syncAnimationTab()
-            root.syncStabilizeTab()
             root.syncAdjustmentTab()
             root.syncActiveTab()
         }
         function onSelectedClipDataChanged() {
             root.clipDataRevision++
-            root.syncSubtitlesTab()
+            root.syncActiveTab()
         }
         function onSelectedTransitionDataChanged() {
             if (root.hasTransitionSelection)
@@ -87,7 +83,7 @@ PanelFrame {
         // selected it, so the Text tab exists; callLater lets the tab switch settle before the
         // focus lands on a child of the page that was hidden a moment ago.
         function onInlineTextEditRequested(trackIndex, clipIndex) {
-            if (root.textTabIndex < 0 || !root.tabVisible("text"))
+            if (!root.tabVisible("text"))
                 return
             root.activeTab = root.textTabIndex
             Qt.callLater(() => {
@@ -98,137 +94,60 @@ PanelFrame {
     }
 
     Component.onCompleted: {
-        root.syncSubtitlesTab()
+        root.syncActiveTab()
     }
-
-    // ListElement only accepts literal values; qsTr() calls are not
-    // evaluated. Labels are translated via tabLabels below.
-    property var tabLabels: ({
-        "general": qsTr("General"),
-        "text": qsTr("Text"),
-        "shape": qsTr("Shape"),
-        "vector": qsTr("Motion"),
-        "model3d": qsTr("3D Model"),
-        "pdf": qsTr("PDF"),
-        "subtitles": qsTr("Subtitles"),
-        "transform": qsTr("Transform"),
-        "camera": qsTr("Camera"),
-        "stabilize": qsTr("Stabilization"),
-        "animation": qsTr("Animation"),
-        "audio": qsTr("Audio"),
-        "speed": qsTr("Speed"),
-        "blending": qsTr("Blending"),
-        "masks": qsTr("Masks"),
-        "effects": qsTr("Effects"),
-        "audioEffects": qsTr("Audio FX"),
-        "transition": qsTr("Transition")
-    })
 
     // Rail order: clip identity → geometry/timing → compositing / FX.
-    // Contextual tabs (text / shape / captions) share the first group so a
-    // separator still appears after General when they are hidden.
     // `group` drives hairlines between the next *visible* tab of a different group.
-    ListModel {
-        id: tabsModel
-        ListElement { tabId: "general"; icon: 0; group: 0 }
-        ListElement { tabId: "text"; icon: 1; group: 0 }
-        ListElement { tabId: "shape"; icon: 2; group: 0 }
-        ListElement { tabId: "vector"; icon: 14; group: 0 }
-        ListElement { tabId: "model3d"; icon: 15; group: 0 }
-        ListElement { tabId: "pdf"; icon: 17; group: 0 }
-        ListElement { tabId: "subtitles"; icon: 3; group: 0 }
-        ListElement { tabId: "transform"; icon: 4; group: 1 }
-        ListElement { tabId: "camera"; icon: 16; group: 1 }
-        ListElement { tabId: "stabilize"; icon: 5; group: 1 }
-        ListElement { tabId: "animation"; icon: 6; group: 1 }
-        ListElement { tabId: "audio"; icon: 7; group: 1 }
-        ListElement { tabId: "speed"; icon: 8; group: 1 }
-        ListElement { tabId: "blending"; icon: 9; group: 2 }
-        ListElement { tabId: "masks"; icon: 10; group: 2 }
-        ListElement { tabId: "effects"; icon: 11; group: 2 }
-        ListElement { tabId: "audioEffects"; icon: 12; group: 2 }
-        ListElement { tabId: "transition"; icon: 13; group: 2 }
-    }
-    property var tabIcons: [
-        Theme.icons.info,
-        Theme.icons.type,
-        Theme.icons.shapes,
-        Theme.icons.captions,
-        Theme.icons.maximize,
-        Theme.icons.locateFixed,
-        Theme.icons.sparkles,
-        Theme.icons.volumeHigh,
-        Theme.icons.gauge,
-        Theme.icons.blend,
-        Theme.icons.mask,
-        Theme.icons.wand,
-        Theme.icons.audioLines,
-        Theme.icons.chevronsRight,
-        Theme.icons.layers,
-        Theme.icons.box,
-        Theme.icons.video,
-        Theme.icons.fileText
+    // A tab shows only when the clip has every cap in `needs`, so a tab or clip kind that nobody
+    // described stays hidden instead of turning up on every clip. `opens` is the adjustment
+    // payload the tab edits: selecting that adjustment jumps straight to it. `keyframes` marks a
+    // tab that edits keyframeable properties, which is when the timeline opens its keyframe lane.
+    // Audio is one: volume is keyframeable and edited there.
+    readonly property var tabs: [
+        { id: "general", label: qsTr("General"), icon: Theme.icons.info, group: 0, needs: [] },
+        { id: "text", label: qsTr("Text"), icon: Theme.icons.type, group: 0, needs: ["textStyled"] },
+        { id: "shape", label: qsTr("Shape"), icon: Theme.icons.shapes, group: 0, needs: ["shape"] },
+        { id: "vector", label: qsTr("Motion"), icon: Theme.icons.layers, group: 0, needs: ["vector"] },
+        { id: "model3d", label: qsTr("3D Model"), icon: Theme.icons.box, group: 0, needs: ["model3d"] },
+        { id: "pdf", label: qsTr("PDF"), icon: Theme.icons.fileText, group: 0, needs: ["pdf"] },
+        { id: "subtitles", label: qsTr("Subtitles"), icon: Theme.icons.captions, group: 0, needs: ["subtitle"] },
+        { id: "transform", label: qsTr("Transform"), icon: Theme.icons.maximize, group: 1,
+          needs: ["transformable"], opens: "adj:transform", keyframes: true },
+        { id: "camera", label: qsTr("Camera"), icon: Theme.icons.video, group: 1,
+          needs: ["adj:camera"], opens: "adj:camera" },
+        { id: "stabilize", label: qsTr("Stabilization"), icon: Theme.icons.locateFixed, group: 1,
+          needs: ["stabilizable"], keyframes: true },
+        { id: "animation", label: qsTr("Animation"), icon: Theme.icons.sparkles, group: 1, needs: ["animatable"] },
+        { id: "audio", label: qsTr("Audio"), icon: Theme.icons.volumeHigh, group: 1, needs: ["audible"], keyframes: true },
+        { id: "speed", label: qsTr("Speed"), icon: Theme.icons.gauge, group: 1, needs: ["retimable"] },
+        { id: "blending", label: qsTr("Blending"), icon: Theme.icons.blend, group: 2, needs: ["blendable"] },
+        // Masks and effect stacks live on the adjustments pinned to a clip, and those adjustments
+        // are what you select to edit them. A clip can carry several mask adjustments, and
+        // reporting one clip-shaped stack for it could only ever show the first.
+        { id: "masks", label: qsTr("Masks"), icon: Theme.icons.mask, group: 2,
+          needs: ["maskable"], opens: "adj:mask", keyframes: true },
+        { id: "effects", label: qsTr("Effects"), icon: Theme.icons.wand, group: 2,
+          needs: ["adj:videoEffects"], opens: "adj:videoEffects", keyframes: true },
+        { id: "audioEffects", label: qsTr("Audio FX"), icon: Theme.icons.audioLines, group: 2,
+          needs: ["adj:audioEffects"], opens: "adj:audioEffects" },
+        { id: "transition", label: qsTr("Transition"), icon: Theme.icons.chevronsRight, group: 2,
+          needs: ["transitionable"] }
     ]
 
     function tabVisible(tabId) {
-        // An adjustment carries one kind of payload, so it shows the inspector for that and
-        // nothing else. It used to offer Transform and Speed, which the compositor ignores for
-        // an adjustment — the layer is the whole canvas, and there is no source to retime.
-        if (root.clipKind === "adjustment") {
-            const kind = root.clipData.adjustmentKind || "videoEffects"
-            // A transform layer is its transform: the box, plus Animation for group slide-ins.
-            if (kind === "transform")
-                return tabId === "general" || tabId === "transform" || tabId === "animation"
-            // A camera clip is its viewpoint and nothing else. No Animation: a camera has no box
-            // to slide in, and no Blending, because it never draws a pixel.
-            if (kind === "camera")
-                return tabId === "general" || tabId === "camera"
-            if (tabId === "general" || tabId === "blending")
-                return true
-            if (tabId === "effects")
-                return kind === "videoEffects"
-            if (tabId === "audioEffects")
-                return kind === "audioEffects"
-            if (tabId === "masks")
-                return kind === "mask" || kind === "videoEffects"
-            return false
-        }
-        if (tabId === "subtitles")
-            return root.clipKind === "subtitle"
-        if (tabId === "shape")
-            return root.clipKind === "shape"
-        if (tabId === "vector")
-            return root.clipKind === "vector"
-        if (tabId === "model3d")
-            return root.clipKind === "model3d"
-        if (tabId === "pdf")
-            return root.clipKind === "pdf"
-        if (tabId === "text")
-            return root.hasTextStyle
-        if (tabId === "animation")
-            return root.clipKind === "video" || root.clipKind === "image"
-                   || root.clipKind === "shape" || root.clipKind === "text"
-                   || root.clipKind === "vector" || root.clipKind === "pdf" || root.clipKind === "audio"
-                   || root.clipKind === "composite"
-        if (tabId === "stabilize")
-            return root.clipKind === "video"
-        // Masks and effect stacks live on the adjustments pinned to a clip, and those adjustments
-        // are what you select to edit them. The clip is where you *aim* one from — the assets
-        // panel does that — but not where it is configured: a clip can carry several mask
-        // adjustments, and reporting one clip-shaped stack for it can only ever show the first.
-        if (tabId === "masks" || tabId === "effects" || tabId === "audioEffects")
-            return false
-        return true
+        const tab = root.tabs[tabIndexOf(tabId)]
+        return !!tab && tab.needs.every(cap => root.caps.indexOf(cap) >= 0)
     }
 
     // Hairline after this index when the next visible tab belongs to another group.
     function showSeparatorAfter(index) {
-        const cur = tabsModel.get(index)
-        if (!tabVisible(cur.tabId))
+        const cur = root.tabs[index]
+        if (!tabVisible(cur.id))
             return false
-        for (let i = index + 1; i < tabsModel.count; ++i) {
-            const next = tabsModel.get(i)
-            if (!tabVisible(next.tabId))
+        for (let i = index + 1; i < root.tabs.length; ++i) {
+            const next = root.tabs[i]
+            if (!tabVisible(next.id))
                 continue
             return next.group !== cur.group
         }
@@ -236,82 +155,32 @@ PanelFrame {
     }
 
     function tabIndexOf(id) {
-        for (let i = 0; i < tabsModel.count; i++) {
-            if (tabsModel.get(i).tabId === id)
+        for (let i = 0; i < root.tabs.length; i++) {
+            if (root.tabs[i].id === id)
                 return i
         }
         return -1
     }
-    readonly property int subtitlesTabIndex: tabIndexOf("subtitles")
-    readonly property int shapeTabIndex: tabIndexOf("shape")
     readonly property int textTabIndex: tabIndexOf("text")
-    readonly property int animationTabIndex: tabIndexOf("animation")
-    readonly property int stabilizeTabIndex: tabIndexOf("stabilize")
-    // The one tab an adjustment exists for. Mirrors the kind switch in tabVisible above.
-    readonly property string adjustmentTabId: {
-        const kind = root.clipData.adjustmentKind || "videoEffects"
-        if (kind === "mask")
-            return "masks"
-        if (kind === "audioEffects")
-            return "audioEffects"
-        if (kind === "transform")
-            return "transform"
-        if (kind === "camera")
-            return "camera"
-        return "effects"
-    }
 
-    // The Subtitles tab only exists for subtitle clips, so leaving it selected would show a blank
-    // pane once the selection moves off one. Selecting a subtitle clip never opens the tab by
-    // itself: it took over whatever pane you were working in, and with it the timeline lane.
-    function syncSubtitlesTab() {
-        if (root.subtitlesTabIndex >= 0 && root.activeTab === root.subtitlesTabIndex
-                && root.clipKind !== "subtitle")
-            root.activeTab = 0
-    }
-
-    // The Shape tab is hidden for every other clip kind, so leaving it selected would show a blank
-    // pane after the selection moves off a shape.
-    function syncShapeTab() {
-        if (root.shapeTabIndex >= 0 && root.activeTab === root.shapeTabIndex
-                && root.clipKind !== "shape")
-            root.activeTab = 0
-    }
-
-    // Same for the Text tab, which only exists for clips carrying a text style.
-    function syncTextTab() {
-        if (root.textTabIndex >= 0 && root.activeTab === root.textTabIndex && !root.hasTextStyle)
-            root.activeTab = 0
-    }
-
-    function syncAnimationTab() {
-        if (root.animationTabIndex >= 0 && root.activeTab === root.animationTabIndex
-                && !root.tabVisible("animation"))
-            root.activeTab = 0
-    }
-
-    function syncStabilizeTab() {
-        if (root.stabilizeTabIndex >= 0 && root.activeTab === root.stabilizeTabIndex
-                && !root.tabVisible("stabilize"))
-            root.activeTab = 0
-    }
-
-    // Selecting an adjustment is how you edit its payload now, so it opens the pane that edits
+    // Selecting an adjustment is how you edit its payload, so it opens the pane that edits
     // one — the same courtesy selecting a transition already gets. A video-effects adjustment
-    // also offers the Masks tab (a mask there scopes where the chain lands), but its effect
-    // stack is what you came for, so kind decides and not tab order.
+    // also offers the Masks tab, but its effect stack is what you came for, so `opens` decides
+    // and not tab order.
     function syncAdjustmentTab() {
-        if (root.clipKind !== "adjustment")
-            return
-        const target = tabIndexOf(root.adjustmentTabId)
-        if (target >= 0)
-            root.activeTab = target
+        for (let i = 0; i < root.tabs.length; i++) {
+            const opens = root.tabs[i].opens
+            if (opens && root.caps.indexOf(opens) >= 0) {
+                root.activeTab = i
+                return
+            }
+        }
     }
 
-    // The catch-all behind the per-tab syncs above: an adjustment hides most of the rail, so any
-    // tab open on the clip you came from can vanish under you and leave an empty pane.
+    // A tab that the new selection does not support would leave an empty pane. With nothing
+    // selected the tab is kept, so reselecting a clip lands where you were.
     function syncActiveTab() {
-        if (!root.tabVisible(root.currentTabId))
+        if (root.hasSelection && !root.tabVisible(root.currentTabId))
             root.activeTab = 0
     }
 
@@ -429,18 +298,18 @@ PanelFrame {
 
                     Repeater {
                         id: tabStripRepeater
-                        model: tabsModel
+                        model: root.tabs
                         // Not a ThemedChip: that one's contentItem is a single Text,
                         // and stacking a glyph over the label needs two rows.
                         delegate: AbstractButton {
                             id: tabChip
                             required property int index
-                            required property var model
+                            required property var modelData
 
                             readonly property bool current: root.activeTab === tabChip.index
 
                             anchors.verticalCenter: parent.verticalCenter
-                            visible: root.tabVisible(tabChip.model.tabId)
+                            visible: root.tabVisible(tabChip.modelData.id)
                             height: tabStripHost.tabChipHeight
                             implicitWidth: Math.max(Theme.controlHeight + Theme.spacing2xl,
                                                     tabChipLabel.implicitWidth + Theme.spacingXl * 2)
@@ -448,7 +317,7 @@ PanelFrame {
                             focusPolicy: Qt.StrongFocus
 
                             Accessible.role: Accessible.PageTab
-                            Accessible.name: root.tabLabels[tabChip.model.tabId]
+                            Accessible.name: tabChip.modelData.label
                             Accessible.checked: tabChip.current
 
                             scale: tabChip.down ? Theme.pressScale : 1.0
@@ -496,7 +365,7 @@ PanelFrame {
 
                                     IconGlyph {
                                         anchors.horizontalCenter: parent.horizontalCenter
-                                        glyph: root.tabIcons[tabChip.model.icon]
+                                        glyph: tabChip.modelData.icon
                                         iconSize: Theme.iconSizeLg
                                         iconColor: tabChip.current ? Theme.primaryForeground
                                                                    : Theme.panelForeground
@@ -505,7 +374,7 @@ PanelFrame {
                                     Text {
                                         id: tabChipLabel
                                         anchors.horizontalCenter: parent.horizontalCenter
-                                        text: root.tabLabels[tabChip.model.tabId]
+                                        text: tabChip.modelData.label
                                         color: tabChip.current ? Theme.primaryForeground
                                                                : Theme.panelForeground
                                         font.family: Theme.fontFamily
@@ -552,9 +421,9 @@ PanelFrame {
 
             Keys.onUpPressed: function(event) {
                 let next = root.activeTab
-                for (let step = 0; step < tabsModel.count; ++step) {
-                    next = (next - 1 + tabsModel.count) % tabsModel.count
-                    if (root.tabVisible(tabsModel.get(next).tabId)) {
+                for (let step = 0; step < root.tabs.length; ++step) {
+                    next = (next - 1 + root.tabs.length) % root.tabs.length
+                    if (root.tabVisible(root.tabs[next].id)) {
                         root.activeTab = next
                         break
                     }
@@ -563,9 +432,9 @@ PanelFrame {
             }
             Keys.onDownPressed: function(event) {
                 let next = root.activeTab
-                for (let step = 0; step < tabsModel.count; ++step) {
-                    next = (next + 1) % tabsModel.count
-                    if (root.tabVisible(tabsModel.get(next).tabId)) {
+                for (let step = 0; step < root.tabs.length; ++step) {
+                    next = (next + 1) % root.tabs.length
+                    if (root.tabVisible(root.tabs[next].id)) {
                         root.activeTab = next
                         break
                     }
@@ -580,27 +449,27 @@ PanelFrame {
                 spacing: Theme.spacingXs
 
                 Repeater {
-                    model: tabsModel
+                    model: root.tabs
                     delegate: Column {
                         required property int index
-                        required property var model
+                        required property var modelData
 
                         width: parent.width
                         spacing: 0
                         // Collapse so hidden contextual tabs leave no rail gap.
-                        visible: root.tabVisible(model.tabId)
+                        visible: root.tabVisible(modelData.id)
                         height: visible ? implicitHeight : 0
 
                         IconButton {
                             anchors.horizontalCenter: parent.horizontalCenter
-                            glyph: root.tabIcons[model.icon]
+                            glyph: modelData.icon
                             variant: "ghost"
-                            tooltip: root.tabLabels[model.tabId]
+                            tooltip: modelData.label
                             active: root.activeTab === index
                             onClicked: root.activeTab = index
 
                             Accessible.role: Accessible.PageTab
-                            Accessible.name: root.tabLabels[model.tabId]
+                            Accessible.name: modelData.label
                             Accessible.checked: root.activeTab === index
                         }
 
@@ -688,7 +557,7 @@ PanelFrame {
                 Text {
                     // The strip above already names the tab, in a size you can read.
                     visible: !root.sheetMode
-                    text: root.tabLabels[tabsModel.get(root.activeTab).tabId]
+                    text: root.tabs[root.activeTab].label
                     color: Theme.mutedForeground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs

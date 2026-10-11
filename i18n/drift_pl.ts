@@ -4652,14 +4652,6 @@
         <translation>%1 słów na napis</translation>
     </message>
     <message>
-        <source>No audio</source>
-        <translation>Brak audio</translation>
-    </message>
-    <message>
-        <source>This clip has no audio track.</source>
-        <translation>Ten klip nie ma ścieżki audio.</translation>
-    </message>
-    <message>
         <source>Pan</source>
         <translation>Panorama</translation>
     </message>
@@ -4903,14 +4895,6 @@
 </context>
 <context>
     <name>BlendingInspector</name>
-    <message>
-        <source>Video only</source>
-        <translation>Tylko wideo</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>Ta karta nie dotyczy klipów audio.</translation>
-    </message>
     <message>
         <source>Blend mode</source>
         <translation>Tryb mieszania</translation>
@@ -13031,14 +13015,6 @@ Jeśli odtwarzanie się zacina, spróbuj innego.</translation>
 <context>
     <name>SpeedFadeInspector</name>
     <message>
-        <source>Not available</source>
-        <translation>Niedostępne</translation>
-    </message>
-    <message>
-        <source>Speed applies to video, audio and composite clips.</source>
-        <translation>Prędkość dotyczy klipów wideo, audio i kompozycji.</translation>
-    </message>
-    <message>
         <source>Playback speed</source>
         <translation>Prędkość odtwarzania</translation>
     </message>
@@ -15498,14 +15474,6 @@ Jeśli odtwarzanie się zacina, spróbuj innego.</translation>
     <message>
         <source>Perspective</source>
         <translation>Perspektywa</translation>
-    </message>
-    <message>
-        <source>Video only</source>
-        <translation>Tylko wideo</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>Ta karta nie dotyczy klipów audio.</translation>
     </message>
     <message>
         <source>Also moved by %1</source>

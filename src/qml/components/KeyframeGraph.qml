@@ -21,7 +21,8 @@ Item {
     readonly property real paintOriginX: Math.floor(contentX / paintChunk) * paintChunk - paintChunk
     property real contentWidth: 800
     property real labelsWidth: Theme.trackLabelsWidth
-    property string propertiesTab: ""
+    // Whether the open properties tab edits keyframeable properties (PropertiesPanel `keyframes`).
+    property bool keyframesTab: false
 
     readonly property bool hasClip: EditorState.selectedTrack >= 0 && EditorState.selectedClip >= 0
     readonly property var clip: {
@@ -339,15 +340,7 @@ Item {
     height: visible ? laneHeight : 0
     // Open whenever the clip has an animation to show, even if every curve is currently folded
     // away — otherwise hiding the last one would take the chips with it.
-    // "audio" belongs here for the same reason the rest do: volume is a keyframeable property
-    // (supportsProperty allows it for audio and video clips) and the Audio tab is where it is
-    // edited, so leaving the tab out hid the lane at exactly the moment it was wanted. The
-    // curve was still reachable by switching to Transform, which made it look inconsistent
-    // rather than missing.
-    visible: (propertiesTab === "transform" || propertiesTab === "effects"
-              || propertiesTab === "stabilize" || propertiesTab === "masks"
-              || propertiesTab === "audio")
-             && hasClip && clip && allSeries.length > 0
+    visible: keyframesTab && hasClip && clip && allSeries.length > 0
 
     // Curve editing focuses one series: it gets tangent handles and owns the value axis,
     // while the others stay drawn as dimmed context. Handles from two series normalized to

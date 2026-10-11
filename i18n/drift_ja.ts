@@ -4614,14 +4614,6 @@
         <translation>キャプションあたり %1 単語</translation>
     </message>
     <message>
-        <source>No audio</source>
-        <translation>音声なし</translation>
-    </message>
-    <message>
-        <source>This clip has no audio track.</source>
-        <translation>このクリップにはオーディオトラックがありません。</translation>
-    </message>
-    <message>
         <source>Pan</source>
         <translation>パン</translation>
     </message>
@@ -4865,14 +4857,6 @@
 </context>
 <context>
     <name>BlendingInspector</name>
-    <message>
-        <source>Video only</source>
-        <translation>ビデオのみ</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>このタブはオーディオクリップには適用されません。</translation>
-    </message>
     <message>
         <source>Blend mode</source>
         <translation>ブレンドモード</translation>
@@ -12941,14 +12925,6 @@ If playback stutters, try another.</source>
 <context>
     <name>SpeedFadeInspector</name>
     <message>
-        <source>Not available</source>
-        <translation>利用できません</translation>
-    </message>
-    <message>
-        <source>Speed applies to video, audio and composite clips.</source>
-        <translation>速度はビデオ、オーディオ、コンポジットクリップに適用されます。</translation>
-    </message>
-    <message>
         <source>Playback speed</source>
         <translation>再生速度</translation>
     </message>
@@ -15400,14 +15376,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Perspective</source>
         <translation>パースペクティブ</translation>
-    </message>
-    <message>
-        <source>Video only</source>
-        <translation>ビデオのみ</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>このタブはオーディオクリップには適用されません。</translation>
     </message>
     <message>
         <source>Also moved by %1</source>

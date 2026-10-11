@@ -23,7 +23,7 @@ Item {
     property real zoom: 1.0
 
     // Keyframe lane: opened from the lane bar, and only offered when the selected
-    // clip has something animated. KeyframeGraph gates itself on propertiesTab, so
+    // clip has something animated. KeyframeGraph gates itself on keyframesTab, so
     // the collapse goes through that rather than through `visible` — otherwise the
     // lane would keep its height while folded away.
     property bool keyframeLaneOpen: false
@@ -1115,7 +1115,7 @@ Item {
             width: parent.width
             pxPerSecond: root.pxPerSecond
             labelsWidth: root.labelsWidth
-            propertiesTab: root.keyframeLaneOpen ? "transform" : ""
+            keyframesTab: root.keyframeLaneOpen
             contentX: flick.contentX
             contentWidth: flick.contentWidth
             // Tangent grips are only armed above 140px, so on a phone the lane opens

@@ -127,19 +127,9 @@ Item {
         width: root.width
         spacing: Theme.spacingXl
 
-        EmptyState {
-            visible: root.clipKind === "audio"
-            width: parent.width
-            compact: true
-            glyph: Theme.icons.film
-            title: qsTr("Video only")
-            hint: qsTr("This tab does not apply to audio clips.")
-        }
-
         Column {
             width: root.width
             spacing: 10
-            visible: root.clipKind !== "audio"
 
             TransformLayerCard {
                 visible: root.isTransformLayer

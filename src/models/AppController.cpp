@@ -976,6 +976,80 @@ bool trackAllowsTransitions(drift::TrackType type)
            || type == drift::TrackType::Text || type == drift::TrackType::Audio;
 }
 
+// What the properties panel may offer for a clip. Each inspector tab lists the caps it needs and
+// is hidden without them, so a new clip kind only has to be described here.
+QStringList inspectorCaps(const drift::Clip &clip, drift::TrackType trackType)
+{
+    using drift::ClipType;
+    QStringList caps;
+    if (clip.type == ClipType::Adjustment) {
+        switch (clip.adjustmentKind) {
+        case drift::AdjustmentKind::VideoEffects:
+            caps << QStringLiteral("blendable") << QStringLiteral("maskable") << QStringLiteral("adj:videoEffects");
+            break;
+        case drift::AdjustmentKind::Mask:
+            caps << QStringLiteral("blendable") << QStringLiteral("maskable") << QStringLiteral("adj:mask");
+            break;
+        case drift::AdjustmentKind::AudioEffects:
+            caps << QStringLiteral("adj:audioEffects");
+            break;
+        case drift::AdjustmentKind::Transform:
+            caps << QStringLiteral("transformable") << QStringLiteral("animatable") << QStringLiteral("adj:transform");
+            break;
+        case drift::AdjustmentKind::Camera:
+            caps << QStringLiteral("adj:camera");
+            break;
+        }
+        return caps;
+    }
+
+    if (trackAllowsTransitions(trackType))
+        caps << QStringLiteral("transitionable");
+
+    switch (clip.type) {
+    case ClipType::Video:
+        caps << QStringLiteral("transformable") << QStringLiteral("blendable") << QStringLiteral("animatable")
+             << QStringLiteral("audible") << QStringLiteral("retimable") << QStringLiteral("stabilizable");
+        break;
+    case ClipType::Composite:
+        caps << QStringLiteral("transformable") << QStringLiteral("blendable") << QStringLiteral("animatable")
+             << QStringLiteral("audible") << QStringLiteral("retimable");
+        break;
+    case ClipType::Audio:
+        caps << QStringLiteral("animatable") << QStringLiteral("audible") << QStringLiteral("retimable");
+        break;
+    case ClipType::Text:
+        caps << QStringLiteral("transformable") << QStringLiteral("blendable") << QStringLiteral("animatable")
+             << QStringLiteral("textStyled");
+        break;
+    case ClipType::Subtitle:
+        caps << QStringLiteral("transformable") << QStringLiteral("blendable") << QStringLiteral("textStyled")
+             << QStringLiteral("subtitle");
+        break;
+    case ClipType::Image:
+        caps << QStringLiteral("transformable") << QStringLiteral("blendable") << QStringLiteral("animatable");
+        break;
+    case ClipType::Shape:
+        caps << QStringLiteral("transformable") << QStringLiteral("blendable") << QStringLiteral("animatable")
+             << QStringLiteral("shape");
+        break;
+    case ClipType::Vector:
+        caps << QStringLiteral("transformable") << QStringLiteral("blendable") << QStringLiteral("animatable")
+             << QStringLiteral("vector");
+        break;
+    case ClipType::Pdf:
+        caps << QStringLiteral("transformable") << QStringLiteral("blendable") << QStringLiteral("animatable")
+             << QStringLiteral("pdf");
+        break;
+    case ClipType::Model3d:
+        caps << QStringLiteral("transformable") << QStringLiteral("blendable") << QStringLiteral("model3d");
+        break;
+    case ClipType::Adjustment:
+        break;
+    }
+    return caps;
+}
+
 // On an audio track only the sound of a transition exists, and "hold" has none.
 bool transitionKindFitsTrack(drift::TrackType type, const QString &kindId)
 {
@@ -4922,6 +4996,8 @@ QVariantMap AppController::selectedClipData() const
         const drift::TimeUs relative = qMax<drift::TimeUs>(0, m_playheadUs - clip.timelineStart);
         data.insert(QStringLiteral("rotationAtPlayhead"),
                     clipTransformValue(clip.rotation, relative, 0.0));
+        data.insert(QStringLiteral("caps"),
+                    inspectorCaps(clip, m_project.tracks().at(trackIndex).type));
         return data;
     };
 

@@ -4633,14 +4633,6 @@
         <translation>%1 palabras por subtítulo</translation>
     </message>
     <message>
-        <source>No audio</source>
-        <translation>Sin audio</translation>
-    </message>
-    <message>
-        <source>This clip has no audio track.</source>
-        <translation>Este clip no tiene pista de audio.</translation>
-    </message>
-    <message>
         <source>Pan</source>
         <translation>Panorámica</translation>
     </message>
@@ -4884,14 +4876,6 @@
 </context>
 <context>
     <name>BlendingInspector</name>
-    <message>
-        <source>Video only</source>
-        <translation>Solo vídeo</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>Esta pestaña no se aplica a clips de audio.</translation>
-    </message>
     <message>
         <source>Blend mode</source>
         <translation>Modo de fusión</translation>
@@ -12986,14 +12970,6 @@ Si la reproducción se corta, prueba con otra opción.</translation>
 <context>
     <name>SpeedFadeInspector</name>
     <message>
-        <source>Not available</source>
-        <translation>No disponible</translation>
-    </message>
-    <message>
-        <source>Speed applies to video, audio and composite clips.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Playback speed</source>
         <translation>Velocidad de reproducción</translation>
     </message>
@@ -15449,14 +15425,6 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     <message>
         <source>Perspective</source>
         <translation>Perspectiva</translation>
-    </message>
-    <message>
-        <source>Video only</source>
-        <translation>Solo vídeo</translation>
-    </message>
-    <message>
-        <source>This tab does not apply to audio clips.</source>
-        <translation>Esta pestaña no se aplica a clips de audio.</translation>
     </message>
     <message>
         <source>Also moved by %1</source>
