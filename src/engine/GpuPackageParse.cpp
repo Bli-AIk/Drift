@@ -484,7 +484,7 @@ QStringList defaultSearchPaths(const QString &envVar, const QString &subdir,
     if (!addonKind.isEmpty())
         roots.append(drift::addon::addonRootsForKind(addonKind));
 
-#ifdef Q_OS_ANDROID
+#if defined(Q_OS_ANDROID) || defined(Q_OS_WASM)
     // applicationDirPath() is the APK's lib directory and holds nothing but .so files, so the
     // bundled packages ride inside the binary as Qt resources instead (see qt_add_resources in
     // CMakeLists.txt). QDir enumerates and QFile reads ":/" paths exactly as real ones, which is

@@ -9,7 +9,9 @@
 #include <QGuiApplication>
 #include <QLibraryInfo>
 #include <QLocale>
+#if !defined(Q_OS_WASM)
 #include <QProcess>
+#endif
 #include <QScreen>
 #include <QSettings>
 #include <QTranslator>
@@ -558,7 +560,11 @@ void PreferencesController::setInterfaceShell(const QString &shell)
 
 bool PreferencesController::canRestart() const
 {
+#ifdef Q_OS_WASM
+    return false;
+#else
     return !qEnvironmentVariableIsSet("FLATPAK_ID");
+#endif
 }
 
 void PreferencesController::restartApp()
@@ -570,7 +576,7 @@ void PreferencesController::restartApp()
     QJniObject context = QNativeInterface::QAndroidApplication::context();
     QJniObject::callStaticMethod<void>("org/cutwire/drift/AppRestart", "restart",
                                        "(Landroid/content/Context;)V", context.object());
-#else
+#elif !defined(Q_OS_WASM)
     if (m_relaunchOnQuit)
         return;
     m_relaunchOnQuit = true;

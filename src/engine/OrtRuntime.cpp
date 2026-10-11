@@ -253,6 +253,9 @@ bool ensureLoaded(QString *error)
     auto getApiBase = reinterpret_cast<const OrtApiBase *(ORT_API_CALL *)()>(
         GetProcAddress(handle, "OrtGetApiBase"));
 #else
+#ifdef Q_OS_WASM
+    return fail(QStringLiteral("ONNX Runtime is not available in the browser build"));
+#endif
     void *handle = dlopen(chosen->libPath.toLocal8Bit().constData(), RTLD_NOW | RTLD_LOCAL);
     if (!handle)
         return fail(QStringLiteral("Cannot load %1 (%2)")

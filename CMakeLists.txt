@@ -23,7 +23,7 @@ option(DRIFT_WITH_SKIA "Draw vector content (text, shapes, Lottie, SVG) with Ski
 set(DRIFT_SKIA_DIR "" CACHE PATH "Directory containing SkiaConfig.cmake (default: third_party/prebuilt/skia/<target>)")
 
 # Defaults off under CI so the Translations test still compares the committed catalogs.
-if(DEFINED ENV{CI})
+if(DEFINED ENV{CI} OR EMSCRIPTEN)
     set(_drift_auto_ts OFF)
 else()
     set(_drift_auto_ts ON)
@@ -135,6 +135,21 @@ message(STATUS "Drift distribution: ${DRIFT_DISTRIBUTION}")
 if(DRIFT_DISTRIBUTION STREQUAL "android-play")
     set(DRIFT_UPDATE_FEED_URL "")
 endif()
+# A browser tab is always the latest deployment; there is no installer to point at.
+if(EMSCRIPTEN)
+    set(DRIFT_UPDATE_FEED_URL "")
+endif()
+
+# Qt for wasm is built with one exception model and every object linked into it must agree, so this
+# has to match how Qt itself was configured. The official Qt 6.11 wasm builds use JS exceptions
+# (config_qtbase.summary: "WebAssembly Exceptions ... no"), hence -fexceptions.
+# Global rather than per target: the prebuilt archives and JUCE are compiled the same way.
+if(EMSCRIPTEN)
+    set(DRIFT_WASM_EH_FLAGS "-fexceptions" CACHE STRING
+        "Exception-handling flag for wasm; must match the Qt for wasm build")
+    add_compile_options(${DRIFT_WASM_EH_FLAGS})
+    add_link_options(${DRIFT_WASM_EH_FLAGS})
+endif()
 
 find_package(Qt6 6.10 REQUIRED COMPONENTS Quick QuickControls2 Multimedia Test Concurrent Widgets OpenGL Network QuickEffects Svg Xml)
 find_package(Qt6 COMPONENTS LinguistTools QUIET)
@@ -239,7 +254,54 @@ if(ANDROID)
     set(DRIFT_SOUNDTOUCH_TARGET drift_soundtouch)
 endif()
 
-if(NOT ANDROID)
+# --- WebAssembly prebuilt dependencies ---------------------------------------
+# Same shape as the Android block above: no pkg-config and no system prefix, so the static archives
+# built by third_party/build-wasm.sh stand in for the host lookups. Compiled with the same -pthread
+# and exception flags as Qt for wasm, or the link fails on mismatched atomics/EH features.
+if(EMSCRIPTEN)
+    set(DRIFT_PREBUILT "${CMAKE_SOURCE_DIR}/third_party/prebuilt/wasm")
+    if(NOT EXISTS "${DRIFT_PREBUILT}/lib/libavcodec.a")
+        message(FATAL_ERROR
+            "No prebuilt dependencies for wasm. Run:\n"
+            "    third_party/build-wasm.sh")
+    endif()
+
+    # zlib is an emscripten port, not an archive: the flag has to reach both compile and link.
+    add_library(ZLIB::ZLIB INTERFACE IMPORTED)
+    target_compile_options(ZLIB::ZLIB INTERFACE -sUSE_ZLIB=1)
+    target_link_options(ZLIB::ZLIB INTERFACE -sUSE_ZLIB=1)
+    set(ZLIB_FOUND TRUE)
+
+    add_library(FFmpeg::FFmpeg INTERFACE IMPORTED)
+    target_include_directories(FFmpeg::FFmpeg INTERFACE "${DRIFT_PREBUILT}/include")
+    target_link_libraries(FFmpeg::FFmpeg INTERFACE
+        "${DRIFT_PREBUILT}/lib/libavfilter.a"
+        "${DRIFT_PREBUILT}/lib/libavformat.a"
+        "${DRIFT_PREBUILT}/lib/libavcodec.a"
+        "${DRIFT_PREBUILT}/lib/libswscale.a"
+        "${DRIFT_PREBUILT}/lib/libswresample.a"
+        "${DRIFT_PREBUILT}/lib/libavutil.a"
+        "${DRIFT_PREBUILT}/lib/libx264.a"
+        "${DRIFT_PREBUILT}/lib/libdav1d.a"
+        "${DRIFT_PREBUILT}/lib/libvidstab.a"
+        m ZLIB::ZLIB)
+
+    add_library(drift_zstd INTERFACE IMPORTED)
+    target_include_directories(drift_zstd INTERFACE "${DRIFT_PREBUILT}/include")
+    target_link_libraries(drift_zstd INTERFACE "${DRIFT_PREBUILT}/lib/libzstd.a")
+    set(DRIFT_ZSTD_TARGET drift_zstd)
+
+    add_library(OpenSSL::Crypto INTERFACE IMPORTED)
+    target_include_directories(OpenSSL::Crypto INTERFACE "${DRIFT_PREBUILT}/include")
+    target_link_libraries(OpenSSL::Crypto INTERFACE "${DRIFT_PREBUILT}/lib/libcrypto.a")
+
+    add_library(drift_soundtouch INTERFACE IMPORTED)
+    target_include_directories(drift_soundtouch INTERFACE "${DRIFT_PREBUILT}/include")
+    target_link_libraries(drift_soundtouch INTERFACE "${DRIFT_PREBUILT}/lib/libSoundTouch.a")
+    set(DRIFT_SOUNDTOUCH_TARGET drift_soundtouch)
+endif()
+
+if(NOT ANDROID AND NOT EMSCRIPTEN)
     find_package(FFmpeg REQUIRED)
 endif()
 
@@ -251,8 +313,14 @@ option(DRIFT_FETCH_ONNXRUNTIME
     "Download prebuilt ONNX Runtime headers when they are not installed (cmake/FetchOnnxRuntime.cmake)" ON)
 # Stage a CPU runtime into <appDir>/onnxruntime so the build tree can transcribe without going
 # through the addon service. Packaged builds turn this off — they ship no runtime at all.
+# Not on wasm: only the headers are fetched, and there is no runtime to dlopen in a browser.
+if(EMSCRIPTEN)
+    set(_drift_bundle_ort OFF)
+else()
+    set(_drift_bundle_ort ON)
+endif()
 option(DRIFT_BUNDLE_ONNXRUNTIME
-    "Stage a CPU ONNX Runtime into the build tree for development" ON)
+    "Stage a CPU ONNX Runtime into the build tree for development" ${_drift_bundle_ort})
 find_package(OnnxRuntime QUIET)
 if(DRIFT_BUNDLE_ONNXRUNTIME AND OnnxRuntime_FOUND AND NOT ONNXRUNTIME_RUNTIME_LIBS
    AND DRIFT_FETCH_ONNXRUNTIME)
@@ -287,7 +355,7 @@ endif()
 # Addon packages (.driftpkg) are solid-zstd compressed and Ed25519 signed. zstd upstream only
 # ships a CMake config in recent releases, so fall back to pkg-config.
 find_package(PkgConfig QUIET)
-if(NOT ANDROID)
+if(NOT ANDROID AND NOT EMSCRIPTEN)
     find_package(zstd CONFIG QUIET)
     if(TARGET zstd::libzstd_shared)
         set(DRIFT_ZSTD_TARGET zstd::libzstd_shared)
@@ -301,7 +369,9 @@ if(NOT ANDROID)
     endif()
     find_package(OpenSSL REQUIRED COMPONENTS Crypto)
 endif()
-find_package(ZLIB REQUIRED)
+if(NOT EMSCRIPTEN)
+    find_package(ZLIB REQUIRED)
+endif()
 
 # SoundTouch does the pitch shifting behind the voice effects. juce_dsp has no pitch shifter, and a
 # hand-rolled granular one cancels the signal outright wherever the tap spacing lands on an odd
@@ -311,7 +381,7 @@ find_package(ZLIB REQUIRED)
 # exist, and a non-existent INTERFACE_INCLUDE_DIRECTORIES entry on an imported target is a hard
 # generate-time error rather than something we can fall back from. Where there is no pkg-config at
 # all (MSVC), the CMake config below is the only path, so it gets repaired instead.
-if(NOT ANDROID)
+if(NOT ANDROID AND NOT EMSCRIPTEN)
     if(PkgConfig_FOUND)
         pkg_check_modules(SOUNDTOUCH QUIET IMPORTED_TARGET soundtouch)
     endif()
@@ -404,15 +474,40 @@ if(DRIFT_JUCE_DIR)
             "(looked in ${_drift_juce_dir}).")
     endif()
     message(STATUS "JUCE: using ${_drift_juce_dir}")
+    if(EMSCRIPTEN)
+        # The wasm fix-up edits a JUCE header, which is not something to do to a user's checkout,
+        # so build from a copy in the build tree (rerun when the source path changes).
+        include(PatchJuceWasm)
+        set(_drift_juce_copied "")
+        if(EXISTS "${CMAKE_BINARY_DIR}/juce-wasm-src/.src")
+            file(READ "${CMAKE_BINARY_DIR}/juce-wasm-src/.src" _drift_juce_copied)
+        endif()
+        if(NOT "${_drift_juce_copied}" STREQUAL "${_drift_juce_dir}")
+            file(REMOVE_RECURSE "${CMAKE_BINARY_DIR}/juce-wasm-src")
+            file(COPY "${_drift_juce_dir}/" DESTINATION "${CMAKE_BINARY_DIR}/juce-wasm-src"
+                 PATTERN ".git" EXCLUDE)
+            file(WRITE "${CMAKE_BINARY_DIR}/juce-wasm-src/.src" "${_drift_juce_dir}")
+        endif()
+        drift_patch_juce_wasm("${CMAKE_BINARY_DIR}/juce-wasm-src/modules")
+        set(_drift_juce_dir "${CMAKE_BINARY_DIR}/juce-wasm-src")
+    endif()
     add_subdirectory("${_drift_juce_dir}" "${CMAKE_BINARY_DIR}/juce-build")
 elseif(DRIFT_FETCH_JUCE)
     message(STATUS "JUCE: fetching ${DRIFT_JUCE_TAG}")
     include(FetchContent)
+    set(_drift_juce_patch "")
+    if(EMSCRIPTEN)
+        # The download is ours alone, so patch it in place between populate and add_subdirectory.
+        set(_drift_juce_patch PATCH_COMMAND ${CMAKE_COMMAND}
+            -DDRIFT_JUCE_MODULES_DIR=<SOURCE_DIR>/modules
+            -P "${CMAKE_SOURCE_DIR}/cmake/PatchJuceWasm.cmake")
+    endif()
     FetchContent_Declare(JUCE
         GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
         GIT_TAG ${DRIFT_JUCE_TAG}
         GIT_SHALLOW TRUE
-        GIT_PROGRESS TRUE)
+        GIT_PROGRESS TRUE
+        ${_drift_juce_patch})
     FetchContent_MakeAvailable(JUCE)
 else()
     message(FATAL_ERROR
@@ -572,6 +667,13 @@ target_compile_definitions(driftaudiodsp PRIVATE
     # Otherwise every binary that links this, tools and tests included, opens with "JUCE v8.0.15".
     JUCE_DISABLE_JUCE_VERSION_PRINTING=1
 )
+if(EMSCRIPTEN)
+    # juce_SystemStats_wasm.cpp calls emscripten_get_now() without including its header. JUCE's
+    # sources reach this target as interface sources, so a per-file property would be keyed on a
+    # path this file does not own; the flag is harmless for the rest of the target.
+    target_compile_options(driftaudiodsp PRIVATE "SHELL:-include emscripten/emscripten.h")
+    target_sources(driftaudiodsp PRIVATE wasm/juce_wasm_shim.cpp)
+endif()
 # The same sources are built to WebAssembly for Drift Forge's preview (wasm/). Fused multiply-adds
 # would round differently from the wasm build, and on ARM the compiler contracts by default.
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
@@ -980,8 +1082,6 @@ target_sources(drift PRIVATE
     src/mcp/McpCatalog.cpp
     src/mcp/McpProtocol.h
     src/mcp/McpProtocol.cpp
-    src/mcp/McpHttp.h
-    src/mcp/McpHttp.cpp
     src/mcp/McpDispatcher.h
     src/mcp/McpDispatcher.cpp
     src/mcp/McpDispatcherExtended.cpp
@@ -990,14 +1090,23 @@ target_sources(drift PRIVATE
     src/mcp/McpValidate.h
     src/mcp/McpValidate.cpp
     src/mcp/McpMarket.cpp
-    src/mcp/McpServer.h
-    src/mcp/McpServer.cpp
     src/mcp/McpJson.h
 )
 
+# The HTTP listener needs QTcpServer, which a browser has no sockets for; McpController does not
+# construct a McpServer under Q_OS_WASM.
+if(NOT EMSCRIPTEN)
+    target_sources(drift PRIVATE
+        src/mcp/McpHttp.h
+        src/mcp/McpHttp.cpp
+        src/mcp/McpServer.h
+        src/mcp/McpServer.cpp
+    )
+endif()
+
 # The stdio transport and the headless entry point stay desktop-only: both are process entry
 # points driven from a terminal, which an APK has no equivalent of.
-if(NOT ANDROID)
+if(NOT ANDROID AND NOT EMSCRIPTEN)
     target_sources(drift PRIVATE
         src/mcp/McpStdio.h
         src/mcp/McpStdio.cpp
@@ -1422,31 +1531,6 @@ if(ANDROID)
     find_package(Qt6 REQUIRED COMPONENTS CorePrivate)
     target_link_libraries(drift PRIVATE Qt6::CorePrivate)
 
-    # applicationDirPath() on Android is the APK's lib directory and contains nothing but .so
-    # files, so the file-based package roots the desktop build stages next to the binary have
-    # nowhere to live. The packages ride inside the binary as Qt resources instead;
-    # GpuPackageParse::defaultSearchPaths adds ":/packages/<subdir>" as the bundled root.
-    file(GLOB_RECURSE DRIFT_PACKAGE_FILES RELATIVE "${CMAKE_SOURCE_DIR}" CONFIGURE_DEPENDS
-         "effects/*/effect.json"
-         "effects/*/*.frag"
-         "effects/*/*.png"
-         "effects/*/*.bin"
-         "effects/*/NOTICE"
-         "effects/*/LICENSE*"
-         "transitions/*/*.json"
-         "transitions/*/*.frag"
-         "transitions/*/*.png"
-         "audio-effects/*/audio-effect.json"
-         "audio-effects/*/thumbnail.png"
-         "effect-templates/*/template.json"
-         "effect-templates/*/thumbnail.png")
-    list(REMOVE_DUPLICATES DRIFT_PACKAGE_FILES)
-    qt_add_resources(drift "drift_packages"
-        PREFIX "/packages"
-        BASE "${CMAKE_SOURCE_DIR}"
-        FILES ${DRIFT_PACKAGE_FILES}
-    )
-
     # Qt Network's OpenSSL TLS plugin dlopens libcrypto_3.so / libssl_3.so at runtime.
     # androiddeployqt files each extra .so under lib/<abi>/ from its ELF architecture, so a
     # multi-ABI AAB must list the OpenSSL pair for every ABI in QT_ANDROID_ABIS — not only
@@ -1498,6 +1582,33 @@ if(ANDROID)
         QT_ANDROID_VERSION_NAME "${PROJECT_VERSION}"
         QT_ANDROID_VERSION_CODE "${DRIFT_ANDROID_VERSION_CODE}"
         QT_ANDROID_EXTRA_LIBS "${_drift_android_extra_libs}"
+    )
+endif()
+
+# applicationDirPath() has nothing to stage into on Android (the APK's lib directory) or wasm (a
+# virtual filesystem with no files beside the binary), so the file-based package roots the desktop
+# build stages next to the binary ride inside it as Qt resources instead.
+if(ANDROID OR EMSCRIPTEN)
+    # GpuPackageParse::defaultSearchPaths adds ":/packages/<subdir>" as the bundled root.
+    file(GLOB_RECURSE DRIFT_PACKAGE_FILES RELATIVE "${CMAKE_SOURCE_DIR}" CONFIGURE_DEPENDS
+         "effects/*/effect.json"
+         "effects/*/*.frag"
+         "effects/*/*.png"
+         "effects/*/*.bin"
+         "effects/*/NOTICE"
+         "effects/*/LICENSE*"
+         "transitions/*/*.json"
+         "transitions/*/*.frag"
+         "transitions/*/*.png"
+         "audio-effects/*/audio-effect.json"
+         "audio-effects/*/thumbnail.png"
+         "effect-templates/*/template.json"
+         "effect-templates/*/thumbnail.png")
+    list(REMOVE_DUPLICATES DRIFT_PACKAGE_FILES)
+    qt_add_resources(drift "drift_packages"
+        PREFIX "/packages"
+        BASE "${CMAKE_SOURCE_DIR}"
+        FILES ${DRIFT_PACKAGE_FILES}
     )
 endif()
 
@@ -1608,6 +1719,18 @@ else()
     message(STATUS "Qt6 LinguistTools not found; translations will not be built.")
 endif()
 
+if(EMSCRIPTEN)
+    # Threads come from Qt's multithread toolchain (-pthread). The pool is pre-spawned because a
+    # worker can only be created from the main thread's event loop, which blocks on thread joins.
+    # FULL_ES3 emulates glMapBufferRange, which GlRuntime's PBO readback needs.
+    set_target_properties(drift PROPERTIES QT_WASM_INITIAL_MEMORY 128MB)
+    target_link_options(drift PRIVATE
+        -sALLOW_MEMORY_GROWTH=1
+        -sMAXIMUM_MEMORY=4GB
+        -sPTHREAD_POOL_SIZE=8
+        -sFULL_ES3=1)
+endif()
+
 # Defined here rather than in the header so there is exactly one place to change them.
 target_compile_definitions(drift PRIVATE
     DRIFT_ADDON_INDEX_URL="${DRIFT_ADDON_INDEX_URL}"
@@ -1701,8 +1824,8 @@ function(drift_copy_effect_templates target)
     drift_stage_packages(${target} effect-templates)
 endfunction()
 
-# Android gets these through qt_add_resources above; there is no <appDir> to stage into.
-if(NOT ANDROID)
+# Android and wasm get these through qt_add_resources above; there is no <appDir> to stage into.
+if(NOT ANDROID AND NOT EMSCRIPTEN)
     drift_copy_effects(drift)
     drift_copy_effect_templates(drift)
     drift_copy_transitions(drift)
@@ -1711,8 +1834,8 @@ if(NOT ANDROID)
 endif()
 
 # Desktop packaging, the headless CLI tools and the QTest binaries. None of it applies to an
-# APK, so the Android configure skips it wholesale.
-if(NOT ANDROID)
+# APK or a browser tab, so the Android and wasm configures skip it wholesale.
+if(NOT ANDROID AND NOT EMSCRIPTEN)
 # --- install (used by packaging, e.g. Flatpak; the dev workflow runs in-place) ---
 include(GNUInstallDirs)
 
@@ -1780,4 +1903,4 @@ add_subdirectory(tools)
 # --- tests -------------------------------------------------------------------
 enable_testing()
 add_subdirectory(tests)
-endif() # NOT ANDROID
+endif() # NOT ANDROID AND NOT EMSCRIPTEN

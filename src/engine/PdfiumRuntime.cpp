@@ -196,6 +196,9 @@ bool ensureLoaded(QString *error)
                     true);
     const auto symbol = [&](const char *name) { return reinterpret_cast<void *>(GetProcAddress(handle, name)); };
 #else
+#ifdef Q_OS_WASM
+    return fail(QStringLiteral("PDFium is not available in the browser build"), true);
+#endif
     void *handle = dlopen(libPath.toLocal8Bit().constData(), RTLD_NOW | RTLD_LOCAL);
     if (!handle)
         return fail(QStringLiteral("Cannot load %1 (%2)")

@@ -49,7 +49,9 @@ public:
     Q_INVOKABLE void setEnabled(bool enabled);
     // Headless wires transports onto the server itself, which the on/off switch above
     // does not expose.
+#ifndef Q_OS_WASM
     drift::mcp::McpServer *server() const { return m_mcp.get(); }
+#endif
     bool enabled() const { return running(); }
     bool running() const;
     QString url() const;
@@ -234,7 +236,9 @@ private:
     void storeTranscript(const QString &assetId, std::shared_ptr<drift::Transcript> transcript);
 
     AppController *m_app = nullptr;
+#ifndef Q_OS_WASM
     std::unique_ptr<drift::mcp::McpServer> m_mcp;
+#endif
     bool m_mcpStartOnLaunch = false;
     bool m_undoSuspended = false;
     int m_batchDepth = 0;

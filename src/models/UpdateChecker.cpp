@@ -17,7 +17,9 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#if !defined(Q_OS_WASM)
 #include <QProcess>
+#endif
 #include <QSettings>
 #include <QStandardPaths>
 #include <QSysInfo>
@@ -865,6 +867,7 @@ void UpdateChecker::stageAppImage()
     finishStage();
 }
 
+#if !defined(Q_OS_WASM)
 void UpdateChecker::runStageStep(const QString &program, const QStringList &arguments,
                                  const std::function<void(int, const QString &)> &done)
 {
@@ -957,6 +960,8 @@ void UpdateChecker::detachMacImage(bool thenInstall)
                          failPrepare(tr("Couldn’t prepare the update."));
                  });
 }
+
+#endif
 
 void UpdateChecker::failPrepare(const QString &message)
 {

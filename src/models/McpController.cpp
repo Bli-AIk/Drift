@@ -1,7 +1,9 @@
 #include "McpController.h"
 
 #include "mcp/McpCatalog.h"
+#ifndef Q_OS_WASM
 #include "mcp/McpServer.h"
+#endif
 #include "models/AppController.h"
 #include "McpDetail.h"
 #include "MarketClient.h"
@@ -80,6 +82,7 @@ McpController::McpController(AppController *app, QObject *parent)
     : QObject(parent)
     , m_app(app)
 {
+#ifndef Q_OS_WASM
     m_mcp = std::make_unique<drift::mcp::McpServer>(m_app);
     connect(m_mcp.get(), &drift::mcp::McpServer::runningChanged, this,
             &McpController::runningChanged);
@@ -88,6 +91,7 @@ McpController::McpController(AppController *app, QObject *parent)
     connect(m_mcp.get(), &drift::mcp::McpServer::tokenChanged, this,
             &McpController::runningChanged);
     connect(m_mcp.get(), &drift::mcp::McpServer::errorChanged, this, &McpController::errorChanged);
+#endif
     // Loaded here so the property already reads correctly for anything constructed on
     // this object, but NOT acted on here — headless mode constructs the same
     // AppController/EditorState and configures the MCP server itself from CLI args
@@ -101,43 +105,73 @@ McpController::McpController(AppController *app, QObject *parent)
 
 McpController::~McpController()
 {
+#ifndef Q_OS_WASM
     if (m_mcp)
         m_mcp->stop();
+#endif
 }
 
 bool McpController::running() const
 {
+#ifndef Q_OS_WASM
     return m_mcp && m_mcp->running();
+#else
+    return false;
+#endif
 }
 
 QString McpController::url() const
 {
+#ifndef Q_OS_WASM
     return m_mcp ? m_mcp->url() : QString();
+#else
+    return QString();
+#endif
 }
 
 QString McpController::token() const
 {
+#ifndef Q_OS_WASM
     return m_mcp ? m_mcp->token() : QString();
+#else
+    return QString();
+#endif
 }
 
 int McpController::port() const
 {
+#ifndef Q_OS_WASM
     return m_mcp ? int(m_mcp->port()) : 0;
+#else
+    return 0;
+#endif
 }
 
 QString McpController::error() const
 {
+#ifndef Q_OS_WASM
     return m_mcp ? m_mcp->error() : QString();
+#else
+    return QString();
+#endif
 }
 
 QString McpController::cursorSnippet() const
 {
+#ifndef Q_OS_WASM
     return m_mcp ? m_mcp->cursorSnippet() : QString();
+#else
+    return QString();
+#endif
 }
 
 QString McpController::claudeCommand() const
 {
+#ifndef Q_OS_WASM
     return m_mcp ? m_mcp->claudeCommand() : QString();
+#else
+    return QString();
+#endif
 }
 
 QString McpController::stdioSnippet() const
@@ -154,6 +188,7 @@ QString McpController::stdioSnippet() const
 
 void McpController::setEnabled(bool enabled)
 {
+#ifndef Q_OS_WASM
     if (!m_mcp)
         return;
     if (enabled) {
@@ -166,12 +201,15 @@ void McpController::setEnabled(bool enabled)
         // stop from inside McpServer never reaches this branch.
         setStartOnLaunch(false);
     }
+#endif
 }
 
 void McpController::rotateToken()
 {
+#ifndef Q_OS_WASM
     if (m_mcp)
         m_mcp->rotateToken();
+#endif
 }
 
 void McpController::setStartOnLaunch(bool enabled)
@@ -188,8 +226,10 @@ void McpController::setStartOnLaunch(bool enabled)
 // the constructor is what stops the two from racing over the same server instance.
 void McpController::applyStartOnLaunch()
 {
+#ifndef Q_OS_WASM
     if (m_mcpStartOnLaunch && m_mcp)
         m_mcp->start();
+#endif
 }
 
 namespace {
@@ -221,7 +261,7 @@ void McpController::copyStdioSnippet()
 
 QString McpController::agentGuide() const
 {
-#ifndef Q_OS_ANDROID
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_WASM)
     QString guide = drift::mcp::agentGuideText();
     if (m_mcp && m_mcp->running()) {
         guide += QStringLiteral("\nThis session:\nURL: %1\nToken: %2\n")

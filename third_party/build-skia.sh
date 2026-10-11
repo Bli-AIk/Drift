@@ -16,8 +16,9 @@
 #
 # Usage: third_party/build-skia.sh [target]
 #   target  linux-x64 (default) | linux-arm64 | mac-arm64 | mac-x64
-#           | android-arm64-v8a | android-armeabi-v7a | android-x86_64
+#           | android-arm64-v8a | android-armeabi-v7a | android-x86_64 | wasm
 #           Android targets need ANDROID_NDK_ROOT, as build-android.sh does.
+#           wasm needs emcc on PATH (source emsdk_env.sh first).
 #
 # Environment:
 #   CC / CXX          host compiler for the linux/mac targets (default clang / clang++)
@@ -27,6 +28,8 @@
 #   SKIA_OUT_DIR      install prefix (default third_party/prebuilt/skia/<target>)
 #   SKIA_SYSTEM_ICU   linux only, default 1. 0 compiles Skia's own ICU with embedded data, for
 #                     the AppImage: bundling the distro's libicudata costs ~30 MB, Skia's ~10 MB.
+#   WASM_EH_FLAGS     wasm only, default -fexceptions. Must match how the installed Qt for
+#                     wasm was built (-fwasm-exceptions for a Qt built with them).
 set -euo pipefail
 
 TARGET="${1:-linux-x64}"
@@ -222,11 +225,48 @@ case "$TARGET" in
     )
     sync_externals expat freetype harfbuzz icu libpng zlib
     ;;
+  wasm)
+    command -v emcc >/dev/null 2>&1 || { echo "emcc not found: activate emsdk (source emsdk_env.sh) first" >&2; exit 1; }
+    # Modelled on Skia's CanvasKit build (modules/canvaskit/compile.sh). -pthread because Qt is the
+    # multithreaded wasm build: objects without atomics/bulk-memory cannot link into a shared-memory
+    # module. The exception flag must match Qt's, or throws cross the boundary as aborts.
+    # extra_cflags replaces the common -fPIC. GL comes from -sUSE_WEBGL2 at app link time.
+    PLATFORM_ARGS=(
+      target_os=\"wasm\"
+      target_cpu=\"wasm\"
+      skia_gl_standard=\"webgl\"
+      skia_use_webgl=true
+      skia_use_fontconfig=false
+      skia_enable_fontmgr_custom_directory=false
+      skia_enable_fontmgr_custom_embedded=false
+      skia_use_system_freetype2=false
+      skia_use_system_harfbuzz=false
+      skia_use_system_icu=false
+      skia_use_system_expat=false
+      skia_use_system_libpng=false
+      skia_use_system_zlib=false
+      extra_cflags=[\"-pthread\",\"-matomics\",\"-mbulk-memory\",\"-ffp-contract=off\",\"${WASM_EH_FLAGS:--fexceptions}\"]
+    )
+    sync_externals expat freetype harfbuzz icu libpng zlib
+    # Skia's wasm toolchain takes emcc from externals/emsdk and runs bin/activate-emsdk there before
+    # compiling. Pointing it at the caller's emsdk keeps one compiler for Skia and Qt; activation is
+    # a no-op when that emsdk already has Skia's pinned version (4.0.7, the same as Qt 6.11) active.
+    ln -sfn "${EMSDK:?source emsdk_env.sh first}" "$SKIA_SRC/third_party/externals/emsdk"
+    # The non-CanvasKit wasm toolchain names its archives libfoo.wasm.a.
+    LIB_EXT=.wasm.a
+    ;;
   *) echo "unsupported target: $TARGET" >&2; exit 1 ;;
 esac
 
 BUILD="${SKIA_BUILD_DIR:-$SKIA_SRC/out/$TARGET}"
-GN_ARGS="${COMMON_ARGS[*]} ${PLATFORM_ARGS[*]}"
+# A platform value replaces the common one rather than following it, so each key is assigned once.
+declare -A PLATFORM_KEYS=()
+for arg in "${PLATFORM_ARGS[@]}"; do PLATFORM_KEYS[${arg%%=*}]=1; done
+BASE_ARGS=()
+for arg in "${COMMON_ARGS[@]}"; do
+  [ -n "${PLATFORM_KEYS[${arg%%=*}]:-}" ] || BASE_ARGS+=("$arg")
+done
+GN_ARGS="${BASE_ARGS[*]} ${PLATFORM_ARGS[*]}"
 echo "==> gn gen $BUILD"
 ( cd "$SKIA_SRC" && "$GN" gen "$BUILD" --args="$GN_ARGS" )
 
@@ -252,9 +292,9 @@ done
 LIBS=()
 for t in "${SKIA_TARGETS[@]}"; do
   name="${t##*:}"
-  [ -f "$BUILD/lib$name.a" ] || { echo "missing $BUILD/lib$name.a" >&2; exit 1; }
-  cp "$BUILD/lib$name.a" "$OUT/lib/"
-  LIBS+=("lib$name.a")
+  [ -f "$BUILD/lib$name${LIB_EXT:-.a}" ] || { echo "missing $BUILD/lib$name${LIB_EXT:-.a}" >&2; exit 1; }
+  cp "$BUILD/lib$name${LIB_EXT:-.a}" "$OUT/lib/"
+  LIBS+=("lib$name${LIB_EXT:-.a}")
 done
 # Archives the targets above pull in transitively (skcms, bentleyottmann, bundled externals).
 for a in "$BUILD"/*.a; do

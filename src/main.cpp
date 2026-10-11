@@ -5,7 +5,7 @@
 #include "engine/GpuPreference.h"
 #include "engine/HwAccel.h"
 #include "engine/ReverseProxyCache.h"
-#ifndef Q_OS_ANDROID
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_WASM)
 #include "HeadlessApp.h"
 #include "mcp/McpStdio.h"
 #endif
@@ -275,7 +275,7 @@ bool runSelfTest()
 }
 #endif // Q_OS_ANDROID
 
-#ifndef Q_OS_ANDROID
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_WASM)
 // Creates a throwaway context in `format`. On success reports what the driver
 // actually handed back, which is not always what was asked for.
 bool probeOpenGl(const QSurfaceFormat &format, QSurfaceFormat *obtained = nullptr,
@@ -492,7 +492,7 @@ int main(int argc, char *argv[])
     if (drift::perf::enabled() && qEnvironmentVariableIsEmpty("QT_LOGGING_RULES"))
         qputenv("QT_LOGGING_RULES", "qt.scenegraph.time.renderloop.debug=true");
 
-#ifndef Q_OS_ANDROID
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_WASM)
     // --headless is checked first: it also accepts --mcp-stdio, as the transport to serve
     // rather than as a request to attach to an editor running elsewhere.
     for (int i = 1; i < argc; ++i) {
@@ -509,8 +509,8 @@ int main(int argc, char *argv[])
     }
 #endif
 
-#ifdef Q_OS_ANDROID
-    // Android is GLES-only; the desktop 3.3 core profile the engine asks for cannot be created
+#if defined(Q_OS_ANDROID) || defined(Q_OS_WASM)
+    // Android and WebGL2 are GLES-only; the desktop 3.3 core profile the engine asks for cannot be created
     // here at all. Both contexts that matter — the Qt Quick scene graph's and the compositor's
     // offscreen one in GlRuntime — must agree on the version before they can share textures.
     QSurfaceFormat androidFormat;
@@ -623,7 +623,7 @@ int main(int argc, char *argv[])
     // Protocol strings under src/mcp/ are excluded from the catalog; they stay English.
     PreferencesController::installUiTranslators();
 
-#ifndef Q_OS_ANDROID
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_WASM)
     // The whole UI is a Qt Quick scene graph on OpenGL, so with no OpenGL at all
     // there is no window to put an error in — the app would just appear not to
     // start. That is reachable on Windows, where the packages no longer carry Qt's
@@ -801,7 +801,7 @@ int main(int argc, char *argv[])
         hookTimer->start(1000);
     }
 
-#ifndef Q_OS_ANDROID
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_WASM)
     // Shell.qml is not a window itself; the shell window it builds is its host.
     if (!engine.rootObjects().isEmpty()) {
         auto *host = engine.rootObjects().constFirst()->property("host").value<QObject *>();

@@ -16,14 +16,14 @@ extern "C" {
 #include <libavutil/log.h>
 }
 
-#if !defined(Q_OS_WIN) && !defined(Q_OS_MACOS)
+#if !defined(Q_OS_WIN) && !defined(Q_OS_MACOS) && !defined(Q_OS_WASM)
 #include <dlfcn.h>
 #endif
 
 namespace drift::hwaccel {
 namespace {
 
-#if !defined(Q_OS_WIN) && !defined(Q_OS_MACOS)
+#if !defined(Q_OS_WIN) && !defined(Q_OS_MACOS) && !defined(Q_OS_WASM)
 // FFmpeg reaches libva through implib-gen stubs whose generated dlopen failure path is
 // assert(0), so asking it about VAAPI on a host with no libva aborts the process instead
 // of reporting no device. Load the two the default-device path actually calls into first;
@@ -359,7 +359,7 @@ bool deviceAvailable(AVHWDeviceType type, const QByteArray &device)
 {
     if (type == AV_HWDEVICE_TYPE_NONE)
         return false;
-#if !defined(Q_OS_WIN) && !defined(Q_OS_MACOS)
+#if !defined(Q_OS_WIN) && !defined(Q_OS_MACOS) && !defined(Q_OS_WASM)
     if (type == AV_HWDEVICE_TYPE_VAAPI && !vaapiLoadable())
         return false;
 #endif
@@ -453,7 +453,7 @@ const AVCodec *findDecoder(AVCodecID codecId, AVHWDeviceType type, AVPixelFormat
 
 void syncVaapiFrame(const AVFrame *frame)
 {
-#if defined(Q_OS_WIN) || defined(Q_OS_MACOS) || defined(Q_OS_ANDROID)
+#if defined(Q_OS_WIN) || defined(Q_OS_MACOS) || defined(Q_OS_ANDROID) || defined(Q_OS_WASM)
     Q_UNUSED(frame);
 #else
     if (!frame || frame->format != AV_PIX_FMT_VAAPI || !frame->hw_frames_ctx)
