@@ -14,9 +14,9 @@ PanelFrame {
 
     readonly property real currentSeconds: EditorState.playheadSeconds
     readonly property real durationSeconds: EditorState.durationSeconds
-    // 3D mode is a desktop tool: phones keep the camera's picture and its 2D grips.
-    readonly property bool mobile: Qt.platform.os === "android" || Qt.platform.os === "ios"
-    readonly property bool mode3d: EditorState.preview.mode === "3d" && !mobile
+    // Only the desktop shell hosts this panel (phones use AndroidPreview), so 3D mode is always
+    // available here, including Android tablets and DeX.
+    readonly property bool mode3d: EditorState.preview.mode === "3d"
 
     // Driven by Main, which owns the window and the panels that hide around it.
     property bool previewFullscreen: false
