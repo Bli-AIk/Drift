@@ -10,6 +10,7 @@
 #include "include/core/SkFontMetrics.h"
 #include "include/core/SkFontMgr.h"
 #include "include/core/SkPathBuilder.h"
+#include "include/core/SkTypeface.h"
 #include "modules/skparagraph/include/Paragraph.h"
 #include "modules/skparagraph/include/ParagraphBuilder.h"
 #include "modules/skparagraph/include/ParagraphStyle.h"
@@ -18,6 +19,7 @@
 #endif
 
 #include <QCache>
+#include <QHash>
 #include <QMutex>
 #include <QMutexLocker>
 #include <QTextBoundaryFinder>
@@ -254,6 +256,31 @@ bool rightToLeft(const QString &source)
             return true;
     }
     return false;
+}
+
+// Colour glyphs have to be drawn as glyph images. Their outlines and bounds say nothing reliable:
+// a bitmap strike (CBDT, Samsung's sbix) can report empty bounds and a COLR base glyph can carry a
+// placeholder outline, so the font's tables decide.
+bool isColourTypeface(const SkTypeface *typeface)
+{
+    if (!typeface)
+        return false;
+    static QMutex mutex;
+    static QHash<SkTypefaceID, bool> known;
+    QMutexLocker lock(&mutex);
+    const auto it = known.constFind(typeface->uniqueID());
+    if (it != known.constEnd())
+        return it.value();
+    bool colour = false;
+    for (const SkFourByteTag tag : {SkSetFourByteTag('C', 'B', 'D', 'T'), SkSetFourByteTag('s', 'b', 'i', 'x'),
+                                    SkSetFourByteTag('C', 'O', 'L', 'R'), SkSetFourByteTag('S', 'V', 'G', ' ')}) {
+        if (typeface->getTableSize(tag) > 0) {
+            colour = true;
+            break;
+        }
+    }
+    known.insert(typeface->uniqueID(), colour);
+    return colour;
 }
 
 QRectF toQRect(const SkRect &r)
@@ -536,8 +563,11 @@ TextLayoutResult layoutStyledText(const QString &text, const drift::TextStyle &s
                                                                            : run.advanceX - run.positions[g].fX));
                         // Winding, not odd-even: at heavy weights adjacent glyph contours overlap,
                         // and odd-even punches those overlaps out as holes.
-                        const std::optional<SkPath> outline = run.font.getPath(run.glyphs[g]);
-                        if (outline && !outline->isEmpty()) {
+                        const std::optional<SkPath> outline = isColourTypeface(run.font.getTypeface())
+                            ? std::nullopt : run.font.getPath(run.glyphs[g]);
+                        if (isColourTypeface(run.font.getTypeface())) {
+                            anyBounds = true;
+                        } else if (outline && !outline->isEmpty()) {
                             anyOutline = true;
                             builder.addPath(*outline, gx, gy);
                         } else if (!run.font.getBounds(run.glyphs[g], nullptr).isEmpty()) {

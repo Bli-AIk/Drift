@@ -300,6 +300,7 @@ private slots:
     void gradientFillSweepsTheBlock();
     void pathBendArchesTheLine();
     void emojiOutlineDrawsARing();
+    void systemEmojiFallbackDraws();
     void textPrimitivesRender();
     void fragmentAnimationRendersPerCharacter();
     void bleedIsTimeInvariant();
@@ -1141,6 +1142,36 @@ void SkiaTest::emojiOutlineDrawsARing()
                 ++blue;
         }
     QVERIFY2(blue > 5, qPrintable(QString::number(blue)));
+}
+
+// With no emoji addon the colour glyphs come from the system font through fallback, which is
+// what every fresh install sees.
+void SkiaTest::systemEmojiFallbackDraws()
+{
+    reloadFontCatalog({QString::fromUtf8(DRIFT_TEST_FONTS_DIR)});
+    SKIP_WITHOUT_FONTS();
+    reloadEmojiCatalog({QDir::tempPath() + QStringLiteral("/drift-no-emoji-font")});
+    TextStyle style;
+    style.pixelSize = 72;
+    setSolidFill(style, Qt::white);
+    const QString text = QString::fromUtf8("\xF0\x9F\x98\x80");
+    const QRectF layout(0, 0, 200, 120);
+    const QImage img = skiaText(textClip(style, text), text, layout, 1.0, -1, nullptr)
+                           .convertToFormat(QImage::Format_RGBA8888);
+    int coloured = 0;
+    for (int y = 0; y < img.height(); ++y)
+        for (int x = 0; x < img.width(); ++x) {
+            const QRgb p = img.pixel(x, y);
+            if (qAlpha(p) > 100 && qAbs(qRed(p) - qBlue(p)) > 40)
+                ++coloured;
+        }
+    const text::TextLayoutResult laid =
+        text::layoutStyledText(text, style, 1.0, 200.0, 120.0, -1, text::WordSplit::Whole);
+    if (text::unresolvedGlyphs(*laid.paragraph) > 0)
+        QSKIP("No system emoji font");
+    QVERIFY2(coloured > 300, qPrintable(QStringLiteral("%1 coloured px, %2 pieces, colour %3")
+                                            .arg(coloured).arg(laid.words.size())
+                                            .arg(!laid.words.isEmpty() && laid.words.first().colour)));
 }
 
 
