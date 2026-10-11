@@ -1036,7 +1036,7 @@
     </message>
     <message>
         <source>Switch to desktop layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển sang bố cục máy tính để bàn</translation>
     </message>
     <message>
         <source>Extras</source>
@@ -1067,11 +1067,11 @@
     </message>
     <message>
         <source>Unlock crop ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở khóa tỷ lệ cắt cúp</translation>
     </message>
     <message>
         <source>Lock crop ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Khóa tỷ lệ cắt cúp</translation>
     </message>
     <message>
         <source>Trim</source>
@@ -1115,11 +1115,11 @@
     </message>
     <message>
         <source>Save keeps the original file and stores this crop.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu sẽ giữ nguyên tệp gốc và lưu phần cắt cúp này.</translation>
     </message>
     <message>
         <source>Save keeps the original file and stores this trim.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu sẽ giữ nguyên tệp gốc và lưu phần cắt này.</translation>
     </message>
     <message>
         <source>Nothing changed yet. Trim or crop above, or go back and drag this onto the timeline.</source>
@@ -2041,11 +2041,11 @@
     </message>
     <message>
         <source>Crop clip</source>
-        <translation type="unfinished"></translation>
+        <translation>Cắt cúp clip</translation>
     </message>
     <message>
         <source>Crop saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Đã lưu cắt cúp</translation>
     </message>
     <message>
         <source>New project</source>
@@ -2109,7 +2109,7 @@
     </message>
     <message>
         <source>Link clips</source>
-        <translation type="unfinished"></translation>
+        <translation>Liên kết các clip</translation>
     </message>
     <message>
         <source>Clear selection</source>
@@ -2971,7 +2971,7 @@
     </message>
     <message>
         <source>Clips linked</source>
-        <translation type="unfinished"></translation>
+        <translation>Đã liên kết các clip</translation>
     </message>
     <message>
         <source>Fade updated</source>
@@ -5831,7 +5831,7 @@
     </message>
     <message>
         <source>Switch to mobile layout…</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển sang bố cục điện thoại di động…</translation>
     </message>
     <message>
         <source>Debug info…</source>
@@ -7116,19 +7116,19 @@
     </message>
     <message>
         <source>Crop</source>
-        <translation type="unfinished">Cắt khung hình</translation>
+        <translation>Cắt cúp</translation>
     </message>
     <message>
         <source>Unlock crop ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở khóa tỷ lệ cắt cúp</translation>
     </message>
     <message>
         <source>Lock crop ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Khóa tỷ lệ cắt cúp</translation>
     </message>
     <message>
         <source>Crop…</source>
-        <translation type="unfinished"></translation>
+        <translation>Cắt cúp…</translation>
     </message>
     <message>
         <source>Which part of the original file this clip plays</source>
@@ -7920,7 +7920,7 @@
     </message>
     <message>
         <source>Switch to Mobile Layout…</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển sang Bố cục Điện thoại di động…</translation>
     </message>
     <message>
         <source>&amp;Window</source>
@@ -8000,7 +8000,7 @@
     </message>
     <message>
         <source>Links can’t be opened in this layout.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể mở liên kết trong bố cục này.</translation>
     </message>
     <message>
         <source>Export finished.</source>
@@ -8695,15 +8695,15 @@
     </message>
     <message>
         <source>Crop image</source>
-        <translation type="unfinished"></translation>
+        <translation>Cắt cúp hình ảnh</translation>
     </message>
     <message>
         <source>Crop saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Đã lưu cắt cúp</translation>
     </message>
     <message>
         <source>Crop video</source>
-        <translation type="unfinished"></translation>
+        <translation>Cắt cúp video</translation>
     </message>
     <message>
         <source>Media trimmed</source>
@@ -8921,51 +8921,51 @@
     </message>
     <message>
         <source>Crop — %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Cắt cúp — %1</translation>
     </message>
     <message>
         <source>Crop</source>
-        <translation type="unfinished">Cắt khung hình</translation>
+        <translation>Cắt cúp</translation>
     </message>
     <message>
         <source>Drag the box to crop. The original image stays available, so the crop can be changed later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kéo hộp để cắt cúp. Hình ảnh gốc vẫn được giữ, nên có thể thay đổi phần cắt cúp sau.</translation>
     </message>
     <message>
         <source>Drag the box to crop. The original video stays available, so the crop can be changed later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kéo hộp để cắt cúp. Video gốc vẫn được giữ, nên có thể thay đổi phần cắt cúp sau.</translation>
     </message>
     <message>
         <source>Original: %1×%2 • Crop: %3×%4</source>
-        <translation type="unfinished"></translation>
+        <translation>Gốc: %1×%2 • Cắt cúp: %3×%4</translation>
     </message>
     <message>
         <source>Unlock crop ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở khóa tỷ lệ cắt cúp</translation>
     </message>
     <message>
         <source>Lock crop ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Khóa tỷ lệ cắt cúp</translation>
     </message>
     <message>
         <source>Done keeps the original video and stores this range and crop. Upscale renders them as a new video in the media bin, then opens it in the Enhance window.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xong sẽ giữ nguyên video gốc và lưu phạm vi cùng phần cắt cúp này. Nâng cấp sẽ kết xuất chúng thành video mới trong ngăn media, rồi mở nó trong cửa sổ Nâng cấp.</translation>
     </message>
     <message>
         <source>Choose the part and crop to keep, then Next.</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn phần và vùng cắt cúp cần giữ, rồi nhấn Kế tiếp.</translation>
     </message>
     <message>
         <source>Save keeps the original file and stores this crop.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu sẽ giữ nguyên tệp gốc và lưu phần cắt cúp này.</translation>
     </message>
     <message>
         <source>Save keeps the original file and stores this trim.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu sẽ giữ nguyên tệp gốc và lưu phần cắt này.</translation>
     </message>
     <message>
         <source>Adjust the crop or Reset to restore the full picture.</source>
-        <translation type="unfinished"></translation>
+        <translation>Điều chỉnh phần cắt cúp hoặc Đặt lại để khôi phục hình ảnh đầy đủ.</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -11680,31 +11680,31 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     </message>
     <message>
         <source>Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Bố cục</translation>
     </message>
     <message>
         <source>Automatic</source>
-        <translation type="unfinished"></translation>
+        <translation>Tự động</translation>
     </message>
     <message>
         <source>Desktop</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy tính để bàn</translation>
     </message>
     <message>
         <source>Mobile</source>
-        <translation type="unfinished"></translation>
+        <translation>Điện thoại di động</translation>
     </message>
     <message>
         <source>Desktop suits a mouse and keyboard, including tablets in desktop mode. Mobile is the touch layout made for phones. Takes effect after restart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy tính để bàn phù hợp với chuột và bàn phím, bao gồm cả máy tính bảng ở chế độ desktop. Điện thoại di động là bố cục cảm ứng dành cho điện thoại. Có hiệu lực sau khi khởi động lại.</translation>
     </message>
     <message>
         <source>Restart Drift to switch layouts.</source>
-        <translation type="unfinished"></translation>
+        <translation>Khởi động lại Drift để chuyển bố cục.</translation>
     </message>
     <message>
         <source>Restart now</source>
-        <translation type="unfinished"></translation>
+        <translation>Khởi động lại ngay</translation>
     </message>
     <message>
         <source>Horizontal mouse-wheel pan</source>
@@ -12441,43 +12441,43 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     <name>ShellSwitchDialog</name>
     <message>
         <source>Switch to the mobile layout?</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển sang bố cục điện thoại di động?</translation>
     </message>
     <message>
         <source>Switch to the desktop layout?</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển sang bố cục máy tính để bàn?</translation>
     </message>
     <message>
         <source>Restart now</source>
-        <translation type="unfinished"></translation>
+        <translation>Khởi động lại ngay</translation>
     </message>
     <message>
         <source>Switch</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển đổi</translation>
     </message>
     <message>
         <source>Not now</source>
-        <translation type="unfinished"></translation>
+        <translation>Không phải bây giờ</translation>
     </message>
     <message>
         <source>Later</source>
-        <translation type="unfinished">Để sau</translation>
+        <translation>Để sau</translation>
     </message>
     <message>
         <source>Restart Drift to switch layouts.</source>
-        <translation type="unfinished"></translation>
+        <translation>Khởi động lại Drift để chuyển bố cục.</translation>
     </message>
     <message>
         <source>A mouse is connected. The desktop layout has full menus, panels and precise timeline editing. Drift restarts to switch, and your project is kept.</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuột đã được kết nối. Bố cục máy tính để bàn có đầy đủ menu, bảng điều khiển và chỉnh sửa dòng thời gian chính xác. Drift sẽ khởi động lại để chuyển, và dự án của bạn vẫn được giữ.</translation>
     </message>
     <message>
         <source>The mobile layout is the touch interface made for phones. Drift restarts to switch.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bố cục điện thoại di động là giao diện cảm ứng dành cho điện thoại. Drift khởi động lại để chuyển.</translation>
     </message>
     <message>
         <source>The desktop layout suits a mouse and keyboard. Drift restarts to switch.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bố cục máy tính để bàn phù hợp với chuột và bàn phím. Drift khởi động lại để chuyển.</translation>
     </message>
 </context>
 <context>
@@ -14489,7 +14489,7 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     </message>
     <message>
         <source>Crop…</source>
-        <translation type="unfinished"></translation>
+        <translation>Cắt cúp…</translation>
     </message>
     <message>
         <source>Enhance video…</source>
@@ -14501,7 +14501,7 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     </message>
     <message>
         <source>Link</source>
-        <translation type="unfinished"></translation>
+        <translation>Liên kết</translation>
     </message>
     <message>
         <source>Merge subtitle clips</source>
@@ -14755,7 +14755,7 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     </message>
     <message>
         <source>Link selected clips</source>
-        <translation type="unfinished"></translation>
+        <translation>Liên kết các clip đã chọn</translation>
     </message>
     <message>
         <source>Trim start</source>
