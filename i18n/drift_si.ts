@@ -12615,6 +12615,10 @@ If playback stutters, try another.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Speech longer than 30 seconds often ends in gibberish or silence. Split the script into shorter parts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Voice</source>
         <translation type="unfinished">කටහඬ</translation>
     </message>

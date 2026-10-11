@@ -194,7 +194,8 @@ ComboBox {
                                        || (model && model.warn === true)
 
         contentItem: Text {
-            text: root.textRole ? (modelData[root.textRole] !== undefined
+            // modelData is undefined for multi-role item models (VoiceLibrary), so guard it.
+            text: root.textRole ? (modelData && modelData[root.textRole] !== undefined
                                    ? modelData[root.textRole]
                                    : (model[root.textRole] !== undefined ? model[root.textRole] : modelData))
                                 : (root.labels ? (root.labels[modelData] || modelData) : modelData)

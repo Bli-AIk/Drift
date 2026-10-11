@@ -133,6 +133,16 @@ Item {
                     font.pixelSize: Theme.fontSizeXs
                 }
 
+                Text {
+                    visible: Math.ceil(scriptField.text.length / 14) > 30
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    text: qsTr("Speech longer than 30 seconds often ends in gibberish or silence. Split the script into shorter parts.")
+                    color: Theme.destructive
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontSizeXs
+                }
+
                 ThemedLabel {
                     text: qsTr("Voice")
                     tone: "default"
