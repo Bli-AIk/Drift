@@ -83,6 +83,8 @@
 #include <QDir>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJniEnvironment>
+#include <QJniObject>
 #include <QStandardPaths>
 #endif
 
@@ -746,7 +748,18 @@ int main(int argc, char *argv[])
         shellPreference = envShell;
     PreferencesController::setAppliedShell(shellPreference);
 
-    engine.setInitialProperties({{QStringLiteral("shellPreference"), shellPreference}});
+    // Resolved, not the raw preference: "auto" has to mean the same thing here as in Settings,
+    // which counts tablets and DeX as desktop.
+    const QString resolvedShell = PreferencesController::resolveInterfaceShell(shellPreference);
+#ifdef Q_OS_ANDROID
+    if (resolvedShell == QLatin1String("desktop")) {
+        QJniObject::callStaticMethod<void>("org/cutwire/drift/DesktopMode", "lockLandscape",
+                                           "(Landroid/content/Context;)V",
+                                           QNativeInterface::QAndroidApplication::context().object());
+        QJniEnvironment().checkAndClearExceptions();
+    }
+#endif
+    engine.setInitialProperties({{QStringLiteral("shellPreference"), resolvedShell}});
     engine.loadFromModule("Drift", "Shell");
     drift::perf::install();
     if (drift::perf::enabled()) {

@@ -16,6 +16,7 @@
 #include <QVariantMap>
 
 #ifdef Q_OS_ANDROID
+#include <QJniEnvironment>
 #include <QJniObject>
 #endif
 
@@ -501,7 +502,18 @@ QString PreferencesController::resolveInterfaceShell(const QString &shell)
     if (shell == QLatin1String("desktop") || shell == QLatin1String("mobile"))
         return shell;
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-    // Tablets (smallest logical side >= 600 dp) get the desktop shell; phones the touch one.
+    // Tablets (smallest logical side >= 600 dp), DeX, ChromeOS and Android PCs get the desktop
+    // shell; phones the touch one.
+#ifdef Q_OS_ANDROID
+    QJniObject context = QNativeInterface::QAndroidApplication::context();
+    if (context.isValid()) {
+        const bool desktop = QJniObject::callStaticMethod<jboolean>(
+            "org/cutwire/drift/DesktopMode", "isDesktop", "(Landroid/content/Context;)Z", context.object());
+        QJniEnvironment().checkAndClearExceptions();
+        if (desktop)
+            return QStringLiteral("desktop");
+    }
+#endif
     if (const QScreen *screen = QGuiApplication::primaryScreen()) {
         const QSize size = screen->size();
         if (qMin(size.width(), size.height()) >= 600)

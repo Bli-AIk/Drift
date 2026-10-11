@@ -23,7 +23,8 @@ import Drift
 Item {
     id: shell
 
-    // Set from main.cpp via setInitialProperties: "mobile", "desktop", or "auto".
+    // Set from main.cpp via setInitialProperties, already resolved to "mobile" or "desktop"
+    // (PreferencesController::resolveInterfaceShell). "auto" only applies if it is left unset.
     property string shellPreference: "auto"
 
     // "auto" is platform-derived. Window width deliberately does not enter into it: see build().
