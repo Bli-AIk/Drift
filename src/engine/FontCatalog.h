@@ -46,3 +46,15 @@ void reloadFontCatalog(const QStringList &packageRoots = {});
 // Resolve a style to a concrete face at pixelSizePx. Falls through to the system font database for
 // families that are not in the catalog, so projects written before the bundle still render.
 QFont fontForStyle(const drift::TextStyle &style, int pixelSizePx);
+
+// What the Skia layout asks its font collection for. `family` is the face's file path when the
+// style resolved to a bundled face (registered under that name), else the requested family for
+// the system manager to match.
+struct ResolvedFont
+{
+    QString family;
+    int weight = 400;
+    bool italic = false;
+    bool bundled = false;
+};
+ResolvedFont resolveFont(const drift::TextStyle &style);

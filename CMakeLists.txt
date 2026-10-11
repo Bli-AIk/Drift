@@ -821,6 +821,8 @@ if(DRIFT_WITH_SKIA)
         src/engine/SkiaShapePainter.cpp
         src/engine/SkiaFonts.h
         src/engine/SkiaFonts.cpp
+        src/engine/SkiaFontCollection.h
+        src/engine/SkiaFontCollection.cpp
         src/engine/SkiaVectorResources.h
         src/engine/SkiaVectorResources.cpp
         src/engine/SkiaVectorObservers.h

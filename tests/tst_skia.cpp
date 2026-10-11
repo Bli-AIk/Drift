@@ -14,6 +14,7 @@
 #include "engine/FontCatalog.h"
 #include "engine/SkiaRuntime.h"
 #include "engine/SkiaShapePainter.h"
+#include "engine/SkiaTextGeometry.h"
 #include "engine/SkiaTextPainter.h"
 #include "engine/SkiaTextEffects.h"
 #include "engine/TextLayout.h"
@@ -303,6 +304,10 @@ private slots:
     void wipeMaskRevealsBottomUp();
     void caretDrawsAfterLastVisibleFragment();
     void arabicTextShapesRightToLeft();
+    void layoutIsDeterministic();
+    void textRangesRoundTripUtf16();
+    void complexScriptsShapeWithoutMissingGlyphs();
+    void characterPiecesNeverSplitShapingClusters();
     void skslEffectsCompileAndRender();
     void textLookRenders();
     void textPacksRender();
@@ -1446,14 +1451,13 @@ void SkiaTest::arabicTextShapesRightToLeft()
 
     // Every installed Arabic face: ligatures and mark clusters differ from font to font.
     for (const QString &family : families) {
-        QFont font(family);
-        font.setPixelSize(40);
         for (const bool wrap : {false, true}) {
             TextStyle style;
+            style.fontFamily = family;
             style.pixelSize = 40;
             style.wordWrap = wrap;
             const QList<text::StyledWord> words =
-                text::layoutStyledText(verse, style, font, font, width, 200.0, -1, text::WordSplit::Whole);
+                text::layoutStyledText(verse, style, 1.0, width, 200.0, -1, text::WordSplit::Whole).words;
             QCOMPARE(words.size(), 4);
             for (int i = 0; i < words.size(); ++i) {
                 const text::StyledWord &w = words.at(i);
@@ -1468,27 +1472,24 @@ void SkiaTest::arabicTextShapesRightToLeft()
 
             // Pieces cut per character keep the joined forms the whole line was shaped with.
             const QList<text::StyledWord> chars =
-                text::layoutStyledText(verse, style, font, font, width, 200.0, -1, text::WordSplit::Characters);
+                text::layoutStyledText(verse, style, 1.0, width, 200.0, -1, text::WordSplit::Characters).words;
             QVERIFY(chars.size() > words.size());
-            // Drawing elements only: QPainterPath::addPath drops a glyph outline's trailing MoveTo
-            // (Arial Unicode MS on macOS ends its glyphs with one), so a whole word counts fewer
-            // MoveTos than its pieces do.
-            const auto drawnElements = [](const QPainterPath &path) {
+            const auto drawnElements = [](const text::StyledWord &w) {
                 int n = 0;
-                for (int e = 0; e < path.elementCount(); ++e)
-                    n += path.elementAt(e).type != QPainterPath::MoveToElement;
+                for (const SkPathVerb verb : w.geometry->path.verbs())
+                    n += verb != SkPathVerb::kMove;
                 return n;
             };
             int wholeElements = 0;
             QRectF wholeInk;
             for (const text::StyledWord &w : words) {
-                wholeElements += drawnElements(w.path);
+                wholeElements += drawnElements(w);
                 wholeInk = wholeInk.united(w.inkRect);
             }
             int charElements = 0;
             QRectF charInk;
             for (const text::StyledWord &w : chars) {
-                charElements += drawnElements(w.path);
+                charElements += drawnElements(w);
                 charInk = charInk.united(w.inkRect);
             }
             QVERIFY2(charElements == wholeElements,
@@ -1496,6 +1497,138 @@ void SkiaTest::arabicTextShapesRightToLeft()
             QVERIFY(std::abs(charInk.left() - wholeInk.left()) < 0.5 && std::abs(charInk.right() - wholeInk.right()) < 0.5);
         }
     }
+}
+
+namespace {
+
+const QStringList &complexScriptSamples()
+{
+    // Sinhala: a ZWJ conjunct (shri), yansaya, a pre-base vowel (kombuva, stored after the
+    // consonant and drawn before it) and a two-part vowel; Devanagari: a conjunct plus a pre-base
+    // vowel sign.
+    static const QStringList samples = {
+        QString::fromUtf8("ශ්‍රී"),
+        QString::fromUtf8("ක්‍ය"),
+        QString::fromUtf8("කෙ"),
+        QString::fromUtf8("කො"),
+        QString::fromUtf8("क्षि"),
+    };
+    return samples;
+}
+
+TextStyle layoutTestStyle()
+{
+    TextStyle style;
+    style.pixelSize = 48;
+    style.wordWrap = false;
+    return style;
+}
+
+bool hasScriptFont(QFontDatabase::WritingSystem system)
+{
+    return !QFontDatabase::families(system).isEmpty();
+}
+
+} // namespace
+
+// The same request lays out to the same pieces, byte for byte.
+void SkiaTest::layoutIsDeterministic()
+{
+    const QString text = QString::fromUtf8("Hello \U0001F600 مرحبا é ශ්‍රී\nsecond line");
+    TextStyle style = layoutTestStyle();
+    style.wordWrap = true;
+    style.accent.rule = WordAccentRule::EveryOther;
+    style.accent.sizeScale = 1.4;
+    for (const text::WordSplit split : {text::WordSplit::Whole, text::WordSplit::Characters}) {
+        const text::TextLayoutResult a = text::layoutStyledText(text, style, 1.0, 300.0, 200.0, -1, split);
+        const text::TextLayoutResult b = text::layoutStyledText(text, style, 1.0, 300.0, 200.0, -1, split);
+        QVERIFY(!a.words.isEmpty());
+        QCOMPARE(a.words.size(), b.words.size());
+        for (int i = 0; i < a.words.size(); ++i) {
+            const text::StyledWord &x = a.words.at(i);
+            const text::StyledWord &y = b.words.at(i);
+            QCOMPARE(x.inkRect, y.inkRect);
+            QCOMPARE(x.cellRect, y.cellRect);
+            QCOMPARE(x.baselineY, y.baselineY);
+            QCOMPARE(x.textStart, y.textStart);
+            QCOMPARE(x.textLength, y.textLength);
+            QCOMPARE(x.line, y.line);
+            QCOMPARE(x.index, y.index);
+            QCOMPARE(x.colour, y.colour);
+            QCOMPARE(x.geometry->path.countVerbs(), y.geometry->path.countVerbs());
+            QCOMPARE(x.geometry->path.getBounds(), y.geometry->path.getBounds());
+        }
+        QCOMPARE(a.paragraph->caretStops, b.paragraph->caretStops);
+        QCOMPARE(a.paragraph->lineBaseline, b.paragraph->lineBaseline);
+    }
+}
+
+// textStart/textLength address the source QString in UTF-16 units, whatever Skia counts in
+// internally: surrogate pairs, combining marks, ZWJ sequences and Arabic must all land on the
+// characters they were cut from.
+void SkiaTest::textRangesRoundTripUtf16()
+{
+    const QString text = QString::fromUtf8("a\U0001F600b مرحبا éx ශ්‍රී \U0001F1F1\U0001F1F0 c");
+    const TextStyle style = layoutTestStyle();
+    for (const text::WordSplit split : {text::WordSplit::Whole, text::WordSplit::Characters}) {
+        const text::TextLayoutResult laid = text::layoutStyledText(text, style, 1.0, 2000.0, 200.0, -1, split);
+        QVERIFY(!laid.words.isEmpty());
+        const QList<int> &stops = laid.paragraph->caretStops;
+        QVERIFY(stops.contains(0) && stops.contains(text.size()));
+        QList<bool> covered(text.size(), false);
+        for (const text::StyledWord &w : laid.words) {
+            QVERIFY(w.textStart >= 0 && w.textLength > 0 && w.textStart + w.textLength <= text.size());
+            QVERIFY2(!text.mid(w.textStart, w.textLength).trimmed().isEmpty(), "piece covers only spaces");
+            // Pieces start and end at valid caret stops, so none cuts a surrogate pair, a mark or a conjunct.
+            QVERIFY2(stops.contains(w.textStart), qPrintable(QString::number(w.textStart)));
+            QVERIFY2(stops.contains(w.textStart + w.textLength), qPrintable(QString::number(w.textStart + w.textLength)));
+            for (int p = w.textStart; p < w.textStart + w.textLength; ++p) {
+                QVERIFY2(!covered.at(p), "pieces overlap");
+                covered[p] = true;
+            }
+        }
+        if (split == text::WordSplit::Whole) {
+            for (int p = 0; p < text.size(); ++p)
+                QVERIFY2(covered.at(p) || text.at(p).isSpace(), qPrintable(QStringLiteral("char %1 not covered").arg(p)));
+        }
+    }
+}
+
+// Sinhala and Devanagari go through the font collection's fallback and the shaper without a
+// missing-glyph box.
+void SkiaTest::complexScriptsShapeWithoutMissingGlyphs()
+{
+    if (!hasScriptFont(QFontDatabase::Sinhala) || !hasScriptFont(QFontDatabase::Devanagari))
+        QSKIP("no Sinhala/Devanagari font installed");
+    for (const QString &sample : complexScriptSamples()) {
+        const text::TextLayoutResult laid =
+            text::layoutStyledText(sample, layoutTestStyle(), 1.0, 600.0, 120.0, -1, text::WordSplit::Whole);
+        QVERIFY2(!laid.words.isEmpty(), qPrintable(sample));
+        QCOMPARE(text::unresolvedGlyphs(*laid.paragraph), 0);
+        qInfo("Sinhala/Devanagari sample %s shaped with: %s", qPrintable(sample),
+              qPrintable(text::firstFontFamily(*laid.paragraph)));
+        QVERIFY(!laid.words.first().inkRect.isEmpty());
+    }
+}
+
+// A character split may not cut a shaping cluster, even where UAX #29 has a boundary.
+void SkiaTest::characterPiecesNeverSplitShapingClusters()
+{
+    if (!hasScriptFont(QFontDatabase::Sinhala) || !hasScriptFont(QFontDatabase::Devanagari))
+        QSKIP("no Sinhala/Devanagari font installed");
+    for (const QString &sample : complexScriptSamples()) {
+        const text::TextLayoutResult laid =
+            text::layoutStyledText(sample, layoutTestStyle(), 1.0, 600.0, 120.0, -1, text::WordSplit::Characters);
+        QCOMPARE(laid.words.size(), 1);
+        QCOMPARE(laid.words.first().textStart, 0);
+        QCOMPARE(laid.words.first().textLength, int(sample.size()));
+        QCOMPARE(laid.paragraph->caretStops, (QList<int>{0, int(sample.size())}));
+    }
+    // Separate words stay separate pieces.
+    const QString two = complexScriptSamples().at(0) + QLatin1Char(' ') + complexScriptSamples().at(2);
+    const text::TextLayoutResult laid =
+        text::layoutStyledText(two, layoutTestStyle(), 1.0, 600.0, 120.0, -1, text::WordSplit::Characters);
+    QCOMPARE(laid.words.size(), 2);
 }
 
 void SkiaTest::caretDrawsAfterLastVisibleFragment()

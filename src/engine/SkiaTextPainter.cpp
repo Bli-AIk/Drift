@@ -2,6 +2,7 @@
 
 #include "SkiaPath.h"
 #include "SkiaShading.h"
+#include "SkiaTextGeometry.h"
 #include "SkiaTextEffects.h"
 #include "SkiaVectorResources.h"
 #include "core/TextAnimationPreset.h"
@@ -10,7 +11,6 @@
 #include <QHash>
 #include <QMutex>
 #include <QMutexLocker>
-#include <QPainter>
 #include <QtMath>
 
 #include <algorithm>
@@ -28,6 +28,7 @@
 #include "include/core/SkPathEffect.h"
 #include "include/core/SkRRect.h"
 #include "include/core/SkSamplingOptions.h"
+#include "include/core/SkTextBlob.h"
 #include "include/effects/SkGradient.h"
 #include "include/effects/SkImageFilters.h"
 #include "include/effects/SkShaderMaskFilter.h"
@@ -56,29 +57,8 @@ struct Piece
     int line = 0;
     int wordIndex = 0;
     bool accent = false;
-    sk_sp<SkImage> emoji; // bitmap-face cluster, pre-drawn by Qt
-    QPointF emojiOrigin;  // where the emoji image's top-left lands
+    sk_sp<SkTextBlob> emoji; // colour-glyph cluster (no outline), drawn as glyphs in block coordinates
 };
-
-// Colour emoji have no outlines: the CBDT face is drawn by Qt into a small premultiplied image
-// here on the scene thread, and blitted 1:1 at paint time. The cell is padded because a bitmap
-// glyph can overhang its advance and because the outline dilation grows it.
-sk_sp<SkImage> renderEmoji(const text::StyledWord &word, double extra, QPointF *origin)
-{
-    const double pad = std::ceil(word.cellRect.height() * 0.25 + extra) + 1.0;
-    const int w = qMax(1, qCeil(word.cellRect.width() + pad * 2.0));
-    const int h = qMax(1, qCeil(word.cellRect.height() + pad * 2.0));
-    QImage image(w, h, QImage::Format_ARGB32_Premultiplied);
-    image.fill(Qt::transparent);
-    QPainter p(&image);
-    p.setRenderHint(QPainter::TextAntialiasing);
-    p.setFont(word.emojiFont);
-    p.setPen(Qt::white);
-    p.drawText(QPointF(pad, pad + (word.baselineY - word.cellRect.top())), word.emojiText);
-    p.end();
-    *origin = QPointF(word.cellRect.left() - pad, word.cellRect.top() - pad);
-    return imageFromQImage(image);
-}
 
 struct BlockGeometry
 {
@@ -88,11 +68,10 @@ struct BlockGeometry
 QMutex g_geometryMutex;
 QCache<quint64, std::shared_ptr<const BlockGeometry>> g_geometryCache(48);
 
-// Glyph paths and emoji bitmaps for a fragment set, converted once per layout. Keyed by the
-// set and the emoji padding (the widest stroke), the only style input that touches geometry.
-std::shared_ptr<const BlockGeometry> geometryFor(const text::FragmentSet &set, double emojiPadPx)
+// Glyph paths and colour-glyph blobs for a fragment set, built once per layout.
+std::shared_ptr<const BlockGeometry> geometryFor(const text::FragmentSet &set)
 {
-    const quint64 key = qHashMulti(set.key, qRound(emojiPadPx * 4.0));
+    const quint64 key = set.key;
     {
         QMutexLocker lock(&g_geometryMutex);
         if (const auto *hit = g_geometryCache.object(key))
@@ -108,10 +87,14 @@ std::shared_ptr<const BlockGeometry> geometryFor(const text::FragmentSet &set, d
         piece.line = word.line;
         piece.wordIndex = word.index;
         piece.accent = word.accent;
-        if (!word.emojiText.isEmpty())
-            piece.emoji = renderEmoji(word, emojiPadPx, &piece.emojiOrigin);
-        else
-            piece.glyphs = toSkPath(word.path);
+        if (word.geometry) {
+            const text::PieceGeometry &geometry = *word.geometry;
+            if (word.colour) {
+                piece.emoji = SkTextBlob::MakeFromPosGlyphs(geometry.glyphs, geometry.positions, geometry.font);
+            } else {
+                piece.glyphs = geometry.path;
+            }
+        }
         geometry->pieces.append(piece);
     }
     QMutexLocker lock(&g_geometryMutex);
@@ -618,8 +601,7 @@ private:
 
     void drawEmoji(SkCanvas &canvas, const Piece &piece, const SkPaint *paint) const
     {
-        canvas.drawImage(piece.emoji.get(), float(piece.emojiOrigin.x()), float(piece.emojiOrigin.y()),
-                         SkSamplingOptions(SkFilterMode::kLinear), paint);
+        canvas.drawTextBlob(piece.emoji, 0, 0, paint ? *paint : SkPaint());
     }
 
     void drawUnderline(SkCanvas &canvas) const
@@ -728,7 +710,7 @@ TextPainterResult makeTextPainter(const TextPaintRequest &request)
     result.rect = QRectF(request.layoutRect.x() - bleed, request.layoutRect.y() - bleed, imageW, imageH);
     result.block = request.frame.block;
 
-    std::shared_ptr<const BlockGeometry> geometry = geometryFor(*request.set, widestStroke(style) * scale);
+    std::shared_ptr<const BlockGeometry> geometry = geometryFor(*request.set);
     const Bend bend = bendFor(request.set->frags, style, scale);
 
     const bool cacheable = request.frame.isStatic && !style.isAnimated() && !timeDrivenPaint(style);

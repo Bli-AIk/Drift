@@ -2,6 +2,9 @@
 
 #include "EmojiTable.h"
 #include "GpuPackageParse.h"
+#ifdef DRIFT_WITH_SKIA
+#include "SkiaFontCollection.h"
+#endif
 
 #include <QDir>
 #include <QFileInfo>
@@ -73,6 +76,9 @@ void rebuildLocked(const QStringList &packageRoots)
         g_fontId = -1;
     }
     g_family.clear();
+#ifdef DRIFT_WITH_SKIA
+    drift::skia::clearRegisteredFonts(drift::skia::FontGroup::Emoji);
+#endif
 
     const QStringList roots = packageRoots.isEmpty()
         ? GpuPackageParse::defaultSearchPaths(QStringLiteral("DRIFT_EMOJI_FONT_DIR"),
@@ -93,6 +99,9 @@ void rebuildLocked(const QStringList &packageRoots)
         g_fontId = -1;
         return;
     }
+#ifdef DRIFT_WITH_SKIA
+    drift::skia::registerFontFile(drift::skia::FontGroup::Emoji, file, g_family);
+#endif
 
     QFont probe(g_family);
     probe.setPixelSize(64);

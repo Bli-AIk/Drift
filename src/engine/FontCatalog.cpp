@@ -1,6 +1,9 @@
 #include "FontCatalog.h"
 
 #include "GpuPackageParse.h"
+#ifdef DRIFT_WITH_SKIA
+#include "SkiaFontCollection.h"
+#endif
 
 #include <QCoreApplication>
 #include <QDir>
@@ -80,6 +83,11 @@ FontFamilyEntry loadPackage(const QString &packageDir)
         }
         if (entry.qtFamily.isEmpty())
             entry.qtFamily = QFontDatabase::applicationFontFamilies(id).value(0);
+#ifdef DRIFT_WITH_SKIA
+        // Keyed by file: the weight inside these files is unreliable (see fontForStyle), so the
+        // layout names the exact face rather than letting Skia match on a family and a weight.
+        drift::skia::registerFontFile(drift::skia::FontGroup::Catalog, absolute, absolute);
+#endif
 
         FontFace face;
         face.weight = qBound(100, object.value(QStringLiteral("weight")).toInt(400), 900);
@@ -104,6 +112,9 @@ void rebuildLocked(const QStringList &packageRoots)
 {
     g_catalog.clear();
     g_familyIndex.clear();
+#ifdef DRIFT_WITH_SKIA
+    drift::skia::clearRegisteredFonts(drift::skia::FontGroup::Catalog);
+#endif
 
     const QStringList roots = packageRoots.isEmpty()
         ? GpuPackageParse::defaultSearchPaths(QStringLiteral("DRIFT_FONTS_DIR"),
@@ -204,6 +215,29 @@ QList<QPair<QString, QString>> fontCategories()
     };
 }
 
+namespace {
+
+const FontFace *faceForStyle(const FontFamilyEntry &entry, const drift::TextStyle &style)
+{
+    const FontFace *face = nearestFace(entry, style.fontWeight, style.italic);
+    if (!face && style.italic) // family ships no italic; use the upright face
+        face = nearestFace(entry, style.fontWeight, false);
+    if (!face)
+        face = &entry.faces.first();
+    return face;
+}
+
+} // namespace
+
+ResolvedFont resolveFont(const drift::TextStyle &style)
+{
+    const FontFamilyEntry *entry = fontFamilyForName(style.fontFamily);
+    if (!entry)
+        return {style.fontFamily, qBound(100, style.fontWeight, 900), style.italic, false};
+    const FontFace *face = faceForStyle(*entry, style);
+    return {face->file, face->weight, face->italic, true};
+}
+
 QFont fontForStyle(const drift::TextStyle &style, int pixelSizePx)
 {
     const int px = qMax(4, pixelSizePx);
@@ -217,11 +251,7 @@ QFont fontForStyle(const drift::TextStyle &style, int pixelSizePx)
         return font;
     }
 
-    const FontFace *face = nearestFace(*entry, style.fontWeight, style.italic);
-    if (!face && style.italic) // family ships no italic; use the upright face
-        face = nearestFace(*entry, style.fontWeight, false);
-    if (!face)
-        face = &entry->faces.first();
+    const FontFace *face = faceForStyle(*entry, style);
 
     QFont font(entry->qtFamily);
     // usWeightClass is unreliable in these files (Montserrat/Inter Thin both report 250), so the

@@ -11,7 +11,7 @@
 
 #include <memory>
 
-// The Skia text painter. Layout is TextLayout's (QTextLayout pieces, bleed and cache keys); the
+// The Skia text painter. Layout is TextLayout's (SkParagraph pieces, bleed and cache keys); the
 // animator engine's frame says where every fragment sits at this instant; the shading stack says
 // how each is painted. Skia-free header.
 
