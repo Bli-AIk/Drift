@@ -466,6 +466,90 @@ PanelFrame {
         EditorState.bin.replaceSource(assetIndex, url)
     }
 
+    function requestLinkProxy(assetId) {
+        var url = FileDialogs.openFile(qsTr("Link Proxy"), [AssetLibrary.mediaNameFilter()])
+        if (!url || url.toString() === "")
+            return
+        AssetLibrary.linkProxy(assetId, url)
+    }
+
+    property string pendingProxyPattern: ""
+    property int pendingProxyMatches: 0
+
+    ThemedDialog {
+        id: linkProxyPatternDialog
+        title: qsTr("Link proxies by pattern?")
+        acceptText: qsTr("Link")
+        preferredWidth: Theme.dialogWidthSm
+
+        contentItem: ThemedLabel {
+            width: parent ? parent.width : Theme.dialogWidthSm
+            wrapMode: Text.WordWrap
+            size: "sm"
+            text: qsTr("“%1” matches this clip and %n other clips in the project. Drift will link them all, and link future imports whose proxy follows the same name.", "", root.pendingProxyMatches)
+                .arg(root.pendingProxyPattern)
+        }
+
+        onAccepted: {
+            AssetLibrary.commitProxyRule(root.pendingProxyPattern)
+            Toasts.success(qsTr("Linked this clip and %n other clips.", "", root.pendingProxyMatches))
+        }
+    }
+
+    ThemedDialog {
+        id: proxyFallbackDialog
+        property string folders: ""
+        title: qsTr("Couldn’t save files next to the media")
+        acceptText: qsTr("OK")
+        showReject: false
+        preferredWidth: Theme.dialogWidthSm
+
+        contentItem: Column {
+            width: parent ? parent.width : Theme.dialogWidthSm
+            spacing: Theme.spacingMd
+
+            ThemedLabel {
+                width: parent.width
+                wrapMode: Text.WordWrap
+                size: "sm"
+                text: qsTr("Drift can’t write to the folders listed below, because of their permissions or because they are on a read-only network share. The proxies or reversed clips were saved to Drift’s cache instead.")
+            }
+            TextEdit {
+                width: parent.width
+                readOnly: true
+                selectByMouse: true
+                wrapMode: TextEdit.Wrap
+                color: Theme.foreground
+                selectionColor: Theme.primary
+                selectedTextColor: Theme.primaryForeground
+                font.family: Theme.monoFontFamily
+                font.pixelSize: Theme.fontSizeSm
+                text: proxyFallbackDialog.folders
+            }
+        }
+    }
+
+    Connections {
+        target: AssetLibrary
+
+        function onProxyLinkProbed(assetId, pattern, otherMatches, error) {
+            if (error.length > 0) {
+                Toasts.error(error)
+            } else if (otherMatches === 0) {
+                AssetLibrary.commitProxyRule(pattern)
+                Toasts.success(qsTr("Linked the proxy. Future imports named like “%1” will link automatically.").arg(pattern))
+            } else {
+                root.pendingProxyPattern = pattern
+                root.pendingProxyMatches = otherMatches
+                linkProxyPatternDialog.open()
+            }
+        }
+        function onProxyLocationFallback(folders) {
+            proxyFallbackDialog.folders = folders.join("\n")
+            proxyFallbackDialog.open()
+        }
+    }
+
     // Writes an image row back out to disk — the way a freeze frame captured in the preview
     // leaves the project. The format follows the name the user picks, not the filter.
     function requestExportAsset(assetIndex) {
@@ -1235,6 +1319,7 @@ PanelFrame {
                         onAddToTimelineRequested: (assetIds) => root.requestAddToTimeline(assetIds)
                         onRemoveRequested: (assetIds) => root.requestRemoveAsset(assetIds)
                         onReplaceRequested: (assetIndex) => root.requestReplaceAsset(assetIndex)
+                        onLinkProxyRequested: (assetId) => root.requestLinkProxy(assetId)
                         onRenameRequested: (assetIndex) => root.requestRenameAsset(assetIndex)
                         onExportRequested: (assetIndex) => root.requestExportAsset(assetIndex)
                         onSaveAsRequested: (assetIndex) => root.requestSaveAssetAs(assetIndex)

@@ -856,6 +856,8 @@ add_library(driftengine STATIC
     src/engine/DeepFilterDenoiser.cpp
     src/engine/MatteWriter.h
     src/engine/MatteWriter.cpp
+    src/engine/ProxyNaming.h
+    src/engine/ProxyNaming.cpp
     src/engine/ReverseProxyCache.h
     src/engine/ReverseProxyCache.cpp
     src/engine/ReverseRenderer.h

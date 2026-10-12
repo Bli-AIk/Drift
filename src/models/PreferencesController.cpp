@@ -1,4 +1,5 @@
 #include "PreferencesController.h"
+#include "engine/ProxyNaming.h"
 
 #include "engine/GpuPreference.h"
 #include "engine/HwAccel.h"
@@ -132,6 +133,9 @@ PreferencesController::PreferencesController(QObject *parent)
         settings.value(QStringLiteral("ui/trackLabelsWidth"), 130.0).toDouble(), 320.0);
     m_timelineToolbarItems = settings.value(QStringLiteral("ui/timelineToolbarItems")).toStringList();
     m_timelineMenuItems = settings.value(QStringLiteral("ui/timelineMenuItems")).toStringList();
+    m_proxyNamePatterns = settings.contains(QStringLiteral("proxy/namePatterns"))
+        ? settings.value(QStringLiteral("proxy/namePatterns")).toStringList()
+        : drift::defaultProxyNamePatterns();
     // Checked means "allowed", not "forced": with the key unset the engine is in Auto and
     // will use zero-copy on drivers it has been verified against, so showing the box
     // unchecked would contradict what the preview is actually doing. Unchecking writes an
@@ -249,6 +253,37 @@ void PreferencesController::setTrackLabelsWidth(qreal width)
     QSettings settings;
     settings.setValue(QStringLiteral("ui/trackLabelsWidth"), m_trackLabelsWidth);
     emit trackLabelsWidthChanged();
+}
+
+void PreferencesController::setProxyNamePatterns(const QStringList &patterns)
+{
+    QStringList clean;
+    for (const QString &pattern : patterns) {
+        if (drift::proxyRuleFromString(pattern) && !clean.contains(pattern))
+            clean.append(pattern);
+    }
+    if (clean == m_proxyNamePatterns)
+        return;
+    m_proxyNamePatterns = clean;
+    QSettings().setValue(QStringLiteral("proxy/namePatterns"), clean);
+    emit proxyNamePatternsChanged();
+}
+
+void PreferencesController::addProxyNamePattern(const QString &pattern)
+{
+    if (m_proxyNamePatterns.contains(pattern))
+        return;
+    setProxyNamePatterns(m_proxyNamePatterns + QStringList{pattern});
+}
+
+void PreferencesController::resetProxyNamePatterns()
+{
+    const QStringList defaults = drift::defaultProxyNamePatterns();
+    if (m_proxyNamePatterns == defaults)
+        return;
+    m_proxyNamePatterns = defaults;
+    QSettings().remove(QStringLiteral("proxy/namePatterns"));
+    emit proxyNamePatternsChanged();
 }
 
 void PreferencesController::setTimelineToolbarLayout(const QStringList &toolbarItems,

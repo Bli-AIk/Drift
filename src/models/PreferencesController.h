@@ -43,6 +43,10 @@ class PreferencesController : public QObject
                    NOTIFY timelineToolbarLayoutChanged)
     Q_PROPERTY(QStringList timelineMenuItems READ timelineMenuItems
                    NOTIFY timelineToolbarLayoutChanged)
+    // Name patterns (ProxyNaming strings such as "*_proxy") that find proxies made outside Drift
+    // beside a source. Seeded with the defaults until the user changes them.
+    Q_PROPERTY(QStringList proxyNamePatterns READ proxyNamePatterns WRITE setProxyNamePatterns
+                   NOTIFY proxyNamePatternsChanged)
     // Opt-in: on launch, restore the last open project (saved .drift or unsaved recovery snapshot).
     Q_PROPERTY(bool reopenLastProject READ reopenLastProject WRITE setReopenLastProject NOTIFY reopenLastProjectChanged)
     // Preview zero-copy import: VAAPI dma-buf on Linux, D3D11 interop on Windows. Takes effect
@@ -110,6 +114,11 @@ public:
     void setTrackLabelsWidth(qreal width);
     QStringList timelineToolbarItems() const { return m_timelineToolbarItems; }
     QStringList timelineMenuItems() const { return m_timelineMenuItems; }
+    QStringList proxyNamePatterns() const { return m_proxyNamePatterns; }
+    // Drops anything that isn't a valid pattern, and duplicates.
+    void setProxyNamePatterns(const QStringList &patterns);
+    void addProxyNamePattern(const QString &pattern);
+    Q_INVOKABLE void resetProxyNamePatterns();
     Q_INVOKABLE void setTimelineToolbarLayout(const QStringList &toolbarItems,
                                               const QStringList &menuItems);
 
@@ -169,6 +178,7 @@ signals:
     void audioMixerVisibleChanged();
     void audioMixerWidthChanged();
     void trackLabelsWidthChanged();
+    void proxyNamePatternsChanged();
     void timelineToolbarLayoutChanged();
     void reopenLastProjectChanged();
     void vaapiZeroCopyChanged();
@@ -192,6 +202,7 @@ private:
     qreal m_audioMixerWidth = 0;
     qreal m_trackLabelsWidth = 130;
     QStringList m_timelineToolbarItems;
+    QStringList m_proxyNamePatterns;
     QStringList m_timelineMenuItems;
     bool m_reopenLastProject = false;
     bool m_vaapiZeroCopy = false;

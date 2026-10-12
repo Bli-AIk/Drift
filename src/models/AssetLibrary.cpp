@@ -8,16 +8,18 @@
 #include "engine/ModelAsset.h"
 #include "engine/PdfClipRenderer.h"
 #include "engine/PreviewProxyRenderer.h"
+#include "engine/AndroidUri.h"
+#include "engine/ProxyNaming.h"
 #include "engine/ReverseProxyCache.h"
 #include "engine/VectorInspect.h"
 #include "core/DotLottie.h"
 
 #ifdef Q_OS_ANDROID
-#include "engine/AndroidUri.h"
 #include <QCryptographicHash>
 #include <QStandardPaths>
 #endif
 
+#include <QDateTime>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -294,6 +296,9 @@ drift::MediaKind provisionalKind(const QString &path)
         return drift::MediaKind::Audio;
     return drift::MediaKind::Video;
 }
+
+// The sizes Drift can generate; a proxy made at any of them is found by name alone.
+constexpr int kGeneratedProxySides[] = {360, 540, 720, 1080};
 
 QString formatDuration(drift::TimeUs durationUs)
 {
@@ -777,6 +782,7 @@ void AssetLibrary::syncToProject()
     if (m_syncedOrder != m_project->assetOrder()) {
         beginResetModel();
         endResetModel();
+        refreshSidecars();
         return;
     }
 
@@ -789,6 +795,7 @@ void AssetLibrary::syncToProject()
     if (paths == m_syncedPaths && folderIds == m_syncedFolderIds && edits == m_syncedEdits)
         return;
 
+    QStringList movedIds;
     for (int i = 0; i < paths.size(); ++i) {
         const bool pathChanged = i >= m_syncedPaths.size() || m_syncedPaths.at(i) != paths.at(i);
         const bool folderChanged =
@@ -802,6 +809,8 @@ void AssetLibrary::syncToProject()
                                : folderChanged ? QList<int>{FolderIdRole}
                                                : QList<int>{DurationRole, ThumbnailPathRole, FilmstripPathRole});
         const QString assetId = m_project->assetIdAt(i);
+        if (pathChanged)
+            movedIds.append(assetId);
         if (pathChanged || editChanged) {
             emit assetMetadataChanged(assetId);
             emit assetCardChanged(assetId);
@@ -818,6 +827,8 @@ void AssetLibrary::syncToProject()
     m_syncedPaths = paths;
     m_syncedFolderIds = folderIds;
     m_syncedEdits = edits;
+    if (!movedIds.isEmpty())
+        refreshSidecars(movedIds);
 }
 
 void AssetLibrary::setProject(drift::Project *project)
@@ -829,6 +840,7 @@ void AssetLibrary::setProject(drift::Project *project)
     m_audioProbePending.clear();
     m_frameRateProbePending.clear();
     endResetModel();
+    refreshSidecars();
 }
 
 int AssetLibrary::rowCount(const QModelIndex &parent) const
@@ -1133,6 +1145,7 @@ bool AssetLibrary::applyProbedSource(const QString &assetId, const drift::MediaA
                          ThumbnailPathRole, FilmstripPathRole});
     emit assetMetadataChanged(assetId);
     emit assetCardChanged(assetId);
+    refreshSidecars({assetId});
     return true;
 }
 
@@ -1207,6 +1220,7 @@ void AssetLibrary::applyImportResult(const QString &assetId, const drift::MediaA
                          ThumbnailPathRole, FilmstripPathRole});
     emit assetMetadataChanged(assetId);
     emit assetCardChanged(assetId);
+    refreshSidecars({assetId});
 }
 
 QString AssetLibrary::proxyCurrentName() const
@@ -1224,10 +1238,14 @@ QString AssetLibrary::proxyState(const QString &assetId) const
         return QStringLiteral("building");
     if (m_proxyQueue.contains(assetId))
         return QStringLiteral("queued");
-    return drift::ReverseProxyCache::instance()
-                   .lookupPreview(asset->path, drift::ReverseProxyCache::previewProxyShortSide)
-                   .isEmpty()
-        ? QStringLiteral("none")
+    const drift::ReverseProxyCache &cache = drift::ReverseProxyCache::instance();
+    const int shortSide = drift::ReverseProxyCache::previewProxyShortSide;
+    const QString active = cache.lookupPreview(asset->path, shortSide);
+    if (active.isEmpty())
+        return QStringLiteral("none");
+    const drift::ReverseProxyCache::Sidecars sidecars = cache.sidecars(asset->path);
+    return active == sidecars.external && !sidecars.generated.contains(shortSide)
+        ? QStringLiteral("linked")
         : QStringLiteral("ready");
 }
 
@@ -1310,7 +1328,15 @@ void AssetLibrary::removeProxies(const QStringList &assetIds)
             m_proxyCancel.storeRelaxed(1);
         if (const drift::MediaAsset *asset = m_project ? m_project->asset(id) : nullptr;
             asset && proxyState(id) == QLatin1String("ready")) {
-            drift::ReverseProxyCache::instance().removePreview(asset->path);
+            drift::ReverseProxyCache &cache = drift::ReverseProxyCache::instance();
+            const int shortSide = drift::ReverseProxyCache::previewProxyShortSide;
+            if (cache.sidecars(asset->path).generated.contains(shortSide)) {
+                cache.updateSidecars(asset->path, [shortSide](auto &sidecars) {
+                    QFile::remove(sidecars.generated.take(shortSide));
+                });
+            } else {
+                cache.removePreview(asset->path);
+            }
             removedAny = true;
             emit proxyStateChanged(id);
         }
@@ -1346,8 +1372,13 @@ void AssetLibrary::startNextProxy()
     }
     m_proxyProgress = 0.0;
     emit proxyJobsChanged();
-    if (!asset)
+    if (!asset) {
+        if (!m_proxyFallbackFolders.isEmpty()) {
+            const QStringList folders = std::exchange(m_proxyFallbackFolders, {});
+            emit proxyLocationFallback(folders);
+        }
         return;
+    }
     emit proxyStateChanged(m_proxyBuilding);
 
     const QString assetId = m_proxyBuilding;
@@ -1357,7 +1388,19 @@ void AssetLibrary::startNextProxy()
     m_proxyCancel.storeRelaxed(0);
 
     (void)QtConcurrent::run(&m_proxyPool, [this, assetId, sourcePath, name, shortSide]() {
-        const QString outPath = drift::newReversePath();
+        // Beside the source when that folder takes a write, else the app cache. Tried by really
+        // creating a file because isWritable lies on network shares.
+        QString outPath;
+        bool beside = false;
+        if (drift::isLocalSourcePath(sourcePath)) {
+            const QString target = drift::generatedProxyPath(sourcePath, shortSide);
+            if (drift::canWriteBeside(target)) {
+                outPath = target;
+                beside = true;
+            }
+        }
+        if (!beside)
+            outPath = drift::newReversePath();
         QString error;
         const bool ok = !outPath.isEmpty()
             && drift::renderPreviewProxy(sourcePath, shortSide, outPath, &error,
@@ -1379,11 +1422,29 @@ void AssetLibrary::startNextProxy()
 
         QMetaObject::invokeMethod(
             this,
-            [this, assetId, sourcePath, name, shortSide, outPath, ok, cancelled, error]() {
+            [this, assetId, sourcePath, name, shortSide, outPath, beside, ok, cancelled,
+             error]() {
                 m_proxyBuilding.clear();
-                if (ok && !cancelled) {
-                    drift::ReverseProxyCache::instance().insertPreview(sourcePath, shortSide,
-                                                                       outPath);
+                if (!beside && drift::isLocalSourcePath(sourcePath)) {
+                    const QString folder =
+                        QDir::toNativeSeparators(QFileInfo(sourcePath).absolutePath());
+                    if (!m_proxyFallbackFolders.contains(folder))
+                        m_proxyFallbackFolders.append(folder);
+                }
+                if (ok && cancelled && beside) {
+                    // Cancelled or removed while the last frames landed; the user asked for
+                    // no proxy, so don't leave one behind.
+                    QFile::remove(outPath);
+                } else if (ok && !cancelled) {
+                    drift::ReverseProxyCache &cache = drift::ReverseProxyCache::instance();
+                    if (beside) {
+                        cache.updateSidecars(sourcePath, [&](auto &sidecars) {
+                            sidecars.generated.insert(shortSide, outPath);
+                        });
+                    } else {
+                        cache.insertPreview(sourcePath, shortSide, outPath);
+                    }
+                    bumpBadges();
                     emit proxiesChanged();
                 } else if (!cancelled) {
                     emit proxyFailed(name, error);
@@ -1393,6 +1454,193 @@ void AssetLibrary::startNextProxy()
             },
             Qt::QueuedConnection);
     });
+}
+
+void AssetLibrary::reportProxyFallback(const QString &sourcePath)
+{
+    emit proxyLocationFallback(
+        {QDir::toNativeSeparators(QFileInfo(sourcePath).absolutePath())});
+}
+
+void AssetLibrary::setProxyNamePatterns(const QStringList &patterns)
+{
+    if (patterns == m_proxyNamePatterns)
+        return;
+    m_proxyNamePatterns = patterns;
+    refreshSidecars();
+}
+
+void AssetLibrary::refreshSidecars()
+{
+    refreshSidecars(m_project ? m_project->assetOrder() : QStringList{});
+}
+
+void AssetLibrary::refreshSidecars(const QStringList &assetIds)
+{
+    if (!m_project)
+        return;
+
+    QList<QPair<QString, QString>> targets;
+    for (const QString &id : assetIds) {
+        const drift::MediaAsset *asset = m_project->asset(id);
+        if (asset && asset->kind == drift::MediaKind::Video && drift::isLocalSourcePath(asset->path))
+            targets.append({id, asset->path});
+    }
+    if (targets.isEmpty())
+        return;
+
+    const QStringList patterns = m_proxyNamePatterns;
+    (void)QtConcurrent::run(&m_jobs, [this, targets, patterns]() {
+        QList<drift::ProxyNameRule> rules;
+        for (const QString &pattern : patterns) {
+            if (const auto rule = drift::proxyRuleFromString(pattern))
+                rules.append(*rule);
+        }
+
+        QHash<QString, QFileInfoList> reversedByDir;
+        QList<drift::ReverseProxyCache::Sidecars> found;
+        for (const auto &[id, path] : targets) {
+            drift::ReverseProxyCache::Sidecars sidecars;
+            for (const int side : kGeneratedProxySides) {
+                const QString generated = drift::generatedProxyPath(path, side);
+                if (QFileInfo(generated).isFile())
+                    sidecars.generated.insert(side, generated);
+            }
+            for (const drift::ProxyNameRule &rule : rules) {
+                const QString candidate = drift::proxyCandidatePath(rule, path);
+                if (candidate != path && QFileInfo(candidate).isFile()) {
+                    sidecars.external = candidate;
+                    break;
+                }
+            }
+
+            const QFileInfo source(path);
+            auto listed = reversedByDir.find(source.absolutePath());
+            if (listed == reversedByDir.end()) {
+                listed = reversedByDir.insert(
+                    source.absolutePath(),
+                    QDir(source.absolutePath())
+                        .entryInfoList({QStringLiteral("*_reversed_*.mp4")}, QDir::Files));
+            }
+            const QDateTime sourceModified = source.lastModified();
+            for (const QFileInfo &file : *listed) {
+                // Older than the source means the source was replaced in place since the render.
+                if (file.lastModified() < sourceModified)
+                    continue;
+                if (const auto range = drift::parseReversedSidecarName(path, file.fileName()))
+                    sidecars.reversed.append({range->inUs, range->outUs, file.absoluteFilePath()});
+            }
+            found.append(sidecars);
+        }
+
+        QMetaObject::invokeMethod(
+            this,
+            [this, targets, found]() {
+                if (!m_project)
+                    return;
+                drift::ReverseProxyCache &cache = drift::ReverseProxyCache::instance();
+                QStringList changed;
+                for (int i = 0; i < targets.size(); ++i) {
+                    const auto &[id, path] = targets.at(i);
+                    // Re-pointed at another file while the scan ran.
+                    const drift::MediaAsset *asset = m_project->asset(id);
+                    if (!asset || asset->path != path)
+                        continue;
+                    // Field by field: a reversed render may have finished while the scan ran.
+                    const auto &scanned = found.at(i);
+                    if (cache.updateSidecars(path, [&scanned](auto &sidecars) {
+                            sidecars.generated = scanned.generated;
+                            sidecars.external = scanned.external;
+                            sidecars.reversed = scanned.reversed;
+                        }))
+                        changed.append(id);
+                }
+                if (changed.isEmpty())
+                    return;
+                bumpBadges();
+                emit proxiesChanged();
+                for (const QString &id : changed)
+                    emit proxyStateChanged(id);
+            },
+            Qt::QueuedConnection);
+    });
+}
+
+void AssetLibrary::linkProxy(const QString &assetId, const QUrl &file)
+{
+    const drift::MediaAsset *asset = m_project ? m_project->asset(assetId) : nullptr;
+    if (!asset || asset->kind != drift::MediaKind::Video)
+        return;
+
+    const QString proxyPath = AndroidUri::localPath(file);
+    const QString sourcePath = asset->path;
+    const drift::TimeUs sourceDurationUs = asset->durationUs;
+    const double fps = asset->fps;
+    QList<QString> otherPaths;
+    for (const QString &id : m_project->assetOrder()) {
+        const drift::MediaAsset *other = m_project->asset(id);
+        if (other && id != assetId && other->kind == drift::MediaKind::Video
+            && drift::isLocalSourcePath(other->path))
+            otherPaths.append(other->path);
+    }
+
+    (void)QtConcurrent::run(&m_jobs, [this, assetId, proxyPath, sourcePath, sourceDurationUs, fps,
+                                      otherPaths]() {
+        QString pattern;
+        QString error;
+        int otherMatches = 0;
+        const auto seconds = [this](drift::TimeUs us) {
+            return tr("%1 s").arg(QString::number(drift::usToSeconds(us), 'f', 2));
+        };
+
+        const MediaInfo info = proxyPath.isEmpty() ? MediaInfo{} : MediaProbe::probe(proxyPath);
+        const bool video = info.ok
+            && std::any_of(info.streams.begin(), info.streams.end(), [](const StreamInfo &s) {
+                   return s.type == StreamInfo::Type::Video && !s.attachedPicture;
+               });
+        if (!video) {
+            error = tr("That file isn’t a video.");
+        } else {
+            const drift::TimeUs frameUs =
+                fps > 0.0 ? static_cast<drift::TimeUs>(drift::kUsPerSecond / fps) : 0;
+            const drift::TimeUs tolerance = std::max<drift::TimeUs>(frameUs, 50000);
+            if (std::abs(info.durationUs - sourceDurationUs) > tolerance) {
+                error = tr("“%1” is %2 long but the source is %3 — it can’t be its proxy.")
+                            .arg(QFileInfo(proxyPath).fileName(), seconds(info.durationUs),
+                                 seconds(sourceDurationUs));
+            } else {
+                const auto rule = QFileInfo(proxyPath).canonicalFilePath()
+                        == QFileInfo(sourcePath).canonicalFilePath()
+                    ? std::nullopt
+                    : drift::learnProxyRule(sourcePath, proxyPath);
+                if (!rule) {
+                    error = tr("The proxy’s name must contain “%1” and sit in the source’s folder "
+                               "or a subfolder of it.")
+                                .arg(QFileInfo(sourcePath).completeBaseName());
+                } else {
+                    pattern = drift::proxyRuleToString(*rule);
+                    for (const QString &other : otherPaths) {
+                        const QString candidate = drift::proxyCandidatePath(*rule, other);
+                        if (candidate != other && QFileInfo(candidate).isFile())
+                            ++otherMatches;
+                    }
+                }
+            }
+        }
+
+        QMetaObject::invokeMethod(
+            this,
+            [this, assetId, pattern, otherMatches, error]() {
+                emit proxyLinkProbed(assetId, pattern, otherMatches, error);
+            },
+            Qt::QueuedConnection);
+    });
+}
+
+void AssetLibrary::commitProxyRule(const QString &pattern)
+{
+    if (drift::proxyRuleFromString(pattern))
+        emit proxyRuleLearned(pattern);
 }
 
 QVariantMap AssetLibrary::assetAt(int index) const

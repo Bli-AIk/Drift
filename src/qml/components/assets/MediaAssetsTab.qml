@@ -75,6 +75,8 @@ Item {
     signal removeRequested(var assetIds)
     // Emitted from the card/row context menu. The parent owns the file picker.
     signal replaceRequested(int assetIndex)
+    // Emitted from the video context menu. The parent owns the file picker and the pattern prompt.
+    signal linkProxyRequested(string assetId)
     // Emitted from the card/row context menu. The parent owns the rename dialog.
     signal renameRequested(int assetIndex)
     // Emitted from the card/row context menu, image rows only. The parent owns the save dialog.
@@ -112,7 +114,7 @@ Item {
     // QML can't track, and proxy "ready" also depends on the proxy size setting.
     readonly property int _badgeRevision: AssetLibrary.badgeRevision + EditorState.playback.proxySize
 
-    // "none", "queued", "building", "ready", or "" for rows a proxy can't apply to.
+    // "none", "queued", "building", "ready", "linked", or "" for rows a proxy can't apply to.
     function proxyStateOf(assetId) {
         void root._badgeRevision
         return AssetLibrary.proxyState(assetId)
@@ -906,6 +908,13 @@ Item {
                         onTriggered: AssetLibrary.createProxies(ids)
                     }
                     ThemedMenuItem {
+                        text: qsTr("Link proxy…")
+                        icon.name: Theme.icons.filePlay
+                        visible: kind === "video" && root.selectedAssetIds.length <= 1
+                                 && root.selectedWithProxyState(["none", "linked"]).length === 1
+                        onTriggered: root.linkProxyRequested(assetId)
+                    }
+                    ThemedMenuItem {
                         readonly property var ids: root.selectedWithProxyState(["ready", "queued", "building"])
                         text: ids.length > 1 ? qsTr("Remove %n proxies", "", ids.length) : qsTr("Remove proxy")
                         icon.name: Theme.icons.x
@@ -977,10 +986,12 @@ Item {
                 MediaPill {
                     id: cardProxyPill
                     anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Proxy")
+                    text: cardNameRow.proxyState === "linked" ? qsTr("Linked proxy") : qsTr("Proxy")
+                    tooltip: cardNameRow.proxyState === "linked"
+                             ? qsTr("Using a proxy file found next to the original") : ""
                     visible: cardNameRow.proxyState === "ready" || cardNameRow.proxyState === "queued"
-                             || cardNameRow.proxyState === "building"
-                    waiting: cardNameRow.proxyState !== "ready"
+                             || cardNameRow.proxyState === "building" || cardNameRow.proxyState === "linked"
+                    waiting: cardNameRow.proxyState === "queued" || cardNameRow.proxyState === "building"
                     fontSize: Theme.fontSizeTiny
                 }
                 MediaPill {
@@ -1182,11 +1193,14 @@ Item {
                         MediaPill {
                             id: rowProxyPill
                             anchors.verticalCenter: parent.verticalCenter
-                            text: qsTr("Proxy")
+                            text: rowNameRow.proxyState === "linked" ? qsTr("Linked proxy") : qsTr("Proxy")
+                            tooltip: rowNameRow.proxyState === "linked"
+                                     ? qsTr("Using a proxy file found next to the original") : ""
                             visible: rowNameRow.proxyState === "ready"
                                      || rowNameRow.proxyState === "queued"
                                      || rowNameRow.proxyState === "building"
-                            waiting: rowNameRow.proxyState !== "ready"
+                                     || rowNameRow.proxyState === "linked"
+                            waiting: rowNameRow.proxyState === "queued" || rowNameRow.proxyState === "building"
                         }
                         MediaPill {
                             id: rowEditFriendlyPill
@@ -1383,6 +1397,13 @@ Item {
                     icon.name: Theme.icons.filePlay
                     visible: ids.length > 0
                     onTriggered: AssetLibrary.createProxies(ids)
+                }
+                ThemedMenuItem {
+                    text: qsTr("Link proxy…")
+                    icon.name: Theme.icons.filePlay
+                    visible: kind === "video" && root.selectedAssetIds.length <= 1
+                             && root.selectedWithProxyState(["none", "linked"]).length === 1
+                    onTriggered: root.linkProxyRequested(assetId)
                 }
                 ThemedMenuItem {
                     readonly property var ids: root.selectedWithProxyState(["ready", "queued", "building"])

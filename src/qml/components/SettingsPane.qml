@@ -184,6 +184,51 @@ Item {
                     onActivated: EditorState.playback.proxySize = model[currentIndex].id
                 }
 
+                ThemedLabel {
+                    text: qsTr("Proxy name patterns")
+                }
+
+                ThemedLabel {
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    text: qsTr("Linking a proxy teaches Drift its name pattern. Proxies next to your media that match a pattern below link automatically.")
+                    color: Theme.panelSecondaryForeground
+                }
+
+                Repeater {
+                    model: EditorState.preferences.proxyNamePatterns
+
+                    Row {
+                        id: patternRow
+                        required property string modelData
+                        width: parent.width
+                        spacing: Theme.spacingSm
+
+                        ThemedLabel {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width - removePattern.width - parent.spacing
+                            text: patternRow.modelData
+                            font.family: Theme.monoFontFamily
+                            elide: Text.ElideMiddle
+                        }
+                        ThemedButton {
+                            id: removePattern
+                            anchors.verticalCenter: parent.verticalCenter
+                            variant: "ghost"
+                            glyph: Theme.icons.x
+                            tooltip: qsTr("Remove pattern")
+                            onClicked: EditorState.preferences.proxyNamePatterns =
+                                EditorState.preferences.proxyNamePatterns.filter(p => p !== patternRow.modelData)
+                        }
+                    }
+                }
+
+                ThemedButton {
+                    variant: "secondary"
+                    text: qsTr("Reset to defaults")
+                    onClicked: EditorState.preferences.resetProxyNamePatterns()
+                }
+
                 ThemedSwitch {
                     visible: EditorState.preferences.vaapiZeroCopySupported
                     checked: EditorState.preferences.vaapiZeroCopy
@@ -547,7 +592,7 @@ Item {
                         readonly property int rev: cloud.revision
                         property string testMessage: ""
 
-                        width: settingsColumn.width
+                        width: parent.width
                         spacing: Theme.spacingMd
 
                         Rectangle {

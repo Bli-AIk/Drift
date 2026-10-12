@@ -69,6 +69,7 @@
 #include "engine/VdaDepth.h"
 #include "engine/ModelAsset.h"
 #include "engine/ModelClipTransform.h"
+#include "engine/ProxyNaming.h"
 #include "engine/ReverseProxyCache.h"
 #include "engine/VectorClipRenderer.h"
 #include "engine/VectorInspect.h"
@@ -629,6 +630,17 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
                     setLastMessage(tr("Could not create a proxy for %1: %2").arg(name, error),
                                    QStringLiteral("error"));
                 });
+    }
+
+    if (m_assetLibrary) {
+        // Context is `this`, not the library: the library is a process-wide static that
+        // outlives this object, and the lambda reaches into the preferences.
+        m_assetLibrary->setProxyNamePatterns(m_preferences->proxyNamePatterns());
+        connect(m_preferences, &PreferencesController::proxyNamePatternsChanged, this, [this] {
+            m_assetLibrary->setProxyNamePatterns(m_preferences->proxyNamePatterns());
+        });
+        connect(m_assetLibrary, &AssetLibrary::proxyRuleLearned, m_preferences,
+                &PreferencesController::addProxyNamePattern);
     }
 
     m_undoStack.setUndoLimit(kMaxUndoSteps);
@@ -12102,12 +12114,18 @@ void AppController::applyClipReverse(int trackIndex, int clipIndex)
     // Padding either side so ordinary trim-handle nudges stay inside the rendered range instead
     // of dropping the clip back onto the live path.
     constexpr drift::TimeUs kPadUs = 2 * drift::kUsPerSecond;
-    const drift::TimeUs coverIn = qMax<drift::TimeUs>(0, clip.srcIn - kPadUs);
+    drift::TimeUs coverIn = qMax<drift::TimeUs>(0, clip.srcIn - kPadUs);
     drift::TimeUs coverOut = clip.srcOut + kPadUs;
     if (sourceDuration > 0)
         coverOut = qMin(coverOut, sourceDuration);
+    coverOut = qMax(coverOut, clip.srcOut);
 
-    startReverseRender(clip.path, coverIn, qMax(coverOut, clip.srcOut));
+    // Whole milliseconds, rounded outward, because the range is the rendered file's name and the
+    // render must match it exactly for the file to be found again by name alone.
+    coverIn = coverIn / 1000 * 1000;
+    coverOut = (coverOut + 999) / 1000 * 1000;
+
+    startReverseRender(clip.path, coverIn, coverOut);
 }
 
 void AppController::startReverseRender(const QString &sourcePath, drift::TimeUs coverInUs,
@@ -12139,19 +12157,25 @@ void AppController::startReverseRender(const QString &sourcePath, drift::TimeUs 
         };
 
         auto finish = [this, sourcePath, coverInUs, coverOutUs](bool ok, const QString &message,
-                                                                const QString &proxyPath) {
+                                                                const QString &proxyPath,
+                                                                bool beside) {
             QMetaObject::invokeMethod(
                 this,
-                [this, ok, message, proxyPath, sourcePath, coverInUs, coverOutUs]() {
+                [this, ok, message, proxyPath, beside, sourcePath, coverInUs, coverOutUs]() {
                     m_reverseRendering = false;
                     emit reverseRenderingChanged();
                     m_reverseProgress = ok ? 1.0 : 0.0;
                     emit reverseRenderProgressChanged();
                     m_reverseStatus = ok ? QStringLiteral("Done") : message;
                     emit reverseRenderStatusChanged();
-                    if (ok) {
+                    if (ok && beside) {
+                        drift::ReverseProxyCache::instance().addReversedSidecar(
+                            sourcePath, coverInUs, coverOutUs, proxyPath);
+                    } else if (ok) {
                         drift::ReverseProxyCache::instance().insert(sourcePath, coverInUs,
                                                                     coverOutUs, proxyPath);
+                        if (m_assetLibrary && drift::isLocalSourcePath(sourcePath))
+                            m_assetLibrary->reportProxyFallback(sourcePath);
                     }
                     setLastMessage(message, ok ? QStringLiteral("info")
                                               : QStringLiteral("error"));
@@ -12164,9 +12188,20 @@ void AppController::startReverseRender(const QString &sourcePath, drift::TimeUs 
                 Qt::QueuedConnection);
         };
 
-        const QString proxyPath = drift::newReversePath();
+        // Beside the source when that folder takes a write, else the app cache.
+        QString proxyPath;
+        bool beside = false;
+        if (drift::isLocalSourcePath(sourcePath)) {
+            const QString target = drift::reversedSidecarPath(sourcePath, coverInUs, coverOutUs);
+            if (drift::canWriteBeside(target)) {
+                proxyPath = target;
+                beside = true;
+            }
+        }
+        if (!beside)
+            proxyPath = drift::newReversePath();
         if (proxyPath.isEmpty()) {
-            finish(false, tr("Could not create a reversed file"), {});
+            finish(false, tr("Could not create a reversed file"), {}, false);
             return;
         }
 
@@ -12176,7 +12211,7 @@ void AppController::startReverseRender(const QString &sourcePath, drift::TimeUs 
                 setProgress(fraction, tr("Reversing video…"));
                 return m_reverseCancel.loadRelaxed() == 0;
             });
-        finish(ok, ok ? QStringLiteral("Reversed clip ready") : error, proxyPath);
+        finish(ok, ok ? QStringLiteral("Reversed clip ready") : error, proxyPath, beside);
     });
 }
 

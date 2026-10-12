@@ -4,10 +4,12 @@
 #include "core/Time.h"
 
 #include <QHash>
+#include <QList>
 #include <QMutex>
 #include <QString>
 
 #include <atomic>
+#include <functional>
 
 namespace drift {
 
@@ -25,7 +27,7 @@ public:
     static ReverseProxyCache &instance();
 
     // Path of a proxy whose covered source range contains [srcIn, srcOut], or empty when nothing
-    // covers it. *coverEndUs receives the covered range's end — the pivot for the timestamp flip,
+    // covers it. Sidecar reversed renders are tried before the cache index. *coverEndUs receives the covered range's end — the pivot for the timestamp flip,
     // so proxyUs == coverEndUs - sourceUs.
     QString lookup(const QString &sourcePath, TimeUs srcIn, TimeUs srcOut, TimeUs *coverEndUs) const;
     void insert(const QString &sourcePath, TimeUs coverInUs, TimeUs coverOutUs,
@@ -40,6 +42,41 @@ public:
     QString lookupPreview(const QString &sourcePath, int shortSide) const;
     void insertPreview(const QString &sourcePath, int shortSide, const QString &proxyPath);
     void removePreview(const QString &sourcePath);
+
+    // Proxies that sit next to the source (Drift-generated or made elsewhere and linked by name).
+    // The registry is in-memory only: never written to index.json, never swept, and nothing here
+    // deletes a file. lookupPreview prefers these over cache entries.
+    struct Sidecars
+    {
+        QHash<int, QString> generated; // short side -> path
+        QString external;              // any resolution
+
+        // Reversed renders named <stem>_reversed_<inMs>-<outMs>.mp4. lookup() reads these
+        // without touching the disk; refreshSidecars has already dropped files older than the
+        // source.
+        struct Reversed
+        {
+            TimeUs inUs = 0;
+            TimeUs outUs = 0;
+            QString path;
+
+            bool operator==(const Reversed &) const = default;
+        };
+        QList<Reversed> reversed;
+
+        bool isEmpty() const { return generated.isEmpty() && external.isEmpty() && reversed.isEmpty(); }
+        bool operator==(const Sidecars &) const = default;
+    };
+    // An empty set erases the entry.
+    void setSidecars(const QString &sourcePath, const Sidecars &sidecars);
+    // Edits one source's set under the mutex, so proxies and reversed renders updating the same
+    // source can't overwrite each other's field. Returns whether anything changed.
+    bool updateSidecars(const QString &sourcePath, const std::function<void(Sidecars &)> &edit);
+    // Registers a finished sidecar reversed render and deletes the older ones it fully covers.
+    void addReversedSidecar(const QString &sourcePath, TimeUs coverInUs, TimeUs coverOutUs,
+                            const QString &path);
+    void clearSidecars();
+    Sidecars sidecars(const QString &sourcePath) const;
 
     // Set from QSettings by PlaybackEngine; read on the compositor threads.
     static std::atomic<bool> previewProxiesEnabled;
@@ -81,6 +118,7 @@ private:
 
     mutable QMutex m_mutex;
     QHash<QString, QList<Entry>> m_entries; // absolute source path -> proxies covering parts of it
+    QHash<QString, Sidecars> m_sidecars;    // absolute source path -> proxies beside it
 };
 
 // Where a clip's video pixels for `timelineUs` actually come from: the reversed proxy when one

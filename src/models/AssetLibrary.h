@@ -171,9 +171,10 @@ public:
     double proxyProgress() const { return m_proxyProgress; }
     QString proxyCurrentName() const;
     int proxyQueuedCount() const { return m_proxyQueue.size(); }
-    // "none", "queued", "building" or "ready" for a video asset; empty for anything else.
-    // "ready" means a proxy exists at the current proxy size, whether or not preview is set to
-    // use proxies.
+    // "none", "queued", "building", "ready" or "linked" for a video asset; empty for anything
+    // else. "ready" means a proxy exists at the current proxy size, whether or not preview is set
+    // to use proxies. "linked" means the proxy in use is a file made elsewhere that matched a
+    // name pattern; Drift never deletes those.
     Q_INVOKABLE QString proxyState(const QString &assetId) const;
     // Whether a proxy exists for this media file at the current proxy size. By path, for timeline
     // clips, which carry their media's path but not always an asset.
@@ -191,6 +192,23 @@ public:
     // proxy is a cache, not project content.
     Q_INVOKABLE void removeProxies(const QStringList &assetIds);
     Q_INVOKABLE void cancelProxies();
+
+    // The patterns that find proxies made elsewhere (ProxyNaming strings). Setting them
+    // re-scans every asset.
+    void setProxyNamePatterns(const QStringList &patterns);
+    // Re-scans the folders beside these assets' sources for proxies, off-thread. The no-argument
+    // form covers every asset.
+    void refreshSidecars(const QStringList &assetIds);
+    void refreshSidecars();
+    // A reversed render could not be written beside its source and went to the app cache; shows
+    // the same notice as a proxy batch that did.
+    void reportProxyFallback(const QString &sourcePath);
+    // Checks that `file` can stand in as this asset's proxy and what naming pattern it implies,
+    // then answers with proxyLinkProbed. Nothing is linked until commitProxyRule.
+    Q_INVOKABLE void linkProxy(const QString &assetId, const QUrl &file);
+    // Asks for `pattern` to be added to the saved list. The preferences own the list, so this
+    // only emits proxyRuleLearned; the preferences answer through setProxyNamePatterns.
+    Q_INVOKABLE void commitProxyRule(const QString &pattern);
 
 signals:
     void countChanged();
@@ -216,6 +234,15 @@ signals:
     // A proxy appeared or went away, so what the preview reads has changed.
     void proxiesChanged();
     void proxyFailed(const QString &name, const QString &error);
+    // A batch of proxies could not be written beside their sources and went to the app cache
+    // instead. `folders` are the unwritable source folders, deduplicated, in native form.
+    void proxyLocationFallback(const QStringList &folders);
+    // Result of linkProxy. `pattern` is the rule the file implies and `otherMatches` how many
+    // other video assets in the project already have a file that rule would find. `error` is
+    // non-empty (user-facing) when the file was refused.
+    void proxyLinkProbed(const QString &assetId, const QString &pattern, int otherMatches,
+                         const QString &error);
+    void proxyRuleLearned(const QString &pattern);
     // Emitted once every probe of an import has landed: assets that would preview faster from a
     // proxy, and assets with a variable frame rate. Either list may be empty, not both.
     void importSuggestions(const QStringList &proxyAssetIds, const QStringList &vfrAssetIds);
@@ -286,6 +313,9 @@ private:
 
     // Asset ids, FIFO. The building one is not in the queue.
     QStringList m_proxyQueue;
+    QStringList m_proxyNamePatterns;
+    // Unwritable source folders met since the queue last drained.
+    QStringList m_proxyFallbackFolders;
     QString m_proxyBuilding;
     double m_proxyProgress = 0.0;
     int m_badgeRevision = 0;

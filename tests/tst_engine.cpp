@@ -112,6 +112,7 @@
 #include "engine/MaskApplier.h"
 #include "engine/MatteWriter.h"
 #include "engine/ReverseProxyCache.h"
+#include "engine/ProxyNaming.h"
 #include "engine/ReverseRenderer.h"
 #include "engine/MediaEditor.h"
 #include "engine/ClipReaderPool.h"
@@ -146,6 +147,10 @@ private slots:
     void matteWriterRoundTripsColourForeground();
     void reverseRendererPlaysSourceBackwards();
     void previewProxyKeepsSourceTiming();
+    void proxyNamingLearnsAndMatchesRules();
+    void sidecarProxiesOutrankTheCache();
+    void reversedSidecarNamesRoundTrip();
+    void reversedSidecarsOutrankTheIndex();
     void variableFrameRateIsDetected();
     void mediaEditorCropsAnImage();
     void mediaEditorConformsVariableFrameRate();
@@ -5280,6 +5285,139 @@ void EngineTest::previewProxyKeepsSourceTiming()
     drift::ReverseProxyCache::instance().removePreview(sourcePath);
     QCOMPARE(drift::resolveVideoRead(clip, 0, true).path, sourcePath);
     QVERIFY(!QFileInfo::exists(proxyPath));
+}
+
+void EngineTest::proxyNamingLearnsAndMatchesRules()
+{
+    using namespace drift;
+    const QString src = QStringLiteral("/media/shoot/clip01.MP4");
+
+    const auto suffixRule = learnProxyRule(src, QStringLiteral("/media/shoot/clip01_proxy.MP4"));
+    QVERIFY(suffixRule);
+    QCOMPARE(proxyRuleToString(*suffixRule), QStringLiteral("*_proxy"));
+    QCOMPARE(proxyCandidatePath(*suffixRule, QStringLiteral("/media/shoot/other.MP4")),
+             QStringLiteral("/media/shoot/other_proxy.MP4"));
+
+    const auto prefixRule = learnProxyRule(src, QStringLiteral("/media/shoot/PRX_clip01.MP4"));
+    QVERIFY(prefixRule);
+    QCOMPARE(proxyRuleToString(*prefixRule), QStringLiteral("PRX_*"));
+
+    const auto subdirRule = learnProxyRule(src, QStringLiteral("/media/shoot/Proxy/clip01_proxy.MP4"));
+    QVERIFY(subdirRule);
+    QCOMPARE(proxyRuleToString(*subdirRule), QStringLiteral("Proxy/*_proxy"));
+    QCOMPARE(proxyCandidatePath(*subdirRule, QStringLiteral("/media/shoot/b.MP4")),
+             QStringLiteral("/media/shoot/Proxy/b_proxy.MP4"));
+
+    const auto extRule = learnProxyRule(src, QStringLiteral("/media/shoot/Proxy/clip01_proxy.mov"));
+    QVERIFY(extRule);
+    QCOMPARE(proxyRuleToString(*extRule), QStringLiteral("Proxy/*_proxy.mov"));
+    QCOMPARE(proxyCandidatePath(*extRule, QStringLiteral("/media/shoot/b.MP4")),
+             QStringLiteral("/media/shoot/Proxy/b_proxy.mov"));
+
+    // Same stem, different extension only is still a rule; the identical path is not.
+    QVERIFY(learnProxyRule(src, QStringLiteral("/media/shoot/clip01.mov")));
+    QVERIFY(!learnProxyRule(src, src));
+    QVERIFY(!learnProxyRule(src, QStringLiteral("/media/shoot/unrelated.MP4")));
+    QVERIFY(!learnProxyRule(src, QStringLiteral("/media/shoot/CLIP01_proxy.MP4")));
+    QVERIFY(!learnProxyRule(src, QStringLiteral("/media/elsewhere/clip01_proxy.MP4")));
+    QVERIFY(!learnProxyRule(src, QStringLiteral("/media/clip01_proxy.MP4")));
+
+    for (const auto &rule : {*suffixRule, *prefixRule, *subdirRule, *extRule}) {
+        const auto back = proxyRuleFromString(proxyRuleToString(rule));
+        QVERIFY(back);
+        QCOMPARE(*back, rule);
+    }
+    QVERIFY(!proxyRuleFromString(QStringLiteral("_proxy")));
+    QVERIFY(!proxyRuleFromString(QStringLiteral("*_*")));
+    QVERIFY(!proxyRuleFromString(QStringLiteral("../*_proxy")));
+
+    QCOMPARE(generatedProxyPath(src, 720), QStringLiteral("/media/shoot/clip01_proxy_720.mp4"));
+    QCOMPARE(defaultProxyNamePatterns().size(), 3);
+}
+
+void EngineTest::sidecarProxiesOutrankTheCache()
+{
+    auto &cache = drift::ReverseProxyCache::instance();
+    const QString source = QStringLiteral("/nonexistent/sidecar-priority/source.mp4");
+    const auto cleanup = qScopeGuard([&] {
+        cache.setSidecars(source, {});
+        cache.removePreview(source);
+    });
+
+    cache.insertPreview(source, 720, QStringLiteral("/nonexistent/cache/720.mp4"));
+    QCOMPARE(cache.lookupPreview(source, 720), QStringLiteral("/nonexistent/cache/720.mp4"));
+
+    drift::ReverseProxyCache::Sidecars set;
+    set.external = QStringLiteral("/nonexistent/sidecar-priority/source_proxy.mp4");
+    cache.setSidecars(source, set);
+    QCOMPARE(cache.lookupPreview(source, 720), set.external);
+    QCOMPARE(cache.lookupPreview(source, 540), set.external);
+
+    set.generated.insert(720, QStringLiteral("/nonexistent/sidecar-priority/source_proxy_720.mp4"));
+    set.generated.insert(360, QStringLiteral("/nonexistent/sidecar-priority/source_proxy_360.mp4"));
+    cache.setSidecars(source, set);
+    QCOMPARE(cache.lookupPreview(source, 720), set.generated.value(720));
+    // A generated proxy at another size is ignored in favour of the external one.
+    QCOMPARE(cache.lookupPreview(source, 540), set.external);
+
+    QCOMPARE(cache.sidecars(source).generated.size(), 2);
+    cache.setSidecars(source, {});
+    QVERIFY(cache.sidecars(source).isEmpty());
+    QCOMPARE(cache.lookupPreview(source, 720), QStringLiteral("/nonexistent/cache/720.mp4"));
+}
+
+void EngineTest::reversedSidecarNamesRoundTrip()
+{
+    using namespace drift;
+    const QString src = QStringLiteral("/media/shoot/we[ir]d*.clip01.MP4");
+
+    // Rounded outward to whole milliseconds.
+    const QString path = reversedSidecarPath(src, 1'500'400, 4'000'100);
+    QCOMPARE(path, QStringLiteral("/media/shoot/we[ir]d*.clip01_reversed_1500-4001.mp4"));
+    const auto range = parseReversedSidecarName(src, QFileInfo(path).fileName());
+    QVERIFY(range);
+    QCOMPARE(range->inUs, TimeUs(1'500'000));
+    QCOMPARE(range->outUs, TimeUs(4'001'000));
+
+    const QString name = QFileInfo(path).fileName();
+    QVERIFY(!parseReversedSidecarName(QStringLiteral("/media/shoot/other.MP4"), name));
+    QVERIFY(!parseReversedSidecarName(QStringLiteral("/media/shoot/we.MP4"), name));
+    const QString head = QStringLiteral("we[ir]d*.clip01_reversed_");
+    QVERIFY(!parseReversedSidecarName(src, head + QStringLiteral("5-5.mp4")));
+    QVERIFY(!parseReversedSidecarName(src, head + QStringLiteral("9-5.mp4")));
+    QVERIFY(!parseReversedSidecarName(src, head + QStringLiteral("a-5.mp4")));
+    QVERIFY(!parseReversedSidecarName(src, head + QStringLiteral("1-2-3.mp4")));
+    QVERIFY(!parseReversedSidecarName(src, head + QStringLiteral("-5.mp4")));
+    QVERIFY(!parseReversedSidecarName(src, head + QStringLiteral("1-5.mp4.part")));
+    QVERIFY(!parseReversedSidecarName(src, head + QStringLiteral("1-5.mov")));
+    QVERIFY(!parseReversedSidecarName(src, QStringLiteral("garbage")));
+    QVERIFY(!parseReversedSidecarName(src, QString()));
+}
+
+void EngineTest::reversedSidecarsOutrankTheIndex()
+{
+    auto &cache = drift::ReverseProxyCache::instance();
+    const QString source = QStringLiteral("/nonexistent/reversed-priority/source.mp4");
+    const auto cleanup = qScopeGuard([&] { cache.setSidecars(source, {}); });
+
+    drift::ReverseProxyCache::Sidecars set;
+    set.reversed.append({2 * drift::kUsPerSecond, 8 * drift::kUsPerSecond,
+                         QStringLiteral("/nonexistent/reversed-priority/source_reversed_2000-8000.mp4")});
+    cache.setSidecars(source, set);
+
+    drift::TimeUs coverEnd = 0;
+    QCOMPARE(cache.lookup(source, 3 * drift::kUsPerSecond, 5 * drift::kUsPerSecond, &coverEnd),
+             set.reversed.first().path);
+    QCOMPARE(coverEnd, 8 * drift::kUsPerSecond);
+    QVERIFY(cache.lookup(source, drift::kUsPerSecond, 5 * drift::kUsPerSecond, &coverEnd).isEmpty());
+
+    // A wider render supersedes the narrower one, and the narrower one is dropped.
+    cache.addReversedSidecar(source, 0, 10 * drift::kUsPerSecond,
+                             QStringLiteral("/nonexistent/reversed-priority/source_reversed_0-10000.mp4"));
+    QCOMPARE(cache.sidecars(source).reversed.size(), 1);
+    QCOMPARE(cache.lookup(source, drift::kUsPerSecond, 5 * drift::kUsPerSecond, &coverEnd),
+             QStringLiteral("/nonexistent/reversed-priority/source_reversed_0-10000.mp4"));
+    QCOMPARE(coverEnd, 10 * drift::kUsPerSecond);
 }
 
 void EngineTest::variableFrameRateIsDetected()

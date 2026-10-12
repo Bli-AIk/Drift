@@ -33,6 +33,9 @@
 #include "engine/HwAccel.h"
 #include "engine/MediaEditor.h"
 #include "engine/MediaProbe.h"
+#include "engine/ProxyNaming.h"
+#include "engine/ReverseProxyCache.h"
+#include "models/PreferencesController.h"
 #include "engine/FrameCompositor.h"
 #include "engine/GpuCompositor.h"
 #include "engine/ClipReaderPool.h"
@@ -249,6 +252,11 @@ private slots:
     void shapeStylePartialUpdateAndUndo();
     void shapeLayersAndKeyframes();
     void replaceSourceRebindsClipsAndClampsTrim();
+    void linkProxyValidatesAndCountsMatches();
+    void proxyGenerationWritesBesideSource();
+    void proxyGenerationFallsBackToCacheWhenFolderIsReadOnly();
+    void reverseRenderWritesBesideSource();
+    void reverseRenderFallsBackToCacheWhenFolderIsReadOnly();
     void replaceSourceRefusesADifferentKind();
     void exportImageWritesPngAndJpeg();
     void startupProjectUrlFromArguments();
@@ -7008,6 +7016,258 @@ void EditorStateTest::replaceSourceRebindsClipsAndClampsTrim()
     QCOMPARE(undone.timelineDuration, beforeSwap.timelineDuration);
     QCOMPARE(undone.faceTrackPath, beforeSwap.faceTrackPath);
     QCOMPARE(undone.depthPath, beforeSwap.depthPath);
+}
+
+namespace {
+
+// Proxy sidecar state is process-wide, so each test starts and ends with none and with the
+// pattern list the user would have had.
+struct ProxyTestScope
+{
+    explicit ProxyTestScope(AppController &state) : m_state(state)
+    {
+        QStandardPaths::setTestModeEnabled(true);
+        m_org = QCoreApplication::organizationName();
+        m_app = QCoreApplication::applicationName();
+        QCoreApplication::setOrganizationName(QStringLiteral("DriftTest"));
+        QCoreApplication::setApplicationName(QStringLiteral("DriftTestProxy"));
+        QSettings().remove(QStringLiteral("proxy"));
+        drift::ReverseProxyCache::instance().clearSidecars();
+        m_side = drift::ReverseProxyCache::previewProxyShortSide.exchange(360);
+        m_state.preferences()->setProxyNamePatterns({});
+    }
+    ~ProxyTestScope()
+    {
+        m_state.preferences()->resetProxyNamePatterns();
+        drift::ReverseProxyCache::previewProxyShortSide.store(m_side);
+        drift::ReverseProxyCache::instance().clearSidecars();
+        QSettings().remove(QStringLiteral("proxy"));
+        QCoreApplication::setOrganizationName(m_org);
+        QCoreApplication::setApplicationName(m_app);
+        QStandardPaths::setTestModeEnabled(false);
+    }
+    AppController &m_state;
+    QString m_org;
+    QString m_app;
+    int m_side = 0;
+};
+
+} // namespace
+
+void EditorStateTest::linkProxyValidatesAndCountsMatches()
+{
+    const QString ffmpeg = QStandardPaths::findExecutable(QStringLiteral("ffmpeg"));
+    if (ffmpeg.isEmpty())
+        QSKIP("ffmpeg not available to generate a test clip");
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString a = dir.filePath(QStringLiteral("a.mp4"));
+    const QString b = dir.filePath(QStringLiteral("b.mp4"));
+    const QString c = dir.filePath(QStringLiteral("c.mp4"));
+    const QString aProxy = dir.filePath(QStringLiteral("a_proxy.mp4"));
+    const QString aLong = dir.filePath(QStringLiteral("a_long.mp4"));
+    const QString aText = dir.filePath(QStringLiteral("a_text.mp4"));
+    QVERIFY(renderTestVideo(ffmpeg, a, 2));
+    QVERIFY(QFile::copy(a, b));
+    QVERIFY(QFile::copy(a, c));
+    QVERIFY(QFile::copy(a, aProxy));
+    QVERIFY(QFile::copy(a, dir.filePath(QStringLiteral("b_proxy.mp4"))));
+    QVERIFY(renderTestVideo(ffmpeg, aLong, 5));
+    {
+        QFile text(aText);
+        QVERIFY(text.open(QIODevice::WriteOnly));
+        text.write("not a video");
+    }
+
+    AssetLibrary library;
+    AppController state(&library);
+    ProxyTestScope scope(state);
+    QVERIFY(importAndAwait(library, a));
+    QVERIFY(importAndAwait(library, b));
+    QVERIFY(importAndAwait(library, c));
+    const QString idA = library.assetIdAt(0);
+    const QString idB = library.assetIdAt(1);
+    const QString idC = library.assetIdAt(2);
+    QCOMPARE(library.proxyState(idA), QStringLiteral("none"));
+
+    QSignalSpy probed(&library, &AssetLibrary::proxyLinkProbed);
+    library.linkProxy(idA, QUrl::fromLocalFile(aLong));
+    QVERIFY(probed.wait(60000));
+    QVERIFY(!probed.last().at(3).toString().isEmpty());
+    QVERIFY(probed.last().at(1).toString().isEmpty());
+
+    probed.clear();
+    library.linkProxy(idA, QUrl::fromLocalFile(aText));
+    QVERIFY(probed.wait(60000));
+    QVERIFY(!probed.last().at(3).toString().isEmpty());
+
+    probed.clear();
+    library.linkProxy(idA, QUrl::fromLocalFile(aProxy));
+    QVERIFY(probed.wait(60000));
+    QCOMPARE(probed.last().at(3).toString(), QString());
+    QCOMPARE(probed.last().at(1).toString(), QStringLiteral("*_proxy"));
+    QCOMPARE(probed.last().at(2).toInt(), 1);
+    QCOMPARE(library.proxyState(idA), QStringLiteral("none"));
+
+    library.commitProxyRule(QStringLiteral("*_proxy"));
+    QCOMPARE(state.preferences()->proxyNamePatterns(), QStringList{QStringLiteral("*_proxy")});
+    QTRY_COMPARE_WITH_TIMEOUT(library.proxyState(idA), QStringLiteral("linked"), 30000);
+    QTRY_COMPARE_WITH_TIMEOUT(library.proxyState(idB), QStringLiteral("linked"), 30000);
+    QCOMPARE(library.proxyState(idC), QStringLiteral("none"));
+}
+
+void EditorStateTest::proxyGenerationWritesBesideSource()
+{
+    const QString ffmpeg = QStandardPaths::findExecutable(QStringLiteral("ffmpeg"));
+    if (ffmpeg.isEmpty())
+        QSKIP("ffmpeg not available to generate a test clip");
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("clip.mp4"));
+    QVERIFY(renderTestVideo(ffmpeg, source, 2));
+
+    AssetLibrary library;
+    AppController state(&library);
+    ProxyTestScope scope(state);
+    QVERIFY(importAndAwait(library, source));
+    const QString id = library.assetIdAt(0);
+
+    QSignalSpy fallback(&library, &AssetLibrary::proxyLocationFallback);
+    library.createProxies({id});
+    QTRY_COMPARE_WITH_TIMEOUT(library.proxyState(id), QStringLiteral("ready"), 120000);
+    QVERIFY(QFileInfo::exists(dir.filePath(QStringLiteral("clip_proxy_360.mp4"))));
+    QVERIFY(!QFileInfo::exists(dir.filePath(QStringLiteral("clip_proxy_360.mp4.part"))));
+    QCOMPARE(fallback.count(), 0);
+
+    library.removeProxies({id});
+    QCOMPARE(library.proxyState(id), QStringLiteral("none"));
+    QVERIFY(!QFileInfo::exists(dir.filePath(QStringLiteral("clip_proxy_360.mp4"))));
+    QVERIFY(QFileInfo::exists(source));
+}
+
+void EditorStateTest::proxyGenerationFallsBackToCacheWhenFolderIsReadOnly()
+{
+    const QString ffmpeg = QStandardPaths::findExecutable(QStringLiteral("ffmpeg"));
+    if (ffmpeg.isEmpty())
+        QSKIP("ffmpeg not available to generate a test clip");
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("clip.mp4"));
+    QVERIFY(renderTestVideo(ffmpeg, source, 2));
+
+    AssetLibrary library;
+    AppController state(&library);
+    ProxyTestScope scope(state);
+    QVERIFY(importAndAwait(library, source));
+    const QString id = library.assetIdAt(0);
+
+    const QFileDevice::Permissions original = QFileInfo(dir.path()).permissions();
+    const auto restorePermissions =
+        qScopeGuard([&] { QFile::setPermissions(dir.path(), original); });
+    QVERIFY(QFile::setPermissions(dir.path(), QFileDevice::ReadOwner | QFileDevice::ExeOwner));
+    {
+        QFile probe(dir.filePath(QStringLiteral("probe")));
+        if (probe.open(QIODevice::WriteOnly))
+            QSKIP("folder stays writable (running as root?)");
+    }
+
+    QSignalSpy fallback(&library, &AssetLibrary::proxyLocationFallback);
+    library.createProxies({id});
+    QVERIFY(fallback.wait(120000));
+    QCOMPARE(fallback.count(), 1);
+    QCOMPARE(fallback.at(0).at(0).toStringList(),
+             QStringList{QDir::toNativeSeparators(QFileInfo(dir.path()).absoluteFilePath())});
+    QTRY_COMPARE_WITH_TIMEOUT(library.proxyState(id), QStringLiteral("ready"), 30000);
+    QVERIFY(!QFileInfo::exists(dir.filePath(QStringLiteral("clip_proxy_360.mp4"))));
+
+    library.removeProxies({id});
+}
+
+void EditorStateTest::reverseRenderWritesBesideSource()
+{
+    const QString ffmpeg = QStandardPaths::findExecutable(QStringLiteral("ffmpeg"));
+    if (ffmpeg.isEmpty())
+        QSKIP("ffmpeg not available to generate a test clip");
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("clip.mp4"));
+    QVERIFY(renderTestVideo(ffmpeg, source, 2));
+
+    AssetLibrary library;
+    AppController state(&library);
+    ProxyTestScope scope(state);
+    QVERIFY(importAndAwait(library, source));
+    state.addClipFromAsset(0);
+    const int track = state.selectedTrack();
+    QVERIFY(track >= 0);
+
+    QSignalSpy fallback(&library, &AssetLibrary::proxyLocationFallback);
+    QSignalSpy finished(&state, &AppController::reverseRenderFinished);
+    state.applyClipReverse(track, 0);
+    QVERIFY(finished.wait(120000));
+    QVERIFY(finished.at(0).at(0).toBool());
+
+    const QStringList written =
+        QDir(dir.path()).entryList({QStringLiteral("clip_reversed_*.mp4")}, QDir::Files);
+    QCOMPARE(written.size(), 1);
+    QVERIFY(drift::parseReversedSidecarName(source, written.first()));
+    QVERIFY(QDir(dir.path()).entryList({QStringLiteral("*.part")}, QDir::Files).isEmpty());
+    QVERIFY(state.clipHasReverseProxy(track, 0));
+    QCOMPARE(fallback.count(), 0);
+}
+
+void EditorStateTest::reverseRenderFallsBackToCacheWhenFolderIsReadOnly()
+{
+    const QString ffmpeg = QStandardPaths::findExecutable(QStringLiteral("ffmpeg"));
+    if (ffmpeg.isEmpty())
+        QSKIP("ffmpeg not available to generate a test clip");
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("clip.mp4"));
+    QVERIFY(renderTestVideo(ffmpeg, source, 2));
+
+    AssetLibrary library;
+    AppController state(&library);
+    ProxyTestScope scope(state);
+    QVERIFY(importAndAwait(library, source));
+    state.addClipFromAsset(0);
+    const int track = state.selectedTrack();
+    QVERIFY(track >= 0);
+
+    const QFileDevice::Permissions original = QFileInfo(dir.path()).permissions();
+    const auto restorePermissions =
+        qScopeGuard([&] { QFile::setPermissions(dir.path(), original); });
+    QVERIFY(QFile::setPermissions(dir.path(), QFileDevice::ReadOwner | QFileDevice::ExeOwner));
+    {
+        QFile probe(dir.filePath(QStringLiteral("probe")));
+        if (probe.open(QIODevice::WriteOnly))
+            QSKIP("folder stays writable (running as root?)");
+    }
+
+    QSignalSpy fallback(&library, &AssetLibrary::proxyLocationFallback);
+    QSignalSpy finished(&state, &AppController::reverseRenderFinished);
+    state.applyClipReverse(track, 0);
+    QVERIFY(finished.wait(120000));
+    QVERIFY(finished.at(0).at(0).toBool());
+
+    QCOMPARE(fallback.count(), 1);
+    QCOMPARE(fallback.at(0).at(0).toStringList(),
+             QStringList{QDir::toNativeSeparators(QFileInfo(dir.path()).absoluteFilePath())});
+    QVERIFY(QDir(dir.path()).entryList({QStringLiteral("clip_reversed_*")}, QDir::Files).isEmpty());
+    QVERIFY(state.clipHasReverseProxy(track, 0));
+
+    // The cache entry is the only thing keeping the lookup alive; drop it so later tests start clean.
+    const auto &clip = state.project()->tracks().at(track).clips.at(0);
+    drift::TimeUs coverEnd = 0;
+    const QString cached =
+        drift::ReverseProxyCache::instance().lookup(source, clip.srcIn, clip.srcOut, &coverEnd);
+    QVERIFY(!cached.isEmpty());
+    QFile::remove(cached);
 }
 
 // A clip's type is fixed at creation and decides which track it may sit on, so audio cannot slot

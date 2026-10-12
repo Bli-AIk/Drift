@@ -8,6 +8,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QSettings>
 #include <QSet>
 #include <QStandardPaths>
 #include <QUuid>
@@ -56,6 +57,16 @@ QString ReverseProxyCache::lookup(const QString &sourcePath, TimeUs srcIn, TimeU
     const QString key = info.absoluteFilePath();
 
     QMutexLocker lock(&m_mutex);
+    const auto side = m_sidecars.constFind(key);
+    if (side != m_sidecars.constEnd()) {
+        for (const Sidecars::Reversed &entry : side->reversed) {
+            if (entry.inUs > srcIn || entry.outUs < srcOut)
+                continue;
+            if (coverEndUs)
+                *coverEndUs = entry.outUs;
+            return entry.path;
+        }
+    }
     const auto it = m_entries.constFind(key);
     if (it == m_entries.constEnd())
         return {};
@@ -112,8 +123,17 @@ QString ReverseProxyCache::lookupPreview(const QString &sourcePath, int shortSid
     if (sourcePath.isEmpty())
         return {};
 
+    const QString key = QFileInfo(sourcePath).absoluteFilePath();
     QMutexLocker lock(&m_mutex);
-    const auto it = m_entries.constFind(QFileInfo(sourcePath).absoluteFilePath());
+    const auto side = m_sidecars.constFind(key);
+    if (side != m_sidecars.constEnd()) {
+        const QString generated = side->generated.value(shortSide);
+        if (!generated.isEmpty())
+            return generated;
+        if (!side->external.isEmpty())
+            return side->external;
+    }
+    const auto it = m_entries.constFind(key);
     if (it == m_entries.constEnd())
         return {};
     for (const Entry &entry : *it) {
@@ -181,6 +201,81 @@ void ReverseProxyCache::removePreview(const QString &sourcePath)
         ClipReaderPool::instance().releasePath(proxyPath);
         QFile::remove(proxyPath);
     }
+}
+
+void ReverseProxyCache::setSidecars(const QString &sourcePath, const Sidecars &sidecars)
+{
+    if (sourcePath.isEmpty())
+        return;
+
+    const QString key = QFileInfo(sourcePath).absoluteFilePath();
+    QMutexLocker lock(&m_mutex);
+    if (sidecars.isEmpty())
+        m_sidecars.remove(key);
+    else
+        m_sidecars.insert(key, sidecars);
+}
+
+bool ReverseProxyCache::updateSidecars(const QString &sourcePath,
+                                       const std::function<void(Sidecars &)> &edit)
+{
+    if (sourcePath.isEmpty())
+        return false;
+
+    const QString key = QFileInfo(sourcePath).absoluteFilePath();
+    QMutexLocker lock(&m_mutex);
+    const Sidecars before = m_sidecars.value(key);
+    Sidecars after = before;
+    edit(after);
+    if (after == before)
+        return false;
+    if (after.isEmpty())
+        m_sidecars.remove(key);
+    else
+        m_sidecars.insert(key, after);
+    return true;
+}
+
+void ReverseProxyCache::addReversedSidecar(const QString &sourcePath, TimeUs coverInUs,
+                                           TimeUs coverOutUs, const QString &path)
+{
+    if (sourcePath.isEmpty() || path.isEmpty() || coverOutUs <= coverInUs)
+        return;
+
+    QStringList superseded;
+    updateSidecars(sourcePath, [&](Sidecars &set) {
+        // Same rule as insert(): a render that fully covers an older one makes it dead weight.
+        for (int i = set.reversed.size() - 1; i >= 0; --i) {
+            const Sidecars::Reversed &old = set.reversed.at(i);
+            if (old.path == path) {
+                set.reversed.removeAt(i);
+            } else if (coverInUs <= old.inUs && coverOutUs >= old.outUs) {
+                superseded.append(old.path);
+                set.reversed.removeAt(i);
+            }
+        }
+        set.reversed.prepend({coverInUs, coverOutUs, path});
+    });
+    // Outside m_mutex, for the same reason as removePreview.
+    for (const QString &old : superseded) {
+        ClipReaderPool::instance().releasePath(old);
+        QFile::remove(old);
+    }
+}
+
+void ReverseProxyCache::clearSidecars()
+{
+    QMutexLocker lock(&m_mutex);
+    m_sidecars.clear();
+}
+
+ReverseProxyCache::Sidecars ReverseProxyCache::sidecars(const QString &sourcePath) const
+{
+    if (sourcePath.isEmpty())
+        return {};
+
+    QMutexLocker lock(&m_mutex);
+    return m_sidecars.value(QFileInfo(sourcePath).absoluteFilePath());
 }
 
 void ReverseProxyCache::saveLocked() const
@@ -252,6 +347,27 @@ void ReverseProxyCache::load()
             continue;
         }
         m_entries[source].append(entry);
+    }
+
+    // Preview proxies used to live only here. They now sit beside the source, so the old ones are
+    // dead weight; drop them once.
+    QSettings settings;
+    const QString purgedKey = QStringLiteral("proxy/legacyPreviewPurged");
+    if (!settings.value(purgedKey, false).toBool()) {
+        for (auto it = m_entries.begin(); it != m_entries.end();) {
+            QList<Entry> &list = it.value();
+            for (int i = list.size() - 1; i >= 0; --i) {
+                if (list.at(i).preview) {
+                    QFile::remove(list.at(i).proxyPath);
+                    list.removeAt(i);
+                }
+            }
+            if (list.isEmpty())
+                it = m_entries.erase(it);
+            else
+                ++it;
+        }
+        settings.setValue(purgedKey, true);
     }
     saveLocked();
 }
