@@ -1122,5 +1122,11 @@ ApplicationWindow {
         }
     }
 
-    ToastHost { parent: Overlay.overlay }
+    // Below the top bar and centered: the bottom is the timeline and the rail, where the
+    // thumb is.
+    ToastHost {
+        parent: Overlay.overlay
+        alignRight: false
+        topMargin: SafeArea.margins.top + Theme.androidTopBarHeight
+    }
 }

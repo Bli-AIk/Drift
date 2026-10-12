@@ -15,6 +15,7 @@ Item {
     // the bar rather than an unlabelled glyph in the corner.
     signal projectMenuRequested()
     signal downloadsRequested()
+    signal notificationsRequested()
 
     readonly property int downloadCount: {
         void Market.downloadsRevision
@@ -156,6 +157,35 @@ Item {
             anchors.rightMargin: Theme.spacingSm
             anchors.verticalCenter: parent.verticalCenter
             spacing: Theme.spacingXs
+
+            IconButton {
+                buttonSize: Theme.androidIconButtonSize
+                iconSize: Theme.iconSizeLg
+                glyph: Theme.icons.bell
+                variant: "text"
+                tooltip: qsTr("Notifications")
+                onClicked: root.notificationsRequested()
+
+                Rectangle {
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.margins: Theme.spacingXs
+                    visible: Toasts.unreadCount > 0
+                    width: Math.max(Theme.spacingXl, unreadText.implicitWidth + Theme.spacingSm)
+                    height: Theme.spacingXl
+                    radius: height / 2
+                    color: Theme.primary
+
+                    Text {
+                        id: unreadText
+                        anchors.centerIn: parent
+                        text: Toasts.unreadCount > 99 ? "99+" : String(Toasts.unreadCount)
+                        color: Theme.primaryForeground
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeXs
+                    }
+                }
+            }
 
             // The way into the downloads sheet, and the only one: the sheet never raises itself,
             // because the per-tile ring is what lets browsing carry on while things download.

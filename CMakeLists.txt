@@ -1284,6 +1284,7 @@ qt_add_qml_module(drift
         src/qml/AndroidLinkImport.qml
         src/qml/DownloadFormat.qml
         src/qml/AndroidDownloadsSheet.qml
+        src/qml/AndroidNotificationsSheet.qml
         src/qml/components/NavRailButton.qml
         # Touch entry point, loaded instead of Main.qml on Android (see src/main.cpp).
         src/qml/AndroidLayoutSheet.qml
@@ -1488,6 +1489,8 @@ qt_add_qml_module(drift
         src/qml/components/StartScreen.qml
         src/qml/components/NewTrackMenu.qml
         src/qml/components/ToastHost.qml
+        src/qml/components/NotificationList.qml
+        src/qml/components/NotificationsPopup.qml
         src/qml/components/EmptyState.qml
         src/qml/components/TouchLiftArea.qml
         src/qml/components/TouchDragGhost.qml

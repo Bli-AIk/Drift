@@ -725,6 +725,7 @@ QtObject {
         spinner: "loader-circle",
         refresh: "refresh-cw",
         download: "download",
+        bell: "bell",
 
         // Affordances
         reset: "rotate-ccw",

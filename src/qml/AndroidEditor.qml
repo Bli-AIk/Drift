@@ -319,6 +319,7 @@ Item {
             }
             onProjectMenuRequested: projectSheet.open()
             onDownloadsRequested: downloadsSheet.open()
+            onNotificationsRequested: notificationsSheet.open()
         }
 
         SplitView {
@@ -549,6 +550,15 @@ Item {
 
     AndroidDownloadsSheet {
         id: downloadsSheet
+    }
+
+    AndroidNotificationsSheet {
+        id: notificationsSheet
+    }
+
+    Connections {
+        target: Toasts
+        function onHistoryRequested() { notificationsSheet.open() }
     }
 
     AndroidLinkImport {

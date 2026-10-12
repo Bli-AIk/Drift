@@ -832,9 +832,6 @@ ApplicationWindow {
 
     Connections {
         target: Updates
-        function onUpdateReady() {
-            window.openUpdateDialog()
-        }
         function onInstallReady() {
             window.openUpdateDialog()
         }
@@ -1982,5 +1979,7 @@ ApplicationWindow {
     }
 
     // Notification host — above all panels, so any message lands in one place.
-    ToastHost { }
+    ToastHost {
+        topMargin: editorHeader.visible ? editorHeader.height : 0
+    }
 }

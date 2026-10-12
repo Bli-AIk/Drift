@@ -1,15 +1,26 @@
 import QtQuick
-import QtQuick.Controls.Basic
 import Drift
 
-// Visual host for the Toasts queue. Instantiated once, in Main.qml, on top of
-// the whole window so any panel's message lands in the same place.
+// Visual host for the Toasts queue. Instantiated once per shell, on top of the
+// whole window so any panel's message lands in the same place.
+//
+// Top of the window, never the bottom: at the bottom it sat on the timeline, the
+// one panel that is always being worked in (#289). One toast at a time; older
+// ones are in the header bell.
 Item {
     id: root
+
+    // Clearance for the shell's header bar, which the toast must not cover.
+    property real topMargin: Theme.spacingLg
+    // Desktop: top-right corner, clear of the transport. Phone: centered.
+    property bool alignRight: true
 
     // Sits above panel content but must never swallow clicks aimed at the editor.
     anchors.fill: parent
     z: 1000
+
+    readonly property real maxWidth: Math.min(alignRight ? 380 : 460,
+                                              root.width - Theme.spacingLg * 2)
 
     function _accent(severity) {
         switch (severity) {
@@ -29,17 +40,20 @@ Item {
         }
     }
 
-    Column {
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: Theme.spacing3xl
-        spacing: Theme.spacingLg
-        width: Math.min(460, root.width - Theme.spacing3xl * 2)
+    Item {
+        id: lane
+        anchors.top: parent.top
+        anchors.topMargin: root.topMargin + Theme.spacingLg
+        anchors.right: root.alignRight ? parent.right : undefined
+        anchors.rightMargin: Theme.spacingLg
+        anchors.horizontalCenter: root.alignRight ? undefined : parent.horizontalCenter
+        width: root.maxWidth
+        height: 0
 
         Repeater {
             model: Toasts.model
 
-            delegate: Rectangle {
+            delegate: Item {
                 id: toast
 
                 required property int index
@@ -51,20 +65,45 @@ Item {
                 required property bool exiting
                 required property string actionText
 
-                width: parent.width
-                height: toastRow.implicitHeight + Theme.spacingXl * 2
-                radius: Theme.radiusMd
-                color: Theme.panelBackground
-                border.width: Theme.borderWidth
-                border.color: Theme.panelBorder
+                readonly property bool front: {
+                    void Toasts.revision
+                    return Toasts.frontId() === toast.toastId
+                }
+                readonly property int behind: {
+                    void Toasts.revision
+                    return toast.front ? Toasts.queuedBehind() : 0
+                }
+                // Passing info/success get a one-line pill; anything that needs reading
+                // or answering keeps the full card.
+                readonly property bool compact: (severity === "info" || severity === "success")
+                                                && actionText.length === 0
 
-                // Toasts are the app's only error surface, and had no role at all —
-                // so every failure was silent to assistive tech.
-                Accessible.role: Accessible.AlertMessage
-                Accessible.name: toast.message
-                Accessible.description: toast.severity
+                // A toast queued behind another is never drawn until it reaches the front;
+                // once drawn it stays visible through its exit.
+                property bool shown: false
+                property real enterOffset: -Theme.spacingXl
+                property real swipeX: 0
+                property real swipeY: 0
+                property bool swipedOut: false
 
+                visible: shown
+                opacity: 0
+                width: compact ? Math.min(root.maxWidth, card.contentWidth) : root.maxWidth
+                height: card.height
+                x: (root.alignRight ? lane.width - width : (lane.width - width) / 2) + swipeX
+                y: enterOffset + Math.min(0, swipeY)
+
+                function _reveal() {
+                    if (shown || exiting)
+                        return
+                    shown = true
+                    enterAnimation.start()
+                }
+
+                onFrontChanged: if (front) _reveal()
                 Component.onCompleted: {
+                    if (front)
+                        _reveal()
                     switch (toast.severity) {
                     case "error": Haptics.error(); break
                     case "warning": Haptics.confirm(); break
@@ -73,83 +112,214 @@ Item {
                     }
                 }
 
-                // Severity is carried by a leading accent bar rather than a full
-                // color wash, so the message stays readable in both themes.
+                // Toasts are the app's only error surface, and had no role at all —
+                // so every failure was silent to assistive tech.
+                Accessible.role: Accessible.AlertMessage
+                Accessible.name: toast.message
+                Accessible.description: toast.severity
+
                 Rectangle {
-                    anchors.left: parent.left
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    width: 3
-                    radius: Theme.radiusMd
-                    color: root._accent(toast.severity)
+                    id: card
+
+                    readonly property real contentWidth: toastRow.implicitWidth
+                                                         + Theme.spacingXl + Theme.spacingSm
+                                                         + Theme.spacingLg
+
+                    width: parent.width
+                    height: Math.max(toast.compact ? Theme.controlHeight + Theme.spacingMd : 0,
+                                     toastRow.height + (toast.compact ? Theme.spacingMd
+                                                                      : Theme.spacingXl) * 2)
+                    radius: toast.compact ? height / 2 : Theme.radiusMd
+                    color: Theme.panelBackground
+                    border.width: Theme.borderWidth
+                    border.color: Theme.panelBorder
+
+                    // Severity is carried by a leading accent bar rather than a full
+                    // color wash, so the message stays readable in both themes. The pill
+                    // already says it with its glyph.
+                    Rectangle {
+                        visible: !toast.compact
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        width: 3
+                        radius: Theme.radiusMd
+                        color: root._accent(toast.severity)
+                    }
+
+                    Row {
+                        id: toastRow
+                        anchors.left: parent.left
+                        anchors.leftMargin: toast.compact ? Theme.spacingXl : Theme.spacingXl + Theme.spacingSm
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingMd
+
+                        readonly property real fixedWidth: Theme.iconSizeBase + dismissButton.width
+                                                           + (moreButton.visible ? moreButton.width + spacing : 0)
+                                                           + (actionButton.visible ? actionButton.width + spacing : 0)
+                                                           + spacing * 2
+                        readonly property real availableWidth: root.maxWidth - Theme.spacingXl
+                                                               - Theme.spacingSm - Theme.spacingLg
+
+                        IconGlyph {
+                            anchors.verticalCenter: parent.verticalCenter
+                            glyph: root._glyph(toast.severity)
+                            iconSize: Theme.iconSizeBase
+                            iconColor: root._accent(toast.severity)
+                        }
+
+                        Text {
+                            id: messageText
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: toast.compact
+                                   ? Math.min(implicitWidth, toastRow.availableWidth - toastRow.fixedWidth)
+                                   : toastRow.availableWidth - toastRow.fixedWidth
+                            text: toast.repeats > 1
+                                  ? qsTr("%1  (×%2)").arg(toast.message).arg(toast.repeats)
+                                  : toast.message
+                            color: Theme.panelForeground
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontSizeSm
+                            wrapMode: toast.compact ? Text.NoWrap : Text.WordWrap
+                            maximumLineCount: toast.compact ? 1 : 3
+                            elide: Text.ElideRight
+                        }
+
+                        ThemedButton {
+                            id: actionButton
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: toast.actionText.length > 0
+                            text: toast.actionText
+                            variant: "primary"
+                            onClicked: Toasts.trigger(toast.toastId)
+                        }
+
+                        // How many more are waiting; opens the full list in the bell.
+                        ThemedButton {
+                            id: moreButton
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: toast.behind > 0
+                            text: qsTr("+%1").arg(toast.behind)
+                            variant: "ghost"
+                            tooltip: qsTr("%n more notification(s)", "", toast.behind)
+                            onClicked: Toasts.historyRequested()
+                        }
+
+                        IconButton {
+                            id: dismissButton
+                            anchors.verticalCenter: parent.verticalCenter
+                            glyph: Theme.icons.x
+                            iconSize: Theme.iconSizeMd
+                            variant: "ghost"
+                            tooltip: qsTr("Dismiss")
+                            onClicked: Toasts.acknowledge(toast.toastId)
+                        }
+                    }
+
+                    // Hovering surfaces the full text, which may be elided.
+                    ThemedToolTip {
+                        text: toast.message
+                        visible: toastHover.hovered && messageText.truncated
+                    }
+
+                    HoverHandler { id: toastHover }
+
+                    // Flick sideways (or up, toward the edge it came from) to dismiss.
+                    DragHandler {
+                        id: swipe
+                        target: null
+                        enabled: !toast.exiting
+                        onTranslationChanged: {
+                            toast.swipeX = translation.x
+                            toast.swipeY = translation.y
+                        }
+                        onActiveChanged: {
+                            if (active)
+                                return
+                            const farX = Math.abs(toast.swipeX) > toast.width * 0.3
+                                         || Math.abs(centroid.velocity.x) > 800
+                            const farY = toast.swipeY < -card.height * 0.5
+                                         || centroid.velocity.y < -600
+                            if (farX || farY) {
+                                toast.swipedOut = true
+                                Toasts.acknowledge(toast.toastId)
+                            } else {
+                                springBack.start()
+                            }
+                        }
+                    }
                 }
 
-                Row {
-                    id: toastRow
-                    anchors.left: parent.left
-                    anchors.leftMargin: Theme.spacingXl + Theme.spacingSm
-                    anchors.right: parent.right
-                    anchors.rightMargin: Theme.spacingLg
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.spacingMd
-
-                    IconGlyph {
-                        anchors.verticalCenter: parent.verticalCenter
-                        glyph: root._glyph(toast.severity)
-                        iconSize: Theme.iconSizeBase
-                        iconColor: root._accent(toast.severity)
-                    }
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: parent.width - parent.spacing * (actionButton.visible ? 3 : 2)
-                               - Theme.iconSizeBase - dismissButton.width
-                               - (actionButton.visible ? actionButton.width : 0)
-                        text: toast.repeats > 1
-                              ? qsTr("%1  (×%2)").arg(toast.message).arg(toast.repeats)
-                              : toast.message
-                        color: Theme.panelForeground
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeSm
-                        wrapMode: Text.WordWrap
-                        maximumLineCount: 3
-                        elide: Text.ElideRight
-                    }
-
-                    ThemedButton {
-                        id: actionButton
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: toast.actionText.length > 0
-                        text: toast.actionText
-                        variant: "primary"
-                        onClicked: Toasts.trigger(toast.toastId)
-                    }
-
-                    IconButton {
-                        id: dismissButton
-                        anchors.verticalCenter: parent.verticalCenter
-                        glyph: Theme.icons.x
-                        iconSize: Theme.iconSizeMd
-                        variant: "ghost"
-                        tooltip: qsTr("Dismiss")
-                        onClicked: Toasts.dismiss(toast.toastId)
-                    }
-                }
-
+                // Hovering or holding the toast pauses the countdown; it restarts in full
+                // on leave so there is time to finish reading.
                 // timeout 0 means "stays until dismissed" (errors).
                 Timer {
-                    running: toast.timeout > 0 && !toast.exiting
+                    running: toast.front && toast.timeout > 0 && !toast.exiting
+                             && !toastHover.hovered && !swipe.active
                     interval: toast.timeout
                     onTriggered: Toasts.dismiss(toast.toastId)
                 }
 
-                // Exit is the reverse of the `add:` transition below, so a
-                // dismissal reads as the arrival played backwards. It runs as an
-                // explicit animation rather than a binding so it does not fight
-                // `add:` over the same properties, and the row is only actually
-                // removed once it has finished — otherwise the delegate would be
-                // destroyed mid-frame and the toast would just blink out.
-                onExitingChanged: if (toast.exiting) exitAnimation.start()
+                ParallelAnimation {
+                    id: enterAnimation
+                    NumberAnimation {
+                        target: toast
+                        property: "opacity"
+                        from: 0
+                        to: 1
+                        duration: Theme.durationSlow
+                        easing.type: Theme.easing
+                    }
+                    NumberAnimation {
+                        target: toast
+                        property: "enterOffset"
+                        from: -Theme.spacingXl
+                        to: 0
+                        duration: Theme.durationSlow
+                        easing.type: Theme.easing
+                    }
+                }
+
+                ParallelAnimation {
+                    id: springBack
+                    NumberAnimation {
+                        target: toast
+                        property: "swipeX"
+                        to: 0
+                        duration: Theme.durationBase
+                        easing.type: Theme.easing
+                    }
+                    NumberAnimation {
+                        target: toast
+                        property: "swipeY"
+                        to: 0
+                        duration: Theme.durationBase
+                        easing.type: Theme.easing
+                    }
+                }
+
+                // The row is only removed once the exit has finished — otherwise the
+                // delegate would be destroyed mid-frame and the toast would just blink
+                // out. A swipe carries on in the direction it was thrown; otherwise the
+                // toast retreats upward, the arrival played backwards.
+                onExitingChanged: {
+                    if (!toast.exiting)
+                        return
+                    enterAnimation.stop()
+                    springBack.stop()
+                    if (!toast.shown) {
+                        Toasts.remove(toast.toastId)
+                        return
+                    }
+                    if (toast.swipedOut && Math.abs(toast.swipeX) >= -Math.min(0, toast.swipeY)) {
+                        exitX.to = (toast.swipeX < 0 ? -1 : 1) * (toast.width + Theme.spacingLg)
+                        exitY.to = toast.swipeY
+                    } else {
+                        exitX.to = toast.swipeX
+                        exitY.to = Math.min(toast.swipeY, 0) - Theme.spacingXl
+                    }
+                    exitAnimation.start()
+                }
 
                 ParallelAnimation {
                     id: exitAnimation
@@ -157,62 +327,26 @@ Item {
                         target: toast
                         property: "opacity"
                         to: 0
-                        duration: Theme.durationFast
+                        duration: Theme.durationBase
                         easing.type: Theme.easing
                     }
                     NumberAnimation {
+                        id: exitX
                         target: toast
-                        property: "scale"
-                        to: 0.96
-                        duration: Theme.durationFast
+                        property: "swipeX"
+                        duration: Theme.durationBase
+                        easing.type: Theme.easing
+                    }
+                    NumberAnimation {
+                        id: exitY
+                        target: toast
+                        property: "swipeY"
+                        duration: Theme.durationBase
                         easing.type: Theme.easing
                     }
                     onFinished: Toasts.remove(toast.toastId)
                 }
-
-                // Hovering pauses nothing but does surface the full text, which
-                // may be elided at three lines.
-                ThemedToolTip {
-                    text: toast.message
-                    visible: toastHover.hovered && toast.message.length > 120
-                }
-
-                HoverHandler { id: toastHover }
             }
         }
-
-        // Enter and exit share a shape, so a dismissal reads as the reverse of the
-        // arrival rather than the toast blinking out of existence. Exit is faster:
-        // the entrance is an announcement, the dismissal is just an acknowledgement.
-        //
-        // `y` is deliberately left to the Column positioner here — driving it from
-        // a transition as well fights the layout and jitters.
-        add: Transition {
-            ParallelAnimation {
-                NumberAnimation {
-                    properties: "opacity"
-                    from: 0
-                    to: 1
-                    duration: Theme.durationBase
-                    easing.type: Theme.easing
-                }
-                NumberAnimation {
-                    properties: "scale"
-                    from: 0.96
-                    to: 1
-                    duration: Theme.durationBase
-                    easing.type: Theme.easing
-                }
-            }
-        }
-
-        move: Transition {
-            NumberAnimation {
-                properties: "y"
-                duration: Theme.durationBase
-                easing.type: Theme.easingInOut
-            }
-        }
-
     }
 }

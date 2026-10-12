@@ -1443,6 +1443,13 @@
     </message>
 </context>
 <context>
+    <name>AndroidNotificationsSheet</name>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AndroidPreview</name>
     <message>
         <source>Full</source>
@@ -1925,6 +1932,10 @@
     <message>
         <source>Untitled</source>
         <translation>Без названия</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Downloads</source>
@@ -6023,6 +6034,14 @@
         <translation>Другие настройки…</translation>
     </message>
     <message>
+        <source>Notifications — Drift %1 is available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Agent</source>
         <translation>Агент</translation>
     </message>
@@ -6037,14 +6056,6 @@
     <message>
         <source>Extras</source>
         <translation>Дополнения</translation>
-    </message>
-    <message>
-        <source>Update</source>
-        <translation>Обновление</translation>
-    </message>
-    <message>
-        <source>Drift %1 is available</source>
-        <translation>Доступна версия Drift %1</translation>
     </message>
     <message>
         <source>Agent access</source>
@@ -9676,6 +9687,37 @@
     <message>
         <source>New track</source>
         <translation>Новая дорожка</translation>
+    </message>
+</context>
+<context>
+    <name>NotificationList</name>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished">Очистить</translation>
+    </message>
+    <message>
+        <source>Drift %1 is ready to install</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drift %1 is available</source>
+        <translation type="unfinished">Доступна версия Drift %1</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation type="unfinished">Обновить</translation>
+    </message>
+    <message>
+        <source>No notifications yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1  (×%2)</source>
+        <translation type="unfinished">%1  (×%2)</translation>
     </message>
 </context>
 <context>
@@ -15452,6 +15494,18 @@ If playback stutters, try another.</source>
         <translation>%1  (×%2)</translation>
     </message>
     <message>
+        <source>+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more notification(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
         <source>Dismiss</source>
         <translation>Закрыть</translation>
     </message>
@@ -16389,7 +16443,7 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Обновить</translation>
     </message>
     <message>
         <source>Closes Drift, installs the update and opens Drift again</source>

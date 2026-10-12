@@ -1443,6 +1443,13 @@
     </message>
 </context>
 <context>
+    <name>AndroidNotificationsSheet</name>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AndroidPreview</name>
     <message>
         <source>Full</source>
@@ -1924,6 +1931,10 @@
     <message>
         <source>Untitled</source>
         <translation>শিরোনামহীন</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Downloads</source>
@@ -5996,6 +6007,14 @@
         <translation>আরও সেটিংস…</translation>
     </message>
     <message>
+        <source>Notifications — Drift %1 is available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Agent</source>
         <translation>এজেন্ট</translation>
     </message>
@@ -6010,14 +6029,6 @@
     <message>
         <source>Extras</source>
         <translation>অতিরিক্ত প্যাক</translation>
-    </message>
-    <message>
-        <source>Update</source>
-        <translation>আপডেট</translation>
-    </message>
-    <message>
-        <source>Drift %1 is available</source>
-        <translation>Drift %1 পাওয়া গেছে</translation>
     </message>
     <message>
         <source>Agent access</source>
@@ -9633,6 +9644,37 @@
     <message>
         <source>New track</source>
         <translation>নতুন ট্র্যাক</translation>
+    </message>
+</context>
+<context>
+    <name>NotificationList</name>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished">মুছুন</translation>
+    </message>
+    <message>
+        <source>Drift %1 is ready to install</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drift %1 is available</source>
+        <translation type="unfinished">Drift %1 পাওয়া গেছে</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation type="unfinished">আপডেট</translation>
+    </message>
+    <message>
+        <source>No notifications yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1  (×%2)</source>
+        <translation type="unfinished">%1  (×%2)</translation>
     </message>
 </context>
 <context>
@@ -15397,6 +15439,17 @@ If playback stutters, try another.</source>
     <message>
         <source>%1  (×%2)</source>
         <translation>%1  (×%2)</translation>
+    </message>
+    <message>
+        <source>+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more notification(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Dismiss</source>

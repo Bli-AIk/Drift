@@ -1443,6 +1443,13 @@
     </message>
 </context>
 <context>
+    <name>AndroidNotificationsSheet</name>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AndroidPreview</name>
     <message>
         <source>Full</source>
@@ -1923,6 +1930,10 @@
     <message>
         <source>Untitled</source>
         <translation>Không có tiêu đề</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Downloads</source>
@@ -5961,6 +5972,14 @@
         <translation>Thêm cài đặt…</translation>
     </message>
     <message>
+        <source>Notifications — Drift %1 is available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Agent</source>
         <translation>Trợ lý</translation>
     </message>
@@ -5983,14 +6002,6 @@
     <message>
         <source>Extras</source>
         <translation>Bổ trợ</translation>
-    </message>
-    <message>
-        <source>Update</source>
-        <translation>Cập nhật</translation>
-    </message>
-    <message>
-        <source>Drift %1 is available</source>
-        <translation>Drift %1 đang có sẵn</translation>
     </message>
     <message>
         <source>Agent access</source>
@@ -9590,6 +9601,37 @@
     <message>
         <source>New track</source>
         <translation>Track mới</translation>
+    </message>
+</context>
+<context>
+    <name>NotificationList</name>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished">Xóa</translation>
+    </message>
+    <message>
+        <source>Drift %1 is ready to install</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drift %1 is available</source>
+        <translation type="unfinished">Drift %1 đang có sẵn</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation type="unfinished">Cập nhật</translation>
+    </message>
+    <message>
+        <source>No notifications yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1  (×%2)</source>
+        <translation type="unfinished">%1  (×%2)</translation>
     </message>
 </context>
 <context>
@@ -15344,6 +15386,16 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
     <message>
         <source>%1  (×%2)</source>
         <translation>%1  (×%2)</translation>
+    </message>
+    <message>
+        <source>+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more notification(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Dismiss</source>

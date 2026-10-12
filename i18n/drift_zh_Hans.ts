@@ -1443,6 +1443,13 @@
     </message>
 </context>
 <context>
+    <name>AndroidNotificationsSheet</name>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AndroidPreview</name>
     <message>
         <source>Full</source>
@@ -1922,6 +1929,10 @@
     </message>
     <message>
         <source>Untitled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notifications</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5969,6 +5980,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Notifications — Drift %1 is available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Agent</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5983,14 +6002,6 @@
     <message>
         <source>Extras</source>
         <translation>附加项</translation>
-    </message>
-    <message>
-        <source>Update</source>
-        <translation>更新</translation>
-    </message>
-    <message>
-        <source>Drift %1 is available</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Agent access</source>
@@ -9589,6 +9600,37 @@
     </message>
     <message>
         <source>New track</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NotificationList</name>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drift %1 is ready to install</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drift %1 is available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation type="unfinished">更新</translation>
+    </message>
+    <message>
+        <source>No notifications yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1  (×%2)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -15336,6 +15378,16 @@ If playback stutters, try another.</source>
     <message>
         <source>%1  (×%2)</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more notification(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Dismiss</source>

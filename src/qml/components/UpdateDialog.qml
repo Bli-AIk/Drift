@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Controls.Basic
 import Drift
 
-// Opened from the header badge, on its own the first time a build that installs its own updates
-// finds a newer version, and again when a download the user started is ready. Nothing downloads
+// Opened from the update row in the header bell, from Check for Updates, and on its own when a
+// download the user started is ready. Nothing downloads
 // or installs until Update is pressed, and Drift never quits unless "Restart and install" is.
 // "Skip" belongs away from the safe actions, so the buttons live in the content and ThemedDialog's
 // two-button footer is off (same shape as UnsavedChangesDialog).
