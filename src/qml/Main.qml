@@ -406,7 +406,7 @@ ApplicationWindow {
     onClosing: function (close) {
         // Before any of the branches below, so a quit that is cancelled at the
         // unsaved prompt still records where the window was.
-        window.persistLayout()
+        window.persistWindowState()
         if (window.forceClose || !EditorState.projectFile.hasUnsavedChanges)
             return
         close.accepted = false
@@ -539,96 +539,62 @@ ApplicationWindow {
         LayoutMemory.saveWindowState(window.windowedGeometry, maximized === 1)
     }
 
-    function persistLayout() {
-        window.persistWindowState()
-        window.capturePanelFractions()
-        for (const key in window.panelFractions)
-            LayoutMemory.setPanelFraction(key, window.panelFractions[key])
-    }
-
     // Panel sizes are kept as a fraction of the split they sit in rather than a pixel
     // width, so a layout dragged out on a 4K display still reads on a laptop screen.
     // Keyed by workspace, because portrait and landscape are different arrangements
     // and each deserves to remember its own.
-    property var panelFractions: ({})
-    // Nothing is captured until the stored layout has been applied, or the defaults
-    // from the first layout pass would immediately overwrite it.
-    property bool panelLayoutRestored: false
-
-    Timer {
-        id: panelSettleTimer
-        interval: 250
-        onTriggered: {
-            window.capturePanelFractions()
-            for (const key in window.panelFractions)
-                LayoutMemory.setPanelFraction(key, window.panelFractions[key])
-        }
-    }
-
-    function schedulePanelCapture() {
-        if (!window.panelLayoutRestored || workspaceApplyTimer.running)
-            return
-        panelSettleTimer.restart()
-    }
-
-    function capturePanelFractions() {
-        // Fullscreen collapses every panel around the preview; those sizes are a mode,
-        // not a layout, and must not be written over the user's arrangement.
-        if (window.previewFullscreen)
-            return
-        const prefix = window.workspaceLayout + "/"
-        if (outerSplit.height > 0 && innerSplit.height > 0)
-            window.panelFractions[prefix + "editorRow"] = innerSplit.height / outerSplit.height
-        if (innerSplit.width > 0) {
-            window.panelFractions[prefix + "assets"] = assetsPanel.width / innerSplit.width
-            window.panelFractions[prefix + "properties"] = propertiesPanel.width / innerSplit.width
-        }
-        // Landscape hands the preview the slack in its row (fillWidth), so it has no
-        // width of its own to remember there.
-        if (window.portraitWorkspace && rootSplit.width > 0)
-            window.panelFractions[prefix + "preview"] = previewPanel.width / rootSplit.width
-    }
+    //
+    // Fractions are written only when the user finishes dragging a handle, and
+    // reapplied whenever the split they are a fraction of changes size. Sampling them
+    // at any other time is what made them shrink every launch (#326): the window first
+    // lays out at its windowed size and is maximized after, so pixel sizes restored on
+    // that first pass were then read back against the larger window.
 
     // Writing an attached SplitView size drops the default binding behind it — which
     // is the point: from here on the panel keeps the size the user chose, exactly as
-    // it does after a handle drag.
-    function applySavedPanelSizes() {
-        const prefix = window.workspaceLayout + "/"
-        const editorRow = LayoutMemory.panelFraction(prefix + "editorRow", 0)
-        if (editorRow > 0 && outerSplit.height > 0)
+    // it does after a handle drag. Fullscreen collapses every panel around the
+    // preview; those sizes are a mode, not a layout, and are left alone.
+    function applyEditorRowFraction() {
+        if (window.previewFullscreen || outerSplit.height <= 0)
+            return
+        const editorRow = LayoutMemory.panelFraction(window.workspaceLayout + "/editorRow", 0)
+        if (editorRow > 0)
             innerSplit.SplitView.preferredHeight = outerSplit.height * editorRow
-        const assets = LayoutMemory.panelFraction(prefix + "assets", 0)
-        if (assets > 0 && innerSplit.width > 0)
-            assetsPanel.SplitView.preferredWidth = innerSplit.width * assets
-        const properties = LayoutMemory.panelFraction(prefix + "properties", 0)
-        if (properties > 0 && innerSplit.width > 0)
-            propertiesPanel.SplitView.preferredWidth = innerSplit.width * properties
-        if (window.portraitWorkspace) {
-            const preview = LayoutMemory.panelFraction(prefix + "preview", 0)
-            if (preview > 0 && rootSplit.width > 0)
-                previewPanel.SplitView.preferredWidth = rootSplit.width * preview
-        }
     }
 
-    // Every extent is 0 on the first layout pass, and a fraction of 0 is 0 — so the
-    // restore waits for real sizes rather than running at Component.onCompleted.
-    function restorePanelSizesWhenReady() {
-        if (window.panelLayoutRestored)
+    function applySidePanelFractions() {
+        if (window.previewFullscreen || innerSplit.width <= 0)
             return
-        if (rootSplit.width <= 0 || outerSplit.height <= 0 || innerSplit.width <= 0)
+        const prefix = window.workspaceLayout + "/"
+        const assets = LayoutMemory.panelFraction(prefix + "assets", 0)
+        if (assets > 0)
+            assetsPanel.SplitView.preferredWidth = innerSplit.width * assets
+        const properties = LayoutMemory.panelFraction(prefix + "properties", 0)
+        if (properties > 0)
+            propertiesPanel.SplitView.preferredWidth = innerSplit.width * properties
+    }
+
+    // Landscape hands the preview the slack in its row (fillWidth), so it has no
+    // width of its own there.
+    function applyPreviewFraction() {
+        if (window.previewFullscreen || !window.portraitWorkspace || rootSplit.width <= 0)
             return
-        window.applySavedPanelSizes()
-        window.panelLayoutRestored = true
+        const preview = LayoutMemory.panelFraction(window.workspaceLayout + "/preview", 0)
+        if (preview > 0)
+            previewPanel.SplitView.preferredWidth = rootSplit.width * preview
     }
 
     // A workspace flip moves the preview between splits, so the panels around it are
     // still resizing on the frame the flip lands. Reapplying immediately would divide
-    // by stale extents; waiting lets the new arrangement settle first, and capture is
-    // suppressed until it has (schedulePanelCapture checks this timer).
+    // by stale extents; waiting lets the new arrangement settle first.
     Timer {
         id: workspaceApplyTimer
         interval: 100
-        onTriggered: window.applySavedPanelSizes()
+        onTriggered: {
+            window.applyEditorRowFraction()
+            window.applySidePanelFractions()
+            window.applyPreviewFraction()
+        }
     }
 
     // Fullscreen preview: the window goes fullscreen *and* every panel around the
@@ -720,11 +686,8 @@ ApplicationWindow {
     onPortraitWorkspaceChanged: {
         rootSplit.relocatePreview()
         // The two workspaces remember their own proportions, so the flip pulls in the
-        // other one's — and any capture already in flight belongs to the old layout.
-        if (window.panelLayoutRestored) {
-            panelSettleTimer.stop()
-            workspaceApplyTimer.restart()
-        }
+        // other one's.
+        workspaceApplyTimer.restart()
     }
 
     function configureAndAddAsset(assetIndex, runner) {
@@ -1790,10 +1753,15 @@ ApplicationWindow {
                 // relocatePreview() is a no-op when nothing has to move.
                 Component.onCompleted: relocatePreview()
 
-                // The stored panel sizes need real extents to be fractions of, and
-                // these are 0 until the first layout pass lands.
-                onWidthChanged: window.restorePanelSizesWhenReady()
-                onHeightChanged: window.restorePanelSizesWhenReady()
+                // Each split reapplies the fractions measured against its own extent,
+                // and saves them once a handle drag ends. Reapplying on another split's
+                // resize would fight a drag in progress there.
+                onWidthChanged: window.applyPreviewFraction()
+                onResizingChanged: {
+                    if (!resizing && window.portraitWorkspace && rootSplit.width > 0)
+                        LayoutMemory.setPanelFraction(window.workspaceLayout + "/preview",
+                                                      previewPanel.width / rootSplit.width)
+                }
 
                 SplitView {
                     id: outerSplit
@@ -1810,7 +1778,12 @@ ApplicationWindow {
                     // layout, so this hands the window to the preview.
                     visible: !(window.previewFullscreen && window.portraitWorkspace)
 
-                    onHeightChanged: window.restorePanelSizesWhenReady()
+                    onHeightChanged: window.applyEditorRowFraction()
+                    onResizingChanged: {
+                        if (!resizing && outerSplit.height > 0)
+                            LayoutMemory.setPanelFraction(window.workspaceLayout + "/editorRow",
+                                                          innerSplit.height / outerSplit.height)
+                    }
 
                     SplitView {
                         id: innerSplit
@@ -1836,12 +1809,14 @@ ApplicationWindow {
 
                         handle: PanelSplitHandle { view: innerSplit }
 
-                        onWidthChanged: window.restorePanelSizesWhenReady()
-                        // This split's share of the vertical one is the timeline's
-                        // height, seen from the other side.
-                        onHeightChanged: {
-                            window.restorePanelSizesWhenReady()
-                            window.schedulePanelCapture()
+                        onWidthChanged: window.applySidePanelFractions()
+                        onResizingChanged: {
+                            if (resizing || innerSplit.width <= 0)
+                                return
+                            const prefix = window.workspaceLayout + "/"
+                            LayoutMemory.setPanelFraction(prefix + "assets", assetsPanel.width / innerSplit.width)
+                            LayoutMemory.setPanelFraction(prefix + "properties",
+                                                          propertiesPanel.width / innerSplit.width)
                         }
 
                         AssetsPanel {
@@ -1858,7 +1833,6 @@ ApplicationWindow {
                             // Cap mins to available width so 200+320+240 never exceeds a
                             // zero/partial first layout pass (Qt asserts max < min).
                             SplitView.minimumWidth: Math.min(200, Math.max(0, innerSplit.width * 0.2))
-                            onWidthChanged: window.schedulePanelCapture()
                         }
 
                         // Declared in its landscape slot; rootSplit.relocatePreview()
@@ -1883,7 +1857,6 @@ ApplicationWindow {
                             SplitView.minimumWidth: window.portraitWorkspace
                                                     ? Math.min(260, Math.max(0, rootSplit.width * 0.2))
                                                     : Math.min(320, Math.max(0, innerSplit.width * 0.3))
-                            onWidthChanged: window.schedulePanelCapture()
                         }
 
                         PropertiesPanel {
@@ -1893,7 +1866,6 @@ ApplicationWindow {
                             SplitView.minimumWidth: Math.min(240, Math.max(0, innerSplit.width * 0.2))
                             // Empty-state browse CTAs jump the assets panel to the
                             // matching library tab.
-                            onWidthChanged: window.schedulePanelCapture()
                             onBrowseEffectsRequested: assetsPanel.showTab("effects")
                             onBrowseAudioEffectsRequested: assetsPanel.showTab("sounds")
                         }

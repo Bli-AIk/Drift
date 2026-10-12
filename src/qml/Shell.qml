@@ -44,7 +44,7 @@ Item {
     //
     // Called once. Swapping shells live on a window resize was built and then removed, because:
     //
-    //   - The two shells do not expose the same API. persistLayout exists only on the desktop
+    //   - The two shells do not expose the same API. persistWindowState exists only on the desktop
     //     root; inEditor, showEditor, overlayModalCount and toolWindowOpen only on the touch one.
     //     A swap can only cope by probing for each name at runtime, and nothing enforces the
     //     parity that shared components currently happen to rely on.
