@@ -4657,6 +4657,12 @@ TimelineClipsModel::Decorations AppController::trackDecorations(const drift::Tra
             continue;
         region.start = drift::usToSeconds(startUs);
         region.end = drift::usToSeconds(endUs);
+        region.overlap = drift::clipsPhysicallyOverlap(fromClip, toClip);
+        const drift::TimeUs shorterUs = qMin(fromClip.timelineDuration, toClip.timelineDuration);
+        region.maxDuration =
+            drift::usToSeconds(region.overlap ? shorterUs - drift::secondsToUs(0.05) : shorterUs);
+        if (transition)
+            region.transitionId = transition->id;
         out.transitions.append(region);
     }
     return out;

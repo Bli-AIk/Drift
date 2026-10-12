@@ -109,6 +109,11 @@ public:
         double start = 0.0;
         double end = 0.0;
         bool hasTransition = false;
+        // The clips physically overlap, so the window is the overlap and only its start can move.
+        bool overlap = false;
+        // Longest duration setTransitionDuration / a project reload will keep.
+        double maxDuration = 0.0;
+        QString transitionId;
         QString label;
         QString kind;
         bool operator==(const TransitionRegion &) const = default;

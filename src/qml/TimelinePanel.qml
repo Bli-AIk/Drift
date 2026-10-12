@@ -253,6 +253,10 @@ PanelFrame {
     // Clip under an in-progress effect drag (for drop highlight).
     property int effectDropTrackIndex: -1
     property int effectDropClipIndex: -1
+    // Window a dragged transition would cover (seconds; track -1 when hidden).
+    property int transitionDropTrackIndex: -1
+    property real transitionDropStart: 0
+    property real transitionDropEnd: 0
     // CapCut-style marquee (drag on empty track space to box-select clips).
     property bool marqueeActive: false
     property bool marqueeAdditive: false
@@ -441,17 +445,18 @@ PanelFrame {
         return "crossfade"
     }
 
-    // Find the outgoing (earlier) clip index for a transition drop at timeline x.
-    function transitionLeftClipAtPosition(trackIndex, xPixels) {
+    // The outgoing (earlier) clip for a transition drop at timeline x, and the window
+    // (seconds) addTransition would give it: the overlap, or a 0.5 s window on the cut.
+    function transitionDropTarget(trackIndex, xPixels) {
         if (trackIndex < 0 || trackIndex >= tracks.length)
-            return -1
+            return null
         const track = tracks[trackIndex]
         if (track.type !== "video" && track.type !== "shape" && track.type !== "text"
                 && track.type !== "audio")
-            return -1
+            return null
         const seconds = xPixels / pxPerSecond
         const clips = track.clips
-        let best = -1
+        let best = null
         let bestDist = 1e9
         for (let i = 0; i < clips.length; i++) {
             const left = clips[i]
@@ -479,7 +484,11 @@ PanelFrame {
                     const dist = Math.abs(seconds - mid)
                     if (dist < bestDist) {
                         bestDist = dist
-                        best = i
+                        best = {
+                            leftClip: i,
+                            start: Math.max(left.start, regionStart),
+                            end: Math.min(right.start + right.duration, regionEnd)
+                        }
                     }
                 }
             }
@@ -487,11 +496,27 @@ PanelFrame {
         return best
     }
 
-    function applyTransitionDrop(trackIndex, xPixels, kind) {
-        const leftClip = transitionLeftClipAtPosition(trackIndex, xPixels)
-        if (leftClip < 0 || !kind || kind.length === 0)
+    function updateTransitionDropPreview(trackIndex, xPixels) {
+        const target = transitionDropTarget(trackIndex, xPixels)
+        if (!target) {
+            clearTransitionDropPreview()
             return
-        EditorState.addTransition(trackIndex, leftClip, transitionKindForTrack(trackIndex, kind), 0.5)
+        }
+        transitionDropTrackIndex = trackIndex
+        transitionDropStart = target.start
+        transitionDropEnd = target.end
+    }
+
+    function clearTransitionDropPreview() {
+        transitionDropTrackIndex = -1
+    }
+
+    function applyTransitionDrop(trackIndex, xPixels, kind) {
+        clearTransitionDropPreview()
+        const target = transitionDropTarget(trackIndex, xPixels)
+        if (!target || !kind || kind.length === 0)
+            return
+        EditorState.addTransition(trackIndex, target.leftClip, transitionKindForTrack(trackIndex, kind), 0.5)
     }
 
     // The bin row's media kind ("video", "audio", "image", ...), which is what the track-fit
@@ -1973,6 +1998,7 @@ PanelFrame {
                                         if (isTransitionDrag(drop)) {
                                             root.clearLandingPreview()
                                             root.clearEffectDropHighlight()
+                                            root.updateTransitionDropPreview(trackRow.trackIndex, drop.x)
                                             return
                                         }
                                         if (isMaskDrag(drop)) {
@@ -2032,6 +2058,7 @@ PanelFrame {
                                     onExited: {
                                         root.clearLandingOutline()
                                         root.clearEffectDropHighlight()
+                                        root.clearTransitionDropPreview()
                                     }
                                     onDropped: (drop) => {
                                         drop.accept(Qt.CopyAction)
@@ -2141,6 +2168,20 @@ PanelFrame {
                                             NumberAnimation { to: 1.0; duration: Theme.durationSlow; easing.type: Theme.easing }
                                         }
                                     }
+                                }
+
+                                // Where a dragged transition would land. Above the transition
+                                // regions so it stays visible over an existing one it replaces.
+                                Rectangle {
+                                    visible: root.transitionDropTrackIndex === trackRow.trackIndex
+                                    x: root.transitionDropStart * root.pxPerSecond
+                                    width: Math.max(8, (root.transitionDropEnd - root.transitionDropStart) * root.pxPerSecond)
+                                    height: parent.height
+                                    radius: Theme.radiusSm
+                                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
+                                    border.width: 2
+                                    border.color: Theme.transitionOverlap
+                                    z: 11
                                 }
 
                                 // Nested adjustment lanes, drawn as strips across the top of
@@ -2412,10 +2453,25 @@ PanelFrame {
                                         readonly property bool transitionSelected:
                                             EditorState.selectedTransitionTrack === trackRow.trackIndex
                                             && EditorState.selectedTransitionLeftClip === leftClipIndex
+                                        // Duration while an edge is being dragged; < 0 otherwise.
+                                        property real liveDuration: -1
+                                        // An overlap window ends where the outgoing clip does and
+                                        // grows leftwards; a window on a cut stays centred on it.
+                                        readonly property real shownStart: {
+                                            if (liveDuration < 0)
+                                                return modelData.start
+                                            if (modelData.overlap)
+                                                return modelData.end - liveDuration
+                                            const left = root.tracks[trackRow.trackIndex].clips[leftClipIndex]
+                                            return left.start + left.duration - liveDuration / 2
+                                        }
+                                        readonly property real shownEnd:
+                                            liveDuration < 0 || modelData.overlap ? modelData.end
+                                                                                  : shownStart + liveDuration
 
                                         z: 10
-                                        x: modelData.start * root.pxPerSecond
-                                        width: Math.max(8, (modelData.end - modelData.start) * root.pxPerSecond)
+                                        x: shownStart * root.pxPerSecond
+                                        width: Math.max(8, (shownEnd - shownStart) * root.pxPerSecond)
                                         height: parent.height - Theme.clipSelectionRingWidth * 2
                                         y: Theme.clipSelectionRingWidth
 
@@ -2479,8 +2535,14 @@ PanelFrame {
                                         DropArea {
                                             anchors.fill: parent
                                             keys: ["application/x-drift-transition"]
+                                            onEntered: (drop) => root.updateTransitionDropPreview(trackRow.trackIndex,
+                                                                                                  transitionRegion.x + drop.x)
+                                            onPositionChanged: (drop) => root.updateTransitionDropPreview(trackRow.trackIndex,
+                                                                                                          transitionRegion.x + drop.x)
+                                            onExited: root.clearTransitionDropPreview()
                                             onDropped: (drop) => {
                                                 drop.accept(Qt.CopyAction)
+                                                root.clearTransitionDropPreview()
                                                 const kind = drop.getDataAsString("application/x-drift-transition")
                                                 if (kind.length > 0)
                                                     EditorState.addTransition(trackRow.trackIndex,
@@ -2504,6 +2566,59 @@ PanelFrame {
                                                                               transitionRegion.leftClipIndex,
                                                                               "crossfade", 0.5)
                                                 }
+                                            }
+                                        }
+
+                                        // Edge handles stretch the transition. A window on a cut
+                                        // grows on both sides, so each pixel dragged counts twice;
+                                        // an overlap can only move its start (the incoming clip).
+                                        Repeater {
+                                            model: !transitionRegion.hasTransition ? []
+                                                   : transitionRegion.modelData.overlap ? [-1] : [-1, 1]
+                                            delegate: MouseArea {
+                                                id: edgeHandle
+                                                required property int modelData
+                                                property real pressX: 0
+                                                property real pressDuration: 0
+
+                                                function durationAt(mouseX) {
+                                                    const dx = (mapToItem(transitionRegion.parent, mouseX, 0).x - pressX)
+                                                               / root.pxPerSecond
+                                                    const scale = transitionRegion.modelData.overlap ? 1 : 2
+                                                    const d = pressDuration + modelData * dx * scale
+                                                    return Math.max(0.1, Math.min(transitionRegion.modelData.maxDuration, d))
+                                                }
+
+                                                // Straddles the edge so it is easy to hit, but leaves the
+                                                // middle of a narrow region clickable.
+                                                readonly property real inside: Math.min(8, parent.width / 4)
+                                                width: 8 + inside
+                                                height: parent.height
+                                                x: modelData < 0 ? -8 : parent.width - inside
+                                                z: 1
+                                                hoverEnabled: true
+                                                preventStealing: true
+                                                cursorShape: Qt.SizeHorCursor
+                                                onPressed: (mouse) => {
+                                                    pressX = mapToItem(transitionRegion.parent, mouse.x, 0).x
+                                                    pressDuration = transitionRegion.modelData.end
+                                                                    - transitionRegion.modelData.start
+                                                    transitionRegion.liveDuration = pressDuration
+                                                }
+                                                onPositionChanged: (mouse) => {
+                                                    if (pressed)
+                                                        transitionRegion.liveDuration = durationAt(mouse.x)
+                                                }
+                                                onReleased: (mouse) => {
+                                                    const d = durationAt(mouse.x)
+                                                    transitionRegion.liveDuration = -1
+                                                    if (Math.abs(d - pressDuration) > 0.001)
+                                                        EditorState.setTransitionDuration(trackRow.trackIndex,
+                                                                                          transitionRegion.modelData.transitionId, d)
+                                                }
+                                                onCanceled: transitionRegion.liveDuration = -1
+
+                                                HoverHandler { cursorShape: Qt.SizeHorCursor }
                                             }
                                         }
                                     }
