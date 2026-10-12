@@ -70,7 +70,17 @@ public:
     // froze the app for minutes on a handful of 4K clips. Returns false when an import is already
     // running; progress arrives as importProgress and the rows exist by the time importFinished
     // is emitted.
-    Q_INVOKABLE bool importUrlsAsync(const QList<QUrl> &urls);
+    //
+    // sequencePaths are image-sequence asset paths (see imageSequenceImportPath): they need no
+    // copy stage, so they join the imported paths as they are and count as materialized. urls may
+    // be empty when sequencePaths is not.
+    Q_INVOKABLE bool importUrlsAsync(const QList<QUrl> &urls, const QStringList &sequencePaths = {});
+    // Numbered still-image runs among the local-file URLs. One map per sequence: displayName,
+    // frameCount, skippedAfterGap, pattern, start and consumedUrls (QUrls equal to the inputs, so
+    // a caller can filter them out). Stats files only, so it is cheap enough for the GUI thread.
+    Q_INVOKABLE QVariantList detectImageSequences(const QList<QUrl> &urls) const;
+    // The asset path for a detected sequence played at `fps`.
+    Q_INVOKABLE QString imageSequenceImportPath(const QString &pattern, int start, double fps) const;
     bool importing() const { return m_importing; }
     bool sandboxed() const;
     // The one place that decides what counts as media, so the file picker, the folder-import

@@ -1,5 +1,6 @@
 #include "AssetLibrary.h"
 
+#include "core/ImageSequence.h"
 #include "core/Project.h"
 
 #include "engine/MediaProbe.h"
@@ -500,7 +501,12 @@ std::optional<drift::MediaAsset> buildModelAsset(const QString &absolutePath, co
 std::optional<drift::MediaAsset> probeAsset(const QString &absolutePath, bool imageOnly,
                                             MediaInfo *infoOut = nullptr)
 {
-    const QString name = QFileInfo(absolutePath).fileName();
+    // A sequence path's file name is the whole pattern plus "#start=..."; the bin shows the
+    // range instead.
+    const std::optional<drift::ImageSequence> sequence = drift::parseImageSequencePath(absolutePath);
+    const QString name = sequence
+        ? drift::imageSequenceDisplayName(*sequence, drift::imageSequenceFrames(*sequence).size())
+        : QFileInfo(absolutePath).fileName();
     if (AssetLibrary::isModelPath(absolutePath))
         return buildModelAsset(absolutePath, name);
     if (AssetLibrary::isVectorPath(absolutePath))
@@ -1915,11 +1921,11 @@ void AssetLibrary::importUrls(const QList<QUrl> &urls)
     importFiles(paths, sourceUris, m_importFolderId);
 }
 
-bool AssetLibrary::importUrlsAsync(const QList<QUrl> &urls)
+bool AssetLibrary::importUrlsAsync(const QList<QUrl> &urls, const QStringList &sequencePaths)
 {
     if (m_importing)
         return false;
-    if (urls.isEmpty()) {
+    if (urls.isEmpty() && sequencePaths.isEmpty()) {
         emit importFinished(0, 0);
         return true;
     }
@@ -1934,9 +1940,10 @@ bool AssetLibrary::importUrlsAsync(const QList<QUrl> &urls)
     const int total = urls.size();
     auto *watcher = new QFutureWatcher<Materialized>(this);
     connect(watcher, &QFutureWatcher<Materialized>::finished, this,
-            [this, watcher, destinationFolderId]() {
+            [this, watcher, destinationFolderId, sequencePaths]() {
         watcher->deleteLater();
-        const Materialized result = watcher->result();
+        Materialized result = watcher->result();
+        result.paths.append(sequencePaths);
 
         // The rows have to exist before importFinished lands: AndroidHome walks countBefore..count
         // and turns every new asset into a clip the moment it sees the signal.
@@ -1972,6 +1979,42 @@ bool AssetLibrary::importUrlsAsync(const QList<QUrl> &urls)
         return out;
     }));
     return true;
+}
+
+QVariantList AssetLibrary::detectImageSequences(const QList<QUrl> &urls) const
+{
+    QStringList paths;
+    QHash<QString, QUrl> urlByPath;
+    for (const QUrl &url : urls) {
+        if (!url.isLocalFile())
+            continue;
+        const QString path = QFileInfo(url.toLocalFile()).absoluteFilePath();
+        paths.append(path);
+        urlByPath.insert(path, url);
+    }
+
+    QVariantList out;
+    for (const drift::DetectedImageSequence &found : drift::detectImageSequences(paths)) {
+        QList<QUrl> consumed;
+        for (const QString &path : found.consumedPaths)
+            consumed.append(urlByPath.value(path));
+        out.append(QVariantMap{{QStringLiteral("displayName"), found.displayName},
+                               {QStringLiteral("frameCount"), found.frameCount},
+                               {QStringLiteral("skippedAfterGap"), found.skippedAfterGap},
+                               {QStringLiteral("pattern"), found.sequence.pattern},
+                               {QStringLiteral("start"), found.sequence.start},
+                               {QStringLiteral("consumedUrls"), QVariant::fromValue(consumed)}});
+    }
+    return out;
+}
+
+QString AssetLibrary::imageSequenceImportPath(const QString &pattern, int start, double fps) const
+{
+    drift::ImageSequence seq;
+    seq.pattern = pattern;
+    seq.start = start;
+    drift::setImageSequenceFps(seq, fps);
+    return drift::imageSequencePath(seq);
 }
 
 QStringList AssetLibrary::importLocalPaths(const QStringList &paths)
@@ -2044,7 +2087,10 @@ QStringList AssetLibrary::importFilesReturningIds(const QStringList &paths,
     for (const QString &path : std::as_const(expanded)) {
         const QFileInfo fileInfo(path);
         const QString absolutePath = fileInfo.absoluteFilePath();
-        if (!fileInfo.isFile())
+        // A sequence path names no file; its first frame stands in for the existence check.
+        const std::optional<drift::ImageSequence> sequence = drift::parseImageSequencePath(path);
+        if (sequence ? !QFileInfo::exists(drift::imageSequenceFramePath(*sequence, sequence->start))
+                     : !fileInfo.isFile())
             continue;
 
         const int existingIndex = indexOfPath(absolutePath);
@@ -2056,7 +2102,9 @@ QStringList AssetLibrary::importFilesReturningIds(const QStringList &paths,
 
         drift::MediaAsset placeholder;
         placeholder.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
-        placeholder.name = fileInfo.fileName();
+        placeholder.name = sequence
+            ? drift::imageSequenceDisplayName(*sequence, drift::imageSequenceFrames(*sequence).size())
+            : fileInfo.fileName();
         placeholder.path = absolutePath;
         placeholder.sourceUri = sourceUris.value(absolutePath);
         placeholder.kind = provisionalKind(absolutePath);
@@ -2067,7 +2115,7 @@ QStringList AssetLibrary::importFilesReturningIds(const QStringList &paths,
         m_project->addAsset(placeholder);
         endInsertRows();
 
-        startImportJob(placeholder.id, absolutePath, isImagePath(path));
+        startImportJob(placeholder.id, absolutePath, !sequence && isImagePath(path));
         ids.append(placeholder.id);
     }
     return ids;

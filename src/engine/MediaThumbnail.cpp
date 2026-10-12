@@ -246,7 +246,7 @@ bool openVideoDecoder(const QString &absolutePath, AVFormatContext **fmtOut,
                       bool singleThreaded = false)
 {
     AVFormatContext *fmt = nullptr;
-    if (avformat_open_input(&fmt, absolutePath.toUtf8().constData(), nullptr, nullptr) < 0)
+    if (openMediaInput(&fmt, absolutePath) < 0)
         return false;
 
     if (avformat_find_stream_info(fmt, nullptr) < 0) {

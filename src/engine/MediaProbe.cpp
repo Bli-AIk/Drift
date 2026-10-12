@@ -1,5 +1,7 @@
 #include "MediaProbe.h"
 
+#include "core/ImageSequence.h"
+
 #include <algorithm>
 #include <cmath>
 #include <vector>
@@ -12,6 +14,21 @@ extern "C" {
 #include <libavutil/display.h>
 #include <libavutil/dict.h>
 #include <libavutil/pixdesc.h>
+}
+
+int openMediaInput(AVFormatContext **fmt, const QString &path)
+{
+    const auto seq = drift::parseImageSequencePath(path);
+    if (!seq)
+        return avformat_open_input(fmt, path.toUtf8().constData(), nullptr, nullptr);
+
+    AVDictionary *opts = nullptr;
+    av_dict_set(&opts, "pattern_type", "sequence", 0);
+    av_dict_set_int(&opts, "start_number", seq->start, 0);
+    av_dict_set(&opts, "framerate", QStringLiteral("%1/%2").arg(seq->fpsNum).arg(seq->fpsDen).toUtf8().constData(), 0);
+    const int rc = avformat_open_input(fmt, seq->pattern.toUtf8().constData(), av_find_input_format("image2"), &opts);
+    av_dict_free(&opts);
+    return rc;
 }
 
 int displayRotationOf(const AVStream *stream)
@@ -121,9 +138,8 @@ MediaInfo MediaProbe::probe(const QString &path)
     result.path = path;
 
     AVFormatContext *fmt = nullptr;
-    const QByteArray pathUtf8 = path.toUtf8();
 
-    int rc = avformat_open_input(&fmt, pathUtf8.constData(), nullptr, nullptr);
+    int rc = openMediaInput(&fmt, path);
     if (rc < 0) {
         char errBuf[AV_ERROR_MAX_STRING_SIZE] = {};
         av_strerror(rc, errBuf, sizeof(errBuf));
@@ -176,8 +192,7 @@ bool MediaProbe::isVariableFrameRate(const QString &path)
     constexpr int64_t kMaxScanUs = 10 * int64_t(AV_TIME_BASE);
 
     AVFormatContext *fmt = nullptr;
-    const QByteArray pathUtf8 = path.toUtf8();
-    if (avformat_open_input(&fmt, pathUtf8.constData(), nullptr, nullptr) < 0)
+    if (openMediaInput(&fmt, path) < 0)
         return false;
     if (avformat_find_stream_info(fmt, nullptr) < 0) {
         avformat_close_input(&fmt);

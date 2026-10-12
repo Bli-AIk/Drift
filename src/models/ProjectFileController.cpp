@@ -4,6 +4,7 @@
 
 #include "AssetLibrary.h"
 #include "core/EdlReader.h"
+#include "core/ImageSequence.h"
 #include "core/KdenliveReader.h"
 #include "core/MogrtReader.h"
 #include "core/OtioReader.h"
@@ -1072,7 +1073,8 @@ void ProjectFileController::collectMediaToFolder(const QUrl &folder, bool move)
         QString folderName = QStringLiteral("Other");
         if (entry.role != drift::bundle::MediaRole::Source)
             folderName = QStringLiteral("Derived");
-        else if (AssetLibrary::isVideoPath(entry.originalPath))
+        else if (drift::isImageSequencePath(entry.originalPath)
+                 || AssetLibrary::isVideoPath(entry.originalPath))
             folderName = QStringLiteral("Video");
         else if (AssetLibrary::isAudioPath(entry.originalPath))
             folderName = QStringLiteral("Audio");

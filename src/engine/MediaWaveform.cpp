@@ -1,4 +1,5 @@
 #include "MediaWaveform.h"
+#include "MediaProbe.h"
 
 #include <QFileInfo>
 #include <QVector>
@@ -175,7 +176,7 @@ bool openAudioDecoder(const QString &absolutePath, AVFormatContext **fmtOut, int
                       AVCodecContext **codecCtxOut, int streamOrdinal = 0)
 {
     AVFormatContext *fmt = nullptr;
-    if (avformat_open_input(&fmt, absolutePath.toUtf8().constData(), nullptr, nullptr) < 0)
+    if (openMediaInput(&fmt, absolutePath) < 0)
         return false;
     if (avformat_find_stream_info(fmt, nullptr) < 0) {
         avformat_close_input(&fmt);

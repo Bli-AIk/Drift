@@ -786,6 +786,13 @@ ApplicationWindow {
     }
 
     LazyLoader {
+        id: imageSequenceDialogLoader
+        sourceComponent: Component {
+            ImageSequenceDialog { }
+        }
+    }
+
+    LazyLoader {
         id: projectSetupDialogLoader
         sourceComponent: Component {
             ProjectSetupDialog { }
@@ -1303,6 +1310,9 @@ ApplicationWindow {
 
     Component.onCompleted: {
         Theme.windowWidth = window.width
+        MediaImport.sequencePrompt = function (found, done) {
+            imageSequenceDialogLoader.ensure().ask(found, done)
+        }
         window.restoreWindowGeometry()
         window.beginStartupProject()
         // Independent of the project-restore sequence above — it neither gates nor is

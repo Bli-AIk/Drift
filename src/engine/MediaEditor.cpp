@@ -308,8 +308,7 @@ bool editAudio(const MediaEditSpec &spec, QString *errorOut,
     };
 
     AVFormatContext *fmt = nullptr;
-    const QByteArray pathUtf8 = spec.inputPath.toUtf8();
-    if (avformat_open_input(&fmt, pathUtf8.constData(), nullptr, nullptr) < 0)
+    if (openMediaInput(&fmt, spec.inputPath) < 0)
         return fail(trEdit("Could not open the audio"));
     if (avformat_find_stream_info(fmt, nullptr) < 0) {
         avformat_close_input(&fmt);
@@ -843,8 +842,7 @@ bool editVideo(const MediaEditSpec &spec, QString *errorOut,
     };
 
     AVFormatContext *fmt = nullptr;
-    const QByteArray pathUtf8 = spec.inputPath.toUtf8();
-    if (avformat_open_input(&fmt, pathUtf8.constData(), nullptr, nullptr) < 0)
+    if (openMediaInput(&fmt, spec.inputPath) < 0)
         return fail(trEdit("Could not open the video"));
     if (avformat_find_stream_info(fmt, nullptr) < 0) {
         avformat_close_input(&fmt);
@@ -1271,8 +1269,7 @@ bool analyzeVideo(const QString &inputPath, TimeUs inUs, TimeUs outUs, const QSt
     };
 
     AVFormatContext *fmt = nullptr;
-    const QByteArray pathUtf8 = inputPath.toUtf8();
-    if (avformat_open_input(&fmt, pathUtf8.constData(), nullptr, nullptr) < 0)
+    if (openMediaInput(&fmt, inputPath) < 0)
         return fail(trEdit("Could not open the video"));
     if (avformat_find_stream_info(fmt, nullptr) < 0) {
         avformat_close_input(&fmt);

@@ -1,3 +1,4 @@
+#include "core/ImageSequence.h"
 #include "engine/ProjectBundle.h"
 #include "engine/ProjectDependencies.h"
 
@@ -5,6 +6,7 @@
 #include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
+#include <QImage>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QTemporaryDir>
@@ -38,9 +40,13 @@ private slots:
     void collectReusesSameBytesAndSuffixesOthers();
     void collectMoveDeletesOriginals();
     void cancelledCollectMoveRestoresOriginals();
+    void packagesImageSequenceFrames();
+    void collectsImageSequenceIntoOneFolder();
 
 private:
     QString writeSource(const QString &name, const QByteArray &content) const;
+    // Five tiny PNGs named <dir>/render_0001.png ..; returns the sequence path for them.
+    QString writeSequence(const QString &dir) const;
     // A bundle with one embedded .mp4 and one referenced .mp4, plus a face-track JSON.
     WriteRequest sampleRequest() const;
     void flipByte(const QString &path, qint64 offset) const;
@@ -561,6 +567,122 @@ void TestProjectBundle::cancelledCollectMoveRestoresOriginals()
     QCOMPARE(readAll(b), QByteArray(100, 'b'));
     QVERIFY(!QFileInfo::exists(QDir(dest).filePath(QStringLiteral("Other/a.mp4"))));
     QVERIFY(!QFileInfo::exists(QDir(dest).filePath(QStringLiteral("Other/b.mp4"))));
+}
+
+QString TestProjectBundle::writeSequence(const QString &dir) const
+{
+    QDir().mkpath(m_tmp.filePath(dir));
+    for (int i = 1; i <= 5; ++i) {
+        QImage image(4, 4, QImage::Format_RGB32);
+        image.fill(QColor(i * 40, 0, 0));
+        image.save(m_tmp.filePath(dir + QStringLiteral("/render_") + QStringLiteral("%1").arg(i, 4, 10, QLatin1Char('0'))
+                                  + QStringLiteral(".png")));
+    }
+    drift::ImageSequence sequence;
+    sequence.pattern = m_tmp.filePath(dir) + QStringLiteral("/render_%04d.png");
+    sequence.start = 1;
+    sequence.fpsNum = 24;
+    return drift::imageSequencePath(sequence);
+}
+
+void TestProjectBundle::packagesImageSequenceFrames()
+{
+    const QString sequencePath = writeSequence(QStringLiteral("seq-pack"));
+    const auto sequence = drift::parseImageSequencePath(sequencePath);
+    QVERIFY(sequence.has_value());
+
+    WriteRequest request = sampleRequest();
+    request.media.clear();
+    MediaEntry entry;
+    entry.originalPath = sequencePath;
+    entry.embedded = true;
+    request.media.append(entry);
+    for (const QString &frame : drift::imageSequenceFrames(*sequence)) {
+        MediaEntry resource;
+        resource.originalPath = frame;
+        resource.resourceOf = sequencePath;
+        resource.embedded = true;
+        request.media.append(resource);
+    }
+    QCOMPARE(request.media.size(), 6);
+
+    const QString path = m_tmp.filePath(QStringLiteral("seq.drift"));
+    QString error;
+    QVERIFY2(write(path, request, {}, &error), qPrintable(error));
+
+    const QString dest = m_tmp.filePath(QStringLiteral("seq-out"));
+    QHash<QString, QString> remap;
+    QVERIFY2(extract(path, dest, {}, &remap, &error), qPrintable(error));
+    QCOMPARE(remap.size(), 1);
+    const auto unpacked = drift::parseImageSequencePath(remap.value(sequencePath));
+    QVERIFY(unpacked.has_value());
+    QCOMPARE(unpacked->start, 1);
+    QCOMPARE(unpacked->fpsNum, 24);
+    QCOMPARE(QFileInfo(unpacked->pattern).fileName(), QStringLiteral("render_%04d.png"));
+    const QStringList frames = drift::imageSequenceFrames(*unpacked);
+    QCOMPARE(frames.size(), 5);
+    const QStringList originals = drift::imageSequenceFrames(*sequence);
+    for (int i = 0; i < frames.size(); ++i)
+        QCOMPARE(readAll(frames.at(i)), readAll(originals.at(i)));
+}
+
+void TestProjectBundle::collectsImageSequenceIntoOneFolder()
+{
+    const QString sequencePath = writeSequence(QStringLiteral("seq-src"));
+    const auto sequence = drift::parseImageSequencePath(sequencePath);
+    QVERIFY(sequence.has_value());
+    const QStringList originals = drift::imageSequenceFrames(*sequence);
+    QCOMPARE(originals.size(), 5);
+    QList<QByteArray> bytes;
+    for (const QString &frame : originals)
+        bytes.append(readAll(frame));
+
+    QList<MediaEntry> media = {collectEntry(sequencePath)};
+    for (const QString &frame : originals)
+        media.append(collectEntry(frame, sequencePath));
+    const QHash<QString, QString> subfolders = {{sequencePath, QStringLiteral("Video")}};
+
+    const auto check = [&](const QString &dest, const QString &folderName) {
+        QHash<QString, QString> remap;
+        int undeleted = -1;
+        QString error;
+        QVERIFY2(collectToFolder(media, subfolders, dest, dest.contains(QLatin1String("move")),
+                                 {}, &remap, &undeleted, &error),
+                 qPrintable(error));
+        QCOMPARE(remap.size(), 1);
+        const auto moved = drift::parseImageSequencePath(remap.value(sequencePath));
+        QVERIFY(moved.has_value());
+        QCOMPARE(moved->start, 1);
+        QCOMPARE(moved->fpsNum, 24);
+        QCOMPARE(moved->pattern,
+                 QDir(dest).filePath(QStringLiteral("Video/") + folderName + QStringLiteral("/render_%04d.png")));
+        const QStringList frames = drift::imageSequenceFrames(*moved);
+        QCOMPARE(frames.size(), 5);
+        for (int i = 0; i < frames.size(); ++i)
+            QCOMPARE(readAll(frames.at(i)), bytes.at(i));
+    };
+
+    const QString copyDest = m_tmp.filePath(QStringLiteral("seq-collect-copy"));
+    QVERIFY(QDir().mkpath(copyDest));
+    check(copyDest, QStringLiteral("render"));
+    for (const QString &frame : originals)
+        QVERIFY(QFileInfo::exists(frame));
+
+    // The folder name is taken by identical frames, so collecting again reuses it...
+    check(copyDest, QStringLiteral("render"));
+
+    // ...and a different sequence with the same pattern gets a folder of its own, not renamed frames.
+    QImage other(4, 4, QImage::Format_RGB32);
+    other.fill(Qt::green);
+    QVERIFY(other.save(originals.at(2)));
+    bytes[2] = readAll(originals.at(2));
+    check(copyDest, QStringLiteral("render (2)"));
+
+    const QString moveDest = m_tmp.filePath(QStringLiteral("seq-collect-move"));
+    QVERIFY(QDir().mkpath(moveDest));
+    check(moveDest, QStringLiteral("render"));
+    for (const QString &frame : originals)
+        QVERIFY(!QFileInfo::exists(frame));
 }
 
 QTEST_MAIN(TestProjectBundle)

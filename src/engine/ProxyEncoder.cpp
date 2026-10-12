@@ -1,4 +1,5 @@
 #include "ProxyEncoder.h"
+#include "MediaProbe.h"
 
 #include "SwsColorRange.h"
 
@@ -259,8 +260,7 @@ bool ProxySource::open(const QString &path, QString *errorOut)
         return false;
     };
 
-    const QByteArray pathUtf8 = path.toUtf8();
-    if (avformat_open_input(&fmt, pathUtf8.constData(), nullptr, nullptr) < 0)
+    if (openMediaInput(&fmt, path) < 0)
         return fail(QT_TRANSLATE_NOOP("ProxyEncoder", "Could not open the clip"));
     if (avformat_find_stream_info(fmt, nullptr) < 0)
         return fail(QT_TRANSLATE_NOOP("ProxyEncoder", "Could not read the clip's streams"));

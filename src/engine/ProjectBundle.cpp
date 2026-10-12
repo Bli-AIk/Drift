@@ -1,5 +1,7 @@
 #include "ProjectBundle.h"
 
+#include "core/ImageSequence.h"
+
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QDir>
@@ -65,6 +67,32 @@ bool safeRelativePath(const QString &path)
         return false;
     const QStringList segments = path.split(QLatin1Char('/'));
     return std::all_of(segments.begin(), segments.end(), safeFileName);
+}
+
+// An image sequence has no file at its recorded path: its first frame stands in for it, and its
+// "folder name" comes from the pattern rather than the "#start=..&fps=.." suffix.
+QString documentFile(const QString &path)
+{
+    const auto sequence = parseImageSequencePath(path);
+    return sequence ? sequence->pattern : path;
+}
+
+// The folder a document's files land in. A sequence's pattern must stay the only '%d' in the path.
+QString documentFolderName(const QString &path)
+{
+    const auto sequence = parseImageSequencePath(path);
+    return sequence ? imageSequenceFolderName(*sequence) : QFileInfo(path).completeBaseName();
+}
+
+QString backingFile(const QString &path)
+{
+    const auto sequence = parseImageSequencePath(path);
+    return sequence ? imageSequenceFramePath(*sequence, sequence->start) : path;
+}
+
+bool isSequenceEntry(const MediaEntry &entry)
+{
+    return entry.resourceOf.isEmpty() && isImageSequencePath(entry.originalPath);
 }
 
 QString uniqueName(const QFileInfo &info, const QSet<QString> &used)
@@ -334,8 +362,8 @@ bool write(const QString &path, const WriteRequest &request, const ProgressFn &p
     // the save: the bytes are lost either way, and blocking the save loses the edit too.
     QSet<QString> embeddedDocuments;
     for (MediaEntry &entry : media) {
-        if (entry.embedded && !(QFileInfo(entry.originalPath).isFile()
-                                && QFileInfo(entry.originalPath).isReadable()))
+        if (entry.embedded && !(QFileInfo(backingFile(entry.originalPath)).isFile()
+                                && QFileInfo(backingFile(entry.originalPath)).isReadable()))
             entry.embedded = false;
         if (entry.embedded && entry.resourceOf.isEmpty())
             embeddedDocuments.insert(entry.originalPath);
@@ -352,7 +380,7 @@ bool write(const QString &path, const WriteRequest &request, const ProgressFn &p
     // Each document with resources gets a folder of its own, so two documents that both name
     // "images/img_0.png" cannot collide. Reserved before any flat name is picked.
     for (auto it = documentFolder.begin(); it != documentFolder.end(); ++it) {
-        const QString folder = uniqueName(QFileInfo(QFileInfo(it.key()).completeBaseName()), usedNames);
+        const QString folder = uniqueName(QFileInfo(documentFolderName(it.key())), usedNames);
         usedNames.insert(folder);
         it.value() = folder;
     }
@@ -361,14 +389,15 @@ bool write(const QString &path, const WriteRequest &request, const ProgressFn &p
         if (!entry.embedded)
             continue;
 
-        const QFileInfo info(entry.originalPath);
+        const QFileInfo info(backingFile(entry.originalPath));
         QString layoutName; // fixed by the document's layout rather than picked freely
         if (!entry.resourceOf.isEmpty()) {
             layoutName = documentFolder.value(entry.resourceOf) + QLatin1Char('/')
-                         + QDir(QFileInfo(entry.resourceOf).absolutePath())
+                         + QDir(QFileInfo(documentFile(entry.resourceOf)).absolutePath())
                                .relativeFilePath(info.absoluteFilePath());
         } else if (documentFolder.contains(entry.originalPath)) {
-            layoutName = documentFolder.value(entry.originalPath) + QLatin1Char('/') + info.fileName();
+            layoutName = documentFolder.value(entry.originalPath) + QLatin1Char('/')
+                         + QFileInfo(documentFile(entry.originalPath)).fileName();
         }
         if (!layoutName.isEmpty() && !safeRelativePath(layoutName)) {
             entry.embedded = false;
@@ -386,7 +415,7 @@ bool write(const QString &path, const WriteRequest &request, const ProgressFn &p
         BlobRecord blob;
         blob.sourcePath = info.absoluteFilePath();
         blob.size = quint64(info.size());
-        blob.compressed = shouldCompress(entry.role, entry.originalPath, blob.size);
+        blob.compressed = shouldCompress(entry.role, info.filePath(), blob.size);
         blob.offset = offset;
         blob.storedSize = blob.size; // raw entries store what they are
 
@@ -583,7 +612,7 @@ bool extract(const QString &path, const QString &destDir, const ProgressFn &prog
     qint64 total = 0;
     QSet<QString> targets;
     for (const MediaEntry &entry : info.media) {
-        if (entry.embedded && !targets.contains(entry.fileName)) {
+        if (entry.embedded && !isSequenceEntry(entry) && !targets.contains(entry.fileName)) {
             targets.insert(entry.fileName);
             total += qint64(blobs.at(entry.blob).size);
         }
@@ -597,6 +626,15 @@ bool extract(const QString &path, const QString &destDir, const ProgressFn &prog
 
         const BlobRecord &blob = blobs.at(entry.blob);
         const QString target = QDir(destDir).filePath(entry.fileName);
+        if (isSequenceEntry(entry)) {
+            // Only the path is remapped; the frames land through their own resource entries.
+            if (pathRemap) {
+                ImageSequence sequence = *parseImageSequencePath(entry.originalPath);
+                sequence.pattern = target;
+                pathRemap->insert(entry.originalPath, imageSequencePath(sequence));
+            }
+            continue;
+        }
         if (pathRemap && entry.resourceOf.isEmpty())
             pathRemap->insert(entry.originalPath, target);
         if (extracted.contains(entry.fileName))

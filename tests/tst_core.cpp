@@ -3,6 +3,7 @@
 #include <QColor>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QPointF>
@@ -10,6 +11,7 @@
 #include <QStandardPaths>
 
 #include "core/ClipAnimation.h"
+#include "core/ImageSequence.h"
 #include "core/Keyframe.h"
 #include "core/Project.h"
 #include "core/Stabilize.h"
@@ -42,6 +44,10 @@ class CoreTest : public QObject
     Q_OBJECT
 
 private slots:
+    void imageSequencePathRoundTrip();
+    void imageSequenceFpsRationals();
+    void imageSequenceDisplayName();
+    void imageSequenceDetection();
     void timeConversion();
     void transcriptJsonRoundTrip();
     void transcriptWordsInRange();
@@ -6347,6 +6353,124 @@ void CoreTest::transcriptWordsFollowClipsOnTimeline()
     QCOMPARE(all[4].word.text, QStringLiteral("world."));
     QCOMPARE(all[4].word.startUs, drift::secondsToUs(20.0));
     QCOMPARE(drift::transcriptWordsOnTimeline(project, 0, drift::secondsToUs(100), QStringLiteral("rev")).size(), 3);
+}
+
+void CoreTest::imageSequencePathRoundTrip()
+{
+    const QString raw = QStringLiteral("/home/u/a#b/100%/render_%04d.png#start=1&fps=24:1");
+    QVERIFY(!drift::isImageSequencePath(raw)); // unescaped '%' in the directory is not a pattern
+    const QString path = QStringLiteral("/home/u/a#b/100%%/render_%04d.png#start=1&fps=24:1");
+    const auto seq = drift::parseImageSequencePath(path);
+    QVERIFY(seq.has_value());
+    QCOMPARE(seq->pattern, QStringLiteral("/home/u/a#b/100%%/render_%04d.png"));
+    QCOMPARE(seq->start, 1);
+    QCOMPARE(seq->fpsNum, 24);
+    QCOMPARE(seq->fpsDen, 1);
+    QCOMPARE(drift::imageSequencePath(*seq), path);
+    QCOMPARE(drift::imageSequenceFramePath(*seq, 7), QStringLiteral("/home/u/a#b/100%/render_0007.png"));
+    QCOMPARE(QFileInfo(path).suffix().contains(QLatin1Char('#')), true);
+
+    QVERIFY(drift::parseImageSequencePath(QStringLiteral("/x/shot.%d.exr#start=1001&fps=24000:1001")).has_value());
+    QVERIFY(!drift::parseImageSequencePath(QStringLiteral("/x/shot.exr#start=1&fps=24:1")).has_value());
+    QVERIFY(!drift::parseImageSequencePath(QStringLiteral("/x/%d_%d.png#start=1&fps=24:1")).has_value());
+    QVERIFY(!drift::parseImageSequencePath(QStringLiteral("/x/%s.png#start=1&fps=24:1")).has_value());
+    QVERIFY(!drift::parseImageSequencePath(QStringLiteral("/x/a_%d.png#start=1&fps=0:1")).has_value());
+    QVERIFY(!drift::parseImageSequencePath(QStringLiteral("/x/a_%d.png#start=1&fps=24:0")).has_value());
+    QVERIFY(!drift::parseImageSequencePath(QStringLiteral("/x/a_%d.png#start=-1&fps=24:1")).has_value());
+    QVERIFY(!drift::parseImageSequencePath(QStringLiteral("/x/a_%d.png")).has_value());
+    QCOMPARE(drift::imageSequenceFramePath(*drift::parseImageSequencePath(QStringLiteral("/x/shot.%d.exr#start=1001&fps=24:1")), 1001),
+             QStringLiteral("/x/shot.1001.exr"));
+}
+
+void CoreTest::imageSequenceFpsRationals()
+{
+    struct Case { double fps; int num; int den; };
+    const Case cases[] = {{23.976, 24000, 1001}, {29.97, 30000, 1001}, {59.94, 60000, 1001},
+                          {47.952, 48000, 1001}, {119.88, 120000, 1001}, {24.0, 24, 1},
+                          {25.0, 25, 1}, {12.5, 25, 2}, {7.123, 7123, 1000}};
+    for (const Case &c : cases) {
+        drift::ImageSequence seq;
+        drift::setImageSequenceFps(seq, c.fps);
+        QCOMPARE(seq.fpsNum, c.num);
+        QCOMPARE(seq.fpsDen, c.den);
+    }
+}
+
+void CoreTest::imageSequenceDisplayName()
+{
+    drift::ImageSequence seq;
+    seq.pattern = QStringLiteral("/a/b/render_%04d.png");
+    seq.start = 1;
+    QCOMPARE(drift::imageSequenceDisplayName(seq, 240), QStringLiteral("render_[0001-0240].png"));
+    seq.pattern = QStringLiteral("/a/b/shot.%d.exr");
+    seq.start = 1001;
+    QCOMPARE(drift::imageSequenceDisplayName(seq, 10), QStringLiteral("shot.[1001-1010].exr"));
+}
+
+void CoreTest::imageSequenceDetection()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    auto touch = [&](const QString &name) -> QString {
+        QFile f(dir.filePath(name));
+        f.open(QIODevice::WriteOnly);
+        return dir.filePath(name);
+    };
+    auto fileList = [&](const QString &fmt, int from, int to) {
+        QStringList out;
+        for (int i = from; i <= to; ++i)
+            out << touch(fmt.arg(i, 4, 10, QLatin1Char('0')));
+        return out;
+    };
+
+    // Padded run with a gap at 0006; 0007 and 0008 are selected but past it.
+    QStringList padded = fileList(QStringLiteral("r_%1.png"), 1, 5);
+    padded << touch(QStringLiteral("r_0007.png")) << touch(QStringLiteral("r_0008.png"));
+    auto found = drift::detectImageSequences(padded);
+    QCOMPARE(found.size(), 1);
+    QCOMPARE(found[0].frameCount, 5);
+    QCOMPARE(found[0].skippedAfterGap, 2);
+    QCOMPARE(found[0].consumedPaths.size(), 7);
+    QCOMPARE(found[0].sequence.start, 1);
+    QCOMPARE(found[0].sequence.pattern, dir.filePath(QStringLiteral("r_%04d.png")));
+    QCOMPARE(found[0].displayName, QStringLiteral("r_[0001-0005].png"));
+
+    // One frame picked from a longer run on disk.
+    found = drift::detectImageSequences({dir.filePath(QStringLiteral("r_0003.png"))});
+    QCOMPARE(found.size(), 1);
+    QCOMPARE(found[0].sequence.start, 3);
+    QCOMPARE(found[0].frameCount, 3);
+    QCOMPARE(found[0].skippedAfterGap, 0);
+
+    // Unpadded, mixed widths (9, 10, 11).
+    QStringList plain;
+    for (int i = 9; i <= 11; ++i) {
+        QFile f(dir.filePath(QStringLiteral("u%1.jpg").arg(i)));
+        QVERIFY(f.open(QIODevice::WriteOnly));
+        plain << f.fileName();
+    }
+    found = drift::detectImageSequences(plain);
+    QCOMPARE(found.size(), 1);
+    QCOMPARE(found[0].sequence.pattern, dir.filePath(QStringLiteral("u%d.jpg")));
+    QCOMPARE(found[0].sequence.start, 9);
+    QCOMPARE(found[0].frameCount, 3);
+
+    // Numbered stills below the minimum, a non-image and an unnumbered image stay untouched.
+    const QStringList few = {touch(QStringLiteral("p1.png")), touch(QStringLiteral("p2.png")),
+                             touch(QStringLiteral("notes7.txt")), touch(QStringLiteral("cover.png"))};
+    QVERIFY(drift::detectImageSequences(few).isEmpty());
+    QCOMPARE(drift::detectImageSequences(few, 2).size(), 1);
+
+    // Zero-padded runs of different widths are separate sequences, in input order.
+    QStringList mixed;
+    for (int i = 1; i <= 3; ++i)
+        mixed << touch(QStringLiteral("m_%1.png").arg(i, 3, 10, QLatin1Char('0')));
+    for (int i = 1; i <= 3; ++i)
+        mixed << touch(QStringLiteral("m_%1.png").arg(i, 5, 10, QLatin1Char('0')));
+    found = drift::detectImageSequences(mixed);
+    QCOMPARE(found.size(), 2);
+    QCOMPARE(found[0].sequence.pattern, dir.filePath(QStringLiteral("m_%03d.png")));
+    QCOMPARE(found[1].sequence.pattern, dir.filePath(QStringLiteral("m_%05d.png")));
 }
 
 QTEST_MAIN(CoreTest)

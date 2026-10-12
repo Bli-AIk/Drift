@@ -526,6 +526,8 @@ add_library(driftcore STATIC
     src/core/BinFolder.h
     src/core/MediaAsset.h
     src/core/MediaAsset.cpp
+    src/core/ImageSequence.h
+    src/core/ImageSequence.cpp
     src/core/BlendMode.h
     src/core/Clip.h
     src/core/Clip.cpp
@@ -1473,6 +1475,7 @@ qt_add_qml_module(drift
         src/qml/components/ExportDialog.qml
         src/qml/components/ExportProgressDialog.qml
         src/qml/components/CollectMediaDialog.qml
+        src/qml/components/ImageSequenceDialog.qml
         src/qml/components/ReverseProgressDialog.qml
         src/qml/components/SubtitleProgressDialog.qml
         src/qml/components/CircularProgress.qml

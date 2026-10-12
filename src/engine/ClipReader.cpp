@@ -829,7 +829,7 @@ bool ClipReader::open(const QString &path, int audioStreamOrdinal)
     m_audioStreamOrdinal = audioStreamOrdinal;
 
     AVFormatContext *fmt = nullptr;
-    if (avformat_open_input(&fmt, path.toUtf8().constData(), nullptr, nullptr) < 0)
+    if (openMediaInput(&fmt, path) < 0)
         return false;
     if (avformat_find_stream_info(fmt, nullptr) < 0) {
         avformat_close_input(&fmt);

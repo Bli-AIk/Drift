@@ -7,6 +7,7 @@
 #include "FontCatalog.h"
 #include "MediaEditor.h"
 #include "TransitionCatalog.h"
+#include "core/ImageSequence.h"
 #include "core/Project.h"
 
 #include <algorithm>
@@ -188,6 +189,12 @@ QList<MediaEntry> collectMedia(const Project &project, bool embedSource)
     const auto append = [&](const QString &path, MediaRole role, bool embedded) {
         if (!appendEntry(path, QString(), role, embedded) || role != MediaRole::Source)
             return;
+        // A sequence's frames are its resources: they keep their names, so the pattern still matches.
+        if (const auto sequence = parseImageSequencePath(path)) {
+            for (const QString &frame : imageSequenceFrames(*sequence))
+                appendEntry(frame, path, MediaRole::Source, embedded);
+            return;
+        }
         for (const QString &resource : documentResources(path))
             appendEntry(resource, path, MediaRole::Source, embedded);
     };
@@ -339,7 +346,10 @@ bool collectToFolder(const QList<MediaEntry> &media, const QHash<QString, QStrin
     };
 
     const auto collectable = [&root](const MediaEntry &entry) {
-        return entry.role != MediaRole::Model3d && QFileInfo(entry.originalPath).isFile()
+        const auto sequence = parseImageSequencePath(entry.originalPath);
+        const QString backing =
+            sequence ? imageSequenceFramePath(*sequence, sequence->start) : entry.originalPath;
+        return entry.role != MediaRole::Model3d && QFileInfo(backing).isFile()
                && !isUnder(entry.originalPath, root) && !addon::addonForPath(entry.originalPath);
     };
 
@@ -429,21 +439,30 @@ bool collectToFolder(const QList<MediaEntry> &media, const QHash<QString, QStrin
     for (const MediaEntry &entry : files) {
         const QString source = entry.originalPath;
         const QString folder = QDir(root).filePath(subfolders.value(source, QStringLiteral("Other")));
-        const QString name = QFileInfo(source).fileName();
+        // A sequence moves as its frames alone, under a folder named for its pattern.
+        const auto sequence = parseImageSequencePath(source);
+        const QString documentFile = sequence ? sequence->pattern : source;
+        const QString name = QFileInfo(documentFile).fileName();
         const QStringList resources = resourcesOf.value(source);
+        QString mainTarget;
 
         // Pairs of (source, target) that must land together; target names are picked so that
         // every one is either free or already holds the same bytes.
         QList<QPair<QString, QString>> pairs;
         for (int n = 1;; ++n) {
             pairs.clear();
-            if (resources.isEmpty()) {
-                pairs.append({source, QDir(folder).filePath(numberedName(name, n))});
+            if (resources.isEmpty() && !sequence) {
+                mainTarget = QDir(folder).filePath(numberedName(name, n));
+                pairs.append({source, mainTarget});
             } else {
                 const QDir own(QDir(folder).filePath(
-                    numberedName(QFileInfo(source).completeBaseName(), n)));
-                const QDir documentDir = QFileInfo(source).absoluteDir();
-                pairs.append({source, own.filePath(name)});
+                    numberedName(sequence ? imageSequenceFolderName(*sequence)
+                                                      : QFileInfo(documentFile).completeBaseName(),
+                                 n)));
+                const QDir documentDir = QFileInfo(documentFile).absoluteDir();
+                mainTarget = own.filePath(name);
+                if (!sequence)
+                    pairs.append({source, mainTarget});
                 for (const QString &resource : resources)
                     pairs.append({resource, own.filePath(documentDir.relativeFilePath(resource))});
             }
@@ -460,7 +479,13 @@ bool collectToFolder(const QList<MediaEntry> &media, const QHash<QString, QStrin
                 return false;
             }
         }
-        remap.insert(source, pairs.first().second);
+        if (sequence) {
+            ImageSequence moved = *sequence;
+            moved.pattern = mainTarget;
+            remap.insert(source, imageSequencePath(moved));
+        } else {
+            remap.insert(source, mainTarget);
+        }
     }
 
     int undeleted = 0;

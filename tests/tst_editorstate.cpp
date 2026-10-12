@@ -156,6 +156,7 @@ private slots:
     void undoingBinFolderRenameEmitsDataChanged();
     void importIntoDeletedFolderFallsBackToRoot();
     void importUnreadableUrlReportsFailed();
+    void importImageSequenceAsVideoAsset();
     void importFolderMirrorsDirectoryTree();
     void importFolderMovesAlreadyImportedMediaIntoMirroredFolder();
     void importFolderSkipsSymlinkCycles();
@@ -2020,6 +2021,45 @@ void EditorStateTest::importIntoDeletedFolderFallsBackToRoot()
     // worker is still running and dereferences that pointer after `library` goes out of scope at
     // the end of this function. Wait for the probe to actually finish first.
     QTRY_VERIFY_WITH_TIMEOUT(!library.isImportPending(ids.first()), 5000);
+}
+
+void EditorStateTest::importImageSequenceAsVideoAsset()
+{
+    AssetLibrary library;
+    AppController state(&library);
+
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QList<QUrl> urls;
+    for (int i = 1; i <= 5; ++i) {
+        QImage image(16, 16, QImage::Format_RGB32);
+        image.fill(Qt::black);
+        const QString file = tempDir.path() + QStringLiteral("/f_") + QString::number(i).rightJustified(4, '0')
+                             + QStringLiteral(".png");
+        QVERIFY(image.save(file));
+        urls.append(QUrl::fromLocalFile(file));
+    }
+
+    const QVariantList found = library.detectImageSequences(urls);
+    QCOMPARE(found.size(), 1);
+    const QVariantMap seq = found.first().toMap();
+    QCOMPARE(seq.value(QStringLiteral("consumedUrls")).value<QList<QUrl>>(), urls);
+
+    const QString path = library.imageSequenceImportPath(seq.value(QStringLiteral("pattern")).toString(),
+                                                         seq.value(QStringLiteral("start")).toInt(), 10.0);
+    QSignalSpy finished(&library, &AssetLibrary::importFinished);
+    QVERIFY(library.importUrlsAsync({}, {path}));
+    QVERIFY(finished.wait(5000));
+    QCOMPARE(finished.first().at(0).toInt(), 1);
+    QCOMPARE(library.count(), 1);
+
+    const QString id = library.assetIdAt(0);
+    QTRY_VERIFY_WITH_TIMEOUT(!library.isImportPending(id), 10000);
+    QCOMPARE(library.count(), 1);
+    const QVariantMap asset = library.assetAt(0);
+    QCOMPARE(asset.value(QStringLiteral("name")).toString(), QStringLiteral("f_[0001-0005].png"));
+    QCOMPARE(asset.value(QStringLiteral("kind")).toString(), QStringLiteral("video"));
+    QCOMPARE(asset.value(QStringLiteral("durationSeconds")).toDouble(), 0.5);
 }
 
 void EditorStateTest::importUnreadableUrlReportsFailed()
