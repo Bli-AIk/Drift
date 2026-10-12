@@ -148,6 +148,7 @@ private slots:
     void clipReverseAndFlipSerialization();
     void clipSplitMergeRoundTrip();
     void subtitleClipsMergeWithGaps();
+    void subtitlesFollowRetimedClip();
     void splitCarriesTheAnimationOntoBothHalves();
     void clipLinkFieldsSerialization();
     void maskAndTransitionSerialization();
@@ -1018,7 +1019,7 @@ void CoreTest::subtitleCueSerialization()
     clip.timelineDuration = drift::secondsToUs(30.0);
     clip.subtitleCues = {
         {drift::secondsToUs(1.0), drift::secondsToUs(4.0), QStringLiteral("Hello")},
-        {drift::secondsToUs(5.0), drift::secondsToUs(8.0), QStringLiteral("World")},
+        {drift::secondsToUs(5.0), drift::secondsToUs(8.0), QStringLiteral("World"), QStringLiteral("asset-1")},
     };
     project.tracks()[0].clips.append(clip);
 
@@ -1032,6 +1033,8 @@ void CoreTest::subtitleCueSerialization()
     QCOMPARE(loadedClip.subtitleCues.size(), 2);
     QCOMPARE(loadedClip.subtitleCues[0].text, QStringLiteral("Hello"));
     QCOMPARE(loadedClip.subtitleCues[1].startUs, drift::secondsToUs(5.0));
+    QVERIFY(loadedClip.subtitleCues[0].source.isEmpty());
+    QCOMPARE(loadedClip.subtitleCues[1].source, QStringLiteral("asset-1"));
 }
 
 void CoreTest::subtitleCueLookup()
@@ -3084,6 +3087,77 @@ void CoreTest::subtitleClipsMergeWithGaps()
         QCOMPARE(rejoined.subtitleCues.at(i).endUs, merged.subtitleCues.at(i).endUs);
         QCOMPARE(rejoined.subtitleCues.at(i).text, merged.subtitleCues.at(i).text);
     }
+}
+
+void CoreTest::subtitlesFollowRetimedClip()
+{
+    auto cue = [](double s, double e, const QString &text, const QString &source) {
+        return drift::SubtitleCue{drift::secondsToUs(s), drift::secondsToUs(e), text, source};
+    };
+
+    drift::Project project;
+    project.tracks().clear();
+    project.tracks().append(drift::Track{.type = drift::TrackType::Subtitle});
+    project.tracks().append(drift::Track{.type = drift::TrackType::Video});
+
+    // A 10 s clip at 2 s, with captions generated across all of it.
+    drift::Clip video;
+    video.id = QStringLiteral("v");
+    video.type = drift::ClipType::Video;
+    video.assetId = QStringLiteral("asset");
+    video.timelineStart = drift::secondsToUs(2.0);
+    video.timelineDuration = drift::secondsToUs(10.0);
+    video.srcIn = 0;
+    video.srcOut = drift::secondsToUs(10.0);
+    project.tracks()[1].clips.append(video);
+
+    drift::Clip subs;
+    subs.id = QStringLiteral("s");
+    subs.type = drift::ClipType::Subtitle;
+    subs.timelineStart = video.timelineStart;
+    subs.timelineDuration = video.timelineDuration;
+    subs.srcOut = subs.timelineDuration;
+    subs.subtitleCues = {
+        cue(1.0, 2.0, QStringLiteral("one"), QStringLiteral("asset")),
+        cue(6.0, 8.0, QStringLiteral("two"), QStringLiteral("asset")),
+        cue(9.0, 9.5, QStringLiteral("typed"), QString()),
+    };
+    project.tracks()[0].clips.append(subs);
+
+    // Double speed: the clip plays in 5 s and every linked cue lands at half its offset.
+    const drift::Project before = project;
+    drift::Clip &fast = project.tracks()[1].clips[0];
+    fast.speed = 2.0;
+    fast.timelineDuration = drift::secondsToUs(5.0);
+    drift::retimeLinkedSubtitles(before, project);
+
+    const drift::Clip &out = project.tracks().at(0).clips.at(0);
+    QCOMPARE(out.timelineStart, drift::secondsToUs(2.0));
+    QCOMPARE(out.timelineDuration, drift::secondsToUs(5.0));
+    QCOMPARE(out.srcOut, out.timelineDuration);
+    QCOMPARE(out.subtitleCues.size(), 3);
+    QCOMPARE(out.subtitleCues.at(0).startUs, drift::secondsToUs(0.5));
+    QCOMPARE(out.subtitleCues.at(0).endUs, drift::secondsToUs(1.0));
+    QCOMPARE(out.subtitleCues.at(1).startUs, drift::secondsToUs(3.0));
+    QCOMPARE(out.subtitleCues.at(1).endUs, drift::secondsToUs(4.0));
+    // A hand-written cue isn't tied to the media and stays where it was put.
+    QCOMPARE(out.subtitleCues.at(2).text, QStringLiteral("typed"));
+    QCOMPARE(out.subtitleCues.at(2).startUs, drift::secondsToUs(9.0));
+
+    // Reversed, the words play back to front: "two" now comes first.
+    const drift::Project forward = project;
+    project.tracks()[1].clips[0].reverse = true;
+    drift::retimeLinkedSubtitles(forward, project);
+    const drift::Clip &rev = project.tracks().at(0).clips.at(0);
+    QCOMPARE(rev.timelineDuration, drift::secondsToUs(5.0));
+    QCOMPARE(rev.subtitleCues.at(0).text, QStringLiteral("two"));
+    QCOMPARE(rev.subtitleCues.at(0).startUs, drift::secondsToUs(1.0));
+    QCOMPARE(rev.subtitleCues.at(0).endUs, drift::secondsToUs(2.0));
+
+    // Nothing retimed: nothing moves.
+    const drift::Project same = project;
+    drift::retimeLinkedSubtitles(same, project);
+    QCOMPARE(project.tracks().at(0).clips.at(0).subtitleCues.at(0).startUs, drift::secondsToUs(1.0));
 }
 
 void CoreTest::clipLinkFieldsSerialization()

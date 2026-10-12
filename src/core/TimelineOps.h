@@ -268,6 +268,19 @@ bool subtitleClipsCanMerge(const QList<Clip> &clips);
 // clip's id, style, transform and effects; every cue is rebased onto the merged clip's start.
 Clip mergeSubtitleClips(QList<Clip> clips);
 
+// Media identity a generated subtitle cue is tied to (SubtitleCue::source): the asset id, or the
+// path for a clip without one. Keyed by media rather than clip id so the link survives splits and
+// covers both halves of a linked A/V pair.
+QString subtitleSourceKey(const Clip &clip);
+
+// Keeps generated captions on their words after media clips were retimed (speed, speed curve,
+// reverse). For every video/audio clip whose timing differs between `before` and `project`, cues
+// tied to its media that sat inside its old span are mapped old timeline -> source -> new
+// timeline, and a subtitle clip edge inside that span moves with it. `replaced` maps the id of a
+// clip that was swapped out to the id of the clip that took its place.
+void retimeLinkedSubtitles(const Project &before, Project &project,
+                           const QHash<QString, QString> &replaced = {});
+
 // All clips sharing `clip.linkId` (excluding `clip` itself).
 QList<ClipRef> linkedPartners(const Project &project, const Clip &clip);
 

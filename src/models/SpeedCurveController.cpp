@@ -255,6 +255,7 @@ void SpeedCurveController::apply()
         }
     }
 
+    drift::retimeLinkedSubtitles(before, m_app->m_project, {{source.id, retimed.id}});
     m_app->pushProjectEdit(before, tr("Custom speed applied"));
     m_app->finishEdit(tr("Custom speed applied"));
     m_app->selectClip(newTrack, m_app->m_project.tracks().at(newTrack).clips.size() - 1);

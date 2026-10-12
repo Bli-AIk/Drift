@@ -76,7 +76,7 @@ Item {
     function cloneCues() {
         const next = []
         for (let i = 0; i < cues.length; i++)
-            next.push({ start: cues[i].start, end: cues[i].end, text: cues[i].text })
+            next.push({ start: cues[i].start, end: cues[i].end, text: cues[i].text, source: cues[i].source })
         return next
     }
 

@@ -12,6 +12,9 @@ struct SubtitleCue
     TimeUs startUs = 0; // relative to the parent clip's timeline start
     TimeUs endUs = 0;
     QString text;
+    // subtitleSourceKey() of the media this cue was transcribed from; empty for hand-written cues.
+    // Lets the cue follow its words when that clip is retimed (retimeLinkedSubtitles).
+    QString source;
 };
 
 const SubtitleCue *activeSubtitleCueAt(const QList<SubtitleCue> &cues, TimeUs localUs);

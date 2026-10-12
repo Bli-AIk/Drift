@@ -3,6 +3,7 @@
 #include <QUuid>
 
 #include <algorithm>
+#include <optional>
 
 namespace drift {
 
@@ -1344,6 +1345,139 @@ Clip mergeSubtitleClips(QList<Clip> clips)
     out.subtitleCues = cues;
     out.name = subtitleClipName(out.subtitleCues);
     return out;
+}
+
+QString subtitleSourceKey(const Clip &clip)
+{
+    return clip.assetId.isEmpty() ? clip.path : clip.assetId;
+}
+
+namespace {
+
+bool sameTiming(const Clip &a, const Clip &b)
+{
+    return a.timelineStart == b.timelineStart && a.timelineDuration == b.timelineDuration
+           && a.srcIn == b.srcIn && a.srcOut == b.srcOut && a.speed == b.speed && a.reverse == b.reverse
+           && a.speedCurve.toJson() == b.speedCurve.toJson();
+}
+
+struct RetimedClip
+{
+    Clip from;
+    Clip to;
+    QString key;
+};
+
+// Where timeline time `t` lands after the retimed clip of media `key` whose old span holds it.
+// Spans are half-open towards the side `t` belongs to, so the start of a span butting against a
+// retimed clip of the same media doesn't get dragged along with that clip's end.
+std::optional<TimeUs> retimedTime(const QList<RetimedClip> &changes, const QString &key, TimeUs t,
+                                  bool isEnd)
+{
+    for (const RetimedClip &c : changes) {
+        const bool inside = isEnd ? t > c.from.timelineStart && t <= c.from.timelineEnd()
+                                  : t >= c.from.timelineStart && t < c.from.timelineEnd();
+        if (c.key == key && inside)
+            return c.to.timelineStart + c.to.sourceUsToClipLocalUs(c.from.timelineToSourceUs(t));
+    }
+    return std::nullopt;
+}
+
+} // namespace
+
+void retimeLinkedSubtitles(const Project &before, Project &project, const QHash<QString, QString> &replaced)
+{
+    QHash<QString, Clip> after;
+    for (const Track &track : project.tracks()) {
+        for (const Clip &clip : track.clips) {
+            if (clip.type == ClipType::Video || clip.type == ClipType::Audio)
+                after.insert(clip.id, clip);
+        }
+    }
+    QList<RetimedClip> changes;
+    for (const Track &track : before.tracks()) {
+        for (const Clip &old : track.clips) {
+            if (old.type != ClipType::Video && old.type != ClipType::Audio)
+                continue;
+            const auto now = after.constFind(replaced.value(old.id, old.id));
+            if (now != after.constEnd() && !sameTiming(old, *now))
+                changes.append({old, *now, subtitleSourceKey(old)});
+        }
+    }
+    if (changes.isEmpty())
+        return;
+
+    for (Track &track : project.tracks()) {
+        for (int i = 0; i < track.clips.size(); ++i) {
+            const Clip &sub = track.clips.at(i);
+            if (sub.type != ClipType::Subtitle)
+                continue;
+
+            bool touched = false;
+            QSet<QString> keys;
+            QList<SubtitleCue> cues = sub.subtitleCues;
+            for (SubtitleCue &cue : cues) {
+                cue.startUs += sub.timelineStart;
+                cue.endUs += sub.timelineStart;
+                if (cue.source.isEmpty())
+                    continue;
+                keys.insert(cue.source);
+                const auto a = retimedTime(changes, cue.source, cue.startUs, false);
+                const auto b = retimedTime(changes, cue.source, cue.endUs, true);
+                if (!a && !b)
+                    continue;
+                touched = true;
+                // Reverse swaps which end comes first.
+                const TimeUs s = a.value_or(cue.startUs);
+                const TimeUs e = b.value_or(cue.endUs);
+                cue.startUs = qMin(s, e);
+                cue.endUs = qMax(s, e);
+            }
+            if (!touched)
+                continue;
+
+            auto retimeEdge = [&](TimeUs t, bool isEnd) {
+                for (const QString &key : keys) {
+                    if (const auto moved = retimedTime(changes, key, t, isEnd))
+                        return *moved;
+                }
+                return t;
+            };
+            const TimeUs a = retimeEdge(sub.timelineStart, false);
+            const TimeUs b = retimeEdge(sub.timelineEnd(), true);
+            TimeUs start = qMin(a, b);
+            TimeUs end = qMax(a, b);
+            // A slowed-down clip pushes its captions later; don't let them run over a neighbour.
+            for (int j = 0; j < track.clips.size(); ++j) {
+                const Clip &other = track.clips.at(j);
+                if (j == i)
+                    continue;
+                if (other.timelineStart >= sub.timelineEnd())
+                    end = qMin(end, other.timelineStart);
+                else if (other.timelineEnd() <= sub.timelineStart)
+                    start = qMax(start, other.timelineEnd());
+            }
+            if (end <= start)
+                continue;
+
+            QList<SubtitleCue> rebased;
+            for (SubtitleCue cue : cues) {
+                cue.startUs -= start;
+                cue.endUs -= start;
+                if (cue.endUs > cue.startUs)
+                    rebased.append(cue);
+            }
+            sortSubtitleCues(rebased);
+
+            Clip &out = track.clips[i];
+            out.timelineStart = start;
+            out.timelineDuration = end - start;
+            out.srcIn = 0;
+            out.srcOut = out.timelineDuration;
+            out.subtitleCues = rebased;
+            out.name = subtitleClipName(rebased);
+        }
+    }
 }
 
 QList<ClipRef> linkedPartners(const Project &project, const Clip &clip)

@@ -1896,6 +1896,7 @@ QVariantList subtitleCuesToMap(const QList<drift::SubtitleCue> &cues)
             {QStringLiteral("start"), drift::usToSeconds(cue.startUs)},
             {QStringLiteral("end"), drift::usToSeconds(cue.endUs)},
             {QStringLiteral("text"), cue.text},
+            {QStringLiteral("source"), cue.source},
         });
     }
     return out;
@@ -1911,6 +1912,7 @@ QList<drift::SubtitleCue> subtitleCuesFromMap(const QVariantList &list)
         cue.startUs = drift::secondsToUs(map.value(QStringLiteral("start")).toDouble());
         cue.endUs = drift::secondsToUs(map.value(QStringLiteral("end")).toDouble());
         cue.text = map.value(QStringLiteral("text")).toString();
+        cue.source = map.value(QStringLiteral("source")).toString();
         cues.append(cue);
     }
     drift::sortSubtitleCues(cues);
@@ -8297,6 +8299,7 @@ std::optional<QList<drift::SubtitleCue>> AppController::cuesFromStoredTranscript
             m.startUs = offset + qBound<drift::TimeUs>(0, drift::secondsToUs(tlStart), source.timelineDuration);
             m.endUs = offset + qBound<drift::TimeUs>(0, drift::secondsToUs(tlEnd), source.timelineDuration);
             m.text = cue.text;
+            m.source = source.assetId.isEmpty() ? source.path : source.assetId;
             if (m.endUs > m.startUs)
                 mapped.append(m);
         }
@@ -8540,6 +8543,7 @@ bool AppController::generateSubtitlesForSources(QList<SubtitleSource> sources, c
                 m.startUs = s;
                 m.endUs = e;
                 m.text = cue.text;
+                m.source = source.assetId.isEmpty() ? source.path : source.assetId;
                 mapped.append(m);
             }
         }
@@ -9184,6 +9188,7 @@ void AppController::clearClipSpeedCurve(int trackIndex, int clipIndex)
     // from is exactly the thing being discarded.
     clip.timelineDuration = qMax<drift::TimeUs>(
         1, llround(static_cast<double>(clip.srcOut - clip.srcIn) / clip.effectiveSpeed()));
+    drift::retimeLinkedSubtitles(before, m_project);
     pushProjectEdit(before, tr("Speed curve removed"));
     finishEdit(tr("Speed curve removed"));
 }
@@ -10852,9 +10857,11 @@ void AppController::previewSetClipSpeed(int trackIndex, int clipIndex, double sp
     if (!m_previewDragActive)
         beginPreviewDrag(tr("Speed changed"));
 
+    const drift::Project before = m_project;
     clip.speed = qBound(0.25, speed, 4.0);
     clip.syncSrcOutFromSpeed(sourceDurationForClip(clip));
     syncLinkedPartnersFrom(m_project, clip);
+    drift::retimeLinkedSubtitles(before, m_project);
     emitPreviewFrame();
 }
 
@@ -12013,6 +12020,7 @@ bool AppController::setClipSpeed(int trackIndex, int clipIndex, double speed)
     clip.speed = qBound(0.25, speed, 4.0);
     clip.syncSrcOutFromSpeed(sourceDurationForClip(clip));
     syncLinkedPartnersFrom(m_project, clip);
+    drift::retimeLinkedSubtitles(before, m_project);
     pushProjectEdit(before, tr("Speed changed"));
     finishEdit(tr("Clip speed updated"));
     return true;
@@ -12035,6 +12043,7 @@ void AppController::setClipReverse(int trackIndex, int clipIndex, bool reverse)
 
     const drift::Project before = m_project;
     clip.reverse = reverse;
+    drift::retimeLinkedSubtitles(before, m_project);
     pushProjectEdit(before, reverse ? tr("Reverse on") : tr("Reverse off"));
     finishEdit(reverse ? tr("Clip reversed") : tr("Clip forward"));
 }
