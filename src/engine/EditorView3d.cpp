@@ -127,6 +127,24 @@ EditorView3d dollyEditorView(const EditorView3d &view, double steps)
     return out;
 }
 
+EditorView3d flyEditorView(const EditorView3d &view, double turnRightDeg, double turnUpDeg,
+                           double forward, double right, double up)
+{
+    const QVector3D eye = editorViewEye(view);
+    EditorView3d out = view;
+    out.yaw = std::remainder(view.yaw - turnRightDeg, 360.0);
+    // Looking up lowers the eye relative to the target, and + pitch raises it.
+    out.pitch = std::clamp(std::clamp(view.pitch, -kMaxPitch, kMaxPitch) - turnUpDeg, -kMaxPitch, kMaxPitch);
+    out.lookThrough = false;
+    out.target = QVector3D();
+    const QVector3D offset = editorViewEye(out);
+    out.target = eye - offset;
+    const QVector3D ahead = -offset.normalized();
+    // World up is -y.
+    out.target += ahead * float(forward) + basisOf(out).right * float(right) + QVector3D(0.f, -float(up), 0.f);
+    return out;
+}
+
 EditorView3d frameEditorView(const EditorView3d &view, const QVector3D &centre, double radius)
 {
     EditorView3d out = view;

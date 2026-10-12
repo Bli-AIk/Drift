@@ -54,6 +54,10 @@ EditorView3d orbitEditorView(const EditorView3d &view, double dxDeg, double dyDe
 EditorView3d panEditorView(const EditorView3d &view, double dxPx, double dyPx, const QSizeF &canvas);
 // Moves toward (steps > 0) or away from the target, by a fixed ratio per step.
 EditorView3d dollyEditorView(const EditorView3d &view, double steps);
+// Fly mode: the eye turns in place (+right, +up, degrees) and then moves along the view's forward,
+// its screen right and the world's up, in world px. The target travels with the eye.
+EditorView3d flyEditorView(const EditorView3d &view, double turnRightDeg, double turnUpDeg,
+                           double forward, double right, double up);
 // Frames a world-space sphere: centred and filling most of the view.
 EditorView3d frameEditorView(const EditorView3d &view, const QVector3D &centre, double radius);
 

@@ -2011,6 +2011,17 @@ void EngineTest::editorViewLooksAtTheWorld()
     const drift::EditorView3d framed = drift::frameEditorView(front, QVector3D(10, 20, 30), 100.0);
     QCOMPARE(framed.target, QVector3D(10, 20, 30));
 
+    // Flying turns the head in place: the eye stays put while the view swings right and up.
+    const drift::EditorView3d turned = drift::flyEditorView(front, 30.0, 20.0, 0.0, 0.0, 0.0);
+    QVERIFY((drift::editorViewEye(turned) - drift::editorViewEye(front)).length() < 0.01f);
+    QVERIFY(turned.target.x() > 0.f);
+    QVERIFY(turned.target.y() < 0.f);
+    QCOMPARE(turned.distance, front.distance);
+    // W moves along the view (toward -z from the front), D to screen right, E up (world -y).
+    const drift::EditorView3d flown = drift::flyEditorView(front, 0.0, 0.0, 100.0, 50.0, 25.0);
+    QVERIFY((drift::editorViewEye(flown) - QVector3D(50, -25, 2900)).length() < 0.01f);
+    QVERIFY((flown.target - QVector3D(50, -25, -100)).length() < 0.01f);
+
     // Looking through the camera is exactly the camera's projection.
     drift::SceneCamera3d camera;
     camera.positionX = 120.0;

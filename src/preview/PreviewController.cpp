@@ -426,6 +426,8 @@ void PreviewController::setMode(const QString &mode)
     if (next == m_mode)
         return;
     m_mode = next;
+    if (next != QLatin1String("3d"))
+        setFlying(false);
     // Cropping is a 2D tool: entering 3D leaves it, as entering it leaves 3D.
     if (next == QLatin1String("3d"))
         setCanvasCropMode(false);
@@ -442,6 +444,79 @@ void PreviewController::setMode(const QString &mode)
 void PreviewController::orbit(double dxDeg, double dyDeg)
 {
     setView(drift::orbitEditorView(m_view, dxDeg, dyDeg));
+}
+
+void PreviewController::fly(double turnRightDeg, double turnUpDeg, double forward, double right, double up)
+{
+    if (m_view.lookThrough) {
+        const QVariantMap state = m_app.cameraStateAtPlayhead();
+        const int trackIndex = state.value(QStringLiteral("track")).toInt();
+        const int clipIndex = state.value(QStringLiteral("clip")).toInt();
+        if (state.value(QStringLiteral("active")).toBool() && m_app.isValidClipIndex(trackIndex, clipIndex)
+            && drift::isCameraClip(m_app.m_project.tracks().at(trackIndex).clips.at(clipIndex))) {
+            flyCamera(trackIndex, clipIndex, turnRightDeg, turnUpDeg, forward, right, up);
+            return;
+        }
+    }
+    const double d = m_view.distance;
+    setView(drift::flyEditorView(m_view, turnRightDeg, turnUpDeg, forward * d, right * d, up * d));
+}
+
+void PreviewController::flyCamera(int trackIndex, int clipIndex, double turnRightDeg, double turnUpDeg,
+                                  double forward, double right, double up)
+{
+    drift::Clip &clip = m_app.m_project.tracks()[trackIndex].clips[clipIndex];
+    const drift::SceneCamera3d camera = drift::sceneCameraFromClip(clip, m_app.m_playheadUs, 1.0);
+    // The camera as a fly view: its eye, looking at a target straight ahead at the lens distance.
+    const double lens = std::max(1.0, camera.perspective);
+    const QVector3D eye = drift::sceneCameraEye(camera);
+    const QVector3D ahead = drift::sceneCameraWorld(camera).mapVector(QVector3D(0.f, 0.f, -1.f)).normalized();
+    drift::EditorView3d view;
+    view.distance = lens;
+    view.pitch = qRadiansToDegrees(std::asin(std::clamp(double(ahead.y()), -1.0, 1.0)));
+    view.yaw = qRadiansToDegrees(std::atan2(-double(ahead.x()), -double(ahead.z())));
+    view.target = eye + ahead * float(lens);
+    const drift::EditorView3d flown =
+        drift::flyEditorView(view, turnRightDeg, turnUpDeg, forward * lens, right * lens, up * lens);
+    const drift::SceneCamera3d next = drift::aimAt(camera, drift::editorViewEye(flown), flown.target);
+
+    m_app.beginImplicitPreviewDrag(AppController::tr("Fly camera"));
+    const drift::TimeUs relative = qMax<drift::TimeUs>(0, m_app.m_playheadUs - clip.timelineStart);
+    bool wrote = false;
+    QStringList keys;
+    const auto write = [&](drift::KeyframeTrack<double> &track, double value, const QString &key) {
+        if (writeKeyframeValue(track, relative, value, m_app.m_autoKeyEnabled, false)) {
+            wrote = true;
+            keys << key;
+        }
+    };
+    write(clip.transformX, next.positionX, QStringLiteral("x"));
+    write(clip.transformY, next.positionY, QStringLiteral("y"));
+    write(clip.positionZ, next.positionZ, QStringLiteral("z"));
+    write(clip.rotationX, next.rotationX, QStringLiteral("rotationX"));
+    write(clip.rotationY, next.rotationY, QStringLiteral("rotationY"));
+    if (!wrote) {
+        if (!m_flyBlocked)
+            emit m_app.transformBlocked(AppController::tr("Turn on Auto keyframes to change this"));
+        m_flyBlocked = true;
+        return;
+    }
+    m_flyEdited = true;
+    m_app.emitPreviewEdit(trackIndex, clipIndex, keys);
+}
+
+void PreviewController::setFlying(bool flying)
+{
+    flying = flying && m_mode == QLatin1String("3d");
+    if (flying == m_flying)
+        return;
+    m_flying = flying;
+    if (!flying && m_flyEdited)
+        m_app.commitPreviewDrag();
+    m_flyEdited = false;
+    m_flyBlocked = false;
+    setNavigating(flying);
+    emit flyingChanged();
 }
 
 void PreviewController::pan(double dxCanvas, double dyCanvas)

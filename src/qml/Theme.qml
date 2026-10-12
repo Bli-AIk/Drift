@@ -741,6 +741,7 @@ QtObject {
         move3d: "move-3d",
         rotate3d: "rotate-3d",
         scale3d: "scale-3d",
+        fly: "helicopter",
         // CapCut-style select/pointer tool (exit cut modes)
         mousePointer: "mouse-pointer",
 

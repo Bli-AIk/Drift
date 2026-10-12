@@ -32,6 +32,8 @@ class PreviewController : public QObject
     Q_PROPERTY(QString mode READ mode WRITE setMode NOTIFY modeChanged)
     // In 3D mode: looking through the scene camera rather than from the free viewpoint.
     Q_PROPERTY(bool lookThrough READ lookThrough NOTIFY viewChanged)
+    // In 3D mode: Blender-style fly navigation owns the pointer and the keyboard.
+    Q_PROPERTY(bool flying READ flying WRITE setFlying NOTIFY flyingChanged)
     // Bumped whenever the 3D viewpoint moves, so overlays drawn through it re-read their geometry.
     Q_PROPERTY(int viewRevision READ viewRevision NOTIFY viewChanged)
     // The 3D gizmo on a clip that is a 3D layer: which tool ("move", "rotate", "scale") and whether
@@ -60,6 +62,8 @@ public:
     QString mode() const { return m_mode; }
     void setMode(const QString &mode);
     bool lookThrough() const { return m_view.lookThrough; }
+    bool flying() const { return m_flying; }
+    void setFlying(bool flying);
     // The free viewpoint, or the overview a fresh 3D view starts from when it was never placed.
     drift::EditorView3d currentView() const;
     // Settles the never-placed viewpoint onto the overview, so navigation starts from it.
@@ -88,6 +92,11 @@ public:
     Q_INVOKABLE void orbit(double dxDeg, double dyDeg);
     Q_INVOKABLE void pan(double dxCanvas, double dyCanvas);
     Q_INVOKABLE void dolly(double steps);
+    // Fly mode step: turn in degrees (+right, +up), then move along the view's forward, its screen
+    // right and the world's up, each in multiples of the view's distance to its target. Looking
+    // through an active scene camera, the camera clip flies instead (in multiples of its lens),
+    // keyed like a gizmo drag; one flight is one undo step.
+    Q_INVOKABLE void fly(double turnRightDeg, double turnUpDeg, double forward, double right, double up);
     // Frames the selected clip (or the whole stage when nothing is selected).
     Q_INVOKABLE void frameSelection();
     // "front", "back", "left", "right", "top" or "bottom", looking at the current target.
@@ -192,6 +201,7 @@ public:
 
 signals:
     void modeChanged();
+    void flyingChanged();
     void viewChanged();
     void gizmoChanged();
     void guidesEnabledChanged();
@@ -220,6 +230,8 @@ private:
     bool selectedModelLights(SelectedModelLights *out) const;
     // Hands the current mode and viewpoint to the preview renderer.
     void pushView();
+    void flyCamera(int trackIndex, int clipIndex, double turnRightDeg, double turnUpDeg, double forward,
+                   double right, double up);
     void setView(const drift::EditorView3d &view);
     void updateActiveTool();
     void updateHandlesVisible();
@@ -230,6 +242,11 @@ private:
     bool m_viewPlaced = false;
     quint64 m_viewSerial = 0;
     bool m_navigating = false;
+    bool m_flying = false;
+    // This flight has written the camera clip (so landing commits it), or was refused a write
+    // (so the "turn on auto keyframes" notice shows once, not every frame).
+    bool m_flyEdited = false;
+    bool m_flyBlocked = false;
     QString m_gizmoTool = QStringLiteral("move");
     QString m_gizmoOrientation = QStringLiteral("global");
     bool m_guidesEnabled = false;

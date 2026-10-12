@@ -3309,6 +3309,10 @@
         <translation>클립 크기 조정</translation>
     </message>
     <message>
+        <source>Fly camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Audio effects go on the timeline.</source>
         <translation>오디오 효과는 타임라인에 적용됩니다.</translation>
     </message>
@@ -10044,6 +10048,17 @@
     </message>
 </context>
 <context>
+    <name>Preview3DMode</name>
+    <message>
+        <source>W/A/S/D move · Q/E down/up · Shift faster · Wheel speed (%1×) · Esc or click to finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move the pointer to the centre ring to start steering</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Preview3DTools</name>
     <message>
         <source>%1 (%2)</source>
@@ -10067,6 +10082,10 @@
     </message>
     <message>
         <source>Gizmo follows the world axes (click for the selection&apos;s own)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fly (WASD to move, Q/E down/up, steer toward the pointer)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

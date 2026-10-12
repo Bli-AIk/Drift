@@ -92,6 +92,7 @@ private slots:
     void compositeClipGetsAPreviewBox();
     void cameraMovesThePreviewOverlayWithThePicture();
     void cameraGizmoMovesAndTurnsTheEye();
+    void flyMovesTheCameraWhenLookingThrough();
     void undoRestoresEditsMadeThroughEarlierPointers();
     void compositeClipSpeedRetimesToFit();
     void importedMediaIsCentredAndResetsToItsFit();
@@ -934,6 +935,47 @@ void EditorStateTest::cameraMovesThePreviewOverlayWithThePicture()
     QCOMPARE(hit.value(QStringLiteral("kind")).toString(), QStringLiteral("image"));
     // And where it used to be is now empty canvas.
     QVERIFY(state.preview()->clipAtCanvasPoint(restRendered.x(), restRendered.y()).isEmpty());
+}
+
+void EditorStateTest::flyMovesTheCameraWhenLookingThrough()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.project()->setResolution(1000, 1000);
+    state.addCameraTrack();
+    state.setPlayheadSeconds(0.0);
+    state.preview()->setMode(QStringLiteral("3d"));
+    const QVariantMap rest = state.preview()->cameraBox();
+    const int track = rest.value(QStringLiteral("track")).toInt();
+    const int clip = rest.value(QStringLiteral("clip")).toInt();
+    const auto eyeOf = [&] {
+        return drift::sceneCameraEye(drift::sceneCameraFromClip(
+            state.project()->tracks().at(track).clips.at(clip), 0, 1.0));
+    };
+
+    // From the free view, flying moves the view and leaves the camera alone.
+    state.preview()->setFlying(true);
+    QVERIFY(state.preview()->flying());
+    const QVector3D viewEye = drift::editorViewEye(state.preview()->currentView());
+    state.preview()->fly(0.0, 0.0, 0.1, 0.0, 0.0);
+    QVERIFY((drift::editorViewEye(state.preview()->currentView()) - viewEye).length() > 1.f);
+    QVERIFY((eyeOf() - QVector3D(0, 0, 2000)).length() < 0.01f);
+    state.preview()->setFlying(false);
+
+    // Through the camera, the camera flies: W moves the eye along its view, by lens multiples.
+    state.preview()->toggleLookThrough();
+    state.preview()->setFlying(true);
+    state.preview()->fly(0.0, 0.0, 0.1, 0.0, 0.0);
+    QVERIFY(state.preview()->lookThrough());
+    QVERIFY2((eyeOf() - QVector3D(0, 0, 1800)).length() < 0.5f, qPrintable(QString::number(eyeOf().z())));
+    // Turning keeps the eye in place and yaws the camera.
+    state.preview()->fly(30.0, 0.0, 0.0, 0.0, 0.0);
+    QVERIFY((eyeOf() - QVector3D(0, 0, 1800)).length() < 0.5f);
+    QVERIFY(std::abs(state.project()->tracks().at(track).clips.at(clip).rotationY.evaluateAt(0)) > 1.0);
+    // Landing makes the whole flight one undo step.
+    state.preview()->setFlying(false);
+    state.undo();
+    QVERIFY((eyeOf() - QVector3D(0, 0, 2000)).length() < 0.5f);
 }
 
 void EditorStateTest::cameraGizmoMovesAndTurnsTheEye()

@@ -59,6 +59,13 @@ Rectangle {
         }
 
         IconButton {
+            glyph: Theme.icons.fly
+            variant: "text"
+            tooltip: tools.withShortcut(qsTr("Fly (WASD to move, Q/E down/up, steer toward the pointer)"), "Shift+F")
+            active: EditorState.preview.flying
+            onClicked: EditorState.preview.flying = !EditorState.preview.flying
+        }
+        IconButton {
             glyph: Theme.icons.video
             variant: "text"
             tooltip: tools.withShortcut(qsTr("Look through the camera"), qsTr("Numpad 0"))
