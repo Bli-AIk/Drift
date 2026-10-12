@@ -1576,7 +1576,7 @@ Item {
                             { glyph: Theme.icons.shapes, label: qsTr("Vector"),
                               formats: "SVG · Lottie (.json, .lottie)" },
                             { glyph: Theme.icons.box, label: qsTr("3D"),
-                              formats: "glTF binary (.glb)" },
+                              formats: qsTr("glTF binary (.glb) · Gaussian splats (.sog, .ply, .zip)") },
                             { glyph: Theme.icons.fileText, label: qsTr("PDF"),
                               formats: qsTr("PDF (needs the PDF Viewer addon)") }
                         ]

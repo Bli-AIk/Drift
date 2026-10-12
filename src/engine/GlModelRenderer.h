@@ -101,6 +101,12 @@ GlTarget drawModelClip(GlRuntime &rt, QOpenGLExtraFunctions *gl,
                        const model3d::ModelDrawRequest &request, const QSize &canvasSize,
                        const QMatrix4x4 &viewProjection, GlTarget *depthOut = nullptr);
 
+// Finish a model-style clip drawn premultiplied into `scratch` (drawW x drawH, 2x the output when
+// `supersample`): box-filter down to the canvas size and unpremultiply into a new straight-alpha
+// layer target. Consumes `scratch`; invalid on failure.
+GlTarget resolveModelClipScratch(GlRuntime &rt, QOpenGLExtraFunctions *gl, GlTarget &&scratch,
+                                 const QSize &canvasSize, bool supersample);
+
 void destroyGlModels(GlRuntime &rt, QOpenGLExtraFunctions *gl);
 
 } // namespace drift::gl

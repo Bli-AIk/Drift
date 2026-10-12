@@ -1299,7 +1299,7 @@ QJsonObject catalogPayload(const QJsonObject &args)
         {"ui", "Editor theme and keyboard shortcuts."},
         {"shapes", "Builtin shapes, stickers, emoji."},
         {"motion", "Lottie animations and SVG drawings as vector clips: add, inspect, re-theme through slots."},
-        {"model3d", "3D models (.glb) as model clips: add, inspect, pick the animation, pose and light them."},
+        {"model3d", "3D models (.glb) and Gaussian splats (.sog, .ply, .zip, meta.json) as model clips: add, inspect, pick the animation, pose and light them."},
         {"subtitles", "Subtitle clips, import/export, Whisper generation."},
         {"segmentation", "SAM-style cutout and mask output."},
         {"ai", "Denoise, face detection, auto-reframe, model add-ons (list/install), acceleration."},

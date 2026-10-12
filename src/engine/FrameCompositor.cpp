@@ -19,6 +19,7 @@
 #include "TransitionCatalog.h"
 #include "ModelAsset.h"
 #include "ModelClipRenderer.h"
+#include "SplatAsset.h"
 #include "VectorClipRenderer.h"
 #include "PdfClipRenderer.h"
 #include "core/Clip.h"
@@ -1510,6 +1511,13 @@ GpuScene buildGpuScene(const drift::Project &project, drift::TimeUs timelineUs, 
                 guides.selectedModel = parent * drift::modelClipWorld(model.rect, model.rotation, model.pose3d,
                                                                       model.asset->aabbMin,
                                                                       model.asset->aabbMax, canvas);
+            } else if (model.splat) {
+                guides.hasSelectedModel = true;
+                guides.selectedModelMin = model.splat->fitMin;
+                guides.selectedModelMax = model.splat->fitMax;
+                guides.selectedModel = parent * drift::modelClipWorld(model.rect, model.rotation, model.pose3d,
+                                                                      model.splat->fitMin,
+                                                                      model.splat->fitMax, canvas);
             }
             return;
         }

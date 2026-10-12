@@ -4,6 +4,7 @@
 #include "Face111.h"
 #include "DepthSidecar.h"
 #include "GlModelRenderer.h"
+#include "GlSplatRenderer.h"
 #include "GpuDevice.h"
 #include "SwsColorRange.h"
 #include "VaapiZeroCopy.h"
@@ -1373,8 +1374,10 @@ void GlRuntime::releaseCaches()
         destroyExportNv12State();
         m_targetPool.clear();
         m_pooledTargets = 0;
-        if (auto *gl = functions())
+        if (auto *gl = functions()) {
             destroyGlModels(*this, gl);
+            destroyGlSplats(*this, gl);
+        }
     });
 }
 
@@ -1418,6 +1421,7 @@ void GlRuntime::shutdown()
             copyProgram.reset();
             if (auto *gl = context->extraFunctions()) {
                 destroyGlModels(*this, gl);
+                destroyGlSplats(*this, gl);
                 for (const auto &entry : staticTextures) {
                     GLuint tex = entry.second;
                     gl->glDeleteTextures(1, &tex);

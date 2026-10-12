@@ -3,7 +3,7 @@ import QtQuick.Controls.Basic
 import Drift
 import ".."
 
-// 3D model clip inspector: which .glb it is, which animation plays, and the lighting knobs. The
+// 3D model clip inspector: which model or splat it is, which animation plays, and the lighting knobs. The
 // model is placed like any 3D layer, from the Transform tab.
 Item {
     id: root
@@ -19,6 +19,7 @@ Item {
                                                  "path": "", "animations": [], "animation": 0,
                                                  "loop": "loop", "offset": 0, "ambient": 0.35
                                              })
+    readonly property bool isSplat: !!(root.model3d && root.model3d.isSplat)
     readonly property var animations: (root.model3d && root.model3d.animations) || []
     readonly property var keyframes: (root.model3d && root.model3d.keyframes) || ({})
 
@@ -44,7 +45,7 @@ Item {
     }
 
     function replaceModel() {
-        const url = FileDialogs.openFile(qsTr("Replace 3D Model"), [qsTr("glTF binary (*.glb)")])
+        const url = FileDialogs.openFile(qsTr("Replace 3D Model"), [qsTr("3D models and Gaussian splats (*.glb *.sog *.ply *.zip meta.json lod-meta.json)")])
         if (url == "")
             return
         const path = url.toString().replace(/^file:\/\//, "")
@@ -83,6 +84,8 @@ Item {
                 elide: Text.ElideMiddle
                 text: {
                     const n = root.animations.length
+                    if (root.isSplat)
+                        return [qsTr("Gaussian splat"), root.model3d.path].filter(s => s && s.length > 0).join(" · ")
                     const anims = n > 0 ? qsTr("%n animation(s)", "", n) : qsTr("static")
                     return [anims, root.model3d.path].filter(s => s && s.length > 0).join(" · ")
                 }
@@ -90,7 +93,7 @@ Item {
 
             ThemedButton {
                 text: qsTr("Replace model…")
-                tooltip: qsTr("Load another .glb; position, length, pose and lighting stay")
+                tooltip: qsTr("Load another model or splat; position, length, pose and lighting stay")
                 onClicked: root.replaceModel()
             }
 
@@ -199,6 +202,7 @@ Item {
         Column {
             width: parent.width
             spacing: Theme.spacingMd
+            visible: !root.isSplat
 
             ThemedLabel { text: qsTr("Lighting") }
 

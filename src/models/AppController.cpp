@@ -68,7 +68,9 @@
 #include "engine/DepthSidecar.h"
 #include "engine/VdaDepth.h"
 #include "engine/ModelAsset.h"
+#include "engine/ModelClipRenderer.h"
 #include "engine/ModelClipTransform.h"
+#include "engine/SplatAsset.h"
 #include "engine/ProxyNaming.h"
 #include "engine/ReverseProxyCache.h"
 #include "engine/VectorClipRenderer.h"
@@ -2034,6 +2036,24 @@ QVariantMap pdfSourceToMap(const drift::PdfSource &s, drift::TimeUs timelineStar
     return map;
 }
 
+// A Model3d clip's file is a .glb or a Gaussian splat input, which never ends in .glb; judged by
+// name so building a clip's map never opens the file.
+bool isSplatSourcePath(const QString &path)
+{
+    return QFileInfo(path).suffix().compare(QLatin1String("glb"), Qt::CaseInsensitive) != 0;
+}
+
+// Why `path` could not be loaded as a model clip source.
+QString model3dLoadError(const QString &path)
+{
+    QString error;
+    if (isSplatSourcePath(path))
+        drift::model3d::loadSplatSceneCached(path, &error);
+    else
+        error = drift::modelAssetWarning(path);
+    return error.isEmpty() ? QStringLiteral("could not load model") : error;
+}
+
 QVariantMap model3dSourceToMap(const drift::Model3dSource &m, drift::TimeUs timelineStart)
 {
     QVariantList animations;
@@ -2054,6 +2074,7 @@ QVariantMap model3dSourceToMap(const drift::Model3dSource &m, drift::TimeUs time
         {QStringLiteral("animation"), m.animation},
         {QStringLiteral("loop"), drift::vectorLoopToString(m.loop)},
         {QStringLiteral("offset"), drift::usToSeconds(m.startOffsetUs)},
+        {QStringLiteral("isSplat"), isSplatSourcePath(m.path)},
     };
     for (const QString &key : drift::model3dKeyframeProperties()) {
         double v = 0.0;
@@ -2244,6 +2265,26 @@ QStringList applyModel3dOptions(drift::Clip &clip, const QVariantMap &opts, doub
 
 QVariantMap inspectModel3dPath(const QString &path)
 {
+    if (isSplatSourcePath(path)) {
+        QString error;
+        const auto splat = drift::model3d::loadSplatSceneCached(path, &error);
+        if (!splat)
+            return {{QStringLiteral("ok"), false},
+                    {QStringLiteral("error"), error.isEmpty() ? QStringLiteral("could not load splat") : error}};
+        QVariantMap out{
+            {QStringLiteral("ok"), true},
+            {QStringLiteral("path"), path},
+            {QStringLiteral("splat"), true},
+            {QStringLiteral("animations"), QVariantList()},
+            {QStringLiteral("splatCount"), splat->count},
+        };
+        if (splat->lodLevel >= 0) {
+            out.insert(QStringLiteral("lodLevel"), splat->lodLevel);
+            out.insert(QStringLiteral("lodLevels"), splat->lodLevels);
+            out.insert(QStringLiteral("totalSplatCount"), splat->totalCount);
+        }
+        return out;
+    }
     const auto asset = drift::loadModelAssetCached(path);
     if (!asset) {
         QString error = drift::modelAssetWarning(path);
@@ -3516,11 +3557,21 @@ void placeModelClipLayout(drift::Clip &clip, int canvasW, int canvasH)
 
 // Fills what the inspector and the overlay need from the .glb (animation list, rest bounds) so
 // neither ever parses on the GUI thread; the loader's cache makes this a hit after the first.
+// A splat has no animations and is bounded by its robust fit box. The import probe already loaded
+// it into the renderer's cache; a path added without importing pays the load here.
 void probeModel3dSource(drift::Model3dSource &source)
 {
     source.animations.clear();
     source.aabbMin = {};
     source.aabbMax = {};
+    if (isSplatSourcePath(source.path)) {
+        source.animation = 0;
+        if (const auto splat = drift::model3d::loadSplatSceneCached(source.path)) {
+            source.aabbMin = splat->fitMin;
+            source.aabbMax = splat->fitMax;
+        }
+        return;
+    }
     const auto asset = drift::loadModelAssetCached(source.path);
     if (!asset)
         return;
@@ -14297,15 +14348,12 @@ QVariantMap AppController::addModel3dClip(const QString &path, int trackIndex, d
     if (path.isEmpty() || !QFileInfo::exists(path))
         return {{QStringLiteral("ok"), false}, {QStringLiteral("error"), QStringLiteral("file not found")}};
     if (!AssetLibrary::isModelPath(path))
-        return {{QStringLiteral("ok"), false}, {QStringLiteral("error"), QStringLiteral("only .glb files are supported")}};
+        return {{QStringLiteral("ok"), false}, {QStringLiteral("error"), QStringLiteral("only .glb files and Gaussian splats (.sog, .ply, .zip, meta.json) are supported")}};
     drift::Model3dSource model;
     model.path = QFileInfo(path).absoluteFilePath();
     probeModel3dSource(model);
     if (!model.hasAabb()) {
-        QString error = drift::modelAssetWarning(model.path);
-        if (error.isEmpty())
-            error = QStringLiteral("could not load model");
-        return {{QStringLiteral("ok"), false}, {QStringLiteral("error"), error}};
+        return {{QStringLiteral("ok"), false}, {QStringLiteral("error"), model3dLoadError(model.path)}};
     }
 
     const drift::Project before = m_project;
@@ -14370,17 +14418,14 @@ QVariantMap AppController::setModel3dSource(int trackIndex, int clipIndex, const
     if (path.isEmpty() || !QFileInfo::exists(path))
         return {{QStringLiteral("ok"), false}, {QStringLiteral("error"), QStringLiteral("file not found")}};
     if (!AssetLibrary::isModelPath(path))
-        return {{QStringLiteral("ok"), false}, {QStringLiteral("error"), QStringLiteral("only .glb files are supported")}};
+        return {{QStringLiteral("ok"), false}, {QStringLiteral("error"), QStringLiteral("only .glb files and Gaussian splats (.sog, .ply, .zip, meta.json) are supported")}};
 
     // Pose, light and keyframes carry over; the animation index is clamped to the new file.
     drift::Model3dSource model = m_project.tracks().at(trackIndex).clips.at(clipIndex).model3d;
     model.path = QFileInfo(path).absoluteFilePath();
     probeModel3dSource(model);
     if (!model.hasAabb()) {
-        QString error = drift::modelAssetWarning(model.path);
-        if (error.isEmpty())
-            error = QStringLiteral("could not load model");
-        return {{QStringLiteral("ok"), false}, {QStringLiteral("error"), error}};
+        return {{QStringLiteral("ok"), false}, {QStringLiteral("error"), model3dLoadError(model.path)}};
     }
 
     const drift::Project before = m_project;

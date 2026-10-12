@@ -1,4 +1,7 @@
 #include <QtTest>
+#include <QBuffer>
+#include <QMap>
+#include <array>
 #include "engine/SileroVad.h"
 #include "engine/ChatterboxTokenizer.h"
 #include "engine/ChatterboxTts.h"
@@ -76,6 +79,7 @@
 #include "engine/AudioOnsets.h"
 #include "engine/ObjectDetector.h"
 #include "engine/SceneDetect.h"
+#include "engine/SplatAsset.h"
 #include "engine/FrameSheet.h"
 #include "engine/WaveformSheet.h"
 #include "engine/DeepFilterDenoiser.h"
@@ -136,6 +140,12 @@ class EngineTest : public QObject
 
 private slots:
     void initTestCase();
+    void splatPlyLoads();
+    void splatPlyRejectsBadFiles();
+    void splatSogRoundTrip();
+    void splatSogStreamedPicksLevelByBudget();
+    void splatRejectsUnrelatedPaths();
+    void splatSampleLoads();
     void aimAtCentresTheTargetAndHoldsTheEye();
     void rotatedKeepingEyeTurnsInPlace();
     void chatterboxTokenizerMatchesReference();
@@ -15526,6 +15536,355 @@ void EngineTest::waveformSheetDrawsWordLane()
     const int laneY = opt.height - opt.axisHeight - opt.wordLaneHeight / 2;
     QVERIFY(withWords.pixel(100, laneY) != bare.pixel(100, laneY));
     QVERIFY(withWords.pixel(100, laneY) != withWords.pixel(390, laneY));
+}
+
+namespace {
+
+struct SogSplat
+{
+    float pos[3];
+    float quat[4]; // w x y z, unit
+    uint8_t scaleIdx[3];
+    uint8_t colorIdx[3];
+    uint8_t opacity;
+};
+
+constexpr float kSogMin[3] = {-1.f, -2.f, -3.f};
+constexpr float kSogMax[3] = {2.f, 1.f, 0.f};
+
+float sogScaleBook(int i) { return -5.f + 0.02f * float(i); }
+float sogColorBook(int i) { return -2.f + 0.02f * float(i); }
+
+QString sogMetaJson(int count)
+{
+    QJsonArray scaleBook, colorBook;
+    for (int i = 0; i < 256; ++i) {
+        scaleBook.append(double(sogScaleBook(i)));
+        colorBook.append(double(sogColorBook(i)));
+    }
+    QJsonObject means{{"mins", QJsonArray{kSogMin[0], kSogMin[1], kSogMin[2]}},
+                      {"maxs", QJsonArray{kSogMax[0], kSogMax[1], kSogMax[2]}},
+                      {"files", QJsonArray{"means_l.webp", "means_u.webp"}}};
+    QJsonObject root{{"version", 2},
+                     {"count", count},
+                     {"means", means},
+                     {"scales", QJsonObject{{"codebook", scaleBook}, {"files", QJsonArray{"scales.webp"}}}},
+                     {"quats", QJsonObject{{"files", QJsonArray{"quats.webp"}}}},
+                     {"sh0", QJsonObject{{"codebook", colorBook}, {"files", QJsonArray{"sh0.webp"}}}}};
+    return QString::fromUtf8(QJsonDocument(root).toJson());
+}
+
+// Writes the five SOG images (lossless) and meta.json into `dir`; returns file name → bytes.
+QMap<QString, QByteArray> writeSogSet(const std::vector<SogSplat> &splats, int width)
+{
+    const int n = int(splats.size());
+    // Qt's WebP plugin fails to decode some one-row images, so keep at least two rows.
+    const int height = std::max(2, (n + width - 1) / width);
+    QImage ml(width, height, QImage::Format_RGBA8888), mu = ml, qi = ml, si = ml, ci = ml;
+    for (QImage *img : {&ml, &mu, &qi, &si, &ci})
+        img->fill(QColor(0, 0, 0, 255));
+    for (int i = 0; i < n; ++i) {
+        const SogSplat &s = splats[size_t(i)];
+        const int x = i % width, y = i / width;
+        uint8_t *l = ml.scanLine(y) + x * 4, *u = mu.scanLine(y) + x * 4;
+        for (int c = 0; c < 3; ++c) {
+            const double nv = (s.pos[c] < 0 ? -1.0 : 1.0) * std::log1p(std::fabs(double(s.pos[c])));
+            const int q = int(std::lround((nv - kSogMin[c]) / (kSogMax[c] - kSogMin[c]) * 65535.0));
+            l[c] = uint8_t(q & 255);
+            u[c] = uint8_t(q >> 8);
+        }
+        int mode = 0;
+        for (int c = 1; c < 4; ++c)
+            if (std::fabs(s.quat[c]) > std::fabs(s.quat[mode]))
+                mode = c;
+        const float sign = s.quat[mode] < 0 ? -1.f : 1.f;
+        uint8_t *q = qi.scanLine(y) + x * 4;
+        int k = 0;
+        for (int c = 0; c < 4; ++c) {
+            if (c == mode)
+                continue;
+            q[k++] = uint8_t(std::lround((sign * s.quat[c] * 0.70710678f + 0.5f) * 255.f));
+        }
+        q[3] = uint8_t(252 + mode);
+        uint8_t *sc = si.scanLine(y) + x * 4, *co = ci.scanLine(y) + x * 4;
+        for (int c = 0; c < 3; ++c) {
+            sc[c] = s.scaleIdx[c];
+            co[c] = s.colorIdx[c];
+        }
+        co[3] = s.opacity;
+    }
+    QMap<QString, QByteArray> files;
+    files.insert("meta.json", sogMetaJson(n).toUtf8());
+    const std::pair<const char *, const QImage *> imgs[] = {
+        {"means_l.webp", &ml}, {"means_u.webp", &mu}, {"quats.webp", &qi}, {"scales.webp", &si}, {"sh0.webp", &ci}};
+    for (const auto &[name, img] : imgs) {
+        QByteArray bytes;
+        QBuffer buf(&bytes);
+        buf.open(QIODevice::WriteOnly);
+        img->save(&buf, "webp", 100);
+        files.insert(QLatin1String(name), bytes);
+    }
+    return files;
+}
+
+void writeFiles(const QString &dir, const QMap<QString, QByteArray> &files)
+{
+    for (auto it = files.begin(); it != files.end(); ++it) {
+        const QString path = QDir(dir).filePath(it.key());
+        QDir().mkpath(QFileInfo(path).absolutePath());
+        QFile f(path);
+        QVERIFY(f.open(QIODevice::WriteOnly));
+        f.write(it.value());
+    }
+}
+
+bool zipFiles(const QString &path, const QMap<QString, QByteArray> &files)
+{
+    QList<QPair<QString, QByteArray>> entries;
+    for (auto it = files.begin(); it != files.end(); ++it)
+        entries.append({it.key(), it.value()});
+    return writeStoredZip(path, entries);
+}
+
+std::vector<SogSplat> sogFixture()
+{
+    // Unit quaternions whose largest component is w, x, y and z in turn, one with a negative
+    // largest component; the last splat has opacity 3 so premultiplication would crush its colour.
+    auto norm = [](float w, float x, float y, float z) {
+        const float l = std::sqrt(w * w + x * x + y * y + z * z);
+        return std::array<float, 4>{w / l, x / l, y / l, z / l};
+    };
+    std::vector<SogSplat> v;
+    const auto q0 = norm(0.9f, 0.1f, -0.2f, 0.3f), q1 = norm(0.2f, -0.8f, 0.3f, 0.1f),
+               q2 = norm(0.1f, 0.2f, 0.9f, -0.3f), q3 = norm(-0.1f, 0.3f, 0.2f, -0.7f);
+    v.push_back({{0.5f, -0.25f, 0.f}, {q0[0], q0[1], q0[2], q0[3]}, {10, 20, 30}, {200, 100, 50}, 255});
+    v.push_back({{-0.5f, 0.75f, -1.f}, {q1[0], q1[1], q1[2], q1[3]}, {40, 50, 60}, {0, 255, 128}, 128});
+    v.push_back({{1.f, 0.f, -0.5f}, {q2[0], q2[1], q2[2], q2[3]}, {70, 80, 90}, {250, 250, 250}, 1});
+    v.push_back({{0.f, -0.5f, -0.1f}, {q3[0], q3[1], q3[2], q3[3]}, {100, 110, 120}, {255, 5, 190}, 3});
+    return v;
+}
+
+void verifySogFixture(const drift::SplatData &d, const std::vector<SogSplat> &exp, size_t first = 0)
+{
+    QVERIFY2(d.error.isEmpty(), qPrintable(d.error));
+    QCOMPARE(size_t(d.count), exp.size() + first);
+    for (size_t i = 0; i < exp.size(); ++i) {
+        const SogSplat &e = exp[i];
+        const size_t o = i + first;
+        for (int c = 0; c < 3; ++c) {
+            const float pos = c == 2 ? e.pos[c] : -e.pos[c]; // turned 180 degrees about z
+            QVERIFY(std::fabs(d.positions[o * 3 + size_t(c)] - pos) < 2e-3f);
+            QVERIFY(std::fabs(d.scales[o * 3 + size_t(c)] - std::exp(sogScaleBook(e.scaleIdx[c]))) < 1e-6f);
+            const float col = 0.5f + sogColorBook(e.colorIdx[c]) * 0.28209479f;
+            QVERIFY(std::abs(int(d.colors[o * 4 + size_t(c)]) - int(std::lround(std::clamp(col, 0.f, 1.f) * 255.f))) <= 1);
+        }
+        QCOMPARE(d.colors[o * 4 + 3], e.opacity);
+        // q and -q are the same rotation.
+        const float turned[4] = {-e.quat[3], -e.quat[2], e.quat[1], e.quat[0]};
+        float dot = 0.f, len = 0.f;
+        for (int c = 0; c < 4; ++c) {
+            dot += d.rotations[o * 4 + size_t(c)] * turned[c];
+            len += d.rotations[o * 4 + size_t(c)] * d.rotations[o * 4 + size_t(c)];
+        }
+        QVERIFY(std::fabs(std::fabs(dot) - 1.f) < 0.01f);
+        QVERIFY(std::fabs(len - 1.f) < 0.01f);
+    }
+}
+
+} // namespace
+
+void EngineTest::splatPlyLoads()
+{
+    QTemporaryDir tmp;
+    QVERIFY(tmp.isValid());
+    const QString path = tmp.filePath("a.ply");
+    QFile f(path);
+    QVERIFY(f.open(QIODevice::WriteOnly));
+    f.write("ply\nformat binary_little_endian 1.0\ncomment x\nelement vertex 3\n"
+            "property float x\nproperty float y\nproperty float z\n"
+            "property float nx\nproperty float ny\nproperty float nz\n"
+            "property float f_dc_0\nproperty float f_dc_1\nproperty float f_dc_2\n"
+            "property float f_rest_0\nproperty uchar pad\n"
+            "property float opacity\nproperty float scale_0\nproperty float scale_1\nproperty float scale_2\n"
+            "property float rot_0\nproperty float rot_1\nproperty float rot_2\nproperty float rot_3\n"
+            "end_header\n");
+    const float rows[3][19] = {
+        {1, 2, 3, 0, 0, 1, 0.f, 1.f, -1.f, 9, 0, 0.f, 0.f, 1.f, 2.f, 2, 0, 0, 0},
+        {-1, 0, 5, 0, 0, 1, 2.f, 0.f, 0.f, 9, 0, 10.f, -1.f, -1.f, -1.f, 0, 0, 3, 4},
+        {0, -4, 1, 0, 0, 1, 0.f, 0.f, 0.f, 9, 0, -10.f, 0.f, 0.f, 0.f, 0, 0, 0, 0},
+    };
+    for (const auto &r : rows) {
+        f.write(reinterpret_cast<const char *>(r), 10 * 4);
+        f.putChar(7);
+        f.write(reinterpret_cast<const char *>(r + 11), 8 * 4);
+    }
+    f.close();
+
+    QVERIFY(drift::isSplatPath(path));
+    const drift::SplatData d = drift::loadSplatAsset(path, 1000);
+    QVERIFY2(d.error.isEmpty(), qPrintable(d.error));
+    QCOMPARE(d.count, 3);
+    QCOMPARE(d.lodLevel, -1);
+    QCOMPARE(d.totalCount, qint64(3));
+    // Turned 180 degrees about z: x and y negate.
+    QCOMPARE(d.positions[0], -1.f);
+    QCOMPARE(d.positions[1], -2.f);
+    QCOMPARE(d.positions[8], 1.f);
+    QCOMPARE(d.colors[0], uint8_t(128));
+    QCOMPARE(d.colors[1], uint8_t(199)); // 0.5 + C0
+    QCOMPARE(d.colors[2], uint8_t(56));  // 0.5 - C0
+    QCOMPARE(d.colors[3], uint8_t(128)); // sigmoid(0) = 0.5
+    QCOMPARE(d.colors[4 + 3], uint8_t(255));
+    QCOMPARE(d.colors[8 + 3], uint8_t(0));
+    QVERIFY(std::fabs(d.scales[0] - 1.f) < 1e-6f);
+    QVERIFY(std::fabs(d.scales[2] - std::exp(2.f)) < 1e-5f);
+    // (w,x,y,z) -> (-z,-y,x,w) after the turn.
+    QVERIFY(std::fabs(d.rotations[3] - 1.f) < 1e-6f); // (2,0,0,0) normalised
+    QVERIFY(std::fabs(d.rotations[4] + 0.8f) < 1e-6f);
+    QVERIFY(std::fabs(d.rotations[4 + 1] + 0.6f) < 1e-6f);
+    QCOMPARE(d.aabbMin, QVector3D(-1.f, -2.f, 1.f));
+    QCOMPARE(d.aabbMax, QVector3D(1.f, 4.f, 5.f));
+}
+
+void EngineTest::splatPlyRejectsBadFiles()
+{
+    QTemporaryDir tmp;
+    QVERIFY(tmp.isValid());
+    auto write = [&](const char *name, const QByteArray &bytes) {
+        QFile f(tmp.filePath(name));
+        f.open(QIODevice::WriteOnly);
+        f.write(bytes);
+        return tmp.filePath(name);
+    };
+    QVERIFY(drift::loadSplatAsset(write("ascii.ply", "ply\nformat ascii 1.0\nelement vertex 1\nproperty float x\nend_header\n1\n"), 0)
+                .error.contains("binary_little_endian"));
+    QVERIFY(drift::loadSplatAsset(write("be.ply", "ply\nformat binary_big_endian 1.0\nelement vertex 1\nproperty float x\nend_header\n"), 0)
+                .error.contains("binary_little_endian"));
+    const drift::SplatData missing = drift::loadSplatAsset(
+        write("mesh.ply", "ply\nformat binary_little_endian 1.0\nelement vertex 1\nproperty float x\nend_header\n\0\0\0\0"), 0);
+    QVERIFY(missing.error.contains("missing property"));
+    QCOMPARE(missing.count, 0);
+    QVERIFY(!drift::isSplatPath(tmp.filePath("mesh.ply")));
+}
+
+void EngineTest::splatSogRoundTrip()
+{
+    QTemporaryDir tmp;
+    QVERIFY(tmp.isValid());
+    const std::vector<SogSplat> splats = sogFixture();
+    const QMap<QString, QByteArray> files = writeSogSet(splats, 2);
+
+    // Bit-exactness guard: a premultiplying decoder would crush the opacity-3 colour.
+    QImage sh0;
+    QVERIFY(sh0.loadFromData(files.value("sh0.webp"), "webp"));
+    sh0 = sh0.convertToFormat(QImage::Format_RGBA8888);
+    QCOMPARE(int(sh0.constScanLine(1)[4 + 0]), 255);
+    QCOMPARE(int(sh0.constScanLine(1)[4 + 3]), 3);
+
+    const QString dir = tmp.filePath("dir");
+    writeFiles(dir, files);
+    QVERIFY(drift::isSplatPath(dir));
+    drift::SplatData d = drift::loadSplatAsset(dir, 0);
+    verifySogFixture(d, splats);
+    QCOMPARE(d.totalCount, qint64(4));
+    QCOMPARE(d.lodLevel, -1);
+    QVERIFY(d.aabbMin.x() <= d.aabbMax.x());
+
+    d = drift::loadSplatAsset(QDir(dir).filePath("meta.json"), 0);
+    verifySogFixture(d, splats);
+
+    // Bundled, with the set in a subdirectory.
+    QMap<QString, QByteArray> nested;
+    for (auto it = files.begin(); it != files.end(); ++it)
+        nested.insert("scene/" + it.key(), it.value());
+    const QString sog = tmp.filePath("a.sog");
+    QVERIFY(zipFiles(sog, nested));
+    QVERIFY(drift::isSplatPath(sog));
+    verifySogFixture(drift::loadSplatAsset(sog, 0), splats);
+    const QString zipPath = tmp.filePath("b.zip");
+    QVERIFY(zipFiles(zipPath, files));
+    QVERIFY(drift::isSplatPath(zipPath));
+    verifySogFixture(drift::loadSplatAsset(zipPath, 0), splats);
+}
+
+void EngineTest::splatSogStreamedPicksLevelByBudget()
+{
+    QTemporaryDir tmp;
+    QVERIFY(tmp.isValid());
+    const std::vector<SogSplat> all = sogFixture();
+    const std::vector<SogSplat> a(all.begin(), all.begin() + 3), b(all.begin() + 3, all.end());
+    QMap<QString, QByteArray> files;
+    for (const auto &[name, set] : {std::pair{"0_0", a}, std::pair{"1_0", b}}) {
+        const QMap<QString, QByteArray> part = writeSogSet(set, 2);
+        for (auto it = part.begin(); it != part.end(); ++it)
+            files.insert(QLatin1String(name) + "/" + it.key(), it.value());
+    }
+    // Level 0 = every splat of both chunks, level 1 = splats 1..2 of chunk 0 and splat 0 of chunk 1.
+    QJsonObject leafA{{"bound", QJsonObject()},
+                      {"lods", QJsonObject{{"0", QJsonObject{{"file", 0}, {"offset", 0}, {"count", 3}}},
+                                           {"1", QJsonObject{{"file", 0}, {"offset", 1}, {"count", 2}}}}}};
+    QJsonObject leafB{{"bound", QJsonObject()},
+                      {"lods", QJsonObject{{"0", QJsonObject{{"file", 1}, {"offset", 0}, {"count", 1}}},
+                                           {"1", QJsonObject{{"file", 1}, {"offset", 0}, {"count", 1}}}}}};
+    QJsonObject root{{"version", 1},
+                     {"count", 7},
+                     {"counts", QJsonArray{4, 3}},
+                     {"lodLevels", 2},
+                     {"filenames", QJsonArray{"0_0/meta.json", "1_0/meta.json"}},
+                     {"tree", QJsonObject{{"bound", QJsonObject()}, {"children", QJsonArray{leafA, leafB}}}}};
+    files.insert("lod-meta.json", QJsonDocument(root).toJson());
+
+    const QString dir = tmp.filePath("dir");
+    writeFiles(dir, files);
+    const QString zipPath = tmp.filePath("s.zip");
+    QVERIFY(zipFiles(zipPath, files));
+    QVERIFY(drift::isSplatPath(dir));
+    QVERIFY(drift::isSplatPath(zipPath));
+
+    for (const QString &src : {dir, zipPath}) {
+        drift::SplatData d = drift::loadSplatAsset(src, 10);
+        QVERIFY2(d.error.isEmpty(), qPrintable(d.error));
+        QCOMPARE(d.lodLevel, 0);
+        QCOMPARE(d.lodLevels, 2);
+        QCOMPARE(d.totalCount, qint64(4));
+        verifySogFixture(d, all);
+
+        d = drift::loadSplatAsset(src, 3);
+        QCOMPARE(d.lodLevel, 1);
+        QCOMPARE(d.totalCount, qint64(3));
+        verifySogFixture(d, std::vector<SogSplat>{all[1], all[2], all[3]});
+
+        d = drift::loadSplatAsset(src, 1);
+        QCOMPARE(d.lodLevel, 1); // nothing fits: coarsest
+    }
+}
+
+void EngineTest::splatRejectsUnrelatedPaths()
+{
+    QTemporaryDir tmp;
+    QVERIFY(tmp.isValid());
+    QVERIFY(zipFiles(tmp.filePath("plain.zip"), {{"readme.txt", "hi"}, {"sub/meta.json", "{}"}}));
+    QVERIFY(!drift::isSplatPath(tmp.filePath("plain.zip")));
+    QVERIFY(!drift::isSplatPath(tmp.path()));
+    QVERIFY(!drift::isSplatPath(tmp.filePath("missing.glb")));
+    writeFiles(tmp.path(), {{"meta.json", "{\"version\":3,\"count\":1}"}});
+    QVERIFY(drift::loadSplatAsset(tmp.path(), 0).error.contains("version"));
+}
+
+void EngineTest::splatSampleLoads()
+{
+    const QString path = qEnvironmentVariable("DRIFT_SPLAT_SAMPLE");
+    if (path.isEmpty())
+        QSKIP("DRIFT_SPLAT_SAMPLE not set");
+    const drift::SplatData d = drift::loadSplatAsset(path, 1300000);
+    QVERIFY2(d.error.isEmpty(), qPrintable(d.error));
+    QCOMPARE(d.lodLevel, 3);
+    QCOMPARE(d.lodLevels, 5);
+    QCOMPARE(d.count, 1249218);
+    QCOMPARE(d.totalCount, qint64(1249218));
+    for (float v : {d.aabbMin.x(), d.aabbMin.y(), d.aabbMin.z(), d.aabbMax.x(), d.aabbMax.y(), d.aabbMax.z()})
+        QVERIFY(std::isfinite(v));
+    qInfo() << "sample aabb" << d.aabbMin << d.aabbMax;
 }
 
 QTEST_MAIN(EngineTest)

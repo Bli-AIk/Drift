@@ -842,10 +842,14 @@ add_library(driftengine STATIC
     src/engine/Face111.cpp
     src/engine/ModelAsset.h
     src/engine/ModelAsset.cpp
+    src/engine/SplatAsset.h
+    src/engine/SplatAsset.cpp
     src/engine/GlFaceSwapRenderer.h
     src/engine/GlFaceSwapRenderer.cpp
     src/engine/GlModelRenderer.h
     src/engine/GlModelRenderer.cpp
+    src/engine/GlSplatRenderer.h
+    src/engine/GlSplatRenderer.cpp
     src/engine/FaceSwapSource.h
     src/engine/FaceSwapSource.cpp
     src/engine/FacePropCatalog.h

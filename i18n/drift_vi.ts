@@ -8698,6 +8698,10 @@
         <translation>3D</translation>
     </message>
     <message>
+        <source>glTF binary (.glb) · Gaussian splats (.sog, .ply, .zip)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>PDF</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9289,10 +9293,6 @@
         <translation>Thay thế mô hình 3D</translation>
     </message>
     <message>
-        <source>glTF binary (*.glb)</source>
-        <translation>glTF binary (*.glb)</translation>
-    </message>
-    <message>
         <source>Could not load the model</source>
         <translation>Không thể tải mô hình</translation>
     </message>
@@ -9315,8 +9315,16 @@
         <translation>Thay thế mô hình…</translation>
     </message>
     <message>
-        <source>Load another .glb; position, length, pose and lighting stay</source>
-        <translation>Tải một .glb khác; vị trí, chiều dài, tư thế và ánh sáng</translation>
+        <source>3D models and Gaussian splats (*.glb *.sog *.ply *.zip meta.json lod-meta.json)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gaussian splat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load another model or splat; position, length, pose and lighting stay</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Playback</source>

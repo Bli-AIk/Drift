@@ -1315,4 +1315,31 @@ GlTarget drawModelClip(GlRuntime &rt, QOpenGLExtraFunctions *gl,
     return result;
 }
 
+GlTarget resolveModelClipScratch(GlRuntime &rt, QOpenGLExtraFunctions *gl, GlTarget &&scratch,
+                                 const QSize &canvasSize, bool supersample)
+{
+    QOpenGLShaderProgram *resolve = rt.builtinProgram(QStringLiteral("model_clip_resolve"),
+                                                      kQuadVertexShader, kModelClipResolveFrag);
+    GlTarget result = resolve ? rt.acquireTarget(canvasSize.width(), canvasSize.height()) : GlTarget{};
+    if (!result.isValid()) {
+        rt.releaseTarget(std::move(scratch));
+        return {};
+    }
+    result.fbo->bind();
+    gl->glViewport(0, 0, canvasSize.width(), canvasSize.height());
+    resolve->bind();
+    resolve->setUniformValue("u_currentTexture", 0);
+    resolve->setUniformValue("u_texel", QVector2D(1.f / float(scratch.width), 1.f / float(scratch.height)));
+    resolve->setUniformValue("u_taps", supersample ? 2.f : 1.f);
+    gl->glActiveTexture(GL_TEXTURE0);
+    gl->glBindTexture(GL_TEXTURE_2D, scratch.texture());
+    gl->glBindVertexArray(rt.vao);
+    gl->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    gl->glBindVertexArray(0);
+    resolve->release();
+    result.fbo->release();
+    rt.releaseTarget(std::move(scratch));
+    return result;
+}
+
 } // namespace drift::gl

@@ -12,6 +12,9 @@
 #include "engine/GlRuntime.h"
 #include "engine/GpuCompositor.h"
 #include "engine/GpuEffectExecutor.h"
+#include "engine/GlSplatRenderer.h"
+#include "engine/ModelClipRenderer.h"
+#include "engine/SplatAsset.h"
 #include "engine/EmojiCatalog.h"
 #include "engine/FontCatalog.h"
 #include "engine/SkiaRuntime.h"
@@ -279,6 +282,7 @@ class SkiaTest : public QObject
 private slots:
     void grContextAttaches();
     void paintToTargetRoundTrip();
+    void splatClipDrawsAtCentre();
     void restoresGlState();
     void rasterizeMatchesGpu();
     void cacheServesStaticPainters();
@@ -334,6 +338,42 @@ void SkiaTest::grContextAttaches()
     gl::runtime().exec([&] { ok = skia::SkiaRuntime::acquire(gl::runtime()) != nullptr; });
     QVERIFY(ok);
     QVERIFY(gl::runtime().skia);
+}
+
+void SkiaTest::splatClipDrawsAtCentre()
+{
+    if (!GpuEffectExecutor::instance().isAvailable())
+        QSKIP("GL unavailable");
+    auto splat = std::make_shared<SplatData>();
+    const float pts[][3] = {{0, 0, 0}, {0.3f, 0.1f, 0.2f}, {-0.3f, -0.1f, -0.2f}, {1, 1, 1}, {-1, -1, -1}};
+    for (const auto &p : pts) {
+        splat->positions.insert(splat->positions.end(), p, p + 3);
+        splat->rotations.insert(splat->rotations.end(), {1.f, 0.f, 0.f, 0.f});
+        splat->scales.insert(splat->scales.end(), {0.15f, 0.15f, 0.15f});
+        splat->colors.insert(splat->colors.end(), {255, 255, 255, 255});
+    }
+    splat->count = 5;
+    splat->fitMin = QVector3D(-1, -1, -1);
+    splat->fitMax = QVector3D(1, 1, 1);
+    // Fitting the box to a 32 px square leaves the outer two splats' 3-sigma reach short of the corners.
+    model3d::ModelDrawRequest request;
+    request.splat = splat;
+    request.rect = QRectF(16, 16, 32, 32);
+    request.canvas = QSizeF(64, 64);
+
+    QImage out;
+    gl::runtime().exec([&] {
+        gl::GlRuntime &rt = gl::runtime();
+        const QMatrix4x4 view = cameraViewProjection(SceneCamera3d(), QSizeF(64, 64));
+        gl::GlTarget target = gl::drawSplatClip(rt, rt.functions(), request, QSize(64, 64), view);
+        QVERIFY(target.isValid());
+        out = readStraight(rt.functions(), target);
+        rt.releaseTarget(std::move(target));
+    });
+    QCOMPARE(out.size(), QSize(64, 64));
+    QVERIFY(qAlpha(out.pixel(32, 32)) > 200);
+    QCOMPARE(qAlpha(out.pixel(1, 1)), 0);
+    QCOMPARE(qAlpha(out.pixel(62, 62)), 0);
 }
 
 void SkiaTest::paintToTargetRoundTrip()

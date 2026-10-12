@@ -8730,6 +8730,10 @@
         <translation>3D</translation>
     </message>
     <message>
+        <source>glTF binary (.glb) · Gaussian splats (.sog, .ply, .zip)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>PDF</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9331,10 +9335,6 @@
         <translation>Reemplazar modelo 3D</translation>
     </message>
     <message>
-        <source>glTF binary (*.glb)</source>
-        <translation>Binario glTF (*.glb)</translation>
-    </message>
-    <message>
         <source>Could not load the model</source>
         <translation>No se pudo cargar el modelo</translation>
     </message>
@@ -9358,8 +9358,16 @@
         <translation>Reemplazar modelo…</translation>
     </message>
     <message>
-        <source>Load another .glb; position, length, pose and lighting stay</source>
-        <translation>Carga otro .glb; la posición, duración, pose e iluminación se mantienen</translation>
+        <source>3D models and Gaussian splats (*.glb *.sog *.ply *.zip meta.json lod-meta.json)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gaussian splat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load another model or splat; position, length, pose and lighting stay</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Playback</source>

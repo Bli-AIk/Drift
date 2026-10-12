@@ -10,6 +10,7 @@
 #include "GlEditorOverlay.h"
 #include "GlModelRenderer.h"
 #include "GlRuntime.h"
+#include "GlSplatRenderer.h"
 #include "GpuDevice.h"
 #include "GpuEffectDefinition.h"
 #include "MaskApplier.h"
@@ -569,7 +570,10 @@ GlTarget buildLayerTarget(GlRuntime &rt, QOpenGLExtraFunctions *gl, const GpuLay
         return {};
 
     GlTarget target;
-    if (layer.model3d) {
+    if (layer.model3d && layer.model3d->splat) {
+        target = drift::gl::drawSplatClip(rt, gl, *layer.model3d, canvasSize,
+                                          layerViewProjection(layer, canvasSize));
+    } else if (layer.model3d) {
         target = drift::gl::drawModelClip(rt, gl, *layer.model3d, canvasSize,
                                           layerViewProjection(layer, canvasSize),
                                           layer.depthOcclude ? modelDepth : nullptr);

@@ -597,8 +597,8 @@
           "Read it to edit a document that has no slots, then send it back with set_lottie_source.",
           objectSchema(clipRefProps()), true, false, true },
 
-        { "add_model3d", "model3d", "Place a 3D model (.glb)",
-          "Add a glTF binary as a model clip on a graphic track, creating one when needed. A model "
+        { "add_model3d", "model3d", "Place a 3D model (.glb) or Gaussian splat",
+          "Add a glTF binary, or a Gaussian splat scene (.sog, a 3DGS .ply, a .zip or folder bundle holding meta.json/lod-meta.json, or that meta.json), as a model clip on a graphic track, creating one when needed. A model "
           "clip is a 3D layer like any other: its rect (x, y, w, h) is the front face of the "
           "model's bounding box, z pushes it in depth, rotationX/rotationY/rotation turn it "
           "(intrinsic, X then Y then the in-plane spin, the same as a tilted clip), and "
@@ -613,8 +613,9 @@
           "clip's position and size but not its rotation. Their numbers are keyframable as "
           "model3d.ambient and model3d.light<n>_<x|y|z|intensity|radius|cone|aimX|aimY>. An animated file plays its first animation at its own length unless "
           "duration is given; loop decides what happens past the end. Returns {id, track, index, "
-          "animations:[{name, durationSec}], vertexCount, warning?, model3d:{…}}.",
-          objectSchema({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute path to a .glb file"))},
+          "animations:[{name, durationSec}], vertexCount, warning?, model3d:{…}}. A splat has no animations or lights "
+          "(those options have no effect) and reports splatCount instead of vertexCount.",
+          objectSchema({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute path to a .glb, .sog, .ply, .zip or meta.json file"))},
                         {QStringLiteral("at"), numberProp(QStringLiteral("Start seconds (default: playhead)"))},
                         {QStringLiteral("track"), integerProp(QStringLiteral("Optional destination graphic track; omitted picks or creates one"))},
                         {QStringLiteral("duration"), numberProp(QStringLiteral("Clip length in seconds (default: the first animation's length, 5 s for a static model)"))},
@@ -631,18 +632,18 @@
                         {QStringLiteral("ambient"), numberProp(QStringLiteral("Ambient light 0..1 (default 0.35)"), 0.0, 1.0)},
                         {QStringLiteral("name"), stringProp(QStringLiteral("Clip name (default: the file name)"))}},
                        {QStringLiteral("path")}) },
-        { "inspect_model3d", "model3d", "Check a .glb before or after placing it",
+        { "inspect_model3d", "model3d", "Check a .glb or splat before or after placing it",
           "Parse a model and report what it carries without touching the timeline: animations:[{name, "
           "durationSec}], vertexCount, primitiveCount, materialCount, textureCount, warning (what "
           "the loader had to skip — Draco compression, extra material textures, …). Give path for a "
           "file, or clip for one already on the timeline (adds its model3d options).",
-          objectSchema(mergeProps({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute .glb path"))}},
+          objectSchema(mergeProps({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute .glb, .sog, .ply, .zip or meta.json path"))}},
                                   clipRefProps())),
           true, false, true },
         { "set_model3d_source", "model3d", "Swap the file under a model clip",
-          "Replace the clip's .glb, keeping its transform, length, lighting and keyframes; the "
+          "Replace the clip's .glb or splat, keeping its transform, length, lighting and keyframes; the "
           "animation index is clamped to the new file. Returns the inspect summary of the new file.",
-          objectSchema(mergeProps({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute .glb path"))}},
+          objectSchema(mergeProps({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute .glb, .sog, .ply, .zip or meta.json path"))}},
                                   clipRefProps()),
                        {QStringLiteral("path")}) },
         { "set_model3d_options", "model3d", "Animation, loop or lighting of a model clip",

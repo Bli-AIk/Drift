@@ -309,6 +309,7 @@ private slots:
     void trackFitAnswersForAKindMatchTheAssetForms();
     void provisionalKindReadsTheExtensionAlone();
     void importFileNameStaysStorable();
+    void splatInputsAreModelPaths();
 };
 
 // A file dragged in from the file manager has no bin row yet, so the timeline's drop preview
@@ -3473,6 +3474,44 @@ bool writeSimpleZipForTest(const QString &outPath, const QList<QPair<QString, QB
     return true;
 }
 } // namespace
+
+// A .sog is a model by name; .ply, .zip and meta.json only when their content says Gaussian splat,
+// so a plain zip or a mesh PLY stays out of the model kind.
+void EditorStateTest::splatInputsAreModelPaths()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    auto write = [&](const char *name, const QByteArray &bytes) {
+        const QString path = dir.filePath(QLatin1String(name));
+        QFile f(path);
+        if (f.open(QIODevice::WriteOnly))
+            f.write(bytes);
+        return path;
+    };
+
+    QVERIFY(AssetLibrary::isModelPath(QStringLiteral("scene.glb")));
+    QVERIFY(AssetLibrary::isModelPath(QStringLiteral("scene.SOG")));
+    QVERIFY(AssetLibrary::isMediaPath(QStringLiteral("scene.sog")));
+    QVERIFY(AssetLibrary::isModelPath(write("splat.ply",
+        "ply\nformat binary_little_endian 1.0\nelement vertex 1\nproperty float x\nproperty float y\n"
+        "property float z\nproperty float f_dc_0\nproperty float f_dc_1\nproperty float f_dc_2\n"
+        "property float opacity\nproperty float scale_0\nproperty float scale_1\nproperty float scale_2\n"
+        "property float rot_0\nproperty float rot_1\nproperty float rot_2\nproperty float rot_3\n"
+        "end_header\n")));
+    QVERIFY(!AssetLibrary::isModelPath(write("mesh.ply",
+        "ply\nformat ascii 1.0\nelement vertex 1\nproperty float x\nproperty float y\n"
+        "property float z\nelement face 0\nproperty list uchar int vertex_indices\nend_header\n")));
+
+    const QString bundle = dir.filePath(QStringLiteral("bundle.zip"));
+    QVERIFY(writeSimpleZipForTest(bundle, {{QStringLiteral("meta.json"), "{}"}}));
+    QVERIFY(AssetLibrary::isModelPath(bundle));
+    QVERIFY(AssetLibrary::isMediaPath(bundle));
+    const QString plain = dir.filePath(QStringLiteral("plain.zip"));
+    QVERIFY(writeSimpleZipForTest(plain, {{QStringLiteral("readme.txt"), "hi"}}));
+    QVERIFY(!AssetLibrary::isModelPath(plain));
+    QVERIFY(!AssetLibrary::isMediaPath(plain));
+    QVERIFY(!AssetLibrary::isModelPath(QStringLiteral("missing.zip")));
+}
 
 void EditorStateTest::mogrtImportIntoExistingProject()
 {

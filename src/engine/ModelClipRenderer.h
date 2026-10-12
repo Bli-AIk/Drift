@@ -14,6 +14,7 @@
 
 namespace drift {
 struct ModelAsset;
+struct SplatData;
 struct ModelPose;
 }
 
@@ -37,6 +38,9 @@ struct ModelDrawRequest
 {
     QString path;
     std::shared_ptr<const ModelAsset> asset;
+    // A Gaussian splat scene instead of a mesh: exactly one of asset and splat is set. It has no
+    // animation or lights, so pose and params stay at their defaults.
+    std::shared_ptr<const SplatData> splat;
     std::shared_ptr<const ModelPose> pose; // null → static (baked) draw
     ModelClipParams params;
     QRectF rect;
@@ -44,6 +48,10 @@ struct ModelDrawRequest
     ClipPose3d pose3d;
     QSizeF canvas;
 };
+
+// The splat scene at `path` through the renderer's cache, so the import probe and the first frame
+// parse it once. Null on failure, with the reason in *error.
+std::shared_ptr<const SplatData> loadSplatSceneCached(const QString &path, QString *error = nullptr);
 
 // Null when nothing should be drawn: an unloadable file, or Hide outside the animation.
 std::shared_ptr<const ModelDrawRequest> makeDrawRequest(const RenderRequest &request);

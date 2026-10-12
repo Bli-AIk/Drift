@@ -8730,6 +8730,10 @@
         <translation>3D</translation>
     </message>
     <message>
+        <source>glTF binary (.glb) · Gaussian splats (.sog, .ply, .zip)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>PDF</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9331,10 +9335,6 @@
         <translation>3D ආකෘතිය ප්‍රතිස්ථාපනය කරන්න</translation>
     </message>
     <message>
-        <source>glTF binary (*.glb)</source>
-        <translation>glTF ද්වීමය (*.glb)</translation>
-    </message>
-    <message>
         <source>Could not load the model</source>
         <translation>ආකෘතිය පූරණය කිරීමට නොහැකි විය</translation>
     </message>
@@ -9358,8 +9358,16 @@
         <translation>ආකෘතිය ප්‍රතිස්ථාපනය කරන්න…</translation>
     </message>
     <message>
-        <source>Load another .glb; position, length, pose and lighting stay</source>
-        <translation>වෙනත් .glb ගොනුවක් පූරණය කරන්න; පිහිටීම, දිග, ඉරියව්ව සහ ආලෝකකරණය නොවෙනස්ව පවතී</translation>
+        <source>3D models and Gaussian splats (*.glb *.sog *.ply *.zip meta.json lod-meta.json)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gaussian splat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load another model or splat; position, length, pose and lighting stay</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Playback</source>

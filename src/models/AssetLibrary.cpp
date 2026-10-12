@@ -6,6 +6,8 @@
 #include "engine/MediaProbe.h"
 #include "engine/MediaThumbnail.h"
 #include "engine/ModelAsset.h"
+#include "engine/ModelClipRenderer.h"
+#include "engine/SplatAsset.h"
 #include "engine/PdfClipRenderer.h"
 #include "engine/PreviewProxyRenderer.h"
 #include "engine/AndroidUri.h"
@@ -482,8 +484,25 @@ std::optional<drift::MediaAsset> buildPdfAsset(const QString &absolutePath, cons
 }
 
 // A glTF binary: parsed by the model loader. No thumbnail — the bin shows a placeholder icon.
+// A Gaussian splat is loaded through the renderer's cache instead, which validates it and leaves
+// it warm for the clip that is added next.
 std::optional<drift::MediaAsset> buildModelAsset(const QString &absolutePath, const QString &name)
 {
+    if (drift::isSplatPath(absolutePath)) {
+        QString error;
+        if (!drift::model3d::loadSplatSceneCached(absolutePath, &error)) {
+            qWarning("import: %s is not a usable Gaussian splat: %s", qPrintable(absolutePath),
+                     qPrintable(error));
+            return std::nullopt;
+        }
+        drift::MediaAsset asset;
+        asset.name = name;
+        asset.path = absolutePath;
+        asset.kind = drift::MediaKind::Model3d;
+        asset.hasAudio = false;
+        asset.hasAudioKnown = true;
+        return asset;
+    }
     const auto model = drift::loadModelAssetCached(absolutePath);
     if (!model) {
         qWarning("import: %s is not a usable glTF binary: %s", qPrintable(absolutePath),
@@ -590,11 +609,20 @@ bool AssetLibrary::isPdfPath(const QString &path)
     return QFileInfo(path).suffix().toLower() == QLatin1String("pdf");
 }
 
-// Only the binary container: a .gltf references sidecar .bin/texture files that bundling and
-// relink would not carry along.
+// A .glb, or a Gaussian splat input. For a .glb only the binary container counts: a .gltf
+// references sidecar .bin/texture files that bundling and relink would not carry along. A .sog is
+// claimed by its suffix; a .ply, .zip or meta.json only when the file exists and its content says
+// splat, so plain zips and mesh PLYs stay out. Folders are not importable as splats.
 bool AssetLibrary::isModelPath(const QString &path)
 {
-    return QFileInfo(path).suffix().toLower() == QLatin1String("glb");
+    const QFileInfo info(path);
+    const QString suffix = info.suffix().toLower();
+    if (suffix == QLatin1String("glb") || suffix == QLatin1String("sog"))
+        return true;
+    const QString name = info.fileName().toLower();
+    const bool candidate = suffix == QLatin1String("ply") || suffix == QLatin1String("zip")
+                           || name == QLatin1String("meta.json") || name == QLatin1String("lod-meta.json");
+    return candidate && info.isFile() && drift::isSplatPath(path);
 }
 
 bool AssetLibrary::isMediaPath(const QString &path)
@@ -668,6 +696,9 @@ QString AssetLibrary::mediaNameFilter() const
         globs.append(QStringLiteral("*.json"));
         globs.append(QStringLiteral("*.lottie"));
         globs.append(QStringLiteral("*.glb"));
+        globs.append(QStringLiteral("*.sog"));
+        globs.append(QStringLiteral("*.ply"));
+        globs.append(QStringLiteral("*.zip"));
         globs.append(QStringLiteral("*.pdf"));
         return globs.join(QLatin1Char(' '));
     }();
