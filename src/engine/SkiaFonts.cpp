@@ -17,6 +17,8 @@
 // macOS included, where it finds no font config files and lists nothing.
 #elif defined(SK_FONTMGR_CORETEXT_AVAILABLE)
 #include "include/ports/SkFontMgr_mac_ct.h"
+#elif defined(SK_FONTMGR_DIRECTWRITE_AVAILABLE)
+#include "include/ports/SkTypeface_win.h"
 #elif defined(SK_FONTMGR_ANDROID_AVAILABLE)
 #include "include/ports/SkFontMgr_android.h"
 #include "include/ports/SkFontScanner_FreeType.h"
@@ -35,7 +37,8 @@ namespace drift::skia {
 namespace {
 
 #if !defined(SK_FONTMGR_FONTCONFIG_AVAILABLE) && !defined(SK_FONTMGR_ANDROID_AVAILABLE) \
-    && !defined(SK_FONTMGR_CORETEXT_AVAILABLE) && defined(SK_FONTMGR_FREETYPE_DIRECTORY_AVAILABLE)
+    && !defined(SK_FONTMGR_CORETEXT_AVAILABLE) && !defined(SK_FONTMGR_DIRECTWRITE_AVAILABLE) \
+    && defined(SK_FONTMGR_FREETYPE_DIRECTORY_AVAILABLE)
 
 // Builds without a platform font port (no fontconfig, CoreText or DirectWrite in the Skia
 // archive) scan the standard font folders instead. The directory manager takes one folder, and
@@ -220,13 +223,16 @@ sk_sp<SkFontMgr> systemFontMgr()
         mgr = SkFontMgr_New_FontConfig(nullptr, SkFontScanner_Make_FreeType());
 #elif defined(SK_FONTMGR_CORETEXT_AVAILABLE)
         mgr = SkFontMgr_New_CoreText(nullptr);
+#elif defined(SK_FONTMGR_DIRECTWRITE_AVAILABLE)
+        mgr = SkFontMgr_New_DirectWrite();
 #elif defined(SK_FONTMGR_ANDROID_AVAILABLE)
         mgr = SkFontMgr_New_Android(nullptr, SkFontScanner_Make_FreeType());
 #elif defined(SK_FONTMGR_FREETYPE_DIRECTORY_AVAILABLE)
         mgr = makeDirectoryMgr();
 #endif
 #if defined(SK_FONTMGR_FREETYPE_EMPTY_AVAILABLE) && !defined(SK_FONTMGR_FONTCONFIG_AVAILABLE) \
-    && !defined(SK_FONTMGR_ANDROID_AVAILABLE) && !defined(SK_FONTMGR_CORETEXT_AVAILABLE)
+    && !defined(SK_FONTMGR_ANDROID_AVAILABLE) && !defined(SK_FONTMGR_CORETEXT_AVAILABLE) \
+    && !defined(SK_FONTMGR_DIRECTWRITE_AVAILABLE)
         if (!mgr)
             mgr = SkFontMgr_New_Custom_Empty();
 #endif

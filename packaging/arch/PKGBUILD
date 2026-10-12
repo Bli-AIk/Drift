@@ -65,7 +65,9 @@ build() {
 
 check() {
     cd "$pkgname"
-    QT_QPA_PLATFORM=xcb xvfb-run -a -s "-screen 0 1280x1024x24" ctest --test-dir build --output-on-failure
+    # The junit report, with passing output kept, is what CI reads the SKIP lines from.
+    QT_QPA_PLATFORM=xcb xvfb-run -a -s "-screen 0 1280x1024x24" ctest --test-dir build --output-on-failure \
+        --output-junit ctest-junit.xml --test-output-size-passed 20000000 --test-output-size-failed 20000000
 }
 
 package() {
