@@ -5289,6 +5289,8 @@ void EngineTest::previewProxyKeepsSourceTiming()
 
 void EngineTest::proxyNamingLearnsAndMatchesRules()
 {
+    // Expected paths go through QFileInfo because the sources resolve onto the current drive on
+    // Windows.
     using namespace drift;
     const QString src = QStringLiteral("/media/shoot/clip01.MP4");
 
@@ -5296,7 +5298,7 @@ void EngineTest::proxyNamingLearnsAndMatchesRules()
     QVERIFY(suffixRule);
     QCOMPARE(proxyRuleToString(*suffixRule), QStringLiteral("*_proxy"));
     QCOMPARE(proxyCandidatePath(*suffixRule, QStringLiteral("/media/shoot/other.MP4")),
-             QStringLiteral("/media/shoot/other_proxy.MP4"));
+             QFileInfo(QStringLiteral("/media/shoot/other_proxy.MP4")).absoluteFilePath());
 
     const auto prefixRule = learnProxyRule(src, QStringLiteral("/media/shoot/PRX_clip01.MP4"));
     QVERIFY(prefixRule);
@@ -5306,13 +5308,13 @@ void EngineTest::proxyNamingLearnsAndMatchesRules()
     QVERIFY(subdirRule);
     QCOMPARE(proxyRuleToString(*subdirRule), QStringLiteral("Proxy/*_proxy"));
     QCOMPARE(proxyCandidatePath(*subdirRule, QStringLiteral("/media/shoot/b.MP4")),
-             QStringLiteral("/media/shoot/Proxy/b_proxy.MP4"));
+             QFileInfo(QStringLiteral("/media/shoot/Proxy/b_proxy.MP4")).absoluteFilePath());
 
     const auto extRule = learnProxyRule(src, QStringLiteral("/media/shoot/Proxy/clip01_proxy.mov"));
     QVERIFY(extRule);
     QCOMPARE(proxyRuleToString(*extRule), QStringLiteral("Proxy/*_proxy.mov"));
     QCOMPARE(proxyCandidatePath(*extRule, QStringLiteral("/media/shoot/b.MP4")),
-             QStringLiteral("/media/shoot/Proxy/b_proxy.mov"));
+             QFileInfo(QStringLiteral("/media/shoot/Proxy/b_proxy.mov")).absoluteFilePath());
 
     // Same stem, different extension only is still a rule; the identical path is not.
     QVERIFY(learnProxyRule(src, QStringLiteral("/media/shoot/clip01.mov")));
@@ -5331,7 +5333,8 @@ void EngineTest::proxyNamingLearnsAndMatchesRules()
     QVERIFY(!proxyRuleFromString(QStringLiteral("*_*")));
     QVERIFY(!proxyRuleFromString(QStringLiteral("../*_proxy")));
 
-    QCOMPARE(generatedProxyPath(src, 720), QStringLiteral("/media/shoot/clip01_proxy_720.mp4"));
+    QCOMPARE(generatedProxyPath(src, 720),
+             QFileInfo(QStringLiteral("/media/shoot/clip01_proxy_720.mp4")).absoluteFilePath());
     QCOMPARE(defaultProxyNamePatterns().size(), 3);
 }
 
@@ -5373,7 +5376,7 @@ void EngineTest::reversedSidecarNamesRoundTrip()
 
     // Rounded outward to whole milliseconds.
     const QString path = reversedSidecarPath(src, 1'500'400, 4'000'100);
-    QCOMPARE(path, QStringLiteral("/media/shoot/we[ir]d*.clip01_reversed_1500-4001.mp4"));
+    QCOMPARE(path, QFileInfo(QStringLiteral("/media/shoot/we[ir]d*.clip01_reversed_1500-4001.mp4")).absoluteFilePath());
     const auto range = parseReversedSidecarName(src, QFileInfo(path).fileName());
     QVERIFY(range);
     QCOMPARE(range->inUs, TimeUs(1'500'000));

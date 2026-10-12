@@ -29,6 +29,8 @@
 #include <QAbstractItemModel>
 #include <zlib.h>
 
+#include <filesystem>
+
 #include "playback/CompositorService.h"
 #include "engine/HwAccel.h"
 #include "engine/MediaEditor.h"
@@ -2229,9 +2231,6 @@ void EditorStateTest::importFolderMovesAlreadyImportedMediaIntoMirroredFolder()
 
 void EditorStateTest::importFolderSkipsSymlinkCycles()
 {
-#ifdef Q_OS_WIN
-    QSKIP("Symlink creation needs elevated privileges on Windows");
-#endif
     AssetLibrary library;
     AppController state(&library);
 
@@ -2243,8 +2242,13 @@ void EditorStateTest::importFolderSkipsSymlinkCycles()
     // SubA/loop -> the temp dir itself, so recursing into it would walk back into root forever
     // without a visited-set guard.
     const QString linkPath = root.filePath(QStringLiteral("SubA/loop"));
-    if (!QFile::link(tempDir.path(), linkPath))
-        QSKIP("This filesystem does not support symlinks");
+    // QFile::link makes a .lnk shortcut on Windows, which the importer does not follow.
+    std::error_code ec;
+    std::filesystem::create_directory_symlink(std::filesystem::path(tempDir.path().toStdWString()),
+                                              std::filesystem::path(linkPath.toStdWString()), ec);
+    if (ec)
+        QSKIP(qPrintable(QStringLiteral("Cannot create a directory symlink here: %1")
+                             .arg(QString::fromStdString(ec.message()))));
 
     // Hangs (or stack-overflows) here if the visited-set guard regresses — there is no bound on
     // the recursion otherwise, since the symlink always resolves back to an already-mirrored
@@ -3195,6 +3199,9 @@ void EditorStateTest::stabilizeRendersRangeIntoBinAndSwapsClip()
     const QString ffmpeg = QStandardPaths::findExecutable(QStringLiteral("ffmpeg"));
     if (ffmpeg.isEmpty())
         QSKIP("ffmpeg not on PATH");
+    // Without it the playback engine's "preview needs OpenGL 3.3" error overwrites lastMessage.
+    if (!GpuCompositor::isAvailable())
+        QSKIP("OpenGL offscreen context unavailable");
     QStandardPaths::setTestModeEnabled(true);
     const auto restore = qScopeGuard([] { QStandardPaths::setTestModeEnabled(false); });
 
@@ -7168,6 +7175,18 @@ void EditorStateTest::proxyGenerationFallsBackToCacheWhenFolderIsReadOnly()
     const auto restorePermissions =
         qScopeGuard([&] { QFile::setPermissions(dir.path(), original); });
     QVERIFY(QFile::setPermissions(dir.path(), QFileDevice::ReadOwner | QFileDevice::ExeOwner));
+#ifdef Q_OS_WIN
+    // A read-only attribute does not stop new files in a directory on Windows; a deny ACE does,
+    // for administrators too.
+    const QString aclTarget = QDir::toNativeSeparators(dir.path());
+    QCOMPARE(QProcess::execute(QStringLiteral("icacls"),
+                               {aclTarget, QStringLiteral("/deny"), QStringLiteral("*S-1-1-0:(W)")}),
+             0);
+    const auto restoreAcl = qScopeGuard([&] {
+        QProcess::execute(QStringLiteral("icacls"),
+                          {aclTarget, QStringLiteral("/remove:d"), QStringLiteral("*S-1-1-0")});
+    });
+#endif
     {
         QFile probe(dir.filePath(QStringLiteral("probe")));
         if (probe.open(QIODevice::WriteOnly))
@@ -7243,6 +7262,18 @@ void EditorStateTest::reverseRenderFallsBackToCacheWhenFolderIsReadOnly()
     const auto restorePermissions =
         qScopeGuard([&] { QFile::setPermissions(dir.path(), original); });
     QVERIFY(QFile::setPermissions(dir.path(), QFileDevice::ReadOwner | QFileDevice::ExeOwner));
+#ifdef Q_OS_WIN
+    // A read-only attribute does not stop new files in a directory on Windows; a deny ACE does,
+    // for administrators too.
+    const QString aclTarget = QDir::toNativeSeparators(dir.path());
+    QCOMPARE(QProcess::execute(QStringLiteral("icacls"),
+                               {aclTarget, QStringLiteral("/deny"), QStringLiteral("*S-1-1-0:(W)")}),
+             0);
+    const auto restoreAcl = qScopeGuard([&] {
+        QProcess::execute(QStringLiteral("icacls"),
+                          {aclTarget, QStringLiteral("/remove:d"), QStringLiteral("*S-1-1-0")});
+    });
+#endif
     {
         QFile probe(dir.filePath(QStringLiteral("probe")));
         if (probe.open(QIODevice::WriteOnly))

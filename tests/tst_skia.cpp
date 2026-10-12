@@ -1706,10 +1706,10 @@ void SkiaTest::userFontImportResolvesAndRemoves()
 
 void SkiaTest::systemFontFamiliesAreListed()
 {
-#ifdef Q_OS_LINUX
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_WASM)
     QVERIFY(!systemFontFamilies().isEmpty());
 #else
-    QSKIP("system font list is only asserted on Linux");
+    QSKIP("system font list is only asserted on desktop");
 #endif
 }
 
