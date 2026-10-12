@@ -87,6 +87,7 @@ private slots:
     void compositeClipGetsAPreviewBox();
     void cameraMovesThePreviewOverlayWithThePicture();
     void cameraGizmoMovesAndTurnsTheEye();
+    void undoRestoresEditsMadeThroughEarlierPointers();
     void compositeClipSpeedRetimesToFit();
     void importedMediaIsCentredAndResetsToItsFit();
     void transformTogetherWrapsTheSelection();
@@ -1040,6 +1041,32 @@ void EditorStateTest::compositeClipGetsAPreviewBox()
             found = true;
     }
     QVERIFY(found);
+}
+
+void EditorStateTest::undoRestoresEditsMadeThroughEarlierPointers()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Hold me"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString prop = QStringLiteral("opacity");
+    state.setClipKeyframe(track, clip, prop, 0.0, 0.0);
+    state.setClipKeyframe(track, clip, prop, 2.0, 1.0);
+
+    // setKeyframeHold resolves its key pointer before taking the undo snapshot. TrackList keeps
+    // clip buffers private to each copy, but a clip's keyframe map is still shared between them.
+    state.setKeyframeHold(track, clip, prop, 0.0, true);
+    QVERIFY(state.clipKeyframes(track, clip, prop).first().toMap().value(QStringLiteral("hold")).toBool());
+    state.undo();
+    QVERIFY(!state.clipKeyframes(track, clip, prop).first().toMap().value(QStringLiteral("hold")).toBool());
+
+    // Bookmarks are a plain QList, so they have the same hazard one level higher.
+    state.addBookmark(1.0, QStringLiteral("A"));
+    state.updateBookmark(0, 2.0, QStringLiteral("B"));
+    QCOMPARE(state.project()->bookmarks().at(0).label, QStringLiteral("B"));
+    state.undo();
+    QCOMPARE(state.project()->bookmarks().at(0).label, QStringLiteral("A"));
 }
 
 void EditorStateTest::compositeClipSpeedRetimesToFit()

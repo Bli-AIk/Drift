@@ -15825,11 +15825,13 @@ void AppController::setKeyframeTangents(int trackIndex, int clipIndex, const QSt
                                         double atSeconds, double inDx, double inDy, double outDx,
                                         double outDy, bool corner)
 {
+    // Snapshot first: the key pointer points into the keyframe map, which TrackList's copy does
+    // not detach, so a snapshot taken after it would share the map and record the edit as "before".
+    const drift::Project before = m_project;
     drift::Keyframe<double> *key = keyframeAt(trackIndex, clipIndex, prop, atSeconds);
     if (!key)
         return;
 
-    const drift::Project before = m_project;
     applyTangents(*key, inDx, inDy, outDx, outDy, corner);
     syncLinkedTangents(trackIndex, clipIndex, prop, atSeconds, inDx, inDy, outDx, outDy, corner);
     pushProjectEdit(before, tr("Keyframe curve changed"));
@@ -15854,11 +15856,12 @@ void AppController::previewSetKeyframeTangents(int trackIndex, int clipIndex, co
 void AppController::setKeyframeHold(int trackIndex, int clipIndex, const QString &prop,
                                     double atSeconds, bool hold)
 {
+    // Snapshot before resolving the key, for the same reason as setKeyframeTangents.
+    const drift::Project before = m_project;
     drift::Keyframe<double> *key = keyframeAt(trackIndex, clipIndex, prop, atSeconds);
     if (!key || key->hold == hold)
         return;
 
-    const drift::Project before = m_project;
     key->hold = hold;
     if (m_positionLinked && (prop == QLatin1String("x") || prop == QLatin1String("y"))) {
         const QString otherProp = (prop == QLatin1String("x")) ? QStringLiteral("y") : QStringLiteral("x");
@@ -18838,11 +18841,13 @@ void AppController::updateBookmark(int index, double seconds, const QString &lab
 
     const drift::TimeUs timeUs = qMax<drift::TimeUs>(0, drift::secondsToUs(seconds));
     const QString resolvedLabel = label.isEmpty() ? QStringLiteral("Bookmark") : label;
+    // Snapshot before binding the reference: bookmarks are a plain QList, so a later copy would
+    // share the buffer the reference writes into.
+    const drift::Project before = m_project;
     drift::Bookmark &bookmark = m_project.bookmarks()[index];
     if (bookmark.timeUs == timeUs && bookmark.label == resolvedLabel)
         return;
 
-    const drift::Project before = m_project;
     bookmark.timeUs = timeUs;
     bookmark.label = resolvedLabel;
     pushProjectEdit(before, tr("Edit bookmark"));
