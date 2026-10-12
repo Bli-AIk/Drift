@@ -13,6 +13,7 @@ Tracks work done on `main` **since the last public release**. Use this to see wh
 
 ## ✨ Added
 
+- **Outline effect.** Sticker outlines, borders and strokes around images, video, cutouts and text, without resizing anything: the content shrinks to make room. Inside, centred or outside strokes, a second outline, dashes, gradients and rainbow fills, round, square or bevelled corners, a hand-drawn wobble, drop and inner shadows, outer and inner glows, and torn paper, burnt, stamp, pinking, scalloped, tape, wavy and rough edges for either side of the border.
 - **Audio effects made of pedals.** An audio effect can now be a whole pedalboard: filters, a ladder filter, drive, reverb, convolution reverb, delay, pan and gain, alongside the original effects, run in series or side by side in parallel and frequency-band splits. Build them in Drift Forge and import the `.driftfx`.
 - **Modulation for audio effects.** LFOs, envelope followers and step sequencers can move any pedal's knobs over time, in step with the clip, so a wobble lands in the same place after you seek.
 - **Convolution reverb.** Put a sound in a real space using an impulse response shipped with the effect: Forge has a room, a plate, a hall and a spring tank, or record your own.
