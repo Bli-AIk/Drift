@@ -1957,6 +1957,7 @@ protected:
     bool m_exportRequestedByAgent = false;
     double m_exportProgress = 0.0;
     QAtomicInt m_exportCancel = 0;
+    QFuture<void> m_exportFuture;
     QUrl m_lastExportUrl;
     QString m_lastExportName;
     // Android: the publish-to-gallery copy behind Share is on a worker, so canShareExport reports

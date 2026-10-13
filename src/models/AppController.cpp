@@ -689,6 +689,11 @@ AppController::~AppController()
     waitForMulticamRefresh();
     if (hadMulticamSession)
         m_playback.setProject(&m_project);
+    // The export worker captures `this` too; cancel it and let it unwind before teardown.
+    if (m_exportFuture.isRunning()) {
+        m_exportCancel.storeRelaxed(1);
+        m_exportFuture.waitForFinished();
+    }
 
     // Stop the agent server before the undo stack is cut loose below. McpController is
     // a child, so without this it would only be destroyed after the members a late
@@ -21024,7 +21029,7 @@ void AppController::exportWithSettings(const QUrl &outputUrl, const QVariantMap 
 
     const bool disposable = writeTargetIsDisposable(outputUrl);
 
-    (void)QtConcurrent::run([this, snapshot, exportSettings, outputPath, outputUrl, disposable]() {
+    m_exportFuture = QtConcurrent::run([this, snapshot, exportSettings, outputPath, outputUrl, disposable]() {
         // Spans the encode *and* the copy into the user's document. Exporter::run takes its own
         // hold, but that one ends when run() returns — and the commit below is the phase that
         // would otherwise lose a multi-minute render to a screen that idled out mid-copy. The
