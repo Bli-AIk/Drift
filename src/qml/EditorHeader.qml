@@ -236,6 +236,10 @@ Rectangle {
             if (EditorState.exportInProgress) {
                 root.exportProgressDismissed = false
                 exportProgressDialogLoader.ensure().openDialog()
+            } else if (EditorState.exportByAgent && exportProgressDialogLoader.item) {
+                // An agent's export has no one waiting on the "Export finished" state; the
+                // toast reports the result and the agent gets it from export_status.
+                exportProgressDialogLoader.item.close()
             }
         }
     }

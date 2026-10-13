@@ -223,6 +223,9 @@ class AppController : public QObject
     Q_PROPERTY(bool undoAvailable READ undoAvailable NOTIFY undoStackChanged)
     Q_PROPERTY(bool redoAvailable READ redoAvailable NOTIFY undoStackChanged)
     Q_PROPERTY(bool exportInProgress READ exportInProgress NOTIFY exportInProgressChanged)
+    // True while (and after) an export an MCP agent started, until the next export begins.
+    // The progress dialog closes itself when such an export ends: nobody at the desk asked for it.
+    Q_PROPERTY(bool exportByAgent READ exportByAgent NOTIFY exportInProgressChanged)
     Q_PROPERTY(double exportProgress READ exportProgress NOTIFY exportProgressChanged)
     Q_PROPERTY(bool canShareExport READ canShareExport NOTIFY canShareExportChanged)
     Q_PROPERTY(bool subtitleGenerating READ subtitleGenerating NOTIFY subtitleGeneratingChanged)
@@ -404,6 +407,10 @@ public:
     bool undoAvailable() const { return m_undoStack.canUndo(); }
     bool redoAvailable() const { return m_undoStack.canRedo(); }
     bool exportInProgress() const { return m_exportInProgress; }
+    bool exportByAgent() const { return m_exportByAgent; }
+    // Set by the MCP dispatcher around the call that starts an export, so the start
+    // records who asked for it. Not invokable.
+    void setExportRequestedByAgent(bool byAgent) { m_exportRequestedByAgent = byAgent; }
     double exportProgress() const;
     bool canShareExport() const;
     bool subtitleGenerating() const { return m_subtitleGenerating; }
@@ -1943,6 +1950,8 @@ protected:
     bool m_subtitleEditing = false;
     int m_selectedSubtitleCue = -1;
     bool m_exportInProgress = false;
+    bool m_exportByAgent = false;
+    bool m_exportRequestedByAgent = false;
     double m_exportProgress = 0.0;
     QAtomicInt m_exportCancel = 0;
     QUrl m_lastExportUrl;

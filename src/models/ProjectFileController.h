@@ -195,6 +195,9 @@ signals:
     void openRequested();
     void saveRequested();
     void saveAsRequested();
+    // MCP close_project / new_project / load_project: show or leave the start screen. GUI only; the
+    // headless app has no start screen and ignores it.
+    void startScreenRequested(bool visible);
 
 private:
     // Bracket every loadProject()/loadProjectJson()/restoreAutosave() call, sync or async, success or

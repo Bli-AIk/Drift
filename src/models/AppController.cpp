@@ -13587,6 +13587,7 @@ bool AppController::flattenComposite(int trackIndex, int clipIndex)
     m_exportProgress = 0.0;
     emit exportProgressChanged();
     m_exportInProgress = true;
+    m_exportByAgent = m_exportRequestedByAgent;
     emit exportInProgressChanged();
     setLastMessage(tr("Flattening composite…"));
 
@@ -20818,6 +20819,7 @@ void AppController::exportWithSettings(const QUrl &outputUrl, const QVariantMap 
     m_exportProgress = 0.0;
     emit exportProgressChanged();
     m_exportInProgress = true;
+    m_exportByAgent = m_exportRequestedByAgent;
     emit exportInProgressChanged();
     setLastMessage(tr("Exporting…"));
 

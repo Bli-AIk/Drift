@@ -1510,6 +1510,15 @@ ApplicationWindow {
             window.openPendingLaunch()
         }
 
+        // An agent's close_project (true) / new_project or load_project (false). The agent already discarded
+        // the document without asking, so there is no unsaved prompt here — only the screen
+        // change and the same "Project closed" note requestCloseProject() posts.
+        function onStartScreenRequested(visible) {
+            window.showStartScreen = visible
+            if (visible)
+                EditorState.setLastMessage(qsTr("Project closed"))
+        }
+
         function onMissingAddons(addons) {
             missingAddonsDialogLoader.ensure().openFor(addons)
         }
