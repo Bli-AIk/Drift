@@ -2249,6 +2249,10 @@
         <translation>أداة القطع</translation>
     </message>
     <message>
+        <source>Search…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>System default</source>
         <translation>افتراضي النظام</translation>
     </message>
@@ -6111,6 +6115,14 @@
         <source>Save project</source>
         <translation>حفظ المشروع</translation>
     </message>
+    <message>
+        <source>Search  %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished">بحث</translation>
+    </message>
     <message numerus="yes">
         <source>Downloads — %n running</source>
         <translation>
@@ -7531,6 +7543,484 @@
     <message>
         <source>File</source>
         <translation>الملف</translation>
+    </message>
+</context>
+<context>
+    <name>GlobalSearchControls</name>
+    <message>
+        <source>Properties</source>
+        <translation type="unfinished">الخصائص</translation>
+    </message>
+    <message>
+        <source>Assets</source>
+        <translation type="unfinished">العناصر</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished">الإعدادات</translation>
+    </message>
+    <message>
+        <source>Select a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a video, image, text or shape clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a video clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a video or audio clip</source>
+        <translation type="unfinished">حدد مقطع فيديو أو صوت</translation>
+    </message>
+    <message>
+        <source>Select a text or subtitle clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip&apos;s effects layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip&apos;s mask layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip&apos;s audio effects layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the clip before a cut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">عام</translation>
+    </message>
+    <message>
+        <source>Clip name</source>
+        <translation type="unfinished">اسم المقطع</translation>
+    </message>
+    <message>
+        <source>Crop</source>
+        <translation type="unfinished">اقتصاص</translation>
+    </message>
+    <message>
+        <source>Trim</source>
+        <translation type="unfinished">قص</translation>
+    </message>
+    <message>
+        <source>Duration</source>
+        <translation type="unfinished">المدة</translation>
+    </message>
+    <message>
+        <source>Transform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scale</source>
+        <translation type="unfinished">الحجم</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation type="unfinished">العتامة</translation>
+    </message>
+    <message>
+        <source>Rotation</source>
+        <translation type="unfinished">الدوران</translation>
+    </message>
+    <message>
+        <source>Flip</source>
+        <translation type="unfinished">انعكاس</translation>
+    </message>
+    <message>
+        <source>Fix orientation</source>
+        <translation type="unfinished">تصحيح الاتجاه</translation>
+    </message>
+    <message>
+        <source>Reset position &amp; size</source>
+        <translation type="unfinished">إعادة تعيين الموضع والحجم</translation>
+    </message>
+    <message>
+        <source>Stabilization</source>
+        <translation type="unfinished">تثبيت الصورة</translation>
+    </message>
+    <message>
+        <source>Stabilize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smoothing</source>
+        <translation type="unfinished">التنعيم</translation>
+    </message>
+    <message>
+        <source>Tripod mode</source>
+        <translation type="unfinished">وضع الحامل الثلاثي</translation>
+    </message>
+    <message>
+        <source>Animation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In animation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Out animation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom curve</source>
+        <translation type="unfinished">منحنى مخصص</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished">مستوى الصوت</translation>
+    </message>
+    <message>
+        <source>Pan</source>
+        <translation type="unfinished">التوزيع الصوتي</translation>
+    </message>
+    <message>
+        <source>Remove noise…</source>
+        <translation type="unfinished">إزالة الضوضاء…</translation>
+    </message>
+    <message>
+        <source>Auto subtitles</source>
+        <translation type="unfinished">ترجمة تلقائية</translation>
+    </message>
+    <message>
+        <source>Audio track</source>
+        <translation type="unfinished">مسار الصوت</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished">السرعة</translation>
+    </message>
+    <message>
+        <source>Playback speed</source>
+        <translation type="unfinished">سرعة التشغيل</translation>
+    </message>
+    <message>
+        <source>Custom speed…</source>
+        <translation type="unfinished">سرعة مخصصة…</translation>
+    </message>
+    <message>
+        <source>Reverse</source>
+        <translation type="unfinished">عكس</translation>
+    </message>
+    <message>
+        <source>Blending</source>
+        <translation type="unfinished">المزج</translation>
+    </message>
+    <message>
+        <source>Blend mode</source>
+        <translation type="unfinished">وضع المزج</translation>
+    </message>
+    <message>
+        <source>Masks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feather</source>
+        <translation type="unfinished">تنعيم الحواف</translation>
+    </message>
+    <message>
+        <source>Invert</source>
+        <translation type="unfinished">عكس</translation>
+    </message>
+    <message>
+        <source>Combine</source>
+        <translation type="unfinished">دمج</translation>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Effect settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Face tracking</source>
+        <translation type="unfinished">تتبع الوجه</translation>
+    </message>
+    <message>
+        <source>Save as preset…</source>
+        <translation type="unfinished">حفظ كإعداد مسبق…</translation>
+    </message>
+    <message>
+        <source>Audio FX</source>
+        <translation type="unfinished">تأثيرات الصوت</translation>
+    </message>
+    <message>
+        <source>Audio effect settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transition duration</source>
+        <translation type="unfinished">مدة الانتقال</translation>
+    </message>
+    <message>
+        <source>Transition curve</source>
+        <translation type="unfinished">منحنى الانتقال</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Font</source>
+        <translation type="unfinished">الخط</translation>
+    </message>
+    <message>
+        <source>Text style</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shape style</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a shape clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the camera layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PDF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PDF page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a PDF clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3D Model</source>
+        <translation type="unfinished">نموذج ثلاثي الأبعاد</translation>
+    </message>
+    <message>
+        <source>3D model</source>
+        <translation type="unfinished">نموذج 3D</translation>
+    </message>
+    <message>
+        <source>Select a 3D model clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interface settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>App settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud providers</source>
+        <translation type="unfinished">موفرو الخدمات السحابية</translation>
+    </message>
+    <message>
+        <source>Marketplace settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Templates</source>
+        <translation type="unfinished">قوالب</translation>
+    </message>
+    <message>
+        <source>Stickers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">الترجمة</translation>
+    </message>
+    <message>
+        <source>Speech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subject</source>
+        <translation type="unfinished">العنصر</translation>
+    </message>
+    <message>
+        <source>Scenes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media</source>
+        <translation type="unfinished">الوسائط</translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished">معاينة</translation>
+    </message>
+    <message>
+        <source>Upscale…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extras</source>
+        <translation type="unfinished">الإضافات</translation>
+    </message>
+</context>
+<context>
+    <name>GlobalSearchPopup</name>
+    <message>
+        <source>Action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Effect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Template</source>
+        <translation type="unfinished">قالب</translation>
+    </message>
+    <message>
+        <source>Effect stack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio FX</source>
+        <translation type="unfinished">تأثيرات الصوت</translation>
+    </message>
+    <message>
+        <source>Transition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mask</source>
+        <translation type="unfinished">قناع</translation>
+    </message>
+    <message>
+        <source>Shape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sticker</source>
+        <translation type="unfinished">ملصق</translation>
+    </message>
+    <message>
+        <source>Text style</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add-on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">تطبيق على المقطع المحدد</translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">إضافة عند مؤشر التشغيل</translation>
+    </message>
+    <message>
+        <source>Not available now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished">الإعدادات</translation>
+    </message>
+    <message>
+        <source>Extras</source>
+        <translation type="unfinished">الإضافات</translation>
+    </message>
+    <message>
+        <source>Add-on manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Debug info…</source>
+        <translation type="unfinished">معلومات تصحيح الأخطاء…</translation>
+    </message>
+    <message>
+        <source>Light theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dark theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add as adjustment clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add after selected clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not available on this track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No matches</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

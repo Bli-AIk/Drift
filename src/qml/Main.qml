@@ -1225,6 +1225,21 @@ ApplicationWindow {
         debugInfoDialogLoader.ensure().open()
     }
 
+    // Global search opens assets tabs and labels them; the panel itself is out of the header's reach.
+    function showAssetsTab(tabId) {
+        if (window.previewFullscreen)
+            window.togglePreviewFullscreen()
+        assetsPanel.showTab(tabId)
+    }
+
+    function assetsTabLabel(tabId) {
+        return assetsPanel.tabLabel(tabId)
+    }
+
+    function focusEditor() {
+        editorScope.forceActiveFocus()
+    }
+
     function openPasteAttributes() {
         pasteAttributesDialogLoader.ensure().openDialog()
     }
@@ -1609,6 +1624,11 @@ ApplicationWindow {
         if (id === "zoomOut") {
             if (timelinePanel.visible)
                 timelinePanel.setZoom(timelinePanel.zoom / 1.5)
+            return
+        }
+        if (id === "search") {
+            if (editorHeader.visible)
+                editorHeader.focusSearch()
             return
         }
         EditorState.triggerAction(id)

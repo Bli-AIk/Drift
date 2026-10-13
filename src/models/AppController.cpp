@@ -4543,6 +4543,8 @@ QHash<QString, QString> defaultShortcuts()
         // Timeline zoom is QML state too, so these take the same route as the tool modes.
         {QStringLiteral("zoomIn"), QStringLiteral("Ctrl+=")},
         {QStringLiteral("zoomOut"), QStringLiteral("Ctrl+-")},
+        // The global search field lives in EditorHeader, so this is QML-only as well.
+        {QStringLiteral("search"), QStringLiteral("Ctrl+K")},
         // QML owns the window, so triggerAction only raises the request — same shape as the
         // file actions above.
         {QStringLiteral("multicam"), QStringLiteral("Ctrl+Shift+C")},
@@ -5361,6 +5363,7 @@ QVariantList AppController::actions() const
         action(QStringLiteral("zoomIn"), tr("Zoom in")),
         action(QStringLiteral("zoomOut"), tr("Zoom out")),
         action(QStringLiteral("multicam"), tr("Multicam window")),
+        action(QStringLiteral("search"), tr("Search…")),
     };
 }
 
@@ -15352,6 +15355,14 @@ QVariantMap AppController::transitionBetweenClips(int trackIndex, int clipIndex)
             return transitionToMap(m_project, track, transition);
     }
     return {};
+}
+
+bool AppController::hasTransitionPartner(int trackIndex, int clipIndex) const
+{
+    if (trackIndex < 0 || trackIndex >= m_project.tracks().size())
+        return false;
+    const drift::Track &track = m_project.tracks().at(trackIndex);
+    return trackAllowsTransitions(track.type) && findTransitionPartnerIndex(track, clipIndex) >= 0;
 }
 
 QVariantList AppController::transitionKindsForTrack(int trackIndex) const

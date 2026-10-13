@@ -1113,6 +1113,8 @@ public:
     Q_INVOKABLE void previewSetTransitionParam(int trackIndex, const QString &transitionId,
                                                const QString &key, double value);
     Q_INVOKABLE QVariantMap transitionBetweenClips(int trackIndex, int clipIndex) const;
+    // True when addTransition on this clip would find a right-hand partner to transition into.
+    Q_INVOKABLE bool hasTransitionPartner(int trackIndex, int clipIndex) const;
     Q_INVOKABLE QVariantList transitionKinds() const;
     // The kinds that make sense on this track: on an audio track only those with an audible
     // curve (crossfade, dip); everything elsewhere.

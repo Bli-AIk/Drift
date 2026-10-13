@@ -39,6 +39,19 @@ Rectangle {
     // Used by New / Open / Recent / Quit and the matching shortcuts.
     // Android Back: closes the topmost dialog this header owns. True if one was open, even when
     // it swallowed the key.
+    function focusSearch() {
+        searchInput.forceActiveFocus()
+        searchInput.selectAll()
+    }
+
+    // Clears the field and hands the keyboard back to the editor, so shortcuts work again.
+    function endSearch() {
+        searchInput.text = ""
+        searchPopup.close()
+        searchInput.focus = false
+        root.Window.window.focusEditor()
+    }
+
     function closeTopDialog() {
         const dialogs = [unsavedDialog, exportDialogLoader.item, exportProgressDialogLoader.item,
                          projectPropertiesDialogLoader.item, agentAccessDialog, videoSizeDialogLoader.item,
@@ -489,7 +502,85 @@ Rectangle {
             }
         }
 
-        // Absorbs leftover space so the two groups stay apart but can compress.
+        // Absorbs leftover space so the groups stay apart but can compress.
+        Item {
+            Layout.fillWidth: true
+            Layout.minimumWidth: 0
+        }
+
+        // --- Centre: global search -------------------------------------------
+        Rectangle {
+            id: searchBox
+            Layout.alignment: Qt.AlignVCenter
+            Layout.fillWidth: true
+            Layout.minimumWidth: 140
+            Layout.maximumWidth: 360
+            implicitHeight: Theme.controlHeight
+            radius: height / 2
+            color: Theme.panelAccent
+            border.width: searchInput.activeFocus ? Theme.borderWidthFocus : 0
+            border.color: Theme.focusRing
+
+            IconGlyph {
+                id: searchLens
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.spacingXl
+                anchors.verticalCenter: parent.verticalCenter
+                glyph: Theme.icons.search
+                iconSize: Theme.iconSizeMd
+                iconColor: Theme.mutedForeground
+            }
+
+            TextField {
+                id: searchInput
+                anchors.left: searchLens.right
+                anchors.right: parent.right
+                anchors.leftMargin: Theme.spacingMd
+                anchors.rightMargin: Theme.spacingXl
+                anchors.verticalCenter: parent.verticalCenter
+                background: null
+                leftPadding: 0
+                rightPadding: 0
+                color: Theme.panelForeground
+                placeholderText: {
+                    const keys = EditorState.shortcutFor("search")
+                    return keys.length > 0 ? qsTr("Search  %1").arg(Theme.shortcutDisplay(keys))
+                                           : qsTr("Search")
+                }
+                placeholderTextColor: Theme.mutedForeground
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSizeSm
+                selectByMouse: true
+                selectedTextColor: Theme.primaryForeground
+                selectionColor: Theme.primary
+
+                onTextEdited: searchPopup.search(text)
+                onActiveFocusChanged: if (activeFocus && text.trim().length > 0) searchPopup.search(text)
+
+                // The popup never takes focus, so the field drives it.
+                Keys.onUpPressed: (event) => { searchPopup.moveHighlight(-1); event.accepted = true }
+                Keys.onDownPressed: (event) => { searchPopup.moveHighlight(1); event.accepted = true }
+                Keys.onReturnPressed: (event) => { searchPopup.activate(searchPopup.highlightIndex); event.accepted = true }
+                Keys.onEnterPressed: (event) => { searchPopup.activate(searchPopup.highlightIndex); event.accepted = true }
+                Keys.onEscapePressed: (event) => { root.endSearch(); event.accepted = true }
+            }
+
+            GlobalSearchPopup {
+                id: searchPopup
+                y: searchBox.height + Theme.spacingMd
+                x: (searchBox.width - width) / 2
+                width: Math.max(searchBox.width, 480)
+                headerCommands: [
+                    { label: qsTr("Export video"), keywords: "render save mp4", run: () => root.exportVideo() },
+                    { label: qsTr("Downloads"), keywords: "download link", run: () => root.downloadsRequested() },
+                    { label: qsTr("Language…"), keywords: "translate locale", run: () => languageChooserDialogLoader.ensure().openFromHeader() },
+                    { label: qsTr("Video size and layout"), keywords: "canvas resolution aspect ratio", run: () => videoSizeDialogLoader.ensure().openDialog() },
+                    { label: qsTr("Switch to mobile layout…"), keywords: "phone shell", run: () => root.Window.window.switchShell("mobile") },
+                ]
+                onFinished: root.endSearch()
+            }
+        }
+
         Item {
             Layout.fillWidth: true
             Layout.minimumWidth: 0

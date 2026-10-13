@@ -1492,6 +1492,8 @@ qt_add_qml_module(drift
         src/qml/components/RecentProjectsPopup.qml
         src/qml/components/StartScreen.qml
         src/qml/components/NewTrackMenu.qml
+        src/qml/components/GlobalSearchPopup.qml
+        src/qml/components/GlobalSearchControls.qml
         src/qml/components/ToastHost.qml
         src/qml/components/NotificationList.qml
         src/qml/components/NotificationsPopup.qml

@@ -2241,6 +2241,10 @@
         <translation>Strumento Taglierina</translation>
     </message>
     <message>
+        <source>Search…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>System default</source>
         <translation>Predefinito di sistema</translation>
     </message>
@@ -6007,6 +6011,14 @@
         <source>Save project</source>
         <translation>Salva progetto</translation>
     </message>
+    <message>
+        <source>Search  %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished">Cerca</translation>
+    </message>
     <message numerus="yes">
         <source>Downloads — %n running</source>
         <translation>
@@ -7419,6 +7431,484 @@
     <message>
         <source>File</source>
         <translation>File</translation>
+    </message>
+</context>
+<context>
+    <name>GlobalSearchControls</name>
+    <message>
+        <source>Properties</source>
+        <translation type="unfinished">Proprietà</translation>
+    </message>
+    <message>
+        <source>Assets</source>
+        <translation type="unfinished">Risorse</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished">Impostazioni</translation>
+    </message>
+    <message>
+        <source>Select a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a video, image, text or shape clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a video clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a video or audio clip</source>
+        <translation type="unfinished">Seleziona una clip video o audio</translation>
+    </message>
+    <message>
+        <source>Select a text or subtitle clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip&apos;s effects layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip&apos;s mask layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip&apos;s audio effects layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the clip before a cut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">Generale</translation>
+    </message>
+    <message>
+        <source>Clip name</source>
+        <translation type="unfinished">Nome clip</translation>
+    </message>
+    <message>
+        <source>Crop</source>
+        <translation type="unfinished">Ritaglio quadro</translation>
+    </message>
+    <message>
+        <source>Trim</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration</source>
+        <translation type="unfinished">Durata</translation>
+    </message>
+    <message>
+        <source>Transform</source>
+        <translation type="unfinished">Trasformazione</translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scale</source>
+        <translation type="unfinished">Scala</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation type="unfinished">Opacità</translation>
+    </message>
+    <message>
+        <source>Rotation</source>
+        <translation type="unfinished">Rotazione</translation>
+    </message>
+    <message>
+        <source>Flip</source>
+        <translation type="unfinished">Capovolgi</translation>
+    </message>
+    <message>
+        <source>Fix orientation</source>
+        <translation type="unfinished">Correggi orientamento</translation>
+    </message>
+    <message>
+        <source>Reset position &amp; size</source>
+        <translation type="unfinished">Reimposta posizione e dimensioni</translation>
+    </message>
+    <message>
+        <source>Stabilization</source>
+        <translation type="unfinished">Stabilizzazione</translation>
+    </message>
+    <message>
+        <source>Stabilize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smoothing</source>
+        <translation type="unfinished">Attenuazione</translation>
+    </message>
+    <message>
+        <source>Tripod mode</source>
+        <translation type="unfinished">Modalità treppiede</translation>
+    </message>
+    <message>
+        <source>Animation</source>
+        <translation type="unfinished">Animazione</translation>
+    </message>
+    <message>
+        <source>In animation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Out animation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom curve</source>
+        <translation type="unfinished">Curva personalizzata</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">Audio</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished">Volume</translation>
+    </message>
+    <message>
+        <source>Pan</source>
+        <translation type="unfinished">Panoramica</translation>
+    </message>
+    <message>
+        <source>Remove noise…</source>
+        <translation type="unfinished">Rimuovi rumore…</translation>
+    </message>
+    <message>
+        <source>Auto subtitles</source>
+        <translation type="unfinished">Sottotitoli automatici</translation>
+    </message>
+    <message>
+        <source>Audio track</source>
+        <translation type="unfinished">Traccia audio</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished">Velocità</translation>
+    </message>
+    <message>
+        <source>Playback speed</source>
+        <translation type="unfinished">Velocità di riproduzione</translation>
+    </message>
+    <message>
+        <source>Custom speed…</source>
+        <translation type="unfinished">Velocità personalizzata…</translation>
+    </message>
+    <message>
+        <source>Reverse</source>
+        <translation type="unfinished">Inverti</translation>
+    </message>
+    <message>
+        <source>Blending</source>
+        <translation type="unfinished">Fusione</translation>
+    </message>
+    <message>
+        <source>Blend mode</source>
+        <translation type="unfinished">Metodo di fusione</translation>
+    </message>
+    <message>
+        <source>Masks</source>
+        <translation type="unfinished">Maschere</translation>
+    </message>
+    <message>
+        <source>Feather</source>
+        <translation type="unfinished">Sfumatura bordi</translation>
+    </message>
+    <message>
+        <source>Invert</source>
+        <translation type="unfinished">Inverti</translation>
+    </message>
+    <message>
+        <source>Combine</source>
+        <translation type="unfinished">Combina</translation>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation type="unfinished">Effetti</translation>
+    </message>
+    <message>
+        <source>Effect settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Face tracking</source>
+        <translation type="unfinished">Tracciamento volto</translation>
+    </message>
+    <message>
+        <source>Save as preset…</source>
+        <translation type="unfinished">Salva come predefinito…</translation>
+    </message>
+    <message>
+        <source>Audio FX</source>
+        <translation type="unfinished">Effetti audio</translation>
+    </message>
+    <message>
+        <source>Audio effect settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transition</source>
+        <translation type="unfinished">Transizione</translation>
+    </message>
+    <message>
+        <source>Transition duration</source>
+        <translation type="unfinished">Durata transizione</translation>
+    </message>
+    <message>
+        <source>Transition curve</source>
+        <translation type="unfinished">Curva di transizione</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished">Testo</translation>
+    </message>
+    <message>
+        <source>Font</source>
+        <translation type="unfinished">Carattere</translation>
+    </message>
+    <message>
+        <source>Text style</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shape</source>
+        <translation type="unfinished">Forma</translation>
+    </message>
+    <message>
+        <source>Shape style</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a shape clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the camera layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PDF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PDF page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a PDF clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3D Model</source>
+        <translation type="unfinished">Modello 3D</translation>
+    </message>
+    <message>
+        <source>3D model</source>
+        <translation type="unfinished">Modello 3D</translation>
+    </message>
+    <message>
+        <source>Select a 3D model clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interface settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>App settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud providers</source>
+        <translation type="unfinished">Provider cloud</translation>
+    </message>
+    <message>
+        <source>Marketplace settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transitions</source>
+        <translation type="unfinished">Transizioni</translation>
+    </message>
+    <message>
+        <source>Templates</source>
+        <translation type="unfinished">Modelli</translation>
+    </message>
+    <message>
+        <source>Stickers</source>
+        <translation type="unfinished">Adesivi</translation>
+    </message>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">Sottotitoli</translation>
+    </message>
+    <message>
+        <source>Speech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subject</source>
+        <translation type="unfinished">Soggetto</translation>
+    </message>
+    <message>
+        <source>Scenes</source>
+        <translation type="unfinished">Scene</translation>
+    </message>
+    <message>
+        <source>Media</source>
+        <translation type="unfinished">Elementi multimediali</translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished">Anteprima</translation>
+    </message>
+    <message>
+        <source>Upscale…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extras</source>
+        <translation type="unfinished">Extra</translation>
+    </message>
+</context>
+<context>
+    <name>GlobalSearchPopup</name>
+    <message>
+        <source>Action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Effect</source>
+        <translation type="unfinished">Effetto</translation>
+    </message>
+    <message>
+        <source>Template</source>
+        <translation type="unfinished">Modello</translation>
+    </message>
+    <message>
+        <source>Effect stack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio FX</source>
+        <translation type="unfinished">Effetti audio</translation>
+    </message>
+    <message>
+        <source>Transition</source>
+        <translation type="unfinished">Transizione</translation>
+    </message>
+    <message>
+        <source>Mask</source>
+        <translation type="unfinished">Maschera</translation>
+    </message>
+    <message>
+        <source>Shape</source>
+        <translation type="unfinished">Forma</translation>
+    </message>
+    <message>
+        <source>Sticker</source>
+        <translation type="unfinished">Adesivo</translation>
+    </message>
+    <message>
+        <source>Text style</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add-on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">Applica alla clip selezionata</translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Aggiungi alla testina di riproduzione</translation>
+    </message>
+    <message>
+        <source>Not available now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished">Impostazioni</translation>
+    </message>
+    <message>
+        <source>Extras</source>
+        <translation type="unfinished">Extra</translation>
+    </message>
+    <message>
+        <source>Add-on manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Debug info…</source>
+        <translation type="unfinished">Informazioni di debug…</translation>
+    </message>
+    <message>
+        <source>Light theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dark theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add as adjustment clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add after selected clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not available on this track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No matches</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
