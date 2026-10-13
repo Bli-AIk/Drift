@@ -762,6 +762,7 @@ public:
     // Shifts every clip on `trackIndex` starting at/after `gapStartSeconds` left by the
     // width of the gap immediately following that position, closing it. Linked partner
     // clips on other tracks (e.g. a companion audio clip) follow along to stay in sync.
+    // At 0 it closes the gap before the first clip, moving the track to the timeline start.
     Q_INVOKABLE void closeGap(int trackIndex, double gapStartSeconds);
     Q_INVOKABLE void alignSelectedClipLeft();
     Q_INVOKABLE void alignSelectedClipRight();
