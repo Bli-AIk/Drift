@@ -6948,6 +6948,8 @@ void AppController::deleteSelectedClip()
     QList<QPair<int, int>> pairs = m_selection;
     expandSelectionWithLinkedPartners(m_project, pairs);
     QSet<QString> removedClipIds;
+    struct RemovedRange { int track; drift::TimeUs start; drift::TimeUs duration; };
+    QList<RemovedRange> removedRanges;
     std::sort(pairs.begin(), pairs.end(), [](const QPair<int, int> &a, const QPair<int, int> &b) {
         if (a.first != b.first)
             return a.first > b.first;
@@ -6956,8 +6958,17 @@ void AppController::deleteSelectedClip()
     for (const QPair<int, int> &pair : pairs) {
         if (!isValidClipIndex(pair.first, pair.second))
             continue;
-        removedClipIds.insert(m_project.tracks().at(pair.first).clips.at(pair.second).id);
+        const drift::Clip &clip = m_project.tracks().at(pair.first).clips.at(pair.second);
+        removedClipIds.insert(clip.id);
+        removedRanges.append({pair.first, clip.timelineStart, clip.timelineDuration});
         m_project.tracks()[pair.first].clips.removeAt(pair.second);
+    }
+    if (m_rippleEnabled) {
+        // Latest first, so each range is closed while the clips before it are still in place.
+        std::sort(removedRanges.begin(), removedRanges.end(),
+                  [](const RemovedRange &a, const RemovedRange &b) { return a.start > b.start; });
+        for (const RemovedRange &range : std::as_const(removedRanges))
+            rippleTracksFrom(m_project, {range.track}, range.start + range.duration, -range.duration, {});
     }
     for (drift::Track &track : m_project.tracks()) {
         for (int i = track.transitions.size() - 1; i >= 0; --i) {
