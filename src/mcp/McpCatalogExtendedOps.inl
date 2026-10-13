@@ -45,6 +45,13 @@
                         {QStringLiteral("height"), integerProp(QStringLiteral("Canvas height pixels; requires width"))},
                         {QStringLiteral("fps"), integerProp(QStringLiteral("Frames per second"))}}),
           false, true },
+        { "close_project", "project", "Close the open timeline and return to the start screen",
+          "Discard the current timeline and show the start screen, like the header's Close project. "
+          "DISCARDS unsaved changes without warning and clears the undo stack — check inspect.dirty "
+          "and save_project first. Afterwards the open document is an empty, untitled project; "
+          "new_project or load_project leaves the start screen.",
+          objectSchema({}),
+          false, true },
         { "package_project", "project", "Save bundled copy",
           "Write a copy of the project with all media embedded. Async: returns {started:true, path} "
           "immediately — poll inspect({detail:true}).jobs.package.{active,progress} until active is false.",

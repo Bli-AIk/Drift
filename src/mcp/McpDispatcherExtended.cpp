@@ -981,6 +981,9 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
             return err("load_timeout", QStringLiteral("Project is still opening"));
         if (!loaded)
             return err("load_failed", message);
+        // Desktop already leaves the start screen on projectLoadFinished; Android's Home does
+        // not, since its own open paths push the editor themselves.
+        emit projectFile->startScreenRequested(false);
         return ok({{QStringLiteral("path"), path}});
     }
 
@@ -1003,9 +1006,24 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
                                          hasSize ? height : projectFile->projectHeight(),
                                          hasFps ? fps : projectFile->projectFps());
         m_controller->markProjectLayoutChosen();
+        // After close_project the start screen is up; a new project is the way off it.
+        emit projectFile->startScreenRequested(false);
         return ok({{QStringLiteral("w"), projectFile->projectWidth()},
                    {QStringLiteral("h"), projectFile->projectHeight()},
                    {QStringLiteral("fps"), projectFile->projectFps()}});
+    }
+
+    if (tool == QLatin1String("close_project")) {
+        // Same discard as new_project, but the GUI lands on the start screen rather than an
+        // empty editor. Raised before the reset so the layout chooser that newProject() reopens
+        // defers to the start screen, exactly as the header's Close project does. The GUI posts
+        // its own "Project closed" message from the same handler.
+        ProjectFileController *projectFile = m_controller->projectFile();
+        if (projectFile->projectLoadPending())
+            return err("busy", QStringLiteral("A project is still opening"));
+        emit projectFile->startScreenRequested(true);
+        projectFile->newProject(/*silent=*/true);
+        return ok({{QStringLiteral("closed"), true}});
     }
 
     if (tool == QLatin1String("package_project")) {
@@ -1180,7 +1198,10 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
             return err("type_mismatch", QStringLiteral("Not a composite clip"));
         if (m_controller->exportInProgress())
             return err("export_busy", QStringLiteral("An export is already running"));
-        if (!m_controller->flattenComposite(ref.track, ref.clip))
+        m_controller->setExportRequestedByAgent(true);
+        const bool started = m_controller->flattenComposite(ref.track, ref.clip);
+        m_controller->setExportRequestedByAgent(false);
+        if (!started)
             return err("export_failed", QStringLiteral("Could not start flattening"));
         return ok({{QStringLiteral("started"), true}});
     }
@@ -3109,7 +3130,9 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
         const QString preset = argString(args, QStringLiteral("preset"));
         if (path.isEmpty() || preset.isEmpty())
             return err("bad_args", QStringLiteral("path and preset required"));
+        m_controller->setExportRequestedByAgent(true);
         m_controller->exportWithPreset(QUrl::fromLocalFile(path), preset);
+        m_controller->setExportRequestedByAgent(false);
         return ok({{QStringLiteral("started"), true},
                    {QStringLiteral("path"), path},
                    {QStringLiteral("preset"), preset}});

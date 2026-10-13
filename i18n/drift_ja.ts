@@ -956,6 +956,10 @@
         <translation>%1 に保存しました</translation>
     </message>
     <message>
+        <source>Project closed</source>
+        <translation type="unfinished">プロジェクトを閉じました</translation>
+    </message>
+    <message>
         <source>Export finished.</source>
         <translation>エクスポートが完了しました。</translation>
     </message>

@@ -957,6 +957,10 @@
         <translation>Enregistré aux %1</translation>
     </message>
     <message>
+        <source>Project closed</source>
+        <translation type="unfinished">Projet fermé</translation>
+    </message>
+    <message>
         <source>Export finished.</source>
         <translation>Exportation terminée.</translation>
     </message>

@@ -956,6 +956,10 @@
         <translation>%1에 저장됨</translation>
     </message>
     <message>
+        <source>Project closed</source>
+        <translation type="unfinished">프로젝트가 닫힘</translation>
+    </message>
+    <message>
         <source>Export finished.</source>
         <translation>내보내기가 완료되었습니다.</translation>
     </message>

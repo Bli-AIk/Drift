@@ -718,6 +718,9 @@ Item {
             if (EditorState.exportInProgress) {
                 exportProgressDialog.dismissed = false
                 exportProgressDialog.openDialog()
+            } else if (EditorState.exportByAgent) {
+                // Same as the desktop header: an agent's export closes its own progress dialog.
+                exportProgressDialog.close()
             }
         }
     }

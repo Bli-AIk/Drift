@@ -547,6 +547,22 @@ ApplicationWindow {
     Connections {
         target: EditorState.projectFile
         function onProjectLoadFinished() { window.openPendingLaunch() }
+
+        // An agent's close_project (true) / new_project or load_project (false): Android's start screen is Home.
+        // The agent already discarded the document, so no unsaved prompt. Unwinds the whole
+        // stack rather than showHome()'s single pop — a media preview pushed over the editor
+        // would otherwise be all that came off.
+        function onStartScreenRequested(visible) {
+            if (!visible) {
+                window.showEditor()
+                return
+            }
+            window.mediaPreviewPage = null
+            if (stack.depth > 1)
+                stack.pop(null)
+            window.inEditor = false
+            EditorState.setLastMessage(qsTr("Project closed"))
+        }
     }
 
     function openProjectProperties() {

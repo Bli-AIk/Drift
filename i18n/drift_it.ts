@@ -956,6 +956,10 @@
         <translation>Salvato in %1</translation>
     </message>
     <message>
+        <source>Project closed</source>
+        <translation type="unfinished">Progetto chiuso</translation>
+    </message>
+    <message>
         <source>Export finished.</source>
         <translation>Esportazione completata.</translation>
     </message>

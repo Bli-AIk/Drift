@@ -956,6 +956,10 @@
         <translation>Đã lưu vào %1</translation>
     </message>
     <message>
+        <source>Project closed</source>
+        <translation type="unfinished">Đã đóng dự án</translation>
+    </message>
+    <message>
         <source>Export finished.</source>
         <translation>Đã xuất xong.</translation>
     </message>
@@ -8227,7 +8231,7 @@
     </message>
     <message>
         <source>Project closed</source>
-        <translation>Đã đóng dựa án</translation>
+        <translation>Đã đóng dự án</translation>
     </message>
     <message>
         <source>Already checking for updates…</source>
