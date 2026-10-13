@@ -89,6 +89,59 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.8.0" date="2026-10-13">
+      <url type="details">https://github.com/CutWire-Studios/Drift/releases/tag/v0.8.0</url>
+      <description>
+        <p>Drift goes 3D: a 3D preview mode with a scene camera, Gaussian splats and lights you
+        can place in the view. It also brings local text-to-speech with voice cloning, PDF clips,
+        audio effects built from pedals, an Outline effect, a rebuilt text engine and a much
+        more usable Android app.</p>
+        <ul>
+          <li>3D preview mode: a free 3D view with a camera gizmo, orbit and zoom controls and a
+          Blender-style fly mode; 3D models sit in the scene as world-space layers</li>
+          <li>Scene camera: add a camera track and pan, orbit and dolly every clip through it,
+          with per-clip depth occlusion</li>
+          <li>Gaussian splats: import SOG, streamed SOG and 3DGS PLY files</li>
+          <li>3D lighting: four point and spot lights editable in the 3D view, and depth-effect
+          clips shown as a relief with draggable light gizmos</li>
+          <li>Text to speech: generate speech and clone voices locally, with a voice library and
+          voiceovers from subtitles</li>
+          <li>PDF clips: place PDF pages on the timeline and scroll through them</li>
+          <li>Audio effects made of pedals: filters, drive, reverb, convolution reverb, delay and
+          more in series, parallel or frequency splits, with LFOs, envelope followers and step
+          sequencers, and keyframable parameters</li>
+          <li>Outline effect: strokes, dashes, gradient fills, shadows, glows and torn, burnt,
+          stamp and other edge styles around any clip</li>
+          <li>Text: edit text directly on the preview, system fonts and your own font files in
+          the picker, colour emoji fonts, and new plain and bold styles</li>
+          <li>Link unrelated clips so they move and trim together</li>
+          <li>Import numbered image sequences as a single video clip</li>
+          <li>Proxies are kept next to the source footage and relinked automatically</li>
+          <li>Generated captions stay in sync when the clip's speed or direction changes</li>
+          <li>Close Gap can move a track's first clip to the start, and deleting with ripple on
+          closes the gap</li>
+          <li>Projects open in the background behind a progress dialog</li>
+          <li>Notifications show one at a time, with a history under a bell in the header</li>
+          <li>Updates download only when you ask, are verified, and install in place on
+          Windows, macOS and AppImage</li>
+          <li>Android: tablets, DeX and ChromeOS open the desktop layout, made touch-friendly;
+          choose the desktop or mobile layout on any device; a keyboard composer for text and
+          subtitles</li>
+          <li>macOS: an appearance-aware app icon and better native menu integration</li>
+          <li>MCP: tools for text to speech, PDFs, the 3D view, the scene camera, effect presets
+          and closing projects</li>
+          <li>Fixes: undo for keyframe tangents, holds and bookmarks, panels no longer shrink on
+          every launch, export reports why it failed, a project name is asked for on first save,
+          AVI, MKV and WebM play in the macOS trim window, and fonts on Windows</li>
+          <li>Translations: Bengali added; Japanese, Korean, Polish, Portuguese, Vietnamese and
+          many others updated</li>
+        </ul>
+        <p>Thanks to @rangaNP for the macOS icon, menu and update work; to André Mota for linking
+        clips; to Jose Miguel Navarro for Close Gap and the MCP project tools; to @NipunSGeeTH for
+        linked keyframe coordinates; to Mehedi Hasan for Bengali; to Paweł Korobajło for Polish;
+        to @coolvitto for Japanese; and to Nguyễn Lam for Vietnamese.</p>
+      </description>
+    </release>
     <release version="0.7.5" date="2026-10-05">
       <url type="details">https://github.com/CutWire-Studios/Drift/releases/tag/v0.7.5</url>
       <description>
