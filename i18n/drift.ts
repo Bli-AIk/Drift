@@ -956,6 +956,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Project closed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Export finished.</source>
         <translation type="unfinished"></translation>
     </message>

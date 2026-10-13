@@ -956,6 +956,10 @@
         <translation>Сохранено в %1</translation>
     </message>
     <message>
+        <source>Project closed</source>
+        <translation type="unfinished">Проект закрыт</translation>
+    </message>
+    <message>
         <source>Export finished.</source>
         <translation>Экспорт завершён.</translation>
     </message>

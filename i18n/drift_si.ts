@@ -956,6 +956,10 @@
         <translation>%1 වෙත සුරකින ලදී</translation>
     </message>
     <message>
+        <source>Project closed</source>
+        <translation type="unfinished">ව්‍යාපෘතිය වසන ලදී</translation>
+    </message>
+    <message>
         <source>Export finished.</source>
         <translation>නිර්යාත කිරීම අවසන් විය.</translation>
     </message>

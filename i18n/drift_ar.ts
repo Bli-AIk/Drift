@@ -956,6 +956,10 @@
         <translation>تم الحفظ في %1</translation>
     </message>
     <message>
+        <source>Project closed</source>
+        <translation type="unfinished">تم إغلاق المشروع</translation>
+    </message>
+    <message>
         <source>Export finished.</source>
         <translation>اكتمل التصدير.</translation>
     </message>

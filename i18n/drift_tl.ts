@@ -956,6 +956,10 @@
         <translation>Nai-save sa %1</translation>
     </message>
     <message>
+        <source>Project closed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Export finished.</source>
         <translation>Tapos na ang pagluwas.</translation>
     </message>

@@ -956,6 +956,10 @@
         <translation>%1-এ সংরক্ষণ করা হয়েছে</translation>
     </message>
     <message>
+        <source>Project closed</source>
+        <translation type="unfinished">প্রকল্প বন্ধ</translation>
+    </message>
+    <message>
         <source>Export finished.</source>
         <translation>এক্সপোর্ট সম্পন্ন হয়েছে.</translation>
     </message>
