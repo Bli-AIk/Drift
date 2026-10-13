@@ -968,14 +968,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export cancelled.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export failed. Check the save location and free space.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Couldn&apos;t create the shareable copy: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2510,6 +2502,42 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>%1 isn’t a folder on this computer (a phone, camera or remote location). Export to a local folder, then copy the file there.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is on a phone or camera connected over MTP, which can’t be written to directly. Export to a local folder, then copy the file there.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The folder %1 doesn’t exist anymore.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is on a read-only drive. Choose another folder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can’t replace %1. It may be read-only or open in another app.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can’t write to the network location %1. Check that it’s connected and that you have permission to save there.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You don’t have permission to save in %1. Choose another folder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can’t write to %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There isn’t enough free space in %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Could not create a proxy for %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3937,6 +3965,10 @@
     </message>
     <message>
         <source>Exporting…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8291,14 +8323,6 @@
     </message>
     <message>
         <source>Export finished.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export cancelled.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export failed. Check the save location and free space on your disk.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

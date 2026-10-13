@@ -120,6 +120,7 @@
 #include <QTemporaryFile>
 #include <QElapsedTimer>
 #include <QSettings>
+#include <QStorageInfo>
 #include <QByteArray>
 #include <QSet>
 #include <QStandardPaths>
@@ -268,6 +269,104 @@ bool writeTargetIsDisposable(const QUrl &url)
     }
 #endif
     return false;
+}
+
+// Checked before an export starts, so a location that can't take the file fails in a second with
+// the reason instead of minutes into the render with a generic encoder error. Returns an empty
+// string when the location looks writable. Android SAF documents are written through the resolver
+// and checked there.
+QString exportTargetProblem(const QUrl &url, const QString &path)
+{
+#ifdef Q_OS_ANDROID
+    if (AndroidUri::isContentUri(url))
+        return {};
+#endif
+    // gvfs/KIO hand back mtp://, smb://, sftp://… for locations with no local path.
+    if (!url.isLocalFile() || path.isEmpty()) {
+        return QCoreApplication::translate(
+                   "AppController",
+                   "%1 isn’t a folder on this computer (a phone, camera or remote location). "
+                   "Export to a local folder, then copy the file there.")
+            .arg(url.toDisplayString(QUrl::PreferLocalFile));
+    }
+
+    const QFileInfo target(path);
+    const QString dirPath = target.absolutePath();
+    const QString dirName = QDir::toNativeSeparators(dirPath);
+
+    // Phones and cameras mounted over MTP/PTP by gvfs, or a Windows shell namespace item: the
+    // FUSE layer can't seek, and every container's header is patched after the fact.
+    if (path.contains(QLatin1String("/gvfs/mtp:")) || path.contains(QLatin1String("/gvfs/gphoto2:"))
+        || path.contains(QLatin1String("::{"))) {
+        return QCoreApplication::translate(
+                   "AppController",
+                   "%1 is on a phone or camera connected over MTP, which can’t be written to "
+                   "directly. Export to a local folder, then copy the file there.")
+            .arg(dirName);
+    }
+
+    if (!QFileInfo(dirPath).isDir()) {
+        return QCoreApplication::translate("AppController", "The folder %1 doesn’t exist anymore.")
+            .arg(dirName);
+    }
+
+    QStorageInfo storage(dirPath);
+    const QByteArray fsType = storage.isValid() ? storage.fileSystemType().toLower() : QByteArray();
+    const bool network = path.startsWith(QLatin1String("//")) || path.startsWith(QLatin1String("\\\\"))
+                         || fsType.startsWith("cifs") || fsType.startsWith("smb")
+                         || fsType.startsWith("nfs") || fsType == "fuse.sshfs"
+                         || fsType == "9p" || fsType.contains("webdav");
+
+    if (storage.isValid() && storage.isReady() && storage.isReadOnly()) {
+        return QCoreApplication::translate("AppController",
+                                           "%1 is on a read-only drive. Choose another folder.")
+            .arg(dirName);
+    }
+
+    // Replacing a file: opening it without truncating catches read-only files and, on Windows,
+    // one that another app (a media player, a sync client) still has open.
+    if (target.exists()) {
+        QFile existing(path);
+        if (!existing.open(QIODevice::ReadWrite)) {
+            return QCoreApplication::translate(
+                       "AppController",
+                       "Can’t replace %1. It may be read-only or open in another app.")
+                .arg(QDir::toNativeSeparators(path));
+        }
+    }
+
+    // A real write is the only reliable answer: ACLs, network shares, sync folders and
+    // controlled-folder access all say yes to isWritable() and then refuse the file.
+    QTemporaryFile probe(QDir(dirPath).filePath(QStringLiteral(".drift-write-test-XXXXXX")));
+    const QByteArray block(64 * 1024, '\0');
+    const bool writable = probe.open() && probe.write(block) == block.size() && probe.seek(0)
+                          && probe.write(block.left(16)) == 16 && probe.flush();
+    if (!writable) {
+        if (network) {
+            return QCoreApplication::translate(
+                       "AppController",
+                       "Can’t write to the network location %1. Check that it’s connected and "
+                       "that you have permission to save there.")
+                .arg(dirName);
+        }
+        if (probe.error() == QFileDevice::PermissionsError || !probe.isOpen()) {
+            return QCoreApplication::translate(
+                       "AppController",
+                       "You don’t have permission to save in %1. Choose another folder.")
+                .arg(dirName);
+        }
+        return QCoreApplication::translate("AppController", "Can’t write to %1: %2")
+            .arg(dirName, probe.errorString());
+    }
+
+    constexpr qint64 kMinFreeBytes = 64ll * 1024 * 1024;
+    if (storage.isValid() && storage.isReady() && storage.bytesAvailable() >= 0
+        && storage.bytesAvailable() < kMinFreeBytes) {
+        return QCoreApplication::translate("AppController",
+                                           "There isn’t enough free space in %1.")
+            .arg(dirName);
+    }
+    return {};
 }
 
 bool commitWriteTarget(const QString &staged, const QUrl &url,
@@ -20795,7 +20894,9 @@ void AppController::exportWithSettings(const QUrl &outputUrl, const QVariantMap 
     const QString outputPath =
         writeTargetPath(outputUrl, Exporter::defaultSuffix(container, exportSettings.audioOnly));
     if (outputPath.isEmpty()) {
-        setLastMessage(tr("That save location isn’t valid"), QStringLiteral("error"));
+        const QString problem = exportTargetProblem(outputUrl, outputPath);
+        setLastMessage(problem.isEmpty() ? tr("That save location isn’t valid") : problem,
+                       QStringLiteral("error"));
         emit exportFinished(false);
         return;
     }
@@ -20851,7 +20952,9 @@ void AppController::exportWithSettings(const QUrl &outputUrl, const QVariantMap 
             // notification's action sets the service flag.
             return m_exportCancel.loadRelaxed() == 0 && !Exporter::BackgroundHold::cancelRequested();
         };
-        bool ok = Exporter::run(snapshot, exportSettings, outputPath, &error, report);
+        // On the worker: probing a disconnected network share can block for many seconds.
+        error = exportTargetProblem(outputUrl, outputPath);
+        bool ok = error.isEmpty() && Exporter::run(snapshot, exportSettings, outputPath, &error, report);
         // Android: the encoder needs a real file, and the document the user picked is only
         // reachable through the resolver, so the finished encode is streamed into it — the bar
         // runs a second time for that, and cancel still lands.
@@ -20885,8 +20988,14 @@ void AppController::exportWithSettings(const QUrl &outputUrl, const QVariantMap 
 #endif
                 emit exportProgressChanged();
                 emit exportInProgressChanged();
-                setLastMessage(ok ? tr("Export complete") : error,
-                               ok ? QStringLiteral("success") : QStringLiteral("error"));
+                const bool cancelled = error == QLatin1String("Export cancelled")
+                                       || error == QLatin1String("Cancelled");
+                const QString severity = ok          ? QStringLiteral("success")
+                                         : cancelled ? QStringLiteral("info")
+                                                     : QStringLiteral("error");
+                setLastMessage(ok ? tr("Export complete")
+                                  : error.isEmpty() ? tr("Export failed") : error,
+                               severity);
                 emit exportFinished(ok);
             },
             Qt::QueuedConnection);

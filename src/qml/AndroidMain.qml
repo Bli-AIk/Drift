@@ -915,15 +915,11 @@ ApplicationWindow {
             dialog.pendingSeconds = seconds
             dialog.open()
         }
+        // Failures and cancellation surface through lastMessage, which carries the
+        // actual reason; a generic toast here used to blame disk space for everything.
         function onExportFinished(success) {
-            if (success) {
+            if (success)
                 Toasts.success(qsTr("Export finished."))
-                return
-            }
-            if (EditorState.lastMessage === "Export cancelled")
-                Toasts.info(qsTr("Export cancelled."))
-            else
-                Toasts.error(qsTr("Export failed. Check the save location and free space."))
         }
         function onSubtitleGenerationFinished(ok, message) {
             if (ok)

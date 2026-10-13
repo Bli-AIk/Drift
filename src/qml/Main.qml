@@ -1434,17 +1434,11 @@ ApplicationWindow {
         // --- Error and status surfacing -------------------------------------
         // These signals previously had no handler anywhere in QML, so a failed
         // export or transcription was reported only to the console.
+        // Failures and cancellation surface through lastMessage, which carries the
+        // actual reason; a generic toast here used to blame disk space for everything.
         function onExportFinished(success) {
-            if (success) {
+            if (success)
                 Toasts.success(qsTr("Export finished."))
-                return
-            }
-            // Exporter reports cancellation as a failed run with this message —
-            // surface it as a neutral note, not a disk/location error.
-            if (EditorState.lastMessage === "Export cancelled")
-                Toasts.info(qsTr("Export cancelled."))
-            else
-                Toasts.error(qsTr("Export failed. Check the save location and free space on your disk."))
         }
 
         function onSubtitleGenerationFinished(ok, message) {

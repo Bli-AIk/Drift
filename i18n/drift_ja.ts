@@ -968,14 +968,6 @@
         <translation>エクスポートが完了しました。</translation>
     </message>
     <message>
-        <source>Export cancelled.</source>
-        <translation>エクスポートをキャンセルしました。</translation>
-    </message>
-    <message>
-        <source>Export failed. Check the save location and free space.</source>
-        <translation>エクスポートに失敗しました。保存先と空き容量を確認してください。</translation>
-    </message>
-    <message>
         <source>Couldn&apos;t create the shareable copy: %1</source>
         <translation>共有可能なコピーを作成できませんでした : %1</translation>
     </message>
@@ -2491,6 +2483,42 @@
         <translation>%1 のプロキシを作成できませんでした : %2</translation>
     </message>
     <message>
+        <source>%1 isn’t a folder on this computer (a phone, camera or remote location). Export to a local folder, then copy the file there.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is on a phone or camera connected over MTP, which can’t be written to directly. Export to a local folder, then copy the file there.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The folder %1 doesn’t exist anymore.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is on a read-only drive. Choose another folder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can’t replace %1. It may be read-only or open in another app.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can’t write to the network location %1. Check that it’s connected and that you have permission to save there.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You don’t have permission to save in %1. Choose another folder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can’t write to %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There isn’t enough free space in %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Your graphics driver is too old for the preview, which needs OpenGL 3.3. See Help → Debug info.</source>
         <translation>グラフィックスドライバーのバージョンが古いため、プレビューを表示できません (OpenGL 3.3が必要です)。「ヘルプ」→「デバッグ情報」を参照してください。</translation>
     </message>
@@ -3927,6 +3955,10 @@
     <message>
         <source>Exporting…</source>
         <translation>エクスポート中…</translation>
+    </message>
+    <message>
+        <source>Export failed</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Opening your video…</source>
@@ -8260,14 +8292,6 @@
     <message>
         <source>Export finished.</source>
         <translation>エクスポートが完了しました。</translation>
-    </message>
-    <message>
-        <source>Export cancelled.</source>
-        <translation>エクスポートをキャンセルしました。</translation>
-    </message>
-    <message>
-        <source>Export failed. Check the save location and free space on your disk.</source>
-        <translation>エクスポートに失敗しました。保存先とディスクの空き容量を確認してください。</translation>
     </message>
     <message>
         <source>Couldn&apos;t create the shareable copy: %1</source>
