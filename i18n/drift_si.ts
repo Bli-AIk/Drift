@@ -728,10 +728,6 @@
         <translation>Drift ව්‍යාපෘතිය (*.drift)</translation>
     </message>
     <message>
-        <source>Save Project</source>
-        <translation>ව්‍යාපෘතිය සුරකින්න</translation>
-    </message>
-    <message>
         <source>Save Project As</source>
         <translation>ව්‍යාපෘතිය වෙනත් නමකින් සුරකින්න</translation>
     </message>
@@ -924,8 +920,16 @@
         <translation>Drift ව්‍යාපෘතිය (*.drift)</translation>
     </message>
     <message>
+        <source>Name your project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Project</source>
         <translation>ව්‍යාපෘතිය සුරකින්න</translation>
+    </message>
+    <message>
+        <source>Untitled Project</source>
+        <translation type="unfinished">නම් නොකළ ව්‍යාපෘතිය</translation>
     </message>
     <message>
         <source>Canvas set to %1×%2 at %3 fps from your first clip.</source>
@@ -5920,6 +5924,10 @@
         <translation>සියලු ගොනු (*)</translation>
     </message>
     <message>
+        <source>Name your project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Project As</source>
         <translation>ව්‍යාපෘතිය මෙසේ සුරකින්න</translation>
     </message>
@@ -5930,6 +5938,10 @@
     <message>
         <source>Save Shareable Copy</source>
         <translation>බෙදාගත හැකි පිටපතක් සුරකින්න</translation>
+    </message>
+    <message>
+        <source>Untitled Project</source>
+        <translation type="unfinished">නම් නොකළ ව්‍යාපෘතිය</translation>
     </message>
     <message>
         <source>Projects</source>

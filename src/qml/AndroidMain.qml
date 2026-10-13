@@ -108,12 +108,26 @@ ApplicationWindow {
             EditorState.projectFile.saveProject(EditorState.fileUrl(EditorState.projectFile.currentProjectPath))
             return !EditorState.projectFile.hasUnsavedChanges
         }
+        // The name is the project's title, independent of the file name, so it is asked for
+        // before the picker. The save finishes later; onProjectSaved runs any queued action.
+        projectNameDialog.openWith(qsTr("Name your project"), EditorState.projectFile.projectName)
+        return false
+    }
+
+    function saveProjectToNewFile() {
         const url = FileDialogs.saveFile(qsTr("Save Project"), window.projectFilter,
                                          EditorState.projectFile.projectName, "drift")
-        if (url === "")
-            return false
-        EditorState.projectFile.saveProject(url)
-        return !EditorState.projectFile.hasUnsavedChanges
+        if (url !== "")
+            EditorState.projectFile.saveProject(url)
+    }
+
+    NameDialog {
+        id: projectNameDialog
+        placeholder: qsTr("Untitled Project")
+        onSubmitted: function (name) {
+            EditorState.projectFile.projectName = name
+            Qt.callLater(window.saveProjectToNewFile)
+        }
     }
 
     // The canvas is inferred from the first clip instead of asked about. shouldConfigure...()

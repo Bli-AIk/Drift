@@ -728,10 +728,6 @@
         <translation>Drift প্রকল্প (*.drift)</translation>
     </message>
     <message>
-        <source>Save Project</source>
-        <translation>প্রকল্প সংরক্ষণ করুন</translation>
-    </message>
-    <message>
         <source>Save Project As</source>
         <translation>নতুন নামে প্রকল্প সংরক্ষণ করুন</translation>
     </message>
@@ -924,8 +920,16 @@
         <translation>Drift প্রকল্প (*.drift)</translation>
     </message>
     <message>
+        <source>Name your project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Project</source>
         <translation>প্রকল্প সংরক্ষণ করুন</translation>
+    </message>
+    <message>
+        <source>Untitled Project</source>
+        <translation type="unfinished">শিরোনামহীন প্রকল্প</translation>
     </message>
     <message>
         <source>Canvas set to %1×%2 at %3 fps from your first clip.</source>
@@ -5920,6 +5924,10 @@
         <translation>সব ফাইল (*)</translation>
     </message>
     <message>
+        <source>Name your project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Project As</source>
         <translation>নতুন নামে প্রকল্প সংরক্ষণ করুন</translation>
     </message>
@@ -5930,6 +5938,10 @@
     <message>
         <source>Save Shareable Copy</source>
         <translation>শেয়ার করার উপযোগী অনুলিপি সংরক্ষণ করুন</translation>
+    </message>
+    <message>
+        <source>Untitled Project</source>
+        <translation type="unfinished">শিরোনামহীন প্রকল্প</translation>
     </message>
     <message>
         <source>Projects</source>

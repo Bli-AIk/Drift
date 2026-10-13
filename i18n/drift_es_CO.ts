@@ -728,10 +728,6 @@
         <translation>Proyecto Drift (*.drift)</translation>
     </message>
     <message>
-        <source>Save Project</source>
-        <translation>Guardar proyecto</translation>
-    </message>
-    <message>
         <source>Save Project As</source>
         <translation>Guardar proyecto como</translation>
     </message>
@@ -924,8 +920,16 @@
         <translation>Proyecto Drift (*.drift)</translation>
     </message>
     <message>
+        <source>Name your project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Project</source>
         <translation>Guardar proyecto</translation>
+    </message>
+    <message>
+        <source>Untitled Project</source>
+        <translation type="unfinished">Proyecto sin título</translation>
     </message>
     <message>
         <source>Canvas set to %1×%2 at %3 fps from your first clip.</source>
@@ -5920,6 +5924,10 @@
         <translation>Todos los archivos (*)</translation>
     </message>
     <message>
+        <source>Name your project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Project As</source>
         <translation>Guardar proyecto como</translation>
     </message>
@@ -5930,6 +5938,10 @@
     <message>
         <source>Save Shareable Copy</source>
         <translation>Guardar copia para compartir</translation>
+    </message>
+    <message>
+        <source>Untitled Project</source>
+        <translation type="unfinished">Proyecto sin título</translation>
     </message>
     <message>
         <source>Projects</source>

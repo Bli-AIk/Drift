@@ -728,10 +728,6 @@
         <translation>Dự án Drift (*.drift)</translation>
     </message>
     <message>
-        <source>Save Project</source>
-        <translation>Lưu dự án</translation>
-    </message>
-    <message>
         <source>Save Project As</source>
         <translation>Lưu dự án thành</translation>
     </message>
@@ -924,8 +920,16 @@
         <translation>Dự án Drift (*.drift)</translation>
     </message>
     <message>
+        <source>Name your project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Project</source>
         <translation>Lưu dự án</translation>
+    </message>
+    <message>
+        <source>Untitled Project</source>
+        <translation type="unfinished">Dự án chưa đặt tên</translation>
     </message>
     <message>
         <source>Canvas set to %1×%2 at %3 fps from your first clip.</source>
@@ -5942,6 +5946,14 @@
     <message>
         <source>Video</source>
         <translation>Video</translation>
+    </message>
+    <message>
+        <source>Name your project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Untitled Project</source>
+        <translation type="unfinished">Dự án chưa đặt tên</translation>
     </message>
     <message>
         <source>Video size and layout</source>

@@ -195,16 +195,7 @@ Item {
     }
 
     function saveProject() {
-        if (EditorState.projectFile.currentProjectPath && EditorState.projectFile.currentProjectPath.length > 0) {
-            EditorState.projectFile.saveProject(EditorState.fileUrl(EditorState.projectFile.currentProjectPath))
-            return !EditorState.projectFile.hasUnsavedChanges
-        }
-        const url = FileDialogs.saveFile(qsTr("Save Project"), root.projectFilter,
-                                         EditorState.projectFile.projectName, "drift")
-        if (url === "")
-            return false
-        EditorState.projectFile.saveProject(url)
-        return !EditorState.projectFile.hasUnsavedChanges
+        return Window.window.saveProject()
     }
 
     // Save As: the open project written to a second file, which the session then continues in.

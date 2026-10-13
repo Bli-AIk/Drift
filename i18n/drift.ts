@@ -728,10 +728,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Save Project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Save Project As</source>
         <translation type="unfinished"></translation>
     </message>
@@ -924,7 +920,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Name your project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Untitled Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5920,6 +5924,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Name your project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Project As</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5929,6 +5937,10 @@
     </message>
     <message>
         <source>Save Shareable Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Untitled Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

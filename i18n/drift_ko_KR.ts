@@ -728,10 +728,6 @@
         <translation>Drift 프로젝트 (*.drift)</translation>
     </message>
     <message>
-        <source>Save Project</source>
-        <translation>프로젝트 저장</translation>
-    </message>
-    <message>
         <source>Save Project As</source>
         <translation>다른 이름으로 프로젝트 저장</translation>
     </message>
@@ -924,8 +920,16 @@
         <translation>Drift 프로젝트 (*.drift)</translation>
     </message>
     <message>
+        <source>Name your project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Project</source>
         <translation>프로젝트 저장</translation>
+    </message>
+    <message>
+        <source>Untitled Project</source>
+        <translation type="unfinished">제목 없는 프로젝트</translation>
     </message>
     <message>
         <source>Canvas set to %1×%2 at %3 fps from your first clip.</source>
@@ -5894,6 +5898,10 @@
         <translation>모든 파일(*)</translation>
     </message>
     <message>
+        <source>Name your project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Project As</source>
         <translation>다른 이름으로 프로젝트 저장</translation>
     </message>
@@ -5904,6 +5912,10 @@
     <message>
         <source>Save Shareable Copy</source>
         <translation>공유 가능한 복사본 저장</translation>
+    </message>
+    <message>
+        <source>Untitled Project</source>
+        <translation type="unfinished">제목 없는 프로젝트</translation>
     </message>
     <message>
         <source>Projects</source>

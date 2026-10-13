@@ -84,20 +84,25 @@ Rectangle {
         root.Window.window.requestCloseProject()
     }
 
-    // Returns true when the project is clean after the attempt. False if the
-    // user cancelled Save As or the write failed — callers must not continue.
+    // Returns true when the project is clean after the attempt. False if the write failed or is
+    // still pending — callers must not continue. A first save asks for the project name before
+    // the picker (the name is the title, independent of the file name), so it always returns
+    // false; onProjectSaved runs any action queued behind the unsaved-changes dialog.
     function saveProject() {
         if (EditorState.projectFile.currentProjectPath && EditorState.projectFile.currentProjectPath.length > 0) {
             EditorState.projectFile.saveProject(EditorState.fileUrl(EditorState.projectFile.currentProjectPath))
             return !EditorState.projectFile.hasUnsavedChanges
         }
+        projectNameDialog.openWith(qsTr("Name your project"), EditorState.projectFile.projectName)
+        return false
+    }
+
+    function saveProjectToNewFile() {
         var url = FileDialogs.saveFile(qsTr("Save Project"), root.projectFilter,
                                        EditorState.projectFile.projectName, "drift", "",
                                        root.projectMimeTypes)
-        if (url == "")
-            return false
-        EditorState.projectFile.saveProject(url)
-        return !EditorState.projectFile.hasUnsavedChanges
+        if (url != "")
+            EditorState.projectFile.saveProject(url)
     }
 
     // Save As: writes the open project to a new .drift and keeps editing that one, leaving the
@@ -251,6 +256,25 @@ Rectangle {
         function onSaveAsRequested() { root.saveProjectAs() }
         function onOpenRequested() { root.openProject() }
         function onNewProjectRequested() { root.requestNewProject() }
+        // A synchronous save also lands here while _pendingAfterUnsaved is set; onSaveChosen
+        // then finds it already cleared, so the action still runs once.
+        function onProjectSaved(ok) {
+            if (!ok || !unsavedDialog.visible || !root._pendingAfterUnsaved)
+                return
+            const action = root._pendingAfterUnsaved
+            root._pendingAfterUnsaved = null
+            unsavedDialog.close()
+            action()
+        }
+    }
+
+    NameDialog {
+        id: projectNameDialog
+        placeholder: qsTr("Untitled Project")
+        onSubmitted: function (name) {
+            EditorState.projectFile.projectName = name
+            Qt.callLater(root.saveProjectToNewFile)
+        }
     }
 
     LazyLoader {

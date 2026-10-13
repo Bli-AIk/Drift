@@ -728,10 +728,6 @@
         <translation>Drift プロジェクト (*.drift)</translation>
     </message>
     <message>
-        <source>Save Project</source>
-        <translation>プロジェクトを保存</translation>
-    </message>
-    <message>
         <source>Save Project As</source>
         <translation>名前を付けてプロジェクトを保存</translation>
     </message>
@@ -924,8 +920,16 @@
         <translation>Drift プロジェクト (*.drift)</translation>
     </message>
     <message>
+        <source>Name your project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Project</source>
         <translation>プロジェクトを保存</translation>
+    </message>
+    <message>
+        <source>Untitled Project</source>
+        <translation type="unfinished">無題のプロジェクト</translation>
     </message>
     <message>
         <source>Canvas set to %1×%2 at %3 fps from your first clip.</source>
@@ -5894,6 +5898,10 @@
         <translation>すべてのファイル (*)</translation>
     </message>
     <message>
+        <source>Name your project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Project As</source>
         <translation>名前を付けてプロジェクトを保存</translation>
     </message>
@@ -5904,6 +5912,10 @@
     <message>
         <source>Save Shareable Copy</source>
         <translation>共有可能なコピーを保存</translation>
+    </message>
+    <message>
+        <source>Untitled Project</source>
+        <translation type="unfinished">無題のプロジェクト</translation>
     </message>
     <message>
         <source>Projects</source>
