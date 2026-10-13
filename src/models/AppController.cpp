@@ -4652,8 +4652,9 @@ TimelineClipsModel::Decorations AppController::trackDecorations(const drift::Tra
     TimelineClipsModel::Decorations out;
     out.adjustmentLanes = laneIndexes;
 
-    // Gaps are whatever time no clip covers between two neighbours in start order. They are
-    // never stored, only derived.
+    // Gaps are whatever time no clip covers between two neighbours in start order, plus the
+    // stretch before the first clip when it does not start at zero — closeGap() at 0 pulls the
+    // track to the start of the timeline. They are never stored, only derived.
     QList<const drift::Clip *> sorted;
     sorted.reserve(track.clips.size());
     for (const drift::Clip &clip : track.clips)
@@ -4661,6 +4662,8 @@ TimelineClipsModel::Decorations AppController::trackDecorations(const drift::Tra
     std::stable_sort(sorted.begin(), sorted.end(), [](const drift::Clip *a, const drift::Clip *b) {
         return a->timelineStart < b->timelineStart;
     });
+    if (!sorted.isEmpty() && sorted.first()->timelineStart > 0)
+        out.gaps.append({0.0, drift::usToSeconds(sorted.first()->timelineStart)});
     for (int i = 0; i + 1 < sorted.size(); ++i) {
         const drift::TimeUs gapStart = sorted.at(i)->timelineEnd();
         const drift::TimeUs gapEnd = sorted.at(i + 1)->timelineStart;
