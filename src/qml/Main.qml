@@ -706,8 +706,9 @@ ApplicationWindow {
     property bool layoutPromptDismissed: false
 
     // True only during the startup window where continueStartupAfterLanguage() has
-    // decided to ask which project to open, rather than settle on one itself.
-    // Cleared for good once that choice is made.
+    // decided to ask which project to open, rather than settle on one itself — and on
+    // first launch, behind the language chooser that runs before it. Cleared for good
+    // once that choice is made.
     property bool showStartScreen: false
 
     // Header Extras icon pulses while true; never auto-opens a dialog.
@@ -1299,6 +1300,12 @@ ApplicationWindow {
     }
 
     function beginStartupProject() {
+        // First launch: the language chooser runs before anything decides which project to
+        // open, and the empty editor behind it is a project nobody asked for. Raise the start
+        // screen first, so the chooser sits on the page the rest of first launch lands on;
+        // continueStartupAfterLanguage() lowers it again for the paths that open a project.
+        if (EditorState.preferences.needsUiLanguagePrompt)
+            window.showStartScreen = true
         if (window.promptLanguageChooserIfNeeded())
             return
         window.continueStartupAfterLanguage()
@@ -1380,6 +1387,11 @@ ApplicationWindow {
             window.showStartScreen = true
             return
         }
+        // Reopen is on but there was nothing to reopen: a fresh project, set up through the
+        // layout chooser — which defers to the start screen, so drop the one raised for the
+        // language chooser first. (The paths above that open a document drop it themselves,
+        // in onProjectLoadFinished, once the document is in.)
+        window.showStartScreen = false
         layoutChooserOpenTimer.start()
     }
 
