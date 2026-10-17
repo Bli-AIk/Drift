@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Window
 import Drift
-import "components"
-
 // Phone preview-and-edit for one media-bin row: watch it, keep a range, crop the picture,
 // then save over the bin row.
 //
@@ -303,7 +301,7 @@ Item {
     readonly property real safeRight: SafeArea.margins.right
 
     // ----- Header ---------------------------------------------------------------------------
-    Item {
+    AndroidMediaPreviewHeader {
         id: header
         anchors.top: parent.top
         anchors.left: parent.left
@@ -312,65 +310,20 @@ Item {
         anchors.rightMargin: root.safeRight
         anchors.topMargin: root.safeTop
         height: Theme.androidTopBarHeight
-
-        Rectangle {
-            anchors.fill: parent
-            color: Theme.panelBackground
-        }
-
-        Rectangle {
-            anchors.bottom: parent.bottom
-            width: parent.width
-            height: 1
-            color: Theme.panelBorder
-        }
-
-        IconButton {
-            id: backButton
-            anchors.left: parent.left
-            anchors.leftMargin: Theme.spacingSm
-            anchors.verticalCenter: parent.verticalCenter
-            buttonSize: Theme.androidIconButtonSize
-            glyph: Theme.icons.chevronLeft
-            tooltip: qsTr("Back")
-            enabled: !root.saving
-            onClicked: root.close()
-        }
-
-        ThemedLabel {
-            anchors.left: backButton.right
-            anchors.right: saveButton.left
-            anchors.leftMargin: Theme.spacingSm
-            anchors.rightMargin: Theme.spacingSm
-            anchors.verticalCenter: parent.verticalCenter
-            text: root.assetName
-            // ThemedLabel wraps by default, and a bin name is long enough to take the header
-            // to two lines and spill out of it.
-            wrapMode: Text.NoWrap
-            elide: Text.ElideMiddle
-            size: "sm"
-            tone: "default"
-        }
-
-        ThemedButton {
-            id: saveButton
-            anchors.right: parent.right
-            anchors.rightMargin: Theme.spacingMd
-            anchors.verticalCenter: parent.verticalCenter
-            variant: "primary"
-            text: qsTr("Save")
-            enabled: root.dirty && !root.saving && (root.assetIndex >= 0 || root.clipId.length > 0)
-            onClicked: {
-                EditorState.assetPreview.pause()
-                if (root.clipId.length > 0) {
-                    if (EditorState.setClipSourceFrame(root.clipId, root.cropX, root.cropY, root.cropW, root.cropH))
-                        root.close()
-                    return
-                }
-                EditorState.bin.saveEdit(root.assetIndex, root.inSeconds,
-                                          root.canTrim ? root.outSeconds : -1,
-                                          root.cropX, root.cropY, root.cropW, root.cropH)
+        assetName: root.assetName
+        backEnabled: !root.saving
+        canSave: root.dirty && !root.saving && (root.assetIndex >= 0 || root.clipId.length > 0)
+        onBackRequested: root.close()
+        onSaveRequested: {
+            EditorState.assetPreview.pause()
+            if (root.clipId.length > 0) {
+                if (EditorState.setClipSourceFrame(root.clipId, root.cropX, root.cropY, root.cropW, root.cropH))
+                    root.close()
+                return
             }
+            EditorState.bin.saveEdit(root.assetIndex, root.inSeconds,
+                                      root.canTrim ? root.outSeconds : -1,
+                                      root.cropX, root.cropY, root.cropW, root.cropH)
         }
     }
 
@@ -446,176 +399,14 @@ Item {
 
         // Crop frame. Only while the Crop tab is open, so the picture is a plain picture until
         // the user asks to crop it.
-        Item {
+        AndroidMediaCropOverlay {
             id: cropHost
             visible: root.canCrop && root.mode === "crop"
             x: stage.fit.x
             y: stage.fit.y
             width: stage.fit.w
             height: stage.fit.h
-
-            readonly property real frameX: root.cropX * width
-            readonly property real frameY: root.cropY * height
-            readonly property real frameW: root.cropW * width
-            readonly property real frameH: root.cropH * height
-            readonly property real minFrac: 0.08
-
-            function setCrop(nx, ny, nw, nh) {
-                const min = cropHost.minFrac
-                nw = Math.max(min, Math.min(1, nw))
-                nh = Math.max(min, Math.min(1, nh))
-                nx = Math.max(0, Math.min(1 - nw, nx))
-                ny = Math.max(0, Math.min(1 - nh, ny))
-                root.cropX = nx
-                root.cropY = ny
-                root.cropW = nw
-                root.cropH = nh
-            }
-
-            Rectangle { width: cropHost.frameX; height: parent.height; color: Theme.scrimStrong }
-            Rectangle {
-                x: cropHost.frameX + cropHost.frameW
-                width: Math.max(0, parent.width - x)
-                height: parent.height
-                color: Theme.scrimStrong
-            }
-            Rectangle {
-                x: cropHost.frameX
-                width: cropHost.frameW
-                height: cropHost.frameY
-                color: Theme.scrimStrong
-            }
-            Rectangle {
-                x: cropHost.frameX
-                y: cropHost.frameY + cropHost.frameH
-                width: cropHost.frameW
-                height: Math.max(0, parent.height - y)
-                color: Theme.scrimStrong
-            }
-
-            Rectangle {
-                x: cropHost.frameX
-                y: cropHost.frameY
-                width: cropHost.frameW
-                height: cropHost.frameH
-                color: "transparent"
-                border.width: Theme.borderWidthFocus
-                border.color: Theme.primary
-            }
-
-            MouseArea {
-                x: cropHost.frameX
-                y: cropHost.frameY
-                width: cropHost.frameW
-                height: cropHost.frameH
-                enabled: !root.saving
-                property real grabX: 0
-                property real grabY: 0
-                onPressed: (mouse) => {
-                    grabX = mouse.x
-                    grabY = mouse.y
-                    Haptics.pickUp()
-                }
-                onReleased: Haptics.drop()
-                onCanceled: Haptics.drop()
-                onPositionChanged: (mouse) => {
-                    if (!pressed || cropHost.width <= 0)
-                        return
-                    const dx = (mouse.x - grabX) / cropHost.width
-                    const dy = (mouse.y - grabY) / cropHost.height
-                    cropHost.setCrop(root.cropX + dx, root.cropY + dy, root.cropW, root.cropH)
-                }
-            }
-
-            Repeater {
-                model: [
-                    { x: 0, y: 0, dx: -1, dy: -1 },
-                    { x: 0.5, y: 0, dx: 0, dy: -1 },
-                    { x: 1, y: 0, dx: 1, dy: -1 },
-                    { x: 0, y: 0.5, dx: -1, dy: 0 },
-                    { x: 1, y: 0.5, dx: 1, dy: 0 },
-                    { x: 0, y: 1, dx: -1, dy: 1 },
-                    { x: 0.5, y: 1, dx: 0, dy: 1 },
-                    { x: 1, y: 1, dx: 1, dy: 1 }
-                ]
-                Rectangle {
-                    required property var modelData
-                    // Fingers, not a mouse pointer: the desktop grip is 10px.
-                    readonly property int grip: 20
-                    width: grip
-                    height: grip
-                    radius: Theme.radiusXs
-                    color: Theme.primary
-                    x: cropHost.frameX + modelData.x * cropHost.frameW - width / 2
-                    y: cropHost.frameY + modelData.y * cropHost.frameH - height / 2
-                    z: 2
-
-                    MouseArea {
-                        anchors.fill: parent
-                        anchors.margins: -14
-                        enabled: !root.saving
-                        preventStealing: true
-                        property real startX: 0
-                        property real startY: 0
-                        property real startW: 1
-                        property real startH: 1
-                        property real origX: 0
-                        property real origY: 0
-                        onPressed: {
-                            startX = root.cropX
-                            startY = root.cropY
-                            startW = root.cropW
-                            startH = root.cropH
-                            origX = mouseX
-                            origY = mouseY
-                            Haptics.pickUp()
-                        }
-                        onPositionChanged: {
-                            if (!pressed || cropHost.width <= 0)
-                                return
-                            const dx = (mouseX - origX) / cropHost.width
-                            const dy = (mouseY - origY) / cropHost.height
-                            let nx = startX
-                            let ny = startY
-                            let nw = startW
-                            let nh = startH
-                            if (root.cropRatioLocked) {
-                                let size
-                                if (modelData.dx !== 0 && modelData.dy !== 0)
-                                    size = Math.abs(dx) >= Math.abs(dy)
-                                           ? startW + modelData.dx * dx
-                                           : startH + modelData.dy * dy
-                                else if (modelData.dx !== 0)
-                                    size = startW + modelData.dx * dx
-                                else
-                                    size = startH + modelData.dy * dy
-                                size = Math.max(cropHost.minFrac, Math.min(1, size))
-                                nx = modelData.dx < 0 ? startX + startW - size
-                                   : modelData.dx > 0 ? startX : startX + (startW - size) / 2
-                                ny = modelData.dy < 0 ? startY + startH - size
-                                   : modelData.dy > 0 ? startY : startY + (startH - size) / 2
-                                cropHost.setCrop(nx, ny, size, size)
-                                return
-                            }
-                            if (modelData.dx < 0) {
-                                nx = startX + dx
-                                nw = startW - dx
-                            } else if (modelData.dx > 0) {
-                                nw = startW + dx
-                            }
-                            if (modelData.dy < 0) {
-                                ny = startY + dy
-                                nh = startH - dy
-                            } else if (modelData.dy > 0) {
-                                nh = startH + dy
-                            }
-                            cropHost.setCrop(nx, ny, nw, nh)
-                        }
-                        onReleased: Haptics.drop()
-                        onCanceled: Haptics.drop()
-                    }
-                }
-            }
+            preview: root
         }
 
         IconButton {
@@ -640,25 +431,10 @@ Item {
         }
 
         // Play/pause over the picture, where a phone player puts it.
-        Rectangle {
+        AndroidMediaPlayBadge {
             visible: root.canPlay && root.mode !== "crop"
             anchors.centerIn: parent
-            width: 64
-            height: 64
-            radius: width / 2
-            color: Theme.scrimStrong
-            opacity: EditorState.assetPreview.playing ? 0 : 1
-
-            Behavior on opacity {
-                NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-            }
-
-            IconGlyph {
-                anchors.centerIn: parent
-                glyph: Theme.icons.play
-                iconSize: Theme.iconSizeLg
-                iconColor: Theme.onMedia
-            }
+            playing: EditorState.assetPreview.playing
         }
 
         MouseArea {
@@ -670,26 +446,15 @@ Item {
             }
         }
 
-        Rectangle {
+        AndroidOnMediaReadout {
             visible: root.mode === "crop"
             anchors.left: parent.left
             anchors.bottom: parent.bottom
             anchors.margins: Theme.spacingMd
-            color: Theme.scrimStrong
-            radius: Theme.radiusSm
-            width: cropSizeLabel.implicitWidth + Theme.spacingLg
-            height: cropSizeLabel.implicitHeight + Theme.spacingSm
-            Text {
-                id: cropSizeLabel
-                anchors.centerIn: parent
-                color: Theme.onMedia
-                font.family: Theme.monoFontFamily
-                font.pixelSize: Theme.fontSizeXs
-                text: {
-                    const w = Math.max(1, Math.round(root.displayW * root.cropW))
-                    const h = Math.max(1, Math.round(root.displayH * root.cropH))
-                    return w + "×" + h
-                }
+            text: {
+                const w = Math.max(1, Math.round(root.displayW * root.cropW))
+                const h = Math.max(1, Math.round(root.displayH * root.cropH))
+                return w + "×" + h
             }
         }
     }
@@ -846,55 +611,11 @@ Item {
                 // dragged; these are thumb-width and carry a grip.
                 Repeater {
                     model: [{ edge: "in" }, { edge: "out" }]
-                    Rectangle {
-                        required property var modelData
-                        readonly property bool isIn: modelData.edge === "in"
-                        width: 22
-                        height: parent.height
-                        x: (isIn ? strip.inX : strip.outX - width)
-                        color: Theme.primary
-                        radius: Theme.radiusXs
-                        z: 3
-
-                        Column {
-                            anchors.centerIn: parent
-                            spacing: 3
-                            Repeater {
-                                model: 3
-                                Rectangle {
-                                    width: 10
-                                    height: 2
-                                    radius: 1
-                                    color: Theme.primaryForeground
-                                    opacity: 0.9
-                                }
-                            }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            anchors.margins: -12
-                            enabled: !root.saving
-                            preventStealing: true
-                            onPressed: {
-                                EditorState.assetPreview.pause()
-                                Haptics.pickUp()
-                            }
-                            onReleased: Haptics.drop()
-                            onCanceled: Haptics.drop()
-                            onPositionChanged: (mouse) => {
-                                if (!pressed)
-                                    return
-                                const t = ((parent.x + mouse.x + (parent.isIn ? 0 : parent.width))
-                                           / Math.max(1, strip.width)) * root.durationSeconds
-                                if (parent.isIn)
-                                    root.inSeconds = t
-                                else
-                                    root.outSeconds = t
-                                root.clampRange()
-                                root.seekTo(parent.isIn ? root.inSeconds : root.outSeconds)
-                            }
-                        }
+                    delegate: AndroidMediaTrimHandle {
+                        preview: root
+                        stripWidth: strip.width
+                        inX: strip.inX
+                        outX: strip.outX
                     }
                 }
             }
@@ -987,39 +708,13 @@ Item {
     }
 
     // ----- Saving ---------------------------------------------------------------------------
-    Rectangle {
+    AndroidMediaSavingScrim {
         visible: root.saving
         anchors.fill: parent
-        color: Theme.scrimColor
         z: 10
-
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.AllButtons
-        }
-
-        Column {
-            anchors.centerIn: parent
-            spacing: Theme.spacingLg
-            width: Math.min(parent.width - Theme.spacing3xl * 2, 320)
-
-            ThemedLabel {
-                width: parent.width
-                horizontalAlignment: Text.AlignHCenter
-                text: EditorState.bin.editStatus.length > 0
-                      ? EditorState.bin.editStatus : qsTr("Saving…")
-                size: "sm"
-            }
-            ThemedProgressBar {
-                width: parent.width
-                value: EditorState.bin.editProgress
-            }
-            ThemedButton {
-                anchors.horizontalCenter: parent.horizontalCenter
-                variant: "ghost"
-                text: qsTr("Cancel")
-                onClicked: EditorState.bin.cancelEdit()
-            }
-        }
+        progress: EditorState.bin.editProgress
+        statusText: EditorState.bin.editStatus.length > 0
+                    ? EditorState.bin.editStatus : qsTr("Saving…")
+        onCancelRequested: EditorState.bin.cancelEdit()
     }
 }

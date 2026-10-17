@@ -336,7 +336,7 @@ Item {
     readonly property real expandedHeight: 180
 
     Behavior on laneHeight {
-        enabled: !resizeDrag.active
+        enabled: !resizeGrip.dragging
         NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
     }
 
@@ -403,12 +403,7 @@ Item {
         return entry.valueMin + t * span
     }
 
-    Rectangle {
-        anchors.fill: parent
-        color: Theme.panelBackground
-        border.width: 1
-        border.color: Theme.panelBorder
-    }
+    KeyframeGraphFrame { anchors.fill: parent }
 
     Row {
         anchors.fill: parent
@@ -462,72 +457,9 @@ Item {
                 anchors.margins: 6
                 spacing: 4
 
-                Row {
+                KeyframeGraphHeaderBar {
                     width: parent.width
-                    spacing: 4
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: qsTr("Keyframes")
-                        color: Theme.mutedForeground
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeXs
-                        font.weight: Font.Medium
-                    }
-
-                    IconButton {
-                        anchors.verticalCenter: parent.verticalCenter
-                        glyph: root.curveEditing ? Theme.icons.minimize : Theme.icons.maximize
-                        variant: "text"
-                        buttonSize: 20
-                        iconSize: 14
-                        tooltip: root.curveEditing
-                                 ? qsTr("Collapse curve editor to compact view (88px)")
-                                 : qsTr("Expand curve editor to view and edit Bezier handles (180px)")
-                        onClicked: root.toggleExpanded()
-                    }
-
-                    // Beat grid / tempo.
-                    IconButton {
-                        anchors.verticalCenter: parent.verticalCenter
-                        glyph: Theme.icons.music
-                        variant: "text"
-                        buttonSize: 20
-                        iconSize: 14
-                        active: EditorState.beatGridVisible
-                        enabled: !EditorState.beatAnalysisRunning
-                        tooltip: EditorState.beatAnalysisRunning
-                                 ? qsTr("Analyzing…")
-                                 : (EditorState.beatGridVisible ? qsTr("Hide the beat markers")
-                                                                : qsTr("Find the beat and show markers"))
-                        onClicked: {
-                            if (EditorState.beatGridVisible)
-                                EditorState.beatGridVisible = false
-                            else
-                                root.showBeatLayer(true)
-                        }
-                    }
-
-                    // Individual transients.
-                    IconButton {
-                        anchors.verticalCenter: parent.verticalCenter
-                        glyph: Theme.icons.audioLines
-                        variant: "text"
-                        buttonSize: 20
-                        iconSize: 14
-                        active: EditorState.onsetsVisible
-                        enabled: !EditorState.beatAnalysisRunning
-                        tooltip: EditorState.beatAnalysisRunning
-                                 ? qsTr("Analyzing…")
-                                 : (EditorState.onsetsVisible ? qsTr("Hide hits")
-                                                              : qsTr("Find beats and hits in the audio under this clip"))
-                        onClicked: {
-                            if (EditorState.onsetsVisible)
-                                EditorState.onsetsVisible = false
-                            else
-                                root.showBeatLayer(false)
-                        }
-                    }
+                    host: root
                 }
 
                 // One chip per animated property of the clip, tinted to its curve. Clicking folds
@@ -567,42 +499,11 @@ Item {
                     }
                 }
 
-                Text {
-                    width: parent.width
-                    wrapMode: Text.WordWrap
-                    text: {
-                        const keys = root.keyCount === 0 ? qsTr("No keyframes")
-                                                         : qsTr("%n keyframes", "", root.keyCount)
-                        let hint = ""
-                        if (!root.curveEditing && root.keyCount > 0)
-                            hint = " · " + qsTr("Expand for handles")
-                        if (!EditorState.beatGridVisible || !root.analyzed)
-                            return keys + hint
-                        // The detector publishes no bpm when the tempo estimate was not
-                        // confident — say so, rather than leaving the grid button lit over
-                        // an empty lane. Onsets may still be perfectly usable.
-                        return (root.bpm > 0 ? keys + " · " + Math.round(root.bpm) + qsTr(" BPM")
-                                             : keys + qsTr(" · no beat found")) + hint
-                    }
-                    color: (!root.curveEditing && root.keyCount > 0) ? Theme.primary : Theme.mutedForeground
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeXs
-
-                    MouseArea {
-                        anchors.fill: parent
-                        enabled: !root.curveEditing && root.keyCount > 0
-                        cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                        onClicked: root.toggleExpanded()
-                    }
-                }
+                KeyframeGraphLaneStatus { width: parent.width
+                    host: root }
             }
 
-            Rectangle {
-                anchors.right: parent.right
-                width: 1
-                height: parent.height
-                color: Theme.panelBorder
-            }
+            KeyframeGraphGutterRule { }
         }
 
         // Timeline-aligned viewport (scrolls with the tracks below).
@@ -628,266 +529,22 @@ Item {
                     anchors.bottomMargin: 6
 
                     // Selected clip's time span — sits under the same region as the clip.
-                    Rectangle {
-                        x: root.xForSeconds(root.clipStart)
-                        width: Math.max(2, root.clipDuration * root.pxPerSecond)
-                        height: parent.height
-                        color: Theme.panelAccent
-                        opacity: 0.55
-                        radius: 2
-                    }
+                    KeyframeGraphClipSpan { host: root }
 
-                    Rectangle {
-                        anchors.verticalCenter: parent.verticalCenter
-                        x: root.xForSeconds(root.clipStart)
-                        width: Math.max(2, root.clipDuration * root.pxPerSecond)
-                        height: 1
-                        color: Theme.panelBorder
-                    }
+                    KeyframeGraphValueAxis { host: root }
 
                     // Playhead — same absolute X as the timeline playhead.
-                    Rectangle {
-                        x: root.xForSeconds(EditorState.playheadSeconds) - Theme.playheadLineWidth / 2
-                        width: Theme.playheadLineWidth
-                        height: parent.height
-                        color: Theme.primary
-                        z: 3
-                    }
+                    KeyframeGraphPlayhead { host: root }
 
                     // Detected beat grid + onset ticks, under the curves and key dots.
-                    Canvas {
-                        id: beatCanvas
-                        // Viewport-sized, not content-sized — see curveCanvas.
-                        x: root.paintOriginX
-                        width: viewport.width + 2 * root.paintChunk
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        z: 0
-                        visible: root.hasGrid || root.hasOnsets
-
-                        onPaint: {
-                            const ctx = getContext("2d")
-                            ctx.clearRect(0, 0, width, height)
-                            const a = root.beats
-                            if (!a)
-                                return
-                            // Canvas-local x for an absolute timeline position. Rounding happens
-                            // after the shift, so a fractional scroll offset cannot push a 1px
-                            // tick onto a half-pixel and smear it across two columns.
-                            const localX = t => Math.round(root.xForSeconds(t) - root.paintOriginX)
-
-                            if (root.hasGrid) {
-                                const perBar = a.beatsPerBar || 4
-                                const first = a.firstDownbeat || 0
-                                for (let i = 0; i < a.beats.length; ++i) {
-                                    const isBar = ((i - first) % perBar + perBar) % perBar === 0
-                                    const px = localX(a.beats[i])
-                                    if (px < -2 || px > width + 2)
-                                        continue
-                                    ctx.fillStyle = String(isBar ? Theme.beatBarColor
-                                                                 : Theme.beatGridColor)
-                                    ctx.fillRect(px, 0, isBar ? 2 : 1, height)
-                                }
-                            }
-
-                            if (!root.hasOnsets)
-                                return
-
-                            // With the grid up, only transients that miss it — the rest would
-                            // just double-draw lines already there. Height tracks strength.
-                            ctx.fillStyle = String(Theme.beatOnsetColor)
-                            const onsets = a.onsets || []
-                            for (let j = 0; j < onsets.length; ++j) {
-                                if (root.hasGrid && root.nearAnyBeat(onsets[j].seconds))
-                                    continue
-                                const ox = localX(onsets[j].seconds)
-                                if (ox < -2 || ox > width + 2)
-                                    continue
-                                // Centered rather than sitting on the floor: a 1px tick down
-                                // at the bottom edge read as chart furniture next to the
-                                // full-height beat lines.
-                                const h = Math.max(6, onsets[j].strength * height * 0.5)
-                                ctx.fillRect(ox - 1, (height - h) / 2, 2, h)
-                            }
-                        }
-
-                        // The canvas is hidden until the first analysis lands, and a
-                        // requestPaint issued while hidden is dropped.
-                        onVisibleChanged: if (visible) requestPaint()
-
-                        Connections {
-                            target: root
-                            function onBeatsChanged() { beatCanvas.requestPaint() }
-                            // Toggling a layer leaves beatAnalysis itself untouched, so
-                            // onBeatsChanged does not fire for it.
-                            function onHasGridChanged() { beatCanvas.requestPaint() }
-                            function onHasOnsetsChanged() { beatCanvas.requestPaint() }
-                            function onPxPerSecondChanged() { beatCanvas.requestPaint() }
-                            function onPaintOriginXChanged() { beatCanvas.requestPaint() }
-                        }
+                    KeyframeGraphBeatCanvas {
+                        host: root
+                        viewportWidth: viewport.width
                     }
 
-                    Canvas {
-                        id: curveCanvas
-                        // Only as wide as the visible strip, parked at the viewport's left edge
-                        // (content is offset by -contentX, so x: contentX cancels the scroll).
-                        // Filling the scrollable content instead would size the backing texture
-                        // to the whole timeline, and QSGPlainTexture silently rescales anything
-                        // past GL_MAX_TEXTURE_SIZE to fit — 16384px, which at 40x zoom is barely
-                        // 8 seconds of timeline. Past that the curves are drawn correctly and
-                        // then downsampled onto the GPU, which is what smeared them.
-                        x: root.paintOriginX
-                        width: viewport.width + 2 * root.paintChunk
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        onPaint: {
-                            const ctx = getContext("2d")
-                            ctx.clearRect(0, 0, width, height)
-                            // Everything below is in absolute timeline coordinates.
-                            ctx.save()
-                            ctx.translate(-root.paintOriginX, 0)
-                            const spanX0 = root.xForSeconds(root.clipStart)
-                            const spanX1 = root.xForSeconds(root.clipStart + root.clipDuration)
-
-                            for (let s = 0; s < root.series.length; ++s) {
-                                const entry = root.series[s]
-                                const isLinkedPartner = EditorState.positionLinked
-                                    && ((root.dragProp === "x" && entry.prop === "y") || (root.dragProp === "y" && entry.prop === "x"))
-
-                                const live = entry.points.map(function (p, i) {
-                                    if (entry.prop === root.dragProp) {
-                                        if (i === root.dragTangentIndex) {
-                                            // Handle being dragged: same key, reshaped.
-                                            return {
-                                                seconds: p.seconds, value: p.value, hold: p.hold,
-                                                inDx: root.dragTangentInDx, inDy: root.dragTangentInDy,
-                                                outDx: root.dragTangentOutDx, outDy: root.dragTangentOutDy
-                                            }
-                                        }
-                                        if (i === root.dragIndex) {
-                                            // Key being moved: carry its tangents through, so the
-                                            // curve shape does not snap back to linear mid-drag.
-                                            return {
-                                                seconds: root.dragSeconds, value: root.dragValue,
-                                                inDx: p.inDx, inDy: p.inDy,
-                                                outDx: p.outDx, outDy: p.outDy, hold: p.hold
-                                            }
-                                        }
-                                    } else if (isLinkedPartner) {
-                                        if (root.dragTangentIndex >= 0 && root.focusedIndex >= 0 && root.focusedIndex < root.series.length) {
-                                            const masterPts = root.series[root.focusedIndex].points
-                                            const masterP = masterPts ? masterPts[root.dragTangentIndex] : null
-                                            if (masterP && Math.abs(masterP.seconds - p.seconds) < (1 / 30)) {
-                                                let partnerInDy = 0.0
-                                                let partnerOutDy = 0.0
-                                                if (i + 1 < entry.points.length && root.dragTangentIndex + 1 < masterPts.length) {
-                                                    const mSpan = masterPts[root.dragTangentIndex + 1].value - masterP.value
-                                                    const sSpan = entry.points[i + 1].value - p.value
-                                                    if (Math.abs(mSpan) > 1e-6)
-                                                        partnerOutDy = root.dragTangentOutDy * (sSpan / mSpan)
-                                                }
-                                                if (i > 0 && root.dragTangentIndex > 0) {
-                                                    const mSpan = masterP.value - masterPts[root.dragTangentIndex - 1].value
-                                                    const sSpan = p.value - entry.points[i - 1].value
-                                                    if (Math.abs(mSpan) > 1e-6)
-                                                        partnerInDy = root.dragTangentInDy * (sSpan / mSpan)
-                                                }
-                                                return {
-                                                    seconds: p.seconds, value: p.value, hold: p.hold,
-                                                    inDx: root.dragTangentInDx, inDy: partnerInDy,
-                                                    outDx: root.dragTangentOutDx, outDy: partnerOutDy
-                                                }
-                                            }
-                                        } else if (root.dragIndex >= 0 && root.focusedIndex >= 0 && root.focusedIndex < root.series.length) {
-                                            const masterPts = root.series[root.focusedIndex].points
-                                            const masterP = masterPts ? masterPts[root.dragIndex] : null
-                                            if (masterP && Math.abs(masterP.seconds - p.seconds) < (1 / 30)) {
-                                                return {
-                                                    seconds: root.dragSeconds, value: p.value,
-                                                    inDx: p.inDx, inDy: p.inDy,
-                                                    outDx: p.outDx, outDy: p.outDy, hold: p.hold
-                                                }
-                                            }
-                                        }
-                                    }
-                                    return p
-                                })
-                                const sorted = live.sort((a, b) => a.seconds - b.seconds)
-
-                                // The focused series is the one being edited; the rest are
-                                // context and are drawn thinner and faded. A series whose
-                                // keyframes are switched off is faded further still — its curve
-                                // is a record of an animation that is not currently playing.
-                                const focused = root.isFocused(s)
-                                // Whole pixels. A 1.8px stroke lands ~40/100/40% across three
-                                // rows, which reads as a glow wherever the curve runs shallow —
-                                // exactly the flat tops and troughs between keys.
-                                ctx.lineWidth = focused ? 2 : 1
-                                ctx.globalAlpha = (root.curveEditing && !focused) ? 0.35 : 1.0
-                                if (entry.enabled === false)
-                                    ctx.globalAlpha *= 0.45
-                                ctx.strokeStyle = String(entry.color)
-                                ctx.beginPath()
-
-                                // An unkeyed property is a flat line at the value it actually
-                                // holds, so every selected property reads as an editable curve
-                                // spanning the clip rather than as nothing at all.
-                                if (sorted.length === 0) {
-                                    const by = root.yForValue(entry.baseValue, entry)
-                                    ctx.moveTo(spanX0, by)
-                                    ctx.lineTo(spanX1, by)
-                                    ctx.stroke()
-                                    continue
-                                }
-
-                                // Outside the keyed range the value is held flat, which is what
-                                // evaluateAt does — so the drawn line matches playback.
-                                const leadY = root.yForValue(sorted[0].value, entry)
-                                ctx.moveTo(spanX0, leadY)
-                                ctx.lineTo(root.xForSeconds(sorted[0].seconds), leadY)
-                                for (let i = 1; i < sorted.length; ++i) {
-                                    const a = sorted[i - 1]
-                                    const b = sorted[i]
-                                    const ax = root.xForSeconds(a.seconds)
-                                    const ay = root.yForValue(a.value, entry)
-                                    const bx = root.xForSeconds(b.seconds)
-                                    const by = root.yForValue(b.value, entry)
-
-                                    if (a.hold) {
-                                        // Step: hold the outgoing value, then jump.
-                                        ctx.lineTo(bx, ay)
-                                        ctx.lineTo(bx, by)
-                                        continue
-                                    }
-                                    // Handles are clamped into the segment exactly as the
-                                    // evaluator does, so the drawn curve matches playback.
-                                    const c1x = Math.min(bx, Math.max(ax, ax + root.xForSeconds(a.outDx || 0)))
-                                    const c2x = Math.min(bx, Math.max(ax, bx + root.xForSeconds(b.inDx || 0)))
-                                    const c1y = root.yForValue(a.value + (a.outDy || 0), entry)
-                                    const c2y = root.yForValue(b.value + (b.inDy || 0), entry)
-                                    ctx.bezierCurveTo(c1x, c1y, c2x, c2y, bx, by)
-                                }
-                                const tail = sorted[sorted.length - 1]
-                                ctx.lineTo(spanX1, root.yForValue(tail.value, entry))
-                                ctx.stroke()
-                            }
-                            ctx.globalAlpha = 1.0
-                            ctx.restore()
-                        }
-                        Connections {
-                            target: root
-                            function onSeriesChanged() { curveCanvas.requestPaint() }
-                            function onPxPerSecondChanged() { curveCanvas.requestPaint() }
-                            function onPaintOriginXChanged() { curveCanvas.requestPaint() }
-                            function onDragSecondsChanged() { curveCanvas.requestPaint() }
-                            function onDragValueChanged() { curveCanvas.requestPaint() }
-                            function onDragTangentOutDyChanged() { curveCanvas.requestPaint() }
-                            function onDragTangentOutDxChanged() { curveCanvas.requestPaint() }
-                            function onDragTangentInDyChanged() { curveCanvas.requestPaint() }
-                            function onDragTangentInDxChanged() { curveCanvas.requestPaint() }
-                            function onFocusedPropChanged() { curveCanvas.requestPaint() }
-                            function onLaneHeightChanged() { curveCanvas.requestPaint() }
-                        }
+                    KeyframeGraphCurveCanvas {
+                        host: root
+                        viewportWidth: viewport.width
                     }
 
                     // Below the key dots (z 2) and tangent grips (z 4), so double-clicking an
@@ -901,158 +558,8 @@ Item {
 
                     Repeater {
                         model: root.keyHandles
-                        delegate: Rectangle {
-                            id: keyDot
-                            required property var modelData
-                            readonly property var entry: root.series[modelData.seriesIndex]
-                            width: 10
-                            height: 10
-                            rotation: 45
-                            radius: 1
-                            color: modelData.color
-                            border.width: 1
-                            border.color: "#ffffff"
-                            opacity: (root.curveEditing && !root.isFocused(modelData.seriesIndex))
-                                     ? 0.4 : 1.0
-                            readonly property bool isLinkedPartnerKey: EditorState.positionLinked
-                                && ((root.dragProp === "x" && modelData.prop === "y") || (root.dragProp === "y" && modelData.prop === "x"))
-                                && root.dragIndex >= 0 && root.focusedIndex >= 0 && root.focusedIndex < root.series.length
-                                && Math.abs((root.series[root.focusedIndex].points[root.dragIndex] ? root.series[root.focusedIndex].points[root.dragIndex].seconds : -999) - modelData.seconds) < (1 / 30)
-                            x: root.xForSeconds(modelData.seconds) - width / 2 + (isLinkedPartnerKey ? (root.xForSeconds(root.dragSeconds) - root.xForSeconds(modelData.seconds)) : dragDx)
-                            y: root.yForValue(modelData.value, entry) - height / 2 + dragDy
-                            z: 2
-
-                            // Offsets rather than direct x/y writes, which would
-                            // clobber the bindings above for good.
-                            property real dragDx: 0
-                            property real dragDy: 0
-                            property real editSeconds: modelData.seconds
-
-                            // Touching a key moves focus to its series, which is what arms
-                            // that curve's tangent handles.
-                            function remove() {
-                                EditorState.removeClipKeyframe(
-                                    EditorState.selectedTrack,
-                                    EditorState.selectedClip,
-                                    keyDot.modelData.prop,
-                                    keyDot.modelData.seconds
-                                )
-                            }
-
-                            TapHandler {
-                                // Finger taps land on touchMove below, which takes the press.
-                                acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
-                                                 | PointerDevice.Stylus
-                                onTapped: root.focusedProp = keyDot.modelData.prop
-                                onDoubleTapped: keyDot.remove()
-                            }
-
-                            function beginMove() {
-                                root.focusedProp = keyDot.modelData.prop
-                                keyDot.editSeconds = keyDot.modelData.seconds
-                                root.frozenSeries = root.series
-                                root.dragProp = keyDot.modelData.prop
-                                root.dragIndex = keyDot.modelData.pointIndex
-                                root.dragSeconds = keyDot.modelData.seconds
-                                root.dragValue = keyDot.modelData.value
-                                root.draggingKey = true
-                                EditorState.beginPreviewDrag(qsTr("Move keyframe"))
-                            }
-                            function endMove() {
-                                // Unfreezing rebuilds the Repeater and destroys this
-                                // delegate mid-handler, so every reset has to land first.
-                                root.dragProp = ""
-                                root.dragIndex = -1
-                                keyDot.dragDx = 0
-                                keyDot.dragDy = 0
-                                EditorState.commitPreviewDrag()
-                                root.draggingKey = false
-                            }
-                            function moveBy(dx, dy) {
-                                const entry = keyDot.entry
-                                const baseSec = keyDot.modelData.seconds
-                                const baseVal = keyDot.modelData.value
-                                // snapTime pulls in beats, clip edges and the playhead,
-                                // and is a no-op when the toolbar's snap toggle is off.
-                                const rawSec = baseSec + dx / root.pxPerSecond
-                                const newSec = Math.max(
-                                    root.clipStart,
-                                    Math.min(root.clipStart + root.clipDuration,
-                                             EditorState.snapTime(rawSec)))
-                                const isShift = (EditorState.keyboardModifiers() & Qt.ShiftModifier) !== 0
-                                const newVal = isShift ? baseVal : Math.max(
-                                    entry.valueMin,
-                                    Math.min(entry.valueMax,
-                                             root.valueForY(
-                                                 root.yForValue(baseVal, entry) + dy,
-                                                 entry)))
-                                EditorState.previewMoveClipKeyframe(
-                                    EditorState.selectedTrack, EditorState.selectedClip,
-                                    keyDot.modelData.prop, keyDot.editSeconds, newSec, newVal)
-                                keyDot.editSeconds = newSec
-                                keyDot.dragDx = root.xForSeconds(newSec) - root.xForSeconds(baseSec)
-                                keyDot.dragDy = root.yForValue(newVal, entry)
-                                              - root.yForValue(baseVal, entry)
-                                root.dragSeconds = newSec
-                                root.dragValue = newVal
-                            }
-
-                            DragHandler {
-                                target: null
-                                acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
-                                                 | PointerDevice.Stylus
-                                onActiveChanged: {
-                                    if (active)
-                                        keyDot.beginMove()
-                                    else
-                                        keyDot.endMove()
-                                }
-                                onTranslationChanged: {
-                                    if (active)
-                                        keyDot.moveBy(translation.x, translation.y)
-                                }
-                            }
-
-                            // Touchscreen: a finger on the lane pans it, so a key only
-                            // moves after a hold. Mouse presses are rejected for the DragHandler.
-                            MouseArea {
-                                id: touchMove
-                                anchors.fill: parent
-                                anchors.margins: -10
-                                pressAndHoldInterval: Theme.touchLiftInterval
-                                preventStealing: armed
-                                property bool armed: false
-                                property point origin
-                                onPressed: (mouse) => {
-                                    if (mouse.source === Qt.MouseEventNotSynthesized) {
-                                        mouse.accepted = false
-                                        return
-                                    }
-                                    armed = false
-                                }
-                                onPressAndHold: (mouse) => {
-                                    origin = mapToItem(null, mouse.x, mouse.y)
-                                    armed = true
-                                    Haptics.pickUp()
-                                    keyDot.beginMove()
-                                }
-                                onPositionChanged: (mouse) => {
-                                    if (!armed)
-                                        return
-                                    const p = mapToItem(null, mouse.x, mouse.y)
-                                    keyDot.moveBy(p.x - origin.x, p.y - origin.y)
-                                }
-                                onClicked: root.focusedProp = keyDot.modelData.prop
-                                onDoubleClicked: keyDot.remove()
-                                onReleased: finish()
-                                onCanceled: finish()
-                                function finish() {
-                                    if (!armed)
-                                        return
-                                    armed = false
-                                    keyDot.endMove()
-                                }
-                            }
+                        delegate: KeyframeGraphKeyDot {
+                            host: root
                         }
                     }
 
@@ -1061,126 +568,8 @@ Item {
                     Repeater {
                         model: root.tangentHandles
 
-                        delegate: Item {
-                            id: tangent
-                            required property var modelData
-
-                            readonly property var entry: root.series[root.focusedIndex]
-                            readonly property real keyX: root.xForSeconds(modelData.point.seconds)
-                            readonly property real keyY: root.yForValue(modelData.point.value, entry)
-                            readonly property real tipX:
-                                root.xForSeconds(modelData.point.seconds
-                                                 + root.handleSeconds(modelData.point, modelData.outgoing))
-                            readonly property real tipY:
-                                root.yForValue(root.handleValue(modelData.point, modelData.outgoing), entry)
-
-                            anchors.fill: parent
-                            z: 4
-
-                            // Leader line from the key out to the grip.
-                            Rectangle {
-                                x: tangent.keyX
-                                y: tangent.keyY
-                                width: Math.hypot(tangent.tipX - tangent.keyX + tangent.dragDx,
-                                                  tangent.tipY - tangent.keyY + tangent.dragDy)
-                                height: 1
-                                color: tangent.modelData.color
-                                opacity: 0.55
-                                transformOrigin: Item.TopLeft
-                                rotation: Math.atan2(tangent.tipY - tangent.keyY + tangent.dragDy,
-                                                     tangent.tipX - tangent.keyX + tangent.dragDx)
-                                          * 180 / Math.PI
-                            }
-
-                            property real dragDx: 0
-                            property real dragDy: 0
-
-                            Rectangle {
-                                id: grip
-                                width: 8
-                                height: 8
-                                radius: 4
-                                color: Theme.panelBackground
-                                border.width: 1.5
-                                border.color: tangent.modelData.color
-                                x: tangent.tipX - width / 2 + tangent.dragDx
-                                y: tangent.tipY - height / 2 + tangent.dragDy
-
-                                HoverHandler { cursorShape: Qt.PointingHandCursor }
-
-                                DragHandler {
-                                    target: null
-                                    onActiveChanged: {
-                                        if (active) {
-                                            // Freeze the model exactly as a key drag does, so the
-                                            // Repeater cannot destroy this delegate mid-grab and
-                                            // so the value axis stops auto-fitting under the cursor.
-                                            const p = tangent.modelData.point
-                                            root.frozenSeries = root.series
-                                            root.dragProp = root.series[root.focusedIndex].prop
-                                            root.dragTangentIndex = tangent.modelData.pointIndex
-                                            root.dragTangentInDx = p.inDx || 0
-                                            root.dragTangentInDy = p.inDy || 0
-                                            root.dragTangentOutDx = p.outDx || 0
-                                            root.dragTangentOutDy = p.outDy || 0
-                                            root.draggingKey = true
-                                            EditorState.beginPreviewDrag(qsTr("Edit keyframe curve"))
-                                        } else {
-                                            // Same ordering as the key drag: unfreezing destroys
-                                            // this delegate, so reset before it.
-                                            root.dragProp = ""
-                                            root.dragTangentIndex = -1
-                                            tangent.dragDx = 0
-                                            tangent.dragDy = 0
-                                            EditorState.commitPreviewDrag()
-                                            root.draggingKey = false
-                                        }
-                                    }
-                                    onTranslationChanged: {
-                                        if (!active)
-                                            return
-                                        const p = tangent.modelData.point
-                                        const outgoing = tangent.modelData.outgoing
-
-                                        const isShift = (EditorState.keyboardModifiers() & Qt.ShiftModifier) !== 0
-                                        const newX = tangent.tipX + translation.x
-                                        const newY = isShift ? tangent.keyY : (tangent.tipY + translation.y)
-                                        // dx keeps its sign: an out-handle may not reach back
-                                        // past its key, nor an in-handle forward past its own.
-                                        let dx = root.secondsForX(newX - tangent.keyX)
-                                        dx = outgoing ? Math.max(0, dx) : Math.min(0, dx)
-                                        const dy = isShift ? 0.0 : (root.valueForY(newY, tangent.entry) - p.value)
-
-                                        const inDx = outgoing ? (p.inDx || 0) : dx
-                                        const outDx = outgoing ? dx : (p.outDx || 0)
-                                        let inDy = outgoing ? (p.inDy || 0) : dy
-                                        let outDy = outgoing ? dy : (p.outDy || 0)
-
-                                        // Unless the key is a corner, the far tangent takes the
-                                        // same slope so the curve stays smooth through the key.
-                                        // Its dx has the opposite sign, so its dy flips with it.
-                                        if (!p.corner && Math.abs(dx) > 1e-6) {
-                                            const slope = dy / dx
-                                            if (outgoing)
-                                                inDy = slope * inDx
-                                            else
-                                                outDy = slope * outDx
-                                        }
-
-                                        EditorState.previewSetKeyframeTangents(
-                                            EditorState.selectedTrack, EditorState.selectedClip,
-                                            root.series[root.focusedIndex].prop,
-                                            p.seconds, inDx, inDy, outDx, outDy, p.corner)
-
-                                        root.dragTangentInDx = inDx
-                                        root.dragTangentInDy = inDy
-                                        root.dragTangentOutDx = outDx
-                                        root.dragTangentOutDy = outDy
-                                        tangent.dragDx = newX - tangent.tipX
-                                        tangent.dragDy = isShift ? (tangent.keyY - tangent.tipY) : (newY - tangent.tipY)
-                                    }
-                                }
-                            }
+                        delegate: KeyframeGraphTangentHandle {
+                            host: root
                         }
                     }
                 }
@@ -1192,39 +581,8 @@ Item {
     // Bottom edge resize grip. A sibling of the Row rather than a child, so it anchors to the
     // lane instead of being laid out horizontally beside the graph, and sits above the lane's
     // content so a drag near the boundary resizes rather than grabbing what is underneath.
-    Rectangle {
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        height: 5
-        z: 100
-        color: resizeHover.hovered || resizeDrag.active ? Theme.primary : "transparent"
-        opacity: 0.6
-
-        HoverHandler {
-            id: resizeHover
-            cursorShape: Qt.SizeVerCursor
-        }
-        TapHandler {
-            onDoubleTapped: root.toggleExpanded()
-        }
-        DragHandler {
-            id: resizeDrag
-            target: null
-            yAxis.enabled: true
-            xAxis.enabled: false
-            property real startHeight: 0
-            onActiveChanged: {
-                if (active)
-                    startHeight = root.laneHeight
-            }
-            onTranslationChanged: {
-                if (!active)
-                    return
-                root.laneHeight = Math.max(root.minLaneHeight,
-                                           Math.min(root.maxLaneHeight,
-                                                    startHeight + translation.y))
-            }
-        }
+    KeyframeGraphResizeGrip {
+        id: resizeGrip
+        host: root
     }
 }

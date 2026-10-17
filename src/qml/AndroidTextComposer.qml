@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import "components"
-
 // The phone's subtitle entry: a bar pinned directly above the soft keyboard, used for one
 // subtitle cue at a time. It is an Item rather than a Popup so the preview
 // above it stays visible and live — AndroidEditor reads `coveredHeight` to keep the frame out
@@ -297,38 +295,13 @@ Item {
                       tip: qsTr("Set end to current time") }
                 ]
 
-                delegate: Column {
+                delegate: AndroidComposerTimingEdge {
                     id: group
-                    required property var modelData
                     width: timing.width / 2
-                    spacing: 0
-
-                    Text {
-                        text: group.modelData.label + "  "
-                              + (root.cue ? root.formatCueTime(root.cue[group.modelData.edge]) : "")
-                        color: Theme.mutedForeground
-                        font.family: Theme.monoFontFamily
-                        font.pixelSize: Theme.fontSizeXs
-                    }
-
-                    Row {
-                        IconButton {
-                            glyph: Theme.icons.chevronLeft
-                            tooltip: qsTr("Back one frame")
-                            onClicked: root.nudge(group.modelData.edge, -1)
-                        }
-                        IconButton {
-                            glyph: Theme.icons.chevronRight
-                            tooltip: qsTr("Forward one frame")
-                            onClicked: root.nudge(group.modelData.edge, 1)
-                        }
-                        IconButton {
-                            glyph: group.modelData.glyph
-                            tooltip: group.modelData.tip
-                            enabled: root.localPlayhead >= 0
-                            onClicked: root.setEdgeToPlayhead(group.modelData.edge)
-                        }
-                    }
+                    readout: root.cue ? root.formatCueTime(root.cue[group.modelData.edge]) : ""
+                    canSetPlayhead: root.localPlayhead >= 0
+                    onNudge: (edge, frames) => root.nudge(edge, frames)
+                    onSetToPlayhead: (edge) => root.setEdgeToPlayhead(edge)
                 }
             }
         }

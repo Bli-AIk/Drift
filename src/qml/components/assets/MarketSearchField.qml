@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // The Market's one entry point: a pill-shaped field with no buttons. Enter submits, the
 // trailing × clears the text or, while a request is out, cancels it. The pill is the only
 // fully rounded control on the page, which is what marks it as the place to start.

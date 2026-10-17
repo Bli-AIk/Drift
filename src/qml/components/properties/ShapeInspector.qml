@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // The shape clip's inspector: which shape, its shading stack (the same layer rows text uses,
 // keyed "shape.layer.<id>.<field>") and the keyframable geometry knobs.
 Item {

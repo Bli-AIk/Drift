@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // Path trail back to the bin root for the folder currently being viewed. Walks
 // BinFolderModel.folderById up through parentId; only shown once folders exist.
 Row {

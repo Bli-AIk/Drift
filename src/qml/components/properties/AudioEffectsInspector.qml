@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Window
 import Drift
-import ".."
-
 // Applied audio-effect stack for the selected clip. Browse presets in the
 // assets panel Audio FX tab; edit parameters here.
 Item {
@@ -116,95 +114,9 @@ Item {
                 width: root.width
                 spacing: 6
 
-                Rectangle {
-                    width: parent.width
-                    height: audioEffectHeader.implicitHeight + 8
-                    radius: Theme.radiusSm
-                    color: Theme.panelAccent
-
-                    Row {
-                        id: audioEffectHeader
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.leftMargin: 8
-                        anchors.rightMargin: 4
-                        spacing: 2
-
-                        IconGlyph {
-                            anchors.verticalCenter: parent.verticalCenter
-                            glyph: audioEffectCard.effectData.icon || "audio-lines"
-                            iconSize: 14
-                            iconColor: Theme.mutedForeground
-                            opacity: audioEffectCard.effectEnabled ? 1 : 0.5
-                        }
-                        Text {
-                            text: audioEffectCard.effectData.missing
-                                  ? qsTr("%1 (not installed)").arg(audioEffectCard.effectData.label)
-                                  : audioEffectCard.effectData.label
-                            color: audioEffectCard.effectEnabled
-                                   ? Theme.panelForeground : Theme.mutedForeground
-                            font.family: Theme.fontFamily
-                            font.pixelSize: Theme.fontSizeSm
-                            font.weight: Font.Medium
-                            width: parent.width - 22 * 5 - 20 - 8
-                            elide: Text.ElideRight
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        IconButton {
-                            glyph: Theme.icons.chevronUp
-                            variant: "ghost"
-                            buttonSize: 22
-                            iconSize: 12
-                            enabled: audioEffectCard.index > 0
-                            tooltip: qsTr("Move audio effect up")
-                            onClicked: EditorState.moveAudioEffect(
-                                           EditorState.selectedTrack, EditorState.selectedClip,
-                                           audioEffectCard.index, audioEffectCard.index - 1)
-                        }
-                        IconButton {
-                            glyph: Theme.icons.chevronDown
-                            variant: "ghost"
-                            buttonSize: 22
-                            iconSize: 12
-                            enabled: audioEffectCard.index < root.selectedAudioEffects.length - 1
-                            tooltip: qsTr("Move audio effect down")
-                            onClicked: EditorState.moveAudioEffect(
-                                           EditorState.selectedTrack, EditorState.selectedClip,
-                                           audioEffectCard.index, audioEffectCard.index + 1)
-                        }
-                        IconButton {
-                            glyph: audioEffectCard.effectEnabled ? Theme.icons.eye : Theme.icons.eyeOff
-                            variant: "ghost"
-                            buttonSize: 22
-                            iconSize: 12
-                            tooltip: audioEffectCard.effectEnabled
-                                     ? qsTr("Disable audio effect") : qsTr("Enable audio effect")
-                            onClicked: EditorState.setAudioEffectEnabled(
-                                           EditorState.selectedTrack, EditorState.selectedClip,
-                                           audioEffectCard.index, !audioEffectCard.effectEnabled)
-                        }
-                        IconButton {
-                            glyph: Theme.icons.copy
-                            variant: "ghost"
-                            buttonSize: 22
-                            iconSize: 12
-                            tooltip: qsTr("Copy this audio effect")
-                            onClicked: EditorState.copyAudioEffectToClipboard(
-                                           EditorState.selectedTrack, EditorState.selectedClip,
-                                           audioEffectCard.index)
-                        }
-                        IconButton {
-                            glyph: Theme.icons.x
-                            variant: "ghost"
-                            buttonSize: 22
-                            iconSize: 12
-                            tooltip: qsTr("Remove audio effect")
-                            onClicked: EditorState.removeAudioEffect(
-                                           EditorState.selectedTrack, EditorState.selectedClip,
-                                           audioEffectCard.index)
-                        }
-                    }
+                AudioEffectHeader {
+                    card: audioEffectCard
+                    inspector: root
                 }
 
                 Column {

@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtMultimedia
 import Drift
-import ".."
-
 // Stock footage, photos and audio for the active Market type. The query comes from the
 // Market field above; Enter there calls submitQuery(). Sources are a quiet line of names
 // rather than a dropdown, led by "All" (every source with no download limit, searched
@@ -539,113 +537,9 @@ Item {
             ScrollBar.vertical: AppScrollBar { }
             onAtYEndChanged: if (atYEnd && Market.hasMore && !Market.searching) Market.loadMore()
 
-            delegate: Rectangle {
-                id: audioRow
-                required property var modelData
-                readonly property bool isPlaying: audioPlayer.itemId === modelData.id
-                                                  && audioPlayer.playbackState === MediaPlayer.PlayingState
-                readonly property var job: {
-                    void Market.downloadsRevision
-                    return Market.downloadInfo(modelData.id)
-                }
-                width: audioList.width
-                height: Theme.touchUi ? Theme.androidMinTouchTarget + Theme.spacingLg : Theme.controlHeight + Theme.spacingLg
-                radius: Theme.radiusSm
-                color: rowHover.hovered ? Theme.popoverHover : "transparent"
-
-                HoverHandler { id: rowHover; cursorShape: Qt.PointingHandCursor }
-                TapHandler { onTapped: root.openDetail(audioRow.modelData) }
-
-                IconButton {
-                    id: playButton
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    glyph: audioRow.isPlaying ? Theme.icons.pause : Theme.icons.play
-                    enabled: !!audioRow.modelData.preview_url
-                    tooltip: audioRow.isPlaying ? qsTr("Pause") : qsTr("Play preview")
-                    onClicked: {
-                        if (audioRow.isPlaying) {
-                            audioPlayer.pause()
-                            return
-                        }
-                        if (audioPlayer.itemId !== audioRow.modelData.id) {
-                            audioPlayer.itemId = audioRow.modelData.id
-                            audioPlayer.source = audioRow.modelData.preview_url
-                        }
-                        audioPlayer.play()
-                    }
-                }
-
-                Column {
-                    anchors.left: playButton.right
-                    anchors.right: trailing.left
-                    anchors.leftMargin: Theme.spacingMd
-                    anchors.rightMargin: Theme.spacingMd
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 2
-                    Text {
-                        width: parent.width
-                        text: audioRow.modelData.title || ""
-                        color: Theme.panelForeground
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeSm
-                        elide: Text.ElideRight
-                    }
-                    Text {
-                        width: parent.width
-                        visible: text.length > 0
-                        text: audioRow.modelData.creator ? (audioRow.modelData.creator.name || "") : ""
-                        color: Theme.mutedForeground
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeXs
-                        elide: Text.ElideRight
-                    }
-                    // Playback position of the row that is playing.
-                    Rectangle {
-                        width: parent.width
-                        height: 2
-                        radius: 1
-                        color: Theme.panelMuted
-                        visible: audioPlayer.itemId === audioRow.modelData.id && audioPlayer.duration > 0
-                        Rectangle {
-                            width: parent.width * Math.min(1, audioPlayer.position / Math.max(1, audioPlayer.duration))
-                            height: parent.height
-                            radius: 1
-                            color: Theme.primary
-                        }
-                    }
-                }
-
-                Item {
-                    id: trailing
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: Math.max(durationText.implicitWidth, ring.width)
-                    height: parent.height
-
-                    Text {
-                        id: durationText
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: !ring.visible
-                        text: {
-                            const n = Math.round(Number(audioRow.modelData.duration_ms || 0) / 1000)
-                            return n > 0 ? Math.floor(n / 60) + ":" + (n % 60 < 10 ? "0" : "") + (n % 60) : ""
-                        }
-                        color: Theme.mutedForeground
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeXs
-                    }
-                    CircularProgress {
-                        id: ring
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: ["waiting", "queued", "processing", "downloading", "importing"].indexOf(audioRow.job.status) >= 0
-                        value: Number(audioRow.job.progress || 0)
-                        indeterminate: Number(audioRow.job.progress || 0) <= 0
-                        size: Theme.spacing2xl + Theme.spacingSm
-                    }
-                }
+            delegate: StockAudioRow {
+                previewPlayer: audioPlayer
+                onOpenRequested: (item) => root.openDetail(item)
             }
         }
     }

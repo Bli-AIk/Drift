@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // The Market's first page: CutWire's own animations, face props and 3D objects, one shelf per
 // category in the order editors reach for them. Typing in the Market field filters these
 // locally and offers the stock sources underneath, so a search never dead-ends here.

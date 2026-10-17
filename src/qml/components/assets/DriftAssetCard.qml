@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Effects
 import QtQuick.Window
 import Drift
-import ".."
-
 // One Drift Asset. The card takes the asset's own shape: a lower third is a strip, a button a
 // pill, a face prop a circle, so a shelf reads as what each overlay is before any label does.
 // The animated preview plays while the card is hovered or focused (or, on touch, while the

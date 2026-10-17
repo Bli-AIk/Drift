@@ -1,7 +1,5 @@
 import QtQuick
 import Drift
-import ".."
-
 // The 3D view's own tools, as a floating column: the gizmo's tool and axes, looking through the
 // camera, and putting the camera or the view back.
 Rectangle {
@@ -51,12 +49,7 @@ Rectangle {
                        EditorState.preview.gizmoOrientation === "local" ? "global" : "local"
         }
 
-        Rectangle {
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: Theme.iconSizeBase
-            height: Theme.borderWidth
-            color: Theme.panelBorder
-        }
+        Preview3DToolsDivider {}
 
         IconButton {
             glyph: Theme.icons.fly

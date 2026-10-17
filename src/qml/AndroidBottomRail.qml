@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import "components"
-
 // CapCut-style bottom tool rail: four destinations either side of a centred Add
 // button.
 //
@@ -76,80 +74,10 @@ Item {
         // the rail wide — far past the 48dp floor even on a 360dp phone.
         readonly property real slotWidth: width / 5
 
-        component RailButton: AbstractButton {
-            id: railBtn
-            required property var entry
-            property bool selected: false
-
-            height: railBody.height
-            hoverEnabled: true
-
-            Accessible.role: Accessible.Button
-            Accessible.name: entry.label
-            // Nav state has to reach assistive tech too, not just the tint below.
-            Accessible.checkable: true
-            Accessible.checked: railBtn.selected
-
-            onClicked: Haptics.select()
-
-            // Press feedback. On the root rather than the background so the label
-            // dips with the icon, and via scale so packed slots do not reflow.
-            scale: railBtn.down ? Theme.pressScale : 1.0
-
-            Behavior on scale {
-                NumberAnimation { duration: Theme.durationPress; easing.type: Theme.easing }
-            }
-
-            background: Item { }
-
-            contentItem: Item {
-                anchors.fill: parent
-
-                Column {
-                    anchors.centerIn: parent
-                    spacing: 3
-
-                    // Selection pill behind the glyph. The old rail signalled the
-                    // active destination with tint alone — and the tint was
-                    // Theme.primary, which sits at 1.69:1 on the light panel and so
-                    // said nothing at all in light mode.
-                    Rectangle {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        width: Theme.iconSizeLg + Theme.spacing2xl
-                        height: Theme.iconSizeLg + Theme.spacingLg
-                        radius: Theme.radiusPill
-                        color: railBtn.selected ? Theme.panelSecondaryBg
-                                                : (railBtn.down ? Theme.panelAccent : "transparent")
-
-                        Behavior on color {
-                            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                        }
-
-                        IconGlyph {
-                            anchors.centerIn: parent
-                            glyph: railBtn.entry.icon
-                            iconSize: Theme.iconSizeLg
-                            iconColor: railBtn.selected ? Theme.accentOnPanel
-                                                        : Theme.mutedForeground
-                        }
-                    }
-
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: railBtn.entry.label
-                        color: railBtn.selected ? Theme.accentOnPanel : Theme.mutedForeground
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeXs
-                        font.weight: railBtn.selected ? Font.Medium : Font.Normal
-                    }
-                }
-            }
-        }
-
         // Edit is the one slot that needs something selected. Dimmed and answered with a
         // toast rather than silently opening an empty sheet: a rail slot that does nothing
         // when tapped reads as a broken app.
-        RailButton {
+        AndroidRailButton {
             x: 0
             width: railBody.slotWidth
             entry: root.items[0]
@@ -165,7 +93,7 @@ Item {
             }
         }
 
-        RailButton {
+        AndroidRailButton {
             x: railBody.slotWidth
             width: railBody.slotWidth
             entry: root.items[1]
@@ -174,58 +102,13 @@ Item {
         }
 
         // Centre slot: everything that puts a new clip on the timeline.
-        AbstractButton {
-            id: addButton
+        AndroidRailAddButton {
             x: railBody.slotWidth * 2
             width: railBody.slotWidth
-            height: railBody.height
-            hoverEnabled: true
-
-            Accessible.role: Accessible.Button
-            Accessible.name: qsTr("Add to timeline")
-
-            scale: addButton.down ? Theme.pressScale : 1.0
-
-            Behavior on scale {
-                NumberAnimation { duration: Theme.durationPress; easing.type: Theme.easing }
-            }
-
-            background: Item { }
-
-            contentItem: Item {
-                anchors.fill: parent
-
-                Rectangle {
-                    anchors.centerIn: parent
-                    width: Theme.androidRailFabSize
-                    height: Theme.androidRailFabSize
-                    radius: Theme.radiusLg
-                    // The one filled control in the shell, so "add something" reads
-                    // as the rail's primary action rather than a fifth tab. `primary`
-                    // is a fill here, not a foreground, so it needs no light-mode
-                    // variant — primaryForeground is 9.8:1 on it in both themes.
-                    color: addButton.down ? Qt.darker(Theme.primary, 1.12) : Theme.primary
-
-                    Behavior on color {
-                        ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                    }
-
-                    IconGlyph {
-                        anchors.centerIn: parent
-                        glyph: Theme.icons.plus
-                        iconSize: Theme.iconSizeXl
-                        iconColor: Theme.primaryForeground
-                    }
-                }
-            }
-
-            onClicked: {
-                Haptics.confirm()
-                root.addRequested()
-            }
+            onRequested: root.addRequested()
         }
 
-        RailButton {
+        AndroidRailButton {
             x: railBody.slotWidth * 3
             width: railBody.slotWidth
             entry: root.items[2]
@@ -233,7 +116,7 @@ Item {
             onClicked: root.tabRequested(entry.id)
         }
 
-        RailButton {
+        AndroidRailButton {
             x: railBody.slotWidth * 4
             width: railBody.slotWidth
             entry: root.items[3]

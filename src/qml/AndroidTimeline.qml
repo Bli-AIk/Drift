@@ -2,9 +2,6 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Window
 import Drift
-import "components"
-import "components/timeline"
-
 // CapCut-style phone timeline: multi-track, seek, select/move/trim/blade, pinch zoom,
 // plus the keyframe, subtitle-cue and beat lanes and transition chrome.
 // Omits the marquee and library drops — neither has a touch gesture; box-select is
@@ -510,7 +507,6 @@ Item {
     property int effectDropTrackIndex: -1
     property int effectDropClipIndex: -1
 
-
     // A trim in progress, broadcast so the dragged clip's linked A/V companion can follow it on
     // screen. The commit gives the partner identical timing (syncLinkedTiming), so the preview
     // is simply the same geometry applied to both.
@@ -937,7 +933,6 @@ Item {
         return index >= 0 && index < tracks.length && !tracks[index].isAdjustmentLane
     }
 
-
     // Adjustment layers are tinted by what they act on, so a glance at a lane says whether it is
     // grading the picture, treating the audio, or cutting a mask.
     function adjustmentColor(kind) {
@@ -992,7 +987,6 @@ Item {
         return -1
     }
 
-
     function trackIndexAtY(y) {
         var cursor = 0
         for (var i = 0; i < tracks.length; i++) {
@@ -1030,82 +1024,15 @@ Item {
         anchors.leftMargin: root.leftInset
         anchors.rightMargin: root.rightInset
 
-        // Lane bar: the keyframe lane's collapse toggle, and — while multi-select is
-        // armed — the controls that gesture has no other home for.
-        Item {
+        AndroidTimelineLaneBar {
             id: laneBar
             width: parent.width
             visible: root.multiSelectActive || keyframeLane.allSeries.length > 0
             height: visible ? 32 : 0
-
-            Rectangle {
-                anchors.fill: parent
-                color: Theme.panelBackground
-            }
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                height: 1
-                color: Theme.panelBorder
-            }
-
-            Row {
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.spacingLg
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.spacingLg
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingSm
-                visible: !root.multiSelectActive
-
-                ThemedChip {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Keyframes")
-                    chipHeight: 26
-                    selected: root.keyframeLaneOpen
-                    onClicked: root.keyframeLaneOpen = !root.keyframeLaneOpen
-                }
-            }
-
-            Row {
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.spacingLg
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.spacingLg
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingSm
-                visible: root.multiSelectActive
-
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("%n clip(s)", "", EditorState.selectionCount)
-                    color: Theme.panelForeground
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeXs
-                }
-                ThemedChip {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("All")
-                    chipHeight: 26
-                    variant: "outline"
-                    onClicked: EditorState.selectAllClips()
-                }
-                ThemedChip {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("None")
-                    chipHeight: 26
-                    variant: "outline"
-                    onClicked: EditorState.clearSelection()
-                }
-                ThemedChip {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Done")
-                    chipHeight: 26
-                    selected: true
-                    onClicked: root.multiSelectActive = false
-                }
-            }
+            multiSelectActive: root.multiSelectActive
+            keyframeLaneOpen: root.keyframeLaneOpen
+            onKeyframesToggled: root.keyframeLaneOpen = !root.keyframeLaneOpen
+            onMultiSelectFinished: root.multiSelectActive = false
         }
 
         // Both lanes size themselves to zero when they have nothing to show, so the
@@ -1217,59 +1144,13 @@ Item {
             // Being outside the content item is also what deletes the four
             // `y: flick.contentY` compensations the old head needed to stay put while the
             // tracks panned vertically.
-            Item {
+            AndroidTimelinePlayhead {
                 id: playhead
                 x: root.labelsWidth + flick.width / 2 - Theme.androidPlayheadCentreWidth / 2
                 y: 0
                 z: 30
                 width: Theme.androidPlayheadCentreWidth
                 height: parent.height
-
-                Rectangle {
-                    anchors.left: parent.left
-                    y: Theme.timelineRulerHeight * 0.55
-                    width: parent.width
-                    height: parent.height - y
-                    color: Theme.primary
-                }
-
-                Item {
-                    width: Theme.playheadHandleSize
-                    height: Theme.playheadHandleSize + 2
-                    x: -width / 2 + parent.width / 2
-                    y: 3
-
-                    Rectangle {
-                        anchors.top: parent.top
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        width: parent.width
-                        height: parent.height * 0.55
-                        radius: 2
-                        color: Theme.primary
-                    }
-
-                    Canvas {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top
-                        anchors.topMargin: parent.height * 0.4
-                        width: parent.width
-                        height: parent.height * 0.6
-                        onPaint: {
-                            const ctx = getContext("2d")
-                            ctx.reset()
-                            ctx.beginPath()
-                            ctx.moveTo(0, 0)
-                            ctx.lineTo(width, 0)
-                            ctx.lineTo(width * 0.5, height)
-                            ctx.closePath()
-                            ctx.fillStyle = Theme.primary
-                            ctx.fill()
-                        }
-                        onWidthChanged: requestPaint()
-                        onHeightChanged: requestPaint()
-                        Component.onCompleted: requestPaint()
-                    }
-                }
             }
 
             Flickable {
@@ -1391,49 +1272,14 @@ Item {
                             color: Theme.panelBorder
                         }
 
-                        Item {
+                        AndroidTimelineRuler {
                             id: ruler
-                            width: parent.width
-                            height: Theme.timelineRulerHeight
-                            z: 0
-
-                            readonly property real tickStepPx: root.tickStepSeconds * root.pxPerSecond
-                            readonly property int tickIndexMax: Math.max(0,
-                                Math.ceil(flick.contentWidth / Math.max(1, tickStepPx)))
-                            readonly property int firstVisibleTick: Math.max(0,
-                                Math.floor(flick.contentX / Math.max(1, tickStepPx)) - 1)
-                            readonly property int visibleTickCount: Math.min(
-                                tickIndexMax - firstVisibleTick + 1,
-                                Math.ceil(flick.width / Math.max(1, tickStepPx)) + 3)
-
-                            Repeater {
-                                model: Math.max(0, ruler.visibleTickCount)
-                                delegate: Item {
-                                    readonly property real tickSeconds:
-                                        (ruler.firstVisibleTick + index) * root.tickStepSeconds
-                                    x: tickSeconds * root.pxPerSecond
-                                    width: root.tickStepSeconds * root.pxPerSecond
-                                    height: ruler.height
-
-                                    Rectangle {
-                                        x: 0
-                                        y: parent.height - 10
-                                        width: 1
-                                        height: 8
-                                        color: Qt.rgba(Theme.mutedForeground.r,
-                                                       Theme.mutedForeground.g,
-                                                       Theme.mutedForeground.b, 0.28)
-                                    }
-                                    Text {
-                                        x: 4
-                                        y: 4
-                                        text: root.formatTick(parent.tickSeconds)
-                                        color: Theme.mutedForeground
-                                        font.pixelSize: Theme.fontSizeTick
-                                        font.family: Theme.fontFamily
-                                    }
-                                }
-                            }
+                            pxPerSecond: root.pxPerSecond
+                            tickStepSeconds: root.tickStepSeconds
+                            contentWidth: flick.contentWidth
+                            contentX: flick.contentX
+                            viewWidth: flick.width
+                            formatTick: function(seconds) { return root.formatTick(seconds) }
                         }
 
                         // Bookmark lane. Tap a flag to jump; hold it for the menu desktop
@@ -1496,71 +1342,9 @@ Item {
 
                             Repeater {
                                 model: EditorState.bookmarks
-                                delegate: Item {
-                                    id: bookmarkFlag
-                                    required property int index
-                                    required property var modelData
-
-                                    x: modelData.seconds * root.pxPerSecond - width / 2
-                                    width: 10
-                                    height: parent.height
-
-                                    Rectangle {
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        y: -6
-                                        width: 1
-                                        height: parent.height + 6
-                                        color: Theme.primary
-                                        opacity: 0.7
-                                    }
-
-                                    Rectangle {
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        width: 8
-                                        height: 8
-                                        rotation: 45
-                                        radius: 1
-                                        color: Theme.primary
-                                    }
-
-                                    // A project marked up on desktop arrived as a row of
-                                    // anonymous diamonds; the label is the whole point of
-                                    // a bookmark. Overflows the 10px flag deliberately.
-                                    Text {
-                                        x: 8
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        text: bookmarkFlag.modelData.label
-                                        color: Theme.mutedForeground
-                                        font.family: Theme.fontFamily
-                                        font.pixelSize: Theme.fontSizeTiny
-                                    }
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        // The flag is 10px; the target is a fingertip — widened
-                                        // sideways only, so it cannot reach down over the first
-                                        // track and eat the start of a pan there.
-                                        anchors.leftMargin: -14
-                                        anchors.rightMargin: -14
-                                        preventStealing: true
-                                        pressAndHoldInterval: 400
-
-                                        property bool held: false
-
-                                        onPressed: held = false
-                                        onPressAndHold: {
-                                            held = true
-                                            Haptics.pickUp()
-                                            bookmarkContextMenu.bookmarkIndex = bookmarkFlag.index
-                                            bookmarkContextMenu.bookmarkLabel = bookmarkFlag.modelData.label
-                                            bookmarkContextMenu.popup()
-                                        }
-                                        onClicked: if (!held) {
-                                            Haptics.select()
-                                            EditorState.goToBookmark(bookmarkFlag.index)
-                                        }
-                                    }
+                                delegate: AndroidTimelineBookmarkFlag {
+                                    pxPerSecond: root.pxPerSecond
+                                    menu: bookmarkContextMenu
                                 }
                             }
                         }
@@ -1627,11 +1411,8 @@ Item {
                                                Theme.panelAccent.b, 0.22)
 
                                 // A transform layer's row carries a faint wash of its colour.
-                                Rectangle {
-                                    anchors.fill: parent
-                                    visible: root.tracks[trackRow.trackIndex].isTransformLayer === true
-                                    color: Qt.rgba(Theme.clipTransform.r, Theme.clipTransform.g,
-                                                   Theme.clipTransform.b, 0.07)
+                                AndroidTimelineTrackWash {
+                                    shown: root.tracks[trackRow.trackIndex].isTransformLayer === true
                                 }
 
                                 // A tap on empty track clears the selection. Clips take their
@@ -1650,31 +1431,11 @@ Item {
 
                                     Repeater {
                                         model: EditorState.clipsModel(trackRow.trackIndex).adjustmentLanes
-                                        delegate: Item {
-                                            id: laneStrip
-                                            required property var modelData
-                                            // See the desktop panel: this Item is what
-                                            // TimelineClipItem reads as its `trackRow`.
-                                            property int trackIndex: modelData
+                                        delegate: AndroidTimelineAdjustmentStrip {
                                             width: trackRow.width
-                                            height: Theme.adjustmentLaneHeight
-                                            opacity: root.tracks[trackIndex].hidden === true ? 0.4 : 1
-
-                                            Rectangle {
-                                                anchors.fill: parent
-                                                color: Qt.rgba(Theme.clipEffect.r, Theme.clipEffect.g,
-                                                               Theme.clipEffect.b, 0.12)
-                                            }
-
-                                            TimelineTrackArea {
-                                                anchors.fill: parent
-                                                panel: root
-                                                timelineColumn: trackColumn
-                                                trackIndex: laneStrip.trackIndex
-                                                viewState: timelineViewState
-                                                touchMode: true
-                                            }
-
+                                            panel: root
+                                            timelineColumn: trackColumn
+                                            viewState: timelineViewState
                                         }
                                     }
                                 }
@@ -1702,133 +1463,9 @@ Item {
                                         touchMode: true
                                     }
 
-
-                                    // Live voiceover recording indicator and waveform on this track
-                                    Rectangle {
-                                        id: liveRecordingBlock
-                                        visible: EditorState.isRecordingAudio && EditorState.recordingTrackIndex === trackClipArea.trackIndex
-                                        x: (EditorState.playheadSeconds - EditorState.audioRecordSeconds) * root.pxPerSecond
-                                        width: Math.max(2, EditorState.audioRecordSeconds * root.pxPerSecond)
-                                        height: parent.height
-                                        color: Qt.rgba(Theme.destructive.r, Theme.destructive.g, Theme.destructive.b, 0.25)
-                                        border.color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
-                                        border.width: 1
-                                        radius: Theme.radiusSm
-                                        clip: true
-                                        z: 2
-
-                                        // Real-time live audio waveform canvas
-                                        Canvas {
-                                            id: liveWaveCanvas
-                                            anchors.fill: parent
-                                            anchors.margins: 1
-                                            visible: parent.width > 4
-
-                                            Connections {
-                                                target: EditorState
-                                                function onAudioRecordLivePeaksChanged() {
-                                                    liveWaveCanvas.requestPaint()
-                                                }
-                                            }
-                                            onWidthChanged: requestPaint()
-                                            onHeightChanged: requestPaint()
-
-                                            onPaint: {
-                                                var ctx = getContext("2d");
-                                                ctx.clearRect(0, 0, width, height);
-                                                var peaks = EditorState.audioRecordLivePeaks;
-                                                if (!peaks || peaks.length === 0)
-                                                    return;
-
-                                                var mid = height / 2;
-                                                var half = mid * 0.85;
-                                                var w = Math.max(1, Math.floor(width));
-                                                var n = peaks.length;
-
-                                                // Centerline guideline
-                                                ctx.strokeStyle = Qt.rgba(1.0, 1.0, 1.0, 0.15);
-                                                ctx.lineWidth = 1;
-                                                ctx.beginPath();
-                                                ctx.moveTo(0, mid);
-                                                ctx.lineTo(w, mid);
-                                                ctx.stroke();
-
-                                                // Mirrored waveform fill
-                                                ctx.fillStyle = Qt.rgba(1.0, 1.0, 1.0, 0.85);
-                                                ctx.beginPath();
-                                                for (var x = 0; x < w; x++) {
-                                                    var i0 = Math.floor(x * n / w);
-                                                    var i1 = Math.floor((x + 1) * n / w);
-                                                    if (i1 <= i0) i1 = Math.min(n, i0 + 1);
-                                                    var peak = 0;
-                                                    for (var i = i0; i < i1; i++) {
-                                                        if (peaks[i] > peak) peak = peaks[i];
-                                                    }
-                                                    var amp = Math.max(1.0, peak * half);
-                                                    if (x === 0) ctx.moveTo(x, mid - amp);
-                                                    else ctx.lineTo(x, mid - amp);
-                                                    ctx.lineTo(x + 1, mid - amp);
-                                                }
-                                                for (var xb = w - 1; xb >= 0; xb--) {
-                                                    var j0 = Math.floor(xb * n / w);
-                                                    var j1 = Math.floor((xb + 1) * n / w);
-                                                    if (j1 <= j0) j1 = Math.min(n, j0 + 1);
-                                                    var peakB = 0;
-                                                    for (var j = j0; j < j1; j++) {
-                                                        if (peaks[j] > peakB) peakB = peaks[j];
-                                                    }
-                                                    var ampB = Math.max(1.0, peakB * half);
-                                                    ctx.lineTo(xb + 1, mid + ampB);
-                                                    ctx.lineTo(xb, mid + ampB);
-                                                }
-                                                ctx.closePath();
-                                                ctx.fill();
-                                            }
-                                        }
-
-                                        // Badge tag in upper-left corner of the recording clip
-                                        Rectangle {
-                                            visible: liveRecordingBlock.width > 55
-                                            anchors.left: parent.left
-                                            anchors.leftMargin: 4
-                                            anchors.top: parent.top
-                                            anchors.topMargin: 3
-                                            height: 18
-                                            radius: 3
-                                            color: Qt.rgba(0, 0, 0, 0.7)
-                                            border.color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
-                                            border.width: 1
-                                            width: liveRecRow.implicitWidth + 8
-
-                                            Row {
-                                                id: liveRecRow
-                                                anchors.centerIn: parent
-                                                spacing: 4
-
-                                                Rectangle {
-                                                    width: 6
-                                                    height: 6
-                                                    radius: 3
-                                                    color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
-                                                    anchors.verticalCenter: parent.verticalCenter
-                                                    SequentialAnimation on opacity {
-                                                        running: liveRecordingBlock.visible && !EditorState.isAudioRecordingPaused
-                                                        loops: Animation.Infinite
-                                                        NumberAnimation { to: 0.2; duration: 400 }
-                                                        NumberAnimation { to: 1.0; duration: 400 }
-                                                    }
-                                                }
-
-                                                Text {
-                                                    text: (EditorState.isAudioRecordingPaused ? qsTr("PAUSED ") : qsTr("REC "))
-                                                          + EditorState.audioRecordSeconds.toFixed(1) + "s"
-                                                    font.pixelSize: 10
-                                                    font.bold: true
-                                                    color: Theme.panelForeground
-                                                    anchors.verticalCenter: parent.verticalCenter
-                                                }
-                                            }
-                                        }
+                                    AndroidTimelineLiveRecording {
+                                        trackIndex: trackClipArea.trackIndex
+                                        pxPerSecond: root.pxPerSecond
                                     }
                                 }
 
@@ -1836,38 +1473,12 @@ Item {
                                 // clears the selection like any other empty stretch of track.
                                 Repeater {
                                     model: EditorState.clipsModel(trackRow.trackIndex).gaps
-                                    delegate: Item {
-                                        id: gapItem
-                                        required property var modelData
-                                        x: modelData.start * root.pxPerSecond
-                                        // The gap's own width, never more: padding it to a minimum
-                                        // spilled it over the next clip's edge, where it swallowed
-                                        // that clip's taps and its trim handle.
-                                        width: Math.max(0, (modelData.end - modelData.start) * root.pxPerSecond)
-                                        height: trackRow.height
-                                        z: 1
-
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            visible: gapPress.pressed
-                                            color: Qt.rgba(Theme.panelAccent.r, Theme.panelAccent.g,
-                                                           Theme.panelAccent.b, 0.35)
-                                        }
-
-                                        MouseArea {
-                                            id: gapPress
-                                            anchors.fill: parent
-                                            pressAndHoldInterval: 400
-                                            property bool held: false
-                                            onPressed: held = false
-                                            onPressAndHold: {
-                                                held = true
-                                                Haptics.pickUp()
-                                                root.openGapMenu(trackRow.trackIndex, gapItem.modelData.start)
-                                            }
-                                            onClicked: if (!held && !root.multiSelectActive)
-                                                           EditorState.clearSelection()
-                                        }
+                                    delegate: AndroidTimelineGapPress {
+                                        trackIndex: trackRow.trackIndex
+                                        pxPerSecond: root.pxPerSecond
+                                        multiSelectActive: root.multiSelectActive
+                                        onGapHeld: (trackIndex, startSeconds) =>
+                                                   root.openGapMenu(trackIndex, startSeconds)
                                     }
                                 }
 
@@ -1878,87 +1489,9 @@ Item {
                                 // reach the Flickable.
                                 Repeater {
                                     model: EditorState.clipsModel(trackRow.trackIndex).transitionRegions
-                                    delegate: Item {
-                                        id: transitionRegion
-                                        required property var modelData
-                                        readonly property int leftClipIndex: modelData.leftClip
-                                        readonly property bool hasTransition: modelData.hasTransition
-                                        readonly property bool transitionSelected:
-                                            EditorState.selectedTransitionTrack === trackRow.trackIndex
-                                            && EditorState.selectedTransitionLeftClip === leftClipIndex
-
-                                        z: 10
-                                        x: modelData.start * root.pxPerSecond
-                                        // Floored to a fingertip rather than the desktop's
-                                        // 8px, so a half-second crossfade is still tappable.
-                                        width: Math.max(Theme.androidIconButtonSize,
-                                                        (modelData.end - modelData.start) * root.pxPerSecond)
-                                        y: Theme.clipSelectionRingWidth
-                                        height: parent.height - Theme.clipSelectionRingWidth * 2
-
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            radius: Theme.radiusSm
-                                            color: Qt.rgba(Theme.transitionOverlap.r,
-                                                           Theme.transitionOverlap.g,
-                                                           Theme.transitionOverlap.b,
-                                                           transitionRegion.transitionSelected ? 0.85
-                                                           : (transitionRegion.hasTransition ? 0.65 : 0.35))
-                                            border.width: transitionRegion.transitionSelected ? 2 : 1
-                                            border.color: Theme.transitionOverlap
-
-                                            Canvas {
-                                                anchors.fill: parent
-                                                anchors.margins: 1
-                                                opacity: 0.35
-                                                onPaint: {
-                                                    const ctx = getContext("2d")
-                                                    ctx.clearRect(0, 0, width, height)
-                                                    ctx.strokeStyle = Theme.onMedia
-                                                    ctx.lineWidth = 1
-                                                    for (var x = -height; x < width; x += 6) {
-                                                        ctx.beginPath()
-                                                        ctx.moveTo(x, height)
-                                                        ctx.lineTo(x + height, 0)
-                                                        ctx.stroke()
-                                                    }
-                                                }
-                                                onWidthChanged: requestPaint()
-                                                onHeightChanged: requestPaint()
-                                            }
-
-                                            Text {
-                                                anchors.centerIn: parent
-                                                text: transitionRegion.hasTransition && transitionRegion.modelData.label
-                                                      ? transitionRegion.modelData.label.charAt(0)
-                                                      : "≫"
-                                                color: Theme.onMedia
-                                                font.family: Theme.fontFamily
-                                                font.pixelSize: Theme.fontSizeTiny
-                                                font.weight: Font.Bold
-                                            }
-                                        }
-
-                                        // Only the glyph in the middle is a target. Covering the
-                                        // whole overlap took the ends of both clips with it, and
-                                        // those are where their trim handles are.
-                                        MouseArea {
-                                            anchors.centerIn: parent
-                                            width: Math.min(parent.width, Theme.androidIconButtonSize)
-                                            height: parent.height
-                                            onClicked: {
-                                                if (transitionRegion.hasTransition) {
-                                                    Haptics.select()
-                                                    EditorState.selectTransition(trackRow.trackIndex,
-                                                                                 transitionRegion.leftClipIndex)
-                                                } else {
-                                                    Haptics.confirm()
-                                                    EditorState.addTransition(trackRow.trackIndex,
-                                                                              transitionRegion.leftClipIndex,
-                                                                              "crossfade", 0.5)
-                                                }
-                                            }
-                                        }
+                                    delegate: AndroidTimelineTransitionMark {
+                                        trackIndex: trackRow.trackIndex
+                                        pxPerSecond: root.pxPerSecond
                                     }
                                 }
                             }
@@ -1995,166 +1528,36 @@ Item {
                         }
                     }
 
-                    Item {
-                        id: workAreaOverlay
-                        z: 1
-                        y: root.seekHeaderHeight
-                        width: parent.width
-                        height: Math.max(root.totalTracksHeight() + Theme.trackGap,
-                                         flick.height - root.seekHeaderHeight)
-
-                        readonly property real inX: EditorState.workAreaInSeconds >= 0
-                                                   ? EditorState.workAreaInSeconds * root.pxPerSecond
-                                                   : -1
-                        readonly property real outX: EditorState.workAreaOutSeconds >= 0
-                                                    ? EditorState.workAreaOutSeconds * root.pxPerSecond
-                                                    : -1
-
-                        Rectangle {
-                            visible: EditorState.workAreaActive
-                            x: parent.inX
-                            width: Math.max(0, parent.outX - parent.inX)
-                            anchors.top: parent.top
-                            anchors.bottom: parent.bottom
-                            color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
-                        }
-
-                        Rectangle {
-                            visible: EditorState.workAreaInSeconds >= 0
-                            x: parent.inX
-                            width: 2
-                            anchors.top: parent.top
-                            anchors.bottom: parent.bottom
-                            color: Theme.primary
-                            opacity: 0.85
-                        }
-
-                        Rectangle {
-                            visible: EditorState.workAreaOutSeconds >= 0
-                            x: parent.outX - width
-                            width: 2
-                            anchors.top: parent.top
-                            anchors.bottom: parent.bottom
-                            color: Theme.primary
-                            opacity: 0.85
-                        }
+                    AndroidTimelineWorkArea {
+                        pxPerSecond: root.pxPerSecond
+                        seekHeaderHeight: root.seekHeaderHeight
+                        tracksHeight: root.totalTracksHeight()
+                        viewHeight: flick.height
                     }
 
-                    Rectangle {
-                        visible: root.dropTrackIndex >= 0
-                        x: root.dropStartSeconds * root.pxPerSecond
-                        y: root.seekHeaderHeight + root.trackOffsetY(root.dropTrackIndex)
-                        width: root.dropDurationSeconds * root.pxPerSecond
-                        height: root.dropTrackIndex >= 0 ? root.trackHeight(root.dropTrackIndex) : 0
-                        radius: Theme.radiusSm
-                        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
-                        border.width: 2
-                        border.color: Theme.primary
-                        z: 5
+                    AndroidTimelineDropGhost {
+                        dropTrackIndex: root.dropTrackIndex
+                        dropStartSeconds: root.dropStartSeconds
+                        dropDurationSeconds: root.dropDurationSeconds
+                        pxPerSecond: root.pxPerSecond
+                        seekHeaderHeight: root.seekHeaderHeight
+                        trackOffsetY: root.dropTrackIndex >= 0
+                                      ? root.trackOffsetY(root.dropTrackIndex) : 0
+                        trackHeight: root.dropTrackIndex >= 0
+                                     ? root.trackHeight(root.dropTrackIndex) : 0
                     }
 
-                    // New-track indicator: a ghost lane straddling the boundary the
-                    // track would be inserted at, drawn at real track height so it
-                    // reads as a track rather than a hairline. Aiming at the top or
-                    // bottom band of a row is the only way to say "put this on its
-                    // own track" without a keyboard.
-                    Item {
-                        id: newTrackIndicator
-                        visible: root.dropCreatesNewTrack
-                        readonly property real laneHeight: {
-                            const t = root.pendingDropKind.length > 0
-                                    ? EditorState.trackTypeForKind(root.pendingDropKind)
-                                    : EditorState.trackTypeForAsset(EditorState.draggingAssetIndex)
-                            if (t === "video") return Theme.trackHeightVideo
-                            if (t === "audio") return Theme.trackHeightAudio
-                            if (t === "shape") return Theme.trackHeightShape
-                            if (t === "subtitle") return Theme.trackHeightSubtitle
-                            return Theme.trackHeightText
-                        }
-                        x: 0
-                        y: root.seekHeaderHeight
-                           + root.newTrackBoundaryY(root.dropNewTrackIndex)
-                           - laneHeight / 2
-                        width: parent.width
-                        height: laneHeight
-                        z: 7
-
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: Theme.radiusSm
-                            color: Qt.rgba(Theme.panelBackground.r, Theme.panelBackground.g,
-                                           Theme.panelBackground.b, 0.92)
-                            border.width: Theme.borderWidth
-                            border.color: Theme.primary
-                        }
-
-                        // The boundary itself, so which gap the lane is going into
-                        // is unambiguous.
-                        Rectangle {
-                            width: parent.width
-                            height: 2
-                            anchors.verticalCenter: parent.verticalCenter
-                            color: Theme.primary
-                        }
-
-                        // Where in time the clip would land, inside the lane it would
-                        // land on — the outline on an existing row is suppressed while
-                        // this is up.
-                        Rectangle {
-                            x: root.dropStartSeconds * root.pxPerSecond
-                            width: root.dropDurationSeconds * root.pxPerSecond
-                            height: parent.height
-                            radius: Theme.radiusSm
-                            color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.18)
-                            border.width: 2
-                            border.color: Theme.primary
-                        }
-
-                        // Pinned to the viewport: the lane spans the whole timeline,
-                        // and a label at its centre is usually off screen.
-                        Text {
-                            x: flick.contentX + Theme.spacingLg
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: qsTr("New track")
-                            color: Theme.primary
-                            font.family: Theme.fontFamily
-                            font.pixelSize: Theme.fontSizeXs
-                            font.weight: Font.Medium
-                        }
+                    AndroidTimelineNewTrackGhost {
+                        panel: root
+                        viewX: flick.contentX
                     }
 
-                    Rectangle {
-                        visible: opacity > 0
-                        opacity: root.snapGuideSeconds >= 0 ? 1 : 0
-                        x: root.snapGuideSeconds * root.pxPerSecond
-                        y: root.seekHeaderHeight
-                        width: Theme.borderWidth
-                        height: root.totalTracksHeight()
-                        color: Theme.snapGuide
-                        z: 6
-
-                        Behavior on opacity {
-                            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                        }
-
-                        Rectangle {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.top: parent.top
-                            anchors.topMargin: Theme.spacingSm
-                            width: snapLabel.implicitWidth + Theme.spacingMd * 2
-                            height: snapLabel.implicitHeight + Theme.spacingSm
-                            radius: Theme.radiusSm
-                            color: Theme.snapGuide
-
-                            Text {
-                                id: snapLabel
-                                anchors.centerIn: parent
-                                text: root.formatTime(root.snapGuideSeconds)
-                                color: Theme.primaryForeground
-                                font.family: Theme.monoFontFamily
-                                font.pixelSize: Theme.fontSizeTick
-                            }
-                        }
+                    AndroidTimelineSnapGuide {
+                        snapSeconds: root.snapGuideSeconds
+                        pxPerSecond: root.pxPerSecond
+                        seekHeaderHeight: root.seekHeaderHeight
+                        tracksHeight: root.totalTracksHeight()
+                        formatTime: function(seconds) { return root.formatTime(seconds) }
                     }
 
                 }

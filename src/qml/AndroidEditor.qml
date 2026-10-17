@@ -3,8 +3,6 @@ import QtQuick.Controls.Basic
 import QtQuick.Templates as T
 import QtQuick.Window
 import Drift
-import "components"
-
 // CapCut-style phone editor: top bar, resizable preview | tools+timeline, bottom rail.
 Item {
     id: root
@@ -625,63 +623,17 @@ Item {
     }
 
     // Only the buttons: the text is edited on the preview itself, which stays visible above this.
-    Rectangle {
+    AndroidTextEditBar {
         id: textEditBar
-        readonly property bool editing: preview.textEditor.active
-        readonly property real coveredHeight: editing ? height + anchors.bottomMargin : 0
+        editing: preview.textEditor.active
+        textEditor: preview.textEditor
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.leftMargin: root.SafeArea.margins.left
         anchors.rightMargin: root.SafeArea.margins.right
         anchors.bottomMargin: Math.max(root.SafeArea.margins.bottom, Theme.keyboardInset)
-        height: Theme.iconButtonSize + Theme.spacingMd * 2
-        visible: editing
-        color: Theme.panelBackground
         z: 10
-
-        Rectangle {
-            anchors.top: parent.top
-            width: parent.width
-            height: Theme.borderWidth
-            color: Theme.panelBorder
-        }
-
-        // Swallows touches that miss a control so they do not fall through to the timeline below.
-        MouseArea {
-            anchors.fill: parent
-        }
-
-        IconButton {
-            id: cancelEditButton
-            anchors.left: parent.left
-            anchors.leftMargin: Theme.spacingMd
-            anchors.verticalCenter: parent.verticalCenter
-            focusPolicy: Qt.NoFocus
-            glyph: Theme.icons.x
-            tooltip: qsTr("Cancel")
-            onClicked: preview.textEditor.cancel()
-        }
-
-        ThemedButton {
-            anchors.left: cancelEditButton.right
-            anchors.leftMargin: Theme.spacingMd
-            anchors.verticalCenter: parent.verticalCenter
-            focusPolicy: Qt.NoFocus
-            text: qsTr("Select all")
-            onClicked: preview.textEditor.selectAll()
-        }
-
-        ThemedButton {
-            anchors.right: parent.right
-            anchors.rightMargin: Theme.spacingMd
-            anchors.verticalCenter: parent.verticalCenter
-            focusPolicy: Qt.NoFocus
-            variant: "primary"
-            glyph: Theme.icons.check
-            text: qsTr("Done")
-            onClicked: preview.textEditor.commit()
-        }
     }
 
     ExportDialog {

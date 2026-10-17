@@ -226,46 +226,6 @@
         <translation>Réessayer</translation>
     </message>
     <message>
-        <source>Technical details</source>
-        <translation>Détails techniques</translation>
-    </message>
-    <message>
-        <source>%1 → %2</source>
-        <translation>%1 vers %2</translation>
-    </message>
-    <message>
-        <source>%1… %2%</source>
-        <translation>%1&#x202f;à %2&#x202f;%</translation>
-    </message>
-    <message>
-        <source>Requires Drift %1 or newer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unofficial</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Installed from file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 download</source>
-        <translation>téléchargement de %1</translation>
-    </message>
-    <message>
-        <source>%1 items</source>
-        <translation>%1 éléments</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Update</source>
-        <translation>Mettre à jour</translation>
-    </message>
-    <message>
         <source>Install</source>
         <translation>Installer</translation>
     </message>
@@ -285,9 +245,64 @@
         <source>Put addon folders here, then reopen Extras</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>AddonManagerRow</name>
+    <message>
+        <source>Technical details</source>
+        <translation type="unfinished">Détails techniques</translation>
+    </message>
+    <message>
+        <source>%1 → %2</source>
+        <translation type="unfinished">%1 vers %2</translation>
+    </message>
+    <message>
+        <source>%1… %2%</source>
+        <translation type="unfinished">%1&#x202f;à %2&#x202f;%</translation>
+    </message>
+    <message>
+        <source>Requires Drift %1 or newer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unofficial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installed from file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 download</source>
+        <translation type="unfinished">téléchargement de %1</translation>
+    </message>
+    <message>
+        <source>%1 items</source>
+        <translation type="unfinished">%1 éléments</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation type="unfinished">Mettre à jour</translation>
+    </message>
+    <message>
+        <source>Retry</source>
+        <translation type="unfinished">Réessayer</translation>
+    </message>
+    <message>
+        <source>Install</source>
+        <translation type="unfinished">Installer</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished">Supprimer</translation>
+    </message>
     <message>
         <source>Delete this pack&apos;s downloaded data</source>
-        <translation>Supprimer les données téléchargées de cette extension</translation>
+        <translation type="unfinished">Supprimer les données téléchargées de cette extension</translation>
     </message>
 </context>
 <context>
@@ -309,20 +324,12 @@
         <translation>Installez les extensions essentielles pour les effets, transitions et audio. Vous pouvez continuer à utiliser Drift sans eux — leur installation vous permettra de recevoir les mises à jour lorsqu’ils seront améliorés.</translation>
     </message>
     <message>
-        <source>%1… %2%</source>
-        <translation>%1&#x202f;à %2&#x202f;%</translation>
-    </message>
-    <message>
         <source>Don&apos;t remind me of essential addons</source>
         <translation>Ne plus me rappeler les extensions essentielles</translation>
     </message>
     <message>
         <source>Updates are available for packs you already have installed.</source>
         <translation>Des mises à jour sont disponibles pour les extensions que vous avez déjà installées.</translation>
-    </message>
-    <message>
-        <source>%1 → %2</source>
-        <translation>%1 vers %2</translation>
     </message>
     <message>
         <source>Don&apos;t remind me of future addon updates</source>
@@ -360,6 +367,17 @@
     <message>
         <source>Install all</source>
         <translation>Tout installer</translation>
+    </message>
+</context>
+<context>
+    <name>AddonStartupPackRow</name>
+    <message>
+        <source>%1… %2%</source>
+        <translation type="unfinished">%1&#x202f;à %2&#x202f;%</translation>
+    </message>
+    <message>
+        <source>%1 → %2</source>
+        <translation type="unfinished">%1 vers %2</translation>
     </message>
 </context>
 <context>
@@ -601,21 +619,6 @@
         <source>Tap a clip to edit it</source>
         <translation>Touchez un clip pour le modifier</translation>
     </message>
-    <message>
-        <source>Add to timeline</source>
-        <translation>Ajouter à la ligne du temps</translation>
-    </message>
-</context>
-<context>
-    <name>AndroidBottomSheet</name>
-    <message>
-        <source>Sheet</source>
-        <translation>Volet</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>Fermer</translation>
-    </message>
 </context>
 <context>
     <name>AndroidClipToolbar</name>
@@ -675,17 +678,34 @@
         <source>Move the playhead over the clip to split it</source>
         <translation>Déplacez la tête de lecture sur le clip pour le scinder</translation>
     </message>
+</context>
+<context>
+    <name>AndroidClipToolbarHint</name>
     <message>
         <source>Tap a clip to edit</source>
-        <translation>Appuyez sur un clip pour le modifier</translation>
+        <translation type="unfinished">Appuyez sur un clip pour le modifier</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidComposerTimingEdge</name>
+    <message>
+        <source>Back one frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward one frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AndroidCropHint</name>
+    <message>
+        <source>Drag the edges to reframe · pinch to zoom</source>
+        <translation type="unfinished">Faites glisser les bords pour recadrer · Pincez pour zoomer</translation>
     </message>
 </context>
 <context>
     <name>AndroidCropOverlay</name>
-    <message>
-        <source>Drag the edges to reframe · pinch to zoom</source>
-        <translation>Faites glisser les bords pour recadrer · Pincez pour zoomer</translation>
-    </message>
     <message>
         <source>Reset</source>
         <translation>Réinitialiser</translation>
@@ -700,6 +720,17 @@
     </message>
 </context>
 <context>
+    <name>AndroidDownloadJobRow</name>
+    <message>
+        <source>Cancel download</source>
+        <translation type="unfinished">Annuler le téléchargement</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation type="unfinished">Réessayez</translation>
+    </message>
+</context>
+<context>
     <name>AndroidDownloadsSheet</name>
     <message>
         <source>Downloads</source>
@@ -708,14 +739,6 @@
     <message>
         <source>Nothing downloading right now.</source>
         <translation>Aucun téléchargement en cours.</translation>
-    </message>
-    <message>
-        <source>Cancel download</source>
-        <translation>Annuler le téléchargement</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <translation>Réessayez</translation>
     </message>
     <message>
         <source>Clear finished</source>
@@ -764,14 +787,6 @@
         <source>Done</source>
         <translation>Terminé</translation>
     </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
-    </message>
-    <message>
-        <source>Select all</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>AndroidFadeSheet</name>
@@ -814,6 +829,32 @@
     <message>
         <source>Curve</source>
         <translation>Courbe</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidHomeRecentCard</name>
+    <message>
+        <source>Untitled</source>
+        <translation type="unfinished">Sans titre</translation>
+    </message>
+    <message>
+        <source>That project file is missing.</source>
+        <translation type="unfinished">Ce fichier de projet est introuvable.</translation>
+    </message>
+    <message>
+        <source>Project actions</source>
+        <translation type="unfinished">Actions du projet</translation>
+    </message>
+    <message>
+        <source>Remove from recents</source>
+        <translation type="unfinished">Supprimer des récents</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidHomeWordmark</name>
+    <message>
+        <source>Create polished videos fast</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1000,14 +1041,6 @@
 <context>
     <name>AndroidMediaPreview</name>
     <message>
-        <source>Back</source>
-        <translation>Retour</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>Enregistrer</translation>
-    </message>
-    <message>
         <source>Audio only — trim it below</source>
         <translation>Audio uniquement — raccourcissez-le ci-dessous</translation>
     </message>
@@ -1068,12 +1101,26 @@
         <translation>Rien n’a changé pour l’instant. Raccourcissez ou recadrez ci-dessus, ou revenez en arrière et faites glisser ceci sur la timeline.</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
         <source>Rotate</source>
         <translation>Tourner</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidMediaPreviewHeader</name>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished">Retour</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Enregistrer</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidMediaSavingScrim</name>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
     </message>
 </context>
 <context>
@@ -1453,76 +1500,82 @@
 <context>
     <name>AndroidPreview</name>
     <message>
-        <source>Full</source>
-        <translation>Plein</translation>
-    </message>
-    <message>
-        <source>Half</source>
-        <translation>Demi</translation>
-    </message>
-    <message>
-        <source>Quarter</source>
-        <translation>Quart</translation>
-    </message>
-    <message>
-        <source>Auto</source>
-        <translation>Automatique</translation>
-    </message>
-    <message>
-        <source>Quality: %1</source>
-        <translation>Qualité : %1</translation>
-    </message>
-    <message>
-        <source>Guides</source>
-        <translation>Guides</translation>
-    </message>
-    <message>
         <source>Seek</source>
         <translation>Chercher</translation>
     </message>
+</context>
+<context>
+    <name>AndroidPreviewOptionsStrip</name>
+    <message>
+        <source>Full</source>
+        <translation type="unfinished">Plein</translation>
+    </message>
+    <message>
+        <source>Half</source>
+        <translation type="unfinished">Demi</translation>
+    </message>
+    <message>
+        <source>Quarter</source>
+        <translation type="unfinished">Quart</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished">Automatique</translation>
+    </message>
+    <message>
+        <source>Quality: %1</source>
+        <translation type="unfinished">Qualité : %1</translation>
+    </message>
+    <message>
+        <source>Guides</source>
+        <translation type="unfinished">Guides</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidPreviewTransport</name>
     <message>
         <source>Back 1 second</source>
-        <translation>Reculer de 1 seconde</translation>
+        <translation type="unfinished">Reculer de 1 seconde</translation>
     </message>
     <message>
         <source>Previous frame</source>
-        <translation>Image précédente</translation>
+        <translation type="unfinished">Image précédente</translation>
     </message>
     <message>
         <source>Pause</source>
-        <translation>Pause</translation>
+        <translation type="unfinished">Pause</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation>Lire</translation>
+        <translation type="unfinished">Lire</translation>
     </message>
     <message>
         <source>Next frame</source>
-        <translation>Image suivante</translation>
+        <translation type="unfinished">Image suivante</translation>
     </message>
     <message>
         <source>Loop work area on — tap to turn off</source>
-        <translation>Boucle de la zone de travail activée — touchez pour désactiver</translation>
+        <translation type="unfinished">Boucle de la zone de travail activée — touchez pour désactiver</translation>
     </message>
     <message>
         <source>Loop work area off — tap to turn on</source>
-        <translation>Boucle de la zone de travail désactivée — touchez pour activer</translation>
+        <translation type="unfinished">Boucle de la zone de travail désactivée — touchez pour activer</translation>
     </message>
     <message>
         <source>Forward 1 second</source>
-        <translation>Avancer de 1 seconde</translation>
+        <translation type="unfinished">Avancer de 1 seconde</translation>
     </message>
     <message>
         <source>View and playback settings</source>
-        <translation>Paramètres d’affichage et de lecture</translation>
+        <translation type="unfinished">Paramètres d’affichage et de lecture</translation>
     </message>
     <message>
         <source>Exit fullscreen preview</source>
-        <translation>Quitter l’aperçu plein écran</translation>
+        <translation type="unfinished">Quitter l’aperçu plein écran</translation>
     </message>
     <message>
         <source>Fullscreen preview</source>
-        <translation>Aperçu plein écran</translation>
+        <translation type="unfinished">Aperçu plein écran</translation>
     </message>
 </context>
 <context>
@@ -1675,10 +1728,6 @@
         <translation>Choisissez un canevas, commencez à vide</translation>
     </message>
     <message>
-        <source>Create polished videos fast</source>
-        <translation>Créez des vidéos soignées rapidement</translation>
-    </message>
-    <message>
         <source>Recent projects</source>
         <translation>Projects récents</translation>
     </message>
@@ -1694,21 +1743,12 @@
         <source>Nothing here yet — projects you save will show up in this list.</source>
         <translation>Rien ici pour le moment — les projets que vous enregistrez apparaîtront dans cette liste.</translation>
     </message>
+</context>
+<context>
+    <name>AndroidRailAddButton</name>
     <message>
-        <source>Untitled</source>
-        <translation>Sans titre</translation>
-    </message>
-    <message>
-        <source>That project file is missing.</source>
-        <translation>Ce fichier de projet est introuvable.</translation>
-    </message>
-    <message>
-        <source>Project actions</source>
-        <translation>Actions du projet</translation>
-    </message>
-    <message>
-        <source>Remove from recents</source>
-        <translation>Supprimer des récents</translation>
+        <source>Add to timeline</source>
+        <translation type="unfinished">Ajouter à la ligne du temps</translation>
     </message>
 </context>
 <context>
@@ -1732,6 +1772,17 @@
     <message>
         <source>Start a new project from this clip</source>
         <translation>Créer un projet à partir de ce clip</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidSheetHeader</name>
+    <message>
+        <source>Sheet</source>
+        <translation type="unfinished">Volet</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">Fermer</translation>
     </message>
 </context>
 <context>
@@ -1772,13 +1823,20 @@
         <source>Set end to current time</source>
         <translation type="unfinished">Définir la fin à l&apos;heure actuelle</translation>
     </message>
+</context>
+<context>
+    <name>AndroidTextEditBar</name>
     <message>
-        <source>Back one frame</source>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Select all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Forward one frame</source>
-        <translation type="unfinished"></translation>
+        <source>Done</source>
+        <translation type="unfinished">Terminé</translation>
     </message>
 </context>
 <context>
@@ -1860,29 +1918,6 @@
         <translation>Calque de transformation : déplace, redimensionne et fait pivoter chaque piste couverte par son crochet</translation>
     </message>
     <message>
-        <source>Keyframes</source>
-        <translation>Images clés</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n clip(s)</source>
-        <translation>
-            <numerusform>%n clip</numerusform>
-            <numerusform>%n clips</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation>Tous</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation>Aucun</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation>Terminé</translation>
-    </message>
-    <message>
         <source>Add new track</source>
         <translation>Ajouter une piste</translation>
     </message>
@@ -1903,20 +1938,52 @@
         <translation>Supprimer</translation>
     </message>
     <message>
-        <source>PAUSED </source>
-        <translation>PAUSE </translation>
-    </message>
-    <message>
-        <source>REC </source>
-        <translation>REC </translation>
-    </message>
-    <message>
         <source>Close gap</source>
         <translation>Fermer l’écart</translation>
     </message>
+</context>
+<context>
+    <name>AndroidTimelineLaneBar</name>
+    <message>
+        <source>Keyframes</source>
+        <translation type="unfinished">Images clés</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n clip(s)</source>
+        <translation type="unfinished">
+            <numerusform>%n clip</numerusform>
+            <numerusform>%n clips</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Tous</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">Aucun</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">Terminé</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidTimelineLiveRecording</name>
+    <message>
+        <source>PAUSED </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>REC </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AndroidTimelineNewTrackGhost</name>
     <message>
         <source>New track</source>
-        <translation>Nouvelle piste</translation>
+        <translation type="unfinished">Nouvelle piste</translation>
     </message>
 </context>
 <context>
@@ -1924,14 +1991,6 @@
     <message>
         <source>Back</source>
         <translation>Retour</translation>
-    </message>
-    <message>
-        <source>Project actions</source>
-        <translation>Actions du projet</translation>
-    </message>
-    <message>
-        <source>Untitled</source>
-        <translation>Sans titre</translation>
     </message>
     <message>
         <source>Notifications</source>
@@ -1953,31 +2012,52 @@
         <source>Redo</source>
         <translation>Refaire</translation>
     </message>
+</context>
+<context>
+    <name>AndroidTopBarExportButton</name>
     <message>
         <source>Export</source>
-        <translation>Exporter</translation>
+        <translation type="unfinished">Exporter</translation>
     </message>
     <message>
         <source>Show export progress</source>
-        <translation>Afficher la progression de l&apos;exportation</translation>
+        <translation type="unfinished">Afficher la progression de l&apos;exportation</translation>
     </message>
 </context>
 <context>
-    <name>AndroidTransformOverlay</name>
+    <name>AndroidTopBarTitleButton</name>
+    <message>
+        <source>Project actions</source>
+        <translation type="unfinished">Actions du projet</translation>
+    </message>
+    <message>
+        <source>Untitled</source>
+        <translation type="unfinished">Sans titre</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidTransformLayerChip</name>
     <message numerus="yes">
         <source>%1 · %n clip(s)</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>%1 · %n clip</numerusform>
             <numerusform>%1 · %n clips</numerusform>
         </translation>
     </message>
     <message>
         <source>Transform</source>
-        <translation>Transformation</translation>
+        <translation type="unfinished">Transformation</translation>
     </message>
+</context>
+<context>
+    <name>AndroidTransformParentFrame</name>
     <message>
         <source>Select %1</source>
-        <translation>Sélectionner %1</translation>
+        <translation type="unfinished">Sélectionner %1</translation>
+    </message>
+    <message>
+        <source>Transform</source>
+        <translation type="unfinished">Transformation</translation>
     </message>
 </context>
 <context>
@@ -4482,46 +4562,6 @@
         <translation>Raccourcis</translation>
     </message>
     <message>
-        <source>Drop to import</source>
-        <translation>Déposez pour importer</translation>
-    </message>
-    <message>
-        <source>Video, audio and image files</source>
-        <translation>Fichiers vidéo, audio et images</translation>
-    </message>
-    <message>
-        <source>Importing…</source>
-        <translation>Importation…</translation>
-    </message>
-    <message>
-        <source>Reading media and generating thumbnails.</source>
-        <translation>Lecture des médias et génération de vignettes.</translation>
-    </message>
-    <message>
-        <source>More import options</source>
-        <translation>Plus de paramètres d&apos;importation</translation>
-    </message>
-    <message>
-        <source>Import Files…</source>
-        <translation>Importer des fichiers…</translation>
-    </message>
-    <message>
-        <source>Import Folder…</source>
-        <translation>Importer un dossier…</translation>
-    </message>
-    <message>
-        <source>Collect Media to Folder…</source>
-        <translation>Rassembler les médias dans un dossier…</translation>
-    </message>
-    <message>
-        <source>Import</source>
-        <translation>Importer</translation>
-    </message>
-    <message>
-        <source>Import video, audio or image files</source>
-        <translation>Importer des fichiers vidéo, audio ou image</translation>
-    </message>
-    <message>
         <source>New folder</source>
         <translation>Nouveau dossier</translation>
     </message>
@@ -4541,14 +4581,6 @@
         <source>Move to folder</source>
         <translation>Déplacer vers un dossier</translation>
     </message>
-    <message>
-        <source>New Folder</source>
-        <translation>Nouveau dossier</translation>
-    </message>
-    <message>
-        <source>Create a new folder here</source>
-        <translation>Créer un nouveau dossier ici</translation>
-    </message>
     <message numerus="yes">
         <source>%n items</source>
         <translation>
@@ -4566,6 +4598,69 @@
             <numerusform>%n élément supprimé.</numerusform>
             <numerusform>%n éléments supprimés.</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>AssetsPanelDropOverlay</name>
+    <message>
+        <source>Drop to import</source>
+        <translation type="unfinished">Déposez pour importer</translation>
+    </message>
+    <message>
+        <source>Video, audio and image files</source>
+        <translation type="unfinished">Fichiers vidéo, audio et images</translation>
+    </message>
+</context>
+<context>
+    <name>AssetsPanelHeader</name>
+    <message>
+        <source>New Folder</source>
+        <translation type="unfinished">Nouveau dossier</translation>
+    </message>
+    <message>
+        <source>Create a new folder here</source>
+        <translation type="unfinished">Créer un nouveau dossier ici</translation>
+    </message>
+</context>
+<context>
+    <name>AssetsPanelImportMenu</name>
+    <message>
+        <source>Import Files…</source>
+        <translation type="unfinished">Importer des fichiers…</translation>
+    </message>
+    <message>
+        <source>Import Folder…</source>
+        <translation type="unfinished">Importer un dossier…</translation>
+    </message>
+    <message>
+        <source>Collect Media to Folder…</source>
+        <translation type="unfinished">Rassembler les médias dans un dossier…</translation>
+    </message>
+</context>
+<context>
+    <name>AssetsPanelImportOverlay</name>
+    <message>
+        <source>Importing…</source>
+        <translation type="unfinished">Importation en cours…</translation>
+    </message>
+    <message>
+        <source>Reading media and generating thumbnails.</source>
+        <translation type="unfinished">Lecture des médias et génération de vignettes.</translation>
+    </message>
+</context>
+<context>
+    <name>AssetsPanelImportSplit</name>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished">Importer</translation>
+    </message>
+    <message>
+        <source>Import video, audio or image files</source>
+        <translation type="unfinished">Importer des fichiers vidéo, audio ou image</translation>
+    </message>
+    <message>
+        <source>More import options</source>
+        <translation type="unfinished">Plus de paramètres d&apos;importation</translation>
     </message>
 </context>
 <context>
@@ -4622,26 +4717,6 @@
         <source>Import</source>
         <translation type="unfinished">Importer</translation>
     </message>
-    <message>
-        <source>%1 — click to apply to the selection, or drag onto a clip</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 — drag onto a clip in the timeline</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Apply to selected clip</source>
-        <translation>Appliquer au clip sélectionné</translation>
-    </message>
-    <message>
-        <source>Remove from favorites</source>
-        <translation type="unfinished">Supprimer des favoris</translation>
-    </message>
-    <message>
-        <source>Add to favorites</source>
-        <translation type="unfinished">Ajouter aux favoris</translation>
-    </message>
 </context>
 <context>
     <name>AudioEffectCatalog</name>
@@ -4664,6 +4739,60 @@
     <message>
         <source>Other</source>
         <translation>Autre</translation>
+    </message>
+</context>
+<context>
+    <name>AudioEffectHeader</name>
+    <message>
+        <source>%1 (not installed)</source>
+        <translation type="unfinished">%1 (non installé)</translation>
+    </message>
+    <message>
+        <source>Move audio effect up</source>
+        <translation type="unfinished">Monter l&apos;effet audio</translation>
+    </message>
+    <message>
+        <source>Move audio effect down</source>
+        <translation type="unfinished">Descendre l’effet audio</translation>
+    </message>
+    <message>
+        <source>Disable audio effect</source>
+        <translation type="unfinished">Désactiver l&apos;effet audio</translation>
+    </message>
+    <message>
+        <source>Enable audio effect</source>
+        <translation type="unfinished">Activer l’effet audio</translation>
+    </message>
+    <message>
+        <source>Copy this audio effect</source>
+        <translation type="unfinished">Copier cet effet audio</translation>
+    </message>
+    <message>
+        <source>Remove audio effect</source>
+        <translation type="unfinished">Supprimer l’effet audio</translation>
+    </message>
+</context>
+<context>
+    <name>AudioEffectPresetCard</name>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — drag onto a clip in the timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">Appliquer au clip sélectionné</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Supprimer des favoris</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Ajouter aux favoris</translation>
     </message>
 </context>
 <context>
@@ -4703,34 +4832,6 @@
     <message>
         <source>Auto keyframes</source>
         <translation type="unfinished">Cadres clés automatiques</translation>
-    </message>
-    <message>
-        <source>%1 (not installed)</source>
-        <translation>%1 (non installé)</translation>
-    </message>
-    <message>
-        <source>Move audio effect up</source>
-        <translation>Monter l&apos;effet audio</translation>
-    </message>
-    <message>
-        <source>Move audio effect down</source>
-        <translation>Descendre l’effet audio</translation>
-    </message>
-    <message>
-        <source>Disable audio effect</source>
-        <translation>Désactiver l’effet audio</translation>
-    </message>
-    <message>
-        <source>Enable audio effect</source>
-        <translation>Activer l’effet audio</translation>
-    </message>
-    <message>
-        <source>Copy this audio effect</source>
-        <translation>Copier cet effet audio</translation>
-    </message>
-    <message>
-        <source>Remove audio effect</source>
-        <translation>Supprimer l’effet audio</translation>
     </message>
 </context>
 <context>
@@ -4867,66 +4968,6 @@
         <translation>Micro par défaut</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>Rétablir le son</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Couper le son</translation>
-    </message>
-    <message>
-        <source>Unsolo</source>
-        <translation>Désactiver le solo</translation>
-    </message>
-    <message>
-        <source>Solo</source>
-        <translation>Solo</translation>
-    </message>
-    <message>
-        <source>Recording paused — click to finish</source>
-        <translation>Enregistrement en pause — cliquez pour terminer</translation>
-    </message>
-    <message>
-        <source>Recording — click to finish</source>
-        <translation>Enregistrement en cours — cliquez pour terminer</translation>
-    </message>
-    <message>
-        <source>Record voiceover on %1</source>
-        <translation>Enregistrer une voix hors champ sur %1</translation>
-    </message>
-    <message>
-        <source>Pan %1 — drag to adjust, double-click to center</source>
-        <translation>Panoramique %1 — faites glisser pour ajuster, double-cliquez pour centrer</translation>
-    </message>
-    <message>
-        <source>Mic gain %1 dB (%2%) — scroll to adjust, double-click for 0 dB</source>
-        <translation>Gain du micro %1 dB (%2%) — faites défiler pour ajuster, double-cliquez pour 0 dB</translation>
-    </message>
-    <message>
-        <source>%1 dB — scroll to adjust, double-click for 0 dB</source>
-        <translation>%1 dB — faites défiler pour ajuster, double-cliquez pour 0 dB</translation>
-    </message>
-    <message>
-        <source>Master volume</source>
-        <translation>Volume master</translation>
-    </message>
-    <message>
-        <source>%1 volume</source>
-        <translation>Volume de %1</translation>
-    </message>
-    <message>
-        <source>Mic gain %1 dB</source>
-        <translation>Gain du micro %1 dB</translation>
-    </message>
-    <message>
-        <source>Volume %1 dB</source>
-        <translation>Volume %1 dB</translation>
-    </message>
-    <message>
-        <source> — Shift-drag for fine, double-click for 0 dB</source>
-        <translation> — faites glisser avec Shift pour un réglage fin, double-cliquez pour 0 dB</translation>
-    </message>
-    <message>
         <source>Add audio track</source>
         <translation>Ajouter une piste audio</translation>
     </message>
@@ -4939,10 +4980,6 @@
         <translation>Master</translation>
     </message>
     <message>
-        <source>Unmute master</source>
-        <translation>Rétablir le son du master</translation>
-    </message>
-    <message>
         <source>C</source>
         <translation>C</translation>
     </message>
@@ -4953,14 +4990,6 @@
     <message>
         <source>R%1</source>
         <translation>R%1</translation>
-    </message>
-    <message>
-        <source> (recording)</source>
-        <translation> (enregistrement)</translation>
-    </message>
-    <message>
-        <source>Mute master</source>
-        <translation>Couper le son du master</translation>
     </message>
 </context>
 <context>
@@ -5164,6 +5193,13 @@
     </message>
 </context>
 <context>
+    <name>ColorSwatchButton</name>
+    <message>
+        <source>Choose colour</source>
+        <translation type="unfinished">Choisir la couleur</translation>
+    </message>
+</context>
+<context>
     <name>ColorSwatchField</name>
     <message>
         <source>Choose colour</source>
@@ -5180,18 +5216,6 @@
 </context>
 <context>
     <name>CropOverlay</name>
-    <message>
-        <source>Drag the edges to reframe</source>
-        <translation>Faites glisser les bords pour recadrer</translation>
-    </message>
-    <message>
-        <source>Ctrl + scroll to zoom</source>
-        <translation>Ctrl + défilement pour zoomer</translation>
-    </message>
-    <message>
-        <source>Middle-drag to pan</source>
-        <translation>Glisser avec le bouton central pour faire défiler</translation>
-    </message>
     <message>
         <source>Fit view</source>
         <translation>Ajuster la vue</translation>
@@ -5211,6 +5235,21 @@
     <message>
         <source>Apply</source>
         <translation>Appliquer</translation>
+    </message>
+</context>
+<context>
+    <name>CropOverlayHint</name>
+    <message>
+        <source>Drag the edges to reframe</source>
+        <translation type="unfinished">Faites glisser les bords pour recadrer</translation>
+    </message>
+    <message>
+        <source>Ctrl + scroll to zoom</source>
+        <translation type="unfinished">Ctrl + défilement pour zoomer</translation>
+    </message>
+    <message>
+        <source>Middle-drag to pan</source>
+        <translation type="unfinished">Glisser avec le bouton central pour faire défiler</translation>
     </message>
 </context>
 <context>
@@ -5271,136 +5310,8 @@
         <translation>Lecture</translation>
     </message>
     <message>
-        <source>Video decoders</source>
-        <translation>Décodeurs vidéo</translation>
-    </message>
-    <message>
-        <source>Codec Name</source>
-        <translation>Nom du codec</translation>
-    </message>
-    <message>
-        <source>Software Decoding</source>
-        <translation>Décodage logiciel</translation>
-    </message>
-    <message>
-        <source>Hardware Decoding</source>
-        <translation>Décodage matériel</translation>
-    </message>
-    <message>
-        <source>Video encoders</source>
-        <translation>Encodeur vidéo</translation>
-    </message>
-    <message>
-        <source>Software Encoding</source>
-        <translation>Encodage logiciel</translation>
-    </message>
-    <message>
-        <source>Hardware Encoding</source>
-        <translation>Encodage matériel</translation>
-    </message>
-    <message>
-        <source>Software: %1</source>
-        <translation>Logiciel: %1</translation>
-    </message>
-    <message>
-        <source>Hardware: %1</source>
-        <translation>Matériel: %1</translation>
-    </message>
-    <message>
-        <source>Checks</source>
-        <translation>Vérifications</translation>
-    </message>
-    <message>
-        <source>Open Add-ons</source>
-        <translation>Ouvrir extensions</translation>
-    </message>
-    <message>
         <source>System</source>
         <translation>Système</translation>
-    </message>
-    <message>
-        <source>Delivered well above displayed means frames are being produced that the display never shows — a cadence problem rather than a slow machine.</source>
-        <translation>Un nombre d&apos;images livrées bien supérieur au nombre d&apos;images affichées signifie que des images sont produites sans jamais être affichées — un problème de cadence plutôt qu&apos;un ordinateur trop lent.</translation>
-    </message>
-    <message>
-        <source>Show live stats on the preview</source>
-        <translation>Afficher les statistiques en direct sur l&apos;aperçu</translation>
-    </message>
-    <message>
-        <source>Stays on after this dialog closes, so you can watch the numbers while the timeline plays.</source>
-        <translation>Reste affiché après la fermeture de cette boîte de dialogue, afin que vous puissiez suivre les chiffres pendant la lecture de la ligne du temps.</translation>
-    </message>
-    <message>
-        <source>Where the time goes</source>
-        <translation>Où passe le temps</translation>
-    </message>
-    <message>
-        <source>Decodes a fixed 1080p60 clip, and the first clip on the timeline, through each stage of the preview. Takes a few seconds.</source>
-        <translation>Décode un clip 1080p60 fixe et le premier clip sur la ligne du temps à travers chaque étape de l&apos;aperçu. Prend quelques secondes.</translation>
-    </message>
-    <message>
-        <source>Measuring…</source>
-        <translation>Mesure en cours…</translation>
-    </message>
-    <message>
-        <source>Run test</source>
-        <translation>Lancer le test</translation>
-    </message>
-    <message>
-        <source>Reference clip (1080p60)</source>
-        <translation>Clip de référence (1080p60)</translation>
-    </message>
-    <message>
-        <source>Timeline clip</source>
-        <translation>Clip de la ligne du temps</translation>
-    </message>
-    <message>
-        <source>Source</source>
-        <translation>Source</translation>
-    </message>
-    <message>
-        <source>Decoder</source>
-        <translation>Décodeur</translation>
-    </message>
-    <message>
-        <source> (hardware)</source>
-        <translation> (matériel)</translation>
-    </message>
-    <message>
-        <source> (software)</source>
-        <translation> (logiciel)</translation>
-    </message>
-    <message>
-        <source>Preview upload</source>
-        <translation>Téléversement de l&apos;aperçu</translation>
-    </message>
-    <message>
-        <source>Decode</source>
-        <translation>Décodage</translation>
-    </message>
-    <message>
-        <source>Readback to CPU costs</source>
-        <translation>Coûts de relecture vers le CPU</translation>
-    </message>
-    <message>
-        <source>Compositing costs</source>
-        <translation>Coûts de composition</translation>
-    </message>
-    <message>
-        <source>Total per frame</source>
-        <translation>Total par image</translation>
-    </message>
-    <message>
-        <source>Budget at this frame rate</source>
-        <translation>Budget à cette fréquence d&apos;images</translation>
-    </message>
-    <message>
-        <source>Findings</source>
-        <translation>Résultats</translation>
-    </message>
-    <message>
-        <source>Nothing stood out. Turn on the live stats above, play the timeline for a few seconds, then reopen this.</source>
-        <translation>Rien de particulier n&apos;est ressorti. Activez les statistiques en direct ci-dessus, lisez la ligne du temps pendant quelques secondes, puis rouvrez ceci.</translation>
     </message>
     <message>
         <source>Need help? Copy the report above when you file an issue.</source>
@@ -5417,6 +5328,148 @@
     <message>
         <source>Questions and support on Discord</source>
         <translation>Questions et soutien sur Discord</translation>
+    </message>
+</context>
+<context>
+    <name>DebugInfoPlaybackTab</name>
+    <message>
+        <source>Playback</source>
+        <translation type="unfinished">Lecture</translation>
+    </message>
+    <message>
+        <source>Delivered well above displayed means frames are being produced that the display never shows — a cadence problem rather than a slow machine.</source>
+        <translation type="unfinished">Un nombre d&apos;images livrées bien supérieur au nombre d&apos;images affichées signifie que des images sont produites sans jamais être affichées — un problème de cadence plutôt qu&apos;un ordinateur trop lent.</translation>
+    </message>
+    <message>
+        <source>Show live stats on the preview</source>
+        <translation type="unfinished">Afficher les statistiques en direct sur l&apos;aperçu</translation>
+    </message>
+    <message>
+        <source>Stays on after this dialog closes, so you can watch the numbers while the timeline plays.</source>
+        <translation type="unfinished">Reste affiché après la fermeture de cette boîte de dialogue, afin que vous puissiez suivre les chiffres pendant la lecture de la ligne du temps.</translation>
+    </message>
+    <message>
+        <source>Where the time goes</source>
+        <translation type="unfinished">Où passe le temps</translation>
+    </message>
+    <message>
+        <source>Decodes a fixed 1080p60 clip, and the first clip on the timeline, through each stage of the preview. Takes a few seconds.</source>
+        <translation type="unfinished">Décode un clip 1080p60 fixe et le premier clip sur la ligne du temps à travers chaque étape de l&apos;aperçu. Prend quelques secondes.</translation>
+    </message>
+    <message>
+        <source>Measuring…</source>
+        <translation type="unfinished">Mesure en cours…</translation>
+    </message>
+    <message>
+        <source>Run test</source>
+        <translation type="unfinished">Lancer le test</translation>
+    </message>
+    <message>
+        <source>Reference clip (1080p60)</source>
+        <translation type="unfinished">Clip de référence (1080p60)</translation>
+    </message>
+    <message>
+        <source>Timeline clip</source>
+        <translation type="unfinished">Clip de la ligne du temps</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation type="unfinished">Source</translation>
+    </message>
+    <message>
+        <source>Decoder</source>
+        <translation type="unfinished">Décodeur</translation>
+    </message>
+    <message>
+        <source> (hardware)</source>
+        <translation type="unfinished"> (matériel)</translation>
+    </message>
+    <message>
+        <source> (software)</source>
+        <translation type="unfinished"> (logiciel)</translation>
+    </message>
+    <message>
+        <source>Preview upload</source>
+        <translation type="unfinished">Téléversement de l&apos;aperçu</translation>
+    </message>
+    <message>
+        <source>Decode</source>
+        <translation type="unfinished">Décodage</translation>
+    </message>
+    <message>
+        <source>Readback to CPU costs</source>
+        <translation type="unfinished">Coûts de relecture vers le CPU</translation>
+    </message>
+    <message>
+        <source>Compositing costs</source>
+        <translation type="unfinished">Coûts de composition</translation>
+    </message>
+    <message>
+        <source>Total per frame</source>
+        <translation type="unfinished">Total par image</translation>
+    </message>
+    <message>
+        <source>Budget at this frame rate</source>
+        <translation type="unfinished">Budget à cette fréquence d&apos;images</translation>
+    </message>
+    <message>
+        <source>Findings</source>
+        <translation type="unfinished">Résultats</translation>
+    </message>
+    <message>
+        <source>Nothing stood out. Turn on the live stats above, play the timeline for a few seconds, then reopen this.</source>
+        <translation type="unfinished">Rien de particulier n&apos;est ressorti. Activez les statistiques en direct ci-dessus, lisez la ligne du temps pendant quelques secondes, puis rouvrez ceci.</translation>
+    </message>
+</context>
+<context>
+    <name>DebugInfoSystemTab</name>
+    <message>
+        <source>Video decoders</source>
+        <translation type="unfinished">Décodeurs vidéo</translation>
+    </message>
+    <message>
+        <source>Codec Name</source>
+        <translation type="unfinished">Nom du codec</translation>
+    </message>
+    <message>
+        <source>Software Decoding</source>
+        <translation type="unfinished">Décodage logiciel</translation>
+    </message>
+    <message>
+        <source>Hardware Decoding</source>
+        <translation type="unfinished">Décodage matériel</translation>
+    </message>
+    <message>
+        <source>Video encoders</source>
+        <translation type="unfinished">Encodeur vidéo</translation>
+    </message>
+    <message>
+        <source>Software Encoding</source>
+        <translation type="unfinished">Encodage logiciel</translation>
+    </message>
+    <message>
+        <source>Hardware Encoding</source>
+        <translation type="unfinished">Encodage matériel</translation>
+    </message>
+    <message>
+        <source>Software: %1</source>
+        <translation type="unfinished">Logiciel: %1</translation>
+    </message>
+    <message>
+        <source>Hardware: %1</source>
+        <translation type="unfinished">Matériel: %1</translation>
+    </message>
+    <message>
+        <source>Checks</source>
+        <translation type="unfinished">Vérifications</translation>
+    </message>
+    <message>
+        <source>Open Add-ons</source>
+        <translation type="unfinished">Ouvrir extensions</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished">Système</translation>
     </message>
 </context>
 <context>
@@ -5507,6 +5560,13 @@
     </message>
 </context>
 <context>
+    <name>DenoiseWaveformLane</name>
+    <message>
+        <source>· playing</source>
+        <translation type="unfinished">· lecture</translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWindow</name>
     <message>
         <source>Remove noise</source>
@@ -5523,10 +5583,6 @@
     <message>
         <source>Noise removed</source>
         <translation>Bruit supprimé</translation>
-    </message>
-    <message>
-        <source>· playing</source>
-        <translation>· lecture</translation>
     </message>
     <message>
         <source>Stop</source>
@@ -5585,34 +5641,43 @@
     </message>
 </context>
 <context>
-    <name>DepthEffectOverlay</name>
-    <message>
-        <source>Aim light</source>
-        <translation>Orienter la lumière</translation>
-    </message>
-    <message>
-        <source>Move light</source>
-        <translation>Déplacer la lumière</translation>
-    </message>
-    <message>
-        <source>Focus</source>
-        <translation>Mise au point</translation>
-    </message>
-    <message>
-        <source>Pick focus</source>
-        <translation>Choisir la mise au point</translation>
-    </message>
-    <message>
-        <source>Move focus</source>
-        <translation>Déplacer la mise au point</translation>
-    </message>
-</context>
-<context>
-    <name>DepthLight3dOverlay</name>
+    <name>DepthEffectAimRing</name>
     <message>
         <source>Aim light</source>
         <translation type="unfinished">Orienter la lumière</translation>
     </message>
+</context>
+<context>
+    <name>DepthEffectFocusReticle</name>
+    <message>
+        <source>Focus</source>
+        <translation type="unfinished">Mise au point</translation>
+    </message>
+    <message>
+        <source>Pick focus</source>
+        <translation type="unfinished">Choisir la mise au point</translation>
+    </message>
+    <message>
+        <source>Move focus</source>
+        <translation type="unfinished">Déplacer la mise au point</translation>
+    </message>
+</context>
+<context>
+    <name>DepthEffectLightKnob</name>
+    <message>
+        <source>Move light</source>
+        <translation type="unfinished">Déplacer la lumière</translation>
+    </message>
+</context>
+<context>
+    <name>DepthLight3dAimRing</name>
+    <message>
+        <source>Aim light</source>
+        <translation type="unfinished">Orienter la lumière</translation>
+    </message>
+</context>
+<context>
+    <name>DepthLight3dKnob</name>
     <message>
         <source>Move light</source>
         <translation type="unfinished">Déplacer la lumière</translation>
@@ -5676,6 +5741,17 @@
     </message>
 </context>
 <context>
+    <name>DownloadsJobRow</name>
+    <message>
+        <source>Try again</source>
+        <translation type="unfinished">Réessayez</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+</context>
+<context>
     <name>DownloadsWindow</name>
     <message>
         <source>Downloads</source>
@@ -5707,14 +5783,6 @@
     <message>
         <source>Downloads from the Market tab show up here while they run.</source>
         <translation>Les téléchargements en provenance du Marché s&apos;affichent ici en cours de progression.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <translation>Réessayez</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
     </message>
 </context>
 <context>
@@ -5982,26 +6050,6 @@
         <translation type="unfinished">Projet sans titre</translation>
     </message>
     <message>
-        <source>Projects</source>
-        <translation>Projets</translation>
-    </message>
-    <message>
-        <source>All changes saved</source>
-        <translation>Toutes les modifications enregistrées</translation>
-    </message>
-    <message>
-        <source>Unsaved changes</source>
-        <translation>Modifications non enregistrées</translation>
-    </message>
-    <message>
-        <source>Projects — click to switch or start new</source>
-        <translation>Projets — cliquez pour changer ou en créer un nouveau</translation>
-    </message>
-    <message>
-        <source>Unsaved changes — click to switch or start new</source>
-        <translation>Modifications non enregistrées — cliquez pour basculer ou démarrer un nouveau</translation>
-    </message>
-    <message>
         <source>Save</source>
         <translation>Enregistrer</translation>
     </message>
@@ -6014,71 +6062,12 @@
         <translation>Enregistrer le projet</translation>
     </message>
     <message>
-        <source>Search  %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <translation type="unfinished">Rechercher</translation>
-    </message>
-    <message numerus="yes">
-        <source>Downloads — %n running</source>
-        <translation>
-            <numerusform>Téléchargements — %n en cours</numerusform>
-            <numerusform>Téléchargements — %n en cours</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Downloads</source>
-        <translation>Téléchargements</translation>
-    </message>
-    <message>
         <source>Video</source>
         <translation>Vidéo</translation>
     </message>
     <message>
         <source>Video size and layout</source>
         <translation>Taille et disposition de la vidéo</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>Paramètres</translation>
-    </message>
-    <message>
-        <source>Workspace, theme, language and more</source>
-        <translation>Espace de travail, thème, langue et plus</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation>Claire</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation>Sombre</translation>
-    </message>
-    <message>
-        <source>Language…</source>
-        <translation>Langue…</translation>
-    </message>
-    <message>
-        <source>Switch to mobile layout…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Debug info…</source>
-        <translation>Information de débogage…</translation>
-    </message>
-    <message>
-        <source>More settings…</source>
-        <translation>Plus de paramètres…</translation>
-    </message>
-    <message>
-        <source>Notifications — Drift %1 is available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Agent</source>
@@ -6089,56 +6078,179 @@
         <translation>L’accès aux agents est activé</translation>
     </message>
     <message>
-        <source>Recommended packs and updates</source>
-        <translation>extensions et mises à jour recommandées</translation>
-    </message>
-    <message>
-        <source>Extras</source>
-        <translation>Extras</translation>
-    </message>
-    <message>
         <source>Agent access</source>
         <translation>Accès aux agents</translation>
     </message>
-    <message>
-        <source>Export in progress (%1%) — click to view</source>
-        <translation>Exportation en cours (%1%) — cliquez pour visualiser</translation>
+</context>
+<context>
+    <name>EditorHeaderDownloadsButton</name>
+    <message numerus="yes">
+        <source>Downloads — %n running</source>
+        <translation type="unfinished">
+            <numerusform>Téléchargements — %n en cours</numerusform>
+            <numerusform>Téléchargements — %n en cours</numerusform>
+        </translation>
     </message>
     <message>
+        <source>Downloads</source>
+        <translation type="unfinished">Téléchargements</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderExportBadge</name>
+    <message>
+        <source>Export in progress (%1%) — click to view</source>
+        <translation type="unfinished">Exportation en cours (%1%) — cliquez pour visualiser</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderExportButton</name>
+    <message>
         <source>Export video</source>
-        <translation>Exporter la vidéo</translation>
+        <translation type="unfinished">Exporter la vidéo</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation>Exporter</translation>
+        <translation type="unfinished">Exporter</translation>
     </message>
     <message>
         <source>Export already in progress</source>
-        <translation>Exportation déjà en cours</translation>
+        <translation type="unfinished">Exportation déjà en cours</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderExtrasButton</name>
+    <message>
+        <source>Extras</source>
+        <translation type="unfinished">Extras</translation>
     </message>
     <message>
-        <source>Multicam</source>
-        <translation>Multicam</translation>
+        <source>Recommended packs and updates</source>
+        <translation type="unfinished">extensions et mises à jour recommandées</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderNotificationsButton</name>
+    <message>
+        <source>Notifications — Drift %1 is available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderProjectsButton</name>
+    <message>
+        <source>Projects</source>
+        <translation type="unfinished">Projets</translation>
+    </message>
+    <message>
+        <source>All changes saved</source>
+        <translation type="unfinished">Toutes les modifications enregistrées</translation>
+    </message>
+    <message>
+        <source>Unsaved changes</source>
+        <translation type="unfinished">Modifications non enregistrées</translation>
+    </message>
+    <message>
+        <source>Projects — click to switch or start new</source>
+        <translation type="unfinished">Projets — cliquez pour changer ou en créer un nouveau</translation>
+    </message>
+    <message>
+        <source>Unsaved changes — click to switch or start new</source>
+        <translation type="unfinished">Modifications non enregistrées — cliquez pour basculer ou démarrer un nouveau</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderSearchField</name>
+    <message>
+        <source>Search  %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished">Rechercher</translation>
+    </message>
+    <message>
+        <source>Export video</source>
+        <translation type="unfinished">Exporter la vidéo</translation>
+    </message>
+    <message>
+        <source>Downloads</source>
+        <translation type="unfinished">Téléchargements</translation>
+    </message>
+    <message>
+        <source>Language…</source>
+        <translation type="unfinished">Langue…</translation>
+    </message>
+    <message>
+        <source>Video size and layout</source>
+        <translation type="unfinished">Taille et disposition de la vidéo</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderSettingsButton</name>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished">Paramètres</translation>
+    </message>
+    <message>
+        <source>Workspace, theme, language and more</source>
+        <translation type="unfinished">Espace de travail, thème, langue et plus</translation>
     </message>
     <message>
         <source>Workspace</source>
-        <translation>Espace de travail</translation>
+        <translation type="unfinished">Espace de travail</translation>
     </message>
     <message>
         <source>Auto (follow canvas)</source>
-        <translation>Auto (suivre le canevas)</translation>
+        <translation type="unfinished">Auto (suivre le canevas)</translation>
     </message>
     <message>
         <source>Landscape</source>
-        <translation>Paysage</translation>
+        <translation type="unfinished">Paysage</translation>
     </message>
     <message>
         <source>Portrait</source>
-        <translation>Portrait</translation>
+        <translation type="unfinished">Portrait</translation>
     </message>
     <message>
         <source>Theme</source>
-        <translation>Thème</translation>
+        <translation type="unfinished">Thème</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation type="unfinished">Lumière</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation type="unfinished">Sombre</translation>
+    </message>
+    <message>
+        <source>Language…</source>
+        <translation type="unfinished">Langue…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multicam</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Debug info…</source>
+        <translation type="unfinished">Information de débogage…</translation>
+    </message>
+    <message>
+        <source>More settings…</source>
+        <translation type="unfinished">Plus de paramètres…</translation>
     </message>
 </context>
 <context>
@@ -6202,34 +6314,6 @@
     <message>
         <source>Import a .driftfx file made in Drift Forge to add your own.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 — click to apply to the selection, or drag onto a clip</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 — click to add as an adjustment layer, or drag onto a clip</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Apply to selected clip</source>
-        <translation>Appliquer au clip sélectionné</translation>
-    </message>
-    <message>
-        <source>Remove from favorites</source>
-        <translation type="unfinished">Supprimer des favoris</translation>
-    </message>
-    <message>
-        <source>Add to favorites</source>
-        <translation type="unfinished">Ajouter aux favoris</translation>
-    </message>
-    <message>
-        <source>Delete from My Effects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Built-in</source>
-        <translation>Intégré</translation>
     </message>
     <message>
         <source>Delete effect</source>
@@ -6303,6 +6387,60 @@
     </message>
 </context>
 <context>
+    <name>EffectPresetCard</name>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — click to add as an adjustment layer, or drag onto a clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">Appliquer au clip sélectionné</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Supprimer des favoris</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Ajouter aux favoris</translation>
+    </message>
+    <message>
+        <source>Delete from My Effects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Built-in</source>
+        <translation type="unfinished">Intégré</translation>
+    </message>
+</context>
+<context>
+    <name>EffectStackCard</name>
+    <message>
+        <source>+%1 more</source>
+        <translation type="unfinished">+%1 de plus</translation>
+    </message>
+    <message>
+        <source>Preset options</source>
+        <translation type="unfinished">Options de préréglage</translation>
+    </message>
+    <message>
+        <source>Rename…</source>
+        <translation type="unfinished">Renommer…</translation>
+    </message>
+    <message>
+        <source>Export…</source>
+        <translation type="unfinished">Exporter...</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Supprimer</translation>
+    </message>
+</context>
+<context>
     <name>EffectStacksSection</name>
     <message>
         <source>Drift effect stack (*.drifteffects)</source>
@@ -6327,22 +6465,6 @@
     <message>
         <source>Import</source>
         <translation type="unfinished">Importer</translation>
-    </message>
-    <message>
-        <source>+%1 more</source>
-        <translation>+%1 de plus</translation>
-    </message>
-    <message>
-        <source>Preset options</source>
-        <translation>Options de préréglage</translation>
-    </message>
-    <message>
-        <source>Rename…</source>
-        <translation>Renommer…</translation>
-    </message>
-    <message>
-        <source>Export…</source>
-        <translation>Exporter...</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -6399,6 +6521,9 @@
         <source>Nothing in this category.</source>
         <translation>Rien dans cette catégorie.</translation>
     </message>
+</context>
+<context>
+    <name>EffectTemplateCard</name>
     <message>
         <source>%1 — click to apply music-synced effects to the selection</source>
         <translation type="unfinished"></translation>
@@ -6406,6 +6531,10 @@
     <message>
         <source>%1 — select a clip, then click to apply</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">Appliquer au clip sélectionné</translation>
     </message>
     <message>
         <source>Remove from favorites</source>
@@ -6417,11 +6546,7 @@
     </message>
     <message>
         <source>Needs cutout</source>
-        <translation>Découpage requises</translation>
-    </message>
-    <message>
-        <source>Apply to selected clip</source>
-        <translation>Appliquer au clip sélectionné</translation>
+        <translation type="unfinished">Découpage requises</translation>
     </message>
 </context>
 <context>
@@ -6468,95 +6593,224 @@
     </message>
 </context>
 <context>
-    <name>EffectsInspector</name>
+    <name>EffectsAutoKeyHint</name>
     <message>
-        <source>Face tracking</source>
-        <translation>Suivi du visage</translation>
+        <source>Move to a time, set a value, then click the diamond to add a keyframe. With Auto keyframes on, dragging a slider also creates them.</source>
+        <translation type="unfinished">Déplacez‑vous à une heure, définissez une valeur, puis cliquez sur le diamant pour ajouter un cadre clé. Avec les cadres clés automatiques activés, faire glisser un curseur crée également des cadres clés.</translation>
     </message>
     <message>
-        <source>This clip was scanned before makeup was supported. Re-detect faces to enable the Beauty effects.</source>
-        <translation>Ce clip a été scanné avant que le maquillage ne soit pris en charge. Redétectez les visages pour activer les effets Beauté.</translation>
+        <source>Auto keyframes</source>
+        <translation type="unfinished">Cadres clés automatiques</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsBoolParam</name>
+    <message>
+        <source>On</source>
+        <translation type="unfinished">Activé</translation>
     </message>
     <message>
-        <source>Re-detect faces</source>
-        <translation>Redétecter les visages</translation>
+        <source>Off</source>
+        <translation type="unfinished">Désactivé</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsClipParam</name>
+    <message>
+        <source>Automatic (clip beneath)</source>
+        <translation type="unfinished">Automatique (clip en dessous)</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsColorParam</name>
+    <message>
+        <source>Choose %1</source>
+        <translation type="unfinished">Choisir %1</translation>
     </message>
     <message>
-        <source>These effects follow a face, so the clip has to be scanned before they do anything.</source>
-        <translation>Ces effets suivent un visage, le clip doit donc être analysé avant qu&apos;ils ne fassent quoi que ce soit.</translation>
+        <source>%1 opacity</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Download depth estimation (about 160 MB)</source>
-        <translation>Télécharger l&apos;estimation de la profondeur (environ 160 MB)</translation>
+        <source>Edit %1</source>
+        <translation type="unfinished">Modifier %1</translation>
     </message>
-    <message>
-        <source>Face effects follow one clip&apos;s faces. Add this to a clip rather than to an adjustment layer.</source>
-        <translation>Les effets de visage suivent les visages d&apos;un clip. Ajoutez ceci à un clip plutôt qu&apos;à un calque d&apos;ajustement.</translation>
-    </message>
-    <message>
-        <source>Scan for faces…</source>
-        <translation>Rechercher des visages…</translation>
-    </message>
-    <message>
-        <source>Clear face track</source>
-        <translation>Effacer le suivi du visage</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Download face detection (about 5 MB)</source>
-        <translation>Télécharger la détection de visage (environ 5&#x202f;Mo)</translation>
-    </message>
-    <message>
-        <source>Install AI engine first</source>
-        <translation>Installez d&apos;abord le moteur IA</translation>
-    </message>
-    <message>
-        <source>Depth</source>
-        <translation>Profondeur</translation>
-    </message>
-    <message>
-        <source>Depth effects follow one clip&apos;s depth. Add this to a clip rather than to an adjustment layer.</source>
-        <translation>Les effets de profondeur suivent la profondeur d&apos;un clip. Ajoutez ceci à un clip plutôt qu&apos;à un calque d&apos;ajustement.</translation>
-    </message>
-    <message>
-        <source>These effects need the clip&apos;s depth, so it has to be estimated first. It runs in the background and takes roughly half a second per frame.</source>
-        <translation>Ces effets nécessitent la profondeur du clip, elle doit donc d&apos;abord être estimée. L&apos;opération s&apos;exécute en arrière-plan et prend environ une demi-seconde par image.</translation>
-    </message>
+</context>
+<context>
+    <name>EffectsDepthPanel</name>
     <message>
         <source>High quality</source>
-        <translation>Haute qualité</translation>
+        <translation type="unfinished">Haute qualité</translation>
     </message>
     <message>
         <source>Sharper depth edges, about twice as slow</source>
-        <translation>Contours de profondeur plus nets, environ deux fois plus lent</translation>
+        <translation type="unfinished">Contours de profondeur plus nets, environ deux fois plus lent</translation>
     </message>
     <message>
         <source>Re-estimate depth</source>
-        <translation>Réestimer la profondeur</translation>
+        <translation type="unfinished">Réestimer la profondeur</translation>
     </message>
     <message>
         <source>Estimate depth</source>
-        <translation>Estimer la profondeur</translation>
+        <translation type="unfinished">Estimer la profondeur</translation>
     </message>
     <message>
         <source>Clear depth</source>
-        <translation>Effacer la profondeur</translation>
+        <translation type="unfinished">Effacer la profondeur</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Download depth estimation (about 160 MB)</source>
+        <translation type="unfinished">Télécharger l&apos;estimation de la profondeur (environ 160 MB)</translation>
+    </message>
+    <message>
+        <source>Install AI engine first</source>
+        <translation type="unfinished">Installez d&apos;abord le moteur IA</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsDepthSection</name>
+    <message>
+        <source>Depth</source>
+        <translation type="unfinished">Profondeur</translation>
+    </message>
+    <message>
+        <source>Depth effects follow one clip&apos;s depth. Add this to a clip rather than to an adjustment layer.</source>
+        <translation type="unfinished">Les effets de profondeur suivent la profondeur d&apos;un clip. Ajoutez ceci à un clip plutôt qu&apos;à un calque d&apos;ajustement.</translation>
+    </message>
+    <message>
+        <source>These effects need the clip&apos;s depth, so it has to be estimated first. It runs in the background and takes roughly half a second per frame.</source>
+        <translation type="unfinished">Ces effets nécessitent la profondeur du clip, elle doit donc d&apos;abord être estimée. L&apos;opération s&apos;exécute en arrière-plan et prend environ une demi-seconde par image.</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsEffectHeader</name>
+    <message>
+        <source>Copy this effect</source>
+        <translation type="unfinished">Copier cet effet</translation>
+    </message>
+    <message>
+        <source>Save as preset…</source>
+        <translation type="unfinished">Enregistrer comme préréglage…</translation>
+    </message>
+    <message>
+        <source>%1 (not installed)</source>
+        <translation type="unfinished">%1 (non installé)</translation>
+    </message>
+    <message>
+        <source>Move effect up</source>
+        <translation type="unfinished">Déplacer l’effet vers le haut</translation>
+    </message>
+    <message>
+        <source>Move effect down</source>
+        <translation type="unfinished">Déplacer l’effet vers le bas</translation>
+    </message>
+    <message>
+        <source>Disable effect</source>
+        <translation type="unfinished">Désactiver l’effet</translation>
+    </message>
+    <message>
+        <source>Enable effect</source>
+        <translation type="unfinished">Activer l’effet</translation>
+    </message>
+    <message>
+        <source>Remove effect</source>
+        <translation type="unfinished">Supprimer l’effet</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsFaceIndexParam</name>
+    <message>
+        <source>Face %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EffectsFaceSection</name>
+    <message>
+        <source>Face tracking</source>
+        <translation type="unfinished">Suivi du visage</translation>
+    </message>
+    <message>
+        <source>Face effects follow one clip&apos;s faces. Add this to a clip rather than to an adjustment layer.</source>
+        <translation type="unfinished">Les effets de visage suivent les visages d&apos;un clip. Ajoutez ceci à un clip plutôt qu&apos;à un calque d&apos;ajustement.</translation>
+    </message>
+    <message>
+        <source>These effects follow a face, so the clip has to be scanned before they do anything.</source>
+        <translation type="unfinished">Ces effets suivent un visage, le clip doit donc être analysé avant qu&apos;ils ne fassent quoi que ce soit.</translation>
+    </message>
+    <message>
+        <source>This clip was scanned before makeup was supported. Re-detect faces to enable the Beauty effects.</source>
+        <translation type="unfinished">Ce clip a été scanné avant que le maquillage ne soit pris en charge. Redétectez les visages pour activer les effets Beauté.</translation>
     </message>
     <message>
         <source>This clip was scanned before the face mesh was supported. Re-detect faces to enable 3D Face Mesh and Face Retouch.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Move to a time, set a value, then click the diamond to add a keyframe. With Auto keyframes on, dragging a slider also creates them.</source>
-        <translation>Déplacez‑vous à une heure, définissez une valeur, puis cliquez sur le diamant pour ajouter un cadre clé. Avec les cadres clés automatiques activés, faire glisser un curseur crée également des cadres clés.</translation>
+        <source>Re-detect faces</source>
+        <translation type="unfinished">Redétecter les visages</translation>
     </message>
     <message>
-        <source>Auto keyframes</source>
-        <translation>Cadres clés automatiques</translation>
+        <source>Scan for faces…</source>
+        <translation type="unfinished">Rechercher des visages…</translation>
     </message>
+    <message>
+        <source>Clear face track</source>
+        <translation type="unfinished">Effacer le suivi du visage</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Download face detection (about 5 MB)</source>
+        <translation type="unfinished">Télécharger la détection de visage (environ 5&#x202f;Mo)</translation>
+    </message>
+    <message>
+        <source>Install AI engine first</source>
+        <translation type="unfinished">Installez d&apos;abord le moteur IA</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsFileParam</name>
+    <message>
+        <source>: (none)</source>
+        <translation type="unfinished">: (aucun)</translation>
+    </message>
+    <message>
+        <source>Choose file</source>
+        <translation type="unfinished">Choisir le fichier</translation>
+    </message>
+    <message>
+        <source>Choose %1</source>
+        <translation type="unfinished">Choisir %1</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished">Effacer</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsHueParam</name>
+    <message>
+        <source>Pick %1</source>
+        <translation type="unfinished">Choisir %1</translation>
+    </message>
+    <message>
+        <source>Choose %1</source>
+        <translation type="unfinished">Choisir %1</translation>
+    </message>
+    <message>
+        <source>Edit %1</source>
+        <translation type="unfinished">Modifier %1</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsInspector</name>
     <message>
         <source>No effects yet</source>
         <translation>Pas encore d’effets</translation>
@@ -6569,101 +6823,35 @@
         <source>Browse effects</source>
         <translation>Parcourir les effets</translation>
     </message>
-    <message>
-        <source>Copy this effect</source>
-        <translation>Copier cet effet</translation>
-    </message>
-    <message>
-        <source>Save as preset…</source>
-        <translation>Enregistrer comme préréglage…</translation>
-    </message>
-    <message>
-        <source>%1 (not installed)</source>
-        <translation>%1 (non installé)</translation>
-    </message>
-    <message>
-        <source>Move effect up</source>
-        <translation>Déplacer l’effet vers le haut</translation>
-    </message>
-    <message>
-        <source>Move effect down</source>
-        <translation>Déplacer l’effet vers le bas</translation>
-    </message>
-    <message>
-        <source>Disable effect</source>
-        <translation>Désactiver l’effet</translation>
-    </message>
-    <message>
-        <source>Enable effect</source>
-        <translation>Activer l’effet</translation>
-    </message>
-    <message>
-        <source>Remove effect</source>
-        <translation>Supprimer l’effet</translation>
-    </message>
-    <message>
-        <source>On</source>
-        <translation>Activé</translation>
-    </message>
-    <message>
-        <source>Off</source>
-        <translation>Désactivé</translation>
-    </message>
-    <message>
-        <source>Choose %1</source>
-        <translation>Choisir %1</translation>
-    </message>
-    <message>
-        <source>%1 opacity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Automatic (clip beneath)</source>
-        <translation>Automatique (clip en dessous)</translation>
-    </message>
-    <message>
-        <source>: (none)</source>
-        <translation>: (aucun)</translation>
-    </message>
-    <message>
-        <source>Choose file</source>
-        <translation>Choisir le fichier</translation>
-    </message>
-    <message>
-        <source>Clear</source>
-        <translation>Effacer</translation>
-    </message>
-    <message>
-        <source>Pick %1</source>
-        <translation>Choisir %1</translation>
-    </message>
-    <message>
-        <source>Edit %1</source>
-        <translation>Modifier %1</translation>
-    </message>
-    <message>
-        <source>Face %1</source>
-        <translation type="unfinished"></translation>
-    </message>
+</context>
+<context>
+    <name>EffectsOccludeSection</name>
     <message>
         <source>Anything in “%1” nearer than Distance passes in front of this layer.</source>
-        <translation>Tout élément de « %1 » plus proche que Distance passe devant ce calque.</translation>
+        <translation type="unfinished">Tout élément de « %1 » plus proche que Distance passe devant ce calque.</translation>
     </message>
     <message>
         <source>Anything in “%1” (the clip beneath at the playhead) nearer than Distance passes in front of this layer.</source>
-        <translation>Tout élément de « %1 » (le clip en dessous à la tête de lecture) plus proche que Distance passe devant ce calque.</translation>
+        <translation type="unfinished">Tout élément de « %1 » (le clip en dessous à la tête de lecture) plus proche que Distance passe devant ce calque.</translation>
     </message>
     <message>
         <source>Place this layer above a video or image clip. It goes behind whatever in that clip is nearer than Distance.</source>
-        <translation>Placez ce calque au-dessus d&apos;un clip vidéo ou d&apos;une image. Il se place derrière tout ce qui, dans ce clip, est plus proche que Distance.</translation>
+        <translation type="unfinished">Placez ce calque au-dessus d&apos;un clip vidéo ou d&apos;une image. Il se place derrière tout ce qui, dans ce clip, est plus proche que Distance.</translation>
     </message>
     <message>
         <source>“%1” needs its depth estimated before anything in it can pass in front. It runs in the background and takes roughly half a second per frame.</source>
-        <translation>La profondeur de « %1 » doit être estimée avant que quoi que ce soit puisse passer devant. L&apos;opération s&apos;exécute en arrière-plan et prend environ une demi-seconde par image.</translation>
+        <translation type="unfinished">La profondeur de « %1 » doit être estimée avant que quoi que ce soit puisse passer devant. L&apos;opération s&apos;exécute en arrière-plan et prend environ une demi-seconde par image.</translation>
     </message>
+</context>
+<context>
+    <name>EffectsStackActions</name>
     <message>
         <source>Paste effects</source>
-        <translation>Coller les effets</translation>
+        <translation type="unfinished">Coller les effets</translation>
+    </message>
+    <message>
+        <source>Save as preset…</source>
+        <translation type="unfinished">Enregistrer comme préréglage…</translation>
     </message>
 </context>
 <context>
@@ -6684,9 +6872,12 @@
         <source>Search</source>
         <translation>Rechercher</translation>
     </message>
+</context>
+<context>
+    <name>EmojiPickerEmptyLabel</name>
     <message>
         <source>No emoji match “%1”.</source>
-        <translation>Aucun émoji ne correspond à « %1 ».</translation>
+        <translation type="unfinished">Aucun émoji ne correspond à « %1 ».</translation>
     </message>
 </context>
 <context>
@@ -6747,137 +6938,184 @@
         <source>Export cancelled.</source>
         <translation>Exportation annulée.</translation>
     </message>
+</context>
+<context>
+    <name>ExportDialogAudioSection</name>
     <message>
-        <source>Video</source>
-        <translation>Vidéo</translation>
-    </message>
-    <message>
-        <source>Audio</source>
-        <translation>Audio</translation>
-    </message>
-    <message>
-        <source>GIF</source>
-        <translation>GIF</translation>
-    </message>
-    <message>
-        <source>GIF encoder is not available in this build</source>
-        <translation>L&apos;encodeur GIF n&apos;est pas disponible dans cette version</translation>
-    </message>
-    <message>
-        <source>Export work area only (%1 – %2)</source>
-        <translation>Exporter uniquement la zone de travail (%1 – %2)</translation>
-    </message>
-    <message>
-        <source>Encode only the marked In/Out range instead of the full timeline</source>
-        <translation>Encoder uniquement la plage In/Out marquée au lieu de toute la timeline</translation>
-    </message>
-    <message>
-        <source>Saves what you see in the preview. Pick a size — the picture shape stays the same.</source>
-        <translation>Enregistre ce que vous voyez dans l&apos;aperçu. Choisissez une taille — la forme de l&apos;image reste la même.</translation>
-    </message>
-    <message>
-        <source>Downscale</source>
-        <translation>Réduire</translation>
-    </message>
-    <message>
-        <source>Export at %1×%2</source>
-        <translation>Exporter à %1×%2</translation>
-    </message>
-    <message>
-        <source>Frame rate</source>
-        <translation>Fréquence d&apos;images</translation>
-    </message>
-    <message>
-        <source>fps</source>
-        <translation>ips</translation>
-    </message>
-    <message>
-        <source>Exporting above the project rate pulls extra frames from the source footage where it has them — this is what makes slowed clips look smooth. Where it doesn&apos;t, frames repeat.</source>
-        <translation>Exporter à un taux supérieur au projet extrait des images supplémentaires de la séquence source lorsqu&apos;elles sont disponibles — c&apos;est ce qui rend les clips ralentis fluides. Là où il n&apos;y a pas d&apos;images supplémentaires, les images se répètent.</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <translation>Avancé</translation>
-    </message>
-    <message>
-        <source>Video encoder</source>
-        <translation>Encodeur vidéo</translation>
-    </message>
-    <message>
-        <source>Keeps a transparent canvas. Set the project background to Transparent so holes stay empty.</source>
-        <translation>Conserve un canevas transparent. Définissez l&apos;arrière-plan du projet sur Transparent pour que les zones vides restent vides.</translation>
-    </message>
-    <message>
-        <source>Constant Quality</source>
-        <translation>Qualité constante</translation>
-    </message>
-    <message>
-        <source>Bitrate</source>
-        <translation>Débit</translation>
-    </message>
-    <message>
-        <source>RF %1</source>
-        <translation>RF %1</translation>
-    </message>
-    <message>
-        <source>Quality (RF)</source>
-        <translation>Qualité (RF)</translation>
-    </message>
-    <message>
-        <source>Higher quality</source>
-        <translation>Meilleure qualité</translation>
-    </message>
-    <message>
-        <source>Lower quality</source>
-        <translation>Qualité inférieure</translation>
-    </message>
-    <message>
-        <source>Bitrate (kbps)</source>
-        <translation>Débit (kbps)</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation>kbps</translation>
-    </message>
-    <message>
-        <source>Preset</source>
-        <translation>Préréglage</translation>
+        <source>Exports the timeline audio mix only — no video track.</source>
+        <translation type="unfinished">Exporte uniquement le mélange audio de la timeline — pas de piste vidéo.</translation>
     </message>
     <message>
         <source>Audio encoder</source>
-        <translation>Encodeur audio</translation>
+        <translation type="unfinished">Encodeur audio</translation>
     </message>
     <message>
-        <source>Animated GIF — no audio. Mark a work area for short loops, or export up to 60 seconds.</source>
-        <translation>GIF animé — sans son. Sélectionnez une zone de travail pour des boucles courtes, ou exportez jusqu&apos;à 60 secondes.</translation>
+        <source>Bitrate</source>
+        <translation type="unfinished">Débit</translation>
     </message>
     <message>
-        <source>15 fps is a good default for small file sizes. GIF export is limited to 60 seconds.</source>
-        <translation>15 ips est un bon réglage par défaut pour les fichiers de petite taille. L&apos;export GIF est limité à 60 secondes.</translation>
+        <source>kbps</source>
+        <translation type="unfinished">kbps</translation>
     </message>
     <message>
-        <source>Exports the timeline audio mix only — no video track.</source>
-        <translation>Exporte uniquement le mélange audio de la timeline — pas de piste vidéo.</translation>
+        <source>Advanced</source>
+        <translation type="unfinished">Avancé</translation>
     </message>
     <message>
         <source>Tags</source>
-        <translation>Étiquettes</translation>
+        <translation type="unfinished">Étiquettes</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation>Titre</translation>
+        <translation type="unfinished">Titre</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation>Artiste</translation>
+        <translation type="unfinished">Artiste</translation>
     </message>
     <message>
         <source>Album</source>
-        <translation>Album</translation>
+        <translation type="unfinished">Album</translation>
     </message>
     <message>
         <source>Comment</source>
-        <translation>Commentaire</translation>
+        <translation type="unfinished">Commentaire</translation>
+    </message>
+</context>
+<context>
+    <name>ExportDialogGifSection</name>
+    <message>
+        <source>Animated GIF — no audio. Mark a work area for short loops, or export up to 60 seconds.</source>
+        <translation type="unfinished">GIF animé — sans son. Sélectionnez une zone de travail pour des boucles courtes, ou exportez jusqu&apos;à 60 secondes.</translation>
+    </message>
+    <message>
+        <source>Downscale</source>
+        <translation type="unfinished">Réduire</translation>
+    </message>
+    <message>
+        <source>Export at %1×%2</source>
+        <translation type="unfinished">Exporter à %1×%2</translation>
+    </message>
+    <message>
+        <source>Frame rate</source>
+        <translation type="unfinished">Fréquence d&apos;images</translation>
+    </message>
+    <message>
+        <source>fps</source>
+        <translation type="unfinished">ips</translation>
+    </message>
+    <message>
+        <source>15 fps is a good default for small file sizes. GIF export is limited to 60 seconds.</source>
+        <translation type="unfinished">15 ips est un bon réglage par défaut pour les fichiers de petite taille. L&apos;export GIF est limité à 60 secondes.</translation>
+    </message>
+</context>
+<context>
+    <name>ExportDialogModeBar</name>
+    <message>
+        <source>Video</source>
+        <translation type="unfinished">Vidéo</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">Audio</translation>
+    </message>
+    <message>
+        <source>GIF</source>
+        <translation type="unfinished">GIF</translation>
+    </message>
+    <message>
+        <source>GIF encoder is not available in this build</source>
+        <translation type="unfinished">L&apos;encodeur GIF n&apos;est pas disponible dans cette version</translation>
+    </message>
+</context>
+<context>
+    <name>ExportDialogVideoSection</name>
+    <message>
+        <source>Saves what you see in the preview. Pick a size — the picture shape stays the same.</source>
+        <translation type="unfinished">Enregistre ce que vous voyez dans l&apos;aperçu. Choisissez une taille — la forme de l&apos;image reste la même.</translation>
+    </message>
+    <message>
+        <source>Downscale</source>
+        <translation type="unfinished">Réduire</translation>
+    </message>
+    <message>
+        <source>Export at %1×%2</source>
+        <translation type="unfinished">Exporter à %1×%2</translation>
+    </message>
+    <message>
+        <source>Frame rate</source>
+        <translation type="unfinished">Fréquence d&apos;images</translation>
+    </message>
+    <message>
+        <source>fps</source>
+        <translation type="unfinished">ips</translation>
+    </message>
+    <message>
+        <source>Exporting above the project rate pulls extra frames from the source footage where it has them — this is what makes slowed clips look smooth. Where it doesn&apos;t, frames repeat.</source>
+        <translation type="unfinished">Exporter à un taux supérieur au projet extrait des images supplémentaires de la séquence source lorsqu&apos;elles sont disponibles — c&apos;est ce qui rend les clips ralentis fluides. Là où il n&apos;y a pas d&apos;images supplémentaires, les images se répètent.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished">Avancé</translation>
+    </message>
+    <message>
+        <source>Video encoder</source>
+        <translation type="unfinished">Encodeur vidéo</translation>
+    </message>
+    <message>
+        <source>Keeps a transparent canvas. Set the project background to Transparent so holes stay empty.</source>
+        <translation type="unfinished">Conserve un canevas transparent. Définissez l&apos;arrière-plan du projet sur Transparent pour que les zones vides restent vides.</translation>
+    </message>
+    <message>
+        <source>Constant Quality</source>
+        <translation type="unfinished">Qualité constante</translation>
+    </message>
+    <message>
+        <source>Bitrate</source>
+        <translation type="unfinished">Débit</translation>
+    </message>
+    <message>
+        <source>RF %1</source>
+        <translation type="unfinished">RF %1</translation>
+    </message>
+    <message>
+        <source>Quality (RF)</source>
+        <translation type="unfinished">Qualité (RF)</translation>
+    </message>
+    <message>
+        <source>Higher quality</source>
+        <translation type="unfinished">Meilleure qualité</translation>
+    </message>
+    <message>
+        <source>Lower quality</source>
+        <translation type="unfinished">Qualité inférieure</translation>
+    </message>
+    <message>
+        <source>Bitrate (kbps)</source>
+        <translation type="unfinished">Débit (kbps)</translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="unfinished">kbps</translation>
+    </message>
+    <message>
+        <source>Preset</source>
+        <translation type="unfinished">Préréglage</translation>
+    </message>
+    <message>
+        <source>Audio encoder</source>
+        <translation type="unfinished">Encodeur audio</translation>
+    </message>
+</context>
+<context>
+    <name>ExportDialogWorkAreaCheck</name>
+    <message>
+        <source>Export work area only (%1 – %2)</source>
+        <translation type="unfinished">Exporter uniquement la zone de travail (%1 – %2)</translation>
+    </message>
+    <message>
+        <source>Encode only the marked In/Out range instead of the full timeline</source>
+        <translation type="unfinished">Encoder uniquement la plage In/Out marquée au lieu de toute la timeline</translation>
     </message>
 </context>
 <context>
@@ -7299,17 +7537,26 @@
         <source>Search fonts</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>FontPickerAddRow</name>
     <message>
         <source>Add font file…</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Install the font pack for curated families →</source>
-        <translation>Installer l&apos;extension de polices pour les familles sélectionnées →</translation>
-    </message>
+</context>
+<context>
+    <name>FontPickerFamilyRow</name>
     <message>
         <source>Remove font</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FontPickerPackBanner</name>
+    <message>
+        <source>Install the font pack for curated families →</source>
+        <translation type="unfinished">Installer l&apos;extension de polices pour les familles sélectionnées →</translation>
     </message>
 </context>
 <context>
@@ -7915,15 +8162,18 @@
     </message>
 </context>
 <context>
-    <name>GradientStopEditor</name>
+    <name>GradientStopChip</name>
     <message>
         <source>Drag to move, tap for colour, hold or right-click to remove</source>
-        <translation>Faites glisser pour déplacer, appuyez pour la couleur, maintenez enfoncé ou faites un clic droit pour supprimer</translation>
+        <translation type="unfinished">Faites glisser pour déplacer, appuyez pour la couleur, maintenez enfoncé ou faites un clic droit pour supprimer</translation>
     </message>
     <message>
         <source>Move gradient stop</source>
-        <translation>Déplacer le point de dégradé</translation>
+        <translation type="unfinished">Déplacer le point de dégradé</translation>
     </message>
+</context>
+<context>
+    <name>GradientStopEditor</name>
     <message>
         <source>Add a colour stop</source>
         <translation>Ajouter un point de couleur</translation>
@@ -8018,22 +8268,25 @@
     </message>
 </context>
 <context>
+    <name>GuideEditBar</name>
+    <message>
+        <source>Editing %1</source>
+        <translation type="unfinished">Modification de %1</translation>
+    </message>
+    <message>
+        <source>Drag from the top or left edge to add a guide, off the canvas to remove one. Shift steps by 1%.</source>
+        <translation type="unfinished">Faites glisser depuis le bord supérieur ou gauche pour ajouter un guide, hors du canevas pour en supprimer un. Shift déplace par pas de 1%.</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">Terminé</translation>
+    </message>
+</context>
+<context>
     <name>GuideEditOverlay</name>
     <message>
         <source>Release to remove</source>
         <translation>Relâcher pour supprimer</translation>
-    </message>
-    <message>
-        <source>Editing %1</source>
-        <translation>Modification de %1</translation>
-    </message>
-    <message>
-        <source>Drag from the top or left edge to add a guide, off the canvas to remove one. Shift steps by 1%.</source>
-        <translation>Faites glisser depuis le bord supérieur ou gauche pour ajouter un guide, hors du canevas pour en supprimer un. Shift déplace par pas de 1%.</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation>Terminé</translation>
     </message>
 </context>
 <context>
@@ -8066,64 +8319,8 @@
 <context>
     <name>GuidesPopover</name>
     <message>
-        <source>Vertical line</source>
-        <translation>Ligne verticale</translation>
-    </message>
-    <message>
-        <source>Horizontal line</source>
-        <translation>Ligne horizontale</translation>
-    </message>
-    <message>
         <source>Margins</source>
         <translation>Marges</translation>
-    </message>
-    <message>
-        <source>Aspect frame</source>
-        <translation>Cadre de format</translation>
-    </message>
-    <message>
-        <source>Unlock so it can be dragged on the preview</source>
-        <translation>Déverrouiller pour pouvoir le faire glisser sur l&apos;aperçu</translation>
-    </message>
-    <message>
-        <source>Lock so it cannot be dragged on the preview</source>
-        <translation>Verrouiller pour empêcher le déplacement sur l&apos;aperçu</translation>
-    </message>
-    <message>
-        <source>Remove guide</source>
-        <translation>Supprimer le guide</translation>
-    </message>
-    <message>
-        <source>From left</source>
-        <translation>Depuis la gauche</translation>
-    </message>
-    <message>
-        <source>From top</source>
-        <translation>Depuis le haut</translation>
-    </message>
-    <message>
-        <source>Left</source>
-        <translation>Gauche</translation>
-    </message>
-    <message>
-        <source>Right</source>
-        <translation>Droite</translation>
-    </message>
-    <message>
-        <source>Top</source>
-        <translation>Haut</translation>
-    </message>
-    <message>
-        <source>Bottom</source>
-        <translation>Bas</translation>
-    </message>
-    <message>
-        <source>Guide colour</source>
-        <translation>Couleur du guide</translation>
-    </message>
-    <message>
-        <source>Opacity</source>
-        <translation>Opacité</translation>
     </message>
     <message>
         <source>Show guides</source>
@@ -8132,18 +8329,6 @@
     <message>
         <source>Guide sets</source>
         <translation>Jeux de guides</translation>
-    </message>
-    <message>
-        <source>Show this set</source>
-        <translation>Afficher ce jeu</translation>
-    </message>
-    <message>
-        <source>Built-in</source>
-        <translation>Intégré</translation>
-    </message>
-    <message>
-        <source>From project</source>
-        <translation>Du projet</translation>
     </message>
     <message>
         <source>New guide set</source>
@@ -8170,14 +8355,6 @@
         <translation>Modifier sur l&apos;aperçu</translation>
     </message>
     <message>
-        <source>Built-in sets can&apos;t be changed. Duplicate one to make an editable copy.</source>
-        <translation>Les jeux intégrés ne peuvent pas être modifiés. Dupliquez-en un pour créer une copie modifiable.</translation>
-    </message>
-    <message>
-        <source>This set came with the project. Save it to your guide sets to edit it.</source>
-        <translation>Ce jeu provient du projet. Enregistrez-le dans vos jeux de guides pour le modifier.</translation>
-    </message>
-    <message>
         <source>Vertical</source>
         <translation>Vertical</translation>
     </message>
@@ -8192,6 +8369,104 @@
     <message>
         <source>Add a guide</source>
         <translation>Ajouter un guide</translation>
+    </message>
+</context>
+<context>
+    <name>GuidesPopoverColorRow</name>
+    <message>
+        <source>Guide colour</source>
+        <translation type="unfinished">Couleur du guide</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation type="unfinished">Opacité</translation>
+    </message>
+</context>
+<context>
+    <name>GuidesPopoverItemHeader</name>
+    <message>
+        <source>Vertical line</source>
+        <translation type="unfinished">Ligne verticale</translation>
+    </message>
+    <message>
+        <source>Horizontal line</source>
+        <translation type="unfinished">Ligne horizontale</translation>
+    </message>
+    <message>
+        <source>Margins</source>
+        <translation type="unfinished">Marges</translation>
+    </message>
+    <message>
+        <source>Aspect frame</source>
+        <translation type="unfinished">Cadre de format</translation>
+    </message>
+    <message>
+        <source>Unlock so it can be dragged on the preview</source>
+        <translation type="unfinished">Déverrouiller pour pouvoir le faire glisser sur l&apos;aperçu</translation>
+    </message>
+    <message>
+        <source>Lock so it cannot be dragged on the preview</source>
+        <translation type="unfinished">Verrouiller pour empêcher le déplacement sur l&apos;aperçu</translation>
+    </message>
+    <message>
+        <source>Remove guide</source>
+        <translation type="unfinished">Supprimer le guide</translation>
+    </message>
+</context>
+<context>
+    <name>GuidesPopoverLinePosition</name>
+    <message>
+        <source>From left</source>
+        <translation type="unfinished">Depuis la gauche</translation>
+    </message>
+    <message>
+        <source>From top</source>
+        <translation type="unfinished">Depuis le haut</translation>
+    </message>
+</context>
+<context>
+    <name>GuidesPopoverMarginFields</name>
+    <message>
+        <source>Left</source>
+        <translation type="unfinished">Gauche</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <translation type="unfinished">Droite</translation>
+    </message>
+    <message>
+        <source>Top</source>
+        <translation type="unfinished">Haut</translation>
+    </message>
+    <message>
+        <source>Bottom</source>
+        <translation type="unfinished">Bas</translation>
+    </message>
+</context>
+<context>
+    <name>GuidesPopoverReadOnlyNote</name>
+    <message>
+        <source>Built-in sets can&apos;t be changed. Duplicate one to make an editable copy.</source>
+        <translation type="unfinished">Les jeux intégrés ne peuvent pas être modifiés. Dupliquez-en un pour créer une copie modifiable.</translation>
+    </message>
+    <message>
+        <source>This set came with the project. Save it to your guide sets to edit it.</source>
+        <translation type="unfinished">Ce jeu provient du projet. Enregistrez-le dans vos jeux de guides pour le modifier.</translation>
+    </message>
+</context>
+<context>
+    <name>GuidesPopoverSetRow</name>
+    <message>
+        <source>Show this set</source>
+        <translation type="unfinished">Afficher ce jeu</translation>
+    </message>
+    <message>
+        <source>Built-in</source>
+        <translation type="unfinished">Intégré</translation>
+    </message>
+    <message>
+        <source>From project</source>
+        <translation type="unfinished">Du projet</translation>
     </message>
 </context>
 <context>
@@ -8316,38 +8591,6 @@
         <translation>Contour progressif du masque</translation>
     </message>
     <message>
-        <source>Keyframes</source>
-        <translation>Images clés</translation>
-    </message>
-    <message>
-        <source>Collapse curve editor to compact view (88px)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Expand curve editor to view and edit Bezier handles (180px)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Analyzing…</source>
-        <translation>Analyse en cours…</translation>
-    </message>
-    <message>
-        <source>Hide the beat markers</source>
-        <translation>Masquer les marqueurs de battement</translation>
-    </message>
-    <message>
-        <source>Find the beat and show markers</source>
-        <translation>Trouver le battement et afficher les marqueurs</translation>
-    </message>
-    <message>
-        <source>Hide hits</source>
-        <translation>Masquer les frappes</translation>
-    </message>
-    <message>
-        <source>Find beats and hits in the audio under this clip</source>
-        <translation>Trouver les battements et les frappes dans l&apos;audio sous ce clip</translation>
-    </message>
-    <message>
         <source>%1 (keyframes off)</source>
         <translation>%1 (images clés désactivées)</translation>
     </message>
@@ -8359,13 +8602,58 @@
         <source>%1 — click to show this curve</source>
         <translation>%1 — cliquer pour afficher cette courbe</translation>
     </message>
+</context>
+<context>
+    <name>KeyframeGraphHeaderBar</name>
+    <message>
+        <source>Keyframes</source>
+        <translation type="unfinished">Images clés</translation>
+    </message>
+    <message>
+        <source>Collapse curve editor to compact view (88px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expand curve editor to view and edit Bezier handles (180px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analyzing…</source>
+        <translation type="unfinished">Analyse en cours…</translation>
+    </message>
+    <message>
+        <source>Hide the beat markers</source>
+        <translation type="unfinished">Masquer les marqueurs de battement</translation>
+    </message>
+    <message>
+        <source>Find the beat and show markers</source>
+        <translation type="unfinished">Trouver le battement et afficher les marqueurs</translation>
+    </message>
+    <message>
+        <source>Hide hits</source>
+        <translation type="unfinished">Masquer les frappes</translation>
+    </message>
+    <message>
+        <source>Find beats and hits in the audio under this clip</source>
+        <translation type="unfinished">Trouver les battements et les frappes dans l&apos;audio sous ce clip</translation>
+    </message>
+</context>
+<context>
+    <name>KeyframeGraphKeyDot</name>
+    <message>
+        <source>Move keyframe</source>
+        <translation type="unfinished">Déplacer l&apos;image clé</translation>
+    </message>
+</context>
+<context>
+    <name>KeyframeGraphLaneStatus</name>
     <message>
         <source>No keyframes</source>
-        <translation>Aucune image clé</translation>
+        <translation type="unfinished">Aucune image clé</translation>
     </message>
     <message numerus="yes">
         <source>%n keyframes</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>%n image clé</numerusform>
             <numerusform>%n images clés</numerusform>
         </translation>
@@ -8376,19 +8664,18 @@
     </message>
     <message>
         <source> BPM</source>
-        <translation> BPM</translation>
+        <translation type="unfinished"> BPM</translation>
     </message>
     <message>
         <source> · no beat found</source>
-        <translation> · aucun battement trouvé</translation>
+        <translation type="unfinished"> · aucun battement trouvé</translation>
     </message>
-    <message>
-        <source>Move keyframe</source>
-        <translation>Déplacer l&apos;image clé</translation>
-    </message>
+</context>
+<context>
+    <name>KeyframeGraphTangentHandle</name>
     <message>
         <source>Edit keyframe curve</source>
-        <translation>Modifier la courbe des images clés</translation>
+        <translation type="unfinished">Modifier la courbe des images clés</translation>
     </message>
 </context>
 <context>
@@ -8575,6 +8862,69 @@
 <context>
     <name>Main</name>
     <message>
+        <source>Drift %1 is the latest version.</source>
+        <translation type="unfinished">Drift %1 est la dernière version.</translation>
+    </message>
+    <message>
+        <source>Still opening a project — try again in a moment.</source>
+        <translation>Ouverture d&apos;un projet en cours — réessayez dans un instant.</translation>
+    </message>
+    <message>
+        <source>Open Project</source>
+        <translation>Ouvrir le projet</translation>
+    </message>
+    <message>
+        <source>Project closed</source>
+        <translation>Projet fermé</translation>
+    </message>
+    <message>
+        <source>Already checking for updates…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking for updates…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Links can’t be opened in this layout.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export finished.</source>
+        <translation>Exportation terminée.</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t create the shareable copy: %1</source>
+        <translation>Impossible de créer la copie partageable : %1</translation>
+    </message>
+    <message>
+        <source>Captions created.</source>
+        <translation>Sous-titres créés.</translation>
+    </message>
+    <message>
+        <source>Couldn’t create captions: %1</source>
+        <translation>Impossible de créer les sous-titres : %1</translation>
+    </message>
+    <message>
+        <source>Couldn’t create captions.</source>
+        <translation>Impossible de créer les sous-titres.</translation>
+    </message>
+    <message>
+        <source>Couldn’t install “%1”: %2</source>
+        <translation>Impossible d&apos;installer «&#xa0;%1&#xa0;» : %2</translation>
+    </message>
+    <message>
+        <source>Imported “%1”.</source>
+        <translation>« %1 » importé</translation>
+    </message>
+    <message>
+        <source>Imported from the marketplace.</source>
+        <translation>Importé depuis le Marché</translation>
+    </message>
+</context>
+<context>
+    <name>MainMacMenuBar</name>
+    <message>
         <source>&amp;File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8668,6 +9018,18 @@
     </message>
     <message>
         <source>Paste Attributes…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About Drift</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check for Updates…</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8771,80 +9133,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check for Updates…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>About Drift</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Settings…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Debug Info…</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Drift %1 is the latest version.</source>
-        <translation type="unfinished">Drift %1 est la dernière version.</translation>
-    </message>
-    <message>
-        <source>Still opening a project — try again in a moment.</source>
-        <translation>Ouverture d&apos;un projet en cours — réessayez dans un instant.</translation>
-    </message>
-    <message>
-        <source>Open Project</source>
-        <translation>Ouvrir le projet</translation>
-    </message>
-    <message>
-        <source>Project closed</source>
-        <translation>Projet fermé</translation>
-    </message>
-    <message>
-        <source>Already checking for updates…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Checking for updates…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Links can’t be opened in this layout.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export finished.</source>
-        <translation>Exportation terminée.</translation>
-    </message>
-    <message>
-        <source>Couldn&apos;t create the shareable copy: %1</source>
-        <translation>Impossible de créer la copie partageable : %1</translation>
-    </message>
-    <message>
-        <source>Captions created.</source>
-        <translation>Sous-titres créés.</translation>
-    </message>
-    <message>
-        <source>Couldn’t create captions: %1</source>
-        <translation>Impossible de créer les sous-titres : %1</translation>
-    </message>
-    <message>
-        <source>Couldn’t create captions.</source>
-        <translation>Impossible de créer les sous-titres.</translation>
-    </message>
-    <message>
-        <source>Couldn’t install “%1”: %2</source>
-        <translation>Impossible d&apos;installer «&#xa0;%1&#xa0;» : %2</translation>
-    </message>
-    <message>
-        <source>Imported “%1”.</source>
-        <translation>« %1 » importé</translation>
-    </message>
-    <message>
-        <source>Imported from the marketplace.</source>
-        <translation>Importé depuis le Marché</translation>
     </message>
 </context>
 <context>
@@ -9053,13 +9343,63 @@
         <source>Mask changed</source>
         <translation>Masque modifié</translation>
     </message>
+</context>
+<context>
+    <name>MaskOverlayBarEdge</name>
+    <message>
+        <source>Mask changed</source>
+        <translation type="unfinished">Masque modifié</translation>
+    </message>
+</context>
+<context>
+    <name>MaskOverlayEmptyHint</name>
     <message>
         <source>Drag a mask from the Masks tab onto a clip to edit it here</source>
-        <translation>Faites glisser un masque depuis l&apos;onglet Masques sur un clip pour le modifier ici</translation>
+        <translation type="unfinished">Faites glisser un masque depuis l&apos;onglet Masques sur un clip pour le modifier ici</translation>
     </message>
     <message>
         <source>Select a clip at the playhead to edit its masks</source>
-        <translation>Sélectionnez un clip à la tête de lecture pour modifier ses masques</translation>
+        <translation type="unfinished">Sélectionnez un clip à la tête de lecture pour modifier ses masques</translation>
+    </message>
+</context>
+<context>
+    <name>MaskOverlayResizeGrip</name>
+    <message>
+        <source>Mask changed</source>
+        <translation type="unfinished">Masque modifié</translation>
+    </message>
+</context>
+<context>
+    <name>MaskOverlayRotateHandle</name>
+    <message>
+        <source>Mask changed</source>
+        <translation type="unfinished">Masque modifié</translation>
+    </message>
+</context>
+<context>
+    <name>MaskOverlayVertexHandle</name>
+    <message>
+        <source>Mask changed</source>
+        <translation type="unfinished">Masque modifié</translation>
+    </message>
+</context>
+<context>
+    <name>MaskPresetCard</name>
+    <message>
+        <source>%1 — click to apply, or drag onto a clip</source>
+        <translation type="unfinished">%1 — cliquez pour appliquer, ou faites glisser sur un clip</translation>
+    </message>
+    <message>
+        <source>%1 — drag onto a clip</source>
+        <translation type="unfinished">%1 — faites glisser sur un clip</translation>
+    </message>
+    <message>
+        <source>Select a clip first, or drag the mask onto one</source>
+        <translation type="unfinished">Sélectionnez d&apos;abord un clip, ou faites glisser le masque sur l&apos;un d&apos;eux</translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">Appliquer au clip sélectionné</translation>
     </message>
 </context>
 <context>
@@ -9207,64 +9547,48 @@
         <source>All files (*)</source>
         <translation>Tous les fichiers (*)</translation>
     </message>
-    <message>
-        <source>%1 — click to apply, or drag onto a clip</source>
-        <translation>%1 — cliquez pour appliquer, ou faites glisser sur un clip</translation>
-    </message>
-    <message>
-        <source>%1 — drag onto a clip</source>
-        <translation>%1 — faites glisser sur un clip</translation>
-    </message>
-    <message>
-        <source>Select a clip first, or drag the mask onto one</source>
-        <translation>Sélectionnez d&apos;abord un clip, ou faites glisser le masque sur l&apos;un d&apos;eux</translation>
-    </message>
-    <message>
-        <source>Apply to selected clip</source>
-        <translation type="unfinished">Appliquer au clip sélectionné</translation>
-    </message>
 </context>
 <context>
-    <name>MediaAssetsTab</name>
+    <name>MediaAssetsEmptyState</name>
     <message>
         <source>No media yet</source>
-        <translation>Pas encore de médias</translation>
+        <translation type="unfinished">Pas encore de médias</translation>
     </message>
     <message>
         <source>Import files or drop them here, then drag them onto the timeline. Right-click a clip to preview and trim it first.</source>
-        <translation>Importez des fichiers ou déposez-les ici, puis faites-les glisser sur la ligne du temps. Faites un clic droit sur un clip pour le prévisualiser et le raccourcir d&apos;abord.</translation>
+        <translation type="unfinished">Importez des fichiers ou déposez-les ici, puis faites-les glisser sur la ligne du temps. Faites un clic droit sur un clip pour le prévisualiser et le raccourcir d&apos;abord.</translation>
     </message>
     <message>
         <source>Import media</source>
-        <translation>Importer des médias</translation>
+        <translation type="unfinished">Importer des médias</translation>
     </message>
     <message>
         <source>Import folder</source>
-        <translation>Importer un fichier</translation>
+        <translation type="unfinished">Importer un fichier</translation>
     </message>
     <message>
         <source>Supported formats</source>
-        <translation>Formats supportés</translation>
+        <translation type="unfinished">Formats supportés</translation>
     </message>
     <message>
         <source>Video</source>
-        <translation>Vidéo</translation>
+        <translation type="unfinished">Vidéo</translation>
     </message>
     <message>
         <source>Audio</source>
-        <translation>Audio</translation>
+        <translation type="unfinished">Audio</translation>
     </message>
     <message>
         <source>Images</source>
-        <translation>Images</translation>
+        <translation type="unfinished">Images</translation>
     </message>
     <message>
         <source>Vector</source>
-        <translation>Vecteur</translation>
+        <translation type="unfinished">Vecteur</translation>
     </message>
     <message>
         <source>3D</source>
-        <translation>3D</translation>
+        <translation type="unfinished">3D</translation>
     </message>
     <message>
         <source>glTF binary (.glb) · Gaussian splats (.sog, .ply, .zip)</source>
@@ -9278,29 +9602,193 @@
         <source>PDF (needs the PDF Viewer addon)</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>MediaAssetsFolderMenu</name>
+    <message>
+        <source>Open</source>
+        <translation type="unfinished">Ouvrir</translation>
+    </message>
+    <message>
+        <source>Rename…</source>
+        <translation type="unfinished">Renommer…</translation>
+    </message>
+    <message>
+        <source>Move to folder…</source>
+        <translation type="unfinished">Déplacer vers un dossier…</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Supprimer</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsGridCard</name>
+    <message>
+        <source>%1 — drag to the timeline, right-click to preview</source>
+        <translation type="unfinished">%1 — faites glisser vers la timeline, clic droit pour prévisualiser</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsGridNameRow</name>
+    <message>
+        <source>Linked proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy</source>
+        <translation type="unfinished">Proxy</translation>
+    </message>
+    <message>
+        <source>Using a proxy file found next to the original</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit-friendly</source>
+        <translation type="unfinished">Optimisé pour le montage</translation>
+    </message>
+    <message>
+        <source>Converted to a constant frame rate for smooth editing</source>
+        <translation type="unfinished">Converti à une fréquence d&apos;images constante pour un montage fluide</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsItemMenu</name>
+    <message>
+        <source>Open composite</source>
+        <translation type="unfinished">Ouvrir le composite</translation>
+    </message>
+    <message numerus="yes">
+        <source>Add %n items to timeline</source>
+        <translation type="unfinished">
+            <numerusform>Ajouter %n élément à la ligne du temps</numerusform>
+            <numerusform>Ajouter %n éléments à la ligne du temps</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Add to timeline</source>
+        <translation type="unfinished">Ajouter à la ligne du temps</translation>
+    </message>
+    <message>
+        <source>Trim, crop and upscale…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview and edit…</source>
+        <translation type="unfinished">Prévisualiser et modifier…</translation>
+    </message>
+    <message>
+        <source>Rename…</source>
+        <translation type="unfinished">Renommer…</translation>
+    </message>
+    <message>
+        <source>Replace media…</source>
+        <translation type="unfinished">Remplacer les médias…</translation>
+    </message>
+    <message numerus="yes">
+        <source>Move %n items to folder…</source>
+        <translation type="unfinished">
+            <numerusform>Déplacer %n élément vers un dossier…</numerusform>
+            <numerusform>Déplacer %n éléments vers un dossier…</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Move to folder…</source>
+        <translation type="unfinished">Déplacer vers un dossier…</translation>
+    </message>
+    <message numerus="yes">
+        <source>Create %n proxies</source>
+        <translation type="unfinished">
+            <numerusform>Créer %n proxy</numerusform>
+            <numerusform>Créer %n proxies</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Create proxy</source>
+        <translation type="unfinished">Créer un proxy</translation>
+    </message>
+    <message>
+        <source>Link proxy…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Remove %n proxies</source>
+        <translation type="unfinished">
+            <numerusform>Supprimer %n proxy</numerusform>
+            <numerusform>Supprimer %n proxies</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Remove proxy</source>
+        <translation type="unfinished">Supprimer le proxy</translation>
+    </message>
+    <message>
+        <source>Convert to edit-friendly format</source>
+        <translation type="unfinished">Convertir au format optimisé pour le montage</translation>
+    </message>
+    <message>
+        <source>Export image…</source>
+        <translation type="unfinished">Exporter l&apos;image…</translation>
+    </message>
+    <message>
+        <source>Save As…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Remove %n items from project</source>
+        <translation type="unfinished">
+            <numerusform>Supprimer %n élément du projet</numerusform>
+            <numerusform>Supprimer %n éléments du projet</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Remove from project</source>
+        <translation type="unfinished">Supprimer du projet</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsListLabels</name>
+    <message>
+        <source>Linked proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy</source>
+        <translation type="unfinished">Proxy</translation>
+    </message>
+    <message>
+        <source>Using a proxy file found next to the original</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit-friendly</source>
+        <translation type="unfinished">Optimisé pour le montage</translation>
+    </message>
+    <message>
+        <source>Converted to a constant frame rate for smooth editing</source>
+        <translation type="unfinished">Converti à une fréquence d&apos;images constante pour un montage fluide</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsListRow</name>
+    <message>
+        <source>%1 — drag to the timeline, right-click to preview</source>
+        <translation type="unfinished">%1 — faites glisser vers la timeline, clic droit pour prévisualiser</translation>
+    </message>
+    <message>
+        <source>Collapse folder</source>
+        <translation type="unfinished">Réplier dossier</translation>
+    </message>
+    <message>
+        <source>Expand folder</source>
+        <translation type="unfinished">Développer dossier</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsTab</name>
     <message>
         <source>Search media</source>
         <translation>Rechercher des médias</translation>
-    </message>
-    <message>
-        <source>Grid view</source>
-        <translation>Vue en grille</translation>
-    </message>
-    <message>
-        <source>List view</source>
-        <translation>Vue en liste</translation>
-    </message>
-    <message>
-        <source>Tree view</source>
-        <translation>Vue en arbre</translation>
-    </message>
-    <message>
-        <source>Sort by name</source>
-        <translation>Trier par nom</translation>
-    </message>
-    <message>
-        <source>Sort by type</source>
-        <translation>Trier par type</translation>
     </message>
     <message>
         <source>Expand all</source>
@@ -9339,100 +9827,6 @@
         <translation>Arrêter la conversion</translation>
     </message>
     <message>
-        <source>Rename…</source>
-        <translation>Renommer…</translation>
-    </message>
-    <message>
-        <source>%1 — drag to the timeline, right-click to preview</source>
-        <translation>%1 — faites glisser vers la timeline, clic droit pour prévisualiser</translation>
-    </message>
-    <message>
-        <source>Open composite</source>
-        <translation>Ouvrir la composition</translation>
-    </message>
-    <message>
-        <source>Preview and edit…</source>
-        <translation>Prévisualiser et modifier…</translation>
-    </message>
-    <message>
-        <source>Trim, crop and upscale…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Replace media…</source>
-        <translation>Remplacer les médias…</translation>
-    </message>
-    <message numerus="yes">
-        <source>Create %n proxies</source>
-        <translation>
-            <numerusform>Créer %n proxy</numerusform>
-            <numerusform>Créer %n proxies</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Create proxy</source>
-        <translation>Créer un proxy</translation>
-    </message>
-    <message>
-        <source>Link proxy…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Remove %n proxies</source>
-        <translation>
-            <numerusform>Supprimer %n proxy</numerusform>
-            <numerusform>Supprimer %n proxies</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Remove proxy</source>
-        <translation>Supprimer le proxy</translation>
-    </message>
-    <message>
-        <source>Export image…</source>
-        <translation>Exporter l&apos;image…</translation>
-    </message>
-    <message>
-        <source>Save As…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remove from project</source>
-        <translation>Supprimer du projet</translation>
-    </message>
-    <message>
-        <source>Proxy</source>
-        <translation>Proxy</translation>
-    </message>
-    <message>
-        <source>Linked proxy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Using a proxy file found next to the original</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Edit-friendly</source>
-        <translation>Optimisé pour le montage</translation>
-    </message>
-    <message>
-        <source>Converted to a constant frame rate for smooth editing</source>
-        <translation>Converti à une fréquence d&apos;images constante pour un montage fluide</translation>
-    </message>
-    <message>
-        <source>Collapse folder</source>
-        <translation>Réplier dossier</translation>
-    </message>
-    <message>
-        <source>Expand folder</source>
-        <translation>Développer dossier</translation>
-    </message>
-    <message>
-        <source>Move to folder…</source>
-        <translation>Déplacer vers un dossier…</translation>
-    </message>
-    <message>
         <source>This folder is empty</source>
         <translation>Ce dossier est vide</translation>
     </message>
@@ -9440,42 +9834,28 @@
         <source>Drag media here, or import more.</source>
         <translation>Glissez des médias ici ou importez-en d&apos;autres.</translation>
     </message>
+</context>
+<context>
+    <name>MediaAssetsViewToolbar</name>
     <message>
-        <source>Open</source>
-        <translation>Ouvrir</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Supprimer</translation>
-    </message>
-    <message numerus="yes">
-        <source>Add %n items to timeline</source>
-        <translation>
-            <numerusform>Ajouter %n élément à la ligne du temps</numerusform>
-            <numerusform>Ajouter %n éléments à la ligne du temps</numerusform>
-        </translation>
+        <source>Grid view</source>
+        <translation type="unfinished">Vue en grille</translation>
     </message>
     <message>
-        <source>Add to timeline</source>
-        <translation>Ajouter à la ligne du temps</translation>
-    </message>
-    <message numerus="yes">
-        <source>Move %n items to folder…</source>
-        <translation>
-            <numerusform>Déplacer %n élément vers un dossier…</numerusform>
-            <numerusform>Déplacer %n éléments vers un dossier…</numerusform>
-        </translation>
+        <source>List view</source>
+        <translation type="unfinished">Vue en liste</translation>
     </message>
     <message>
-        <source>Convert to edit-friendly format</source>
-        <translation>Convertir vers un format optimisé pour le montage</translation>
+        <source>Tree view</source>
+        <translation type="unfinished">Vue en arbre</translation>
     </message>
-    <message numerus="yes">
-        <source>Remove %n items from project</source>
-        <translation>
-            <numerusform>Supprimer %n élément du projet</numerusform>
-            <numerusform>Supprimer %n éléments du projet</numerusform>
-        </translation>
+    <message>
+        <source>Sort by name</source>
+        <translation type="unfinished">Trier par nom</translation>
+    </message>
+    <message>
+        <source>Sort by type</source>
+        <translation type="unfinished">Trier par type</translation>
     </message>
 </context>
 <context>
@@ -9688,6 +10068,13 @@
     </message>
 </context>
 <context>
+    <name>MediaPreviewResolutionPill</name>
+    <message>
+        <source>%1p</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MediaPreviewWindow</name>
     <message>
         <source>Preview — %1</source>
@@ -9723,10 +10110,6 @@
     </message>
     <message>
         <source>Upscale this video?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1p</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9849,20 +10232,110 @@
         <translation>Ce projet a été enregistré avec des extensions supplémentaires que vous ne possédez pas. Il s&apos;est ouvert, mais tout ce qu&apos;elles fournissent n&apos;apparaîtra pas tant qu&apos;elles ne seront pas installées.</translation>
     </message>
     <message>
+        <source>Reopen the project once they finish installing.</source>
+        <translation>Rouvrez le projet une fois l&apos;installation terminée.</translation>
+    </message>
+</context>
+<context>
+    <name>MissingAddonsRow</name>
+    <message>
         <source>%1… %2%</source>
-        <translation>%1&#x202f;à %2&#x202f;%</translation>
+        <translation type="unfinished">%1&#x202f;à %2&#x202f;%</translation>
     </message>
     <message>
         <source>used version %1</source>
-        <translation>Version utilisée %1</translation>
+        <translation type="unfinished">Version utilisée %1</translation>
     </message>
     <message>
         <source>Install</source>
-        <translation>Installer</translation>
+        <translation type="unfinished">Installer</translation>
+    </message>
+</context>
+<context>
+    <name>MixerChannelName</name>
+    <message>
+        <source> (recording)</source>
+        <translation type="unfinished"> (enregistrement)</translation>
+    </message>
+</context>
+<context>
+    <name>MixerChannelStrip</name>
+    <message>
+        <source>Unmute master</source>
+        <translation type="unfinished">Rétablir le son du master</translation>
     </message>
     <message>
-        <source>Reopen the project once they finish installing.</source>
-        <translation>Rouvrez le projet une fois l&apos;installation terminée.</translation>
+        <source>Mute master</source>
+        <translation type="unfinished">Couper le son du master</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation type="unfinished">Rétablir le son</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation type="unfinished">Couper le son</translation>
+    </message>
+    <message>
+        <source>Unsolo</source>
+        <translation type="unfinished">Désactiver le solo</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation type="unfinished">Solo</translation>
+    </message>
+    <message>
+        <source>Recording paused — click to finish</source>
+        <translation type="unfinished">Enregistrement en pause — cliquez pour terminer</translation>
+    </message>
+    <message>
+        <source>Recording — click to finish</source>
+        <translation type="unfinished">Enregistrement en cours — cliquez pour terminer</translation>
+    </message>
+    <message>
+        <source>Record voiceover on %1</source>
+        <translation type="unfinished">Enregistrer une voix hors champ sur %1</translation>
+    </message>
+</context>
+<context>
+    <name>MixerFader</name>
+    <message>
+        <source>Master volume</source>
+        <translation type="unfinished">Volume master</translation>
+    </message>
+    <message>
+        <source>%1 volume</source>
+        <translation type="unfinished">Volume de %1</translation>
+    </message>
+    <message>
+        <source>Mic gain %1 dB</source>
+        <translation type="unfinished">Gain du micro %1 dB</translation>
+    </message>
+    <message>
+        <source>Volume %1 dB</source>
+        <translation type="unfinished">Volume %1 dB</translation>
+    </message>
+    <message>
+        <source> — Shift-drag for fine, double-click for 0 dB</source>
+        <translation type="unfinished"> — faites glisser avec Shift pour un réglage fin, double-cliquez pour 0 dB</translation>
+    </message>
+</context>
+<context>
+    <name>MixerLevelReadout</name>
+    <message>
+        <source>Mic gain %1 dB (%2%) — scroll to adjust, double-click for 0 dB</source>
+        <translation type="unfinished">Gain du micro %1 dB (%2%) — faites défiler pour ajuster, double-cliquez pour 0 dB</translation>
+    </message>
+    <message>
+        <source>%1 dB — scroll to adjust, double-click for 0 dB</source>
+        <translation type="unfinished">%1 dB — faites défiler pour ajuster, double-cliquez pour 0 dB</translation>
+    </message>
+</context>
+<context>
+    <name>MixerPanControl</name>
+    <message>
+        <source>Pan %1 — drag to adjust, double-click to center</source>
+        <translation type="unfinished">Panoramique %1 — faites glisser pour ajuster, double-cliquez pour centrer</translation>
     </message>
 </context>
 <context>
@@ -10051,6 +10524,24 @@
     </message>
 </context>
 <context>
+    <name>MulticamAngleTile</name>
+    <message>
+        <source>Nothing here</source>
+        <translation type="unfinished">Rien ici</translation>
+    </message>
+    <message>
+        <source>Switch the program to %1 (key %2)</source>
+        <translation type="unfinished">Changer le programme en %1 (touche %2)</translation>
+    </message>
+</context>
+<context>
+    <name>MulticamProgramBadge</name>
+    <message>
+        <source>Program</source>
+        <translation type="unfinished">Programme</translation>
+    </message>
+</context>
+<context>
     <name>MulticamWindow</name>
     <message>
         <source>Multicam</source>
@@ -10081,24 +10572,12 @@
         <translation>Configurer depuis mes médias</translation>
     </message>
     <message>
-        <source>Nothing here</source>
-        <translation>Rien ici</translation>
-    </message>
-    <message>
-        <source>Switch the program to %1 (key %2)</source>
-        <translation>Changer le programme en %1 (touche %2)</translation>
-    </message>
-    <message>
         <source>No clip at the current time</source>
         <translation>Aucun clip à l&apos;heure actuelle</translation>
     </message>
     <message>
         <source>GPU preview unavailable — see Help → Debug info</source>
         <translation>Aperçu GPU non disponible — consultez Aide → Infos de débogage</translation>
-    </message>
-    <message>
-        <source>Program</source>
-        <translation>Programme</translation>
     </message>
     <message>
         <source>Previous frame</source>
@@ -10192,6 +10671,13 @@
     </message>
 </context>
 <context>
+    <name>NotificationHistoryRow</name>
+    <message>
+        <source>%1  (×%2)</source>
+        <translation type="unfinished">%1  (×%2)</translation>
+    </message>
+</context>
+<context>
     <name>NotificationList</name>
     <message>
         <source>Notifications</source>
@@ -10201,6 +10687,13 @@
         <source>Clear</source>
         <translation type="unfinished">Effacer</translation>
     </message>
+    <message>
+        <source>No notifications yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NotificationUpdateRow</name>
     <message>
         <source>Drift %1 is ready to install</source>
         <translation type="unfinished"></translation>
@@ -10212,14 +10705,6 @@
     <message>
         <source>Update</source>
         <translation type="unfinished">Mettre à jour</translation>
-    </message>
-    <message>
-        <source>No notifications yet.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1  (×%2)</source>
-        <translation type="unfinished">%1  (×%2)</translation>
     </message>
 </context>
 <context>
@@ -10321,6 +10806,28 @@
     </message>
 </context>
 <context>
+    <name>PasteAttributesAudioSection</name>
+    <message>
+        <source>Audio Attributes</source>
+        <translation type="unfinished">Attributs audio</translation>
+    </message>
+    <message>
+        <source>Volume &amp; Fades (volume keyframes, in/out ramps)</source>
+        <translation type="unfinished">Volume et fondus (images clés de volume, rampes d&apos;entrée/sortie)</translation>
+    </message>
+    <message numerus="yes">
+        <source>Audio Effects (%n effect(s))</source>
+        <translation type="unfinished">
+            <numerusform>Effets audio (%n effet)</numerusform>
+            <numerusform>Effets audio (%n effets)</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Audio Effects (none)</source>
+        <translation type="unfinished">Effets audio (aucun)</translation>
+    </message>
+</context>
+<context>
     <name>PasteAttributesDialog</name>
     <message>
         <source>Paste Attributes</source>
@@ -10346,71 +10853,6 @@
         </translation>
     </message>
     <message>
-        <source>Video Attributes</source>
-        <translation>Attributs vidéo</translation>
-    </message>
-    <message>
-        <source>Transform (motion, position, scale, opacity)</source>
-        <translation>Transformation (mouvement, position, échelle, opacité)</translation>
-    </message>
-    <message>
-        <source>, reverse</source>
-        <translation>, inversion</translation>
-    </message>
-    <message>
-        <source>, speed curve</source>
-        <translation>, courbe de vitesse</translation>
-    </message>
-    <message>
-        <source>Speed / Retime (%1x%2%3)</source>
-        <translation>Vitesse / Réétalonnage temporel (%1x%2%3)</translation>
-    </message>
-    <message>
-        <source>Speed / Retime</source>
-        <translation>Vitesse / Réétalonnage temporel</translation>
-    </message>
-    <message numerus="yes">
-        <source>Video Effects (%n effect(s))</source>
-        <translation>
-            <numerusform>Effets vidéo (%n effet)</numerusform>
-            <numerusform>Effets vidéo (%n effets)</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Video Effects (none)</source>
-        <translation>Effets vidéo (aucun)</translation>
-    </message>
-    <message>
-        <source>Audio Attributes</source>
-        <translation>Attributs audio</translation>
-    </message>
-    <message>
-        <source>Volume &amp; Fades (volume keyframes, in/out ramps)</source>
-        <translation>Volume et fondus (images clés de volume, rampes d&apos;entrée/sortie)</translation>
-    </message>
-    <message numerus="yes">
-        <source>Audio Effects (%n effect(s))</source>
-        <translation>
-            <numerusform>Effets audio (%n effet)</numerusform>
-            <numerusform>Effets audio (%n effets)</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Audio Effects (none)</source>
-        <translation>Effets audio (aucun)</translation>
-    </message>
-    <message>
-        <source>Transitions</source>
-        <translation>Transitions</translation>
-    </message>
-    <message numerus="yes">
-        <source>Transitions (%n transition(s))</source>
-        <translation>
-            <numerusform>Transitions (%n transition)</numerusform>
-            <numerusform>Transitions (%n transitions)</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Replace existing effects (instead of appending)</source>
         <translation>Remplacer les effets existants (au lieu de les ajouter)</translation>
     </message>
@@ -10421,6 +10863,58 @@
     <message>
         <source>Select None</source>
         <translation>Sélectionner auncun</translation>
+    </message>
+</context>
+<context>
+    <name>PasteAttributesTransitionsSection</name>
+    <message>
+        <source>Transitions</source>
+        <translation type="unfinished">Transitions</translation>
+    </message>
+    <message numerus="yes">
+        <source>Transitions (%n transition(s))</source>
+        <translation type="unfinished">
+            <numerusform>Transitions (%n transition)</numerusform>
+            <numerusform>Transitions (%n transitions)</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>PasteAttributesVideoSection</name>
+    <message>
+        <source>Video Attributes</source>
+        <translation type="unfinished">Attributs vidéo</translation>
+    </message>
+    <message>
+        <source>Transform (motion, position, scale, opacity)</source>
+        <translation type="unfinished">Transformation (mouvement, position, échelle, opacité)</translation>
+    </message>
+    <message>
+        <source>, reverse</source>
+        <translation type="unfinished">, inversion</translation>
+    </message>
+    <message>
+        <source>, speed curve</source>
+        <translation type="unfinished">, courbe de vitesse</translation>
+    </message>
+    <message>
+        <source>Speed / Retime (%1x%2%3)</source>
+        <translation type="unfinished">Vitesse / Réétalonnage temporel (%1x%2%3)</translation>
+    </message>
+    <message>
+        <source>Speed / Retime</source>
+        <translation type="unfinished">Vitesse / Réétalonnage temporel</translation>
+    </message>
+    <message numerus="yes">
+        <source>Video Effects (%n effect(s))</source>
+        <translation type="unfinished">
+            <numerusform>Effets vidéo (%n effet)</numerusform>
+            <numerusform>Effets vidéo (%n effets)</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Video Effects (none)</source>
+        <translation type="unfinished">Effets vidéo (aucun)</translation>
     </message>
 </context>
 <context>
@@ -10691,6 +11185,13 @@
     </message>
 </context>
 <context>
+    <name>PreviewCompactGpuCaption</name>
+    <message>
+        <source>GPU preview unavailable</source>
+        <translation type="unfinished">Aperçu GPU non disponible</translation>
+    </message>
+</context>
+<context>
     <name>PreviewModeSwitch</name>
     <message>
         <source>Camera Output</source>
@@ -10706,6 +11207,37 @@
     </message>
     <message>
         <source>The scene from a free viewpoint, with the camera in it. Middle- or right-drag orbits, Shift pans, the wheel zooms, and the corner pad steps the view.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PreviewOptionsDecodeDialog</name>
+    <message>
+        <source>Decoding on a different graphics card</source>
+        <translation type="unfinished">Décodage sur une autre carte graphique</translation>
+    </message>
+    <message>
+        <source>Use anyway</source>
+        <translation type="unfinished">Utiliser quand même</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Launching Drift with prime-run (or DRI_PRIME=1) puts OpenGL on the same card as the decoder.</source>
+        <translation type="unfinished">Lancer Drift avec prime-run (ou DRI_PRIME=1) place OpenGL sur la même carte que le décodeur.</translation>
+    </message>
+    <message>
+        <source>Run Drift on the high-performance graphics card</source>
+        <translation type="unfinished">Exécuter Drift sur la carte graphique haute performance</translation>
+    </message>
+    <message>
+        <source>Set Drift to High performance in Windows Settings &gt; Display &gt; Graphics, then restart Drift.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open graphics settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10771,52 +11303,33 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <source>Keep mask handles on the preview while another clip is selected</source>
         <translation type="unfinished">Conserver les poignées du masque sur l&apos;aperçu lorsqu&apos;un autre clip est sélectionné</translation>
     </message>
-    <message>
-        <source>Decoding on a different graphics card</source>
-        <translation type="unfinished">Décodage sur une autre carte graphique</translation>
-    </message>
-    <message>
-        <source>Use anyway</source>
-        <translation type="unfinished">Utiliser quand même</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
-    </message>
-    <message>
-        <source>Launching Drift with prime-run (or DRI_PRIME=1) puts OpenGL on the same card as the decoder.</source>
-        <translation type="unfinished">Lancer Drift avec prime-run (ou DRI_PRIME=1) place OpenGL sur la même carte que le décodeur.</translation>
-    </message>
-    <message>
-        <source>Run Drift on the high-performance graphics card</source>
-        <translation type="unfinished">Exécuter Drift sur la carte graphique haute performance</translation>
-    </message>
-    <message>
-        <source>Set Drift to High performance in Windows Settings &gt; Display &gt; Graphics, then restart Drift.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open graphics settings</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
-    <name>PreviewOsd</name>
-    <message>
-        <source>Preview zoom — Ctrl+scroll over the preview to zoom, middle-drag to pan. Click to reset to 100%.</source>
-        <translation type="unfinished">Zoom aperçu — Ctrl + défilement sur l&apos;aperçu pour zoomer, glisser au centre pour déplacer. Cliquez pour réinitialiser à 100&#x202f;%.</translation>
-    </message>
-    <message>
-        <source>Toggle guides</source>
-        <translation type="unfinished">Basculer les repères</translation>
-    </message>
+    <name>PreviewOsdGuideMenuButton</name>
     <message>
         <source>Guide sets</source>
         <translation type="unfinished">Jeux de guides</translation>
     </message>
+</context>
+<context>
+    <name>PreviewOsdGuidesButton</name>
+    <message>
+        <source>Toggle guides</source>
+        <translation type="unfinished">Basculer les repères</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewOsdOptionsButton</name>
     <message>
         <source>Preview options</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PreviewOsdZoomChip</name>
+    <message>
+        <source>Preview zoom — Ctrl+scroll over the preview to zoom, middle-drag to pan. Click to reset to 100%.</source>
+        <translation type="unfinished">Zoom aperçu — Ctrl + défilement sur l&apos;aperçu pour zoomer, glisser au centre pour déplacer. Cliquez pour réinitialiser à 100&#x202f;%.</translation>
     </message>
 </context>
 <context>
@@ -10828,14 +11341,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
 </context>
 <context>
     <name>PreviewStatusLayer</name>
-    <message>
-        <source>PAUSED %1s</source>
-        <translation type="unfinished">EN PAUSE %1s</translation>
-    </message>
-    <message>
-        <source>REC %1s</source>
-        <translation type="unfinished">ENR. %1s</translation>
-    </message>
     <message>
         <source>Nothing to preview yet</source>
         <translation type="unfinished">Pas encore de prévisualisation</translation>
@@ -10876,29 +11381,34 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <translation type="unfinished">%1 (%2)</translation>
     </message>
     <message>
-        <source>Current time / total · %1 frames per second</source>
-        <translation type="unfinished">Temps actuel / total · %1 images par seconde</translation>
-    </message>
-    <message>
-        <source>Jump back 1s · Shift for 5s · Ctrl for 10s</source>
-        <translation type="unfinished">Reculer de 1&#x202f;s · Shift pour 5&#x202f;s · Ctrl pour 10&#x202f;s</translation>
-    </message>
-    <message>
         <source>Previous frame</source>
         <translation type="unfinished">Image précédente</translation>
-    </message>
-    <message>
-        <source>Pause</source>
-        <translation type="unfinished">Pause</translation>
-    </message>
-    <message>
-        <source>Play</source>
-        <translation type="unfinished">Lire</translation>
     </message>
     <message>
         <source>Next frame</source>
         <translation type="unfinished">Image suivante</translation>
     </message>
+</context>
+<context>
+    <name>PreviewTransportFastForwardButton</name>
+    <message>
+        <source>Jump forward 1s · Shift for 5s · Ctrl for 10s</source>
+        <translation type="unfinished">Avancer de 1&#x202f;s · Shift pour 5&#x202f;s · Ctrl pour 10&#x202f;s</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewTransportFullscreenButton</name>
+    <message>
+        <source>Exit fullscreen preview (Esc)</source>
+        <translation type="unfinished">Quitter l&apos;aperçu plein écran (Esc)</translation>
+    </message>
+    <message>
+        <source>Fullscreen preview</source>
+        <translation type="unfinished">Aperçu plein écran</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewTransportLoopButton</name>
     <message>
         <source>Loop work area on — click to turn off</source>
         <translation type="unfinished">Boucle de zone de travail activée — cliquez pour désactiver</translation>
@@ -10907,17 +11417,41 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <source>Loop work area off — click to turn on</source>
         <translation type="unfinished">Boucle de zone de travail désactivée — cliquez pour activer</translation>
     </message>
+</context>
+<context>
+    <name>PreviewTransportPlayButton</name>
     <message>
-        <source>Jump forward 1s · Shift for 5s · Ctrl for 10s</source>
-        <translation type="unfinished">Avancer de 1&#x202f;s · Shift pour 5&#x202f;s · Ctrl pour 10&#x202f;s</translation>
+        <source>Pause</source>
+        <translation type="unfinished">Pause</translation>
     </message>
     <message>
-        <source>Exit fullscreen preview (Esc)</source>
-        <translation type="unfinished">Quitter l&apos;aperçu plein écran (Esc)</translation>
+        <source>Play</source>
+        <translation type="unfinished">Lire</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewTransportRewindButton</name>
+    <message>
+        <source>Jump back 1s · Shift for 5s · Ctrl for 10s</source>
+        <translation type="unfinished">Reculer de 1&#x202f;s · Shift pour 5&#x202f;s · Ctrl pour 10&#x202f;s</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewTransportTimecode</name>
+    <message>
+        <source>Current time / total · %1 frames per second</source>
+        <translation type="unfinished">Temps actuel / total · %1 images par seconde</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewVoiceoverBadge</name>
+    <message>
+        <source>PAUSED %1s</source>
+        <translation type="unfinished">EN PAUSE %1s</translation>
     </message>
     <message>
-        <source>Fullscreen preview</source>
-        <translation type="unfinished">Aperçu plein écran</translation>
+        <source>REC %1s</source>
+        <translation type="unfinished">ENR. %1s</translation>
     </message>
 </context>
 <context>
@@ -11362,6 +11896,21 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
+    <name>PropertiesEmptyState</name>
+    <message>
+        <source>It&apos;s empty here</source>
+        <translation type="unfinished">Il est vide ici</translation>
+    </message>
+    <message>
+        <source>Tap a clip on the timeline to edit its properties</source>
+        <translation type="unfinished">Touchez un clip sur la timeline pour modifier ses propriétés</translation>
+    </message>
+    <message>
+        <source>Click a clip on the timeline to edit its properties</source>
+        <translation type="unfinished">Cliquez sur un clip dans la timeline pour modifier ses propriétés</translation>
+    </message>
+</context>
+<context>
     <name>PropertiesPanel</name>
     <message>
         <source>General</source>
@@ -11434,18 +11983,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>Transition</source>
         <translation>Transition</translation>
-    </message>
-    <message>
-        <source>It&apos;s empty here</source>
-        <translation>Il est vide ici</translation>
-    </message>
-    <message>
-        <source>Tap a clip on the timeline to edit its properties</source>
-        <translation>Touchez un clip sur la timeline pour modifier ses propriétés</translation>
-    </message>
-    <message>
-        <source>Click a clip on the timeline to edit its properties</source>
-        <translation>Cliquez sur un clip dans la timeline pour modifier ses propriétés</translation>
     </message>
     <message>
         <source>Save effect preset</source>
@@ -11812,10 +12349,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
 <context>
     <name>RecentProjectsPopup</name>
     <message>
-        <source>Remove from recents</source>
-        <translation>Supprimer des récents</translation>
-    </message>
-    <message>
         <source>All changes saved</source>
         <translation>Toutes les modifications enregistrées</translation>
     </message>
@@ -11875,6 +12408,13 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
+    <name>RecentProjectsProjectRow</name>
+    <message>
+        <source>Remove from recents</source>
+        <translation type="unfinished">Supprimer des récents</translation>
+    </message>
+</context>
+<context>
     <name>RecoveryDialog</name>
     <message>
         <source>Unsaved work from last session</source>
@@ -11899,6 +12439,96 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>Auto-saved: %1</source>
         <translation>Sauvegarde automatique : %1</translation>
+    </message>
+</context>
+<context>
+    <name>RestoreCompareView</name>
+    <message>
+        <source>Original</source>
+        <translation type="unfinished">Original</translation>
+    </message>
+    <message>
+        <source>Enhanced — out of date, preview again</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enhanced %1 × %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading this frame…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Working…</source>
+        <translation type="unfinished">En cours…</translation>
+    </message>
+    <message>
+        <source>Choose models, then Preview to compare this frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frame</source>
+        <translation type="unfinished">Image</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <translation type="unfinished">s</translation>
+    </message>
+    <message>
+        <source>Fit</source>
+        <translation type="unfinished">Ajuster</translation>
+    </message>
+</context>
+<context>
+    <name>RestoreControlColumn</name>
+    <message>
+        <source>Preview one frame, then enhance the whole video. The result is added to the media bin. Enhancing is slow — minutes per second of video without a GPU.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview one frame, then enhance the part of the clip used on the timeline. The result is added to the media bin. Enhancing is slow — minutes per second of video without a GPU.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove compression</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upscale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output: %1 × %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> — larger than 4K, which is slow to edit and export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up to about %1 on this computer&apos;s CPU.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up to about %1 on a typical laptop CPU. Preview a frame for an estimate for this computer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview this frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished">Arrêter</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">Fermer</translation>
+    </message>
+    <message>
+        <source>Enhance clip</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11937,91 +12567,7 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
-    <name>RestoreWindow</name>
-    <message>
-        <source>Enhance video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation type="unfinished">Aucun</translation>
-    </message>
-    <message>
-        <source>%1 (custom, experimental)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Original</source>
-        <translation type="unfinished">Original</translation>
-    </message>
-    <message>
-        <source>Enhanced — out of date, preview again</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enhanced %1 × %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Loading this frame…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Working…</source>
-        <translation type="unfinished">En cours…</translation>
-    </message>
-    <message>
-        <source>Choose models, then Preview to compare this frame</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Frame</source>
-        <translation type="unfinished">Image</translation>
-    </message>
-    <message>
-        <source>s</source>
-        <translation type="unfinished">s</translation>
-    </message>
-    <message>
-        <source>Fit</source>
-        <translation type="unfinished">Ajuster</translation>
-    </message>
-    <message>
-        <source>Preview one frame, then enhance the whole video. The result is added to the media bin. Enhancing is slow — minutes per second of video without a GPU.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Preview one frame, then enhance the part of the clip used on the timeline. The result is added to the media bin. Enhancing is slow — minutes per second of video without a GPU.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remove compression</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Upscale</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Output: %1 × %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> — larger than 4K, which is slow to edit and export</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Up to about %1 on this computer&apos;s CPU.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Up to about %1 on a typical laptop CPU. Preview a frame for an estimate for this computer.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Preview this frame</source>
-        <translation type="unfinished"></translation>
-    </message>
+    <name>RestoreUpscalerPicker</name>
     <message>
         <source>Anime and drawings</source>
         <translation type="unfinished"></translation>
@@ -12043,6 +12589,10 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Close</source>
+        <translation type="unfinished">Fermer</translation>
+    </message>
+    <message>
         <source>All</source>
         <translation type="unfinished">Tous</translation>
     </message>
@@ -12051,11 +12601,34 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Refresh model list</source>
+        <source>Get models (openmodeldb.info)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enhance clip</source>
+        <source>Install AI engine first</source>
+        <translation type="unfinished">Installez d&apos;abord le moteur IA</translation>
+    </message>
+    <message>
+        <source>Open custom models folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh model list</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RestoreWindow</name>
+    <message>
+        <source>Enhance video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">Aucun</translation>
+    </message>
+    <message>
+        <source>%1 (custom, experimental)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -12085,26 +12658,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>Keep the original size.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Install AI engine first</source>
-        <translation type="unfinished">Installez d&apos;abord le moteur IA</translation>
-    </message>
-    <message>
-        <source>Get models (openmodeldb.info)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open custom models folder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation type="unfinished">Arrêter</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished">Fermer</translation>
     </message>
 </context>
 <context>
@@ -12208,6 +12761,17 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
+    <name>ScenesShotRow</name>
+    <message>
+        <source>Scene %1</source>
+        <translation type="unfinished">Scène %1</translation>
+    </message>
+    <message>
+        <source>%1 – %2  ·  %3s</source>
+        <translation type="unfinished">%1 - %2  ·  %3s</translation>
+    </message>
+</context>
+<context>
     <name>ScenesTab</name>
     <message>
         <source>Finds where the picture cuts in the selected video clip, and ranks each shot by movement and loudness. Click a shot to jump to it.</source>
@@ -12289,13 +12853,72 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <source>Select a video clip on the timeline to scan it.</source>
         <translation>Sélectionnez un clip vidéo sur la timeline pour l&apos;analyser.</translation>
     </message>
+</context>
+<context>
+    <name>SegmentationControlColumn</name>
     <message>
-        <source>Scene %1</source>
-        <translation>Scène %1</translation>
+        <source>Tap marks the subject, press and hold marks what to exclude. Tap a marker to remove it.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 – %2  ·  %3s</source>
-        <translation>%1 - %2  ·  %3s</translation>
+        <source>Left-click marks the subject, right-click marks what to exclude. Click a marker to remove it.</source>
+        <translation type="unfinished">Le clic gauche marque le sujet, le clic droit marque ce qu&apos;il faut exclure. Cliquez sur un marqueur pour l&apos;enlever.</translation>
+    </message>
+    <message>
+        <source>Everyone in the shot is cut out automatically — there is nothing to click.</source>
+        <translation type="unfinished">Chaque personne du plan est détourée automatiquement — il n&apos;y a rien à cliquer.</translation>
+    </message>
+    <message>
+        <source>Cut out</source>
+        <translation type="unfinished">Détourer</translation>
+    </message>
+    <message>
+        <source>Quality</source>
+        <translation type="unfinished">Qualité</translation>
+    </message>
+    <message>
+        <source>AI: %1</source>
+        <translation type="unfinished">IA : %1</translation>
+    </message>
+    <message>
+        <source>not installed</source>
+        <translation type="unfinished">non installé</translation>
+    </message>
+    <message>
+        <source>Result</source>
+        <translation type="unfinished">Résultat</translation>
+    </message>
+    <message>
+        <source>Adds a mask layer under the clip. The clip itself is left alone — flip it to the background, or remove it, from the Masks tab.</source>
+        <translation type="unfinished">Ajoute un calque de masque sous le clip. Le clip lui-même reste inchangé — inversez-le avec l&apos;arrière-plan ou supprimez-le à partir de l&apos;onglet Masques.</translation>
+    </message>
+    <message>
+        <source>The cutout is only for this effect — no extra tracks are added.</source>
+        <translation type="unfinished">Le découpage est uniquement pour cet effet — aucune piste supplémentaire n’est ajoutée.</translation>
+    </message>
+    <message>
+        <source>Clear points</source>
+        <translation type="unfinished">Effacer les points</translation>
+    </message>
+    <message>
+        <source>Cutting out… %1%</source>
+        <translation type="unfinished">Découpage… %1%</translation>
+    </message>
+    <message>
+        <source>Cut out &amp; apply effect</source>
+        <translation type="unfinished">Découper &amp; appliquer l&apos;effet</translation>
+    </message>
+    <message>
+        <source>Cut out subject</source>
+        <translation type="unfinished">Découper le sujet</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Each moment is processed, so longer clips take longer.</source>
+        <translation type="unfinished">Chaque instant est traité, donc les clips plus longs prennent plus de temps.</translation>
     </message>
 </context>
 <context>
@@ -12370,6 +12993,21 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
+    <name>SegmentationFrameColumn</name>
+    <message>
+        <source>Looking at this moment…</source>
+        <translation type="unfinished">En regardant ce moment…</translation>
+    </message>
+    <message>
+        <source>Frame</source>
+        <translation type="unfinished">Image</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <translation type="unfinished">s</translation>
+    </message>
+</context>
+<context>
     <name>SegmentationWindow</name>
     <message>
         <source>Cut out subject</source>
@@ -12391,77 +13029,143 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <source>Fast</source>
         <translation>Rapide</translation>
     </message>
+</context>
+<context>
+    <name>SettingsAppSection</name>
     <message>
-        <source>Looking at this moment…</source>
-        <translation>En regardant ce moment…</translation>
+        <source>App</source>
+        <translation type="unfinished">Application</translation>
     </message>
     <message>
-        <source>Frame</source>
-        <translation>Image</translation>
+        <source>Reopen last project on startup</source>
+        <translation type="unfinished">Rouvrir le dernier projet au démarrage</translation>
     </message>
     <message>
-        <source>s</source>
-        <translation>s</translation>
+        <source>Automatically restore the last open project on startup. Closing still asks you to save; a crash snapshot never overwrites your save file.</source>
+        <translation type="unfinished">Rouvre automatiquement le dernier projet ouvert au démarrage. La fermeture demande toujours d&apos;enregistrer les modifications ; une capture en cas de plantage n&apos;écrase jamais votre fichier sauvegardé.</translation>
     </message>
     <message>
-        <source>Tap marks the subject, press and hold marks what to exclude. Tap a marker to remove it.</source>
+        <source>Updates</source>
+        <translation type="unfinished">Mises à jour</translation>
+    </message>
+    <message>
+        <source>Check on startup</source>
+        <translation type="unfinished">Vérifier au démarrage</translation>
+    </message>
+    <message>
+        <source>Once a day, check whether a newer Drift has been released</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Left-click marks the subject, right-click marks what to exclude. Click a marker to remove it.</source>
-        <translation>Le clic gauche marque le sujet, le clic droit marque ce qu&apos;il faut exclure. Cliquez sur un marqueur pour l&apos;enlever.</translation>
+        <source>Checking…</source>
+        <translation type="unfinished">Vérification…</translation>
     </message>
     <message>
-        <source>Everyone in the shot is cut out automatically — there is nothing to click.</source>
-        <translation>Chaque personne du plan est détourée automatiquement — il n&apos;y a rien à cliquer.</translation>
+        <source>Downloading…</source>
+        <translation type="unfinished">Téléchargement en cours…</translation>
     </message>
     <message>
-        <source>Cut out</source>
-        <translation>Détourer</translation>
+        <source>Check now</source>
+        <translation type="unfinished">Vérifier maintenant</translation>
     </message>
     <message>
-        <source>Quality</source>
-        <translation>Qualité</translation>
+        <source>Drift %1</source>
+        <translation type="unfinished">Drift %1</translation>
     </message>
     <message>
-        <source>AI: %1</source>
-        <translation>IA : %1</translation>
+        <source>Extra packs</source>
+        <translation type="unfinished">extensions supplémentaires</translation>
     </message>
     <message>
-        <source>not installed</source>
-        <translation>non installé</translation>
+        <source>Remind about essential packs</source>
+        <translation type="unfinished">Rappeler les extensions essentielles</translation>
     </message>
     <message>
-        <source>Result</source>
-        <translation>Résultat</translation>
+        <source>Pulse the Extras icon when the video, transitions, and audio packs are not installed</source>
+        <translation type="unfinished">Faire pulser l’icône Extras quand les extensions vidéo, transitions et audio ne sont pas installées</translation>
     </message>
     <message>
-        <source>Adds a mask layer under the clip. The clip itself is left alone — flip it to the background, or remove it, from the Masks tab.</source>
-        <translation>Ajoute un calque de masque sous le clip. Le clip lui-même reste inchangé — inversez-le avec l&apos;arrière-plan ou supprimez-le à partir de l&apos;onglet Masques.</translation>
+        <source>Remind about pack updates</source>
+        <translation type="unfinished">Rappeler les mises à jour des extensions</translation>
     </message>
     <message>
-        <source>The cutout is only for this effect — no extra tracks are added.</source>
-        <translation>Le découpage est uniquement pour cet effet — aucune piste supplémentaire n’est ajoutée.</translation>
+        <source>Pulse the Extras icon when updates are available for packs you already have installed</source>
+        <translation type="unfinished">Faire pulser l’icône Extras lorsqu’il y a des mises à jour disponibles pour les extensions déjà installées</translation>
     </message>
     <message>
-        <source>Clear points</source>
-        <translation>Effacer les points</translation>
+        <source>Agent access</source>
+        <translation type="unfinished">Accès aux agents</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsCloudProvidersSection</name>
+    <message>
+        <source>Cloud providers</source>
+        <translation type="unfinished">Fournisseurs infonuagiques</translation>
     </message>
     <message>
-        <source>Cutting out… %1%</source>
-        <translation>Découpage… %1%</translation>
+        <source>Keys are stored unencrypted in Drift&apos;s settings. ELEVENLABS_API_KEY and FISH_API_KEY in the environment take precedence. Use is billed to your own account.</source>
+        <translation type="unfinished">Les clés sont stockées non chiffrées dans les paramètres de Drift. ELEVENLABS_API_KEY et FISH_API_KEY dans l&apos;environnement ont priorité. L&apos;utilisation est facturée sur votre propre compte.</translation>
     </message>
     <message>
-        <source>Cut out &amp; apply effect</source>
-        <translation>Découper &amp; appliquer l&apos;effet</translation>
+        <source>Transcription (Scribe), voiceover, sound effects</source>
+        <translation type="unfinished">Transcription (Scribe), voix hors champ, effets sonores</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
+        <source>Voiceover</source>
+        <translation type="unfinished">Voix hors champ</translation>
     </message>
     <message>
-        <source>Each moment is processed, so longer clips take longer.</source>
-        <translation>Chaque instant est traité, donc les clips plus longs prennent plus de temps.</translation>
+        <source>No key</source>
+        <translation type="unfinished">Aucune clé</translation>
+    </message>
+    <message>
+        <source>Key from the environment</source>
+        <translation type="unfinished">Clé de l&apos;environnement</translation>
+    </message>
+    <message>
+        <source>Key %1</source>
+        <translation type="unfinished">Clé %1</translation>
+    </message>
+    <message>
+        <source>Paste API key</source>
+        <translation type="unfinished">Coller la clé API</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Enregistrer</translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished">Tester</translation>
+    </message>
+    <message>
+        <source>Checking…</source>
+        <translation type="unfinished">Vérification…</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished">Effacer</translation>
+    </message>
+    <message>
+        <source>Allow sending audio and text to %1</source>
+        <translation type="unfinished">Autoriser l&apos;envoi d&apos;audio et de texte à %1</translation>
+    </message>
+    <message>
+        <source>Needed before Drift or a connected agent can transcribe or generate audio with this service</source>
+        <translation type="unfinished">Requis avant que Drift ou un agent connecté ne puisse transcrire ou générer de l&apos;audio avec ce service</translation>
+    </message>
+    <message>
+        <source>Default voice id</source>
+        <translation type="unfinished">Identifiant de voix par défaut</translation>
+    </message>
+    <message>
+        <source>Voice model</source>
+        <translation type="unfinished">Modèle vocal</translation>
+    </message>
+    <message>
+        <source>Transcription model</source>
+        <translation type="unfinished">Modèle de transcription</translation>
     </message>
 </context>
 <context>
@@ -12476,170 +13180,26 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
-    <name>SettingsPane</name>
-    <message>
-        <source>Preview</source>
-        <translation>Aperçu</translation>
-    </message>
-    <message>
-        <source>Show guides</source>
-        <translation>Afficher les guides</translation>
-    </message>
-    <message>
-        <source>Show alignment guides over the preview</source>
-        <translation>Afficher les guides d’alignement sur l’aperçu</translation>
-    </message>
-    <message>
-        <source>Background</source>
-        <translation>Arrière-plan</translation>
-    </message>
-    <message>
-        <source>Solid color</source>
-        <translation>Couleur unie</translation>
-    </message>
-    <message>
-        <source>Blur</source>
-        <translation>Flou</translation>
-    </message>
-    <message>
-        <source>Transparent</source>
-        <translation>Transparent</translation>
-    </message>
-    <message>
-        <source>Fill behind clips that don’t cover the whole screen</source>
-        <translation>Remplir derrière les clips qui ne couvrent pas tout l&apos;écran</translation>
-    </message>
-    <message>
-        <source>Choose background colour</source>
-        <translation>Choisir la couleur de fond</translation>
-    </message>
-    <message>
-        <source>Blur strength</source>
-        <translation>Intensité du flou</translation>
-    </message>
-    <message>
-        <source>Use proxies for preview</source>
-        <translation>Utiliser des proxys pour l&apos;aperçu</translation>
-    </message>
-    <message>
-        <source>Play clips from their low-resolution proxies where one exists. Export always uses the original media.</source>
-        <translation>Lit les clips à partir de leurs proxys basse résolution lorsqu&apos;il en existe un. L&apos;exportation utilise toujours le média original.</translation>
-    </message>
-    <message>
-        <source>Proxy resolution</source>
-        <translation>Résolution du proxy</translation>
-    </message>
-    <message>
-        <source>360p</source>
-        <translation>360p</translation>
-    </message>
-    <message>
-        <source>540p</source>
-        <translation>540p</translation>
-    </message>
-    <message>
-        <source>720p</source>
-        <translation>720p</translation>
-    </message>
-    <message>
-        <source>1080p</source>
-        <translation>1080p</translation>
-    </message>
-    <message>
-        <source>Size of new proxies. Proxies made at another size are not used until you create them again.</source>
-        <translation>Taille des nouveaux proxys. Les proxys créés à une autre taille ne sont pas utilisés tant que vous ne les recréez pas.</translation>
-    </message>
-    <message>
-        <source>Proxy name patterns</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Linking a proxy teaches Drift its name pattern. Proxies next to your media that match a pattern below link automatically.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remove pattern</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reset to defaults</source>
-        <translation type="unfinished">Réinitialiser aux valeurs par défaut</translation>
-    </message>
-    <message>
-        <source>Faster preview (experimental)</source>
-        <translation>Aperçu plus rapide (expérimental)</translation>
-    </message>
-    <message>
-        <source>Can make playback smoother by keeping video on the graphics card. Turn it off if the picture looks wrong. Takes effect after restart.</source>
-        <translation>Peut rendre la lecture plus fluide en conservant la vidéo sur la carte graphique. Désactivez-le si l&apos;image s&apos;affiche mal. S&apos;applique après le redémarrage.</translation>
-    </message>
-    <message>
-        <source>Graphics card</source>
-        <translation>Carte graphique</translation>
-    </message>
-    <message>
-        <source>Windows default</source>
-        <translation>Par défaut de Windows</translation>
-    </message>
-    <message>
-        <source>Power saving (integrated GPU)</source>
-        <translation>Économie d&apos;énergie (GPU intégré)</translation>
-    </message>
-    <message>
-        <source>High performance (discrete GPU)</source>
-        <translation>Haute performance (GPU dédié)</translation>
-    </message>
-    <message>
-        <source>Which graphics card Drift runs on. High performance keeps video decoded on an NVIDIA card on that card; power saving uses less battery. Takes effect after restart.</source>
-        <translation>Définit la carte graphique utilisée par Drift. Le mode Haute performance conserve les vidéos décodées par une carte NVIDIA sur cette même carte ; le mode Économie d&apos;énergie réduit la consommation de la batterie. S&apos;applique après le redémarrage.</translation>
-    </message>
-    <message>
-        <source>Choose which graphics card Drift runs on in Windows Settings, under Display &gt; Graphics. Takes effect after restart.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open graphics settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Playback</source>
-        <translation>Lecture</translation>
-    </message>
-    <message>
-        <source>Audio output</source>
-        <translation>Sortie audio</translation>
-    </message>
-    <message>
-        <source>Where playback is heard. “System default” follows whatever your computer is set to, including when that changes.</source>
-        <translation>Où le son est entendu. « Par défaut du système » suit ce que votre ordinateur a configuré, y compris lorsqu’il change.</translation>
-    </message>
-    <message>
-        <source>Microphone input</source>
-        <translation>Entrée microphone</translation>
-    </message>
-    <message>
-        <source>Audio device used for recording voiceovers onto audio tracks.</source>
-        <translation>Périphérique audio utilisé pour enregistrer des voix hors champ sur les pistes audio.</translation>
-    </message>
+    <name>SettingsInterfaceSection</name>
     <message>
         <source>Interface</source>
-        <translation>Interface</translation>
+        <translation type="unfinished">Interface</translation>
     </message>
     <message>
         <source>Size</source>
-        <translation>Taille</translation>
+        <translation type="unfinished">Taille</translation>
     </message>
     <message>
         <source>100% (system)</source>
-        <translation>100% (système)</translation>
+        <translation type="unfinished">100% (système)</translation>
     </message>
     <message>
         <source>Makes buttons, text, and icons larger. This is extra scale on top of the size already set in your display settings. Takes effect after restart.</source>
-        <translation>Agrandit les boutons, le texte et les icônes. Cette échelle s&apos;ajoute à celle déjà définie dans vos paramètres d&apos;affichage. Prend effet après le redémarrage.</translation>
+        <translation type="unfinished">Agrandit les boutons, le texte et les icônes. Cette échelle s&apos;ajoute à celle déjà définie dans vos paramètres d&apos;affichage. Prend effet après le redémarrage.</translation>
     </message>
     <message>
         <source>Restart Drift to apply this size.</source>
-        <translation>Redémarrer Drift pour appliquer cette échelle.</translation>
+        <translation type="unfinished">Redémarrer Drift pour appliquer cette échelle.</translation>
     </message>
     <message>
         <source>Layout</source>
@@ -12671,175 +13231,200 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
     <message>
         <source>Horizontal mouse-wheel pan</source>
-        <translation>Déplacement horizontal avec la molette de la souris</translation>
+        <translation type="unfinished">Déplacement horizontal avec la molette de la souris</translation>
     </message>
     <message>
         <source>Scroll pans left and right along the timeline. Shift+scroll moves between tracks. Middle-click drag also pans.</source>
-        <translation>Le défilement déplace la vue vers la gauche et la droite sur la timeline. Maj+défilement navigue entre les pistes. Glisser avec le clic du milieu déplace également la vue.</translation>
+        <translation type="unfinished">Le défilement déplace la vue vers la gauche et la droite sur la timeline. Maj+défilement navigue entre les pistes. Glisser avec le clic du milieu déplace également la vue.</translation>
     </message>
     <message>
         <source>Haptic feedback</source>
-        <translation>Retour haptique</translation>
+        <translation type="unfinished">Retour haptique</translation>
     </message>
     <message>
         <source>Vibrate on taps, snaps, and edits. Uses this device’s own haptic effects when it has them.</source>
-        <translation>Vibre lors des appuis, de l&apos;aimantage et des coupes. Utilise les effets haptiques propres à cet appareil lorsqu&apos;ils sont disponibles.</translation>
+        <translation type="unfinished">Vibre lors des appuis, de l&apos;aimantage et des coupes. Utilise les effets haptiques propres à cet appareil lorsqu&apos;ils sont disponibles.</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation>Langue</translation>
+        <translation type="unfinished">Langue</translation>
     </message>
     <message>
         <source>Language for menus and labels. Takes effect immediately.</source>
-        <translation>Langue des menus et des libellés. Prise en compte immédiate.</translation>
+        <translation type="unfinished">Langue des menus et des libellés. Prise en compte immédiate.</translation>
     </message>
-    <message>
-        <source>App</source>
-        <translation>Application</translation>
-    </message>
-    <message>
-        <source>Reopen last project on startup</source>
-        <translation>Rouvrir le dernier projet au démarrage</translation>
-    </message>
-    <message>
-        <source>Automatically restore the last open project on startup. Closing still asks you to save; a crash snapshot never overwrites your save file.</source>
-        <translation>Rouvre automatiquement le dernier projet ouvert au démarrage. La fermeture demande toujours d&apos;enregistrer les modifications ; une capture en cas de plantage n&apos;écrase jamais votre fichier sauvegardé.</translation>
-    </message>
-    <message>
-        <source>Updates</source>
-        <translation>Mises à jour</translation>
-    </message>
-    <message>
-        <source>Check on startup</source>
-        <translation>Vérifier au démarrage</translation>
-    </message>
-    <message>
-        <source>Checking…</source>
-        <translation>Vérification…</translation>
-    </message>
-    <message>
-        <source>Check now</source>
-        <translation>Vérifier maintenant</translation>
-    </message>
-    <message>
-        <source>Drift %1</source>
-        <translation>Drift %1</translation>
-    </message>
-    <message>
-        <source>Extra packs</source>
-        <translation>Extensions supplémentaires</translation>
-    </message>
-    <message>
-        <source>Remind about essential packs</source>
-        <translation>Rappeler les extensions essentielles</translation>
-    </message>
-    <message>
-        <source>Pulse the Extras icon when the video, transitions, and audio packs are not installed</source>
-        <translation>Faire pulser l’icône Extras quand les extensions vidéo, transitions et audio ne sont pas installées</translation>
-    </message>
-    <message>
-        <source>Remind about pack updates</source>
-        <translation>Rappeler les mises à jour des extensions</translation>
-    </message>
-    <message>
-        <source>Pulse the Extras icon when updates are available for packs you already have installed</source>
-        <translation>Faire pulser l’icône Extras lorsqu’il y a des mises à jour disponibles pour les extensions déjà installées</translation>
-    </message>
-    <message>
-        <source>Agent access</source>
-        <translation>Accès aux agents</translation>
-    </message>
-    <message>
-        <source>Cloud providers</source>
-        <translation>Fournisseurs infonuagiques</translation>
-    </message>
-    <message>
-        <source>Keys are stored unencrypted in Drift&apos;s settings. ELEVENLABS_API_KEY and FISH_API_KEY in the environment take precedence. Use is billed to your own account.</source>
-        <translation>Les clés sont stockées non chiffrées dans les paramètres de Drift. ELEVENLABS_API_KEY et FISH_API_KEY dans l&apos;environnement ont priorité. L&apos;utilisation est facturée sur votre propre compte.</translation>
-    </message>
-    <message>
-        <source>Transcription (Scribe), voiceover, sound effects</source>
-        <translation>Transcription (Scribe), voix hors champ, effets sonores</translation>
-    </message>
-    <message>
-        <source>Voiceover</source>
-        <translation>Voix hors champ</translation>
-    </message>
-    <message>
-        <source>No key</source>
-        <translation>Aucune clé</translation>
-    </message>
-    <message>
-        <source>Key from the environment</source>
-        <translation>Clé de l&apos;environnement</translation>
-    </message>
-    <message>
-        <source>Key %1</source>
-        <translation>Clé %1</translation>
-    </message>
-    <message>
-        <source>Paste API key</source>
-        <translation>Coller la clé API</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>Enregistrer</translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation>Tester</translation>
-    </message>
-    <message>
-        <source>Clear</source>
-        <translation>Effacer</translation>
-    </message>
-    <message>
-        <source>Allow sending audio and text to %1</source>
-        <translation>Autoriser l&apos;envoi d&apos;audio et de texte à %1</translation>
-    </message>
-    <message>
-        <source>Needed before Drift or a connected agent can transcribe or generate audio with this service</source>
-        <translation>Requis avant que Drift ou un agent connecté ne puisse transcrire ou générer de l&apos;audio avec ce service</translation>
-    </message>
-    <message>
-        <source>Default voice id</source>
-        <translation>Identifiant de voix par défaut</translation>
-    </message>
-    <message>
-        <source>Voice model</source>
-        <translation>Modèle vocal</translation>
-    </message>
-    <message>
-        <source>Transcription model</source>
-        <translation>Modèle de transcription</translation>
-    </message>
+</context>
+<context>
+    <name>SettingsMarketplaceSection</name>
     <message>
         <source>Marketplace</source>
-        <translation>Marché</translation>
+        <translation type="unfinished">Marché</translation>
     </message>
     <message>
         <source>Account connected (%1)</source>
-        <translation>Compte connecté (%1)</translation>
+        <translation type="unfinished">Compte connecté (%1)</translation>
     </message>
     <message>
         <source>Marketplace account connected</source>
-        <translation>Compte de marché connecté</translation>
+        <translation type="unfinished">Compte de marché connecté</translation>
     </message>
     <message>
         <source>Disconnect</source>
-        <translation>Déconnecter</translation>
+        <translation type="unfinished">Déconnecter</translation>
     </message>
     <message>
         <source>Unlink the marketplace account from this device</source>
-        <translation>Dissocier le compte du marché de cet appareil</translation>
+        <translation type="unfinished">Dissocier le compte du marché de cet appareil</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPlaybackSection</name>
+    <message>
+        <source>Playback</source>
+        <translation type="unfinished">Lecture</translation>
     </message>
     <message>
-        <source>Once a day, check whether a newer Drift has been released</source>
+        <source>Audio output</source>
+        <translation type="unfinished">Sortie audio</translation>
+    </message>
+    <message>
+        <source>Where playback is heard. “System default” follows whatever your computer is set to, including when that changes.</source>
+        <translation type="unfinished">Où le son est entendu. « Par défaut du système » suit ce que votre ordinateur a configuré, y compris lorsqu’il change.</translation>
+    </message>
+    <message>
+        <source>Microphone input</source>
+        <translation type="unfinished">Entrée microphone</translation>
+    </message>
+    <message>
+        <source>Audio device used for recording voiceovers onto audio tracks.</source>
+        <translation type="unfinished">Périphérique audio utilisé pour enregistrer des voix hors champ sur les pistes audio.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPreviewSection</name>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished">Aperçu</translation>
+    </message>
+    <message>
+        <source>Show guides</source>
+        <translation type="unfinished">Afficher les guides</translation>
+    </message>
+    <message>
+        <source>Show alignment guides over the preview</source>
+        <translation type="unfinished">Afficher les guides d’alignement sur l’aperçu</translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation type="unfinished">Arrière-plan</translation>
+    </message>
+    <message>
+        <source>Solid color</source>
+        <translation type="unfinished">Couleur unie</translation>
+    </message>
+    <message>
+        <source>Blur</source>
+        <translation type="unfinished">Flou</translation>
+    </message>
+    <message>
+        <source>Transparent</source>
+        <translation type="unfinished">Transparent</translation>
+    </message>
+    <message>
+        <source>Fill behind clips that don’t cover the whole screen</source>
+        <translation type="unfinished">Remplir derrière les clips qui ne couvrent pas tout l&apos;écran</translation>
+    </message>
+    <message>
+        <source>Choose background colour</source>
+        <translation type="unfinished">Choisir la couleur de fond</translation>
+    </message>
+    <message>
+        <source>Blur strength</source>
+        <translation type="unfinished">Intensité du flou</translation>
+    </message>
+    <message>
+        <source>Use proxies for preview</source>
+        <translation type="unfinished">Utiliser des proxys pour l&apos;aperçu</translation>
+    </message>
+    <message>
+        <source>Play clips from their low-resolution proxies where one exists. Export always uses the original media.</source>
+        <translation type="unfinished">Lit les clips à partir de leurs proxys basse résolution lorsqu&apos;il en existe un. L&apos;exportation utilise toujours le média original.</translation>
+    </message>
+    <message>
+        <source>Proxy resolution</source>
+        <translation type="unfinished">Résolution du proxy</translation>
+    </message>
+    <message>
+        <source>360p</source>
+        <translation type="unfinished">360p</translation>
+    </message>
+    <message>
+        <source>540p</source>
+        <translation type="unfinished">540p</translation>
+    </message>
+    <message>
+        <source>720p</source>
+        <translation type="unfinished">720p</translation>
+    </message>
+    <message>
+        <source>1080p</source>
+        <translation type="unfinished">1080p</translation>
+    </message>
+    <message>
+        <source>Size of new proxies. Proxies made at another size are not used until you create them again.</source>
+        <translation type="unfinished">Taille des nouveaux proxys. Les proxys créés à une autre taille ne sont pas utilisés tant que vous ne les recréez pas.</translation>
+    </message>
+    <message>
+        <source>Proxy name patterns</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation type="unfinished">Téléchargement en cours…</translation>
+        <source>Linking a proxy teaches Drift its name pattern. Proxies next to your media that match a pattern below link automatically.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove pattern</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset to defaults</source>
+        <translation type="unfinished">Réinitialiser aux valeurs par défaut</translation>
+    </message>
+    <message>
+        <source>Faster preview (experimental)</source>
+        <translation type="unfinished">Aperçu plus rapide (expérimental)</translation>
+    </message>
+    <message>
+        <source>Can make playback smoother by keeping video on the graphics card. Turn it off if the picture looks wrong. Takes effect after restart.</source>
+        <translation type="unfinished">Peut rendre la lecture plus fluide en conservant la vidéo sur la carte graphique. Désactivez-le si l&apos;image s&apos;affiche mal. S&apos;applique après le redémarrage.</translation>
+    </message>
+    <message>
+        <source>Graphics card</source>
+        <translation type="unfinished">Carte graphique</translation>
+    </message>
+    <message>
+        <source>Windows default</source>
+        <translation type="unfinished">Par défaut de Windows</translation>
+    </message>
+    <message>
+        <source>Power saving (integrated GPU)</source>
+        <translation type="unfinished">Économie d&apos;énergie (GPU intégré)</translation>
+    </message>
+    <message>
+        <source>High performance (discrete GPU)</source>
+        <translation type="unfinished">Haute performance (GPU dédié)</translation>
+    </message>
+    <message>
+        <source>Which graphics card Drift runs on. High performance keeps video decoded on an NVIDIA card on that card; power saving uses less battery. Takes effect after restart.</source>
+        <translation type="unfinished">Définit la carte graphique utilisée par Drift. Le mode Haute performance conserve les vidéos décodées par une carte NVIDIA sur cette même carte ; le mode Économie d&apos;énergie réduit la consommation de la batterie. S&apos;applique après le redémarrage.</translation>
+    </message>
+    <message>
+        <source>Choose which graphics card Drift runs on in Windows Settings, under Display &gt; Graphics. Takes effect after restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open graphics settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12872,22 +13457,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <source>No sound effects here.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Pause</source>
-        <translation type="unfinished">Pause</translation>
-    </message>
-    <message>
-        <source>Play preview</source>
-        <translation type="unfinished">Lire l&apos;aperçu</translation>
-    </message>
-    <message>
-        <source>Add to the media bin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add to the timeline</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>SfxLibrary</name>
@@ -12910,6 +13479,60 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>Could not add that sound to the media bin.</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SfxSoundRow</name>
+    <message>
+        <source>Pause</source>
+        <translation type="unfinished">Pause</translation>
+    </message>
+    <message>
+        <source>Play preview</source>
+        <translation type="unfinished">Lire l&apos;aperçu</translation>
+    </message>
+    <message>
+        <source>Add to the media bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add to the timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ShadingLayerHeader</name>
+    <message>
+        <source>Collapse layer</source>
+        <translation type="unfinished">Réduire le calque</translation>
+    </message>
+    <message>
+        <source>Expand layer</source>
+        <translation type="unfinished">Développer le calque</translation>
+    </message>
+    <message>
+        <source>Bring forward</source>
+        <translation type="unfinished">Avancer d&apos;un rang</translation>
+    </message>
+    <message>
+        <source>Send backward</source>
+        <translation type="unfinished">Reculer d&apos;un rang</translation>
+    </message>
+    <message>
+        <source>Hide layer</source>
+        <translation type="unfinished">Masquer le calque</translation>
+    </message>
+    <message>
+        <source>Show layer</source>
+        <translation type="unfinished">Afficher le calque</translation>
+    </message>
+    <message>
+        <source>Duplicate layer</source>
+        <translation type="unfinished">Dupliquer le calque</translation>
+    </message>
+    <message>
+        <source>Remove layer</source>
+        <translation type="unfinished">Supprimer le calque</translation>
     </message>
 </context>
 <context>
@@ -13001,38 +13624,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>Dash-dot</source>
         <translation>Tiret-point</translation>
-    </message>
-    <message>
-        <source>Collapse layer</source>
-        <translation>Réduire le calque</translation>
-    </message>
-    <message>
-        <source>Expand layer</source>
-        <translation>Développer le calque</translation>
-    </message>
-    <message>
-        <source>Bring forward</source>
-        <translation>Avancer d&apos;un rang</translation>
-    </message>
-    <message>
-        <source>Send backward</source>
-        <translation>Reculer d&apos;un rang</translation>
-    </message>
-    <message>
-        <source>Hide layer</source>
-        <translation>Masquer le calque</translation>
-    </message>
-    <message>
-        <source>Show layer</source>
-        <translation>Afficher le calque</translation>
-    </message>
-    <message>
-        <source>Duplicate layer</source>
-        <translation>Dupliquer le calque</translation>
-    </message>
-    <message>
-        <source>Remove layer</source>
-        <translation>Supprimer le calque</translation>
     </message>
     <message>
         <source>Opacity</source>
@@ -13215,6 +13806,25 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
+    <name>ShapePresetCard</name>
+    <message>
+        <source>%1 — click to add, or drag to the timeline or preview</source>
+        <translation type="unfinished">%1 — cliquez pour ajouter, ou faites glisser sur la ligne du temps ou l&apos;aperçu</translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Ajouter à la tête de lecture</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Supprimer des favoris</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Ajouter aux favoris</translation>
+    </message>
+</context>
+<context>
     <name>ShapeStyle</name>
     <message>
         <source>Rectangle</source>
@@ -13394,22 +14004,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>Nothing in this category.</source>
         <translation>Rien dans cette catégorie.</translation>
-    </message>
-    <message>
-        <source>%1 — click to add, or drag to the timeline or preview</source>
-        <translation>%1 — cliquez pour ajouter, ou faites glisser sur la ligne du temps ou l&apos;aperçu</translation>
-    </message>
-    <message>
-        <source>Add at playhead</source>
-        <translation type="unfinished">Ajouter à la tête de lecture</translation>
-    </message>
-    <message>
-        <source>Remove from favorites</source>
-        <translation type="unfinished">Supprimer des favoris</translation>
-    </message>
-    <message>
-        <source>Add to favorites</source>
-        <translation type="unfinished">Ajouter aux favoris</translation>
     </message>
 </context>
 <context>
@@ -13724,14 +14318,17 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
+    <name>SpeedCurvePreviewStage</name>
+    <message>
+        <source>Audio only</source>
+        <translation type="unfinished">Audio uniquement</translation>
+    </message>
+</context>
+<context>
     <name>SpeedCurveWindow</name>
     <message>
         <source>Custom speed</source>
         <translation>Vitesse personnalisée</translation>
-    </message>
-    <message>
-        <source>Audio only</source>
-        <translation>Audio uniquement</translation>
     </message>
     <message>
         <source>Pause</source>
@@ -14051,40 +14648,68 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
-    <name>StartScreen</name>
+    <name>StartScreenActions</name>
+    <message>
+        <source>New Project</source>
+        <translation type="unfinished">Nouveau projet</translation>
+    </message>
+    <message>
+        <source>Open Project…</source>
+        <translation type="unfinished">Ouvrir le projet…</translation>
+    </message>
+</context>
+<context>
+    <name>StartScreenProjectRow</name>
     <message>
         <source> (missing)</source>
-        <translation> (manquant)</translation>
+        <translation type="unfinished"> (manquant)</translation>
     </message>
     <message>
         <source>This file has been moved or deleted:
 %1</source>
-        <translation>Ce fichier a été déplacé ou supprimé :
+        <translation type="unfinished">Ce fichier a été déplacé ou supprimé :
 %1</translation>
     </message>
     <message>
         <source>Remove from recents</source>
-        <translation>Supprimer des récents</translation>
+        <translation type="unfinished">Supprimer des récents</translation>
     </message>
-    <message>
-        <source>Create polished videos fast</source>
-        <translation>Créez rapidement des vidéos soignées</translation>
-    </message>
-    <message>
-        <source>New Project</source>
-        <translation>Nouveau projet</translation>
-    </message>
-    <message>
-        <source>Open Project…</source>
-        <translation>Ouvrir le projet…</translation>
-    </message>
+</context>
+<context>
+    <name>StartScreenRecents</name>
     <message>
         <source>Recent Projects</source>
-        <translation>Projects récents</translation>
+        <translation type="unfinished">Projects récents</translation>
     </message>
     <message>
         <source>Nothing here yet — projects you save will show up in this list.</source>
-        <translation>Rien ici pour l&apos;instant — les projets que vous enregistrez apparaîtront dans cette liste.</translation>
+        <translation type="unfinished">Rien ici pour le moment — les projets que vous enregistrez apparaîtront dans cette liste.</translation>
+    </message>
+</context>
+<context>
+    <name>StartScreenTitle</name>
+    <message>
+        <source>Create polished videos fast</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StickerPresetCard</name>
+    <message>
+        <source>%1 — click to add, or drag to the timeline or preview</source>
+        <translation type="unfinished">%1 — cliquez pour ajouter, ou faites glisser sur la ligne du temps ou l&apos;aperçu</translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Ajouter à la tête de lecture</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Supprimer des favoris</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Ajouter aux favoris</translation>
     </message>
 </context>
 <context>
@@ -14133,21 +14758,16 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <source>Pick another category.</source>
         <translation>Choisissez une autre catégorie.</translation>
     </message>
+</context>
+<context>
+    <name>StockAudioRow</name>
     <message>
-        <source>%1 — click to add, or drag to the timeline or preview</source>
-        <translation>%1 — cliquez pour ajouter, ou faites glisser sur la ligne du temps ou l&apos;aperçu</translation>
+        <source>Pause</source>
+        <translation type="unfinished">Pause</translation>
     </message>
     <message>
-        <source>Add at playhead</source>
-        <translation type="unfinished">Ajouter à la tête de lecture</translation>
-    </message>
-    <message>
-        <source>Remove from favorites</source>
-        <translation type="unfinished">Supprimer des favoris</translation>
-    </message>
-    <message>
-        <source>Add to favorites</source>
-        <translation type="unfinished">Ajouter aux favoris</translation>
+        <source>Play preview</source>
+        <translation type="unfinished">Lire l&apos;aperçu</translation>
     </message>
 </context>
 <context>
@@ -14223,14 +14843,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <source>Paste a page link above and press Enter.</source>
         <translation>Collez un lien de page ci-dessus et appuyez sur Enter.</translation>
     </message>
-    <message>
-        <source>Pause</source>
-        <translation>Pause</translation>
-    </message>
-    <message>
-        <source>Play preview</source>
-        <translation>Lire l&apos;aperçu</translation>
-    </message>
 </context>
 <context>
     <name>StockItemDetail</name>
@@ -14301,32 +14913,57 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
-    <name>SubtitleCueLane</name>
+    <name>SubtitleCueBlock</name>
+    <message>
+        <source>(empty)</source>
+        <translation type="unfinished">(vide)</translation>
+    </message>
+</context>
+<context>
+    <name>SubtitleCueCard</name>
+    <message>
+        <source>(empty)</source>
+        <translation type="unfinished">(vide)</translation>
+    </message>
+    <message>
+        <source>Delete this subtitle</source>
+        <translation type="unfinished">Supprimer ce sous-titre</translation>
+    </message>
+    <message>
+        <source>Add a subtitle after this one</source>
+        <translation type="unfinished">Ajouter un sous-titre après celui-ci</translation>
+    </message>
+</context>
+<context>
+    <name>SubtitleCueEmptyState</name>
+    <message>
+        <source>No subtitles yet. Move to a time inside this clip and add one below.</source>
+        <translation type="unfinished">Pas encore de sous-titres. Déplacez-vous à une position dans ce clip et ajoutez-en un ci-dessous.</translation>
+    </message>
+</context>
+<context>
+    <name>SubtitleCueGutter</name>
     <message>
         <source>Subtitles</source>
-        <translation>Sous-titres</translation>
+        <translation type="unfinished">Sous-titres</translation>
     </message>
     <message numerus="yes">
         <source>%n captions</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>%n sous-titre</numerusform>
             <numerusform>%n sous-titres</numerusform>
         </translation>
     </message>
-    <message>
-        <source>(empty)</source>
-        <translation>(vide)</translation>
-    </message>
 </context>
 <context>
-    <name>SubtitleEditor</name>
+    <name>SubtitleEditorHeader</name>
     <message>
         <source>Subtitles</source>
-        <translation>Sous-titres</translation>
+        <translation type="unfinished">Sous-titres</translation>
     </message>
     <message>
         <source>%1 captions</source>
-        <translation>%1 sous-titres</translation>
+        <translation type="unfinished">%1 sous-titres</translation>
     </message>
     <message>
         <source>Play the timeline — the line on screen lights up. Tap any line to edit it.</source>
@@ -14334,103 +14971,90 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
     <message>
         <source>Play the timeline — the line on screen lights up. Click any line to jump to it and edit it below.</source>
-        <translation>Lisez la timeline — la ligne à l&apos;écran s&apos;allume. Cliquez sur n&apos;importe quelle ligne pour y sauter et l&apos;éditer ci-dessous.</translation>
+        <translation type="unfinished">Lisez la timeline — la ligne à l&apos;écran s&apos;allume. Cliquez sur n&apos;importe quelle ligne pour y sauter et l&apos;éditer ci-dessous.</translation>
     </message>
     <message>
         <source>Import</source>
-        <translation>Importer</translation>
+        <translation type="unfinished">Importer</translation>
     </message>
     <message>
         <source>Replace these captions from a .srt file</source>
-        <translation>Remplacer ces sous-titres par un fichier .srt</translation>
+        <translation type="unfinished">Remplacer ces sous-titres par un fichier .srt</translation>
     </message>
     <message>
         <source>Import Subtitles</source>
-        <translation>Importer des sous-titres</translation>
+        <translation type="unfinished">Importer des sous-titres</translation>
     </message>
     <message>
         <source>SubRip subtitles (*.srt)</source>
-        <translation>Sous-titres SubRip (*.srt)</translation>
+        <translation type="unfinished">Sous-titres SubRip (*.srt)</translation>
     </message>
     <message>
         <source>All files (*)</source>
-        <translation>Tous les fichiers (*)</translation>
+        <translation type="unfinished">Tous les fichiers (*)</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation>Exporter</translation>
+        <translation type="unfinished">Exporter</translation>
     </message>
     <message>
         <source>Save captions as a .srt file</source>
-        <translation>Enregistrer les sous-titres en tant que fichier .srt</translation>
+        <translation type="unfinished">Enregistrer les sous-titres en tant que fichier .srt</translation>
     </message>
     <message>
         <source>Export Subtitles</source>
-        <translation>Exporter des sous-titres</translation>
+        <translation type="unfinished">Exporter des sous-titres</translation>
     </message>
     <message>
         <source>Timestamps from the start of the video</source>
-        <translation>Horodatages depuis le début de la vidéo</translation>
+        <translation type="unfinished">Horodatages depuis le début de la vidéo</translation>
     </message>
     <message>
         <source>Offset the exported captions by this clip&apos;s start so they match the exported video</source>
-        <translation>Décaler les sous-titres exportés du début de ce clip pour qu&apos;ils correspondent à la vidéo exportée</translation>
+        <translation type="unfinished">Décaler les sous-titres exportés du début de ce clip pour qu&apos;ils correspondent à la vidéo exportée</translation>
     </message>
-    <message>
-        <source>(empty)</source>
-        <translation>(vide)</translation>
-    </message>
-    <message>
-        <source>Delete this subtitle</source>
-        <translation>Supprimer ce sous-titre</translation>
-    </message>
-    <message>
-        <source>Add a subtitle after this one</source>
-        <translation>Ajouter un sous-titre après celui-ci</translation>
-    </message>
-    <message>
-        <source>No subtitles yet. Move to a time inside this clip and add one below.</source>
-        <translation>Pas encore de sous-titres. Déplacez-vous à une position dans ce clip et ajoutez-en un ci-dessous.</translation>
-    </message>
+</context>
+<context>
+    <name>SubtitleEditorPanel</name>
     <message>
         <source>Type subtitle…</source>
-        <translation>Tapez le sous-titre…</translation>
+        <translation type="unfinished">Tapez le sous-titre…</translation>
     </message>
     <message>
         <source>Apply text to this subtitle</source>
-        <translation>Appliquer le texte à ce sous-titre</translation>
+        <translation type="unfinished">Appliquer le texte à ce sous-titre</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation>Début</translation>
+        <translation type="unfinished">Début</translation>
     </message>
     <message>
         <source>Set start to current time</source>
-        <translation>Définir le début sur l&apos;heure actuelle</translation>
+        <translation type="unfinished">Définir le début sur l&apos;heure actuelle</translation>
     </message>
     <message>
         <source>End</source>
-        <translation>Fin</translation>
+        <translation type="unfinished">Fin</translation>
     </message>
     <message>
         <source>Set end to current time</source>
-        <translation>Définir la fin à l&apos;heure actuelle</translation>
+        <translation type="unfinished">Définir la fin à l&apos;heure actuelle</translation>
     </message>
     <message>
         <source>Delete caption</source>
-        <translation>Supprimer le sous-titre</translation>
+        <translation type="unfinished">Supprimer le sous-titre</translation>
     </message>
     <message>
         <source>At %1</source>
-        <translation>À %1</translation>
+        <translation type="unfinished">À %1</translation>
     </message>
     <message>
         <source>Move to a time inside this clip to add a subtitle</source>
-        <translation>Aller à un moment dans ce clip pour ajouter un sous-titre</translation>
+        <translation type="unfinished">Aller à un moment dans ce clip pour ajouter un sous-titre</translation>
     </message>
     <message>
         <source>Add subtitle at current time</source>
-        <translation>Ajouter un sous-titre à l&apos;heure actuelle</translation>
+        <translation type="unfinished">Ajouter un sous-titre à l&apos;heure actuelle</translation>
     </message>
 </context>
 <context>
@@ -14545,6 +15169,13 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
+    <name>TextAnimPresetFrame</name>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">Aucun</translation>
+    </message>
+</context>
+<context>
     <name>TextAnimPresetTile</name>
     <message>
         <source>None</source>
@@ -14579,18 +15210,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <translation>Appliquez un style à du texte, puis utilisez « Enregistrer le style… » dans l&apos;onglet Texte des propriétés pour le garder ici.</translation>
     </message>
     <message>
-        <source>Style options</source>
-        <translation>Réglages de style</translation>
-    </message>
-    <message>
-        <source>Rename…</source>
-        <translation>Renommer…</translation>
-    </message>
-    <message>
-        <source>Export…</source>
-        <translation>Exporter...</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
@@ -14601,14 +15220,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>My styles · %1</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add at playhead</source>
-        <translation type="unfinished">Ajouter à la tête de lecture</translation>
     </message>
     <message>
         <source>No saved styles</source>
@@ -14660,22 +15271,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
 </context>
 <context>
     <name>TextInspector</name>
-    <message>
-        <source>Colour</source>
-        <translation>Couleur</translation>
-    </message>
-    <message>
-        <source>Choose the gradient&apos;s first colour</source>
-        <translation>Choisir la première couleur du dégradé</translation>
-    </message>
-    <message>
-        <source>Edits the first gradient stop</source>
-        <translation>Modifie le premier point d&apos;arrêt du dégradé</translation>
-    </message>
-    <message>
-        <source>Style</source>
-        <translation>Style</translation>
-    </message>
     <message>
         <source>Aa</source>
         <translation>Aa</translation>
@@ -14737,10 +15332,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <translation>Rebond</translation>
     </message>
     <message>
-        <source>Save style…</source>
-        <translation>Enregistrer le style…</translation>
-    </message>
-    <message>
         <source>Save text style</source>
         <translation>Enregistrer le style de texte</translation>
     </message>
@@ -14748,269 +15339,442 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <source>My style %1</source>
         <translation>Mon style %1</translation>
     </message>
+</context>
+<context>
+    <name>TextInspectorAccentSection</name>
     <message>
-        <source>Apply to all captions</source>
-        <translation>Appliquer à tous les sous-titres</translation>
+        <source>Word accent</source>
+        <translation type="unfinished">Accent du mot</translation>
     </message>
     <message>
-        <source>Copy this style to every other caption on this track</source>
-        <translation>Copier ce style sur tous les autres sous-titres de cette piste</translation>
+        <source>Style some words differently from the rest, chosen by rule</source>
+        <translation type="unfinished">Appliquer un style différent à certains mots, sélectionnés par une règle</translation>
     </message>
     <message>
-        <source>…every track</source>
-        <translation>…chaque piste</translation>
+        <source>Accent colour</source>
+        <translation type="unfinished">Couleur d&apos;accent</translation>
     </message>
     <message>
-        <source>Copy this style to every caption in the project</source>
-        <translation>Copier ce style sur tous les sous-titres du projet</translation>
+        <source>Recolour the words the rule picks out</source>
+        <translation type="unfinished">Changer la couleur des mots sélectionnés par la règle</translation>
     </message>
     <message>
-        <source>Font</source>
-        <translation>Police</translation>
+        <source>Choose accent colour</source>
+        <translation type="unfinished">Choisir la couleur d&apos;accent</translation>
     </message>
     <message>
-        <source>Weight</source>
-        <translation>Poids</translation>
+        <source>Accent size</source>
+        <translation type="unfinished">Taille de l&apos;accent</translation>
     </message>
     <message>
-        <source>Size</source>
-        <translation>Taille</translation>
+        <source>Size of the accented words relative to the rest of the line</source>
+        <translation type="unfinished">Taille des mots accentués par rapport au reste de la ligne</translation>
     </message>
     <message>
-        <source>Stroke</source>
-        <translation>Contour</translation>
+        <source>Accent outline</source>
+        <translation type="unfinished">Contour d&apos;accent</translation>
     </message>
     <message>
-        <source>Extrude</source>
-        <translation>Extruder</translation>
+        <source>Give the accented words their own outline</source>
+        <translation type="unfinished">Donner un contour propre aux mots accentués</translation>
     </message>
     <message>
-        <source>Decorations</source>
-        <translation>Décorations</translation>
-    </message>
-    <message>
-        <source>Boxes and rules drawn around the text rather than on it</source>
-        <translation>Cadres et filets tracés autour du texte plutôt que dessus</translation>
-    </message>
-    <message>
-        <source>Animate</source>
-        <translation>Animer</translation>
-    </message>
-    <message>
-        <source>Phase</source>
-        <translation>Phase</translation>
-    </message>
-    <message>
-        <source>Stagger</source>
-        <translation>Décalage</translation>
-    </message>
-    <message>
-        <source>Delay between one unit and the next along the cycle</source>
-        <translation>Délai entre une unité et la suivante au cours du cycle</translation>
-    </message>
-    <message>
-        <source>Delay between one unit starting and the next</source>
-        <translation>Délai entre le début d&apos;une unité et de la suivante</translation>
-    </message>
-    <message>
-        <source>Order</source>
-        <translation>Ordre</translation>
-    </message>
-    <message>
-        <source>Ease</source>
-        <translation>Adouci</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <translation>Avancé</translation>
-    </message>
-    <message>
-        <source>Custom animator (set via MCP). Preset controls are disabled.</source>
-        <translation>Animateur personnalisé (défini via MCP). Les commandes de préréglage sont désactivées.</translation>
-    </message>
-    <message>
-        <source>Revert to preset</source>
-        <translation>Revenir au préréglage</translation>
-    </message>
-    <message>
-        <source>Drop the custom animators and go back to picking presets</source>
-        <translation>Abandonner les animateurs personnalisés et revenir au choix des préréglages</translation>
-    </message>
-    <message>
-        <source>Choose text colour</source>
-        <translation>Choisir la couleur du texte</translation>
-    </message>
-    <message>
-        <source>Italic</source>
-        <translation>Italique</translation>
-    </message>
-    <message>
-        <source>Italicise the text</source>
-        <translation>Mettre le texte en italique</translation>
-    </message>
-    <message>
-        <source>%1 has no italic face</source>
-        <translation>%1 n&apos;a pas de forme italique</translation>
-    </message>
-    <message>
-        <source>Adjust text look</source>
-        <translation>Ajuster le style texte</translation>
-    </message>
-    <message>
-        <source>Layers</source>
-        <translation>Calques</translation>
-    </message>
-    <message>
-        <source>Add layer</source>
-        <translation>Ajouter un calque</translation>
-    </message>
-    <message>
-        <source>Add a fill, stroke, shadow, glow or extrude layer</source>
-        <translation>Ajouter un calque de remplissage, de contour, d&apos;ombre, de lueur ou d&apos;extrusion</translation>
-    </message>
-    <message>
-        <source>Fill</source>
-        <translation>Remplissage</translation>
-    </message>
-    <message>
-        <source>Bend</source>
-        <translation>Courbure</translation>
-    </message>
-    <message>
-        <source>Align left</source>
-        <translation>Aligner à gauche</translation>
-    </message>
-    <message>
-        <source>Align centre</source>
-        <translation>Aligner au centre</translation>
-    </message>
-    <message>
-        <source>Align right</source>
-        <translation>Aligner à droite</translation>
-    </message>
-    <message>
-        <source>Align top</source>
-        <translation>Aligner en haut</translation>
-    </message>
-    <message>
-        <source>Align middle</source>
-        <translation>Aligner au milieu</translation>
-    </message>
-    <message>
-        <source>Align bottom</source>
-        <translation>Aligner en bas</translation>
-    </message>
-    <message>
-        <source>Line height</source>
-        <translation>Interligne</translation>
-    </message>
-    <message>
-        <source>Letter spacing</source>
-        <translation>Interlettrage</translation>
-    </message>
-    <message>
-        <source>Wrapping</source>
-        <translation>Retour à la ligne</translation>
-    </message>
-    <message>
-        <source>Word wrap</source>
-        <translation>Retour à la ligne</translation>
-    </message>
-    <message>
-        <source>Wrap long lines inside the text box instead of overflowing</source>
-        <translation>Envelopper les lignes longues dans la zone de texte au lieu de débordement</translation>
+        <source>Choose accent outline colour</source>
+        <translation type="unfinished">Choisir la couleur du contour d’accent</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation>Largeur</translation>
+        <translation type="unfinished">Largeur</translation>
     </message>
     <message>
-        <source>Shadow</source>
-        <translation>Ombre</translation>
+        <source>Accent pill</source>
+        <translation type="unfinished">Pillule d&apos;accent</translation>
     </message>
     <message>
-        <source>Background</source>
-        <translation>Arrière-plan</translation>
+        <source>Highlight only the accented words, instead of every word</source>
+        <translation type="unfinished">Mettre en évidence uniquement les mots accentués, plutôt que tous les mots</translation>
     </message>
     <message>
-        <source>Draw a filled box behind the text</source>
-        <translation>Dessiner une boîte pleine derrière le texte</translation>
+        <source>Choose accent highlight colour</source>
+        <translation type="unfinished">Choisir la couleur de mise en évidence d&apos;accent</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorAnimAdvanced</name>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished">Avancé</translation>
     </message>
     <message>
-        <source>Choose background colour</source>
-        <translation>Choisir la couleur de fond</translation>
+        <source>Custom animator (set via MCP). Preset controls are disabled.</source>
+        <translation type="unfinished">Animateur personnalisé (défini via MCP). Les commandes de préréglage sont désactivées.</translation>
     </message>
     <message>
-        <source>Padding</source>
-        <translation>Marge</translation>
+        <source>Revert to preset</source>
+        <translation type="unfinished">Revenir au préréglage</translation>
     </message>
     <message>
-        <source>Space between the text and the edge of its background box</source>
-        <translation>Espace entre le texte et le bord de sa boîte d&apos;arrière-plan</translation>
+        <source>Drop the custom animators and go back to picking presets</source>
+        <translation type="unfinished">Abandonner les animateurs personnalisés et revenir au choix des préréglages</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorAnimCategoryStrip</name>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Tous</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorAnimControls</name>
+    <message>
+        <source>Preview this animation</source>
+        <translation type="unfinished">Prévisualiser cette animation</translation>
     </message>
     <message>
-        <source>Corner radius</source>
-        <translation>Rayon des coins</translation>
+        <source>Period</source>
+        <translation type="unfinished">Période</translation>
     </message>
     <message>
-        <source>Roundness of the background box corners</source>
-        <translation>Arrondi des coins de la boîte d&apos;arrière-plan</translation>
+        <source>Duration</source>
+        <translation type="unfinished">Durée</translation>
     </message>
     <message>
-        <source>Glow</source>
-        <translation>Lueur</translation>
+        <source>Edit text animation</source>
+        <translation type="unfinished">Modifier l&apos;animation de texte</translation>
     </message>
+    <message>
+        <source>By</source>
+        <translation type="unfinished">Par</translation>
+    </message>
+    <message>
+        <source>Phase</source>
+        <translation type="unfinished">Phase</translation>
+    </message>
+    <message>
+        <source>Stagger</source>
+        <translation type="unfinished">Décalage</translation>
+    </message>
+    <message>
+        <source>Delay between one unit and the next along the cycle</source>
+        <translation type="unfinished">Délai entre une unité et la suivante au cours du cycle</translation>
+    </message>
+    <message>
+        <source>Delay between one unit starting and the next</source>
+        <translation type="unfinished">Délai entre le début d&apos;une unité et de la suivante</translation>
+    </message>
+    <message>
+        <source>Order</source>
+        <translation type="unfinished">Ordre</translation>
+    </message>
+    <message>
+        <source>Ease</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorAnimSlotBar</name>
+    <message>
+        <source>In</source>
+        <translation type="unfinished">Entrée</translation>
+    </message>
+    <message>
+        <source>Out</source>
+        <translation type="unfinished">Sortie</translation>
+    </message>
+    <message>
+        <source>Loop</source>
+        <translation type="unfinished">Boucle</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorAnimateHint</name>
+    <message>
+        <source>Plays for every caption</source>
+        <translation type="unfinished">Est lu pour chaque sous-titre</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorContentSection</name>
     <message>
         <source>Text</source>
-        <translation>Texte</translation>
+        <translation type="unfinished">Texte</translation>
     </message>
     <message>
         <source>Type your text…</source>
-        <translation>Saisissez votre texte…</translation>
+        <translation type="unfinished">Saisissez votre texte…</translation>
     </message>
     <message>
         <source>Apply</source>
-        <translation>Appliquer</translation>
+        <translation type="unfinished">Appliquer</translation>
     </message>
     <message>
         <source>Apply the text to this clip</source>
-        <translation>Appliquer le texte à ce clip</translation>
+        <translation type="unfinished">Appliquer le texte à ce clip</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorDecorations</name>
+    <message>
+        <source>Decorations</source>
+        <translation type="unfinished">Décorations</translation>
+    </message>
+    <message>
+        <source>Boxes and rules drawn around the text rather than on it</source>
+        <translation type="unfinished">Cadres et filets tracés autour du texte plutôt que dessus</translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation type="unfinished">Arrière-plan</translation>
+    </message>
+    <message>
+        <source>Draw a filled box behind the text</source>
+        <translation type="unfinished">Dessiner une boîte pleine derrière le texte</translation>
+    </message>
+    <message>
+        <source>Choose background colour</source>
+        <translation type="unfinished">Choisir la couleur de fond</translation>
+    </message>
+    <message>
+        <source>Padding</source>
+        <translation type="unfinished">Marge</translation>
+    </message>
+    <message>
+        <source>Space between the text and the edge of its background box</source>
+        <translation type="unfinished">Espace entre le texte et le bord de sa boîte d&apos;arrière-plan</translation>
+    </message>
+    <message>
+        <source>Corner radius</source>
+        <translation type="unfinished">Rayon des coins</translation>
+    </message>
+    <message>
+        <source>Roundness of the background box corners</source>
+        <translation type="unfinished">Arrondi des coins de la boîte d&apos;arrière-plan</translation>
+    </message>
+    <message>
+        <source>Word highlight</source>
+        <translation type="unfinished">Surlignement des mots</translation>
+    </message>
+    <message>
+        <source>Filled pill behind every word, sized to the word itself</source>
+        <translation type="unfinished">Pillule pleine derrière chaque mot, ajustée à la longueur du mot</translation>
+    </message>
+    <message>
+        <source>Thickness</source>
+        <translation type="unfinished">Épaisseur</translation>
+    </message>
+    <message>
+        <source>How far the pill extends past the word</source>
+        <translation type="unfinished">Distance de dépassement de la pillule par rapport au mot</translation>
+    </message>
+    <message>
+        <source>Highlight colour</source>
+        <translation type="unfinished">Couleur du surlignement</translation>
+    </message>
+    <message>
+        <source>Choose highlight colour</source>
+        <translation type="unfinished">Choisir la couleur du surlignement</translation>
+    </message>
+    <message>
+        <source>Underline</source>
+        <translation type="unfinished">Souligner</translation>
+    </message>
+    <message>
+        <source>Draw a rule under each line of text</source>
+        <translation type="unfinished">Tracer une ligne sous chaque ligne de texte</translation>
+    </message>
+    <message>
+        <source>Offset</source>
+        <translation type="unfinished">Décalage</translation>
+    </message>
+    <message>
+        <source>Gap between the baseline and the rule</source>
+        <translation type="unfinished">Espace entre la ligne de base et la règle</translation>
+    </message>
+    <message>
+        <source>Underline colour</source>
+        <translation type="unfinished">Couleur du soulignement</translation>
+    </message>
+    <message>
+        <source>Choose underline colour</source>
+        <translation type="unfinished">Choisir la couleur du soulignement</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorFontSection</name>
+    <message>
+        <source>Font</source>
+        <translation type="unfinished">Police</translation>
+    </message>
+    <message>
+        <source>Weight</source>
+        <translation type="unfinished">Poids</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished">Taille</translation>
+    </message>
+    <message>
+        <source>Colour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose the gradient&apos;s first colour</source>
+        <translation type="unfinished">Choisir la première couleur du dégradé</translation>
+    </message>
+    <message>
+        <source>Choose text colour</source>
+        <translation type="unfinished">Choisir la couleur du texte</translation>
+    </message>
+    <message>
+        <source>Edits the first gradient stop</source>
+        <translation type="unfinished">Modifie le premier point d&apos;arrêt du dégradé</translation>
     </message>
     <message>
         <source>Edit in Style</source>
-        <translation>Modifier dans Style</translation>
+        <translation type="unfinished">Modifier dans Style</translation>
     </message>
     <message>
         <source>The text is painted with an image; change it on the Style page</source>
-        <translation>Le texte est peint avec une image; modifiez-le sur la page Style</translation>
+        <translation type="unfinished">Le texte est peint avec une image; modifiez-le sur la page Style</translation>
     </message>
     <message>
         <source>The text is painted with an effect; change it on the Style page</source>
-        <translation>Le texte est peint avec un effet; modifiez-le sur la page Style</translation>
+        <translation type="unfinished">Le texte est peint avec un effet; modifiez-le sur la page Style</translation>
     </message>
     <message>
-        <source>Spacing</source>
-        <translation>Espacement</translation>
+        <source>Style</source>
+        <translation type="unfinished">Style</translation>
     </message>
     <message>
-        <source>Line height, letter spacing, wrapping and bend</source>
-        <translation>Hauteur de ligne, espacement des lettres, retour à la ligne et courbure</translation>
+        <source>Italic</source>
+        <translation type="unfinished">Italique</translation>
     </message>
+    <message>
+        <source>Italicise the text</source>
+        <translation type="unfinished">Mettre le texte en italique</translation>
+    </message>
+    <message>
+        <source>%1 has no italic face</source>
+        <translation type="unfinished">%1 n&apos;a pas de forme italique</translation>
+    </message>
+    <message>
+        <source>Align left</source>
+        <translation type="unfinished">Aligner à gauche</translation>
+    </message>
+    <message>
+        <source>Align centre</source>
+        <translation type="unfinished">Aligner au centre</translation>
+    </message>
+    <message>
+        <source>Align right</source>
+        <translation type="unfinished">Aligner à droite</translation>
+    </message>
+    <message>
+        <source>Align top</source>
+        <translation type="unfinished">Aligner en haut</translation>
+    </message>
+    <message>
+        <source>Align middle</source>
+        <translation type="unfinished">Aligner au milieu</translation>
+    </message>
+    <message>
+        <source>Align bottom</source>
+        <translation type="unfinished">Aligner en bas</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorLookSection</name>
+    <message>
+        <source>Effect</source>
+        <translation type="unfinished">Effet</translation>
+    </message>
+    <message>
+        <source>Shadow, outline, neon and friends — a recipe that builds the layers below</source>
+        <translation type="unfinished">Ombre, contour, néon et autres — une recette qui crée les calques ci-dessous</translation>
+    </message>
+    <message>
+        <source>Shadow, outline, neon… built as layers you can fine-tune below.</source>
+        <translation type="unfinished">Ombre, contour, néon… conçus sous forme de calques que vous pouvez affiner ci-dessous.</translation>
+    </message>
+    <message>
+        <source>Adjust text look</source>
+        <translation type="unfinished">Ajuster le style texte</translation>
+    </message>
+    <message>
+        <source>Layers</source>
+        <translation type="unfinished">Calques</translation>
+    </message>
+    <message>
+        <source>Add layer</source>
+        <translation type="unfinished">Ajouter un calque</translation>
+    </message>
+    <message>
+        <source>Add a fill, stroke, shadow, glow or extrude layer</source>
+        <translation type="unfinished">Ajouter un calque de remplissage, de contour, d&apos;ombre, de lueur ou d&apos;extrusion</translation>
+    </message>
+    <message>
+        <source>Fill</source>
+        <translation type="unfinished">Remplissage</translation>
+    </message>
+    <message>
+        <source>Stroke</source>
+        <translation type="unfinished">Contour</translation>
+    </message>
+    <message>
+        <source>Shadow</source>
+        <translation type="unfinished">Ombre</translation>
+    </message>
+    <message>
+        <source>Glow</source>
+        <translation type="unfinished">Lueur</translation>
+    </message>
+    <message>
+        <source>Extrude</source>
+        <translation type="unfinished">Extruder</translation>
+    </message>
+    <message>
+        <source>No layers. Pick an effect above or add a fill to start.</source>
+        <translation type="unfinished">Aucun calque. Choisissez un effet ci-dessus ou ajoutez un remplissage pour commencer.</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorPresetSection</name>
     <message>
         <source>Preset</source>
-        <translation>Préréglage</translation>
+        <translation type="unfinished">Préréglage</translation>
     </message>
     <message>
         <source>A whole text style — font, colour and effect — applied in one tap</source>
-        <translation>Un style de texte complet — police, couleur et effet — appliqué en un seul toucher</translation>
+        <translation type="unfinished">Un style de texte complet — police, couleur et effet — appliqué en un seul toucher</translation>
     </message>
     <message>
         <source>Font, colour and effect in one tap. Save your own to reuse it.</source>
-        <translation>Police, couleur et effet en un seul toucher. Enregistrez le vôtre pour le réutiliser.</translation>
+        <translation type="unfinished">Police, couleur et effet en un seul toucher. Enregistrez le vôtre pour le réutiliser.</translation>
+    </message>
+    <message>
+        <source>Save style…</source>
+        <translation type="unfinished">Enregistrer le style…</translation>
     </message>
     <message>
         <source>Save this text&apos;s style as a reusable preset</source>
-        <translation>Enregistrer le style de ce texte comme préréglage réutilisable</translation>
+        <translation type="unfinished">Enregistrer le style de ce texte comme préréglage réutilisable</translation>
+    </message>
+    <message>
+        <source>Apply to all captions</source>
+        <translation type="unfinished">Appliquer à tous les sous-titres</translation>
+    </message>
+    <message>
+        <source>Copy this style to every other caption on this track</source>
+        <translation type="unfinished">Copier ce style sur tous les autres sous-titres de cette piste</translation>
+    </message>
+    <message>
+        <source>…every track</source>
+        <translation type="unfinished">…chaque piste</translation>
+    </message>
+    <message>
+        <source>Copy this style to every caption in the project</source>
+        <translation type="unfinished">Copier ce style sur tous les sous-titres du projet</translation>
     </message>
     <message>
         <source>Generate voiceover</source>
@@ -15028,161 +15792,55 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <source>Install the AI engine and the voice model from the add-on manager to generate voiceovers.</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>TextInspectorSpacingSection</name>
     <message>
-        <source>Effect</source>
-        <translation>Effet</translation>
+        <source>Spacing</source>
+        <translation type="unfinished">Espacement</translation>
     </message>
     <message>
-        <source>Shadow, outline, neon and friends — a recipe that builds the layers below</source>
-        <translation>Ombre, contour, néon et autres — une recette qui crée les calques ci-dessous</translation>
+        <source>Line height, letter spacing, wrapping and bend</source>
+        <translation type="unfinished">Hauteur de ligne, espacement des lettres, retour à la ligne et courbure</translation>
     </message>
     <message>
-        <source>Shadow, outline, neon… built as layers you can fine-tune below.</source>
-        <translation>Ombre, contour, néon… conçus sous forme de calques que vous pouvez affiner ci-dessous.</translation>
+        <source>Line height</source>
+        <translation type="unfinished">Interligne</translation>
     </message>
     <message>
-        <source>No layers. Pick an effect above or add a fill to start.</source>
-        <translation>Aucun calque. Choisissez un effet ci-dessus ou ajoutez un remplissage pour commencer.</translation>
+        <source>Letter spacing</source>
+        <translation type="unfinished">Interlettrage</translation>
     </message>
     <message>
-        <source>Word highlight</source>
-        <translation>Surlignement des mots</translation>
+        <source>Wrapping</source>
+        <translation type="unfinished">Retour à la ligne</translation>
     </message>
     <message>
-        <source>Filled pill behind every word, sized to the word itself</source>
-        <translation>Pillule pleine derrière chaque mot, ajustée à la longueur du mot</translation>
+        <source>Word wrap</source>
+        <translation type="unfinished">Retour à la ligne</translation>
     </message>
     <message>
-        <source>Thickness</source>
-        <translation>Épaisseur</translation>
+        <source>Wrap long lines inside the text box instead of overflowing</source>
+        <translation type="unfinished">Envelopper les lignes longues dans la zone de texte au lieu de débordement</translation>
     </message>
     <message>
-        <source>How far the pill extends past the word</source>
-        <translation>Distance de dépassement de la pillule par rapport au mot</translation>
+        <source>Bend</source>
+        <translation type="unfinished">Courbure</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorTabBar</name>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished">Texte</translation>
     </message>
     <message>
-        <source>Highlight colour</source>
-        <translation>Couleur du surlignement</translation>
+        <source>Style</source>
+        <translation type="unfinished">Style</translation>
     </message>
     <message>
-        <source>Choose highlight colour</source>
-        <translation>Choisir la couleur du surlignement</translation>
-    </message>
-    <message>
-        <source>Underline</source>
-        <translation>Souligner</translation>
-    </message>
-    <message>
-        <source>Draw a rule under each line of text</source>
-        <translation>Tracer une ligne sous chaque ligne de texte</translation>
-    </message>
-    <message>
-        <source>Offset</source>
-        <translation>Décalage</translation>
-    </message>
-    <message>
-        <source>Gap between the baseline and the rule</source>
-        <translation>Espace entre la ligne de base et la règle</translation>
-    </message>
-    <message>
-        <source>Underline colour</source>
-        <translation>Couleur du soulignement</translation>
-    </message>
-    <message>
-        <source>Choose underline colour</source>
-        <translation>Choisir la couleur du soulignement</translation>
-    </message>
-    <message>
-        <source>Word accent</source>
-        <translation>Accent du mot</translation>
-    </message>
-    <message>
-        <source>Style some words differently from the rest, chosen by rule</source>
-        <translation>Appliquer un style différent à certains mots, sélectionnés par une règle</translation>
-    </message>
-    <message>
-        <source>Accent colour</source>
-        <translation>Couleur d&apos;accent</translation>
-    </message>
-    <message>
-        <source>Recolour the words the rule picks out</source>
-        <translation>Changer la couleur des mots sélectionnés par la règle</translation>
-    </message>
-    <message>
-        <source>Choose accent colour</source>
-        <translation>Choisir la couleur d&apos;accent</translation>
-    </message>
-    <message>
-        <source>Accent size</source>
-        <translation>Taille de l&apos;accent</translation>
-    </message>
-    <message>
-        <source>Size of the accented words relative to the rest of the line</source>
-        <translation>Taille des mots accentués par rapport au reste de la ligne</translation>
-    </message>
-    <message>
-        <source>Accent outline</source>
-        <translation>Contour d&apos;accent</translation>
-    </message>
-    <message>
-        <source>Give the accented words their own outline</source>
-        <translation>Donner un contour propre aux mots accentués</translation>
-    </message>
-    <message>
-        <source>Choose accent outline colour</source>
-        <translation>Choisir la couleur du contour d’accent</translation>
-    </message>
-    <message>
-        <source>Accent pill</source>
-        <translation>Pillule d&apos;accent</translation>
-    </message>
-    <message>
-        <source>Highlight only the accented words, instead of every word</source>
-        <translation>Mettre en évidence uniquement les mots accentués, plutôt que tous les mots</translation>
-    </message>
-    <message>
-        <source>Choose accent highlight colour</source>
-        <translation>Choisir la couleur de mise en évidence d&apos;accent</translation>
-    </message>
-    <message>
-        <source>In</source>
-        <translation>Entrée</translation>
-    </message>
-    <message>
-        <source>Out</source>
-        <translation>Sortie</translation>
-    </message>
-    <message>
-        <source>Loop</source>
-        <translation>Boucle</translation>
-    </message>
-    <message>
-        <source>Plays for every caption</source>
-        <translation>Est lu pour chaque sous-titre</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation>Tous</translation>
-    </message>
-    <message>
-        <source>Preview this animation</source>
-        <translation>Prévisualiser cette animation</translation>
-    </message>
-    <message>
-        <source>Period</source>
-        <translation>Période</translation>
-    </message>
-    <message>
-        <source>Duration</source>
-        <translation>Durée</translation>
-    </message>
-    <message>
-        <source>Edit text animation</source>
-        <translation>Modifier l&apos;animation de texte</translation>
-    </message>
-    <message>
-        <source>By</source>
-        <translation>Par</translation>
+        <source>Animate</source>
+        <translation type="unfinished">Animer</translation>
     </message>
 </context>
 <context>
@@ -15359,6 +16017,17 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
+    <name>TextStylePackCard</name>
+    <message>
+        <source>%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">Ajouter à la tête de lecture</translation>
+    </message>
+</context>
+<context>
     <name>TextStylePackPicker</name>
     <message>
         <source>Custom</source>
@@ -15386,6 +16055,29 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>Custom</source>
         <translation>Personnalisé</translation>
+    </message>
+</context>
+<context>
+    <name>TextStyleUserCard</name>
+    <message>
+        <source>%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Style options</source>
+        <translation type="unfinished">Réglages de style</translation>
+    </message>
+    <message>
+        <source>Rename…</source>
+        <translation type="unfinished">Renommer…</translation>
+    </message>
+    <message>
+        <source>Export…</source>
+        <translation type="unfinished">Exporter...</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Supprimer</translation>
     </message>
 </context>
 <context>
@@ -15434,70 +16126,81 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
-    <name>TimelineClipItem</name>
+    <name>TimelineBookmarkContextMenu</name>
     <message>
-        <source>%1, track %2</source>
-        <translation>%1, piste %2</translation>
+        <source>Go to bookmark</source>
+        <translation type="unfinished">Aller au repère</translation>
     </message>
     <message>
+        <source>Rename…</source>
+        <translation type="unfinished">Renommer…</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Supprimer</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineClipContextMenu</name>
+    <message>
         <source>Properties</source>
-        <translation>Propriétés</translation>
+        <translation type="unfinished">Propriétés</translation>
     </message>
     <message>
         <source>Select multiple</source>
-        <translation>Sélection multiple</translation>
+        <translation type="unfinished">Sélection multiple</translation>
     </message>
     <message>
         <source>Open composite</source>
-        <translation>Ouvrir la composition</translation>
+        <translation type="unfinished">Ouvrir le composite</translation>
     </message>
     <message>
         <source>Flatten composite</source>
-        <translation>Aplatir la composition</translation>
+        <translation type="unfinished">Aplatir le composite</translation>
     </message>
     <message>
         <source>Make composite</source>
-        <translation>Créer une composition</translation>
+        <translation type="unfinished">Créer un composite</translation>
     </message>
     <message>
         <source>Transform together</source>
-        <translation>Transformer ensemble</translation>
+        <translation type="unfinished">Transformer ensemble</translation>
     </message>
     <message>
         <source>Add transform layer</source>
-        <translation>Ajouter un calque de transformation</translation>
+        <translation type="unfinished">Ajouter un calque de transformation</translation>
     </message>
     <message>
         <source>Select transform layer</source>
-        <translation>Sélectionner le calque de transformation</translation>
+        <translation type="unfinished">Sélectionner le calque de transformation</translation>
     </message>
     <message>
         <source>Covers…</source>
-        <translation>Couvre…</translation>
+        <translation type="unfinished">Couvre…</translation>
     </message>
     <message>
         <source>Select covered clips</source>
-        <translation>Sélectionner les clips couverts</translation>
+        <translation type="unfinished">Sélectionner les clips couverts</translation>
     </message>
     <message>
         <source>Split at current time</source>
-        <translation>Diviser à l&apos;heure actuelle</translation>
+        <translation type="unfinished">Diviser à l&apos;heure actuelle</translation>
     </message>
     <message>
         <source>Split item at current time</source>
-        <translation>Diviser l&apos;élément au temps actuel</translation>
+        <translation type="unfinished">Diviser l&apos;élément au temps actuel</translation>
     </message>
     <message>
         <source>Separate audio</source>
-        <translation>Séparer l&apos;audio</translation>
+        <translation type="unfinished">Séparer l&apos;audio</translation>
     </message>
     <message>
         <source>Separate all audio tracks</source>
-        <translation>Séparer toutes les pistes audio</translation>
+        <translation type="unfinished">Séparer toutes les pistes audio</translation>
     </message>
     <message>
         <source>Convert to edit-friendly format</source>
-        <translation>Convertir vers un format optimisé pour le montage</translation>
+        <translation type="unfinished">Convertir au format optimisé pour le montage</translation>
     </message>
     <message>
         <source>Crop…</source>
@@ -15509,7 +16212,7 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
     <message>
         <source>Unlink</source>
-        <translation>Dissocier</translation>
+        <translation type="unfinished">Dissocier</translation>
     </message>
     <message>
         <source>Link</source>
@@ -15517,87 +16220,125 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
     <message>
         <source>Merge subtitle clips</source>
-        <translation>Fusionner les clips de sous-titres</translation>
+        <translation type="unfinished">Fusionner les clips de sous-titres</translation>
     </message>
     <message>
         <source>Merge all subtitles on this track</source>
-        <translation>Fusionner tous les sous-titres sur cette piste</translation>
+        <translation type="unfinished">Fusionner tous les sous-titres sur cette piste</translation>
     </message>
     <message>
         <source>Convert to text clips</source>
-        <translation>Convertir en clips de texte</translation>
+        <translation type="unfinished">Convertir en clips de texte</translation>
     </message>
     <message>
         <source>Convert to subtitle</source>
-        <translation>Convertir en sous-titres</translation>
+        <translation type="unfinished">Convertir en sous-titre</translation>
     </message>
     <message>
         <source>Cut</source>
-        <translation>Couper</translation>
+        <translation type="unfinished">Couper</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation>Copier</translation>
+        <translation type="unfinished">Copier</translation>
     </message>
     <message>
         <source>Paste attributes…</source>
-        <translation>Coller les attributs…</translation>
+        <translation type="unfinished">Coller les attributs…</translation>
     </message>
     <message>
         <source>Duplicate</source>
-        <translation>Dupliquer</translation>
+        <translation type="unfinished">Dupliquer</translation>
     </message>
     <message>
         <source>Rename…</source>
-        <translation>Renommer…</translation>
+        <translation type="unfinished">Renommer…</translation>
     </message>
     <message>
         <source>Copy effects</source>
-        <translation>Copier les effets</translation>
+        <translation type="unfinished">Copier les effets</translation>
     </message>
     <message>
         <source>Paste effects</source>
-        <translation>Coller les effets</translation>
+        <translation type="unfinished">Coller les effets</translation>
     </message>
     <message>
         <source>Save effects as preset…</source>
-        <translation>Enregistrer les effets comme préréglage...</translation>
+        <translation type="unfinished">Enregistrer les effets comme préréglage...</translation>
     </message>
     <message>
         <source>Unlink from clip</source>
-        <translation>Dissocier du clip</translation>
+        <translation type="unfinished">Dissocier du clip</translation>
     </message>
     <message>
         <source>Move to its own track</source>
-        <translation>Déplacer sur sa propre piste</translation>
+        <translation type="unfinished">Déplacer sur sa propre piste</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>Supprimer</translation>
+        <translation type="unfinished">Supprimer</translation>
     </message>
+</context>
+<context>
+    <name>TimelineClipItem</name>
+    <message>
+        <source>%1, track %2</source>
+        <translation>%1, piste %2</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineEmptyState</name>
+    <message>
+        <source>Your timeline is empty</source>
+        <translation type="unfinished">Votre ligne du temps est vide</translation>
+    </message>
+    <message>
+        <source>Drag media here from the library, or add an empty track to start.</source>
+        <translation type="unfinished">Glissez les médias ici depuis la bibliothèque, ou ajoutez une piste vide pour commencer.</translation>
+    </message>
+    <message>
+        <source>New track</source>
+        <translation type="unfinished">Nouvelle piste</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineFadeHandle</name>
     <message>
         <source>Adjust fade</source>
-        <translation>Ajuster le fondu</translation>
-    </message>
-    <message>
-        <source>Fade in %1s</source>
-        <translation>Fondu d’entrée de %1s</translation>
+        <translation type="unfinished">Ajuster le fondu</translation>
     </message>
     <message>
         <source>Fade out %1s</source>
-        <translation>Fondu de sortie de %1s</translation>
+        <translation type="unfinished">Fondu de sortie de %1s</translation>
     </message>
     <message>
-        <source>Drag to trim the start</source>
-        <translation>Glisser pour raccourcir le début</translation>
+        <source>Fade in %1s</source>
+        <translation type="unfinished">Fondu d’entrée de %1s</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineLandingOutline</name>
+    <message>
+        <source>Importing…</source>
+        <translation type="unfinished">Importation en cours…</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineLiveRecordingBlock</name>
+    <message>
+        <source>PAUSED </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Trim clip</source>
-        <translation>Raccourcir le clip</translation>
+        <source>REC </source>
+        <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>TimelineNewTrackGhostClip</name>
     <message>
-        <source>Drag to trim the end</source>
-        <translation>Glisser pour raccourcir la fin</translation>
+        <source>Importing…</source>
+        <translation type="unfinished">Importation en cours…</translation>
     </message>
 </context>
 <context>
@@ -15633,46 +16374,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>Add new track</source>
         <translation>Ajouter une piste</translation>
-    </message>
-    <message>
-        <source>Click or drag to seek</source>
-        <translation>Cliquez ou faites glisser pour avancer</translation>
-    </message>
-    <message>
-        <source>Go to bookmark</source>
-        <translation>Aller à la repère</translation>
-    </message>
-    <message>
-        <source>Rename…</source>
-        <translation>Renommer…</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Supprimer</translation>
-    </message>
-    <message>
-        <source>Your timeline is empty</source>
-        <translation>Votre chronologie est vide</translation>
-    </message>
-    <message>
-        <source>Drag media here from the library, or add an empty track to start.</source>
-        <translation>Glissez les médias ici depuis la bibliothèque, ou ajoutez une piste vide pour commencer.</translation>
-    </message>
-    <message>
-        <source>New track</source>
-        <translation>Nouvelle piste</translation>
-    </message>
-    <message>
-        <source>Importing…</source>
-        <translation>Importation…</translation>
-    </message>
-    <message>
-        <source>PAUSED </source>
-        <translation>EN PAUSE </translation>
-    </message>
-    <message>
-        <source>REC </source>
-        <translation>ENR </translation>
     </message>
     <message>
         <source>Close Gap</source>
@@ -15725,6 +16426,23 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>My look</source>
         <translation>Mon style</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineSeekStrip</name>
+    <message>
+        <source>Click or drag to seek</source>
+        <translation type="unfinished">Cliquez ou faites glisser pour avancer</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineSpanBracketChip</name>
+    <message numerus="yes">
+        <source>%n track(s)</source>
+        <translation type="unfinished">
+            <numerusform>%n piste</numerusform>
+            <numerusform>%n pistes</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -15838,22 +16556,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Main</source>
-        <translation>Principale</translation>
-    </message>
-    <message>
-        <source>Composite</source>
-        <translation>Composition</translation>
-    </message>
-    <message>
-        <source>Switch between the main timeline and composite clips</source>
-        <translation>Basculer entre la ligne du temps principale et les clips de composition</translation>
-    </message>
-    <message>
-        <source>No composite clips yet</source>
-        <translation>Aucun clip de composition pour l&apos;instant</translation>
-    </message>
-    <message>
         <source>Toggle audio mixer strip</source>
         <translation>Basculer la tranche du mélangeur audio</translation>
     </message>
@@ -15874,20 +16576,12 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <translation>Geler l&apos;image à l&apos;instant actuel</translation>
     </message>
     <message>
-        <source>More edit actions</source>
-        <translation>Plus d&apos;actions de montage</translation>
-    </message>
-    <message>
         <source>Add adjustment layer</source>
         <translation>Ajouter un calque d&apos;ajustement</translation>
     </message>
     <message>
         <source>Add camera — one viewpoint the whole timeline is seen through. With a camera already there, adds a new camera clip (a cut to a new framing) at the playhead</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Customize toolbar…</source>
-        <translation>Personnaliser la barre d&apos;outils…</translation>
     </message>
     <message>
         <source>Toggle snapping</source>
@@ -15900,30 +16594,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>Allow clip overlap</source>
         <translation>Autoriser le chevauchement des clips</translation>
-    </message>
-    <message>
-        <source>Zoom out</source>
-        <translation>Dézoomer</translation>
-    </message>
-    <message>
-        <source>Timeline zoom</source>
-        <translation>Zoom de la ligne du temps</translation>
-    </message>
-    <message>
-        <source>Zoom %1×</source>
-        <translation>Zoom %1×</translation>
-    </message>
-    <message>
-        <source>Zoom level — click to reset to 1×. Ctrl+wheel over the timeline also zooms.</source>
-        <translation>Niveau de zoom — cliquez pour réinitialiser à 1×. Ctrl+molette sur la timeline effectue aussi un zoom.</translation>
-    </message>
-    <message>
-        <source>Zoom in</source>
-        <translation>Zoom avant</translation>
-    </message>
-    <message>
-        <source>Fit timeline in view</source>
-        <translation>Adapter la timeline à l&apos;affichage</translation>
     </message>
 </context>
 <context>
@@ -15948,25 +16618,97 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <source>Reset to defaults</source>
         <translation>Réinitialiser aux valeurs par défaut</translation>
     </message>
+</context>
+<context>
+    <name>TimelineToolbarCustomizeDivider</name>
     <message>
         <source>More menu</source>
-        <translation>Menu Plus</translation>
+        <translation type="unfinished">Menu Plus</translation>
     </message>
+</context>
+<context>
+    <name>TimelineToolbarCustomizeRow</name>
     <message>
         <source>— Separator —</source>
-        <translation>— Séparateur —</translation>
+        <translation type="unfinished">— Séparateur —</translation>
     </message>
     <message>
         <source>Move up</source>
-        <translation>Monter</translation>
+        <translation type="unfinished">Monter</translation>
     </message>
     <message>
         <source>Move down</source>
-        <translation>Descendre</translation>
+        <translation type="unfinished">Descendre</translation>
     </message>
     <message>
         <source>Remove separator</source>
-        <translation>Supprimer le séparateur</translation>
+        <translation type="unfinished">Supprimer le séparateur</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarOverflowButton</name>
+    <message>
+        <source>More edit actions</source>
+        <translation type="unfinished">Plus d&apos;actions de montage</translation>
+    </message>
+    <message>
+        <source>Customize toolbar…</source>
+        <translation type="unfinished">Personnaliser la barre d&apos;outils…</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarSceneBadge</name>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished">Principale</translation>
+    </message>
+    <message>
+        <source>Composite</source>
+        <translation type="unfinished">Composite</translation>
+    </message>
+    <message>
+        <source>Switch between the main timeline and composite clips</source>
+        <translation type="unfinished">Basculer entre la ligne du temps principale et les clips de composition</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarSceneEmptyItem</name>
+    <message>
+        <source>No composite clips yet</source>
+        <translation type="unfinished">Aucun clip de composition pour l&apos;instant</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarZoomControl</name>
+    <message>
+        <source>Zoom out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom in</source>
+        <translation type="unfinished">Zoom avant</translation>
+    </message>
+    <message>
+        <source>Fit timeline in view</source>
+        <translation type="unfinished">Adapter la timeline à l&apos;affichage</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarZoomReadout</name>
+    <message>
+        <source>Zoom level — click to reset to 1×. Ctrl+wheel over the timeline also zooms.</source>
+        <translation type="unfinished">Niveau de zoom — cliquez pour réinitialiser à 1×. Ctrl+molette sur la timeline effectue aussi un zoom.</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarZoomSlider</name>
+    <message>
+        <source>Timeline zoom</source>
+        <translation type="unfinished">Zoom de la ligne du temps</translation>
+    </message>
+    <message>
+        <source>Zoom %1×</source>
+        <translation type="unfinished">Zoom %1×</translation>
     </message>
 </context>
 <context>
@@ -15997,6 +16739,21 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
+    <name>TimelineTrimHandle</name>
+    <message>
+        <source>Drag to trim the start</source>
+        <translation type="unfinished">Glisser pour raccourcir le début</translation>
+    </message>
+    <message>
+        <source>Drag to trim the end</source>
+        <translation type="unfinished">Glisser pour raccourcir la fin</translation>
+    </message>
+    <message>
+        <source>Trim clip</source>
+        <translation type="unfinished">Raccourcir le clip</translation>
+    </message>
+</context>
+<context>
     <name>ToastHost</name>
     <message>
         <source>%1  (×%2)</source>
@@ -16019,26 +16776,25 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
+    <name>TrackHeaderChannelLanesButton</name>
+    <message>
+        <source>Show one combined waveform</source>
+        <translation type="unfinished">Afficher une forme d&apos;onde combinée</translation>
+    </message>
+    <message>
+        <source>Show each channel separately (%1)</source>
+        <translation type="unfinished">Afficher chaque canal séparément (%1)</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderClipDisplayButton</name>
+    <message>
+        <source>Clips show: %1 (click to change)</source>
+        <translation type="unfinished">Les clips affichent : %1 (cliquez pour changer)</translation>
+    </message>
+</context>
+<context>
     <name>TrackHeaderColumn</name>
-    <message>
-        <source>Delete this track?</source>
-        <translation>Supprimer cette piste&#x202f;?</translation>
-    </message>
-    <message>
-        <source>Delete track</source>
-        <translation>Supprimer la piste</translation>
-    </message>
-    <message numerus="yes">
-        <source>This removes the track and its %n clips. You can undo afterwards.</source>
-        <translation>
-            <numerusform>Cela supprime la piste et son clip %n. Vous pouvez annuler ensuite.</numerusform>
-            <numerusform>Cela supprime la piste et ses %n clips. Vous pouvez annuler ensuite.</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>This removes the empty track. You can undo afterwards.</source>
-        <translation>Ceci supprime la piste vide. Vous pouvez annuler plus tard.</translation>
-    </message>
     <message>
         <source>Waveform</source>
         <translation>Forme d&apos;onde</translation>
@@ -16120,6 +16876,188 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <translation>%1 à %2</translation>
     </message>
     <message>
+        <source>Video</source>
+        <translation>Vidéo</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderContextMenu</name>
+    <message>
+        <source>Rename…</source>
+        <translation type="unfinished">Renommer…</translation>
+    </message>
+    <message>
+        <source>Unmute track</source>
+        <translation type="unfinished">Réactiver le son de la piste</translation>
+    </message>
+    <message>
+        <source>Mute track</source>
+        <translation type="unfinished">Mettre la piste en sourdine</translation>
+    </message>
+    <message>
+        <source>Show track</source>
+        <translation type="unfinished">Afficher la piste</translation>
+    </message>
+    <message>
+        <source>Hide track</source>
+        <translation type="unfinished">Masquer la piste</translation>
+    </message>
+    <message>
+        <source>Add camera clip at playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Covers…</source>
+        <translation type="unfinished">Couvre…</translation>
+    </message>
+    <message>
+        <source>Select covered clips</source>
+        <translation type="unfinished">Sélectionner les clips couverts</translation>
+    </message>
+    <message>
+        <source>Add transform layer above</source>
+        <translation type="unfinished">Ajouter un calque de transformation au-dessus</translation>
+    </message>
+    <message>
+        <source>Track height</source>
+        <translation type="unfinished">Hauteur de la piste</translation>
+    </message>
+    <message>
+        <source>Short</source>
+        <translation type="unfinished">Basse</translation>
+    </message>
+    <message>
+        <source>Tall</source>
+        <translation type="unfinished">Haute</translation>
+    </message>
+    <message>
+        <source>Taller</source>
+        <translation type="unfinished">Plus haute</translation>
+    </message>
+    <message>
+        <source>Scroll over the header to fine-tune</source>
+        <translation type="unfinished">Faites défiler sur l&apos;en-tête pour un réglage fin</translation>
+    </message>
+    <message>
+        <source>Taller row</source>
+        <translation type="unfinished">Ligne plus haute</translation>
+    </message>
+    <message>
+        <source>Shorter row</source>
+        <translation type="unfinished">Ligne moins haute</translation>
+    </message>
+    <message>
+        <source>Delete track</source>
+        <translation type="unfinished">Supprimer la piste</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderCoversMenu</name>
+    <message>
+        <source>Covers</source>
+        <translation type="unfinished">Couvre</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderDeleteDialog</name>
+    <message>
+        <source>Delete this track?</source>
+        <translation type="unfinished">Supprimer cette piste&#x202f;?</translation>
+    </message>
+    <message>
+        <source>Delete track</source>
+        <translation type="unfinished">Supprimer la piste</translation>
+    </message>
+    <message numerus="yes">
+        <source>This removes the track and its %n clips. You can undo afterwards.</source>
+        <translation type="unfinished">
+            <numerusform>Cela supprime la piste et son clip %n. Vous pouvez annuler ensuite.</numerusform>
+            <numerusform>Cela supprime la piste et ses %n clips. Vous pouvez annuler ensuite.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>This removes the empty track. You can undo afterwards.</source>
+        <translation type="unfinished">Ceci supprime la piste vide. Vous pouvez annuler plus tard.</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderGrip</name>
+    <message>
+        <source>Drag the header to reorder this track</source>
+        <translation type="unfinished">Glissez l&apos;en-tête pour réorganiser cette piste</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderLaneEye</name>
+    <message>
+        <source>Turn adjustment on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn adjustment off</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderMicButton</name>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished">Arrêter l&apos;enregistrement</translation>
+    </message>
+    <message>
+        <source>Record voiceover</source>
+        <translation type="unfinished">Enregistrer une voix hors champ</translation>
+    </message>
+    <message>
+        <source>Paused — click to finish recording</source>
+        <translation type="unfinished">Enregistrement en pause — cliquez pour terminer</translation>
+    </message>
+    <message>
+        <source>Recording — click to finish recording</source>
+        <translation type="unfinished">Enregistrement en cours — cliquez pour terminer</translation>
+    </message>
+    <message>
+        <source>Record voiceover (mic)</source>
+        <translation type="unfinished">Enregistrer une voix hors champ (micro)</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderMuteButton</name>
+    <message>
+        <source>Unmute track</source>
+        <translation type="unfinished">Réactiver le son de la piste</translation>
+    </message>
+    <message>
+        <source>Mute track</source>
+        <translation type="unfinished">Mettre la piste en sourdine</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderRenameDialog</name>
+    <message>
+        <source>Rename track</source>
+        <translation type="unfinished">Renommer la piste</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation type="unfinished">Renommer</translation>
+    </message>
+    <message>
+        <source>Track name</source>
+        <translation type="unfinished">Nom de la piste</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderRow</name>
+    <message>
+        <source>Turn transform on</source>
+        <translation type="unfinished">Activer la transformation</translation>
+    </message>
+    <message>
+        <source>Turn transform off</source>
+        <translation type="unfinished">Désactiver la transformation</translation>
+    </message>
+    <message>
         <source>Turn adjustment on</source>
         <translation type="unfinished"></translation>
     </message>
@@ -16128,132 +17066,12 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Stop recording</source>
-        <translation>Arrêter l&apos;enregistrement</translation>
-    </message>
-    <message>
-        <source>Record voiceover</source>
-        <translation>Enregistrer une voix hors champ</translation>
-    </message>
-    <message>
-        <source>Record voiceover (mic)</source>
-        <translation>Enregistrer une voix hors champ (micro)</translation>
-    </message>
-    <message>
-        <source>Turn transform on</source>
-        <translation>Activer la transformation</translation>
-    </message>
-    <message>
-        <source>Turn transform off</source>
-        <translation>Désactiver la transformation</translation>
-    </message>
-    <message>
-        <source>Add camera clip at playhead</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Covers…</source>
-        <translation>Couvre…</translation>
-    </message>
-    <message>
-        <source>Select covered clips</source>
-        <translation>Sélectionner les clips couverts</translation>
-    </message>
-    <message>
-        <source>Add transform layer above</source>
-        <translation>Ajouter un calque de transformation au-dessus</translation>
-    </message>
-    <message>
-        <source>Track height</source>
-        <translation>Hauteur de la piste</translation>
-    </message>
-    <message>
-        <source>Short</source>
-        <translation>Basse</translation>
-    </message>
-    <message>
-        <source>Tall</source>
-        <translation>Haute</translation>
-    </message>
-    <message>
-        <source>Taller</source>
-        <translation>Plus haute</translation>
-    </message>
-    <message>
-        <source>Scroll over the header to fine-tune</source>
-        <translation>Faites défiler sur l&apos;en-tête pour un réglage fin</translation>
-    </message>
-    <message>
-        <source>Covers</source>
-        <translation>Couvre</translation>
-    </message>
-    <message>
-        <source>Video</source>
-        <translation>Vidéo</translation>
-    </message>
-    <message>
-        <source>Drag the header to reorder this track</source>
-        <translation>Glissez l&apos;en-tête pour réorganiser cette piste</translation>
-    </message>
-    <message>
-        <source>Paused — click to finish recording</source>
-        <translation>Enregistrement en pause — cliquez pour terminer</translation>
-    </message>
-    <message>
-        <source>Recording — click to finish recording</source>
-        <translation>Enregistrement en cours — cliquez pour terminer</translation>
-    </message>
-    <message>
-        <source>Unmute track</source>
-        <translation>Réactiver le son de la piste</translation>
-    </message>
-    <message>
-        <source>Mute track</source>
-        <translation>Mettre la piste en sourdine</translation>
-    </message>
-    <message>
-        <source>Show one combined waveform</source>
-        <translation>Afficher une forme d&apos;onde combinée</translation>
-    </message>
-    <message>
-        <source>Show each channel separately (%1)</source>
-        <translation>Afficher chaque canal séparément (%1)</translation>
-    </message>
-    <message>
         <source>Show track</source>
-        <translation>Afficher la piste</translation>
+        <translation type="unfinished">Afficher la piste</translation>
     </message>
     <message>
         <source>Hide track</source>
-        <translation>Masquer la piste</translation>
-    </message>
-    <message>
-        <source>Taller row</source>
-        <translation>Ligne plus haute</translation>
-    </message>
-    <message>
-        <source>Shorter row</source>
-        <translation>Ligne moins haute</translation>
-    </message>
-    <message>
-        <source>Rename track</source>
-        <translation>Renommer la piste</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Renommer</translation>
-    </message>
-    <message>
-        <source>Track name</source>
-        <translation>Nom de la piste</translation>
-    </message>
-    <message>
-        <source>Clips show: %1 (click to change)</source>
-        <translation>Les clips affichent : %1 (cliquez pour changer)</translation>
-    </message>
-    <message>
-        <source>Rename…</source>
-        <translation>Renommer…</translation>
+        <translation type="unfinished">Masquer la piste</translation>
     </message>
 </context>
 <context>
@@ -16522,36 +17340,36 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
-    <name>TransformOverlay</name>
+    <name>TransformOverlayLayerChip</name>
     <message numerus="yes">
         <source>%1 · %n clip(s)</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>%1 · %n clip</numerusform>
             <numerusform>%1 · %n clips</numerusform>
         </translation>
     </message>
     <message>
         <source>Transform</source>
-        <translation>Transformation</translation>
+        <translation type="unfinished">Transformation</translation>
     </message>
+</context>
+<context>
+    <name>TransformOverlayParentChip</name>
     <message>
         <source>Select %1</source>
-        <translation>Sélectionner %1</translation>
+        <translation type="unfinished">Sélectionner %1</translation>
+    </message>
+    <message>
+        <source>Transform</source>
+        <translation type="unfinished">Transformation</translation>
     </message>
     <message>
         <source>Select the transform layer moving this clip (%1)</source>
-        <translation>Sélectionner le calque de transformation déplaçant ce clip (%1)</translation>
+        <translation type="unfinished">Sélectionner le calque de transformation déplaçant ce clip (%1)</translation>
     </message>
 </context>
 <context>
     <name>TransformSpanBracket</name>
-    <message numerus="yes">
-        <source>%n track(s)</source>
-        <translation>
-            <numerusform>%n piste</numerusform>
-            <numerusform>%n pistes</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Transform layer span end</source>
         <translation>Fin de l&apos;étendue du calque de transformation</translation>
@@ -16671,6 +17489,21 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
+    <name>TransitionPresetCard</name>
+    <message>
+        <source>%1 — drag onto where two clips meet, or on touch hold then drag</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">Supprimer des favoris</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">Ajouter aux favoris</translation>
+    </message>
+</context>
+<context>
     <name>TransitionsTab</name>
     <message>
         <source>Search transitions</source>
@@ -16731,18 +17564,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>Import</source>
         <translation type="unfinished">Importer</translation>
-    </message>
-    <message>
-        <source>%1 — drag onto where two clips meet, or on touch hold then drag</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remove from favorites</source>
-        <translation type="unfinished">Supprimer des favoris</translation>
-    </message>
-    <message>
-        <source>Add to favorites</source>
-        <translation type="unfinished">Ajouter aux favoris</translation>
     </message>
 </context>
 <context>
@@ -17007,7 +17828,7 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
-    <name>Vec2Param</name>
+    <name>Vec2ParamPad</name>
     <message>
         <source>Edit %1</source>
         <translation type="unfinished">Modifier %1</translation>
@@ -17015,22 +17836,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
 </context>
 <context>
     <name>VectorInspector</name>
-    <message>
-        <source>Toggle %1&apos;s keyframes</source>
-        <translation>Basculer les images clés de %1</translation>
-    </message>
-    <message>
-        <source>Key %1 at the playhead</source>
-        <translation>Ajouter une image clé pour %1 à la tête de lecture</translation>
-    </message>
-    <message>
-        <source>Override the %1 colour</source>
-        <translation>Remplacer la couleur %1</translation>
-    </message>
-    <message>
-        <source>Back to the drawing&apos;s own %1</source>
-        <translation>Retour au %1 d&apos;origine du dessin</translation>
-    </message>
     <message>
         <source>Replace Animation</source>
         <translation>Remplacer l&apos;animation</translation>
@@ -17228,6 +18033,25 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
+    <name>VectorSvgColorRow</name>
+    <message>
+        <source>Toggle %1&apos;s keyframes</source>
+        <translation type="unfinished">Basculer les images clés de %1</translation>
+    </message>
+    <message>
+        <source>Key %1 at the playhead</source>
+        <translation type="unfinished">Ajouter une image clé pour %1 à la tête de lecture</translation>
+    </message>
+    <message>
+        <source>Override the %1 colour</source>
+        <translation type="unfinished">Remplacer la couleur %1</translation>
+    </message>
+    <message>
+        <source>Back to the drawing&apos;s own %1</source>
+        <translation type="unfinished">Retour au %1 d&apos;origine du dessin</translation>
+    </message>
+</context>
+<context>
     <name>VfrWarning</name>
     <message>
         <source>Variable frame rate. This clip can drift out of sync with its audio. Right-click it and choose Convert to edit-friendly format.</source>
@@ -17383,53 +18207,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
 </context>
 <context>
-    <name>VoiceoverControlBar</name>
-    <message>
-        <source>PAUSED</source>
-        <translation>EN PAUSE</translation>
-    </message>
-    <message>
-        <source>REC</source>
-        <translation>REC</translation>
-    </message>
-    <message>
-        <source>Default Mic</source>
-        <translation>Micro par défaut</translation>
-    </message>
-    <message>
-        <source>Input microphone: %1 (click to switch)</source>
-        <translation>Microphone d&apos;entrée : %1 (cliquez pour changer)</translation>
-    </message>
-    <message>
-        <source>Mic gain</source>
-        <translation>Gain du micro</translation>
-    </message>
-    <message>
-        <source>Voice input gain: %1% (adjust voice level)</source>
-        <translation>Gain d&apos;entrée vocale : %1% (ajustez le niveau de la voix)</translation>
-    </message>
-    <message>
-        <source>Live voice level: %1%</source>
-        <translation>Niveau vocal en direct : %1%</translation>
-    </message>
-    <message>
-        <source>Resume recording</source>
-        <translation>Reprendre l&apos;enregistrement</translation>
-    </message>
-    <message>
-        <source>Pause recording</source>
-        <translation>Mettre l&apos;enregistrement en pause</translation>
-    </message>
-    <message>
-        <source>Done — finish recording and save to track</source>
-        <translation>Terminé — terminer l&apos;enregistrement et l&apos;enregistrer sur la piste</translation>
-    </message>
-    <message>
-        <source>Cancel — discard recording</source>
-        <translation>Annuler — abandonner l&apos;enregistrement</translation>
-    </message>
-</context>
-<context>
     <name>VoiceoverDialog</name>
     <message>
         <source>Generate voiceover</source>
@@ -17466,6 +18243,65 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>Close</source>
         <translation type="unfinished">Fermer</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceoverGainControl</name>
+    <message>
+        <source>Mic gain</source>
+        <translation type="unfinished">Gain du micro</translation>
+    </message>
+    <message>
+        <source>Voice input gain: %1% (adjust voice level)</source>
+        <translation type="unfinished">Gain d&apos;entrée vocale : %1% (ajustez le niveau de la voix)</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceoverLevelMeter</name>
+    <message>
+        <source>Live voice level: %1%</source>
+        <translation type="unfinished">Niveau vocal en direct : %1%</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceoverMicPicker</name>
+    <message>
+        <source>Default Mic</source>
+        <translation type="unfinished">Micro par défaut</translation>
+    </message>
+    <message>
+        <source>Input microphone: %1 (click to switch)</source>
+        <translation type="unfinished">Microphone d&apos;entrée : %1 (cliquez pour changer)</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceoverRecLabel</name>
+    <message>
+        <source>PAUSED</source>
+        <translation type="unfinished">EN PAUSE</translation>
+    </message>
+    <message>
+        <source>REC</source>
+        <translation type="unfinished">REC</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceoverTransport</name>
+    <message>
+        <source>Resume recording</source>
+        <translation type="unfinished">Reprendre l&apos;enregistrement</translation>
+    </message>
+    <message>
+        <source>Pause recording</source>
+        <translation type="unfinished">Mettre l&apos;enregistrement en pause</translation>
+    </message>
+    <message>
+        <source>Done — finish recording and save to track</source>
+        <translation type="unfinished">Terminé — terminer l&apos;enregistrement et l&apos;enregistrer sur la piste</translation>
+    </message>
+    <message>
+        <source>Cancel — discard recording</source>
+        <translation type="unfinished">Annuler — abandonner l&apos;enregistrement</translation>
     </message>
 </context>
 <context>

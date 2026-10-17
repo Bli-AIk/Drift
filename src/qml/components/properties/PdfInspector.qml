@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Window
 import Drift
-import ".."
-
 // PDF clip inspector: which pages show and how they are laid out, then the viewport that scrolls
 // and zooms through them. The clip frame itself is placed from the Transform tab.
 Item {

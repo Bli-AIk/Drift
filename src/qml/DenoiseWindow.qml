@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Window
 import QtMultimedia
 import Drift 1.0
-import "components"
 
 // Audition surface for noise removal. Opened for one clip: a short window of it is run through the
 // model, the original and the result are compared side by side, and only then is the whole clip
@@ -119,112 +118,12 @@ ToolWindow {
                     { label: qsTr("Noise removed"), path: root.cleanPath, clean: true }
                 ]
 
-                delegate: Column {
-                    id: lane
-                    required property var modelData
+                delegate: DenoiseWaveformLane {
                     width: content.width
-                    spacing: Theme.spacingSm
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingMd
-
-                        ThemedLabel {
-                            text: lane.modelData.label
-                            tone: root.showClean === lane.modelData.clean ? "default" : "muted"
-                        }
-
-                        ThemedLabel {
-                            visible: root.showClean === lane.modelData.clean && root.hasPreview
-                            tone: "muted"
-                            size: "sm"
-                            text: qsTr("· playing")
-                        }
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 80
-                        radius: Theme.radiusMd
-                        color: Theme.panelBackground
-                        border.width: Theme.borderWidth
-                        border.color: root.showClean === lane.modelData.clean
-                                      ? Theme.panelSecondaryForeground : Theme.panelBorder
-
-                        SkeletonBox {
-                            anchors.fill: parent
-                            anchors.margins: Theme.spacingSm
-                            visible: !lane.modelData.path
-                        }
-
-                        Canvas {
-                            id: wave
-                            anchors.fill: parent
-                            anchors.margins: Theme.spacingSm
-                            visible: !!lane.modelData.path
-
-                            property var peaks: lane.modelData.path
-                                                ? EditorState.waveformPeaks(lane.modelData.path) : []
-
-                            onPeaksChanged: requestPaint()
-                            onWidthChanged: requestPaint()
-                            onHeightChanged: requestPaint()
-
-                            // Peaks are computed off-thread, so the first read usually comes back
-                            // empty and arrives on this signal instead.
-                            Connections {
-                                target: EditorState
-                                function onWaveformReady(path) {
-                                    if (path === lane.modelData.path)
-                                        wave.peaks = EditorState.waveformPeaks(path)
-                                }
-                            }
-
-                            onPaint: {
-                                var ctx = getContext("2d");
-                                ctx.clearRect(0, 0, width, height);
-                                if (!peaks || peaks.length === 0)
-                                    return;
-                                ctx.fillStyle = Theme.panelWaveformColor;
-                                var mid = height / 2;
-                                var w = Math.max(1, Math.floor(width));
-                                var n = peaks.length;
-                                for (var x = 0; x < w; x++) {
-                                    var i0 = Math.floor(x * n / w);
-                                    var i1 = Math.floor((x + 1) * n / w);
-                                    if (i1 <= i0)
-                                        i1 = Math.min(n, i0 + 1);
-                                    var peak = 0;
-                                    for (var i = i0; i < i1; i++) {
-                                        if (peaks[i] > peak)
-                                            peak = peaks[i];
-                                    }
-                                    var amp = peak * mid * 0.9;
-                                    if (amp > 0.5)
-                                        ctx.fillRect(x, mid - amp, 1, amp * 2);
-                                }
-                            }
-                        }
-
-                        // Playhead over whichever take is being auditioned.
-                        Rectangle {
-                            visible: root.showClean === lane.modelData.clean
-                                     && player.duration > 0
-                                     && player.playbackState !== MediaPlayer.StoppedState
-                            width: 1
-                            color: Theme.panelSecondaryForeground
-                            anchors.top: parent.top
-                            anchors.bottom: parent.bottom
-                            x: player.duration > 0
-                               ? (player.position / player.duration) * parent.width : 0
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            enabled: root.hasPreview
-                            onClicked: root.showClean = lane.modelData.clean
-                        }
-                    }
+                    showClean: root.showClean
+                    hasPreview: root.hasPreview
+                    sourcePlayer: player
+                    onPicked: (clean) => { root.showClean = clean }
                 }
             }
         }

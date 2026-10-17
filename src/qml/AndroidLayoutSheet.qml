@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import "components"
-
 // The phone view over LayoutPresets — what Android opens instead of the desktop
 // LayoutChooserDialog. Same catalog, same arithmetic, laid out for a thumb: chips and
 // aspect cards rather than a capped list inside a bordered box.
@@ -104,11 +102,6 @@ AndroidBottomSheet {
 
     // Section headings all sit on the same page margin; the scrolling chip rows below
     // them carry that margin as padding instead, so they can bleed to the screen edge.
-    component SectionLabel: ThemedLabel {
-        x: Theme.androidPagePadding
-        tone: "default"
-        size: "sm"
-    }
 
     Item {
         anchors.fill: parent
@@ -162,7 +155,7 @@ AndroidBottomSheet {
                     }
                 }
 
-                SectionLabel { text: qsTr("Template") }
+                AndroidLayoutSectionLabel { text: qsTr("Template") }
 
                 Flickable {
                     width: parent.width
@@ -181,121 +174,11 @@ AndroidBottomSheet {
                         Repeater {
                             model: root.categoryTemplates
 
-                            delegate: AbstractButton {
-                                id: card
-                                required property var modelData
-                                width: Theme.androidLayoutCardWidth
-                                height: Theme.androidLayoutCardHeight
-                                hoverEnabled: true
-
-                                readonly property bool selected: modelData.id === root.templateId
-                                // A free size has no catalog ratio; draw the one being typed.
-                                readonly property var ratio:
-                                    modelData.aspect === "custom"
-                                    ? { w: Math.max(1, root.customWidth),
-                                        h: Math.max(1, root.customHeight) }
-                                    : LayoutPresets.ratioFor(modelData.aspect)
-
-                                Accessible.role: Accessible.RadioButton
-                                Accessible.name: modelData.label
-                                Accessible.description: modelData.detail
-                                Accessible.checked: card.selected
-                                Accessible.onPressAction: card.clicked()
-
-                                scale: card.down ? Theme.pressScale : 1.0
-
-                                Behavior on scale {
-                                    NumberAnimation {
-                                        duration: Theme.durationPress
-                                        easing.type: Theme.easing
-                                    }
-                                }
-
-                                background: Rectangle {
-                                    radius: Theme.radiusMd
-                                    color: card.selected ? Theme.panelSecondaryBg
-                                                         : Theme.panelAccent
-                                    border.width: card.selected ? 2 : Theme.borderWidth
-                                    border.color: card.selected ? Theme.primary
-                                                                : Theme.panelBorder
-
-                                    Behavior on color {
-                                        ColorAnimation {
-                                            duration: Theme.durationFast
-                                            easing.type: Theme.easing
-                                        }
-                                    }
-                                }
-
-                                contentItem: Item {
-                                    Item {
-                                        id: swatchBox
-                                        anchors.top: parent.top
-                                        anchors.topMargin: Theme.spacingLg
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        width: parent.width - Theme.spacingLg * 2
-                                        height: 52
-
-                                        readonly property real scaleToBox:
-                                            Math.min(width / card.ratio.w, height / card.ratio.h)
-
-                                        Rectangle {
-                                            anchors.centerIn: parent
-                                            width: Math.max(12, card.ratio.w * swatchBox.scaleToBox)
-                                            height: Math.max(12, card.ratio.h * swatchBox.scaleToBox)
-                                            radius: Theme.radiusXs
-                                            color: Theme.appBackground
-                                            border.width: Theme.borderWidth
-                                            border.color: card.selected ? Theme.primary
-                                                                        : Theme.panelBorder
-
-                                            IconGlyph {
-                                                anchors.centerIn: parent
-                                                glyph: card.modelData.icon
-                                                iconSize: Theme.iconSizeMd
-                                                iconColor: card.selected ? Theme.primary
-                                                                         : Theme.mutedForeground
-                                            }
-                                        }
-                                    }
-
-                                    Column {
-                                        anchors.left: parent.left
-                                        anchors.right: parent.right
-                                        anchors.leftMargin: Theme.spacingSm
-                                        anchors.rightMargin: Theme.spacingSm
-                                        anchors.top: swatchBox.bottom
-                                        anchors.topMargin: Theme.spacingMd
-                                        spacing: 1
-
-                                        Text {
-                                            width: parent.width
-                                            text: card.modelData.label
-                                            color: card.selected ? Theme.panelSecondaryForeground
-                                                                 : Theme.panelForeground
-                                            font.family: Theme.fontFamily
-                                            font.pixelSize: Theme.fontSizeXs
-                                            font.weight: Font.Medium
-                                            horizontalAlignment: Text.AlignHCenter
-                                            elide: Text.ElideRight
-                                        }
-
-                                        Text {
-                                            width: parent.width
-                                            text: card.modelData.detail
-                                            color: Theme.mutedForeground
-                                            font.family: Theme.monoFontFamily
-                                            font.pixelSize: Theme.fontSizeTiny
-                                            horizontalAlignment: Text.AlignHCenter
-                                            elide: Text.ElideRight
-                                        }
-                                    }
-                                }
-
-                                onClicked: {
-                                    Haptics.select()
-                                    root.templateId = card.modelData.id
-                                }
+                            delegate: AndroidLayoutTemplateCard {
+                                selected: modelData.id === root.templateId
+                                customWidth: root.customWidth
+                                customHeight: root.customHeight
+                                onChosen: (templateId) => root.templateId = templateId
                             }
                         }
                     }
@@ -343,7 +226,7 @@ AndroidBottomSheet {
                     }
                 }
 
-                SectionLabel {
+                AndroidLayoutSectionLabel {
                     text: qsTr("Quality")
                     visible: !root.customSize
                 }
@@ -377,7 +260,7 @@ AndroidBottomSheet {
                     }
                 }
 
-                SectionLabel { text: qsTr("Frames per second") }
+                AndroidLayoutSectionLabel { text: qsTr("Frames per second") }
 
                 Flickable {
                     width: parent.width
@@ -435,51 +318,11 @@ AndroidBottomSheet {
                     width: parent.width - Theme.androidPagePadding * 2
                     spacing: Theme.spacingXl
 
-                    Rectangle {
+                    AndroidLayoutSummarySwatch {
                         id: aspectBox
-                        width: 72
-                        height: 72
-                        radius: Theme.radiusSm
-                        color: Theme.appBackground
-                        border.width: Theme.borderWidth
-                        border.color: Theme.panelBorder
-
-                        readonly property real scaleToBox:
-                            Math.min(width / Math.max(1, root.outWidth),
-                                     height / Math.max(1, root.outHeight))
-
-                        Rectangle {
-                            anchors.centerIn: parent
-                            width: Math.max(8, root.outWidth * aspectBox.scaleToBox)
-                            height: Math.max(8, root.outHeight * aspectBox.scaleToBox)
-                            radius: Theme.radiusXs
-                            color: Theme.panelAccent
-                            border.width: Theme.borderWidth
-                            border.color: Theme.primary
-
-                            // A morph between two aspect ratios, not an entrance.
-                            Behavior on width {
-                                NumberAnimation {
-                                    duration: Theme.durationBase
-                                    easing.type: Theme.easingInOut
-                                }
-                            }
-                            Behavior on height {
-                                NumberAnimation {
-                                    duration: Theme.durationBase
-                                    easing.type: Theme.easingInOut
-                                }
-                            }
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: root.aspectLabel
-                                color: Theme.panelForeground
-                                font.family: Theme.monoFontFamily
-                                font.pixelSize: Theme.fontSizeXs
-                                font.weight: Font.Medium
-                            }
-                        }
+                        outWidth: root.outWidth
+                        outHeight: root.outHeight
+                        aspectLabel: root.aspectLabel
                     }
 
                     Column {

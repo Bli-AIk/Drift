@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtMultimedia
 import Drift
-import ".."
-
 // CutWire's sound effects: category chips, then a row per sound with an inline preview, its
 // waveform and length. The Market field above filters by name. Sounds are downloaded into app
 // data on first use, then go onto the timeline ("use") or into the media bin ("keep").
@@ -223,133 +221,12 @@ Item {
         ScrollBar.vertical: AppScrollBar { }
         footer: Item { width: 1; height: Theme.spacing3xl }
 
-        delegate: Rectangle {
-            id: row
-            required property var modelData
-            readonly property bool isCurrent: player.soundId === modelData.id
-            readonly property bool isPlaying: isCurrent && player.playbackState === MediaPlayer.PlayingState
-            readonly property string installState: {
-                void Sfx.revision
-                return Sfx.state(modelData.id)
-            }
-            readonly property bool busy: installState === "installing"
-            readonly property var peaks: modelData.peaks || []
-            readonly property real progress: isCurrent && player.duration > 0
-                                             ? Math.min(1, player.position / player.duration) : 0
-
-            width: list.width
-            height: Theme.touchUi ? Theme.androidMinTouchTarget + Theme.spacingLg : Theme.controlHeight + Theme.spacingLg
-            radius: Theme.radiusSm
-            color: rowHover.hovered ? Theme.popoverHover : "transparent"
-
-            HoverHandler { id: rowHover }
-
-            IconButton {
-                id: playButton
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                glyph: row.isPlaying ? Theme.icons.pause : Theme.icons.play
-                enabled: !!row.modelData.preview_url
-                tooltip: row.isPlaying ? qsTr("Pause") : qsTr("Play preview")
-                onClicked: {
-                    if (row.isPlaying) {
-                        player.pause()
-                        return
-                    }
-                    if (!row.isCurrent) {
-                        player.soundId = row.modelData.id
-                        player.source = row.modelData.preview_url
-                    }
-                    player.play()
-                }
-            }
-
-            Column {
-                id: label
-                anchors.left: playButton.right
-                anchors.leftMargin: Theme.spacingMd
-                anchors.verticalCenter: parent.verticalCenter
-                width: root.compact ? parent.width - playButton.width - trailing.width - Theme.spacingMd * 2
-                                    : Math.min(200, (parent.width - playButton.width - trailing.width) * 0.4)
-                spacing: 2
-
-                Text {
-                    width: parent.width
-                    text: row.modelData.name || ""
-                    color: Theme.panelForeground
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeSm
-                    elide: Text.ElideRight
-                }
-                Text {
-                    width: parent.width
-                    text: root.formatDuration(row.modelData.duration)
-                    color: Theme.mutedForeground
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeXs
-                    elide: Text.ElideRight
-                }
-            }
-
-            // The sound's shape, filled up to the playback position while it plays.
-            Canvas {
-                id: wave
-                anchors.left: label.right
-                anchors.right: trailing.left
-                anchors.leftMargin: Theme.spacingLg
-                anchors.rightMargin: Theme.spacingLg
-                anchors.verticalCenter: parent.verticalCenter
-                height: parent.height * 0.5
-                visible: !root.compact && row.peaks.length > 0
-                onPaint: {
-                    const ctx = getContext("2d")
-                    ctx.reset()
-                    const n = row.peaks.length
-                    if (n === 0)
-                        return
-                    const step = width / n
-                    const bar = Math.max(1, step * 0.6)
-                    for (let i = 0; i < n; ++i) {
-                        const h = Math.max(2, row.peaks[i] * height)
-                        ctx.fillStyle = (i + 0.5) / n <= row.progress ? Theme.primary : Theme.mutedForeground
-                        ctx.fillRect(i * step, (height - h) / 2, bar, h)
-                    }
-                }
-                onWidthChanged: requestPaint()
-                Connections {
-                    target: row
-                    function onProgressChanged() { wave.requestPaint() }
-                    function onPeaksChanged() { wave.requestPaint() }
-                }
-            }
-
-            Row {
-                id: trailing
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingXs
-
-                CircularProgress {
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: row.busy
-                    indeterminate: true
-                    size: Theme.spacing2xl + Theme.spacingSm
-                }
-                IconButton {
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: !row.busy
-                    glyph: Theme.icons.folderInput
-                    tooltip: qsTr("Add to the media bin")
-                    onClicked: root.act(row.modelData, "keep")
-                }
-                IconButton {
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: !row.busy
-                    glyph: root.justAddedId === row.modelData.id ? Theme.icons.check : Theme.icons.plus
-                    tooltip: qsTr("Add to the timeline")
-                    onClicked: root.act(row.modelData, "use")
-                }
-            }
+        delegate: SfxSoundRow {
+            compact: root.compact
+            justAddedId: root.justAddedId
+            previewPlayer: player
+            onKeepRequested: (sound) => root.act(sound, "keep")
+            onUseRequested: (sound) => root.act(sound, "use")
         }
     }
 }

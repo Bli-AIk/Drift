@@ -1,6 +1,5 @@
 import QtQuick
 import Drift
-import ".."
 
 // The 2D / 3D switch: an icon pill that slides between the two. 2D shows the scene camera's
 // picture, which is what exports; 3D shows the world from a free viewpoint with the camera drawn
@@ -27,19 +26,10 @@ Rectangle {
     border.width: Theme.borderWidth
     border.color: Theme.panelBorder
 
-    Rectangle {
-        x: modeSwitch.inset + modeSwitch.current * modeSwitch.segmentWidth
-        y: modeSwitch.inset
-        width: modeSwitch.segmentWidth
-        height: parent.height - modeSwitch.inset * 2
-        radius: height / 2
-        color: Theme.panelSecondaryBg
-        border.width: Theme.borderWidth
-        border.color: Theme.panelSecondaryBorder
-
-        Behavior on x {
-            NumberAnimation { duration: Theme.durationBase; easing.type: Theme.easing }
-        }
+    PreviewModeSwitchPill {
+        inset: modeSwitch.inset
+        current: modeSwitch.current
+        segmentWidth: modeSwitch.segmentWidth
     }
 
     Row {
@@ -48,43 +38,10 @@ Rectangle {
 
         Repeater {
             model: modeSwitch.modes
-            delegate: Item {
-                id: segment
-                required property var modelData
-                required property int index
-                readonly property bool selected: index === modeSwitch.current
-                width: modeSwitch.segmentWidth
-                height: Theme.iconButtonSize
-
-                Accessible.role: Accessible.RadioButton
-                Accessible.name: modelData.label
-                Accessible.checked: selected
-
-                IconGlyph {
-                    anchors.centerIn: parent
-                    glyph: segment.modelData.glyph
-                    iconSize: Theme.iconSizeBase
-                    iconColor: segment.selected ? Theme.panelSecondaryForeground
-                                                : segmentArea.containsMouse ? Theme.panelForeground
-                                                                            : Theme.mutedForeground
-
-                    Behavior on iconColor {
-                        ColorAnimation { duration: Theme.durationBase; easing.type: Theme.easing }
-                    }
-                }
-
-                MouseArea {
-                    id: segmentArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: EditorState.preview.mode = segment.modelData.value
-                }
-
-                ThemedToolTip {
-                    text: segment.modelData.tip
-                    visible: segmentArea.containsMouse
-                }
+            delegate: PreviewModeSwitchSegment {
+                current: modeSwitch.current
+                segmentWidth: modeSwitch.segmentWidth
+                onChosen: (value) => EditorState.preview.mode = value
             }
         }
     }

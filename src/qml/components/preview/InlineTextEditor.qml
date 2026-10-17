@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import Drift
-import ".."
 
 // In-place editing of a text clip on the preview, where the compositor's render is the only
 // visible text: it draws the caret, the selection tint and the preedit underline itself. This
@@ -396,63 +395,14 @@ Item {
         }
     }
 
-    component Handle: Item {
-        id: handle
-
-        // "caret", "start" or "end": which way the teardrop's point faces.
-        property string kind: "caret"
-        property point tip
-
-        signal grabbed()
-        signal moved(point pos)
-
-        width: root.handleTouch
-        height: root.handleTouch
-        x: tip.x - width / 2
-        y: tip.y
-
-        Rectangle {
-            width: root.handleSize
-            height: root.handleSize
-            x: (handle.width - width) / 2
-            y: width * (Math.SQRT2 - 1) / 2 + 2
-            radius: width / 2
-            topLeftRadius: handle.kind === "start" ? radius : 0
-            topRightRadius: handle.kind === "start" ? 0 : radius
-            rotation: handle.kind === "start" ? -45 : 45
-            color: Theme.primary
-        }
-
-        DragHandler {
-            id: drag
-            target: null
-            property point grab: Qt.point(0, 0)
-
-            function scenePoint() {
-                return root.mapFromItem(null, centroid.scenePosition.x, centroid.scenePosition.y)
-            }
-
-            onActiveChanged: {
-                if (!active)
-                    return
-                const p = drag.scenePoint()
-                drag.grab = Qt.point(p.x - handle.tip.x, p.y - handle.tip.y)
-                handle.grabbed()
-            }
-            onCentroidChanged: {
-                if (!active)
-                    return
-                const p = drag.scenePoint()
-                // Hit-tested at the middle of the line the finger's tip points at.
-                handle.moved(Qt.point(p.x - drag.grab.x, p.y - drag.grab.y - root.caretHeight / 2))
-            }
-        }
-    }
-
-    Handle {
+    InlineTextSelectionHandle {
         id: caretHandle
         kind: "caret"
         tip: root.caretTip
+        touchExtent: root.handleTouch
+        knobSize: root.handleSize
+        caretHeight: root.caretHeight
+        space: root
         visible: root.active && root.touchMode && root.hasCaret && proxy.preeditText === ""
                  && !root.hasSelection
         onMoved: pos => root.moveCaret(root.hitAt(pos), false)
@@ -460,20 +410,28 @@ Item {
 
     property int _rangeAnchor: 0
 
-    Handle {
+    InlineTextSelectionHandle {
         id: startHandle
         kind: "start"
         tip: root.selectionStartTip
+        touchExtent: root.handleTouch
+        knobSize: root.handleSize
+        caretHeight: root.caretHeight
+        space: root
         visible: root.active && root.touchMode && root.hasSelection && proxy.preeditText === ""
         onGrabbed: root._rangeAnchor = Math.max(proxy.selectionStart, proxy.selectionEnd)
         onMoved: pos => proxy.select(root._rangeAnchor,
                                      Math.min(root.hitAt(pos), root._rangeAnchor - 1))
     }
 
-    Handle {
+    InlineTextSelectionHandle {
         id: endHandle
         kind: "end"
         tip: root.selectionEndTip
+        touchExtent: root.handleTouch
+        knobSize: root.handleSize
+        caretHeight: root.caretHeight
+        space: root
         visible: root.active && root.touchMode && root.hasSelection && proxy.preeditText === ""
         onGrabbed: root._rangeAnchor = Math.min(proxy.selectionStart, proxy.selectionEnd)
         onMoved: pos => proxy.select(root._rangeAnchor,

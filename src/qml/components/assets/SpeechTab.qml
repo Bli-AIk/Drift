@@ -3,8 +3,6 @@ import QtQuick.Controls.Basic
 import QtQuick.Window
 import QtMultimedia
 import Drift
-import ".."
-
 // Speech tab: local text-to-speech with optional voice cloning, placed at the playhead.
 Item {
     id: root

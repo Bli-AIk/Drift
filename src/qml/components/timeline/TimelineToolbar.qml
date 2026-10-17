@@ -1,7 +1,5 @@
 import QtQuick
-import QtQuick.Controls.Basic
 import Drift
-import ".."
 
 // Timeline toolbar: transport, user-arranged edit actions with a More menu, timeline
 // switcher (main / composites), snap/ripple toggles, zoom controls and the overview toggle. Zoom and the
@@ -202,6 +200,9 @@ Item {
         return false
     }
 
+
+    TimelineToolbarHairline { }
+
     Row {
         id: leftControls
         anchors.left: parent.left
@@ -214,127 +215,30 @@ Item {
         width: Math.max(0, toolbar.width - rightControls.width - Theme.spacingLg * 3)
         clip: true
 
-        IconButton {
+        TimelineToolbarToolButton {
             glyph: EditorState.playing ? Theme.icons.pause : Theme.icons.play
-            variant: "text"
             tooltip: EditorState.playing ? qsTr("Pause") : qsTr("Play")
             onClicked: EditorState.togglePlayback()
         }
 
-        Text {
-            text: toolbar.panel.formatTime(EditorState.playheadSeconds) + " / " + toolbar.panel.formatTime(EditorState.durationSeconds)
-            color: Theme.mutedForeground
-            font.family: Theme.monoFontFamily
-            font.pixelSize: Theme.fontSizeXs
-            anchors.verticalCenter: parent.verticalCenter
+        TimelineToolbarTimecode {
+            panel: toolbar.panel
         }
 
-        Rectangle {
-            width: Theme.borderWidth
-            height: Theme.spacing3xl
-            color: Theme.panelBorder
-            anchors.verticalCenter: parent.verticalCenter
-        }
+        TimelineToolbarSeparator { }
 
         Repeater {
             model: toolbar.layout.toolbar
-
-            delegate: Item {
-                id: slot
-                required property string modelData
-                required property int index
-                readonly property bool isSeparator: modelData === "separator"
-
-                visible: isSeparator
-                         ? toolbar.separatorNeeded(toolbar.layout.toolbar, index,
-                                                   toolbar.actionShownOnToolbar)
-                         : toolbar.actionShownOnToolbar(modelData)
-                width: isSeparator ? Theme.borderWidth : actionButton.width
-                height: isSeparator ? Theme.spacing3xl : actionButton.height
-                anchors.verticalCenter: parent ? parent.verticalCenter : undefined
-
-                Rectangle {
-                    visible: slot.isSeparator
-                    anchors.fill: parent
-                    color: Theme.panelBorder
-                }
-
-                IconButton {
-                    id: actionButton
-                    visible: !slot.isSeparator
-                    glyph: slot.isSeparator ? "" : toolbar.actionMeta[slot.modelData].glyph
-                    variant: "text"
-                    tooltip: slot.isSeparator ? "" : toolbar.actionTooltip(slot.modelData)
-                    active: toolbar.actionActive(slot.modelData)
-                    enabled: toolbar.actionEnabled(slot.modelData)
-                    onClicked: toolbar.triggerAction(slot.modelData)
-                }
+            delegate: TimelineToolbarActionSlot {
+                host: toolbar
             }
         }
 
-        IconButton {
+        TimelineToolbarOverflowButton {
             id: overflowButton
-            glyph: Theme.icons.ellipsis
-            variant: "text"
-            tooltip: qsTr("More edit actions")
-            active: overflowMenu.opened
-            onClicked: overflowMenu.opened ? overflowMenu.close()
-                                           : overflowMenu.popup(0, overflowButton.height)
-
-            ThemedContextMenu {
-                id: overflowMenu
-                implicitWidth: 260
-
-                // Rebuilt on each open from the current layout. A Menu cannot host a
-                // Repeater, and Instantiator cannot mix items with separators.
-                onAboutToShow: toolbar.rebuildOverflowMenu()
-
-                ThemedMenuSeparator { id: customizeSeparator }
-                ThemedMenuItem {
-                    text: qsTr("Customize toolbar…")
-                    icon.name: Theme.icons.sliders
-                    onTriggered: customizeDialog.open()
-                }
-            }
+            host: toolbar
+            onCustomizeRequested: customizeDialog.open()
         }
-    }
-
-    Component {
-        id: overflowItemComponent
-        ThemedMenuItem {
-            property string actionId
-            text: toolbar.actionMeta[actionId].shortcut
-                  ? toolbar.withShortcut(toolbar.actionMeta[actionId].label,
-                                         toolbar.actionMeta[actionId].shortcut)
-                  : toolbar.actionMeta[actionId].label
-            icon.name: toolbar.actionMeta[actionId].glyph
-            enabled: toolbar.actionEnabled(actionId)
-            onTriggered: toolbar.triggerAction(actionId)
-        }
-    }
-
-    Component {
-        id: overflowSeparatorComponent
-        ThemedMenuSeparator {}
-    }
-
-    function rebuildOverflowMenu() {
-        // Everything before the fixed "Customize" tail is generated.
-        while (overflowMenu.count > 2)
-            overflowMenu.removeItem(overflowMenu.itemAt(0))
-        const list = layout.menu
-        const always = () => true
-        var at = 0
-        for (var i = 0; i < list.length; i++) {
-            if (list[i] === "separator") {
-                if (separatorNeeded(list, i, always))
-                    overflowMenu.insertItem(at++, overflowSeparatorComponent.createObject(null))
-                continue
-            }
-            overflowMenu.insertItem(at++, overflowItemComponent.createObject(null,
-                                                                            { actionId: list[i] }))
-        }
-        customizeSeparator.visible = at > 0
     }
 
     TimelineToolbarCustomizeDialog {
@@ -342,132 +246,10 @@ Item {
         toolbar: toolbar
     }
 
-    Rectangle {
-        id: sceneBadge
-
-        // Sits between the two button groups, which are anchored to the
-        // toolbar edges and grow freely. Prefer dead centre, but slide
-        // aside to stay clear of them, and drop out entirely once the
-        // gap can no longer fit the badge.
-        // leftControls is stretched up to rightControls so it can clip, so its buttons
-        // end at implicitWidth, not width.
-        // Worked out left-to-right and flipped at the end: an explicit x is not
-        // mirrored along with the anchors that swap the two groups under RTL.
-        readonly property real gapStart: Theme.spacingLg
-                                         + Math.min(leftControls.implicitWidth, leftControls.width) + 12
-        readonly property real gapEnd: toolbar.width - Theme.spacingLg - rightControls.width - 12
-        readonly property real ltrX: Math.max(gapStart, Math.min((toolbar.width - width) / 2,
-                                                                  gapEnd - width))
-
-        x: Qt.application.layoutDirection === Qt.RightToLeft ? toolbar.width - ltrX - width : ltrX
-        anchors.verticalCenter: parent.verticalCenter
-        visible: gapEnd - gapStart >= width
-        width: sceneRow.implicitWidth + 20
-        height: 26
-        radius: Theme.radiusSm
-        color: "transparent"
-        border.width: 1
-        border.color: Qt.rgba(Theme.panelForeground.r, Theme.panelForeground.g, Theme.panelForeground.b, 0.1)
-
-        // The active timeline: "Main", or the open composite's name.
-        readonly property string activeName: {
-            const active = EditorState.activeSequenceId
-            if (active === "")
-                return qsTr("Main")
-            const tabs = EditorState.sequenceTabs
-            for (var i = 0; i < tabs.length; i++) {
-                if (tabs[i].id === active)
-                    return tabs[i].name
-            }
-            return qsTr("Composite")
-        }
-
-        Row {
-            id: sceneRow
-            anchors.centerIn: parent
-            spacing: 6
-
-            IconGlyph {
-                glyph: EditorState.activeSequenceId === "" ? Theme.icons.film : Theme.icons.layers
-                iconSize: 14
-                iconColor: Theme.mutedForeground
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            Text {
-                text: sceneBadge.activeName
-                color: Theme.panelForeground
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSizeSm
-                elide: Text.ElideRight
-                width: Math.min(implicitWidth, 180)
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            IconGlyph {
-                glyph: Theme.icons.chevronDown
-                iconSize: 12
-                iconColor: Theme.mutedForeground
-                anchors.verticalCenter: parent.verticalCenter
-            }
-        }
-
-        MouseArea {
-            id: sceneMouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: sceneMenu.opened ? sceneMenu.close() : sceneMenu.popup(0, sceneBadge.height + 4)
-        }
-
-        ThemedToolTip {
-            visible: sceneMouse.containsMouse && !sceneMenu.opened
-            text: qsTr("Switch between the main timeline and composite clips")
-        }
-
-        ThemedContextMenu {
-            id: sceneMenu
-            implicitWidth: 240
-
-            // Composites come and go with the project's assets, which have no notify of
-            // their own here, so the list is read fresh on each open.
-            onAboutToShow: toolbar.rebuildSceneMenu()
-        }
-    }
-
-    Component {
-        id: sceneItemComponent
-        ThemedMenuItem {
-            property string sequenceId
-            property string sequenceName
-            text: sequenceName
-            icon.name: EditorState.activeSequenceId === sequenceId
-                       ? Theme.icons.check
-                       : (sequenceId === "" ? Theme.icons.film : Theme.icons.layers)
-            onTriggered: EditorState.openSequence(sequenceId)
-        }
-    }
-
-    Component {
-        id: sceneEmptyComponent
-        ThemedMenuItem {
-            enabled: false
-            text: qsTr("No composite clips yet")
-            icon.name: Theme.icons.info
-        }
-    }
-
-    function rebuildSceneMenu() {
-        while (sceneMenu.count > 0)
-            sceneMenu.removeItem(sceneMenu.itemAt(0))
-        sceneMenu.addItem(sceneItemComponent.createObject(null,
-            { sequenceId: "", sequenceName: qsTr("Main") }))
-        sceneMenu.addItem(overflowSeparatorComponent.createObject(null))
-        const composites = EditorState.compositeSequences()
-        if (composites.length === 0)
-            sceneMenu.addItem(sceneEmptyComponent.createObject(null))
-        for (var i = 0; i < composites.length; i++) {
-            sceneMenu.addItem(sceneItemComponent.createObject(null,
-                { sequenceId: composites[i].id, sequenceName: composites[i].name }))
-        }
+    TimelineToolbarSceneBadge {
+        host: toolbar
+        leftGroup: leftControls
+        rightGroup: rightControls
     }
 
     Row {
@@ -477,116 +259,42 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.spacingSm
 
-        IconButton {
-            id: magnetButton
+        TimelineToolbarToolButton {
             glyph: Theme.icons.magnet
-            variant: "text"
             tooltip: qsTr("Toggle snapping")
             active: EditorState.snapEnabled
             onClicked: EditorState.snapEnabled = !EditorState.snapEnabled
         }
-        IconButton {
-            id: rippleButton
+        TimelineToolbarToolButton {
             glyph: Theme.icons.foldHorizontal
-            variant: "text"
             tooltip: qsTr("Close gaps when trimming")
             active: EditorState.rippleEnabled
             onClicked: EditorState.rippleEnabled = !EditorState.rippleEnabled
         }
-        IconButton {
-            id: overlapButton
+        TimelineToolbarToolButton {
             glyph: Theme.icons.option
-            variant: "text"
             tooltip: qsTr("Allow clip overlap")
             active: EditorState.allowClipOverlap
             onClicked: EditorState.allowClipOverlap = !EditorState.allowClipOverlap
         }
 
-        Rectangle {
-            width: Theme.borderWidth
-            height: Theme.spacing3xl
-            color: Theme.panelBorder
-            anchors.verticalCenter: parent.verticalCenter
+        TimelineToolbarSeparator { }
+
+        TimelineToolbarZoomControl {
+            host: toolbar
         }
 
-        IconButton {
-            glyph: Theme.icons.zoomOut
-            variant: "text"
-            tooltip: qsTr("Zoom out")
-            onClicked: toolbar.panel.setZoom(toolbar.panel.zoom / 1.5)
-        }
-        ThemedSlider {
-            id: zoomSlider
-            label: qsTr("Timeline zoom")
-            width: 112
-            anchors.verticalCenter: parent.verticalCenter
-            // Logarithmic mapping so the wide zoom range stays controllable.
-            from: 0
-            to: 1
-            value: Math.log(toolbar.panel.zoom / toolbar.panel.minZoom) / Math.log(toolbar.panel.maxZoom / toolbar.panel.minZoom)
-            onMoved: toolbar.panel.setZoom(
-                toolbar.panel.minZoom * Math.pow(toolbar.panel.maxZoom / toolbar.panel.minZoom, value))
-            // There was no zoom readout anywhere, so the current level
-            // was simply unknowable.
-            valueFormatter: function () {
-                return qsTr("Zoom %1×").arg(toolbar.panel.zoom.toFixed(2))
-            }
-        }
+        TimelineToolbarSeparator { }
 
-        // Numeric zoom level, and a click target to return to 1×.
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            width: 44
-            text: toolbar.panel.zoom.toFixed(2) + "×"
-            color: Theme.mutedForeground
-            font.family: Theme.monoFontFamily
-            font.pixelSize: Theme.fontSizeTick
-            horizontalAlignment: Text.AlignHCenter
-
-            ThemedToolTip {
-                text: qsTr("Zoom level — click to reset to 1×. Ctrl+wheel over the timeline also zooms.")
-                visible: zoomLabelMouse.containsMouse
-            }
-
-            MouseArea {
-                id: zoomLabelMouse
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: toolbar.panel.setZoom(1.0)
-            }
-        }
-        IconButton {
-            glyph: Theme.icons.zoomIn
-            variant: "text"
-            tooltip: qsTr("Zoom in")
-            onClicked: toolbar.panel.setZoom(toolbar.panel.zoom * 1.5)
-        }
-        IconButton {
-            glyph: Theme.icons.zoomFit
-            variant: "text"
-            tooltip: qsTr("Fit timeline in view")
-            onClicked: toolbar.panel.fitZoom()
-        }
-
-        Rectangle {
-            width: Theme.borderWidth
-            height: Theme.spacing3xl
-            color: Theme.panelBorder
-            anchors.verticalCenter: parent.verticalCenter
-        }
-
-        IconButton {
+        TimelineToolbarToolButton {
             glyph: Theme.icons.slidersVertical
-            variant: "text"
             tooltip: qsTr("Toggle audio mixer strip")
             active: EditorState.preferences.audioMixerVisible
             onClicked: EditorState.preferences.audioMixerVisible = !EditorState.preferences.audioMixerVisible
         }
 
-        IconButton {
+        TimelineToolbarToolButton {
             glyph: Theme.icons.panelTop
-            variant: "text"
             tooltip: qsTr("Timeline overview — a minimap of the whole project; click or drag it to jump the view")
             active: EditorState.preferences.timelineOverviewVisible
             onClicked: EditorState.preferences.timelineOverviewVisible = !EditorState.preferences.timelineOverviewVisible

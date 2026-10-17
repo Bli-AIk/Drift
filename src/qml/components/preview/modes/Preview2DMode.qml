@@ -1,8 +1,5 @@
 import QtQuick
 import Drift
-import "../.."
-import ".."
-
 // Navigating the camera output: wheel zoom about the cursor with Ctrl, middle-drag pan, and the
 // composition guides on the canvas. Takes only the middle button, so left-drags still reach the
 // clip handles; in crop mode CropOverlay has the same gestures and takes them first.

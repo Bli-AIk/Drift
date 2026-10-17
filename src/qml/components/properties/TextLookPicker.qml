@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // Text-effect selector for the Style page: shows the active look (Shadow, Neon, …) rendered on
 // the clip's own text, and opens a dialog with a roomy grid of every look to switch. Same
 // trigger shape as TextStylePackPicker so the two pickers read as siblings.
@@ -143,59 +141,12 @@ Item {
                     // Popup content exists while closed; building the tiles only while open keeps
                     // their preview renders from running on every edit behind a closed dialog.
                     model: dialog.visible ? root.looks : []
-                    delegate: Column {
-                        id: lookTile
-                        required property var modelData
-                        readonly property bool selected: root.lookId === modelData.id
-                        width: lookGrid.tileWidth
-                        spacing: 4
-
-                        Rectangle {
-                            width: parent.width
-                            height: Math.round(width * 0.56)
-                            radius: Theme.radiusSm
-                            color: Theme.textStylePreviewBg
-                            border.width: lookTile.selected ? Theme.borderWidthFocus : Theme.borderWidth
-                            border.color: lookTile.selected ? Theme.primary
-                                                            : (lookHover.hovered ? Theme.panelMuted : Theme.textStylePreviewBorder)
-                            clip: true
-
-                            Behavior on border.color {
-                                ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                            }
-
-                            Image {
-                                anchors.fill: parent
-                                anchors.margins: 2
-                                asynchronous: true
-                                cache: false
-                                fillMode: Image.PreserveAspectFit
-                                source: root.previewSource(lookTile.modelData.id)
-                                sourceSize.width: 300
-                                sourceSize.height: 168
-                            }
-
-                            HoverHandler { id: lookHover }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    Haptics.select()
-                                    root.lookPicked(lookTile.modelData.id)
-                                    dialog.close()
-                                }
-                            }
-                        }
-
-                        Text {
-                            width: parent.width
-                            text: lookTile.modelData.label
-                            elide: Text.ElideRight
-                            horizontalAlignment: Text.AlignHCenter
-                            color: lookTile.selected ? Theme.primary : Theme.panelForeground
-                            font.family: Theme.fontFamily
-                            font.pixelSize: Theme.fontSizeXs
+                    delegate: TextLookTile {
+                        tileWidth: lookGrid.tileWidth
+                        host: root
+                        onChosen: function(lookId) {
+                            root.lookPicked(lookId)
+                            dialog.close()
                         }
                     }
                 }

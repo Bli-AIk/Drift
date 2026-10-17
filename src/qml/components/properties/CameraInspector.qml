@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // The scene camera: one viewpoint the whole sequence is seen through. A camera clip has no pixels
 // of its own, so this is its entire inspector.
 //

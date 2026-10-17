@@ -1,7 +1,5 @@
 import QtQuick
 import Drift
-import ".."
-
 // Generic editor for a typed parameter list: one control per spec, picked by `type`.
 //
 // `specs` is the schema ([{id, label?, type, unit?, min?, max?, step?, default?, values?}]) and

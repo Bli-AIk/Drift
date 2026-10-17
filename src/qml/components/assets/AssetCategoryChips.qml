@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // Category filter row: favorites star, then horizontal category chips.
 // ⭐ | [Color] [Glitch] …
 Item {

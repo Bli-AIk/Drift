@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // Top of the Transform tab for a transform clip: what the layer covers, and the clips it is
 // moving right now.
 Column {

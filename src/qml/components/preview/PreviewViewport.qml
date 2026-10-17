@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Window
 import Drift
-import ".."
-
 // The canvas and the view onto it, shared by the desktop panel and the phone preview: aspect fit,
 // zoom and pan, the composited picture, and the interaction tools laid over it. Children declared
 // on an instance land on this item, which is where navigation input (mode views, pinch) belongs:

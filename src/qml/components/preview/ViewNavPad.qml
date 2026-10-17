@@ -1,7 +1,5 @@
 import QtQuick
 import Drift
-import ".."
-
 // Discrete steps for the free 3D view, under the axis widget. The four orbits and the two zooms
 // are Blender's numpad 4/6/8/2 and +/−. Holding a button keeps stepping.
 Rectangle {

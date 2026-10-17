@@ -1,7 +1,5 @@
 import QtQuick
 import Drift
-import ".."
-
 // Paint editor for a fill or stroke layer of a text or shape clip: solid colour, gradient, image
 // texture or a shader effect. Every write goes through setStyleLayer with a partial paint patch.
 Column {

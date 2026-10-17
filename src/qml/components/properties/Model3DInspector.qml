@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // 3D model clip inspector: which model or splat it is, which animation plays, and the lighting knobs. The
 // model is placed like any 3D layer, from the Transform tab.
 Item {

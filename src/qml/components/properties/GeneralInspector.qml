@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 Item {
     id: root
 

@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Window
 import Drift
-import ".."
-
 // Everything about one Drift Asset, and the place to set its colours before adding it, so a
 // brand colour is picked once rather than fixed clip by clip afterwards.
 Rectangle {

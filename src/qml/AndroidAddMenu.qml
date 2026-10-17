@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import "components"
-
 // What the bottom rail's [+] opens: the five things that put a new clip on the
 // timeline, which used to be five permanent rail slots each.
 //

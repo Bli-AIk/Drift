@@ -226,46 +226,6 @@
         <translation>再試行</translation>
     </message>
     <message>
-        <source>Technical details</source>
-        <translation>技術詳細</translation>
-    </message>
-    <message>
-        <source>%1 → %2</source>
-        <translation>%1 → %2</translation>
-    </message>
-    <message>
-        <source>%1… %2%</source>
-        <translation>%1… %2%</translation>
-    </message>
-    <message>
-        <source>Requires Drift %1 or newer</source>
-        <translation>Drift %1 以降が必要です</translation>
-    </message>
-    <message>
-        <source>Unofficial</source>
-        <translation>非公式</translation>
-    </message>
-    <message>
-        <source>Installed from file</source>
-        <translation>ファイルからインストール済み</translation>
-    </message>
-    <message>
-        <source>%1 download</source>
-        <translation>%1 ダウンロード</translation>
-    </message>
-    <message>
-        <source>%1 items</source>
-        <translation>%1 項目</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>キャンセル</translation>
-    </message>
-    <message>
-        <source>Update</source>
-        <translation>アップデート</translation>
-    </message>
-    <message>
         <source>Install</source>
         <translation>インストール</translation>
     </message>
@@ -285,9 +245,64 @@
         <source>Put addon folders here, then reopen Extras</source>
         <translation>ここにアドオンフォルダーを配置し、「エクストラ」を開き直してください</translation>
     </message>
+</context>
+<context>
+    <name>AddonManagerRow</name>
+    <message>
+        <source>Technical details</source>
+        <translation type="unfinished">技術詳細</translation>
+    </message>
+    <message>
+        <source>%1 → %2</source>
+        <translation type="unfinished">%1 → %2</translation>
+    </message>
+    <message>
+        <source>%1… %2%</source>
+        <translation type="unfinished">%1… %2%</translation>
+    </message>
+    <message>
+        <source>Requires Drift %1 or newer</source>
+        <translation type="unfinished">Drift %1 以降が必要です</translation>
+    </message>
+    <message>
+        <source>Unofficial</source>
+        <translation type="unfinished">非公式</translation>
+    </message>
+    <message>
+        <source>Installed from file</source>
+        <translation type="unfinished">ファイルからインストール済み</translation>
+    </message>
+    <message>
+        <source>%1 download</source>
+        <translation type="unfinished">%1 ダウンロード</translation>
+    </message>
+    <message>
+        <source>%1 items</source>
+        <translation type="unfinished">%1 項目</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">キャンセル</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation type="unfinished">アップデート</translation>
+    </message>
+    <message>
+        <source>Retry</source>
+        <translation type="unfinished">再試行</translation>
+    </message>
+    <message>
+        <source>Install</source>
+        <translation type="unfinished">インストール</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished">削除</translation>
+    </message>
     <message>
         <source>Delete this pack&apos;s downloaded data</source>
-        <translation>このパックのダウンロードデータを削除</translation>
+        <translation type="unfinished">このパックのダウンロードデータを削除</translation>
     </message>
 </context>
 <context>
@@ -309,20 +324,12 @@
         <translation>エフェクト、トランジション、オーディオに必須のパックをインストールします。これらがなくても Drift は使用できますが、インストールすると改善時のアップデートが利用可能になります。</translation>
     </message>
     <message>
-        <source>%1… %2%</source>
-        <translation>%1… %2%</translation>
-    </message>
-    <message>
         <source>Don&apos;t remind me of essential addons</source>
         <translation>必須アドオンの通知を表示しない</translation>
     </message>
     <message>
         <source>Updates are available for packs you already have installed.</source>
         <translation>インストール済みのパックにアップデートが利用可能です。</translation>
-    </message>
-    <message>
-        <source>%1 → %2</source>
-        <translation>%1 → %2</translation>
     </message>
     <message>
         <source>Don&apos;t remind me of future addon updates</source>
@@ -359,6 +366,17 @@
     <message>
         <source>Install all</source>
         <translation>すべてインストール</translation>
+    </message>
+</context>
+<context>
+    <name>AddonStartupPackRow</name>
+    <message>
+        <source>%1… %2%</source>
+        <translation type="unfinished">%1… %2%</translation>
+    </message>
+    <message>
+        <source>%1 → %2</source>
+        <translation type="unfinished">%1 → %2</translation>
     </message>
 </context>
 <context>
@@ -600,21 +618,6 @@
         <source>Tap a clip to edit it</source>
         <translation>クリップをタップして編集</translation>
     </message>
-    <message>
-        <source>Add to timeline</source>
-        <translation>タイムラインに追加</translation>
-    </message>
-</context>
-<context>
-    <name>AndroidBottomSheet</name>
-    <message>
-        <source>Sheet</source>
-        <translation>シート</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>閉じる</translation>
-    </message>
 </context>
 <context>
     <name>AndroidClipToolbar</name>
@@ -674,17 +677,34 @@
         <source>Move the playhead over the clip to split it</source>
         <translation>クリップを分割するには、再生ヘッドをクリップ上に移動してください</translation>
     </message>
+</context>
+<context>
+    <name>AndroidClipToolbarHint</name>
     <message>
         <source>Tap a clip to edit</source>
-        <translation>クリップをタップして編集</translation>
+        <translation type="unfinished">クリップをタップして編集</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidComposerTimingEdge</name>
+    <message>
+        <source>Back one frame</source>
+        <translation type="unfinished">1 フレーム戻る</translation>
+    </message>
+    <message>
+        <source>Forward one frame</source>
+        <translation type="unfinished">1 フレーム進む</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidCropHint</name>
+    <message>
+        <source>Drag the edges to reframe · pinch to zoom</source>
+        <translation type="unfinished">端をドラッグしてフレーミング · ピンチでズーム</translation>
     </message>
 </context>
 <context>
     <name>AndroidCropOverlay</name>
-    <message>
-        <source>Drag the edges to reframe · pinch to zoom</source>
-        <translation>端をドラッグしてフレーミング · ピンチでズーム</translation>
-    </message>
     <message>
         <source>Reset</source>
         <translation>リセット</translation>
@@ -699,6 +719,17 @@
     </message>
 </context>
 <context>
+    <name>AndroidDownloadJobRow</name>
+    <message>
+        <source>Cancel download</source>
+        <translation type="unfinished">ダウンロードをキャンセル</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation type="unfinished">再試行</translation>
+    </message>
+</context>
+<context>
     <name>AndroidDownloadsSheet</name>
     <message>
         <source>Downloads</source>
@@ -707,14 +738,6 @@
     <message>
         <source>Nothing downloading right now.</source>
         <translation>現在、ダウンロード中のものはありません。</translation>
-    </message>
-    <message>
-        <source>Cancel download</source>
-        <translation>ダウンロードをキャンセル</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <translation>再試行</translation>
     </message>
     <message>
         <source>Clear finished</source>
@@ -763,14 +786,6 @@
         <source>Done</source>
         <translation>完了</translation>
     </message>
-    <message>
-        <source>Cancel</source>
-        <translation>キャンセル</translation>
-    </message>
-    <message>
-        <source>Select all</source>
-        <translation>すべて選択</translation>
-    </message>
 </context>
 <context>
     <name>AndroidFadeSheet</name>
@@ -813,6 +828,32 @@
     <message>
         <source>Curve</source>
         <translation>カーブ</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidHomeRecentCard</name>
+    <message>
+        <source>Untitled</source>
+        <translation type="unfinished">無題</translation>
+    </message>
+    <message>
+        <source>That project file is missing.</source>
+        <translation type="unfinished">そのプロジェクトファイルが見つかりません。</translation>
+    </message>
+    <message>
+        <source>Project actions</source>
+        <translation type="unfinished">プロジェクトの操作</translation>
+    </message>
+    <message>
+        <source>Remove from recents</source>
+        <translation type="unfinished">最近使用した項目から削除</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidHomeWordmark</name>
+    <message>
+        <source>Create polished videos fast</source>
+        <translation type="unfinished">洗練されたビデオを素早く作成</translation>
     </message>
 </context>
 <context>
@@ -999,14 +1040,6 @@
 <context>
     <name>AndroidMediaPreview</name>
     <message>
-        <source>Back</source>
-        <translation>戻る</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>保存</translation>
-    </message>
-    <message>
         <source>Audio only — trim it below</source>
         <translation>オーディオのみ — 下でトリム</translation>
     </message>
@@ -1067,12 +1100,26 @@
         <translation>まだ変更はありません。上でトリムまたはクロップするか、戻ってこれをタイムラインにドラッグしてください。</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>キャンセル</translation>
-    </message>
-    <message>
         <source>Rotate</source>
         <translation>回転</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidMediaPreviewHeader</name>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished">戻る</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">保存</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidMediaSavingScrim</name>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">キャンセル</translation>
     </message>
 </context>
 <context>
@@ -1452,76 +1499,82 @@
 <context>
     <name>AndroidPreview</name>
     <message>
-        <source>Full</source>
-        <translation>フル</translation>
-    </message>
-    <message>
-        <source>Half</source>
-        <translation>半分</translation>
-    </message>
-    <message>
-        <source>Quarter</source>
-        <translation>4分の1</translation>
-    </message>
-    <message>
-        <source>Auto</source>
-        <translation>自動</translation>
-    </message>
-    <message>
-        <source>Quality: %1</source>
-        <translation>品質 : %1</translation>
-    </message>
-    <message>
-        <source>Guides</source>
-        <translation>ガイド</translation>
-    </message>
-    <message>
         <source>Seek</source>
         <translation>シーク</translation>
     </message>
+</context>
+<context>
+    <name>AndroidPreviewOptionsStrip</name>
+    <message>
+        <source>Full</source>
+        <translation type="unfinished">フル</translation>
+    </message>
+    <message>
+        <source>Half</source>
+        <translation type="unfinished">半分</translation>
+    </message>
+    <message>
+        <source>Quarter</source>
+        <translation type="unfinished">4分の1</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished">自動</translation>
+    </message>
+    <message>
+        <source>Quality: %1</source>
+        <translation type="unfinished">品質 : %1</translation>
+    </message>
+    <message>
+        <source>Guides</source>
+        <translation type="unfinished">ガイド</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidPreviewTransport</name>
     <message>
         <source>Back 1 second</source>
-        <translation>1秒 戻る</translation>
+        <translation type="unfinished">1秒 戻る</translation>
     </message>
     <message>
         <source>Previous frame</source>
-        <translation>前のフレーム</translation>
+        <translation type="unfinished">前のフレーム</translation>
     </message>
     <message>
         <source>Pause</source>
-        <translation>一時停止</translation>
+        <translation type="unfinished">一時停止</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation>再生</translation>
+        <translation type="unfinished">再生</translation>
     </message>
     <message>
         <source>Next frame</source>
-        <translation>次のフレーム</translation>
+        <translation type="unfinished">次のフレーム</translation>
     </message>
     <message>
         <source>Loop work area on — tap to turn off</source>
-        <translation>ワークエリアループオン — タップでオフ</translation>
+        <translation type="unfinished">ワークエリアループオン — タップでオフ</translation>
     </message>
     <message>
         <source>Loop work area off — tap to turn on</source>
-        <translation>ワークエリアループオフ — タップでオン</translation>
+        <translation type="unfinished">ワークエリアループオフ — タップでオン</translation>
     </message>
     <message>
         <source>Forward 1 second</source>
-        <translation>1秒 進む</translation>
+        <translation type="unfinished">1秒 進む</translation>
     </message>
     <message>
         <source>View and playback settings</source>
-        <translation>表示と再生設定</translation>
+        <translation type="unfinished">表示と再生設定</translation>
     </message>
     <message>
         <source>Exit fullscreen preview</source>
-        <translation>フルスクリーンプレビューを終了</translation>
+        <translation type="unfinished">フルスクリーンプレビューを終了</translation>
     </message>
     <message>
         <source>Fullscreen preview</source>
-        <translation>フルスクリーンプレビュー</translation>
+        <translation type="unfinished">フルスクリーンプレビュー</translation>
     </message>
 </context>
 <context>
@@ -1674,10 +1727,6 @@
         <translation>キャンバスを選択し、空から開始</translation>
     </message>
     <message>
-        <source>Create polished videos fast</source>
-        <translation>洗練されたビデオを素早く作成</translation>
-    </message>
-    <message>
         <source>Recent projects</source>
         <translation>最近のプロジェクト</translation>
     </message>
@@ -1693,21 +1742,12 @@
         <source>Nothing here yet — projects you save will show up in this list.</source>
         <translation>ここにはまだ何もありません — 保存したプロジェクトはこのリストに表示されます。</translation>
     </message>
+</context>
+<context>
+    <name>AndroidRailAddButton</name>
     <message>
-        <source>Untitled</source>
-        <translation>無題</translation>
-    </message>
-    <message>
-        <source>That project file is missing.</source>
-        <translation>そのプロジェクトファイルが見つかりません。</translation>
-    </message>
-    <message>
-        <source>Project actions</source>
-        <translation>プロジェクトの操作</translation>
-    </message>
-    <message>
-        <source>Remove from recents</source>
-        <translation>最近使用した項目から削除</translation>
+        <source>Add to timeline</source>
+        <translation type="unfinished">タイムラインに追加</translation>
     </message>
 </context>
 <context>
@@ -1731,6 +1771,17 @@
     <message>
         <source>Start a new project from this clip</source>
         <translation>このクリップから新しいプロジェクトを開始</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidSheetHeader</name>
+    <message>
+        <source>Sheet</source>
+        <translation type="unfinished">シート</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">閉じる</translation>
     </message>
 </context>
 <context>
@@ -1771,13 +1822,20 @@
         <source>Set end to current time</source>
         <translation>終了を現在の時間に設定</translation>
     </message>
+</context>
+<context>
+    <name>AndroidTextEditBar</name>
     <message>
-        <source>Back one frame</source>
-        <translation>1 フレーム戻る</translation>
+        <source>Cancel</source>
+        <translation type="unfinished">キャンセル</translation>
     </message>
     <message>
-        <source>Forward one frame</source>
-        <translation>1 フレーム進む</translation>
+        <source>Select all</source>
+        <translation type="unfinished">すべて選択</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">完了</translation>
     </message>
 </context>
 <context>
@@ -1859,28 +1917,6 @@
         <translation>変形レイヤー : ブラケットがカバーするすべてのトラックを移動、拡大縮小、回転します</translation>
     </message>
     <message>
-        <source>Keyframes</source>
-        <translation>キーフレーム</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n clip(s)</source>
-        <translation>
-            <numerusform>%n 個のクリップ</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation>すべて</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation>なし</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation>完了</translation>
-    </message>
-    <message>
         <source>Add new track</source>
         <translation>新しいトラックを追加</translation>
     </message>
@@ -1901,20 +1937,51 @@
         <translation>削除</translation>
     </message>
     <message>
-        <source>PAUSED </source>
-        <translation>一時停止 </translation>
-    </message>
-    <message>
-        <source>REC </source>
-        <translation>録音 </translation>
-    </message>
-    <message>
         <source>Close gap</source>
         <translation>ギャップを埋める</translation>
     </message>
+</context>
+<context>
+    <name>AndroidTimelineLaneBar</name>
+    <message>
+        <source>Keyframes</source>
+        <translation type="unfinished">キーフレーム</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n clip(s)</source>
+        <translation type="unfinished">
+            <numerusform>%n 個のクリップ</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">すべて</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">なし</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">完了</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidTimelineLiveRecording</name>
+    <message>
+        <source>PAUSED </source>
+        <translation type="unfinished">一時停止 </translation>
+    </message>
+    <message>
+        <source>REC </source>
+        <translation type="unfinished">録音 </translation>
+    </message>
+</context>
+<context>
+    <name>AndroidTimelineNewTrackGhost</name>
     <message>
         <source>New track</source>
-        <translation>新しいトラック</translation>
+        <translation type="unfinished">新しいトラック</translation>
     </message>
 </context>
 <context>
@@ -1922,14 +1989,6 @@
     <message>
         <source>Back</source>
         <translation>戻る</translation>
-    </message>
-    <message>
-        <source>Project actions</source>
-        <translation>プロジェクトの操作</translation>
-    </message>
-    <message>
-        <source>Untitled</source>
-        <translation>無題</translation>
     </message>
     <message>
         <source>Notifications</source>
@@ -1951,30 +2010,51 @@
         <source>Redo</source>
         <translation>やり直し</translation>
     </message>
+</context>
+<context>
+    <name>AndroidTopBarExportButton</name>
     <message>
         <source>Export</source>
-        <translation>エクスポート</translation>
+        <translation type="unfinished">エクスポート</translation>
     </message>
     <message>
         <source>Show export progress</source>
-        <translation>エクスポートの進行状況を表示する</translation>
+        <translation type="unfinished">エクスポートの進行状況を表示する</translation>
     </message>
 </context>
 <context>
-    <name>AndroidTransformOverlay</name>
+    <name>AndroidTopBarTitleButton</name>
+    <message>
+        <source>Project actions</source>
+        <translation type="unfinished">プロジェクトの操作</translation>
+    </message>
+    <message>
+        <source>Untitled</source>
+        <translation type="unfinished">無題</translation>
+    </message>
+</context>
+<context>
+    <name>AndroidTransformLayerChip</name>
     <message numerus="yes">
         <source>%1 · %n clip(s)</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>%1 · %n 個のクリップ</numerusform>
         </translation>
     </message>
     <message>
         <source>Transform</source>
-        <translation>変形</translation>
+        <translation type="unfinished">変形</translation>
     </message>
+</context>
+<context>
+    <name>AndroidTransformParentFrame</name>
     <message>
         <source>Select %1</source>
-        <translation>%1 を選択</translation>
+        <translation type="unfinished">%1 を選択</translation>
+    </message>
+    <message>
+        <source>Transform</source>
+        <translation type="unfinished">変形</translation>
     </message>
 </context>
 <context>
@@ -4461,46 +4541,6 @@
         <translation>ショートカット</translation>
     </message>
     <message>
-        <source>Drop to import</source>
-        <translation>ドロップしてインポート</translation>
-    </message>
-    <message>
-        <source>Video, audio and image files</source>
-        <translation>ビデオ、オーディオ、画像ファイル</translation>
-    </message>
-    <message>
-        <source>Importing…</source>
-        <translation>インポート中…</translation>
-    </message>
-    <message>
-        <source>Reading media and generating thumbnails.</source>
-        <translation>メディアを読み込み、サムネイルを生成中。</translation>
-    </message>
-    <message>
-        <source>More import options</source>
-        <translation>その他のインポートオプション</translation>
-    </message>
-    <message>
-        <source>Import Files…</source>
-        <translation>インポート ファイル…</translation>
-    </message>
-    <message>
-        <source>Import Folder…</source>
-        <translation>インポート フォルダー…</translation>
-    </message>
-    <message>
-        <source>Collect Media to Folder…</source>
-        <translation>フォルダーにメディアを収集…</translation>
-    </message>
-    <message>
-        <source>Import</source>
-        <translation>インポート</translation>
-    </message>
-    <message>
-        <source>Import video, audio or image files</source>
-        <translation>ビデオ、オーディオ、画像ファイルをインポート</translation>
-    </message>
-    <message>
         <source>New folder</source>
         <translation>新しいフォルダー</translation>
     </message>
@@ -4520,14 +4560,6 @@
         <source>Move to folder</source>
         <translation>フォルダーに移動</translation>
     </message>
-    <message>
-        <source>New Folder</source>
-        <translation>新しいフォルダー</translation>
-    </message>
-    <message>
-        <source>Create a new folder here</source>
-        <translation>ここに新しいフォルダーを作成</translation>
-    </message>
     <message numerus="yes">
         <source>%n items</source>
         <translation>
@@ -4543,6 +4575,69 @@
         <translation>
             <numerusform>%n 個の項目を削除しました。</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>AssetsPanelDropOverlay</name>
+    <message>
+        <source>Drop to import</source>
+        <translation type="unfinished">ドロップしてインポート</translation>
+    </message>
+    <message>
+        <source>Video, audio and image files</source>
+        <translation type="unfinished">ビデオ、オーディオ、画像ファイル</translation>
+    </message>
+</context>
+<context>
+    <name>AssetsPanelHeader</name>
+    <message>
+        <source>New Folder</source>
+        <translation type="unfinished">新しいフォルダー</translation>
+    </message>
+    <message>
+        <source>Create a new folder here</source>
+        <translation type="unfinished">ここに新しいフォルダーを作成</translation>
+    </message>
+</context>
+<context>
+    <name>AssetsPanelImportMenu</name>
+    <message>
+        <source>Import Files…</source>
+        <translation type="unfinished">インポート ファイル…</translation>
+    </message>
+    <message>
+        <source>Import Folder…</source>
+        <translation type="unfinished">インポート フォルダー…</translation>
+    </message>
+    <message>
+        <source>Collect Media to Folder…</source>
+        <translation type="unfinished">フォルダーにメディアを収集…</translation>
+    </message>
+</context>
+<context>
+    <name>AssetsPanelImportOverlay</name>
+    <message>
+        <source>Importing…</source>
+        <translation type="unfinished">インポート中…</translation>
+    </message>
+    <message>
+        <source>Reading media and generating thumbnails.</source>
+        <translation type="unfinished">メディアを読み込み、サムネイルを生成中。</translation>
+    </message>
+</context>
+<context>
+    <name>AssetsPanelImportSplit</name>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished">インポート</translation>
+    </message>
+    <message>
+        <source>Import video, audio or image files</source>
+        <translation type="unfinished">ビデオ、オーディオ、画像ファイルをインポート</translation>
+    </message>
+    <message>
+        <source>More import options</source>
+        <translation type="unfinished">その他のインポートオプション</translation>
     </message>
 </context>
 <context>
@@ -4599,26 +4694,6 @@
         <source>Import</source>
         <translation>インポート</translation>
     </message>
-    <message>
-        <source>%1 — click to apply to the selection, or drag onto a clip</source>
-        <translation>%1 — クリックで選択範囲に適用、またはクリップにドラッグ</translation>
-    </message>
-    <message>
-        <source>%1 — drag onto a clip in the timeline</source>
-        <translation>%1 — タイムライン上のクリップにドラッグ</translation>
-    </message>
-    <message>
-        <source>Apply to selected clip</source>
-        <translation>選択クリップに適用</translation>
-    </message>
-    <message>
-        <source>Remove from favorites</source>
-        <translation>お気に入りから削除</translation>
-    </message>
-    <message>
-        <source>Add to favorites</source>
-        <translation>お気に入りに追加</translation>
-    </message>
 </context>
 <context>
     <name>AudioEffectCatalog</name>
@@ -4641,6 +4716,60 @@
     <message>
         <source>Other</source>
         <translation>その他</translation>
+    </message>
+</context>
+<context>
+    <name>AudioEffectHeader</name>
+    <message>
+        <source>%1 (not installed)</source>
+        <translation type="unfinished">%1 (インストールされていません)</translation>
+    </message>
+    <message>
+        <source>Move audio effect up</source>
+        <translation type="unfinished">オーディオエフェクトを上に移動</translation>
+    </message>
+    <message>
+        <source>Move audio effect down</source>
+        <translation type="unfinished">オーディオエフェクトを下に移動</translation>
+    </message>
+    <message>
+        <source>Disable audio effect</source>
+        <translation type="unfinished">オーディオエフェクトを無効化</translation>
+    </message>
+    <message>
+        <source>Enable audio effect</source>
+        <translation type="unfinished">オーディオエフェクトを有効化</translation>
+    </message>
+    <message>
+        <source>Copy this audio effect</source>
+        <translation type="unfinished">このオーディオエフェクトをコピー</translation>
+    </message>
+    <message>
+        <source>Remove audio effect</source>
+        <translation type="unfinished">オーディオエフェクトを削除</translation>
+    </message>
+</context>
+<context>
+    <name>AudioEffectPresetCard</name>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished">%1 — クリックで選択範囲に適用、またはクリップにドラッグ</translation>
+    </message>
+    <message>
+        <source>%1 — drag onto a clip in the timeline</source>
+        <translation type="unfinished">%1 — タイムライン上のクリップにドラッグ</translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">選択クリップに適用</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">お気に入りから削除</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">お気に入りに追加</translation>
     </message>
 </context>
 <context>
@@ -4680,34 +4809,6 @@
     <message>
         <source>Auto keyframes</source>
         <translation>自動キーフレーム</translation>
-    </message>
-    <message>
-        <source>%1 (not installed)</source>
-        <translation>%1 (インストールされていません)</translation>
-    </message>
-    <message>
-        <source>Move audio effect up</source>
-        <translation>オーディオエフェクトを上に移動</translation>
-    </message>
-    <message>
-        <source>Move audio effect down</source>
-        <translation>オーディオエフェクトを下に移動</translation>
-    </message>
-    <message>
-        <source>Disable audio effect</source>
-        <translation>オーディオエフェクトを無効化</translation>
-    </message>
-    <message>
-        <source>Enable audio effect</source>
-        <translation>オーディオエフェクトを有効化</translation>
-    </message>
-    <message>
-        <source>Copy this audio effect</source>
-        <translation>このオーディオエフェクトをコピー</translation>
-    </message>
-    <message>
-        <source>Remove audio effect</source>
-        <translation>オーディオエフェクトを削除</translation>
     </message>
 </context>
 <context>
@@ -4844,66 +4945,6 @@
         <translation>デフォルトマイク</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>ミュート解除</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>ミュート</translation>
-    </message>
-    <message>
-        <source>Unsolo</source>
-        <translation>ソロ解除</translation>
-    </message>
-    <message>
-        <source>Solo</source>
-        <translation>ソロ</translation>
-    </message>
-    <message>
-        <source>Recording paused — click to finish</source>
-        <translation>録音一時停止中 — クリックして完了</translation>
-    </message>
-    <message>
-        <source>Recording — click to finish</source>
-        <translation>録音中 — クリックして完了</translation>
-    </message>
-    <message>
-        <source>Record voiceover on %1</source>
-        <translation>%1 にボイスオーバーを録音</translation>
-    </message>
-    <message>
-        <source>Pan %1 — drag to adjust, double-click to center</source>
-        <translation>パン %1 — ドラッグで調整、ダブルクリックで中央に戻す</translation>
-    </message>
-    <message>
-        <source>Mic gain %1 dB (%2%) — scroll to adjust, double-click for 0 dB</source>
-        <translation>マイクゲイン %1 dB (%2%) — スクロールで調整、ダブルクリックで 0 dB</translation>
-    </message>
-    <message>
-        <source>%1 dB — scroll to adjust, double-click for 0 dB</source>
-        <translation>%1 dB — スクロールで調整、ダブルクリックで 0 dB</translation>
-    </message>
-    <message>
-        <source>Master volume</source>
-        <translation>マスター音量</translation>
-    </message>
-    <message>
-        <source>%1 volume</source>
-        <translation>%1 の音量</translation>
-    </message>
-    <message>
-        <source>Mic gain %1 dB</source>
-        <translation>マイクゲイン %1 dB</translation>
-    </message>
-    <message>
-        <source>Volume %1 dB</source>
-        <translation>音量 %1 dB</translation>
-    </message>
-    <message>
-        <source> — Shift-drag for fine, double-click for 0 dB</source>
-        <translation> — Shift+ドラッグで微調整、ダブルクリックで 0 dB</translation>
-    </message>
-    <message>
         <source>Add audio track</source>
         <translation>オーディオトラックを追加</translation>
     </message>
@@ -4916,10 +4957,6 @@
         <translation>マスター</translation>
     </message>
     <message>
-        <source>Unmute master</source>
-        <translation>マスターのミュートを解除</translation>
-    </message>
-    <message>
         <source>C</source>
         <translation>C</translation>
     </message>
@@ -4930,14 +4967,6 @@
     <message>
         <source>R%1</source>
         <translation>R%1</translation>
-    </message>
-    <message>
-        <source> (recording)</source>
-        <translation> (録音中)</translation>
-    </message>
-    <message>
-        <source>Mute master</source>
-        <translation>マスターをミュート</translation>
     </message>
 </context>
 <context>
@@ -5141,6 +5170,13 @@
     </message>
 </context>
 <context>
+    <name>ColorSwatchButton</name>
+    <message>
+        <source>Choose colour</source>
+        <translation type="unfinished">色を選択</translation>
+    </message>
+</context>
+<context>
     <name>ColorSwatchField</name>
     <message>
         <source>Choose colour</source>
@@ -5157,18 +5193,6 @@
 </context>
 <context>
     <name>CropOverlay</name>
-    <message>
-        <source>Drag the edges to reframe</source>
-        <translation>端をドラッグしてフレーミングを調整</translation>
-    </message>
-    <message>
-        <source>Ctrl + scroll to zoom</source>
-        <translation>Ctrl + スクロールでズーム</translation>
-    </message>
-    <message>
-        <source>Middle-drag to pan</source>
-        <translation>中ボタンドラッグでパン</translation>
-    </message>
     <message>
         <source>Fit view</source>
         <translation>ビューに合わせる</translation>
@@ -5188,6 +5212,21 @@
     <message>
         <source>Apply</source>
         <translation>適用</translation>
+    </message>
+</context>
+<context>
+    <name>CropOverlayHint</name>
+    <message>
+        <source>Drag the edges to reframe</source>
+        <translation type="unfinished">端をドラッグしてフレーミングを調整</translation>
+    </message>
+    <message>
+        <source>Ctrl + scroll to zoom</source>
+        <translation type="unfinished">Ctrl + スクロールでズーム</translation>
+    </message>
+    <message>
+        <source>Middle-drag to pan</source>
+        <translation type="unfinished">中ボタンドラッグでパン</translation>
     </message>
 </context>
 <context>
@@ -5240,42 +5279,6 @@
         <translation>再生</translation>
     </message>
     <message>
-        <source>Video decoders</source>
-        <translation>ビデオデコーダ</translation>
-    </message>
-    <message>
-        <source>Codec Name</source>
-        <translation>コーデック名</translation>
-    </message>
-    <message>
-        <source>Software Decoding</source>
-        <translation>ソフトウェアデコード</translation>
-    </message>
-    <message>
-        <source>Hardware Decoding</source>
-        <translation>ハードウェアデコード</translation>
-    </message>
-    <message>
-        <source>Video encoders</source>
-        <translation>ビデオエンコーダ</translation>
-    </message>
-    <message>
-        <source>Software Encoding</source>
-        <translation>ソフトウェアエンコード</translation>
-    </message>
-    <message>
-        <source>Hardware Encoding</source>
-        <translation>ハードウェアエンコード</translation>
-    </message>
-    <message>
-        <source>Software: %1</source>
-        <translation>ソフトウェア : %1</translation>
-    </message>
-    <message>
-        <source>Hardware: %1</source>
-        <translation>ハードウェア : %1</translation>
-    </message>
-    <message>
         <source>Supported</source>
         <translation>サポートあり</translation>
     </message>
@@ -5284,100 +5287,8 @@
         <translation>サポートなし</translation>
     </message>
     <message>
-        <source>Checks</source>
-        <translation>チェック</translation>
-    </message>
-    <message>
-        <source>Open Add-ons</source>
-        <translation>アドオンを開く</translation>
-    </message>
-    <message>
         <source>System</source>
         <translation>システム</translation>
-    </message>
-    <message>
-        <source>Delivered well above displayed means frames are being produced that the display never shows — a cadence problem rather than a slow machine.</source>
-        <translation>配信レートが表示レートを大きく上回っている場合、ディスプレイに一度も表示されないフレームが生成されていることになります — 処理が遅いのではなく、フレームの送出間隔（ケイデンス）の問題です。</translation>
-    </message>
-    <message>
-        <source>Show live stats on the preview</source>
-        <translation>プレビューにライブ統計を表示する</translation>
-    </message>
-    <message>
-        <source>Stays on after this dialog closes, so you can watch the numbers while the timeline plays.</source>
-        <translation>このダイアログを閉じても表示されたままになるため、タイムラインの再生中に数値を確認できます。</translation>
-    </message>
-    <message>
-        <source>Where the time goes</source>
-        <translation>処理時間の内訳</translation>
-    </message>
-    <message>
-        <source>Decodes a fixed 1080p60 clip, and the first clip on the timeline, through each stage of the preview. Takes a few seconds.</source>
-        <translation>固定の 1080p60 クリップと、タイムライン上の最初のクリップを、プレビューの各段階でデコードします。数秒かかります。</translation>
-    </message>
-    <message>
-        <source>Measuring…</source>
-        <translation>測定中…</translation>
-    </message>
-    <message>
-        <source>Run test</source>
-        <translation>テストを実行</translation>
-    </message>
-    <message>
-        <source>Reference clip (1080p60)</source>
-        <translation>リファレンスクリップ (1080p60)</translation>
-    </message>
-    <message>
-        <source>Timeline clip</source>
-        <translation>タイムラインクリップ</translation>
-    </message>
-    <message>
-        <source>Source</source>
-        <translation>ソース</translation>
-    </message>
-    <message>
-        <source>Decoder</source>
-        <translation>デコーダー</translation>
-    </message>
-    <message>
-        <source> (hardware)</source>
-        <translation> (ハードウェア)</translation>
-    </message>
-    <message>
-        <source> (software)</source>
-        <translation> (ソフトウェア)</translation>
-    </message>
-    <message>
-        <source>Preview upload</source>
-        <translation>プレビューアップロード</translation>
-    </message>
-    <message>
-        <source>Decode</source>
-        <translation>デコード</translation>
-    </message>
-    <message>
-        <source>Readback to CPU costs</source>
-        <translation>CPU への読み戻しコスト</translation>
-    </message>
-    <message>
-        <source>Compositing costs</source>
-        <translation>コンポジットコスト</translation>
-    </message>
-    <message>
-        <source>Total per frame</source>
-        <translation>1フレームあたりの合計</translation>
-    </message>
-    <message>
-        <source>Budget at this frame rate</source>
-        <translation>このフレームレートにおける許容時間</translation>
-    </message>
-    <message>
-        <source>Findings</source>
-        <translation>検出結果</translation>
-    </message>
-    <message>
-        <source>Nothing stood out. Turn on the live stats above, play the timeline for a few seconds, then reopen this.</source>
-        <translation>特に目立った点はありませんでした。上のライブ統計をオンにしてタイムラインを数秒再生し、これを再度開いてください。</translation>
     </message>
     <message>
         <source>Need help? Copy the report above when you file an issue.</source>
@@ -5394,6 +5305,148 @@
     <message>
         <source>Questions and support on Discord</source>
         <translation>Discord での質問とサポート</translation>
+    </message>
+</context>
+<context>
+    <name>DebugInfoPlaybackTab</name>
+    <message>
+        <source>Playback</source>
+        <translation type="unfinished">再生</translation>
+    </message>
+    <message>
+        <source>Delivered well above displayed means frames are being produced that the display never shows — a cadence problem rather than a slow machine.</source>
+        <translation type="unfinished">配信レートが表示レートを大きく上回っている場合、ディスプレイに一度も表示されないフレームが生成されていることになります — 処理が遅いのではなく、フレームの送出間隔（ケイデンス）の問題です。</translation>
+    </message>
+    <message>
+        <source>Show live stats on the preview</source>
+        <translation type="unfinished">プレビューにライブ統計を表示する</translation>
+    </message>
+    <message>
+        <source>Stays on after this dialog closes, so you can watch the numbers while the timeline plays.</source>
+        <translation type="unfinished">このダイアログを閉じても表示されたままになるため、タイムラインの再生中に数値を確認できます。</translation>
+    </message>
+    <message>
+        <source>Where the time goes</source>
+        <translation type="unfinished">処理時間の内訳</translation>
+    </message>
+    <message>
+        <source>Decodes a fixed 1080p60 clip, and the first clip on the timeline, through each stage of the preview. Takes a few seconds.</source>
+        <translation type="unfinished">固定の 1080p60 クリップと、タイムライン上の最初のクリップを、プレビューの各段階でデコードします。数秒かかります。</translation>
+    </message>
+    <message>
+        <source>Measuring…</source>
+        <translation type="unfinished">測定中…</translation>
+    </message>
+    <message>
+        <source>Run test</source>
+        <translation type="unfinished">テストを実行</translation>
+    </message>
+    <message>
+        <source>Reference clip (1080p60)</source>
+        <translation type="unfinished">リファレンスクリップ (1080p60)</translation>
+    </message>
+    <message>
+        <source>Timeline clip</source>
+        <translation type="unfinished">タイムラインクリップ</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation type="unfinished">ソース</translation>
+    </message>
+    <message>
+        <source>Decoder</source>
+        <translation type="unfinished">デコーダー</translation>
+    </message>
+    <message>
+        <source> (hardware)</source>
+        <translation type="unfinished"> (ハードウェア)</translation>
+    </message>
+    <message>
+        <source> (software)</source>
+        <translation type="unfinished"> (ソフトウェア)</translation>
+    </message>
+    <message>
+        <source>Preview upload</source>
+        <translation type="unfinished">プレビューアップロード</translation>
+    </message>
+    <message>
+        <source>Decode</source>
+        <translation type="unfinished">デコード</translation>
+    </message>
+    <message>
+        <source>Readback to CPU costs</source>
+        <translation type="unfinished">CPU への読み戻しコスト</translation>
+    </message>
+    <message>
+        <source>Compositing costs</source>
+        <translation type="unfinished">コンポジットコスト</translation>
+    </message>
+    <message>
+        <source>Total per frame</source>
+        <translation type="unfinished">1フレームあたりの合計</translation>
+    </message>
+    <message>
+        <source>Budget at this frame rate</source>
+        <translation type="unfinished">このフレームレートにおける許容時間</translation>
+    </message>
+    <message>
+        <source>Findings</source>
+        <translation type="unfinished">検出結果</translation>
+    </message>
+    <message>
+        <source>Nothing stood out. Turn on the live stats above, play the timeline for a few seconds, then reopen this.</source>
+        <translation type="unfinished">特に目立った点はありませんでした。上のライブ統計をオンにしてタイムラインを数秒再生し、これを再度開いてください。</translation>
+    </message>
+</context>
+<context>
+    <name>DebugInfoSystemTab</name>
+    <message>
+        <source>Video decoders</source>
+        <translation type="unfinished">ビデオデコーダ</translation>
+    </message>
+    <message>
+        <source>Codec Name</source>
+        <translation type="unfinished">コーデック名</translation>
+    </message>
+    <message>
+        <source>Software Decoding</source>
+        <translation type="unfinished">ソフトウェアデコード</translation>
+    </message>
+    <message>
+        <source>Hardware Decoding</source>
+        <translation type="unfinished">ハードウェアデコード</translation>
+    </message>
+    <message>
+        <source>Video encoders</source>
+        <translation type="unfinished">ビデオエンコーダ</translation>
+    </message>
+    <message>
+        <source>Software Encoding</source>
+        <translation type="unfinished">ソフトウェアエンコード</translation>
+    </message>
+    <message>
+        <source>Hardware Encoding</source>
+        <translation type="unfinished">ハードウェアエンコード</translation>
+    </message>
+    <message>
+        <source>Software: %1</source>
+        <translation type="unfinished">ソフトウェア : %1</translation>
+    </message>
+    <message>
+        <source>Hardware: %1</source>
+        <translation type="unfinished">ハードウェア : %1</translation>
+    </message>
+    <message>
+        <source>Checks</source>
+        <translation type="unfinished">チェック</translation>
+    </message>
+    <message>
+        <source>Open Add-ons</source>
+        <translation type="unfinished">アドオンを開く</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished">システム</translation>
     </message>
 </context>
 <context>
@@ -5484,6 +5537,13 @@
     </message>
 </context>
 <context>
+    <name>DenoiseWaveformLane</name>
+    <message>
+        <source>· playing</source>
+        <translation type="unfinished">· 再生中</translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWindow</name>
     <message>
         <source>Remove noise</source>
@@ -5500,10 +5560,6 @@
     <message>
         <source>Noise removed</source>
         <translation>ノイズを除去しました</translation>
-    </message>
-    <message>
-        <source>· playing</source>
-        <translation>· 再生中</translation>
     </message>
     <message>
         <source>Stop</source>
@@ -5562,37 +5618,46 @@
     </message>
 </context>
 <context>
-    <name>DepthEffectOverlay</name>
+    <name>DepthEffectAimRing</name>
     <message>
         <source>Aim light</source>
-        <translation>ライトを向ける</translation>
-    </message>
-    <message>
-        <source>Move light</source>
-        <translation>ライトを移動</translation>
-    </message>
-    <message>
-        <source>Focus</source>
-        <translation>フォーカス</translation>
-    </message>
-    <message>
-        <source>Pick focus</source>
-        <translation>フォーカスを選択</translation>
-    </message>
-    <message>
-        <source>Move focus</source>
-        <translation>フォーカスを移動</translation>
+        <translation type="unfinished">ライトを向ける</translation>
     </message>
 </context>
 <context>
-    <name>DepthLight3dOverlay</name>
+    <name>DepthEffectFocusReticle</name>
     <message>
-        <source>Aim light</source>
-        <translation>ライトを向ける</translation>
+        <source>Focus</source>
+        <translation type="unfinished">フォーカス</translation>
     </message>
     <message>
+        <source>Pick focus</source>
+        <translation type="unfinished">フォーカスを選択</translation>
+    </message>
+    <message>
+        <source>Move focus</source>
+        <translation type="unfinished">フォーカスを移動</translation>
+    </message>
+</context>
+<context>
+    <name>DepthEffectLightKnob</name>
+    <message>
         <source>Move light</source>
-        <translation>ライトを移動</translation>
+        <translation type="unfinished">ライトを移動</translation>
+    </message>
+</context>
+<context>
+    <name>DepthLight3dAimRing</name>
+    <message>
+        <source>Aim light</source>
+        <translation type="unfinished">ライトを向ける</translation>
+    </message>
+</context>
+<context>
+    <name>DepthLight3dKnob</name>
+    <message>
+        <source>Move light</source>
+        <translation type="unfinished">ライトを移動</translation>
     </message>
 </context>
 <context>
@@ -5651,6 +5716,17 @@
     </message>
 </context>
 <context>
+    <name>DownloadsJobRow</name>
+    <message>
+        <source>Try again</source>
+        <translation type="unfinished">再試行</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">キャンセル</translation>
+    </message>
+</context>
+<context>
     <name>DownloadsWindow</name>
     <message>
         <source>Downloads</source>
@@ -5681,14 +5757,6 @@
     <message>
         <source>Downloads from the Market tab show up here while they run.</source>
         <translation>「マーケット」タブからダウンロードしたものは、実行中にここに表示されます。</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <translation>再試行</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -5954,26 +6022,6 @@
         <translation>無題のプロジェクト</translation>
     </message>
     <message>
-        <source>Projects</source>
-        <translation>プロジェクト</translation>
-    </message>
-    <message>
-        <source>All changes saved</source>
-        <translation>すべての変更を保存しました</translation>
-    </message>
-    <message>
-        <source>Unsaved changes</source>
-        <translation>未保存の変更があります</translation>
-    </message>
-    <message>
-        <source>Projects — click to switch or start new</source>
-        <translation>プロジェクト — クリックして切り替えまたは新規作成</translation>
-    </message>
-    <message>
-        <source>Unsaved changes — click to switch or start new</source>
-        <translation>未保存の変更あり — クリックして切り替えまたは新規作成</translation>
-    </message>
-    <message>
         <source>Save</source>
         <translation>保存</translation>
     </message>
@@ -5986,70 +6034,12 @@
         <translation>プロジェクトを保存</translation>
     </message>
     <message>
-        <source>Search  %1</source>
-        <translation>検索  %1</translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <translation>検索</translation>
-    </message>
-    <message numerus="yes">
-        <source>Downloads — %n running</source>
-        <translation>
-            <numerusform>ダウンロード — %n 個実行中</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Downloads</source>
-        <translation>ダウンロード</translation>
-    </message>
-    <message>
         <source>Video</source>
         <translation>ビデオ</translation>
     </message>
     <message>
         <source>Video size and layout</source>
         <translation>ビデオサイズとレイアウト</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>設定</translation>
-    </message>
-    <message>
-        <source>Workspace, theme, language and more</source>
-        <translation>ワークスペース、テーマ、言語など</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation>ライト</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation>ダーク</translation>
-    </message>
-    <message>
-        <source>Language…</source>
-        <translation>言語…</translation>
-    </message>
-    <message>
-        <source>Switch to mobile layout…</source>
-        <translation>モバイルレイアウトに切り替え…</translation>
-    </message>
-    <message>
-        <source>Debug info…</source>
-        <translation>デバッグ情報…</translation>
-    </message>
-    <message>
-        <source>More settings…</source>
-        <translation>詳細設定…</translation>
-    </message>
-    <message>
-        <source>Notifications — Drift %1 is available</source>
-        <translation>通知 — Drift %1 が利用可能です</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>通知</translation>
     </message>
     <message>
         <source>Agent</source>
@@ -6060,56 +6050,178 @@
         <translation>エージェントアクセスがオン</translation>
     </message>
     <message>
-        <source>Recommended packs and updates</source>
-        <translation>推奨パックとアップデート</translation>
-    </message>
-    <message>
-        <source>Extras</source>
-        <translation>拡張機能</translation>
-    </message>
-    <message>
         <source>Agent access</source>
         <translation>エージェントアクセス</translation>
     </message>
-    <message>
-        <source>Export in progress (%1%) — click to view</source>
-        <translation>エクスポート実行中 (%1%) — クリックして表示</translation>
+</context>
+<context>
+    <name>EditorHeaderDownloadsButton</name>
+    <message numerus="yes">
+        <source>Downloads — %n running</source>
+        <translation type="unfinished">
+            <numerusform>ダウンロード — %n 個実行中</numerusform>
+        </translation>
     </message>
     <message>
+        <source>Downloads</source>
+        <translation type="unfinished">ダウンロード</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderExportBadge</name>
+    <message>
+        <source>Export in progress (%1%) — click to view</source>
+        <translation type="unfinished">エクスポート実行中 (%1%) — クリックして表示</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderExportButton</name>
+    <message>
         <source>Export video</source>
-        <translation>ビデオをエクスポート</translation>
+        <translation type="unfinished">ビデオをエクスポート</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation>エクスポート</translation>
+        <translation type="unfinished">エクスポート</translation>
     </message>
     <message>
         <source>Export already in progress</source>
-        <translation>エクスポートは既に実行中です</translation>
+        <translation type="unfinished">エクスポートは既に実行中です</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderExtrasButton</name>
+    <message>
+        <source>Extras</source>
+        <translation type="unfinished">拡張機能</translation>
     </message>
     <message>
-        <source>Multicam</source>
-        <translation>マルチカム</translation>
+        <source>Recommended packs and updates</source>
+        <translation type="unfinished">推奨パックとアップデート</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderNotificationsButton</name>
+    <message>
+        <source>Notifications — Drift %1 is available</source>
+        <translation type="unfinished">通知 — Drift %1 が利用可能です</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished">通知</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderProjectsButton</name>
+    <message>
+        <source>Projects</source>
+        <translation type="unfinished">プロジェクト</translation>
+    </message>
+    <message>
+        <source>All changes saved</source>
+        <translation type="unfinished">すべての変更を保存しました</translation>
+    </message>
+    <message>
+        <source>Unsaved changes</source>
+        <translation type="unfinished">未保存の変更があります</translation>
+    </message>
+    <message>
+        <source>Projects — click to switch or start new</source>
+        <translation type="unfinished">プロジェクト — クリックして切り替えまたは新規作成</translation>
+    </message>
+    <message>
+        <source>Unsaved changes — click to switch or start new</source>
+        <translation type="unfinished">未保存の変更あり — クリックして切り替えまたは新規作成</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderSearchField</name>
+    <message>
+        <source>Search  %1</source>
+        <translation type="unfinished">検索  %1</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished">検索</translation>
+    </message>
+    <message>
+        <source>Export video</source>
+        <translation type="unfinished">ビデオをエクスポート</translation>
+    </message>
+    <message>
+        <source>Downloads</source>
+        <translation type="unfinished">ダウンロード</translation>
+    </message>
+    <message>
+        <source>Language…</source>
+        <translation type="unfinished">言語…</translation>
+    </message>
+    <message>
+        <source>Video size and layout</source>
+        <translation type="unfinished">ビデオサイズとレイアウト</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished">モバイルレイアウトに切り替え…</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderSettingsButton</name>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished">設定</translation>
+    </message>
+    <message>
+        <source>Workspace, theme, language and more</source>
+        <translation type="unfinished">ワークスペース、テーマ、言語など</translation>
     </message>
     <message>
         <source>Workspace</source>
-        <translation>ワークスペース</translation>
+        <translation type="unfinished">ワークスペース</translation>
     </message>
     <message>
         <source>Auto (follow canvas)</source>
-        <translation>自動 (キャンバスに追従)</translation>
+        <translation type="unfinished">自動 (キャンバスに追従)</translation>
     </message>
     <message>
         <source>Landscape</source>
-        <translation>横向き</translation>
+        <translation type="unfinished">横向き</translation>
     </message>
     <message>
         <source>Portrait</source>
-        <translation>縦向き</translation>
+        <translation type="unfinished">縦向き</translation>
     </message>
     <message>
         <source>Theme</source>
-        <translation>テーマ</translation>
+        <translation type="unfinished">テーマ</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation type="unfinished">ライト</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation type="unfinished">ダーク</translation>
+    </message>
+    <message>
+        <source>Language…</source>
+        <translation type="unfinished">言語…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished">モバイルレイアウトに切り替え…</translation>
+    </message>
+    <message>
+        <source>Multicam</source>
+        <translation type="unfinished">マルチカム</translation>
+    </message>
+    <message>
+        <source>Debug info…</source>
+        <translation type="unfinished">デバッグ情報…</translation>
+    </message>
+    <message>
+        <source>More settings…</source>
+        <translation type="unfinished">詳細設定…</translation>
     </message>
 </context>
 <context>
@@ -6173,34 +6285,6 @@
     <message>
         <source>Import a .driftfx file made in Drift Forge to add your own.</source>
         <translation>Drift Forge で作成した .driftfx ファイルをインポートして、独自のものを追加してください。</translation>
-    </message>
-    <message>
-        <source>%1 — click to apply to the selection, or drag onto a clip</source>
-        <translation>%1 — クリックで選択範囲に適用、またはクリップにドラッグ</translation>
-    </message>
-    <message>
-        <source>%1 — click to add as an adjustment layer, or drag onto a clip</source>
-        <translation>%1 — クリックで調整レイヤーとして追加、またはクリップにドラッグ</translation>
-    </message>
-    <message>
-        <source>Apply to selected clip</source>
-        <translation>選択クリップに適用</translation>
-    </message>
-    <message>
-        <source>Remove from favorites</source>
-        <translation>お気に入りから削除</translation>
-    </message>
-    <message>
-        <source>Add to favorites</source>
-        <translation>お気に入りに追加</translation>
-    </message>
-    <message>
-        <source>Delete from My Effects</source>
-        <translation>マイエフェクトから削除</translation>
-    </message>
-    <message>
-        <source>Built-in</source>
-        <translation>組み込み</translation>
     </message>
     <message>
         <source>Delete effect</source>
@@ -6273,6 +6357,60 @@
     </message>
 </context>
 <context>
+    <name>EffectPresetCard</name>
+    <message>
+        <source>%1 — click to apply to the selection, or drag onto a clip</source>
+        <translation type="unfinished">%1 — クリックで選択範囲に適用、またはクリップにドラッグ</translation>
+    </message>
+    <message>
+        <source>%1 — click to add as an adjustment layer, or drag onto a clip</source>
+        <translation type="unfinished">%1 — クリックで調整レイヤーとして追加、またはクリップにドラッグ</translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">選択クリップに適用</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">お気に入りから削除</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">お気に入りに追加</translation>
+    </message>
+    <message>
+        <source>Delete from My Effects</source>
+        <translation type="unfinished">マイエフェクトから削除</translation>
+    </message>
+    <message>
+        <source>Built-in</source>
+        <translation type="unfinished">組み込み</translation>
+    </message>
+</context>
+<context>
+    <name>EffectStackCard</name>
+    <message>
+        <source>+%1 more</source>
+        <translation type="unfinished">+%1 個</translation>
+    </message>
+    <message>
+        <source>Preset options</source>
+        <translation type="unfinished">プリセットオプション</translation>
+    </message>
+    <message>
+        <source>Rename…</source>
+        <translation type="unfinished">名前の変更…</translation>
+    </message>
+    <message>
+        <source>Export…</source>
+        <translation type="unfinished">エクスポート…</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">削除</translation>
+    </message>
+</context>
+<context>
     <name>EffectStacksSection</name>
     <message>
         <source>Drift effect stack (*.drifteffects)</source>
@@ -6297,22 +6435,6 @@
     <message>
         <source>Import</source>
         <translation>インポート</translation>
-    </message>
-    <message>
-        <source>+%1 more</source>
-        <translation>+%1 個</translation>
-    </message>
-    <message>
-        <source>Preset options</source>
-        <translation>プリセットオプション</translation>
-    </message>
-    <message>
-        <source>Rename…</source>
-        <translation>名前の変更…</translation>
-    </message>
-    <message>
-        <source>Export…</source>
-        <translation>エクスポート…</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -6369,29 +6491,32 @@
         <source>Nothing in this category.</source>
         <translation>このカテゴリには何もありません。</translation>
     </message>
+</context>
+<context>
+    <name>EffectTemplateCard</name>
     <message>
         <source>%1 — click to apply music-synced effects to the selection</source>
-        <translation>%1 — クリックで選択範囲に音楽同期エフェクトを適用</translation>
+        <translation type="unfinished">%1 — クリックで選択範囲に音楽同期エフェクトを適用</translation>
     </message>
     <message>
         <source>%1 — select a clip, then click to apply</source>
-        <translation>%1 — クリップを選択してからクリックで適用</translation>
-    </message>
-    <message>
-        <source>Remove from favorites</source>
-        <translation>お気に入りから削除</translation>
-    </message>
-    <message>
-        <source>Add to favorites</source>
-        <translation>お気に入りに追加</translation>
-    </message>
-    <message>
-        <source>Needs cutout</source>
-        <translation>切り抜きが必要</translation>
+        <translation type="unfinished">%1 — クリップを選択してからクリックで適用</translation>
     </message>
     <message>
         <source>Apply to selected clip</source>
-        <translation>選択クリップに適用</translation>
+        <translation type="unfinished">選択クリップに適用</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">お気に入りから削除</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">お気に入りに追加</translation>
+    </message>
+    <message>
+        <source>Needs cutout</source>
+        <translation type="unfinished">切り抜きが必要</translation>
     </message>
 </context>
 <context>
@@ -6438,95 +6563,224 @@
     </message>
 </context>
 <context>
-    <name>EffectsInspector</name>
-    <message>
-        <source>Face tracking</source>
-        <translation>顔トラッキング</translation>
-    </message>
-    <message>
-        <source>This clip was scanned before makeup was supported. Re-detect faces to enable the Beauty effects.</source>
-        <translation>このクリップはメイクアップがサポートされる前にスキャンされました。ビューティーエフェクトを有効にするには、顔を再検出してください。</translation>
-    </message>
-    <message>
-        <source>Re-detect faces</source>
-        <translation>顔を再検出</translation>
-    </message>
-    <message>
-        <source>These effects follow a face, so the clip has to be scanned before they do anything.</source>
-        <translation>これらのエフェクトは顔に追従するため、実際に機能させるには、あらかじめクリップをスキャンしておく必要があります。</translation>
-    </message>
-    <message>
-        <source>Download depth estimation (about 160 MB)</source>
-        <translation>深度推定をダウンロード (約 160 MB)</translation>
-    </message>
-    <message>
-        <source>Face effects follow one clip&apos;s faces. Add this to a clip rather than to an adjustment layer.</source>
-        <translation>「顔エフェクト」は、特定のクリップ内の顔を追跡します。このエフェクトは、調整レイヤーではなくクリップに適用してください。</translation>
-    </message>
-    <message>
-        <source>Scan for faces…</source>
-        <translation>顔をスキャン中…</translation>
-    </message>
-    <message>
-        <source>Clear face track</source>
-        <translation>顔トラックをクリア</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>キャンセル</translation>
-    </message>
-    <message>
-        <source>Download face detection (about 5 MB)</source>
-        <translation>顔検出をダウンロード (約 5 MB)</translation>
-    </message>
-    <message>
-        <source>Install AI engine first</source>
-        <translation>まず AI エンジンをインストール</translation>
-    </message>
-    <message>
-        <source>Depth</source>
-        <translation>深さ</translation>
-    </message>
-    <message>
-        <source>Depth effects follow one clip&apos;s depth. Add this to a clip rather than to an adjustment layer.</source>
-        <translation>深度エフェクトは1つのクリップの深度を追従します。調整レイヤーではなくクリップに追加してください。</translation>
-    </message>
-    <message>
-        <source>These effects need the clip&apos;s depth, so it has to be estimated first. It runs in the background and takes roughly half a second per frame.</source>
-        <translation>これらのエフェクトにはクリップの深度が必要なため、最初に推定を行う必要があります。バックグラウンドで実行され、1フレームあたり約0.5秒かかります。</translation>
-    </message>
-    <message>
-        <source>High quality</source>
-        <translation>高品質</translation>
-    </message>
-    <message>
-        <source>Sharper depth edges, about twice as slow</source>
-        <translation>深度のエッジがよりシャープになりますが、約2倍の時間がかかります</translation>
-    </message>
-    <message>
-        <source>Re-estimate depth</source>
-        <translation>深度を再推定</translation>
-    </message>
-    <message>
-        <source>Estimate depth</source>
-        <translation>深度を推定</translation>
-    </message>
-    <message>
-        <source>Clear depth</source>
-        <translation>深度をクリア</translation>
-    </message>
-    <message>
-        <source>This clip was scanned before the face mesh was supported. Re-detect faces to enable 3D Face Mesh and Face Retouch.</source>
-        <translation>このクリップはフェイスメッシュがサポートされる前にスキャンされました。3D フェイスメッシュと顔のレタッチを有効にするには、顔を再検出してください。</translation>
-    </message>
+    <name>EffectsAutoKeyHint</name>
     <message>
         <source>Move to a time, set a value, then click the diamond to add a keyframe. With Auto keyframes on, dragging a slider also creates them.</source>
-        <translation>時間を移動し、値を設定して、ダイヤモンドをクリックしてキーフレームを追加します。自動キーフレームがオンの場合、スライダーをドラッグしてもキーフレームが作成されます。</translation>
+        <translation type="unfinished">時間を移動し、値を設定して、ダイヤモンドをクリックしてキーフレームを追加します。自動キーフレームがオンの場合、スライダーをドラッグしてもキーフレームが作成されます。</translation>
     </message>
     <message>
         <source>Auto keyframes</source>
-        <translation>自動キーフレーム</translation>
+        <translation type="unfinished">自動キーフレーム</translation>
     </message>
+</context>
+<context>
+    <name>EffectsBoolParam</name>
+    <message>
+        <source>On</source>
+        <translation type="unfinished">オン</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished">オフ</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsClipParam</name>
+    <message>
+        <source>Automatic (clip beneath)</source>
+        <translation type="unfinished">自動 (下にあるクリップ)</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsColorParam</name>
+    <message>
+        <source>Choose %1</source>
+        <translation type="unfinished">%1 を選択</translation>
+    </message>
+    <message>
+        <source>%1 opacity</source>
+        <translation type="unfinished">%1 の不透明度</translation>
+    </message>
+    <message>
+        <source>Edit %1</source>
+        <translation type="unfinished">%1 を編集</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsDepthPanel</name>
+    <message>
+        <source>High quality</source>
+        <translation type="unfinished">高品質</translation>
+    </message>
+    <message>
+        <source>Sharper depth edges, about twice as slow</source>
+        <translation type="unfinished">深度のエッジがよりシャープになりますが、約2倍の時間がかかります</translation>
+    </message>
+    <message>
+        <source>Re-estimate depth</source>
+        <translation type="unfinished">深度を再推定</translation>
+    </message>
+    <message>
+        <source>Estimate depth</source>
+        <translation type="unfinished">深度を推定</translation>
+    </message>
+    <message>
+        <source>Clear depth</source>
+        <translation type="unfinished">深度をクリア</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">キャンセル</translation>
+    </message>
+    <message>
+        <source>Download depth estimation (about 160 MB)</source>
+        <translation type="unfinished">深度推定をダウンロード (約 160 MB)</translation>
+    </message>
+    <message>
+        <source>Install AI engine first</source>
+        <translation type="unfinished">まず AI エンジンをインストール</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsDepthSection</name>
+    <message>
+        <source>Depth</source>
+        <translation type="unfinished">深さ</translation>
+    </message>
+    <message>
+        <source>Depth effects follow one clip&apos;s depth. Add this to a clip rather than to an adjustment layer.</source>
+        <translation type="unfinished">深度エフェクトは1つのクリップの深度を追従します。調整レイヤーではなくクリップに追加してください。</translation>
+    </message>
+    <message>
+        <source>These effects need the clip&apos;s depth, so it has to be estimated first. It runs in the background and takes roughly half a second per frame.</source>
+        <translation type="unfinished">これらのエフェクトにはクリップの深度が必要なため、最初に推定を行う必要があります。バックグラウンドで実行され、1フレームあたり約0.5秒かかります。</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsEffectHeader</name>
+    <message>
+        <source>Copy this effect</source>
+        <translation type="unfinished">このエフェクトをコピー</translation>
+    </message>
+    <message>
+        <source>Save as preset…</source>
+        <translation type="unfinished">プリセットとして保存…</translation>
+    </message>
+    <message>
+        <source>%1 (not installed)</source>
+        <translation type="unfinished">%1 (インストールされていません)</translation>
+    </message>
+    <message>
+        <source>Move effect up</source>
+        <translation type="unfinished">エフェクトを上に移動</translation>
+    </message>
+    <message>
+        <source>Move effect down</source>
+        <translation type="unfinished">エフェクトを下に移動</translation>
+    </message>
+    <message>
+        <source>Disable effect</source>
+        <translation type="unfinished">エフェクトを無効化</translation>
+    </message>
+    <message>
+        <source>Enable effect</source>
+        <translation type="unfinished">エフェクトを有効化</translation>
+    </message>
+    <message>
+        <source>Remove effect</source>
+        <translation type="unfinished">エフェクトを削除</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsFaceIndexParam</name>
+    <message>
+        <source>Face %1</source>
+        <translation type="unfinished">顔 %1</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsFaceSection</name>
+    <message>
+        <source>Face tracking</source>
+        <translation type="unfinished">顔トラッキング</translation>
+    </message>
+    <message>
+        <source>Face effects follow one clip&apos;s faces. Add this to a clip rather than to an adjustment layer.</source>
+        <translation type="unfinished">「顔エフェクト」は、特定のクリップ内の顔を追跡します。このエフェクトは、調整レイヤーではなくクリップに適用してください。</translation>
+    </message>
+    <message>
+        <source>These effects follow a face, so the clip has to be scanned before they do anything.</source>
+        <translation type="unfinished">これらのエフェクトは顔に追従するため、実際に機能させるには、あらかじめクリップをスキャンしておく必要があります。</translation>
+    </message>
+    <message>
+        <source>This clip was scanned before makeup was supported. Re-detect faces to enable the Beauty effects.</source>
+        <translation type="unfinished">このクリップはメイクアップがサポートされる前にスキャンされました。ビューティーエフェクトを有効にするには、顔を再検出してください。</translation>
+    </message>
+    <message>
+        <source>This clip was scanned before the face mesh was supported. Re-detect faces to enable 3D Face Mesh and Face Retouch.</source>
+        <translation type="unfinished">このクリップはフェイスメッシュがサポートされる前にスキャンされました。3D フェイスメッシュと顔のレタッチを有効にするには、顔を再検出してください。</translation>
+    </message>
+    <message>
+        <source>Re-detect faces</source>
+        <translation type="unfinished">顔を再検出</translation>
+    </message>
+    <message>
+        <source>Scan for faces…</source>
+        <translation type="unfinished">顔をスキャン中…</translation>
+    </message>
+    <message>
+        <source>Clear face track</source>
+        <translation type="unfinished">顔トラックをクリア</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">キャンセル</translation>
+    </message>
+    <message>
+        <source>Download face detection (about 5 MB)</source>
+        <translation type="unfinished">顔検出をダウンロード (約 5 MB)</translation>
+    </message>
+    <message>
+        <source>Install AI engine first</source>
+        <translation type="unfinished">まず AI エンジンをインストール</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsFileParam</name>
+    <message>
+        <source>: (none)</source>
+        <translation type="unfinished">: (なし)</translation>
+    </message>
+    <message>
+        <source>Choose file</source>
+        <translation type="unfinished">ファイルを選択</translation>
+    </message>
+    <message>
+        <source>Choose %1</source>
+        <translation type="unfinished">%1 を選択</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished">クリア</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsHueParam</name>
+    <message>
+        <source>Pick %1</source>
+        <translation type="unfinished">選択 %1</translation>
+    </message>
+    <message>
+        <source>Choose %1</source>
+        <translation type="unfinished">%1 を選択</translation>
+    </message>
+    <message>
+        <source>Edit %1</source>
+        <translation type="unfinished">%1 を編集</translation>
+    </message>
+</context>
+<context>
+    <name>EffectsInspector</name>
     <message>
         <source>No effects yet</source>
         <translation>エフェクトはまだありません</translation>
@@ -6539,101 +6793,35 @@
         <source>Browse effects</source>
         <translation>エフェクトを参照</translation>
     </message>
-    <message>
-        <source>Copy this effect</source>
-        <translation>このエフェクトをコピー</translation>
-    </message>
-    <message>
-        <source>Save as preset…</source>
-        <translation>プリセットとして保存…</translation>
-    </message>
-    <message>
-        <source>%1 (not installed)</source>
-        <translation>%1 (インストールされていません)</translation>
-    </message>
-    <message>
-        <source>Move effect up</source>
-        <translation>エフェクトを上に移動</translation>
-    </message>
-    <message>
-        <source>Move effect down</source>
-        <translation>エフェクトを下に移動</translation>
-    </message>
-    <message>
-        <source>Disable effect</source>
-        <translation>エフェクトを無効化</translation>
-    </message>
-    <message>
-        <source>Enable effect</source>
-        <translation>エフェクトを有効化</translation>
-    </message>
-    <message>
-        <source>Remove effect</source>
-        <translation>エフェクトを削除</translation>
-    </message>
-    <message>
-        <source>On</source>
-        <translation>オン</translation>
-    </message>
-    <message>
-        <source>Off</source>
-        <translation>オフ</translation>
-    </message>
-    <message>
-        <source>Choose %1</source>
-        <translation>%1 を選択</translation>
-    </message>
-    <message>
-        <source>%1 opacity</source>
-        <translation>%1 の不透明度</translation>
-    </message>
-    <message>
-        <source>Automatic (clip beneath)</source>
-        <translation>自動 (下にあるクリップ)</translation>
-    </message>
-    <message>
-        <source>: (none)</source>
-        <translation>: (なし)</translation>
-    </message>
-    <message>
-        <source>Choose file</source>
-        <translation>ファイルを選択</translation>
-    </message>
-    <message>
-        <source>Clear</source>
-        <translation>クリア</translation>
-    </message>
-    <message>
-        <source>Pick %1</source>
-        <translation>選択 %1</translation>
-    </message>
-    <message>
-        <source>Edit %1</source>
-        <translation>%1 を編集</translation>
-    </message>
-    <message>
-        <source>Face %1</source>
-        <translation>顔 %1</translation>
-    </message>
+</context>
+<context>
+    <name>EffectsOccludeSection</name>
     <message>
         <source>Anything in “%1” nearer than Distance passes in front of this layer.</source>
-        <translation>“%1” 内で Distance より手前にあるものは、このレイヤーの手前を通過します。</translation>
+        <translation type="unfinished">“%1” 内で Distance より手前にあるものは、このレイヤーの手前を通過します。</translation>
     </message>
     <message>
         <source>Anything in “%1” (the clip beneath at the playhead) nearer than Distance passes in front of this layer.</source>
-        <translation>“%1” (再生ヘッド位置の直下のクリップ) 内で Distance より手前にあるものは、このレイヤーの手前を通過します。</translation>
+        <translation type="unfinished">“%1” (再生ヘッド位置の直下のクリップ) 内で Distance より手前にあるものは、このレイヤーの手前を通過します。</translation>
     </message>
     <message>
         <source>Place this layer above a video or image clip. It goes behind whatever in that clip is nearer than Distance.</source>
-        <translation>このレイヤーをビデオまたは画像クリップの上に配置してください。そのクリップ内で Distance より手前にあるものの背面に配置されます。</translation>
+        <translation type="unfinished">このレイヤーをビデオまたは画像クリップの上に配置してください。そのクリップ内で Distance より手前にあるものの背面に配置されます。</translation>
     </message>
     <message>
         <source>“%1” needs its depth estimated before anything in it can pass in front. It runs in the background and takes roughly half a second per frame.</source>
-        <translation>“%1” の中のものが手前を通過できるようにするには、事前に深度を推定する必要があります。バックグラウンドで実行され、1フレームあたり約0.5秒かかります。</translation>
+        <translation type="unfinished">“%1” の中のものが手前を通過できるようにするには、事前に深度を推定する必要があります。バックグラウンドで実行され、1フレームあたり約0.5秒かかります。</translation>
     </message>
+</context>
+<context>
+    <name>EffectsStackActions</name>
     <message>
         <source>Paste effects</source>
-        <translation>エフェクトを貼り付け</translation>
+        <translation type="unfinished">エフェクトを貼り付け</translation>
+    </message>
+    <message>
+        <source>Save as preset…</source>
+        <translation type="unfinished">プリセットとして保存…</translation>
     </message>
 </context>
 <context>
@@ -6654,9 +6842,12 @@
         <source>Search</source>
         <translation>検索</translation>
     </message>
+</context>
+<context>
+    <name>EmojiPickerEmptyLabel</name>
     <message>
         <source>No emoji match “%1”.</source>
-        <translation>「%1」に一致する絵文字はありません。</translation>
+        <translation type="unfinished">「%1」に一致する絵文字はありません。</translation>
     </message>
 </context>
 <context>
@@ -6717,137 +6908,184 @@
         <source>Export cancelled.</source>
         <translation>エクスポートをキャンセルしました。</translation>
     </message>
+</context>
+<context>
+    <name>ExportDialogAudioSection</name>
     <message>
-        <source>Video</source>
-        <translation>ビデオ</translation>
-    </message>
-    <message>
-        <source>Audio</source>
-        <translation>オーディオ</translation>
-    </message>
-    <message>
-        <source>GIF</source>
-        <translation>GIF</translation>
-    </message>
-    <message>
-        <source>GIF encoder is not available in this build</source>
-        <translation>このビルドでは GIF エンコーダは利用できません</translation>
-    </message>
-    <message>
-        <source>Export work area only (%1 – %2)</source>
-        <translation>ワークエリアのみをエクスポート (%1 – %2)</translation>
-    </message>
-    <message>
-        <source>Encode only the marked In/Out range instead of the full timeline</source>
-        <translation>タイムライン全体ではなく、マークされたイン/アウト範囲のみをエンコード</translation>
-    </message>
-    <message>
-        <source>Saves what you see in the preview. Pick a size — the picture shape stays the same.</source>
-        <translation>プレビューで見えているものを保存します。サイズを選択します — 画像の形状は変わりません。</translation>
-    </message>
-    <message>
-        <source>Downscale</source>
-        <translation>ダウンスケール</translation>
-    </message>
-    <message>
-        <source>Export at %1×%2</source>
-        <translation>%1×%2 でエクスポート</translation>
-    </message>
-    <message>
-        <source>Frame rate</source>
-        <translation>フレームレート</translation>
-    </message>
-    <message>
-        <source>fps</source>
-        <translation>fps</translation>
-    </message>
-    <message>
-        <source>Exporting above the project rate pulls extra frames from the source footage where it has them — this is what makes slowed clips look smooth. Where it doesn&apos;t, frames repeat.</source>
-        <translation>プロジェクトレートより高いフレームレートでエクスポートすると、ソース映像に余分なフレームがあればそれを利用します — これによりスロー再生が滑らかになります。ない場合はフレームが繰り返されます。</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <translation>詳細設定</translation>
-    </message>
-    <message>
-        <source>Video encoder</source>
-        <translation>ビデオエンコーダ</translation>
-    </message>
-    <message>
-        <source>Keeps a transparent canvas. Set the project background to Transparent so holes stay empty.</source>
-        <translation>透明なキャンバスを維持します。穴が空いたままになるよう、プロジェクトの背景を透明に設定してください。</translation>
-    </message>
-    <message>
-        <source>Constant Quality</source>
-        <translation>固定品質</translation>
-    </message>
-    <message>
-        <source>Bitrate</source>
-        <translation>ビットレート</translation>
-    </message>
-    <message>
-        <source>RF %1</source>
-        <translation>RF %1</translation>
-    </message>
-    <message>
-        <source>Quality (RF)</source>
-        <translation>品質 (RF)</translation>
-    </message>
-    <message>
-        <source>Higher quality</source>
-        <translation>高品質</translation>
-    </message>
-    <message>
-        <source>Lower quality</source>
-        <translation>低品質</translation>
-    </message>
-    <message>
-        <source>Bitrate (kbps)</source>
-        <translation>ビットレート (kbps)</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation>kbps</translation>
-    </message>
-    <message>
-        <source>Preset</source>
-        <translation>プリセット</translation>
+        <source>Exports the timeline audio mix only — no video track.</source>
+        <translation type="unfinished">タイムラインのオーディオミックスのみをエクスポート — ビデオトラックは含まれません。</translation>
     </message>
     <message>
         <source>Audio encoder</source>
-        <translation>オーディオエンコーダ</translation>
+        <translation type="unfinished">オーディオエンコーダ</translation>
     </message>
     <message>
-        <source>Animated GIF — no audio. Mark a work area for short loops, or export up to 60 seconds.</source>
-        <translation>アニメーション GIF — 音声なし。短いループ用にワークエリアをマークするか、最大 60 秒までエクスポートできます。</translation>
+        <source>Bitrate</source>
+        <translation type="unfinished">ビットレート</translation>
     </message>
     <message>
-        <source>15 fps is a good default for small file sizes. GIF export is limited to 60 seconds.</source>
-        <translation>15 fps はファイルサイズを小さくするための良いデフォルト値です。GIF エクスポートは 60 秒に制限されています。</translation>
+        <source>kbps</source>
+        <translation type="unfinished">kbps</translation>
     </message>
     <message>
-        <source>Exports the timeline audio mix only — no video track.</source>
-        <translation>タイムラインのオーディオミックスのみをエクスポート — ビデオトラックは含まれません。</translation>
+        <source>Advanced</source>
+        <translation type="unfinished">詳細設定</translation>
     </message>
     <message>
         <source>Tags</source>
-        <translation>タグ</translation>
+        <translation type="unfinished">タグ</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation>タイトル</translation>
+        <translation type="unfinished">タイトル</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation>アーティスト</translation>
+        <translation type="unfinished">アーティスト</translation>
     </message>
     <message>
         <source>Album</source>
-        <translation>アルバム</translation>
+        <translation type="unfinished">アルバム</translation>
     </message>
     <message>
         <source>Comment</source>
-        <translation>コメント</translation>
+        <translation type="unfinished">コメント</translation>
+    </message>
+</context>
+<context>
+    <name>ExportDialogGifSection</name>
+    <message>
+        <source>Animated GIF — no audio. Mark a work area for short loops, or export up to 60 seconds.</source>
+        <translation type="unfinished">アニメーション GIF — 音声なし。短いループ用にワークエリアをマークするか、最大 60 秒までエクスポートできます。</translation>
+    </message>
+    <message>
+        <source>Downscale</source>
+        <translation type="unfinished">ダウンスケール</translation>
+    </message>
+    <message>
+        <source>Export at %1×%2</source>
+        <translation type="unfinished">%1×%2 でエクスポート</translation>
+    </message>
+    <message>
+        <source>Frame rate</source>
+        <translation type="unfinished">フレームレート</translation>
+    </message>
+    <message>
+        <source>fps</source>
+        <translation type="unfinished">fps</translation>
+    </message>
+    <message>
+        <source>15 fps is a good default for small file sizes. GIF export is limited to 60 seconds.</source>
+        <translation type="unfinished">15 fps はファイルサイズを小さくするための良いデフォルト値です。GIF エクスポートは 60 秒に制限されています。</translation>
+    </message>
+</context>
+<context>
+    <name>ExportDialogModeBar</name>
+    <message>
+        <source>Video</source>
+        <translation type="unfinished">ビデオ</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">オーディオ</translation>
+    </message>
+    <message>
+        <source>GIF</source>
+        <translation type="unfinished">GIF</translation>
+    </message>
+    <message>
+        <source>GIF encoder is not available in this build</source>
+        <translation type="unfinished">このビルドでは GIF エンコーダは利用できません</translation>
+    </message>
+</context>
+<context>
+    <name>ExportDialogVideoSection</name>
+    <message>
+        <source>Saves what you see in the preview. Pick a size — the picture shape stays the same.</source>
+        <translation type="unfinished">プレビューで見えているものを保存します。サイズを選択します — 画像の形状は変わりません。</translation>
+    </message>
+    <message>
+        <source>Downscale</source>
+        <translation type="unfinished">ダウンスケール</translation>
+    </message>
+    <message>
+        <source>Export at %1×%2</source>
+        <translation type="unfinished">%1×%2 でエクスポート</translation>
+    </message>
+    <message>
+        <source>Frame rate</source>
+        <translation type="unfinished">フレームレート</translation>
+    </message>
+    <message>
+        <source>fps</source>
+        <translation type="unfinished">fps</translation>
+    </message>
+    <message>
+        <source>Exporting above the project rate pulls extra frames from the source footage where it has them — this is what makes slowed clips look smooth. Where it doesn&apos;t, frames repeat.</source>
+        <translation type="unfinished">プロジェクトレートより高いフレームレートでエクスポートすると、ソース映像に余分なフレームがあればそれを利用します — これによりスロー再生が滑らかになります。ない場合はフレームが繰り返されます。</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished">詳細設定</translation>
+    </message>
+    <message>
+        <source>Video encoder</source>
+        <translation type="unfinished">ビデオエンコーダ</translation>
+    </message>
+    <message>
+        <source>Keeps a transparent canvas. Set the project background to Transparent so holes stay empty.</source>
+        <translation type="unfinished">透明なキャンバスを維持します。穴が空いたままになるよう、プロジェクトの背景を透明に設定してください。</translation>
+    </message>
+    <message>
+        <source>Constant Quality</source>
+        <translation type="unfinished">固定品質</translation>
+    </message>
+    <message>
+        <source>Bitrate</source>
+        <translation type="unfinished">ビットレート</translation>
+    </message>
+    <message>
+        <source>RF %1</source>
+        <translation type="unfinished">RF %1</translation>
+    </message>
+    <message>
+        <source>Quality (RF)</source>
+        <translation type="unfinished">品質 (RF)</translation>
+    </message>
+    <message>
+        <source>Higher quality</source>
+        <translation type="unfinished">高品質</translation>
+    </message>
+    <message>
+        <source>Lower quality</source>
+        <translation type="unfinished">低品質</translation>
+    </message>
+    <message>
+        <source>Bitrate (kbps)</source>
+        <translation type="unfinished">ビットレート (kbps)</translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="unfinished">kbps</translation>
+    </message>
+    <message>
+        <source>Preset</source>
+        <translation type="unfinished">プリセット</translation>
+    </message>
+    <message>
+        <source>Audio encoder</source>
+        <translation type="unfinished">オーディオエンコーダ</translation>
+    </message>
+</context>
+<context>
+    <name>ExportDialogWorkAreaCheck</name>
+    <message>
+        <source>Export work area only (%1 – %2)</source>
+        <translation type="unfinished">ワークエリアのみをエクスポート (%1 – %2)</translation>
+    </message>
+    <message>
+        <source>Encode only the marked In/Out range instead of the full timeline</source>
+        <translation type="unfinished">タイムライン全体ではなく、マークされたイン/アウト範囲のみをエンコード</translation>
     </message>
 </context>
 <context>
@@ -7269,17 +7507,26 @@
         <source>Search fonts</source>
         <translation>フォントを検索</translation>
     </message>
+</context>
+<context>
+    <name>FontPickerAddRow</name>
     <message>
         <source>Add font file…</source>
-        <translation>フォントファイルを追加…</translation>
+        <translation type="unfinished">フォントファイルを追加…</translation>
     </message>
-    <message>
-        <source>Install the font pack for curated families →</source>
-        <translation>厳選されたフォントファミリーを入手するにはフォントパックをインストール →</translation>
-    </message>
+</context>
+<context>
+    <name>FontPickerFamilyRow</name>
     <message>
         <source>Remove font</source>
-        <translation>フォントを削除</translation>
+        <translation type="unfinished">フォントを削除</translation>
+    </message>
+</context>
+<context>
+    <name>FontPickerPackBanner</name>
+    <message>
+        <source>Install the font pack for curated families →</source>
+        <translation type="unfinished">厳選されたフォントファミリーを入手するにはフォントパックをインストール →</translation>
     </message>
 </context>
 <context>
@@ -7884,15 +8131,18 @@
     </message>
 </context>
 <context>
-    <name>GradientStopEditor</name>
+    <name>GradientStopChip</name>
     <message>
         <source>Drag to move, tap for colour, hold or right-click to remove</source>
-        <translation>ドラッグで移動、タップで色を変更、長押しまたは右クリックで削除</translation>
+        <translation type="unfinished">ドラッグで移動、タップで色を変更、長押しまたは右クリックで削除</translation>
     </message>
     <message>
         <source>Move gradient stop</source>
-        <translation>グラデーションストップを移動</translation>
+        <translation type="unfinished">グラデーションストップを移動</translation>
     </message>
+</context>
+<context>
+    <name>GradientStopEditor</name>
     <message>
         <source>Add a colour stop</source>
         <translation>カラーストップを追加</translation>
@@ -7987,22 +8237,25 @@
     </message>
 </context>
 <context>
+    <name>GuideEditBar</name>
+    <message>
+        <source>Editing %1</source>
+        <translation type="unfinished">%1 を編集中</translation>
+    </message>
+    <message>
+        <source>Drag from the top or left edge to add a guide, off the canvas to remove one. Shift steps by 1%.</source>
+        <translation type="unfinished">上端または左端からドラッグしてガイドを追加し、キャンバス外へドラッグして削除します。Shift で 1% 単位で移動します。</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">完了</translation>
+    </message>
+</context>
+<context>
     <name>GuideEditOverlay</name>
     <message>
         <source>Release to remove</source>
         <translation>離して削除</translation>
-    </message>
-    <message>
-        <source>Editing %1</source>
-        <translation>%1 を編集中</translation>
-    </message>
-    <message>
-        <source>Drag from the top or left edge to add a guide, off the canvas to remove one. Shift steps by 1%.</source>
-        <translation>上端または左端からドラッグしてガイドを追加し、キャンバス外へドラッグして削除します。Shift で 1% 単位で移動します。</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation>完了</translation>
     </message>
 </context>
 <context>
@@ -8035,64 +8288,8 @@
 <context>
     <name>GuidesPopover</name>
     <message>
-        <source>Vertical line</source>
-        <translation>垂直線</translation>
-    </message>
-    <message>
-        <source>Horizontal line</source>
-        <translation>水平線</translation>
-    </message>
-    <message>
         <source>Margins</source>
         <translation>マージン</translation>
-    </message>
-    <message>
-        <source>Aspect frame</source>
-        <translation>アスペクトフレーム</translation>
-    </message>
-    <message>
-        <source>Unlock so it can be dragged on the preview</source>
-        <translation>プレビュー上でドラッグできるようにロックを解除</translation>
-    </message>
-    <message>
-        <source>Lock so it cannot be dragged on the preview</source>
-        <translation>プレビュー上でドラッグできないようにロック</translation>
-    </message>
-    <message>
-        <source>Remove guide</source>
-        <translation>ガイドを削除</translation>
-    </message>
-    <message>
-        <source>From left</source>
-        <translation>左から</translation>
-    </message>
-    <message>
-        <source>From top</source>
-        <translation>上から</translation>
-    </message>
-    <message>
-        <source>Left</source>
-        <translation>左</translation>
-    </message>
-    <message>
-        <source>Right</source>
-        <translation>右</translation>
-    </message>
-    <message>
-        <source>Top</source>
-        <translation>上</translation>
-    </message>
-    <message>
-        <source>Bottom</source>
-        <translation>下</translation>
-    </message>
-    <message>
-        <source>Guide colour</source>
-        <translation>ガイドの色</translation>
-    </message>
-    <message>
-        <source>Opacity</source>
-        <translation>不透明度</translation>
     </message>
     <message>
         <source>Show guides</source>
@@ -8101,18 +8298,6 @@
     <message>
         <source>Guide sets</source>
         <translation>ガイドセット</translation>
-    </message>
-    <message>
-        <source>Show this set</source>
-        <translation>このセットを表示</translation>
-    </message>
-    <message>
-        <source>Built-in</source>
-        <translation>組み込み</translation>
-    </message>
-    <message>
-        <source>From project</source>
-        <translation>プロジェクトから</translation>
     </message>
     <message>
         <source>New guide set</source>
@@ -8139,14 +8324,6 @@
         <translation>プレビュー上で編集</translation>
     </message>
     <message>
-        <source>Built-in sets can&apos;t be changed. Duplicate one to make an editable copy.</source>
-        <translation>ビルトインセットは変更できません。複製して編集可能なコピーを作成してください。</translation>
-    </message>
-    <message>
-        <source>This set came with the project. Save it to your guide sets to edit it.</source>
-        <translation>このセットはプロジェクトに含まれていたものです。編集するにはマイガイドセットに保存してください。</translation>
-    </message>
-    <message>
         <source>Vertical</source>
         <translation>垂直</translation>
     </message>
@@ -8161,6 +8338,104 @@
     <message>
         <source>Add a guide</source>
         <translation>ガイドを追加</translation>
+    </message>
+</context>
+<context>
+    <name>GuidesPopoverColorRow</name>
+    <message>
+        <source>Guide colour</source>
+        <translation type="unfinished">ガイドの色</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation type="unfinished">不透明度</translation>
+    </message>
+</context>
+<context>
+    <name>GuidesPopoverItemHeader</name>
+    <message>
+        <source>Vertical line</source>
+        <translation type="unfinished">垂直線</translation>
+    </message>
+    <message>
+        <source>Horizontal line</source>
+        <translation type="unfinished">水平線</translation>
+    </message>
+    <message>
+        <source>Margins</source>
+        <translation type="unfinished">マージン</translation>
+    </message>
+    <message>
+        <source>Aspect frame</source>
+        <translation type="unfinished">アスペクトフレーム</translation>
+    </message>
+    <message>
+        <source>Unlock so it can be dragged on the preview</source>
+        <translation type="unfinished">プレビュー上でドラッグできるようにロックを解除</translation>
+    </message>
+    <message>
+        <source>Lock so it cannot be dragged on the preview</source>
+        <translation type="unfinished">プレビュー上でドラッグできないようにロック</translation>
+    </message>
+    <message>
+        <source>Remove guide</source>
+        <translation type="unfinished">ガイドを削除</translation>
+    </message>
+</context>
+<context>
+    <name>GuidesPopoverLinePosition</name>
+    <message>
+        <source>From left</source>
+        <translation type="unfinished">左から</translation>
+    </message>
+    <message>
+        <source>From top</source>
+        <translation type="unfinished">上から</translation>
+    </message>
+</context>
+<context>
+    <name>GuidesPopoverMarginFields</name>
+    <message>
+        <source>Left</source>
+        <translation type="unfinished">左</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <translation type="unfinished">右</translation>
+    </message>
+    <message>
+        <source>Top</source>
+        <translation type="unfinished">上</translation>
+    </message>
+    <message>
+        <source>Bottom</source>
+        <translation type="unfinished">下</translation>
+    </message>
+</context>
+<context>
+    <name>GuidesPopoverReadOnlyNote</name>
+    <message>
+        <source>Built-in sets can&apos;t be changed. Duplicate one to make an editable copy.</source>
+        <translation type="unfinished">ビルトインセットは変更できません。複製して編集可能なコピーを作成してください。</translation>
+    </message>
+    <message>
+        <source>This set came with the project. Save it to your guide sets to edit it.</source>
+        <translation type="unfinished">このセットはプロジェクトに含まれていたものです。編集するにはマイガイドセットに保存してください。</translation>
+    </message>
+</context>
+<context>
+    <name>GuidesPopoverSetRow</name>
+    <message>
+        <source>Show this set</source>
+        <translation type="unfinished">このセットを表示</translation>
+    </message>
+    <message>
+        <source>Built-in</source>
+        <translation type="unfinished">組み込み</translation>
+    </message>
+    <message>
+        <source>From project</source>
+        <translation type="unfinished">プロジェクトから</translation>
     </message>
 </context>
 <context>
@@ -8282,38 +8557,6 @@
         <translation>マスク ぼかし</translation>
     </message>
     <message>
-        <source>Keyframes</source>
-        <translation>キーフレーム</translation>
-    </message>
-    <message>
-        <source>Collapse curve editor to compact view (88px)</source>
-        <translation>カーブエディタをコンパクト表示 (88px) に折りたたむ</translation>
-    </message>
-    <message>
-        <source>Expand curve editor to view and edit Bezier handles (180px)</source>
-        <translation>カーブエディタを展開してベジェハンドルを表示・編集 (180px)</translation>
-    </message>
-    <message>
-        <source>Analyzing…</source>
-        <translation>分析中…</translation>
-    </message>
-    <message>
-        <source>Hide the beat markers</source>
-        <translation>ビートマーカーを非表示</translation>
-    </message>
-    <message>
-        <source>Find the beat and show markers</source>
-        <translation>ビートを検出してマーカーを表示</translation>
-    </message>
-    <message>
-        <source>Hide hits</source>
-        <translation>ヒットを非表示</translation>
-    </message>
-    <message>
-        <source>Find beats and hits in the audio under this clip</source>
-        <translation>このクリップの下のオーディオからビートとヒットを検出</translation>
-    </message>
-    <message>
         <source>%1 (keyframes off)</source>
         <translation>%1 (キーフレームオフ)</translation>
     </message>
@@ -8325,35 +8568,79 @@
         <source>%1 — click to show this curve</source>
         <translation>%1 — クリックしてこのカーブを表示</translation>
     </message>
+</context>
+<context>
+    <name>KeyframeGraphHeaderBar</name>
+    <message>
+        <source>Keyframes</source>
+        <translation type="unfinished">キーフレーム</translation>
+    </message>
+    <message>
+        <source>Collapse curve editor to compact view (88px)</source>
+        <translation type="unfinished">カーブエディタをコンパクト表示 (88px) に折りたたむ</translation>
+    </message>
+    <message>
+        <source>Expand curve editor to view and edit Bezier handles (180px)</source>
+        <translation type="unfinished">カーブエディタを展開してベジェハンドルを表示・編集 (180px)</translation>
+    </message>
+    <message>
+        <source>Analyzing…</source>
+        <translation type="unfinished">分析中…</translation>
+    </message>
+    <message>
+        <source>Hide the beat markers</source>
+        <translation type="unfinished">ビートマーカーを非表示</translation>
+    </message>
+    <message>
+        <source>Find the beat and show markers</source>
+        <translation type="unfinished">ビートを検出してマーカーを表示</translation>
+    </message>
+    <message>
+        <source>Hide hits</source>
+        <translation type="unfinished">ヒットを非表示</translation>
+    </message>
+    <message>
+        <source>Find beats and hits in the audio under this clip</source>
+        <translation type="unfinished">このクリップの下のオーディオからビートとヒットを検出</translation>
+    </message>
+</context>
+<context>
+    <name>KeyframeGraphKeyDot</name>
+    <message>
+        <source>Move keyframe</source>
+        <translation type="unfinished">キーフレームを移動</translation>
+    </message>
+</context>
+<context>
+    <name>KeyframeGraphLaneStatus</name>
     <message>
         <source>No keyframes</source>
-        <translation>キーフレームなし</translation>
+        <translation type="unfinished">キーフレームなし</translation>
     </message>
     <message numerus="yes">
         <source>%n keyframes</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>%n キーフレーム</numerusform>
         </translation>
     </message>
     <message>
         <source>Expand for handles</source>
-        <translation>展開してハンドルを表示</translation>
+        <translation type="unfinished">展開してハンドルを表示</translation>
     </message>
     <message>
         <source> BPM</source>
-        <translation> BPM</translation>
+        <translation type="unfinished"> BPM</translation>
     </message>
     <message>
         <source> · no beat found</source>
-        <translation> · ビートが見つかりません</translation>
+        <translation type="unfinished"> · ビートが見つかりません</translation>
     </message>
-    <message>
-        <source>Move keyframe</source>
-        <translation>キーフレームを移動</translation>
-    </message>
+</context>
+<context>
+    <name>KeyframeGraphTangentHandle</name>
     <message>
         <source>Edit keyframe curve</source>
-        <translation>キーフレームカーブを編集</translation>
+        <translation type="unfinished">キーフレームカーブを編集</translation>
     </message>
 </context>
 <context>
@@ -8540,218 +8827,6 @@
 <context>
     <name>Main</name>
     <message>
-        <source>&amp;File</source>
-        <translation>ファイル(&amp;F)</translation>
-    </message>
-    <message>
-        <source>&amp;New Project</source>
-        <translation>新規プロジェクト(&amp;N)</translation>
-    </message>
-    <message>
-        <source>&amp;Open Project…</source>
-        <translation>プロジェクトを開く(&amp;O)…</translation>
-    </message>
-    <message>
-        <source>&amp;Save Project</source>
-        <translation>プロジェクトを保存(&amp;S)</translation>
-    </message>
-    <message>
-        <source>Save Project &amp;As…</source>
-        <translation>プロジェクトに名前を付けて保存(&amp;A)…</translation>
-    </message>
-    <message>
-        <source>Save Project &amp;JSON…</source>
-        <translation>プロジェクトを JSON で保存(&amp;J)…</translation>
-    </message>
-    <message>
-        <source>Open Project JSON…</source>
-        <translation>プロジェクト JSON を開く…</translation>
-    </message>
-    <message>
-        <source>&amp;Export Video…</source>
-        <translation>ビデオをエクスポート(&amp;E)…</translation>
-    </message>
-    <message>
-        <source>&amp;Package Project…</source>
-        <translation>プロジェクトをパッケージ化(&amp;P)…</translation>
-    </message>
-    <message>
-        <source>&amp;Close Project</source>
-        <translation>プロジェクトを閉じる(&amp;C)</translation>
-    </message>
-    <message>
-        <source>&amp;Edit</source>
-        <translation>編集(&amp;E)</translation>
-    </message>
-    <message>
-        <source>&amp;Undo</source>
-        <translation>元に戻す(&amp;U)</translation>
-    </message>
-    <message>
-        <source>&amp;Redo</source>
-        <translation>やり直し(&amp;R)</translation>
-    </message>
-    <message>
-        <source>Cu&amp;t</source>
-        <translation>切り取り(&amp;T)</translation>
-    </message>
-    <message>
-        <source>&amp;Copy</source>
-        <translation>コピー(&amp;C)</translation>
-    </message>
-    <message>
-        <source>&amp;Paste</source>
-        <translation>貼り付け(&amp;P)</translation>
-    </message>
-    <message>
-        <source>&amp;Delete</source>
-        <translation>削除(&amp;D)</translation>
-    </message>
-    <message>
-        <source>Select &amp;All</source>
-        <translation>すべて選択(&amp;A)</translation>
-    </message>
-    <message>
-        <source>Clear Selection</source>
-        <translation>選択を解除</translation>
-    </message>
-    <message>
-        <source>Split Clip</source>
-        <translation>クリップを分割</translation>
-    </message>
-    <message>
-        <source>Duplicate Clip</source>
-        <translation>クリップを複製</translation>
-    </message>
-    <message>
-        <source>Copy Effects</source>
-        <translation>エフェクトをコピー</translation>
-    </message>
-    <message>
-        <source>Paste Effects</source>
-        <translation>エフェクトを貼り付け</translation>
-    </message>
-    <message>
-        <source>Paste Attributes…</source>
-        <translation>属性を貼り付け…</translation>
-    </message>
-    <message>
-        <source>&amp;Playback</source>
-        <translation>再生(&amp;P)</translation>
-    </message>
-    <message>
-        <source>Play / Pause</source>
-        <translation>再生 / 一時停止</translation>
-    </message>
-    <message>
-        <source>Step Back One Frame</source>
-        <translation>1フレーム戻る</translation>
-    </message>
-    <message>
-        <source>Step Forward One Frame</source>
-        <translation>1フレーム進む</translation>
-    </message>
-    <message>
-        <source>Previous Cut Point</source>
-        <translation>前のカットポイント</translation>
-    </message>
-    <message>
-        <source>Next Cut Point</source>
-        <translation>次のカットポイント</translation>
-    </message>
-    <message>
-        <source>Go to Start of Timeline</source>
-        <translation>タイムラインの先頭に移動</translation>
-    </message>
-    <message>
-        <source>Toggle Bookmark</source>
-        <translation>ブックマークの切り替え</translation>
-    </message>
-    <message>
-        <source>Next Bookmark</source>
-        <translation>次のブックマーク</translation>
-    </message>
-    <message>
-        <source>Previous Bookmark</source>
-        <translation>前のブックマーク</translation>
-    </message>
-    <message>
-        <source>&amp;View</source>
-        <translation>表示(&amp;V)</translation>
-    </message>
-    <message>
-        <source>Zoom &amp;In</source>
-        <translation>ズームイン(&amp;I)</translation>
-    </message>
-    <message>
-        <source>Zoom &amp;Out</source>
-        <translation>ズームアウト(&amp;O)</translation>
-    </message>
-    <message>
-        <source>Toggle Fullscreen Preview</source>
-        <translation>フルスクリーンプレビューの切り替え</translation>
-    </message>
-    <message>
-        <source>Toggle Guides</source>
-        <translation>ガイドの切り替え</translation>
-    </message>
-    <message>
-        <source>Switch to Mobile Layout…</source>
-        <translation>モバイルレイアウトに切り替え…</translation>
-    </message>
-    <message>
-        <source>&amp;Window</source>
-        <translation>ウィンドウ(&amp;W)</translation>
-    </message>
-    <message>
-        <source>Landscape Workspace</source>
-        <translation>横向きワークスペース</translation>
-    </message>
-    <message>
-        <source>Portrait Workspace</source>
-        <translation>縦向きワークスペース</translation>
-    </message>
-    <message>
-        <source>Auto Workspace (Follow Canvas)</source>
-        <translation>自動ワークスペース (キャンバスに追従)</translation>
-    </message>
-    <message>
-        <source>Downloads</source>
-        <translation>ダウンロード</translation>
-    </message>
-    <message>
-        <source>Multicam</source>
-        <translation>マルチカム</translation>
-    </message>
-    <message>
-        <source>&amp;Help</source>
-        <translation>ヘルプ(&amp;H)</translation>
-    </message>
-    <message>
-        <source>Keyboard Shortcuts</source>
-        <translation>キーボードショートカット</translation>
-    </message>
-    <message>
-        <source>Extras…</source>
-        <translation>エクストラ…</translation>
-    </message>
-    <message>
-        <source>Check for Updates…</source>
-        <translation>更新の確認…</translation>
-    </message>
-    <message>
-        <source>About Drift</source>
-        <translation>Drift について</translation>
-    </message>
-    <message>
-        <source>Settings…</source>
-        <translation>設定…</translation>
-    </message>
-    <message>
-        <source>Debug Info…</source>
-        <translation>デバッグ情報…</translation>
-    </message>
-    <message>
         <source>Drift %1 is the latest version.</source>
         <translation>Drift %1 は最新バージョンです。</translation>
     </message>
@@ -8810,6 +8885,221 @@
     <message>
         <source>Imported from the marketplace.</source>
         <translation>マーケットプレイスからインポートされました。</translation>
+    </message>
+</context>
+<context>
+    <name>MainMacMenuBar</name>
+    <message>
+        <source>&amp;File</source>
+        <translation type="unfinished">ファイル(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;New Project</source>
+        <translation type="unfinished">新規プロジェクト(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Open Project…</source>
+        <translation type="unfinished">プロジェクトを開く(&amp;O)…</translation>
+    </message>
+    <message>
+        <source>&amp;Save Project</source>
+        <translation type="unfinished">プロジェクトを保存(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Save Project &amp;As…</source>
+        <translation type="unfinished">プロジェクトに名前を付けて保存(&amp;A)…</translation>
+    </message>
+    <message>
+        <source>Save Project &amp;JSON…</source>
+        <translation type="unfinished">プロジェクトを JSON で保存(&amp;J)…</translation>
+    </message>
+    <message>
+        <source>Open Project JSON…</source>
+        <translation type="unfinished">プロジェクト JSON を開く…</translation>
+    </message>
+    <message>
+        <source>&amp;Export Video…</source>
+        <translation type="unfinished">ビデオをエクスポート(&amp;E)…</translation>
+    </message>
+    <message>
+        <source>&amp;Package Project…</source>
+        <translation type="unfinished">プロジェクトをパッケージ化(&amp;P)…</translation>
+    </message>
+    <message>
+        <source>&amp;Close Project</source>
+        <translation type="unfinished">プロジェクトを閉じる(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation type="unfinished">編集(&amp;E)</translation>
+    </message>
+    <message>
+        <source>&amp;Undo</source>
+        <translation type="unfinished">元に戻す(&amp;U)</translation>
+    </message>
+    <message>
+        <source>&amp;Redo</source>
+        <translation type="unfinished">やり直し(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Cu&amp;t</source>
+        <translation type="unfinished">切り取り(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation type="unfinished">コピー(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Paste</source>
+        <translation type="unfinished">貼り付け(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Delete</source>
+        <translation type="unfinished">削除(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation type="unfinished">すべて選択(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Clear Selection</source>
+        <translation type="unfinished">選択を解除</translation>
+    </message>
+    <message>
+        <source>Split Clip</source>
+        <translation type="unfinished">クリップを分割</translation>
+    </message>
+    <message>
+        <source>Duplicate Clip</source>
+        <translation type="unfinished">クリップを複製</translation>
+    </message>
+    <message>
+        <source>Copy Effects</source>
+        <translation type="unfinished">エフェクトをコピー</translation>
+    </message>
+    <message>
+        <source>Paste Effects</source>
+        <translation type="unfinished">エフェクトを貼り付け</translation>
+    </message>
+    <message>
+        <source>Paste Attributes…</source>
+        <translation type="unfinished">属性を貼り付け…</translation>
+    </message>
+    <message>
+        <source>About Drift</source>
+        <translation type="unfinished">Drift について</translation>
+    </message>
+    <message>
+        <source>Settings…</source>
+        <translation type="unfinished">設定…</translation>
+    </message>
+    <message>
+        <source>Check for Updates…</source>
+        <translation type="unfinished">更新の確認…</translation>
+    </message>
+    <message>
+        <source>&amp;Playback</source>
+        <translation type="unfinished">再生(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Play / Pause</source>
+        <translation type="unfinished">再生 / 一時停止</translation>
+    </message>
+    <message>
+        <source>Step Back One Frame</source>
+        <translation type="unfinished">1フレーム戻る</translation>
+    </message>
+    <message>
+        <source>Step Forward One Frame</source>
+        <translation type="unfinished">1フレーム進む</translation>
+    </message>
+    <message>
+        <source>Previous Cut Point</source>
+        <translation type="unfinished">前のカットポイント</translation>
+    </message>
+    <message>
+        <source>Next Cut Point</source>
+        <translation type="unfinished">次のカットポイント</translation>
+    </message>
+    <message>
+        <source>Go to Start of Timeline</source>
+        <translation type="unfinished">タイムラインの先頭に移動</translation>
+    </message>
+    <message>
+        <source>Toggle Bookmark</source>
+        <translation type="unfinished">ブックマークの切り替え</translation>
+    </message>
+    <message>
+        <source>Next Bookmark</source>
+        <translation type="unfinished">次のブックマーク</translation>
+    </message>
+    <message>
+        <source>Previous Bookmark</source>
+        <translation type="unfinished">前のブックマーク</translation>
+    </message>
+    <message>
+        <source>&amp;View</source>
+        <translation type="unfinished">表示(&amp;V)</translation>
+    </message>
+    <message>
+        <source>Zoom &amp;In</source>
+        <translation type="unfinished">ズームイン(&amp;I)</translation>
+    </message>
+    <message>
+        <source>Zoom &amp;Out</source>
+        <translation type="unfinished">ズームアウト(&amp;O)</translation>
+    </message>
+    <message>
+        <source>Toggle Fullscreen Preview</source>
+        <translation type="unfinished">フルスクリーンプレビューの切り替え</translation>
+    </message>
+    <message>
+        <source>Toggle Guides</source>
+        <translation type="unfinished">ガイドの切り替え</translation>
+    </message>
+    <message>
+        <source>Switch to Mobile Layout…</source>
+        <translation type="unfinished">モバイルレイアウトに切り替え…</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation type="unfinished">ウィンドウ(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Landscape Workspace</source>
+        <translation type="unfinished">横向きワークスペース</translation>
+    </message>
+    <message>
+        <source>Portrait Workspace</source>
+        <translation type="unfinished">縦向きワークスペース</translation>
+    </message>
+    <message>
+        <source>Auto Workspace (Follow Canvas)</source>
+        <translation type="unfinished">自動ワークスペース (キャンバスに追従)</translation>
+    </message>
+    <message>
+        <source>Downloads</source>
+        <translation type="unfinished">ダウンロード</translation>
+    </message>
+    <message>
+        <source>Multicam</source>
+        <translation type="unfinished">マルチカム</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation type="unfinished">ヘルプ(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Keyboard Shortcuts</source>
+        <translation type="unfinished">キーボードショートカット</translation>
+    </message>
+    <message>
+        <source>Extras…</source>
+        <translation type="unfinished">エクストラ…</translation>
+    </message>
+    <message>
+        <source>Debug Info…</source>
+        <translation type="unfinished">デバッグ情報…</translation>
     </message>
 </context>
 <context>
@@ -9018,13 +9308,63 @@
         <source>Mask changed</source>
         <translation>マスクを変更しました</translation>
     </message>
+</context>
+<context>
+    <name>MaskOverlayBarEdge</name>
+    <message>
+        <source>Mask changed</source>
+        <translation type="unfinished">マスクを変更しました</translation>
+    </message>
+</context>
+<context>
+    <name>MaskOverlayEmptyHint</name>
     <message>
         <source>Drag a mask from the Masks tab onto a clip to edit it here</source>
-        <translation>「マスク」タブからマスクをクリップにドラッグして、ここで編集します</translation>
+        <translation type="unfinished">「マスク」タブからマスクをクリップにドラッグして、ここで編集します</translation>
     </message>
     <message>
         <source>Select a clip at the playhead to edit its masks</source>
-        <translation>再生ヘッドにあるクリップを選択して、そのマスクを編集します</translation>
+        <translation type="unfinished">再生ヘッドにあるクリップを選択して、そのマスクを編集します</translation>
+    </message>
+</context>
+<context>
+    <name>MaskOverlayResizeGrip</name>
+    <message>
+        <source>Mask changed</source>
+        <translation type="unfinished">マスクを変更しました</translation>
+    </message>
+</context>
+<context>
+    <name>MaskOverlayRotateHandle</name>
+    <message>
+        <source>Mask changed</source>
+        <translation type="unfinished">マスクを変更しました</translation>
+    </message>
+</context>
+<context>
+    <name>MaskOverlayVertexHandle</name>
+    <message>
+        <source>Mask changed</source>
+        <translation type="unfinished">マスクを変更しました</translation>
+    </message>
+</context>
+<context>
+    <name>MaskPresetCard</name>
+    <message>
+        <source>%1 — click to apply, or drag onto a clip</source>
+        <translation type="unfinished">%1 — クリックして適用するか、クリップにドラッグ</translation>
+    </message>
+    <message>
+        <source>%1 — drag onto a clip</source>
+        <translation type="unfinished">%1 — クリップ上にドラッグ</translation>
+    </message>
+    <message>
+        <source>Select a clip first, or drag the mask onto one</source>
+        <translation type="unfinished">まずクリップを選択するか、マスクをクリップにドラッグしてください</translation>
+    </message>
+    <message>
+        <source>Apply to selected clip</source>
+        <translation type="unfinished">選択クリップに適用</translation>
     </message>
 </context>
 <context>
@@ -9172,100 +9512,243 @@
         <source>All files (*)</source>
         <translation>すべてのファイル (*)</translation>
     </message>
+</context>
+<context>
+    <name>MediaAssetsEmptyState</name>
     <message>
-        <source>%1 — click to apply, or drag onto a clip</source>
-        <translation>%1 — クリックして適用するか、クリップにドラッグ</translation>
+        <source>No media yet</source>
+        <translation type="unfinished">メディアはまだありません</translation>
     </message>
     <message>
-        <source>%1 — drag onto a clip</source>
-        <translation>%1 — クリップ上にドラッグ</translation>
+        <source>Import files or drop them here, then drag them onto the timeline. Right-click a clip to preview and trim it first.</source>
+        <translation type="unfinished">ファイルをインポートするか、ここにドロップしてから、タイムラインにドラッグします。クリップを右クリックすると、事前にプレビューやトリミングを行うことができます。</translation>
     </message>
     <message>
-        <source>Select a clip first, or drag the mask onto one</source>
-        <translation>まずクリップを選択するか、マスクをクリップにドラッグしてください</translation>
+        <source>Import media</source>
+        <translation type="unfinished">メディアをインポート</translation>
     </message>
     <message>
-        <source>Apply to selected clip</source>
-        <translation>選択クリップに適用</translation>
+        <source>Import folder</source>
+        <translation type="unfinished">インポート フォルダー</translation>
+    </message>
+    <message>
+        <source>Supported formats</source>
+        <translation type="unfinished">サポートされている形式</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation type="unfinished">ビデオ</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">オーディオ</translation>
+    </message>
+    <message>
+        <source>Images</source>
+        <translation type="unfinished">画像</translation>
+    </message>
+    <message>
+        <source>Vector</source>
+        <translation type="unfinished">ベクター</translation>
+    </message>
+    <message>
+        <source>3D</source>
+        <translation type="unfinished">3D</translation>
+    </message>
+    <message>
+        <source>glTF binary (.glb) · Gaussian splats (.sog, .ply, .zip)</source>
+        <translation type="unfinished">glTF バイナリ (.glb) · ガウススプラッティング (.sog, .ply, .zip)</translation>
+    </message>
+    <message>
+        <source>PDF</source>
+        <translation type="unfinished">PDF</translation>
+    </message>
+    <message>
+        <source>PDF (needs the PDF Viewer addon)</source>
+        <translation type="unfinished">PDF (PDF ビューア アドオンが必要です)</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsFolderMenu</name>
+    <message>
+        <source>Open</source>
+        <translation type="unfinished">開く</translation>
+    </message>
+    <message>
+        <source>Rename…</source>
+        <translation type="unfinished">名前の変更…</translation>
+    </message>
+    <message>
+        <source>Move to folder…</source>
+        <translation type="unfinished">フォルダーに移動…</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">削除</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsGridCard</name>
+    <message>
+        <source>%1 — drag to the timeline, right-click to preview</source>
+        <translation type="unfinished">%1 — タイムラインにドラッグ、右クリックでプレビュー</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsGridNameRow</name>
+    <message>
+        <source>Linked proxy</source>
+        <translation type="unfinished">リンク済みプロキシ</translation>
+    </message>
+    <message>
+        <source>Proxy</source>
+        <translation type="unfinished">プロキシ</translation>
+    </message>
+    <message>
+        <source>Using a proxy file found next to the original</source>
+        <translation type="unfinished">元のファイルの隣にあるプロキシファイルを使用中</translation>
+    </message>
+    <message>
+        <source>Edit-friendly</source>
+        <translation type="unfinished">編集に適した形式</translation>
+    </message>
+    <message>
+        <source>Converted to a constant frame rate for smooth editing</source>
+        <translation type="unfinished">スムーズな編集のために固定フレームレートに変換済み</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsItemMenu</name>
+    <message>
+        <source>Open composite</source>
+        <translation type="unfinished">コンポジットを開く</translation>
+    </message>
+    <message numerus="yes">
+        <source>Add %n items to timeline</source>
+        <translation type="unfinished">
+            <numerusform>%n 個の項目をタイムラインに追加</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Add to timeline</source>
+        <translation type="unfinished">タイムラインに追加</translation>
+    </message>
+    <message>
+        <source>Trim, crop and upscale…</source>
+        <translation type="unfinished">トリミング・クロップ・アップスケール…</translation>
+    </message>
+    <message>
+        <source>Preview and edit…</source>
+        <translation type="unfinished">プレビューと編集…</translation>
+    </message>
+    <message>
+        <source>Rename…</source>
+        <translation type="unfinished">名前の変更…</translation>
+    </message>
+    <message>
+        <source>Replace media…</source>
+        <translation type="unfinished">メディアを置き換え…</translation>
+    </message>
+    <message numerus="yes">
+        <source>Move %n items to folder…</source>
+        <translation type="unfinished">
+            <numerusform>%n 個の項目をフォルダーに移動…</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Move to folder…</source>
+        <translation type="unfinished">フォルダーに移動…</translation>
+    </message>
+    <message numerus="yes">
+        <source>Create %n proxies</source>
+        <translation type="unfinished">
+            <numerusform>%n 個のプロキシを作成</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Create proxy</source>
+        <translation type="unfinished">プロキシを作成</translation>
+    </message>
+    <message>
+        <source>Link proxy…</source>
+        <translation type="unfinished">プロキシをリンク…</translation>
+    </message>
+    <message numerus="yes">
+        <source>Remove %n proxies</source>
+        <translation type="unfinished">
+            <numerusform>%n 個のプロキシを削除</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Remove proxy</source>
+        <translation type="unfinished">プロキシを削除</translation>
+    </message>
+    <message>
+        <source>Convert to edit-friendly format</source>
+        <translation type="unfinished">編集に適した形式に変換</translation>
+    </message>
+    <message>
+        <source>Export image…</source>
+        <translation type="unfinished">画像をエクスポート…</translation>
+    </message>
+    <message>
+        <source>Save As…</source>
+        <translation type="unfinished">名前を付けて保存…</translation>
+    </message>
+    <message numerus="yes">
+        <source>Remove %n items from project</source>
+        <translation type="unfinished">
+            <numerusform>%n 個の項目をプロジェクトから削除</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Remove from project</source>
+        <translation type="unfinished">プロジェクトから削除</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsListLabels</name>
+    <message>
+        <source>Linked proxy</source>
+        <translation type="unfinished">リンク済みプロキシ</translation>
+    </message>
+    <message>
+        <source>Proxy</source>
+        <translation type="unfinished">プロキシ</translation>
+    </message>
+    <message>
+        <source>Using a proxy file found next to the original</source>
+        <translation type="unfinished">元のファイルの隣にあるプロキシファイルを使用中</translation>
+    </message>
+    <message>
+        <source>Edit-friendly</source>
+        <translation type="unfinished">編集に適した形式</translation>
+    </message>
+    <message>
+        <source>Converted to a constant frame rate for smooth editing</source>
+        <translation type="unfinished">スムーズな編集のために固定フレームレートに変換済み</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsListRow</name>
+    <message>
+        <source>%1 — drag to the timeline, right-click to preview</source>
+        <translation type="unfinished">%1 — タイムラインにドラッグ、右クリックでプレビュー</translation>
+    </message>
+    <message>
+        <source>Collapse folder</source>
+        <translation type="unfinished">フォルダーを折りたたむ</translation>
+    </message>
+    <message>
+        <source>Expand folder</source>
+        <translation type="unfinished">フォルダーを展開する</translation>
     </message>
 </context>
 <context>
     <name>MediaAssetsTab</name>
     <message>
-        <source>No media yet</source>
-        <translation>メディアはまだありません</translation>
-    </message>
-    <message>
-        <source>Import files or drop them here, then drag them onto the timeline. Right-click a clip to preview and trim it first.</source>
-        <translation>ファイルをインポートするか、ここにドロップしてから、タイムラインにドラッグします。クリップを右クリックすると、事前にプレビューやトリミングを行うことができます。</translation>
-    </message>
-    <message>
-        <source>Import media</source>
-        <translation>メディアをインポート</translation>
-    </message>
-    <message>
-        <source>Import folder</source>
-        <translation>インポート フォルダー</translation>
-    </message>
-    <message>
-        <source>Supported formats</source>
-        <translation>サポートされている形式</translation>
-    </message>
-    <message>
-        <source>Video</source>
-        <translation>ビデオ</translation>
-    </message>
-    <message>
-        <source>Audio</source>
-        <translation>オーディオ</translation>
-    </message>
-    <message>
-        <source>Images</source>
-        <translation>画像</translation>
-    </message>
-    <message>
-        <source>Vector</source>
-        <translation>ベクター</translation>
-    </message>
-    <message>
-        <source>3D</source>
-        <translation>3D</translation>
-    </message>
-    <message>
-        <source>glTF binary (.glb) · Gaussian splats (.sog, .ply, .zip)</source>
-        <translation>glTF バイナリ (.glb) · ガウススプラッティング (.sog, .ply, .zip)</translation>
-    </message>
-    <message>
-        <source>PDF</source>
-        <translation>PDF</translation>
-    </message>
-    <message>
-        <source>PDF (needs the PDF Viewer addon)</source>
-        <translation>PDF (PDF ビューア アドオンが必要です)</translation>
-    </message>
-    <message>
         <source>Search media</source>
         <translation>メディアを検索</translation>
-    </message>
-    <message>
-        <source>Grid view</source>
-        <translation>グリッド表示</translation>
-    </message>
-    <message>
-        <source>List view</source>
-        <translation>リスト表示</translation>
-    </message>
-    <message>
-        <source>Tree view</source>
-        <translation>ツリー表示</translation>
-    </message>
-    <message>
-        <source>Sort by name</source>
-        <translation>名前でソート</translation>
-    </message>
-    <message>
-        <source>Sort by type</source>
-        <translation>タイプでソート</translation>
     </message>
     <message>
         <source>Expand all</source>
@@ -9304,98 +9787,6 @@
         <translation>変換を停止</translation>
     </message>
     <message>
-        <source>Rename…</source>
-        <translation>名前の変更…</translation>
-    </message>
-    <message>
-        <source>%1 — drag to the timeline, right-click to preview</source>
-        <translation>%1 — タイムラインにドラッグ、右クリックでプレビュー</translation>
-    </message>
-    <message>
-        <source>Open composite</source>
-        <translation>コンポジットを開く</translation>
-    </message>
-    <message>
-        <source>Preview and edit…</source>
-        <translation>プレビューと編集…</translation>
-    </message>
-    <message>
-        <source>Trim, crop and upscale…</source>
-        <translation>トリミング・クロップ・アップスケール…</translation>
-    </message>
-    <message>
-        <source>Replace media…</source>
-        <translation>メディアを置き換え…</translation>
-    </message>
-    <message numerus="yes">
-        <source>Create %n proxies</source>
-        <translation>
-            <numerusform>%n 個のプロキシを作成</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Create proxy</source>
-        <translation>プロキシを作成</translation>
-    </message>
-    <message>
-        <source>Link proxy…</source>
-        <translation>プロキシをリンク…</translation>
-    </message>
-    <message numerus="yes">
-        <source>Remove %n proxies</source>
-        <translation>
-            <numerusform>%n 個のプロキシを削除</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Remove proxy</source>
-        <translation>プロキシを削除</translation>
-    </message>
-    <message>
-        <source>Export image…</source>
-        <translation>画像をエクスポート…</translation>
-    </message>
-    <message>
-        <source>Save As…</source>
-        <translation>名前を付けて保存…</translation>
-    </message>
-    <message>
-        <source>Remove from project</source>
-        <translation>プロジェクトから削除</translation>
-    </message>
-    <message>
-        <source>Proxy</source>
-        <translation>プロキシ</translation>
-    </message>
-    <message>
-        <source>Linked proxy</source>
-        <translation>リンク済みプロキシ</translation>
-    </message>
-    <message>
-        <source>Using a proxy file found next to the original</source>
-        <translation>元のファイルの隣にあるプロキシファイルを使用中</translation>
-    </message>
-    <message>
-        <source>Edit-friendly</source>
-        <translation>編集に適した形式</translation>
-    </message>
-    <message>
-        <source>Converted to a constant frame rate for smooth editing</source>
-        <translation>スムーズな編集のために固定フレームレートに変換済み</translation>
-    </message>
-    <message>
-        <source>Collapse folder</source>
-        <translation>フォルダーを折りたたむ</translation>
-    </message>
-    <message>
-        <source>Expand folder</source>
-        <translation>フォルダーを展開する</translation>
-    </message>
-    <message>
-        <source>Move to folder…</source>
-        <translation>フォルダーに移動…</translation>
-    </message>
-    <message>
         <source>This folder is empty</source>
         <translation>このフォルダーは空です</translation>
     </message>
@@ -9403,39 +9794,28 @@
         <source>Drag media here, or import more.</source>
         <translation>ここにメディアをドラッグするか、さらにインポートしてください。</translation>
     </message>
+</context>
+<context>
+    <name>MediaAssetsViewToolbar</name>
     <message>
-        <source>Open</source>
-        <translation>開く</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>削除</translation>
-    </message>
-    <message numerus="yes">
-        <source>Add %n items to timeline</source>
-        <translation>
-            <numerusform>%n 個の項目をタイムラインに追加</numerusform>
-        </translation>
+        <source>Grid view</source>
+        <translation type="unfinished">グリッド表示</translation>
     </message>
     <message>
-        <source>Add to timeline</source>
-        <translation>タイムラインに追加</translation>
-    </message>
-    <message numerus="yes">
-        <source>Move %n items to folder…</source>
-        <translation>
-            <numerusform>%n 個の項目をフォルダーに移動…</numerusform>
-        </translation>
+        <source>List view</source>
+        <translation type="unfinished">リスト表示</translation>
     </message>
     <message>
-        <source>Convert to edit-friendly format</source>
-        <translation>編集に適した形式に変換</translation>
+        <source>Tree view</source>
+        <translation type="unfinished">ツリー表示</translation>
     </message>
-    <message numerus="yes">
-        <source>Remove %n items from project</source>
-        <translation>
-            <numerusform>%n 個の項目をプロジェクトから削除</numerusform>
-        </translation>
+    <message>
+        <source>Sort by name</source>
+        <translation type="unfinished">名前でソート</translation>
+    </message>
+    <message>
+        <source>Sort by type</source>
+        <translation type="unfinished">タイプでソート</translation>
     </message>
 </context>
 <context>
@@ -9643,6 +10023,13 @@
     </message>
 </context>
 <context>
+    <name>MediaPreviewResolutionPill</name>
+    <message>
+        <source>%1p</source>
+        <translation type="unfinished">%1p</translation>
+    </message>
+</context>
+<context>
     <name>MediaPreviewWindow</name>
     <message>
         <source>Preview — %1</source>
@@ -9679,10 +10066,6 @@
     <message>
         <source>Upscale this video?</source>
         <translation>このビデオをアップスケールしますか?</translation>
-    </message>
-    <message>
-        <source>%1p</source>
-        <translation>%1p</translation>
     </message>
     <message>
         <source>Length %1</source>
@@ -9804,20 +10187,110 @@
         <translation>このプロジェクトはお持ちでない拡張パックと共に保存されました。開かれましたが、それらが提供するものはインストールされるまで表示されません。</translation>
     </message>
     <message>
+        <source>Reopen the project once they finish installing.</source>
+        <translation>インストールが完了したらプロジェクトを再度開いてください。</translation>
+    </message>
+</context>
+<context>
+    <name>MissingAddonsRow</name>
+    <message>
         <source>%1… %2%</source>
-        <translation>%1… %2%</translation>
+        <translation type="unfinished">%1… %2%</translation>
     </message>
     <message>
         <source>used version %1</source>
-        <translation>バージョン %1 を使用</translation>
+        <translation type="unfinished">バージョン %1 を使用</translation>
     </message>
     <message>
         <source>Install</source>
-        <translation>インストール</translation>
+        <translation type="unfinished">インストール</translation>
+    </message>
+</context>
+<context>
+    <name>MixerChannelName</name>
+    <message>
+        <source> (recording)</source>
+        <translation type="unfinished"> (録音中)</translation>
+    </message>
+</context>
+<context>
+    <name>MixerChannelStrip</name>
+    <message>
+        <source>Unmute master</source>
+        <translation type="unfinished">マスターのミュートを解除</translation>
     </message>
     <message>
-        <source>Reopen the project once they finish installing.</source>
-        <translation>インストールが完了したらプロジェクトを再度開いてください。</translation>
+        <source>Mute master</source>
+        <translation type="unfinished">マスターをミュート</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation type="unfinished">ミュート解除</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation type="unfinished">ミュート</translation>
+    </message>
+    <message>
+        <source>Unsolo</source>
+        <translation type="unfinished">ソロ解除</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation type="unfinished">ソロ</translation>
+    </message>
+    <message>
+        <source>Recording paused — click to finish</source>
+        <translation type="unfinished">録音一時停止中 — クリックして完了</translation>
+    </message>
+    <message>
+        <source>Recording — click to finish</source>
+        <translation type="unfinished">録音中 — クリックして完了</translation>
+    </message>
+    <message>
+        <source>Record voiceover on %1</source>
+        <translation type="unfinished">%1 にボイスオーバーを録音</translation>
+    </message>
+</context>
+<context>
+    <name>MixerFader</name>
+    <message>
+        <source>Master volume</source>
+        <translation type="unfinished">マスター音量</translation>
+    </message>
+    <message>
+        <source>%1 volume</source>
+        <translation type="unfinished">%1 の音量</translation>
+    </message>
+    <message>
+        <source>Mic gain %1 dB</source>
+        <translation type="unfinished">マイクゲイン %1 dB</translation>
+    </message>
+    <message>
+        <source>Volume %1 dB</source>
+        <translation type="unfinished">音量 %1 dB</translation>
+    </message>
+    <message>
+        <source> — Shift-drag for fine, double-click for 0 dB</source>
+        <translation type="unfinished"> — Shift+ドラッグで微調整、ダブルクリックで 0 dB</translation>
+    </message>
+</context>
+<context>
+    <name>MixerLevelReadout</name>
+    <message>
+        <source>Mic gain %1 dB (%2%) — scroll to adjust, double-click for 0 dB</source>
+        <translation type="unfinished">マイクゲイン %1 dB (%2%) — スクロールで調整、ダブルクリックで 0 dB</translation>
+    </message>
+    <message>
+        <source>%1 dB — scroll to adjust, double-click for 0 dB</source>
+        <translation type="unfinished">%1 dB — スクロールで調整、ダブルクリックで 0 dB</translation>
+    </message>
+</context>
+<context>
+    <name>MixerPanControl</name>
+    <message>
+        <source>Pan %1 — drag to adjust, double-click to center</source>
+        <translation type="unfinished">パン %1 — ドラッグで調整、ダブルクリックで中央に戻す</translation>
     </message>
 </context>
 <context>
@@ -10005,6 +10478,24 @@
     </message>
 </context>
 <context>
+    <name>MulticamAngleTile</name>
+    <message>
+        <source>Nothing here</source>
+        <translation type="unfinished">ここには何もありません</translation>
+    </message>
+    <message>
+        <source>Switch the program to %1 (key %2)</source>
+        <translation type="unfinished">プログラムを %1 に切り替え (キー %2)</translation>
+    </message>
+</context>
+<context>
+    <name>MulticamProgramBadge</name>
+    <message>
+        <source>Program</source>
+        <translation type="unfinished">プログラム</translation>
+    </message>
+</context>
+<context>
     <name>MulticamWindow</name>
     <message>
         <source>Multicam</source>
@@ -10035,24 +10526,12 @@
         <translation>自分のメディアから設定</translation>
     </message>
     <message>
-        <source>Nothing here</source>
-        <translation>ここには何もありません</translation>
-    </message>
-    <message>
-        <source>Switch the program to %1 (key %2)</source>
-        <translation>プログラムを %1 に切り替え (キー %2)</translation>
-    </message>
-    <message>
         <source>No clip at the current time</source>
         <translation>現在の時間にクリップがありません</translation>
     </message>
     <message>
         <source>GPU preview unavailable — see Help → Debug info</source>
         <translation>GPU プレビューは利用できません — 「ヘルプ」→「デバッグ情報」を参照してください</translation>
-    </message>
-    <message>
-        <source>Program</source>
-        <translation>プログラム</translation>
     </message>
     <message>
         <source>Previous frame</source>
@@ -10146,6 +10625,13 @@
     </message>
 </context>
 <context>
+    <name>NotificationHistoryRow</name>
+    <message>
+        <source>%1  (×%2)</source>
+        <translation type="unfinished">%1  (×%2)</translation>
+    </message>
+</context>
+<context>
     <name>NotificationList</name>
     <message>
         <source>Notifications</source>
@@ -10156,24 +10642,23 @@
         <translation>クリア</translation>
     </message>
     <message>
-        <source>Drift %1 is ready to install</source>
-        <translation>Drift %1 のインストール準備ができました</translation>
-    </message>
-    <message>
-        <source>Drift %1 is available</source>
-        <translation>Drift %1 が利用可能です</translation>
-    </message>
-    <message>
-        <source>Update</source>
-        <translation>アップデート</translation>
-    </message>
-    <message>
         <source>No notifications yet.</source>
         <translation>通知はまだありません。</translation>
     </message>
+</context>
+<context>
+    <name>NotificationUpdateRow</name>
     <message>
-        <source>%1  (×%2)</source>
-        <translation>%1  (×%2)</translation>
+        <source>Drift %1 is ready to install</source>
+        <translation type="unfinished">Drift %1 のインストール準備ができました</translation>
+    </message>
+    <message>
+        <source>Drift %1 is available</source>
+        <translation type="unfinished">Drift %1 が利用可能です</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation type="unfinished">アップデート</translation>
     </message>
 </context>
 <context>
@@ -10275,6 +10760,27 @@
     </message>
 </context>
 <context>
+    <name>PasteAttributesAudioSection</name>
+    <message>
+        <source>Audio Attributes</source>
+        <translation type="unfinished">オーディオ属性</translation>
+    </message>
+    <message>
+        <source>Volume &amp; Fades (volume keyframes, in/out ramps)</source>
+        <translation type="unfinished">音量とフェード (音量のキーフレーム、イン/アウトのランプ)</translation>
+    </message>
+    <message numerus="yes">
+        <source>Audio Effects (%n effect(s))</source>
+        <translation type="unfinished">
+            <numerusform>オーディオエフェクト (%n 個)</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Audio Effects (none)</source>
+        <translation type="unfinished">オーディオエフェクト (なし)</translation>
+    </message>
+</context>
+<context>
     <name>PasteAttributesDialog</name>
     <message>
         <source>Paste Attributes</source>
@@ -10299,68 +10805,6 @@
         </translation>
     </message>
     <message>
-        <source>Video Attributes</source>
-        <translation>ビデオの属性</translation>
-    </message>
-    <message>
-        <source>Transform (motion, position, scale, opacity)</source>
-        <translation>変形 (動き、位置、スケール、不透明度)</translation>
-    </message>
-    <message>
-        <source>, reverse</source>
-        <translation>, 逆再生</translation>
-    </message>
-    <message>
-        <source>, speed curve</source>
-        <translation>, スピードカーブ</translation>
-    </message>
-    <message>
-        <source>Speed / Retime (%1x%2%3)</source>
-        <translation>速度 / リタイム (%1x%2%3)</translation>
-    </message>
-    <message>
-        <source>Speed / Retime</source>
-        <translation>速度 / リタイム</translation>
-    </message>
-    <message numerus="yes">
-        <source>Video Effects (%n effect(s))</source>
-        <translation>
-            <numerusform>ビデオエフェクト (%n 個)</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Video Effects (none)</source>
-        <translation>ビデオエフェクト (なし)</translation>
-    </message>
-    <message>
-        <source>Audio Attributes</source>
-        <translation>オーディオ属性</translation>
-    </message>
-    <message>
-        <source>Volume &amp; Fades (volume keyframes, in/out ramps)</source>
-        <translation>音量とフェード (音量のキーフレーム、イン/アウトのランプ)</translation>
-    </message>
-    <message numerus="yes">
-        <source>Audio Effects (%n effect(s))</source>
-        <translation>
-            <numerusform>オーディオエフェクト (%n 個)</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Audio Effects (none)</source>
-        <translation>オーディオエフェクト (なし)</translation>
-    </message>
-    <message>
-        <source>Transitions</source>
-        <translation>トランジション</translation>
-    </message>
-    <message numerus="yes">
-        <source>Transitions (%n transition(s))</source>
-        <translation>
-            <numerusform>トランジション (%n 個)</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Replace existing effects (instead of appending)</source>
         <translation>既存のエフェクトを置き換える (追加するのではなく)</translation>
     </message>
@@ -10371,6 +10815,56 @@
     <message>
         <source>Select None</source>
         <translation>選択解除</translation>
+    </message>
+</context>
+<context>
+    <name>PasteAttributesTransitionsSection</name>
+    <message>
+        <source>Transitions</source>
+        <translation type="unfinished">トランジション</translation>
+    </message>
+    <message numerus="yes">
+        <source>Transitions (%n transition(s))</source>
+        <translation type="unfinished">
+            <numerusform>トランジション (%n 個)</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>PasteAttributesVideoSection</name>
+    <message>
+        <source>Video Attributes</source>
+        <translation type="unfinished">ビデオの属性</translation>
+    </message>
+    <message>
+        <source>Transform (motion, position, scale, opacity)</source>
+        <translation type="unfinished">変形 (動き、位置、スケール、不透明度)</translation>
+    </message>
+    <message>
+        <source>, reverse</source>
+        <translation type="unfinished">, 逆再生</translation>
+    </message>
+    <message>
+        <source>, speed curve</source>
+        <translation type="unfinished">, スピードカーブ</translation>
+    </message>
+    <message>
+        <source>Speed / Retime (%1x%2%3)</source>
+        <translation type="unfinished">速度 / リタイム (%1x%2%3)</translation>
+    </message>
+    <message>
+        <source>Speed / Retime</source>
+        <translation type="unfinished">速度 / リタイム</translation>
+    </message>
+    <message numerus="yes">
+        <source>Video Effects (%n effect(s))</source>
+        <translation type="unfinished">
+            <numerusform>ビデオエフェクト (%n 個)</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Video Effects (none)</source>
+        <translation type="unfinished">ビデオエフェクト (なし)</translation>
     </message>
 </context>
 <context>
@@ -10640,6 +11134,13 @@
     </message>
 </context>
 <context>
+    <name>PreviewCompactGpuCaption</name>
+    <message>
+        <source>GPU preview unavailable</source>
+        <translation type="unfinished">GPUプレビューは利用できません</translation>
+    </message>
+</context>
+<context>
     <name>PreviewModeSwitch</name>
     <message>
         <source>Camera Output</source>
@@ -10656,6 +11157,37 @@
     <message>
         <source>The scene from a free viewpoint, with the camera in it. Middle- or right-drag orbits, Shift pans, the wheel zooms, and the corner pad steps the view.</source>
         <translation>カメラを含むシーンを自由な視点から表示します。中ボタンまたは右ボタンのドラッグで旋回、Shift でパン、ホイールでズーム、隅のパッドで視点を段階的に移動できます。</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewOptionsDecodeDialog</name>
+    <message>
+        <source>Decoding on a different graphics card</source>
+        <translation type="unfinished">別のグラフィックカードでデコード</translation>
+    </message>
+    <message>
+        <source>Use anyway</source>
+        <translation type="unfinished">とにかく使用する</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">キャンセル</translation>
+    </message>
+    <message>
+        <source>Launching Drift with prime-run (or DRI_PRIME=1) puts OpenGL on the same card as the decoder.</source>
+        <translation type="unfinished">prime-run (または DRI_PRIME=1) を指定して Drift を起動すると、OpenGL がデコーダーと同じグラフィックカード上で動作するようになります。</translation>
+    </message>
+    <message>
+        <source>Run Drift on the high-performance graphics card</source>
+        <translation type="unfinished">高性能グラフィックスカードで Drift を実行する</translation>
+    </message>
+    <message>
+        <source>Set Drift to High performance in Windows Settings &gt; Display &gt; Graphics, then restart Drift.</source>
+        <translation type="unfinished">Windows の設定 &gt; ディスプレイ &gt; グラフィックス で Drift を「ハイパフォーマンス」に設定し、Drift を再起動してください。</translation>
+    </message>
+    <message>
+        <source>Open graphics settings</source>
+        <translation type="unfinished">グラフィック設定を開く</translation>
     </message>
 </context>
 <context>
@@ -10720,52 +11252,33 @@ If playback stutters, try another.</source>
         <source>Keep mask handles on the preview while another clip is selected</source>
         <translation>別のクリップが選択されている間も、プレビュー上にマスクのハンドルを表示したままにする</translation>
     </message>
+</context>
+<context>
+    <name>PreviewOsdGuideMenuButton</name>
     <message>
-        <source>Decoding on a different graphics card</source>
-        <translation>別のグラフィックカードでデコード</translation>
-    </message>
-    <message>
-        <source>Use anyway</source>
-        <translation>とにかく使用する</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>キャンセル</translation>
-    </message>
-    <message>
-        <source>Launching Drift with prime-run (or DRI_PRIME=1) puts OpenGL on the same card as the decoder.</source>
-        <translation>prime-run (または DRI_PRIME=1) を指定して Drift を起動すると、OpenGL がデコーダーと同じグラフィックカード上で動作するようになります。</translation>
-    </message>
-    <message>
-        <source>Run Drift on the high-performance graphics card</source>
-        <translation>高性能グラフィックスカードで Drift を実行する</translation>
-    </message>
-    <message>
-        <source>Set Drift to High performance in Windows Settings &gt; Display &gt; Graphics, then restart Drift.</source>
-        <translation>Windows の設定 &gt; ディスプレイ &gt; グラフィックス で Drift を「ハイパフォーマンス」に設定し、Drift を再起動してください。</translation>
-    </message>
-    <message>
-        <source>Open graphics settings</source>
-        <translation>グラフィック設定を開く</translation>
+        <source>Guide sets</source>
+        <translation type="unfinished">ガイドセット</translation>
     </message>
 </context>
 <context>
-    <name>PreviewOsd</name>
-    <message>
-        <source>Preview zoom — Ctrl+scroll over the preview to zoom, middle-drag to pan. Click to reset to 100%.</source>
-        <translation>プレビューズーム — プレビュー上で Ctrl+スクロールでズーム、中ボタンドラッグでパン。クリックで 100% にリセット。</translation>
-    </message>
+    <name>PreviewOsdGuidesButton</name>
     <message>
         <source>Toggle guides</source>
-        <translation>ガイドの切り替え</translation>
+        <translation type="unfinished">ガイドの切り替え</translation>
     </message>
-    <message>
-        <source>Guide sets</source>
-        <translation>ガイドセット</translation>
-    </message>
+</context>
+<context>
+    <name>PreviewOsdOptionsButton</name>
     <message>
         <source>Preview options</source>
-        <translation>プレビュー オプション</translation>
+        <translation type="unfinished">プレビュー オプション</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewOsdZoomChip</name>
+    <message>
+        <source>Preview zoom — Ctrl+scroll over the preview to zoom, middle-drag to pan. Click to reset to 100%.</source>
+        <translation type="unfinished">プレビューズーム — プレビュー上で Ctrl+スクロールでズーム、中ボタンドラッグでパン。クリックで 100% にリセット。</translation>
     </message>
 </context>
 <context>
@@ -10777,14 +11290,6 @@ If playback stutters, try another.</source>
 </context>
 <context>
     <name>PreviewStatusLayer</name>
-    <message>
-        <source>PAUSED %1s</source>
-        <translation>一時停止中 %1s</translation>
-    </message>
-    <message>
-        <source>REC %1s</source>
-        <translation>録画中 %1s</translation>
-    </message>
     <message>
         <source>Nothing to preview yet</source>
         <translation>プレビューするものはまだありません</translation>
@@ -10825,48 +11330,77 @@ If playback stutters, try another.</source>
         <translation>%1 (%2)</translation>
     </message>
     <message>
-        <source>Current time / total · %1 frames per second</source>
-        <translation>現在の時間 / 合計 · %1 フレーム/秒</translation>
-    </message>
-    <message>
-        <source>Jump back 1s · Shift for 5s · Ctrl for 10s</source>
-        <translation>1秒戻る · Shiftキーで5秒 · Ctrlキーで10秒</translation>
-    </message>
-    <message>
         <source>Previous frame</source>
         <translation>前のフレーム</translation>
-    </message>
-    <message>
-        <source>Pause</source>
-        <translation>一時停止</translation>
-    </message>
-    <message>
-        <source>Play</source>
-        <translation>再生</translation>
     </message>
     <message>
         <source>Next frame</source>
         <translation>次のフレーム</translation>
     </message>
-    <message>
-        <source>Loop work area on — click to turn off</source>
-        <translation>ワークエリアループオン — クリックでオフ</translation>
-    </message>
-    <message>
-        <source>Loop work area off — click to turn on</source>
-        <translation>ワークエリアループオフ — クリックでオン</translation>
-    </message>
+</context>
+<context>
+    <name>PreviewTransportFastForwardButton</name>
     <message>
         <source>Jump forward 1s · Shift for 5s · Ctrl for 10s</source>
-        <translation>1秒進む · Shiftキーで5秒 · Ctrlキーで10秒</translation>
+        <translation type="unfinished">1秒進む · Shiftキーで5秒 · Ctrlキーで10秒</translation>
     </message>
+</context>
+<context>
+    <name>PreviewTransportFullscreenButton</name>
     <message>
         <source>Exit fullscreen preview (Esc)</source>
-        <translation>フルスクリーンプレビューを終了 (Esc)</translation>
+        <translation type="unfinished">フルスクリーンプレビューを終了 (Esc)</translation>
     </message>
     <message>
         <source>Fullscreen preview</source>
-        <translation>フルスクリーンプレビュー</translation>
+        <translation type="unfinished">フルスクリーンプレビュー</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewTransportLoopButton</name>
+    <message>
+        <source>Loop work area on — click to turn off</source>
+        <translation type="unfinished">ワークエリアループオン — クリックでオフ</translation>
+    </message>
+    <message>
+        <source>Loop work area off — click to turn on</source>
+        <translation type="unfinished">ワークエリアループオフ — クリックでオン</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewTransportPlayButton</name>
+    <message>
+        <source>Pause</source>
+        <translation type="unfinished">一時停止</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">再生</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewTransportRewindButton</name>
+    <message>
+        <source>Jump back 1s · Shift for 5s · Ctrl for 10s</source>
+        <translation type="unfinished">1秒戻る · Shiftキーで5秒 · Ctrlキーで10秒</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewTransportTimecode</name>
+    <message>
+        <source>Current time / total · %1 frames per second</source>
+        <translation type="unfinished">現在の時間 / 合計 · %1 フレーム/秒</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewVoiceoverBadge</name>
+    <message>
+        <source>PAUSED %1s</source>
+        <translation type="unfinished">一時停止中 %1s</translation>
+    </message>
+    <message>
+        <source>REC %1s</source>
+        <translation type="unfinished">録画中 %1s</translation>
     </message>
 </context>
 <context>
@@ -11310,6 +11844,21 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>PropertiesEmptyState</name>
+    <message>
+        <source>It&apos;s empty here</source>
+        <translation type="unfinished">ここは空です</translation>
+    </message>
+    <message>
+        <source>Tap a clip on the timeline to edit its properties</source>
+        <translation type="unfinished">タイムライン上のクリップをタップしてプロパティを編集</translation>
+    </message>
+    <message>
+        <source>Click a clip on the timeline to edit its properties</source>
+        <translation type="unfinished">タイムライン上のクリップをクリックしてプロパティを編集</translation>
+    </message>
+</context>
+<context>
     <name>PropertiesPanel</name>
     <message>
         <source>General</source>
@@ -11382,18 +11931,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Transition</source>
         <translation>トランジション</translation>
-    </message>
-    <message>
-        <source>It&apos;s empty here</source>
-        <translation>ここは空です</translation>
-    </message>
-    <message>
-        <source>Tap a clip on the timeline to edit its properties</source>
-        <translation>タイムライン上のクリップをタップしてプロパティを編集</translation>
-    </message>
-    <message>
-        <source>Click a clip on the timeline to edit its properties</source>
-        <translation>タイムライン上のクリップをクリックしてプロパティを編集</translation>
     </message>
     <message>
         <source>Save effect preset</source>
@@ -11760,10 +12297,6 @@ If playback stutters, try another.</source>
 <context>
     <name>RecentProjectsPopup</name>
     <message>
-        <source>Remove from recents</source>
-        <translation>最近使用した項目から削除</translation>
-    </message>
-    <message>
         <source>All changes saved</source>
         <translation>すべての変更を保存しました</translation>
     </message>
@@ -11823,6 +12356,13 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>RecentProjectsProjectRow</name>
+    <message>
+        <source>Remove from recents</source>
+        <translation type="unfinished">最近使用した項目から削除</translation>
+    </message>
+</context>
+<context>
     <name>RecoveryDialog</name>
     <message>
         <source>Unsaved work from last session</source>
@@ -11847,6 +12387,96 @@ If playback stutters, try another.</source>
     <message>
         <source>Auto-saved: %1</source>
         <translation>自動保存 : %1</translation>
+    </message>
+</context>
+<context>
+    <name>RestoreCompareView</name>
+    <message>
+        <source>Original</source>
+        <translation type="unfinished">オリジナル</translation>
+    </message>
+    <message>
+        <source>Enhanced — out of date, preview again</source>
+        <translation type="unfinished">強化済み — 古くなっています、再度プレビューしてください</translation>
+    </message>
+    <message>
+        <source>Enhanced %1 × %2</source>
+        <translation type="unfinished">%1 × %2 に強化済み</translation>
+    </message>
+    <message>
+        <source>Loading this frame…</source>
+        <translation type="unfinished">このフレームを読み込み中…</translation>
+    </message>
+    <message>
+        <source>Working…</source>
+        <translation type="unfinished">処理中…</translation>
+    </message>
+    <message>
+        <source>Choose models, then Preview to compare this frame</source>
+        <translation type="unfinished">モデルを選択し、「プレビュー」でこのフレームを比較してください</translation>
+    </message>
+    <message>
+        <source>Frame</source>
+        <translation type="unfinished">フレーム</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <translation type="unfinished">秒</translation>
+    </message>
+    <message>
+        <source>Fit</source>
+        <translation type="unfinished">フィット</translation>
+    </message>
+</context>
+<context>
+    <name>RestoreControlColumn</name>
+    <message>
+        <source>Preview one frame, then enhance the whole video. The result is added to the media bin. Enhancing is slow — minutes per second of video without a GPU.</source>
+        <translation type="unfinished">1フレームをプレビューしてから、ビデオ全体を強化します。結果はメディアビンに追加されます。強化には時間がかかります — GPU がない場合、ビデオ 1秒あたり数分かかります。</translation>
+    </message>
+    <message>
+        <source>Preview one frame, then enhance the part of the clip used on the timeline. The result is added to the media bin. Enhancing is slow — minutes per second of video without a GPU.</source>
+        <translation type="unfinished">1フレームをプレビューしてから、タイムラインで使用されているクリップの部分を強化します。結果はメディアビンに追加されます。強化には時間がかかります — GPU がない場合、ビデオ 1秒あたり数分かかります。</translation>
+    </message>
+    <message>
+        <source>Remove compression</source>
+        <translation type="unfinished">圧縮を除去</translation>
+    </message>
+    <message>
+        <source>Upscale</source>
+        <translation type="unfinished">アップスケール</translation>
+    </message>
+    <message>
+        <source>Output: %1 × %2</source>
+        <translation type="unfinished">出力 : %1 × %2</translation>
+    </message>
+    <message>
+        <source> — larger than 4K, which is slow to edit and export</source>
+        <translation type="unfinished"> — 4K より大きいため、編集とエクスポートに時間がかかります</translation>
+    </message>
+    <message>
+        <source>Up to about %1 on this computer&apos;s CPU.</source>
+        <translation type="unfinished">このコンピューターの CPU で約 %1 かかります。</translation>
+    </message>
+    <message>
+        <source>Up to about %1 on a typical laptop CPU. Preview a frame for an estimate for this computer.</source>
+        <translation type="unfinished">一般的なノート PC の CPU で約 %1 かかります。このコンピューターでの見積もりを確認するには、フレームをプレビューしてください。</translation>
+    </message>
+    <message>
+        <source>Preview this frame</source>
+        <translation type="unfinished">このフレームをプレビュー</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished">停止</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">閉じる</translation>
+    </message>
+    <message>
+        <source>Enhance clip</source>
+        <translation type="unfinished">クリップを強化</translation>
     </message>
 </context>
 <context>
@@ -11885,6 +12515,57 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>RestoreUpscalerPicker</name>
+    <message>
+        <source>Anime and drawings</source>
+        <translation type="unfinished">アニメ・イラスト</translation>
+    </message>
+    <message>
+        <source>Live action</source>
+        <translation type="unfinished">実写</translation>
+    </message>
+    <message>
+        <source>3D animation and games</source>
+        <translation type="unfinished">3D アニメーション・ゲーム</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">全般</translation>
+    </message>
+    <message>
+        <source>Choose an upscaler</source>
+        <translation type="unfinished">アップスケーラーを選択</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">閉じる</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">すべて</translation>
+    </message>
+    <message>
+        <source>Speeds are per frame of this clip. Custom models are experimental and may not work. Drop an ONNX export (fp32 or fp16, RGB, 1x/2x/4x) into the folder; put the scale in the file name, e.g. &quot;2x_Name.onnx&quot;.</source>
+        <translation type="unfinished">速度はこのクリップの 1フレームあたりです。カスタムモデルは実験的な機能であり、動作しない場合があります。ONNX でエクスポートしたファイル (fp32 または fp16、RGB、1x/2x/4x) をフォルダーにドロップしてください。ファイル名に倍率を含めてください (例 : &quot;2x_Name.onnx&quot;)。</translation>
+    </message>
+    <message>
+        <source>Get models (openmodeldb.info)</source>
+        <translation type="unfinished">モデルを取得 (openmodeldb.info)</translation>
+    </message>
+    <message>
+        <source>Install AI engine first</source>
+        <translation type="unfinished">まず AI エンジンをインストール</translation>
+    </message>
+    <message>
+        <source>Open custom models folder</source>
+        <translation type="unfinished">カスタムモデルフォルダーを開く</translation>
+    </message>
+    <message>
+        <source>Refresh model list</source>
+        <translation type="unfinished">モデルリストを更新</translation>
+    </message>
+</context>
+<context>
     <name>RestoreWindow</name>
     <message>
         <source>Enhance video</source>
@@ -11897,114 +12578,6 @@ If playback stutters, try another.</source>
     <message>
         <source>%1 (custom, experimental)</source>
         <translation>%1 (カスタム、実験的)</translation>
-    </message>
-    <message>
-        <source>Original</source>
-        <translation>オリジナル</translation>
-    </message>
-    <message>
-        <source>Enhanced — out of date, preview again</source>
-        <translation>強化済み — 古くなっています、再度プレビューしてください</translation>
-    </message>
-    <message>
-        <source>Enhanced %1 × %2</source>
-        <translation>%1 × %2 に強化済み</translation>
-    </message>
-    <message>
-        <source>Loading this frame…</source>
-        <translation>このフレームを読み込み中…</translation>
-    </message>
-    <message>
-        <source>Working…</source>
-        <translation>処理中…</translation>
-    </message>
-    <message>
-        <source>Choose models, then Preview to compare this frame</source>
-        <translation>モデルを選択し、「プレビュー」でこのフレームを比較してください</translation>
-    </message>
-    <message>
-        <source>Frame</source>
-        <translation>フレーム</translation>
-    </message>
-    <message>
-        <source>s</source>
-        <translation>秒</translation>
-    </message>
-    <message>
-        <source>Fit</source>
-        <translation>フィット</translation>
-    </message>
-    <message>
-        <source>Preview one frame, then enhance the whole video. The result is added to the media bin. Enhancing is slow — minutes per second of video without a GPU.</source>
-        <translation>1フレームをプレビューしてから、ビデオ全体を強化します。結果はメディアビンに追加されます。強化には時間がかかります — GPU がない場合、ビデオ 1秒あたり数分かかります。</translation>
-    </message>
-    <message>
-        <source>Preview one frame, then enhance the part of the clip used on the timeline. The result is added to the media bin. Enhancing is slow — minutes per second of video without a GPU.</source>
-        <translation>1フレームをプレビューしてから、タイムラインで使用されているクリップの部分を強化します。結果はメディアビンに追加されます。強化には時間がかかります — GPU がない場合、ビデオ 1秒あたり数分かかります。</translation>
-    </message>
-    <message>
-        <source>Remove compression</source>
-        <translation>圧縮を除去</translation>
-    </message>
-    <message>
-        <source>Upscale</source>
-        <translation>アップスケール</translation>
-    </message>
-    <message>
-        <source>Output: %1 × %2</source>
-        <translation>出力 : %1 × %2</translation>
-    </message>
-    <message>
-        <source> — larger than 4K, which is slow to edit and export</source>
-        <translation> — 4K より大きいため、編集とエクスポートに時間がかかります</translation>
-    </message>
-    <message>
-        <source>Up to about %1 on this computer&apos;s CPU.</source>
-        <translation>このコンピューターの CPU で約 %1 かかります。</translation>
-    </message>
-    <message>
-        <source>Up to about %1 on a typical laptop CPU. Preview a frame for an estimate for this computer.</source>
-        <translation>一般的なノート PC の CPU で約 %1 かかります。このコンピューターでの見積もりを確認するには、フレームをプレビューしてください。</translation>
-    </message>
-    <message>
-        <source>Preview this frame</source>
-        <translation>このフレームをプレビュー</translation>
-    </message>
-    <message>
-        <source>Anime and drawings</source>
-        <translation>アニメ・イラスト</translation>
-    </message>
-    <message>
-        <source>Live action</source>
-        <translation>実写</translation>
-    </message>
-    <message>
-        <source>3D animation and games</source>
-        <translation>3D アニメーション・ゲーム</translation>
-    </message>
-    <message>
-        <source>General</source>
-        <translation>全般</translation>
-    </message>
-    <message>
-        <source>Choose an upscaler</source>
-        <translation>アップスケーラーを選択</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation>すべて</translation>
-    </message>
-    <message>
-        <source>Speeds are per frame of this clip. Custom models are experimental and may not work. Drop an ONNX export (fp32 or fp16, RGB, 1x/2x/4x) into the folder; put the scale in the file name, e.g. &quot;2x_Name.onnx&quot;.</source>
-        <translation>速度はこのクリップの 1フレームあたりです。カスタムモデルは実験的な機能であり、動作しない場合があります。ONNX でエクスポートしたファイル (fp32 または fp16、RGB、1x/2x/4x) をフォルダーにドロップしてください。ファイル名に倍率を含めてください (例 : &quot;2x_Name.onnx&quot;)。</translation>
-    </message>
-    <message>
-        <source>Refresh model list</source>
-        <translation>モデルリストを更新</translation>
-    </message>
-    <message>
-        <source>Enhance clip</source>
-        <translation>クリップを強化</translation>
     </message>
     <message>
         <source>under a second</source>
@@ -12033,26 +12606,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Keep the original size.</source>
         <translation>元のサイズを維持します。</translation>
-    </message>
-    <message>
-        <source>Install AI engine first</source>
-        <translation>まず AI エンジンをインストール</translation>
-    </message>
-    <message>
-        <source>Get models (openmodeldb.info)</source>
-        <translation>モデルを取得 (openmodeldb.info)</translation>
-    </message>
-    <message>
-        <source>Open custom models folder</source>
-        <translation>カスタムモデルフォルダーを開く</translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation>停止</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>閉じる</translation>
     </message>
 </context>
 <context>
@@ -12155,6 +12708,17 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>ScenesShotRow</name>
+    <message>
+        <source>Scene %1</source>
+        <translation type="unfinished">シーン %1</translation>
+    </message>
+    <message>
+        <source>%1 – %2  ·  %3s</source>
+        <translation type="unfinished">%1 – %2  ·  %3秒</translation>
+    </message>
+</context>
+<context>
     <name>ScenesTab</name>
     <message>
         <source>Finds where the picture cuts in the selected video clip, and ranks each shot by movement and loudness. Click a shot to jump to it.</source>
@@ -12236,13 +12800,72 @@ If playback stutters, try another.</source>
         <source>Select a video clip on the timeline to scan it.</source>
         <translation>タイムライン上のビデオクリップを選択してスキャンします。</translation>
     </message>
+</context>
+<context>
+    <name>SegmentationControlColumn</name>
     <message>
-        <source>Scene %1</source>
-        <translation>シーン %1</translation>
+        <source>Tap marks the subject, press and hold marks what to exclude. Tap a marker to remove it.</source>
+        <translation type="unfinished">タップで被写体をマークし、長押しで除外する部分をマークします。マーカーをタップすると削除できます。</translation>
     </message>
     <message>
-        <source>%1 – %2  ·  %3s</source>
-        <translation>%1 – %2  ·  %3秒</translation>
+        <source>Left-click marks the subject, right-click marks what to exclude. Click a marker to remove it.</source>
+        <translation type="unfinished">左クリックで被写体をマーク、右クリックで除外するものをマークします。マーカーをクリックすると削除されます。</translation>
+    </message>
+    <message>
+        <source>Everyone in the shot is cut out automatically — there is nothing to click.</source>
+        <translation type="unfinished">写真に写っている全員が自動的に切り抜かれるため、クリックなどの操作は一切不要です。</translation>
+    </message>
+    <message>
+        <source>Cut out</source>
+        <translation type="unfinished">切り抜き</translation>
+    </message>
+    <message>
+        <source>Quality</source>
+        <translation type="unfinished">品質</translation>
+    </message>
+    <message>
+        <source>AI: %1</source>
+        <translation type="unfinished">AI : %1</translation>
+    </message>
+    <message>
+        <source>not installed</source>
+        <translation type="unfinished">インストールされていません</translation>
+    </message>
+    <message>
+        <source>Result</source>
+        <translation type="unfinished">結果</translation>
+    </message>
+    <message>
+        <source>Adds a mask layer under the clip. The clip itself is left alone — flip it to the background, or remove it, from the Masks tab.</source>
+        <translation type="unfinished">クリップの下にマスクレイヤーを追加します。クリップ自体はそのまま残ります。 — 「マスク」タブから、背景に切り替えたり、削除したりすることができます。</translation>
+    </message>
+    <message>
+        <source>The cutout is only for this effect — no extra tracks are added.</source>
+        <translation type="unfinished">切り抜きはこのエフェクト専用です — 追加のトラックは作成されません。</translation>
+    </message>
+    <message>
+        <source>Clear points</source>
+        <translation type="unfinished">ポイントをクリア</translation>
+    </message>
+    <message>
+        <source>Cutting out… %1%</source>
+        <translation type="unfinished">切り抜き中… %1%</translation>
+    </message>
+    <message>
+        <source>Cut out &amp; apply effect</source>
+        <translation type="unfinished">切り抜いてエフェクトを適用</translation>
+    </message>
+    <message>
+        <source>Cut out subject</source>
+        <translation type="unfinished">被写体を切り抜く</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">キャンセル</translation>
+    </message>
+    <message>
+        <source>Each moment is processed, so longer clips take longer.</source>
+        <translation type="unfinished">各瞬間が処理されるため、長いクリップほど時間がかかります。</translation>
     </message>
 </context>
 <context>
@@ -12317,6 +12940,21 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>SegmentationFrameColumn</name>
+    <message>
+        <source>Looking at this moment…</source>
+        <translation type="unfinished">この瞬間を確認中…</translation>
+    </message>
+    <message>
+        <source>Frame</source>
+        <translation type="unfinished">フレーム</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <translation type="unfinished">秒</translation>
+    </message>
+</context>
+<context>
     <name>SegmentationWindow</name>
     <message>
         <source>Cut out subject</source>
@@ -12338,77 +12976,143 @@ If playback stutters, try another.</source>
         <source>Fast</source>
         <translation>高速</translation>
     </message>
+</context>
+<context>
+    <name>SettingsAppSection</name>
     <message>
-        <source>Looking at this moment…</source>
-        <translation>この瞬間を確認中…</translation>
+        <source>App</source>
+        <translation type="unfinished">アプリ</translation>
     </message>
     <message>
-        <source>Frame</source>
-        <translation>フレーム</translation>
+        <source>Reopen last project on startup</source>
+        <translation type="unfinished">起動時に最後のプロジェクトを開く</translation>
     </message>
     <message>
-        <source>s</source>
-        <translation>秒</translation>
+        <source>Automatically restore the last open project on startup. Closing still asks you to save; a crash snapshot never overwrites your save file.</source>
+        <translation type="unfinished">起動時に最後に開いていたプロジェクトを自動的に復元します。終了時には依然として保存を確認します；クラッシュ時のスナップショットが保存ファイルを上書きすることはありません。</translation>
     </message>
     <message>
-        <source>Tap marks the subject, press and hold marks what to exclude. Tap a marker to remove it.</source>
-        <translation>タップで被写体をマークし、長押しで除外する部分をマークします。マーカーをタップすると削除できます。</translation>
+        <source>Updates</source>
+        <translation type="unfinished">アップデート</translation>
     </message>
     <message>
-        <source>Left-click marks the subject, right-click marks what to exclude. Click a marker to remove it.</source>
-        <translation>左クリックで被写体をマーク、右クリックで除外するものをマークします。マーカーをクリックすると削除されます。</translation>
+        <source>Check on startup</source>
+        <translation type="unfinished">起動時に確認</translation>
     </message>
     <message>
-        <source>Everyone in the shot is cut out automatically — there is nothing to click.</source>
-        <translation>写真に写っている全員が自動的に切り抜かれるため、クリックなどの操作は一切不要です。</translation>
+        <source>Once a day, check whether a newer Drift has been released</source>
+        <translation type="unfinished">1日1回、新しい Drift がリリースされていないか確認する</translation>
     </message>
     <message>
-        <source>Cut out</source>
-        <translation>切り抜き</translation>
+        <source>Checking…</source>
+        <translation type="unfinished">確認中…</translation>
     </message>
     <message>
-        <source>Quality</source>
-        <translation>品質</translation>
+        <source>Downloading…</source>
+        <translation type="unfinished">ダウンロード中…</translation>
     </message>
     <message>
-        <source>AI: %1</source>
-        <translation>AI : %1</translation>
+        <source>Check now</source>
+        <translation type="unfinished">今すぐ確認</translation>
     </message>
     <message>
-        <source>not installed</source>
-        <translation>インストールされていません</translation>
+        <source>Drift %1</source>
+        <translation type="unfinished">Drift %1</translation>
     </message>
     <message>
-        <source>Result</source>
-        <translation>結果</translation>
+        <source>Extra packs</source>
+        <translation type="unfinished">拡張パック</translation>
     </message>
     <message>
-        <source>Adds a mask layer under the clip. The clip itself is left alone — flip it to the background, or remove it, from the Masks tab.</source>
-        <translation>クリップの下にマスクレイヤーを追加します。クリップ自体はそのまま残ります。 — 「マスク」タブから、背景に切り替えたり、削除したりすることができます。</translation>
+        <source>Remind about essential packs</source>
+        <translation type="unfinished">必須パックの通知</translation>
     </message>
     <message>
-        <source>The cutout is only for this effect — no extra tracks are added.</source>
-        <translation>切り抜きはこのエフェクト専用です — 追加のトラックは作成されません。</translation>
+        <source>Pulse the Extras icon when the video, transitions, and audio packs are not installed</source>
+        <translation type="unfinished">ビデオ、トランジション、オーディオパックがインストールされていないときに拡張機能アイコンを点滅させる</translation>
     </message>
     <message>
-        <source>Clear points</source>
-        <translation>ポイントをクリア</translation>
+        <source>Remind about pack updates</source>
+        <translation type="unfinished">パックアップデートの通知</translation>
     </message>
     <message>
-        <source>Cutting out… %1%</source>
-        <translation>切り抜き中… %1%</translation>
+        <source>Pulse the Extras icon when updates are available for packs you already have installed</source>
+        <translation type="unfinished">インストール済みのパックにアップデートが利用可能なときに拡張機能アイコンを点滅させる</translation>
     </message>
     <message>
-        <source>Cut out &amp; apply effect</source>
-        <translation>切り抜いてエフェクトを適用</translation>
+        <source>Agent access</source>
+        <translation type="unfinished">エージェントアクセス</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsCloudProvidersSection</name>
+    <message>
+        <source>Cloud providers</source>
+        <translation type="unfinished">クラウドプロバイダー</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>キャンセル</translation>
+        <source>Keys are stored unencrypted in Drift&apos;s settings. ELEVENLABS_API_KEY and FISH_API_KEY in the environment take precedence. Use is billed to your own account.</source>
+        <translation type="unfinished">キーは暗号化されずに Drift の設定に保存されます。環境変数の ELEVENLABS_API_KEY および FISH_API_KEY が優先されます。利用料金はお客様のアカウントに請求されます。</translation>
     </message>
     <message>
-        <source>Each moment is processed, so longer clips take longer.</source>
-        <translation>各瞬間が処理されるため、長いクリップほど時間がかかります。</translation>
+        <source>Transcription (Scribe), voiceover, sound effects</source>
+        <translation type="unfinished">文字起こし (Scribe)、ボイスオーバー、効果音</translation>
+    </message>
+    <message>
+        <source>Voiceover</source>
+        <translation type="unfinished">ボイスオーバー</translation>
+    </message>
+    <message>
+        <source>No key</source>
+        <translation type="unfinished">キーなし</translation>
+    </message>
+    <message>
+        <source>Key from the environment</source>
+        <translation type="unfinished">環境変数からのキー</translation>
+    </message>
+    <message>
+        <source>Key %1</source>
+        <translation type="unfinished">キー %1</translation>
+    </message>
+    <message>
+        <source>Paste API key</source>
+        <translation type="unfinished">API キーを貼り付け</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">保存</translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished">テスト</translation>
+    </message>
+    <message>
+        <source>Checking…</source>
+        <translation type="unfinished">確認中…</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished">クリア</translation>
+    </message>
+    <message>
+        <source>Allow sending audio and text to %1</source>
+        <translation type="unfinished">%1 への音声とテキストの送信を許可</translation>
+    </message>
+    <message>
+        <source>Needed before Drift or a connected agent can transcribe or generate audio with this service</source>
+        <translation type="unfinished">Drift や接続されたエージェントがこのサービスを使用して音声を文字起こしまたは生成できるようにするために必要です</translation>
+    </message>
+    <message>
+        <source>Default voice id</source>
+        <translation type="unfinished">デフォルトのボイス ID</translation>
+    </message>
+    <message>
+        <source>Voice model</source>
+        <translation type="unfinished">ボイスモデル</translation>
+    </message>
+    <message>
+        <source>Transcription model</source>
+        <translation type="unfinished">文字起こしモデル</translation>
     </message>
 </context>
 <context>
@@ -12423,370 +13127,251 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPane</name>
-    <message>
-        <source>Preview</source>
-        <translation>プレビュー</translation>
-    </message>
-    <message>
-        <source>Show guides</source>
-        <translation>ガイドを表示</translation>
-    </message>
-    <message>
-        <source>Show alignment guides over the preview</source>
-        <translation>プレビューにアライメントガイドを表示</translation>
-    </message>
-    <message>
-        <source>Background</source>
-        <translation>背景</translation>
-    </message>
-    <message>
-        <source>Solid color</source>
-        <translation>単色</translation>
-    </message>
-    <message>
-        <source>Blur</source>
-        <translation>ブラー</translation>
-    </message>
-    <message>
-        <source>Transparent</source>
-        <translation>透明</translation>
-    </message>
-    <message>
-        <source>Fill behind clips that don’t cover the whole screen</source>
-        <translation>画面全体を覆わないクリップの後ろを埋める</translation>
-    </message>
-    <message>
-        <source>Choose background colour</source>
-        <translation>背景色を選択</translation>
-    </message>
-    <message>
-        <source>Blur strength</source>
-        <translation>ブラーの強さ</translation>
-    </message>
-    <message>
-        <source>Use proxies for preview</source>
-        <translation>プレビューにプロキシを使用</translation>
-    </message>
-    <message>
-        <source>Play clips from their low-resolution proxies where one exists. Export always uses the original media.</source>
-        <translation>プロキシが存在する場合は、低解像度のプロキシからクリップを再生します。エクスポートには常に元のメディアが使用されます。</translation>
-    </message>
-    <message>
-        <source>Proxy resolution</source>
-        <translation>プロキシ解像度</translation>
-    </message>
-    <message>
-        <source>360p</source>
-        <translation>360p</translation>
-    </message>
-    <message>
-        <source>540p</source>
-        <translation>540p</translation>
-    </message>
-    <message>
-        <source>720p</source>
-        <translation>720p</translation>
-    </message>
-    <message>
-        <source>1080p</source>
-        <translation>1080p</translation>
-    </message>
-    <message>
-        <source>Size of new proxies. Proxies made at another size are not used until you create them again.</source>
-        <translation>新規プロキシのサイズ。別のサイズで作成されたプロキシは、再度作成するまで使用されません。</translation>
-    </message>
-    <message>
-        <source>Proxy name patterns</source>
-        <translation>プロキシ名パターン</translation>
-    </message>
-    <message>
-        <source>Linking a proxy teaches Drift its name pattern. Proxies next to your media that match a pattern below link automatically.</source>
-        <translation>プロキシをリンクすると、Drift がその名前パターンを学習します。メディアの隣にあるプロキシが以下のパターンに一致すると、自動的にリンクされます。</translation>
-    </message>
-    <message>
-        <source>Remove pattern</source>
-        <translation>パターンを削除</translation>
-    </message>
-    <message>
-        <source>Reset to defaults</source>
-        <translation>デフォルトにリセット</translation>
-    </message>
-    <message>
-        <source>Faster preview (experimental)</source>
-        <translation>高速プレビュー (実験的)</translation>
-    </message>
-    <message>
-        <source>Can make playback smoother by keeping video on the graphics card. Turn it off if the picture looks wrong. Takes effect after restart.</source>
-        <translation>ビデオをグラフィックスカード上に保持することで再生を滑らかにできます。画像がおかしくなる場合はオフにしてください。再起動後に有効になります。</translation>
-    </message>
-    <message>
-        <source>Graphics card</source>
-        <translation>グラフィックスカード</translation>
-    </message>
-    <message>
-        <source>Windows default</source>
-        <translation>Windows デフォルト</translation>
-    </message>
-    <message>
-        <source>Power saving (integrated GPU)</source>
-        <translation>省電力 (内蔵GPU)</translation>
-    </message>
-    <message>
-        <source>High performance (discrete GPU)</source>
-        <translation>ハイパフォーマンス (discrete GPU)</translation>
-    </message>
-    <message>
-        <source>Which graphics card Drift runs on. High performance keeps video decoded on an NVIDIA card on that card; power saving uses less battery. Takes effect after restart.</source>
-        <translation>Driftがどのグラフィックスカードで動作するかを設定します。ハイパフォーマンスにすると、NVIDIA カード上での動画デコード処理がそのカード内で行われます。省電力にすると、バッテリー消費が抑えられます。設定は再起動後に反映されます。</translation>
-    </message>
-    <message>
-        <source>Choose which graphics card Drift runs on in Windows Settings, under Display &gt; Graphics. Takes effect after restart.</source>
-        <translation>Windows の設定の ディスプレイ &gt; グラフィックス で、Drift がどのグラフィックスカードで動作するかを選択します。再起動後に有効になります。</translation>
-    </message>
-    <message>
-        <source>Open graphics settings</source>
-        <translation>グラフィック設定を開く</translation>
-    </message>
-    <message>
-        <source>Playback</source>
-        <translation>再生</translation>
-    </message>
-    <message>
-        <source>Audio output</source>
-        <translation>オーディオ出力</translation>
-    </message>
-    <message>
-        <source>Where playback is heard. “System default” follows whatever your computer is set to, including when that changes.</source>
-        <translation>再生が聞こえる場所。「システムデフォルト」はコンピューターの設定に追従し、変更時も反映されます。</translation>
-    </message>
-    <message>
-        <source>Microphone input</source>
-        <translation>マイク入力</translation>
-    </message>
-    <message>
-        <source>Audio device used for recording voiceovers onto audio tracks.</source>
-        <translation>オーディオトラックにボイスオーバーを録音するために使用するオーディオデバイス。</translation>
-    </message>
+    <name>SettingsInterfaceSection</name>
     <message>
         <source>Interface</source>
-        <translation>インターフェース</translation>
+        <translation type="unfinished">インターフェース</translation>
     </message>
     <message>
         <source>Size</source>
-        <translation>サイズ</translation>
+        <translation type="unfinished">サイズ</translation>
     </message>
     <message>
         <source>100% (system)</source>
-        <translation>100% (システム)</translation>
+        <translation type="unfinished">100% (システム)</translation>
     </message>
     <message>
         <source>Makes buttons, text, and icons larger. This is extra scale on top of the size already set in your display settings. Takes effect after restart.</source>
-        <translation>ボタン、テキスト、アイコンを大きくします。これはディスプレイ設定で既に設定されているサイズに加えての拡大です。再起動後に有効になります。</translation>
+        <translation type="unfinished">ボタン、テキスト、アイコンを大きくします。これはディスプレイ設定で既に設定されているサイズに加えての拡大です。再起動後に有効になります。</translation>
     </message>
     <message>
         <source>Restart Drift to apply this size.</source>
-        <translation>このサイズを適用するには Drift を再起動してください。</translation>
+        <translation type="unfinished">このサイズを適用するには Drift を再起動してください。</translation>
     </message>
     <message>
         <source>Layout</source>
-        <translation>レイアウト</translation>
+        <translation type="unfinished">レイアウト</translation>
     </message>
     <message>
         <source>Automatic</source>
-        <translation>自動</translation>
+        <translation type="unfinished">自動</translation>
     </message>
     <message>
         <source>Desktop</source>
-        <translation>デスクトップ</translation>
+        <translation type="unfinished">デスクトップ</translation>
     </message>
     <message>
         <source>Mobile</source>
-        <translation>モバイル</translation>
+        <translation type="unfinished">モバイル</translation>
     </message>
     <message>
         <source>Desktop suits a mouse and keyboard, including tablets in desktop mode. Mobile is the touch layout made for phones. Takes effect after restart.</source>
-        <translation>デスクトップはマウスとキーボードに適しており、デスクトップモードのタブレットも含みます。モバイルはスマートフォン向けのタッチレイアウトです。再起動後に有効になります。</translation>
+        <translation type="unfinished">デスクトップはマウスとキーボードに適しており、デスクトップモードのタブレットも含みます。モバイルはスマートフォン向けのタッチレイアウトです。再起動後に有効になります。</translation>
     </message>
     <message>
         <source>Restart Drift to switch layouts.</source>
-        <translation>レイアウトを切り替えるには Drift を再起動してください。</translation>
+        <translation type="unfinished">レイアウトを切り替えるには Drift を再起動してください。</translation>
     </message>
     <message>
         <source>Restart now</source>
-        <translation>今すぐ再起動</translation>
+        <translation type="unfinished">今すぐ再起動</translation>
     </message>
     <message>
         <source>Horizontal mouse-wheel pan</source>
-        <translation>マウスホイール水平パン</translation>
+        <translation type="unfinished">マウスホイール水平パン</translation>
     </message>
     <message>
         <source>Scroll pans left and right along the timeline. Shift+scroll moves between tracks. Middle-click drag also pans.</source>
-        <translation>スクロールでタイムラインに沿って左右にパンします。Shift+スクロールでトラック間を移動します。中クリックドラッグでもパンします。</translation>
+        <translation type="unfinished">スクロールでタイムラインに沿って左右にパンします。Shift+スクロールでトラック間を移動します。中クリックドラッグでもパンします。</translation>
     </message>
     <message>
         <source>Haptic feedback</source>
-        <translation>触覚フィードバック</translation>
+        <translation type="unfinished">触覚フィードバック</translation>
     </message>
     <message>
         <source>Vibrate on taps, snaps, and edits. Uses this device’s own haptic effects when it has them.</source>
-        <translation>タップ、スナップ、編集時に振動します。このデバイスが独自の触覚エフェクトを持っている場合はそれを使用します。</translation>
+        <translation type="unfinished">タップ、スナップ、編集時に振動します。このデバイスが独自の触覚エフェクトを持っている場合はそれを使用します。</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation>言語</translation>
+        <translation type="unfinished">言語</translation>
     </message>
     <message>
         <source>Language for menus and labels. Takes effect immediately.</source>
-        <translation>メニューとラベルの言語。即座に反映されます。</translation>
+        <translation type="unfinished">メニューとラベルの言語。即座に反映されます。</translation>
     </message>
-    <message>
-        <source>App</source>
-        <translation>アプリ</translation>
-    </message>
-    <message>
-        <source>Reopen last project on startup</source>
-        <translation>起動時に最後のプロジェクトを開く</translation>
-    </message>
-    <message>
-        <source>Automatically restore the last open project on startup. Closing still asks you to save; a crash snapshot never overwrites your save file.</source>
-        <translation>起動時に最後に開いていたプロジェクトを自動的に復元します。終了時には依然として保存を確認します；クラッシュ時のスナップショットが保存ファイルを上書きすることはありません。</translation>
-    </message>
-    <message>
-        <source>Updates</source>
-        <translation>アップデート</translation>
-    </message>
-    <message>
-        <source>Check on startup</source>
-        <translation>起動時に確認</translation>
-    </message>
-    <message>
-        <source>Checking…</source>
-        <translation>確認中…</translation>
-    </message>
-    <message>
-        <source>Check now</source>
-        <translation>今すぐ確認</translation>
-    </message>
-    <message>
-        <source>Drift %1</source>
-        <translation>Drift %1</translation>
-    </message>
-    <message>
-        <source>Extra packs</source>
-        <translation>拡張パック</translation>
-    </message>
-    <message>
-        <source>Remind about essential packs</source>
-        <translation>必須パックの通知</translation>
-    </message>
-    <message>
-        <source>Pulse the Extras icon when the video, transitions, and audio packs are not installed</source>
-        <translation>ビデオ、トランジション、オーディオパックがインストールされていないときに拡張機能アイコンを点滅させる</translation>
-    </message>
-    <message>
-        <source>Remind about pack updates</source>
-        <translation>パックアップデートの通知</translation>
-    </message>
-    <message>
-        <source>Pulse the Extras icon when updates are available for packs you already have installed</source>
-        <translation>インストール済みのパックにアップデートが利用可能なときに拡張機能アイコンを点滅させる</translation>
-    </message>
-    <message>
-        <source>Agent access</source>
-        <translation>エージェントアクセス</translation>
-    </message>
-    <message>
-        <source>Cloud providers</source>
-        <translation>クラウドプロバイダー</translation>
-    </message>
-    <message>
-        <source>Keys are stored unencrypted in Drift&apos;s settings. ELEVENLABS_API_KEY and FISH_API_KEY in the environment take precedence. Use is billed to your own account.</source>
-        <translation>キーは暗号化されずに Drift の設定に保存されます。環境変数の ELEVENLABS_API_KEY および FISH_API_KEY が優先されます。利用料金はお客様のアカウントに請求されます。</translation>
-    </message>
-    <message>
-        <source>Transcription (Scribe), voiceover, sound effects</source>
-        <translation>文字起こし (Scribe)、ボイスオーバー、効果音</translation>
-    </message>
-    <message>
-        <source>Voiceover</source>
-        <translation>ボイスオーバー</translation>
-    </message>
-    <message>
-        <source>No key</source>
-        <translation>キーなし</translation>
-    </message>
-    <message>
-        <source>Key from the environment</source>
-        <translation>環境変数からのキー</translation>
-    </message>
-    <message>
-        <source>Key %1</source>
-        <translation>キー %1</translation>
-    </message>
-    <message>
-        <source>Paste API key</source>
-        <translation>API キーを貼り付け</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>保存</translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation>テスト</translation>
-    </message>
-    <message>
-        <source>Clear</source>
-        <translation>クリア</translation>
-    </message>
-    <message>
-        <source>Allow sending audio and text to %1</source>
-        <translation>%1 への音声とテキストの送信を許可</translation>
-    </message>
-    <message>
-        <source>Needed before Drift or a connected agent can transcribe or generate audio with this service</source>
-        <translation>Drift や接続されたエージェントがこのサービスを使用して音声を文字起こしまたは生成できるようにするために必要です</translation>
-    </message>
-    <message>
-        <source>Default voice id</source>
-        <translation>デフォルトのボイス ID</translation>
-    </message>
-    <message>
-        <source>Voice model</source>
-        <translation>ボイスモデル</translation>
-    </message>
-    <message>
-        <source>Transcription model</source>
-        <translation>文字起こしモデル</translation>
-    </message>
+</context>
+<context>
+    <name>SettingsMarketplaceSection</name>
     <message>
         <source>Marketplace</source>
-        <translation>マーケットプレイス</translation>
+        <translation type="unfinished">マーケットプレイス</translation>
     </message>
     <message>
         <source>Account connected (%1)</source>
-        <translation>アカウントが接続されました (%1)</translation>
+        <translation type="unfinished">アカウントが接続されました (%1)</translation>
     </message>
     <message>
         <source>Marketplace account connected</source>
-        <translation>マーケットプレイスのアカウントに接続しました</translation>
+        <translation type="unfinished">マーケットプレイスのアカウントに接続しました</translation>
     </message>
     <message>
         <source>Disconnect</source>
-        <translation>切断</translation>
+        <translation type="unfinished">切断</translation>
     </message>
     <message>
         <source>Unlink the marketplace account from this device</source>
-        <translation>このデバイスからマーケットプレイスアカウントのリンクを解除する</translation>
+        <translation type="unfinished">このデバイスからマーケットプレイスアカウントのリンクを解除する</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPlaybackSection</name>
+    <message>
+        <source>Playback</source>
+        <translation type="unfinished">再生</translation>
     </message>
     <message>
-        <source>Once a day, check whether a newer Drift has been released</source>
-        <translation>1日1回、新しい Drift がリリースされていないか確認する</translation>
+        <source>Audio output</source>
+        <translation type="unfinished">オーディオ出力</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>ダウンロード中…</translation>
+        <source>Where playback is heard. “System default” follows whatever your computer is set to, including when that changes.</source>
+        <translation type="unfinished">再生が聞こえる場所。「システムデフォルト」はコンピューターの設定に追従し、変更時も反映されます。</translation>
+    </message>
+    <message>
+        <source>Microphone input</source>
+        <translation type="unfinished">マイク入力</translation>
+    </message>
+    <message>
+        <source>Audio device used for recording voiceovers onto audio tracks.</source>
+        <translation type="unfinished">オーディオトラックにボイスオーバーを録音するために使用するオーディオデバイス。</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPreviewSection</name>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished">プレビュー</translation>
+    </message>
+    <message>
+        <source>Show guides</source>
+        <translation type="unfinished">ガイドを表示</translation>
+    </message>
+    <message>
+        <source>Show alignment guides over the preview</source>
+        <translation type="unfinished">プレビューにアライメントガイドを表示</translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation type="unfinished">背景</translation>
+    </message>
+    <message>
+        <source>Solid color</source>
+        <translation type="unfinished">単色</translation>
+    </message>
+    <message>
+        <source>Blur</source>
+        <translation type="unfinished">ブラー</translation>
+    </message>
+    <message>
+        <source>Transparent</source>
+        <translation type="unfinished">透明</translation>
+    </message>
+    <message>
+        <source>Fill behind clips that don’t cover the whole screen</source>
+        <translation type="unfinished">画面全体を覆わないクリップの後ろを埋める</translation>
+    </message>
+    <message>
+        <source>Choose background colour</source>
+        <translation type="unfinished">背景色を選択</translation>
+    </message>
+    <message>
+        <source>Blur strength</source>
+        <translation type="unfinished">ブラーの強さ</translation>
+    </message>
+    <message>
+        <source>Use proxies for preview</source>
+        <translation type="unfinished">プレビューにプロキシを使用</translation>
+    </message>
+    <message>
+        <source>Play clips from their low-resolution proxies where one exists. Export always uses the original media.</source>
+        <translation type="unfinished">プロキシが存在する場合は、低解像度のプロキシからクリップを再生します。エクスポートには常に元のメディアが使用されます。</translation>
+    </message>
+    <message>
+        <source>Proxy resolution</source>
+        <translation type="unfinished">プロキシ解像度</translation>
+    </message>
+    <message>
+        <source>360p</source>
+        <translation type="unfinished">360p</translation>
+    </message>
+    <message>
+        <source>540p</source>
+        <translation type="unfinished">540p</translation>
+    </message>
+    <message>
+        <source>720p</source>
+        <translation type="unfinished">720p</translation>
+    </message>
+    <message>
+        <source>1080p</source>
+        <translation type="unfinished">1080p</translation>
+    </message>
+    <message>
+        <source>Size of new proxies. Proxies made at another size are not used until you create them again.</source>
+        <translation type="unfinished">新規プロキシのサイズ。別のサイズで作成されたプロキシは、再度作成するまで使用されません。</translation>
+    </message>
+    <message>
+        <source>Proxy name patterns</source>
+        <translation type="unfinished">プロキシ名パターン</translation>
+    </message>
+    <message>
+        <source>Linking a proxy teaches Drift its name pattern. Proxies next to your media that match a pattern below link automatically.</source>
+        <translation type="unfinished">プロキシをリンクすると、Drift がその名前パターンを学習します。メディアの隣にあるプロキシが以下のパターンに一致すると、自動的にリンクされます。</translation>
+    </message>
+    <message>
+        <source>Remove pattern</source>
+        <translation type="unfinished">パターンを削除</translation>
+    </message>
+    <message>
+        <source>Reset to defaults</source>
+        <translation type="unfinished">デフォルトにリセット</translation>
+    </message>
+    <message>
+        <source>Faster preview (experimental)</source>
+        <translation type="unfinished">高速プレビュー (実験的)</translation>
+    </message>
+    <message>
+        <source>Can make playback smoother by keeping video on the graphics card. Turn it off if the picture looks wrong. Takes effect after restart.</source>
+        <translation type="unfinished">ビデオをグラフィックスカード上に保持することで再生を滑らかにできます。画像がおかしくなる場合はオフにしてください。再起動後に有効になります。</translation>
+    </message>
+    <message>
+        <source>Graphics card</source>
+        <translation type="unfinished">グラフィックスカード</translation>
+    </message>
+    <message>
+        <source>Windows default</source>
+        <translation type="unfinished">Windows デフォルト</translation>
+    </message>
+    <message>
+        <source>Power saving (integrated GPU)</source>
+        <translation type="unfinished">省電力 (内蔵GPU)</translation>
+    </message>
+    <message>
+        <source>High performance (discrete GPU)</source>
+        <translation type="unfinished">ハイパフォーマンス (discrete GPU)</translation>
+    </message>
+    <message>
+        <source>Which graphics card Drift runs on. High performance keeps video decoded on an NVIDIA card on that card; power saving uses less battery. Takes effect after restart.</source>
+        <translation type="unfinished">Driftがどのグラフィックスカードで動作するかを設定します。ハイパフォーマンスにすると、NVIDIA カード上での動画デコード処理がそのカード内で行われます。省電力にすると、バッテリー消費が抑えられます。設定は再起動後に反映されます。</translation>
+    </message>
+    <message>
+        <source>Choose which graphics card Drift runs on in Windows Settings, under Display &gt; Graphics. Takes effect after restart.</source>
+        <translation type="unfinished">Windows の設定の ディスプレイ &gt; グラフィックス で、Drift がどのグラフィックスカードで動作するかを選択します。再起動後に有効になります。</translation>
+    </message>
+    <message>
+        <source>Open graphics settings</source>
+        <translation type="unfinished">グラフィック設定を開く</translation>
     </message>
 </context>
 <context>
@@ -12819,22 +13404,6 @@ If playback stutters, try another.</source>
         <source>No sound effects here.</source>
         <translation>ここには効果音がありません。</translation>
     </message>
-    <message>
-        <source>Pause</source>
-        <translation>一時停止</translation>
-    </message>
-    <message>
-        <source>Play preview</source>
-        <translation>プレビューを再生</translation>
-    </message>
-    <message>
-        <source>Add to the media bin</source>
-        <translation>メディアビンに追加</translation>
-    </message>
-    <message>
-        <source>Add to the timeline</source>
-        <translation>タイムラインに追加</translation>
-    </message>
 </context>
 <context>
     <name>SfxLibrary</name>
@@ -12857,6 +13426,60 @@ If playback stutters, try another.</source>
     <message>
         <source>Could not add that sound to the media bin.</source>
         <translation>そのサウンドをメディアビンに追加できませんでした。</translation>
+    </message>
+</context>
+<context>
+    <name>SfxSoundRow</name>
+    <message>
+        <source>Pause</source>
+        <translation type="unfinished">一時停止</translation>
+    </message>
+    <message>
+        <source>Play preview</source>
+        <translation type="unfinished">プレビューを再生</translation>
+    </message>
+    <message>
+        <source>Add to the media bin</source>
+        <translation type="unfinished">メディアビンに追加</translation>
+    </message>
+    <message>
+        <source>Add to the timeline</source>
+        <translation type="unfinished">タイムラインに追加</translation>
+    </message>
+</context>
+<context>
+    <name>ShadingLayerHeader</name>
+    <message>
+        <source>Collapse layer</source>
+        <translation type="unfinished">レイヤーを折りたたむ</translation>
+    </message>
+    <message>
+        <source>Expand layer</source>
+        <translation type="unfinished">レイヤーを展開</translation>
+    </message>
+    <message>
+        <source>Bring forward</source>
+        <translation type="unfinished">前面へ移動</translation>
+    </message>
+    <message>
+        <source>Send backward</source>
+        <translation type="unfinished">背面へ移動</translation>
+    </message>
+    <message>
+        <source>Hide layer</source>
+        <translation type="unfinished">レイヤーを非表示</translation>
+    </message>
+    <message>
+        <source>Show layer</source>
+        <translation type="unfinished">レイヤーを表示</translation>
+    </message>
+    <message>
+        <source>Duplicate layer</source>
+        <translation type="unfinished">レイヤーを複製</translation>
+    </message>
+    <message>
+        <source>Remove layer</source>
+        <translation type="unfinished">レイヤーを削除</translation>
     </message>
 </context>
 <context>
@@ -12948,38 +13571,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Dash-dot</source>
         <translation>一点鎖線</translation>
-    </message>
-    <message>
-        <source>Collapse layer</source>
-        <translation>レイヤーを折りたたむ</translation>
-    </message>
-    <message>
-        <source>Expand layer</source>
-        <translation>レイヤーを展開</translation>
-    </message>
-    <message>
-        <source>Bring forward</source>
-        <translation>前面へ移動</translation>
-    </message>
-    <message>
-        <source>Send backward</source>
-        <translation>背面へ移動</translation>
-    </message>
-    <message>
-        <source>Hide layer</source>
-        <translation>レイヤーを非表示</translation>
-    </message>
-    <message>
-        <source>Show layer</source>
-        <translation>レイヤーを表示</translation>
-    </message>
-    <message>
-        <source>Duplicate layer</source>
-        <translation>レイヤーを複製</translation>
-    </message>
-    <message>
-        <source>Remove layer</source>
-        <translation>レイヤーを削除</translation>
     </message>
     <message>
         <source>Opacity</source>
@@ -13162,6 +13753,25 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>ShapePresetCard</name>
+    <message>
+        <source>%1 — click to add, or drag to the timeline or preview</source>
+        <translation type="unfinished">%1 — クリックして追加、またはタイムラインやプレビューにドラッグ</translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">再生ヘッド位置に追加</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">お気に入りから削除</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">お気に入りに追加</translation>
+    </message>
+</context>
+<context>
     <name>ShapeStyle</name>
     <message>
         <source>Rectangle</source>
@@ -13341,22 +13951,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Nothing in this category.</source>
         <translation>このカテゴリには何もありません。</translation>
-    </message>
-    <message>
-        <source>%1 — click to add, or drag to the timeline or preview</source>
-        <translation>%1 — クリックして追加、またはタイムラインやプレビューにドラッグ</translation>
-    </message>
-    <message>
-        <source>Add at playhead</source>
-        <translation>再生ヘッド位置に追加</translation>
-    </message>
-    <message>
-        <source>Remove from favorites</source>
-        <translation>お気に入りから削除</translation>
-    </message>
-    <message>
-        <source>Add to favorites</source>
-        <translation>お気に入りに追加</translation>
     </message>
 </context>
 <context>
@@ -13671,14 +14265,17 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>SpeedCurvePreviewStage</name>
+    <message>
+        <source>Audio only</source>
+        <translation type="unfinished">オーディオのみ</translation>
+    </message>
+</context>
+<context>
     <name>SpeedCurveWindow</name>
     <message>
         <source>Custom speed</source>
         <translation>カスタムスピード</translation>
-    </message>
-    <message>
-        <source>Audio only</source>
-        <translation>オーディオのみ</translation>
     </message>
     <message>
         <source>Pause</source>
@@ -13998,40 +14595,68 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>StartScreen</name>
+    <name>StartScreenActions</name>
+    <message>
+        <source>New Project</source>
+        <translation type="unfinished">新しいプロジェクト</translation>
+    </message>
+    <message>
+        <source>Open Project…</source>
+        <translation type="unfinished">プロジェクトを開く…</translation>
+    </message>
+</context>
+<context>
+    <name>StartScreenProjectRow</name>
     <message>
         <source> (missing)</source>
-        <translation> (見つかりません)</translation>
+        <translation type="unfinished"> (見つかりません)</translation>
     </message>
     <message>
         <source>This file has been moved or deleted:
 %1</source>
-        <translation>このファイルは移動または削除されました :
+        <translation type="unfinished">このファイルは移動または削除されました :
 %1</translation>
     </message>
     <message>
         <source>Remove from recents</source>
-        <translation>最近使用した項目から削除</translation>
+        <translation type="unfinished">最近使用した項目から削除</translation>
     </message>
-    <message>
-        <source>Create polished videos fast</source>
-        <translation>洗練されたビデオを素早く作成</translation>
-    </message>
-    <message>
-        <source>New Project</source>
-        <translation>新しいプロジェクト</translation>
-    </message>
-    <message>
-        <source>Open Project…</source>
-        <translation>プロジェクトを開く…</translation>
-    </message>
+</context>
+<context>
+    <name>StartScreenRecents</name>
     <message>
         <source>Recent Projects</source>
-        <translation>最近使ったプロジェクト</translation>
+        <translation type="unfinished">最近使ったプロジェクト</translation>
     </message>
     <message>
         <source>Nothing here yet — projects you save will show up in this list.</source>
-        <translation>ここにはまだ何もありません — 保存したプロジェクトはこのリストに表示されます。</translation>
+        <translation type="unfinished">ここにはまだ何もありません — 保存したプロジェクトはこのリストに表示されます。</translation>
+    </message>
+</context>
+<context>
+    <name>StartScreenTitle</name>
+    <message>
+        <source>Create polished videos fast</source>
+        <translation type="unfinished">洗練されたビデオを素早く作成</translation>
+    </message>
+</context>
+<context>
+    <name>StickerPresetCard</name>
+    <message>
+        <source>%1 — click to add, or drag to the timeline or preview</source>
+        <translation type="unfinished">%1 — クリックして追加、またはタイムラインやプレビューにドラッグ</translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">再生ヘッド位置に追加</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">お気に入りから削除</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">お気に入りに追加</translation>
     </message>
 </context>
 <context>
@@ -14080,21 +14705,16 @@ If playback stutters, try another.</source>
         <source>Pick another category.</source>
         <translation>別のカテゴリを選択してください。</translation>
     </message>
+</context>
+<context>
+    <name>StockAudioRow</name>
     <message>
-        <source>%1 — click to add, or drag to the timeline or preview</source>
-        <translation>%1 — クリックして追加、またはタイムラインやプレビューにドラッグ</translation>
+        <source>Pause</source>
+        <translation type="unfinished">一時停止</translation>
     </message>
     <message>
-        <source>Add at playhead</source>
-        <translation>再生ヘッド位置に追加</translation>
-    </message>
-    <message>
-        <source>Remove from favorites</source>
-        <translation>お気に入りから削除</translation>
-    </message>
-    <message>
-        <source>Add to favorites</source>
-        <translation>お気に入りに追加</translation>
+        <source>Play preview</source>
+        <translation type="unfinished">プレビューを再生</translation>
     </message>
 </context>
 <context>
@@ -14169,14 +14789,6 @@ If playback stutters, try another.</source>
         <source>Paste a page link above and press Enter.</source>
         <translation>上にページのリンクを貼り付けて Enter を押してください。</translation>
     </message>
-    <message>
-        <source>Pause</source>
-        <translation>一時停止</translation>
-    </message>
-    <message>
-        <source>Play preview</source>
-        <translation>プレビューを再生</translation>
-    </message>
 </context>
 <context>
     <name>StockItemDetail</name>
@@ -14246,135 +14858,147 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SubtitleCueLane</name>
-    <message>
-        <source>Subtitles</source>
-        <translation>字幕</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n captions</source>
-        <translation>
-            <numerusform>%n キャプション</numerusform>
-        </translation>
-    </message>
+    <name>SubtitleCueBlock</name>
     <message>
         <source>(empty)</source>
-        <translation>(空)</translation>
+        <translation type="unfinished">(空)</translation>
     </message>
 </context>
 <context>
-    <name>SubtitleEditor</name>
-    <message>
-        <source>Subtitles</source>
-        <translation>字幕</translation>
-    </message>
-    <message>
-        <source>%1 captions</source>
-        <translation>%1 キャプション</translation>
-    </message>
-    <message>
-        <source>Play the timeline — the line on screen lights up. Tap any line to edit it.</source>
-        <translation>タイムラインを再生すると、画面上の行がハイライトされます。任意の行をタップして編集できます。</translation>
-    </message>
-    <message>
-        <source>Play the timeline — the line on screen lights up. Click any line to jump to it and edit it below.</source>
-        <translation>タイムラインを再生 — 画面上の行がハイライトされます。任意の行をクリックしてジャンプし、下で編集します。</translation>
-    </message>
-    <message>
-        <source>Import</source>
-        <translation>インポート</translation>
-    </message>
-    <message>
-        <source>Replace these captions from a .srt file</source>
-        <translation>.srt ファイルからこれらのキャプションを置き換え</translation>
-    </message>
-    <message>
-        <source>Import Subtitles</source>
-        <translation>字幕をインポート</translation>
-    </message>
-    <message>
-        <source>SubRip subtitles (*.srt)</source>
-        <translation>SubRip 字幕 (*.srt)</translation>
-    </message>
-    <message>
-        <source>All files (*)</source>
-        <translation>すべてのファイル (*)</translation>
-    </message>
-    <message>
-        <source>Export</source>
-        <translation>エクスポート</translation>
-    </message>
-    <message>
-        <source>Save captions as a .srt file</source>
-        <translation>キャプションを .srt ファイルとして保存</translation>
-    </message>
-    <message>
-        <source>Export Subtitles</source>
-        <translation>字幕をエクスポート</translation>
-    </message>
-    <message>
-        <source>Timestamps from the start of the video</source>
-        <translation>ビデオの先頭からのタイムスタンプ</translation>
-    </message>
-    <message>
-        <source>Offset the exported captions by this clip&apos;s start so they match the exported video</source>
-        <translation>エクスポートするキャプションをこのクリップの開始位置でオフセットし、エクスポートしたビデオと一致させます</translation>
-    </message>
+    <name>SubtitleCueCard</name>
     <message>
         <source>(empty)</source>
-        <translation>(空)</translation>
+        <translation type="unfinished">(空)</translation>
     </message>
     <message>
         <source>Delete this subtitle</source>
-        <translation>この字幕を削除</translation>
+        <translation type="unfinished">この字幕を削除</translation>
     </message>
     <message>
         <source>Add a subtitle after this one</source>
-        <translation>この後に字幕を追加</translation>
+        <translation type="unfinished">この後に字幕を追加</translation>
     </message>
+</context>
+<context>
+    <name>SubtitleCueEmptyState</name>
     <message>
         <source>No subtitles yet. Move to a time inside this clip and add one below.</source>
-        <translation>字幕はまだありません。このクリップ内の時間に移動して、下に追加してください。</translation>
+        <translation type="unfinished">字幕はまだありません。このクリップ内の時間に移動して、下に追加してください。</translation>
+    </message>
+</context>
+<context>
+    <name>SubtitleCueGutter</name>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">字幕</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n captions</source>
+        <translation type="unfinished">
+            <numerusform>%n キャプション</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>SubtitleEditorHeader</name>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">字幕</translation>
     </message>
     <message>
+        <source>%1 captions</source>
+        <translation type="unfinished">%1 キャプション</translation>
+    </message>
+    <message>
+        <source>Play the timeline — the line on screen lights up. Tap any line to edit it.</source>
+        <translation type="unfinished">タイムラインを再生すると、画面上の行がハイライトされます。任意の行をタップして編集できます。</translation>
+    </message>
+    <message>
+        <source>Play the timeline — the line on screen lights up. Click any line to jump to it and edit it below.</source>
+        <translation type="unfinished">タイムラインを再生 — 画面上の行がハイライトされます。任意の行をクリックしてジャンプし、下で編集します。</translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished">インポート</translation>
+    </message>
+    <message>
+        <source>Replace these captions from a .srt file</source>
+        <translation type="unfinished">.srt ファイルからこれらのキャプションを置き換え</translation>
+    </message>
+    <message>
+        <source>Import Subtitles</source>
+        <translation type="unfinished">字幕をインポート</translation>
+    </message>
+    <message>
+        <source>SubRip subtitles (*.srt)</source>
+        <translation type="unfinished">SubRip 字幕 (*.srt)</translation>
+    </message>
+    <message>
+        <source>All files (*)</source>
+        <translation type="unfinished">すべてのファイル (*)</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished">エクスポート</translation>
+    </message>
+    <message>
+        <source>Save captions as a .srt file</source>
+        <translation type="unfinished">キャプションを .srt ファイルとして保存</translation>
+    </message>
+    <message>
+        <source>Export Subtitles</source>
+        <translation type="unfinished">字幕をエクスポート</translation>
+    </message>
+    <message>
+        <source>Timestamps from the start of the video</source>
+        <translation type="unfinished">ビデオの先頭からのタイムスタンプ</translation>
+    </message>
+    <message>
+        <source>Offset the exported captions by this clip&apos;s start so they match the exported video</source>
+        <translation type="unfinished">エクスポートするキャプションをこのクリップの開始位置でオフセットし、エクスポートしたビデオと一致させます</translation>
+    </message>
+</context>
+<context>
+    <name>SubtitleEditorPanel</name>
+    <message>
         <source>Type subtitle…</source>
-        <translation>字幕を入力…</translation>
+        <translation type="unfinished">字幕を入力…</translation>
     </message>
     <message>
         <source>Apply text to this subtitle</source>
-        <translation>この字幕にテキストを適用</translation>
+        <translation type="unfinished">この字幕にテキストを適用</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation>開始</translation>
+        <translation type="unfinished">開始</translation>
     </message>
     <message>
         <source>Set start to current time</source>
-        <translation>開始を現在の時間に設定</translation>
+        <translation type="unfinished">開始を現在の時間に設定</translation>
     </message>
     <message>
         <source>End</source>
-        <translation>終了</translation>
+        <translation type="unfinished">終了</translation>
     </message>
     <message>
         <source>Set end to current time</source>
-        <translation>終了を現在の時間に設定</translation>
+        <translation type="unfinished">終了を現在の時間に設定</translation>
     </message>
     <message>
         <source>Delete caption</source>
-        <translation>キャプションを削除</translation>
+        <translation type="unfinished">キャプションを削除</translation>
     </message>
     <message>
         <source>At %1</source>
-        <translation>%1 に</translation>
+        <translation type="unfinished">%1 に</translation>
     </message>
     <message>
         <source>Move to a time inside this clip to add a subtitle</source>
-        <translation>このクリップ内の時間に移動して字幕を追加</translation>
+        <translation type="unfinished">このクリップ内の時間に移動して字幕を追加</translation>
     </message>
     <message>
         <source>Add subtitle at current time</source>
-        <translation>現在の時間に字幕を追加</translation>
+        <translation type="unfinished">現在の時間に字幕を追加</translation>
     </message>
 </context>
 <context>
@@ -14488,6 +15112,13 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>TextAnimPresetFrame</name>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">なし</translation>
+    </message>
+</context>
+<context>
     <name>TextAnimPresetTile</name>
     <message>
         <source>None</source>
@@ -14521,18 +15152,6 @@ If playback stutters, try another.</source>
         <translation>テキストにスタイルを設定し、プロパティのテキストタブで「スタイルを保存…」を使用してここに保存します。</translation>
     </message>
     <message>
-        <source>Style options</source>
-        <translation>スタイルオプション</translation>
-    </message>
-    <message>
-        <source>Rename…</source>
-        <translation>名前の変更…</translation>
-    </message>
-    <message>
-        <source>Export…</source>
-        <translation>エクスポート…</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>削除</translation>
     </message>
@@ -14543,14 +15162,6 @@ If playback stutters, try another.</source>
     <message>
         <source>My styles · %1</source>
         <translation>マイスタイル · %1</translation>
-    </message>
-    <message>
-        <source>%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.</source>
-        <translation>%1 — クリックで再生ヘッド位置に追加、またはタイムラインにドラッグ。プレビュー上でダブルクリックすると編集できます。</translation>
-    </message>
-    <message>
-        <source>Add at playhead</source>
-        <translation>再生ヘッド位置に追加</translation>
     </message>
     <message>
         <source>No saved styles</source>
@@ -14602,22 +15213,6 @@ If playback stutters, try another.</source>
 </context>
 <context>
     <name>TextInspector</name>
-    <message>
-        <source>Colour</source>
-        <translation>カラー</translation>
-    </message>
-    <message>
-        <source>Choose the gradient&apos;s first colour</source>
-        <translation>グラデーションの最初の色を選択</translation>
-    </message>
-    <message>
-        <source>Edits the first gradient stop</source>
-        <translation>最初のグラデーションストップを編集します</translation>
-    </message>
-    <message>
-        <source>Style</source>
-        <translation>スタイル</translation>
-    </message>
     <message>
         <source>Aa</source>
         <translation>Aa</translation>
@@ -14679,10 +15274,6 @@ If playback stutters, try another.</source>
         <translation>バウンス</translation>
     </message>
     <message>
-        <source>Save style…</source>
-        <translation>スタイルを保存…</translation>
-    </message>
-    <message>
         <source>Save text style</source>
         <translation>テキストスタイルを保存</translation>
     </message>
@@ -14690,441 +15281,508 @@ If playback stutters, try another.</source>
         <source>My style %1</source>
         <translation>マイスタイル %1</translation>
     </message>
-    <message>
-        <source>Apply to all captions</source>
-        <translation>すべてのキャプションに適用</translation>
-    </message>
-    <message>
-        <source>Copy this style to every other caption on this track</source>
-        <translation>このスタイルをこのトラック上の他のすべてのキャプションにコピー</translation>
-    </message>
-    <message>
-        <source>…every track</source>
-        <translation>…すべてのトラック</translation>
-    </message>
-    <message>
-        <source>Copy this style to every caption in the project</source>
-        <translation>このスタイルをプロジェクト内のすべてのキャプションにコピー</translation>
-    </message>
-    <message>
-        <source>Font</source>
-        <translation>フォント</translation>
-    </message>
-    <message>
-        <source>Weight</source>
-        <translation>太さ</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation>サイズ</translation>
-    </message>
-    <message>
-        <source>Stroke</source>
-        <translation>線</translation>
-    </message>
-    <message>
-        <source>Extrude</source>
-        <translation>押し出し</translation>
-    </message>
-    <message>
-        <source>Decorations</source>
-        <translation>装飾</translation>
-    </message>
-    <message>
-        <source>Boxes and rules drawn around the text rather than on it</source>
-        <translation>テキスト自体ではなく、テキストの周囲に描画されるボックスや罫線</translation>
-    </message>
-    <message>
-        <source>Animate</source>
-        <translation>アニメーション</translation>
-    </message>
-    <message>
-        <source>Phase</source>
-        <translation>フェーズ</translation>
-    </message>
-    <message>
-        <source>Stagger</source>
-        <translation>スタッガー</translation>
-    </message>
-    <message>
-        <source>Delay between one unit and the next along the cycle</source>
-        <translation>サイクルに沿った1つの単位と次の単位の間の遅延</translation>
-    </message>
-    <message>
-        <source>Delay between one unit starting and the next</source>
-        <translation>1つの単位の開始と次の開始の間の遅延</translation>
-    </message>
-    <message>
-        <source>Order</source>
-        <translation>順序</translation>
-    </message>
-    <message>
-        <source>Ease</source>
-        <translation>イーズ</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <translation>詳細設定</translation>
-    </message>
-    <message>
-        <source>Custom animator (set via MCP). Preset controls are disabled.</source>
-        <translation>カスタムアニメーター (MCP 経由で設定)。プリセットコントロールは無効です。</translation>
-    </message>
-    <message>
-        <source>Revert to preset</source>
-        <translation>プリセットに戻す</translation>
-    </message>
-    <message>
-        <source>Drop the custom animators and go back to picking presets</source>
-        <translation>カスタムアニメーターを破棄してプリセット選択に戻ります</translation>
-    </message>
-    <message>
-        <source>Choose text colour</source>
-        <translation>テキストの色を選択</translation>
-    </message>
-    <message>
-        <source>Italic</source>
-        <translation>斜体</translation>
-    </message>
-    <message>
-        <source>Italicise the text</source>
-        <translation>テキストを斜体にする</translation>
-    </message>
-    <message>
-        <source>%1 has no italic face</source>
-        <translation>%1 には斜体がありません</translation>
-    </message>
-    <message>
-        <source>Adjust text look</source>
-        <translation>テキストルックを調整</translation>
-    </message>
-    <message>
-        <source>Layers</source>
-        <translation>レイヤー</translation>
-    </message>
-    <message>
-        <source>Add layer</source>
-        <translation>レイヤーを追加</translation>
-    </message>
-    <message>
-        <source>Add a fill, stroke, shadow, glow or extrude layer</source>
-        <translation>塗り、線、シャドウ、グロー、押し出しのレイヤーを追加</translation>
-    </message>
-    <message>
-        <source>Fill</source>
-        <translation>フィル</translation>
-    </message>
-    <message>
-        <source>Bend</source>
-        <translation>ベンド</translation>
-    </message>
-    <message>
-        <source>Align left</source>
-        <translation>左揃え</translation>
-    </message>
-    <message>
-        <source>Align centre</source>
-        <translation>中央揃え</translation>
-    </message>
-    <message>
-        <source>Align right</source>
-        <translation>右揃え</translation>
-    </message>
-    <message>
-        <source>Align top</source>
-        <translation>上揃え</translation>
-    </message>
-    <message>
-        <source>Align middle</source>
-        <translation>中央揃え</translation>
-    </message>
-    <message>
-        <source>Align bottom</source>
-        <translation>下揃え</translation>
-    </message>
-    <message>
-        <source>Line height</source>
-        <translation>行の高さ</translation>
-    </message>
-    <message>
-        <source>Letter spacing</source>
-        <translation>文字間隔</translation>
-    </message>
-    <message>
-        <source>Wrapping</source>
-        <translation>ラッピング</translation>
-    </message>
-    <message>
-        <source>Word wrap</source>
-        <translation>ワードラップ</translation>
-    </message>
-    <message>
-        <source>Wrap long lines inside the text box instead of overflowing</source>
-        <translation>長い行がはみ出さないように、テキストボックス内で折り返す</translation>
-    </message>
-    <message>
-        <source>Width</source>
-        <translation>幅</translation>
-    </message>
-    <message>
-        <source>Shadow</source>
-        <translation>シャドウ</translation>
-    </message>
-    <message>
-        <source>Background</source>
-        <translation>背景</translation>
-    </message>
-    <message>
-        <source>Draw a filled box behind the text</source>
-        <translation>テキストの背後に塗りつぶしボックスを描画</translation>
-    </message>
-    <message>
-        <source>Choose background colour</source>
-        <translation>背景色を選択</translation>
-    </message>
-    <message>
-        <source>Padding</source>
-        <translation>パディング</translation>
-    </message>
-    <message>
-        <source>Space between the text and the edge of its background box</source>
-        <translation>テキストと背景ボックスの端との間隔</translation>
-    </message>
-    <message>
-        <source>Corner radius</source>
-        <translation>角の丸み</translation>
-    </message>
-    <message>
-        <source>Roundness of the background box corners</source>
-        <translation>背景ボックスの角の丸み</translation>
-    </message>
-    <message>
-        <source>Glow</source>
-        <translation>グロー</translation>
-    </message>
-    <message>
-        <source>Text</source>
-        <translation>テキスト</translation>
-    </message>
-    <message>
-        <source>Type your text…</source>
-        <translation>テキストを入力…</translation>
-    </message>
-    <message>
-        <source>Apply</source>
-        <translation>適用</translation>
-    </message>
-    <message>
-        <source>Apply the text to this clip</source>
-        <translation>このクリップにテキストを適用</translation>
-    </message>
-    <message>
-        <source>Edit in Style</source>
-        <translation>スタイルで編集</translation>
-    </message>
-    <message>
-        <source>The text is painted with an image; change it on the Style page</source>
-        <translation>テキストは画像で塗られています。スタイルページで変更してください</translation>
-    </message>
-    <message>
-        <source>The text is painted with an effect; change it on the Style page</source>
-        <translation>テキストはエフェクトで塗られています。スタイルページで変更してください</translation>
-    </message>
-    <message>
-        <source>Spacing</source>
-        <translation>スペーシング</translation>
-    </message>
-    <message>
-        <source>Line height, letter spacing, wrapping and bend</source>
-        <translation>行の高さ、文字間隔、折り返し、ベンド</translation>
-    </message>
-    <message>
-        <source>Preset</source>
-        <translation>プリセット</translation>
-    </message>
-    <message>
-        <source>A whole text style — font, colour and effect — applied in one tap</source>
-        <translation>テキストスタイル全体 — フォント、色、エフェクト — をワンタップで適用</translation>
-    </message>
-    <message>
-        <source>Font, colour and effect in one tap. Save your own to reuse it.</source>
-        <translation>フォント、色、エフェクトをワンタップで。独自のものは保存して再利用できます。</translation>
-    </message>
-    <message>
-        <source>Save this text&apos;s style as a reusable preset</source>
-        <translation>このテキストのスタイルを再利用可能なプリセットとして保存</translation>
-    </message>
-    <message>
-        <source>Generate voiceover</source>
-        <translation>ナレーションを生成</translation>
-    </message>
-    <message>
-        <source>Speak every caption with a generated voice</source>
-        <translation>すべてのキャプションを生成音声で読み上げる</translation>
-    </message>
-    <message>
-        <source>Install the voice model from the add-on manager first</source>
-        <translation>先にアドオンマネージャーから音声モデルをインストールしてください</translation>
-    </message>
-    <message>
-        <source>Install the AI engine and the voice model from the add-on manager to generate voiceovers.</source>
-        <translation>ナレーションを生成するには、アドオンマネージャーから AI エンジンと音声モデルをインストールしてください。</translation>
-    </message>
-    <message>
-        <source>Effect</source>
-        <translation>エフェクト</translation>
-    </message>
-    <message>
-        <source>Shadow, outline, neon and friends — a recipe that builds the layers below</source>
-        <translation>シャドウ、アウトライン、ネオンなど — 下のレイヤーを構築するレシピ</translation>
-    </message>
-    <message>
-        <source>Shadow, outline, neon… built as layers you can fine-tune below.</source>
-        <translation>シャドウ、アウトライン、ネオン… 下で微調整できるレイヤーとして構築されます。</translation>
-    </message>
-    <message>
-        <source>No layers. Pick an effect above or add a fill to start.</source>
-        <translation>レイヤーがありません。上でエフェクトを選択するか、塗りを追加して開始してください。</translation>
-    </message>
-    <message>
-        <source>Word highlight</source>
-        <translation>単語ハイライト</translation>
-    </message>
-    <message>
-        <source>Filled pill behind every word, sized to the word itself</source>
-        <translation>各単語の背後に、単語自体のサイズに合わせた塗りつぶしピルを配置</translation>
-    </message>
-    <message>
-        <source>Thickness</source>
-        <translation>太さ</translation>
-    </message>
-    <message>
-        <source>How far the pill extends past the word</source>
-        <translation>ピルが単語を超えて広がる距離</translation>
-    </message>
-    <message>
-        <source>Highlight colour</source>
-        <translation>ハイライトの色</translation>
-    </message>
-    <message>
-        <source>Choose highlight colour</source>
-        <translation>ハイライトの色を選択</translation>
-    </message>
-    <message>
-        <source>Underline</source>
-        <translation>下線</translation>
-    </message>
-    <message>
-        <source>Draw a rule under each line of text</source>
-        <translation>テキストの各行の下に線を引く</translation>
-    </message>
-    <message>
-        <source>Offset</source>
-        <translation>オフセット</translation>
-    </message>
-    <message>
-        <source>Gap between the baseline and the rule</source>
-        <translation>ベースラインと線の間のギャップ</translation>
-    </message>
-    <message>
-        <source>Underline colour</source>
-        <translation>下線の色</translation>
-    </message>
-    <message>
-        <source>Choose underline colour</source>
-        <translation>下線の色を選択</translation>
-    </message>
+</context>
+<context>
+    <name>TextInspectorAccentSection</name>
     <message>
         <source>Word accent</source>
-        <translation>単語アクセント</translation>
+        <translation type="unfinished">単語アクセント</translation>
     </message>
     <message>
         <source>Style some words differently from the rest, chosen by rule</source>
-        <translation>ルールに従って、一部の単語を他のものとは異なるスタイルにする</translation>
+        <translation type="unfinished">ルールに従って、一部の単語を他のものとは異なるスタイルにする</translation>
     </message>
     <message>
         <source>Accent colour</source>
-        <translation>アクセントの色</translation>
+        <translation type="unfinished">アクセントの色</translation>
     </message>
     <message>
         <source>Recolour the words the rule picks out</source>
-        <translation>ルールで選択された単語の色を変更</translation>
+        <translation type="unfinished">ルールで選択された単語の色を変更</translation>
     </message>
     <message>
         <source>Choose accent colour</source>
-        <translation>アクセントの色を選択</translation>
+        <translation type="unfinished">アクセントの色を選択</translation>
     </message>
     <message>
         <source>Accent size</source>
-        <translation>アクセントサイズ</translation>
+        <translation type="unfinished">アクセントサイズ</translation>
     </message>
     <message>
         <source>Size of the accented words relative to the rest of the line</source>
-        <translation>アクセント付き単語の行の残りに対するサイズ</translation>
+        <translation type="unfinished">アクセント付き単語の行の残りに対するサイズ</translation>
     </message>
     <message>
         <source>Accent outline</source>
-        <translation>アクセントアウトライン</translation>
+        <translation type="unfinished">アクセントアウトライン</translation>
     </message>
     <message>
         <source>Give the accented words their own outline</source>
-        <translation>アクセント付き単語に独自のアウトラインを設定</translation>
+        <translation type="unfinished">アクセント付き単語に独自のアウトラインを設定</translation>
     </message>
     <message>
         <source>Choose accent outline colour</source>
-        <translation>アクセントアウトラインの色を選択</translation>
+        <translation type="unfinished">アクセントアウトラインの色を選択</translation>
+    </message>
+    <message>
+        <source>Width</source>
+        <translation type="unfinished">幅</translation>
     </message>
     <message>
         <source>Accent pill</source>
-        <translation>アクセントピル</translation>
+        <translation type="unfinished">アクセントピル</translation>
     </message>
     <message>
         <source>Highlight only the accented words, instead of every word</source>
-        <translation>すべての単語ではなく、アクセント付き単語のみをハイライト</translation>
+        <translation type="unfinished">すべての単語ではなく、アクセント付き単語のみをハイライト</translation>
     </message>
     <message>
         <source>Choose accent highlight colour</source>
-        <translation>アクセントハイライトの色を選択</translation>
+        <translation type="unfinished">アクセントハイライトの色を選択</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorAnimAdvanced</name>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished">詳細設定</translation>
     </message>
     <message>
-        <source>In</source>
-        <translation>イン</translation>
+        <source>Custom animator (set via MCP). Preset controls are disabled.</source>
+        <translation type="unfinished">カスタムアニメーター (MCP 経由で設定)。プリセットコントロールは無効です。</translation>
     </message>
     <message>
-        <source>Out</source>
-        <translation>アウト</translation>
+        <source>Revert to preset</source>
+        <translation type="unfinished">プリセットに戻す</translation>
     </message>
     <message>
-        <source>Loop</source>
-        <translation>ループ</translation>
+        <source>Drop the custom animators and go back to picking presets</source>
+        <translation type="unfinished">カスタムアニメーターを破棄してプリセット選択に戻ります</translation>
     </message>
-    <message>
-        <source>Plays for every caption</source>
-        <translation>すべてのキャプションで再生</translation>
-    </message>
+</context>
+<context>
+    <name>TextInspectorAnimCategoryStrip</name>
     <message>
         <source>All</source>
-        <translation>すべて</translation>
+        <translation type="unfinished">すべて</translation>
     </message>
+</context>
+<context>
+    <name>TextInspectorAnimControls</name>
     <message>
         <source>Preview this animation</source>
-        <translation>このアニメーションをプレビュー</translation>
+        <translation type="unfinished">このアニメーションをプレビュー</translation>
     </message>
     <message>
         <source>Period</source>
-        <translation>周期</translation>
+        <translation type="unfinished">周期</translation>
     </message>
     <message>
         <source>Duration</source>
-        <translation>長さ</translation>
+        <translation type="unfinished">長さ</translation>
     </message>
     <message>
         <source>Edit text animation</source>
-        <translation>テキストアニメーションを編集</translation>
+        <translation type="unfinished">テキストアニメーションを編集</translation>
     </message>
     <message>
         <source>By</source>
-        <translation>方法</translation>
+        <translation type="unfinished">方法</translation>
+    </message>
+    <message>
+        <source>Phase</source>
+        <translation type="unfinished">フェーズ</translation>
+    </message>
+    <message>
+        <source>Stagger</source>
+        <translation type="unfinished">スタッガー</translation>
+    </message>
+    <message>
+        <source>Delay between one unit and the next along the cycle</source>
+        <translation type="unfinished">サイクルに沿った1つの単位と次の単位の間の遅延</translation>
+    </message>
+    <message>
+        <source>Delay between one unit starting and the next</source>
+        <translation type="unfinished">1つの単位の開始と次の開始の間の遅延</translation>
+    </message>
+    <message>
+        <source>Order</source>
+        <translation type="unfinished">順序</translation>
+    </message>
+    <message>
+        <source>Ease</source>
+        <translation type="unfinished">イーズ</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorAnimSlotBar</name>
+    <message>
+        <source>In</source>
+        <translation type="unfinished">イン</translation>
+    </message>
+    <message>
+        <source>Out</source>
+        <translation type="unfinished">アウト</translation>
+    </message>
+    <message>
+        <source>Loop</source>
+        <translation type="unfinished">ループ</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorAnimateHint</name>
+    <message>
+        <source>Plays for every caption</source>
+        <translation type="unfinished">すべてのキャプションで再生</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorContentSection</name>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished">テキスト</translation>
+    </message>
+    <message>
+        <source>Type your text…</source>
+        <translation type="unfinished">テキストを入力…</translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation type="unfinished">適用</translation>
+    </message>
+    <message>
+        <source>Apply the text to this clip</source>
+        <translation type="unfinished">このクリップにテキストを適用</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorDecorations</name>
+    <message>
+        <source>Decorations</source>
+        <translation type="unfinished">装飾</translation>
+    </message>
+    <message>
+        <source>Boxes and rules drawn around the text rather than on it</source>
+        <translation type="unfinished">テキスト自体ではなく、テキストの周囲に描画されるボックスや罫線</translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation type="unfinished">背景</translation>
+    </message>
+    <message>
+        <source>Draw a filled box behind the text</source>
+        <translation type="unfinished">テキストの背後に塗りつぶしボックスを描画</translation>
+    </message>
+    <message>
+        <source>Choose background colour</source>
+        <translation type="unfinished">背景色を選択</translation>
+    </message>
+    <message>
+        <source>Padding</source>
+        <translation type="unfinished">パディング</translation>
+    </message>
+    <message>
+        <source>Space between the text and the edge of its background box</source>
+        <translation type="unfinished">テキストと背景ボックスの端との間隔</translation>
+    </message>
+    <message>
+        <source>Corner radius</source>
+        <translation type="unfinished">角の丸み</translation>
+    </message>
+    <message>
+        <source>Roundness of the background box corners</source>
+        <translation type="unfinished">背景ボックスの角の丸み</translation>
+    </message>
+    <message>
+        <source>Word highlight</source>
+        <translation type="unfinished">単語ハイライト</translation>
+    </message>
+    <message>
+        <source>Filled pill behind every word, sized to the word itself</source>
+        <translation type="unfinished">各単語の背後に、単語自体のサイズに合わせた塗りつぶしピルを配置</translation>
+    </message>
+    <message>
+        <source>Thickness</source>
+        <translation type="unfinished">太さ</translation>
+    </message>
+    <message>
+        <source>How far the pill extends past the word</source>
+        <translation type="unfinished">ピルが単語を超えて広がる距離</translation>
+    </message>
+    <message>
+        <source>Highlight colour</source>
+        <translation type="unfinished">ハイライトの色</translation>
+    </message>
+    <message>
+        <source>Choose highlight colour</source>
+        <translation type="unfinished">ハイライトの色を選択</translation>
+    </message>
+    <message>
+        <source>Underline</source>
+        <translation type="unfinished">下線</translation>
+    </message>
+    <message>
+        <source>Draw a rule under each line of text</source>
+        <translation type="unfinished">テキストの各行の下に線を引く</translation>
+    </message>
+    <message>
+        <source>Offset</source>
+        <translation type="unfinished">オフセット</translation>
+    </message>
+    <message>
+        <source>Gap between the baseline and the rule</source>
+        <translation type="unfinished">ベースラインと線の間のギャップ</translation>
+    </message>
+    <message>
+        <source>Underline colour</source>
+        <translation type="unfinished">下線の色</translation>
+    </message>
+    <message>
+        <source>Choose underline colour</source>
+        <translation type="unfinished">下線の色を選択</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorFontSection</name>
+    <message>
+        <source>Font</source>
+        <translation type="unfinished">フォント</translation>
+    </message>
+    <message>
+        <source>Weight</source>
+        <translation type="unfinished">太さ</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished">サイズ</translation>
+    </message>
+    <message>
+        <source>Colour</source>
+        <translation type="unfinished">カラー</translation>
+    </message>
+    <message>
+        <source>Choose the gradient&apos;s first colour</source>
+        <translation type="unfinished">グラデーションの最初の色を選択</translation>
+    </message>
+    <message>
+        <source>Choose text colour</source>
+        <translation type="unfinished">テキストの色を選択</translation>
+    </message>
+    <message>
+        <source>Edits the first gradient stop</source>
+        <translation type="unfinished">最初のグラデーションストップを編集します</translation>
+    </message>
+    <message>
+        <source>Edit in Style</source>
+        <translation type="unfinished">スタイルで編集</translation>
+    </message>
+    <message>
+        <source>The text is painted with an image; change it on the Style page</source>
+        <translation type="unfinished">テキストは画像で塗られています。スタイルページで変更してください</translation>
+    </message>
+    <message>
+        <source>The text is painted with an effect; change it on the Style page</source>
+        <translation type="unfinished">テキストはエフェクトで塗られています。スタイルページで変更してください</translation>
+    </message>
+    <message>
+        <source>Style</source>
+        <translation type="unfinished">スタイル</translation>
+    </message>
+    <message>
+        <source>Italic</source>
+        <translation type="unfinished">斜体</translation>
+    </message>
+    <message>
+        <source>Italicise the text</source>
+        <translation type="unfinished">テキストを斜体にする</translation>
+    </message>
+    <message>
+        <source>%1 has no italic face</source>
+        <translation type="unfinished">%1 には斜体がありません</translation>
+    </message>
+    <message>
+        <source>Align left</source>
+        <translation type="unfinished">左揃え</translation>
+    </message>
+    <message>
+        <source>Align centre</source>
+        <translation type="unfinished">中央揃え</translation>
+    </message>
+    <message>
+        <source>Align right</source>
+        <translation type="unfinished">右揃え</translation>
+    </message>
+    <message>
+        <source>Align top</source>
+        <translation type="unfinished">上揃え</translation>
+    </message>
+    <message>
+        <source>Align middle</source>
+        <translation type="unfinished">中央揃え</translation>
+    </message>
+    <message>
+        <source>Align bottom</source>
+        <translation type="unfinished">下揃え</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorLookSection</name>
+    <message>
+        <source>Effect</source>
+        <translation type="unfinished">エフェクト</translation>
+    </message>
+    <message>
+        <source>Shadow, outline, neon and friends — a recipe that builds the layers below</source>
+        <translation type="unfinished">シャドウ、アウトライン、ネオンなど — 下のレイヤーを構築するレシピ</translation>
+    </message>
+    <message>
+        <source>Shadow, outline, neon… built as layers you can fine-tune below.</source>
+        <translation type="unfinished">シャドウ、アウトライン、ネオン… 下で微調整できるレイヤーとして構築されます。</translation>
+    </message>
+    <message>
+        <source>Adjust text look</source>
+        <translation type="unfinished">テキストルックを調整</translation>
+    </message>
+    <message>
+        <source>Layers</source>
+        <translation type="unfinished">レイヤー</translation>
+    </message>
+    <message>
+        <source>Add layer</source>
+        <translation type="unfinished">レイヤーを追加</translation>
+    </message>
+    <message>
+        <source>Add a fill, stroke, shadow, glow or extrude layer</source>
+        <translation type="unfinished">塗り、線、シャドウ、グロー、押し出しのレイヤーを追加</translation>
+    </message>
+    <message>
+        <source>Fill</source>
+        <translation type="unfinished">フィル</translation>
+    </message>
+    <message>
+        <source>Stroke</source>
+        <translation type="unfinished">線</translation>
+    </message>
+    <message>
+        <source>Shadow</source>
+        <translation type="unfinished">シャドウ</translation>
+    </message>
+    <message>
+        <source>Glow</source>
+        <translation type="unfinished">グロー</translation>
+    </message>
+    <message>
+        <source>Extrude</source>
+        <translation type="unfinished">押し出し</translation>
+    </message>
+    <message>
+        <source>No layers. Pick an effect above or add a fill to start.</source>
+        <translation type="unfinished">レイヤーがありません。上でエフェクトを選択するか、塗りを追加して開始してください。</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorPresetSection</name>
+    <message>
+        <source>Preset</source>
+        <translation type="unfinished">プリセット</translation>
+    </message>
+    <message>
+        <source>A whole text style — font, colour and effect — applied in one tap</source>
+        <translation type="unfinished">テキストスタイル全体 — フォント、色、エフェクト — をワンタップで適用</translation>
+    </message>
+    <message>
+        <source>Font, colour and effect in one tap. Save your own to reuse it.</source>
+        <translation type="unfinished">フォント、色、エフェクトをワンタップで。独自のものは保存して再利用できます。</translation>
+    </message>
+    <message>
+        <source>Save style…</source>
+        <translation type="unfinished">スタイルを保存…</translation>
+    </message>
+    <message>
+        <source>Save this text&apos;s style as a reusable preset</source>
+        <translation type="unfinished">このテキストのスタイルを再利用可能なプリセットとして保存</translation>
+    </message>
+    <message>
+        <source>Apply to all captions</source>
+        <translation type="unfinished">すべてのキャプションに適用</translation>
+    </message>
+    <message>
+        <source>Copy this style to every other caption on this track</source>
+        <translation type="unfinished">このスタイルをこのトラック上の他のすべてのキャプションにコピー</translation>
+    </message>
+    <message>
+        <source>…every track</source>
+        <translation type="unfinished">…すべてのトラック</translation>
+    </message>
+    <message>
+        <source>Copy this style to every caption in the project</source>
+        <translation type="unfinished">このスタイルをプロジェクト内のすべてのキャプションにコピー</translation>
+    </message>
+    <message>
+        <source>Generate voiceover</source>
+        <translation type="unfinished">ナレーションを生成</translation>
+    </message>
+    <message>
+        <source>Speak every caption with a generated voice</source>
+        <translation type="unfinished">すべてのキャプションを生成音声で読み上げる</translation>
+    </message>
+    <message>
+        <source>Install the voice model from the add-on manager first</source>
+        <translation type="unfinished">先にアドオンマネージャーから音声モデルをインストールしてください</translation>
+    </message>
+    <message>
+        <source>Install the AI engine and the voice model from the add-on manager to generate voiceovers.</source>
+        <translation type="unfinished">ナレーションを生成するには、アドオンマネージャーから AI エンジンと音声モデルをインストールしてください。</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorSpacingSection</name>
+    <message>
+        <source>Spacing</source>
+        <translation type="unfinished">スペーシング</translation>
+    </message>
+    <message>
+        <source>Line height, letter spacing, wrapping and bend</source>
+        <translation type="unfinished">行の高さ、文字間隔、折り返し、ベンド</translation>
+    </message>
+    <message>
+        <source>Line height</source>
+        <translation type="unfinished">行の高さ</translation>
+    </message>
+    <message>
+        <source>Letter spacing</source>
+        <translation type="unfinished">文字間隔</translation>
+    </message>
+    <message>
+        <source>Wrapping</source>
+        <translation type="unfinished">ラッピング</translation>
+    </message>
+    <message>
+        <source>Word wrap</source>
+        <translation type="unfinished">ワードラップ</translation>
+    </message>
+    <message>
+        <source>Wrap long lines inside the text box instead of overflowing</source>
+        <translation type="unfinished">長い行がはみ出さないように、テキストボックス内で折り返す</translation>
+    </message>
+    <message>
+        <source>Bend</source>
+        <translation type="unfinished">ベンド</translation>
+    </message>
+</context>
+<context>
+    <name>TextInspectorTabBar</name>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished">テキスト</translation>
+    </message>
+    <message>
+        <source>Style</source>
+        <translation type="unfinished">スタイル</translation>
+    </message>
+    <message>
+        <source>Animate</source>
+        <translation type="unfinished">アニメーション</translation>
     </message>
 </context>
 <context>
@@ -15301,6 +15959,17 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>TextStylePackCard</name>
+    <message>
+        <source>%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.</source>
+        <translation type="unfinished">%1 — クリックで再生ヘッド位置に追加、またはタイムラインにドラッグ。プレビュー上でダブルクリックすると編集できます。</translation>
+    </message>
+    <message>
+        <source>Add at playhead</source>
+        <translation type="unfinished">再生ヘッド位置に追加</translation>
+    </message>
+</context>
+<context>
     <name>TextStylePackPicker</name>
     <message>
         <source>Custom</source>
@@ -15328,6 +15997,29 @@ If playback stutters, try another.</source>
     <message>
         <source>Custom</source>
         <translation>カスタム</translation>
+    </message>
+</context>
+<context>
+    <name>TextStyleUserCard</name>
+    <message>
+        <source>%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.</source>
+        <translation type="unfinished">%1 — クリックで再生ヘッド位置に追加、またはタイムラインにドラッグ。プレビュー上でダブルクリックすると編集できます。</translation>
+    </message>
+    <message>
+        <source>Style options</source>
+        <translation type="unfinished">スタイルオプション</translation>
+    </message>
+    <message>
+        <source>Rename…</source>
+        <translation type="unfinished">名前の変更…</translation>
+    </message>
+    <message>
+        <source>Export…</source>
+        <translation type="unfinished">エクスポート…</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">削除</translation>
     </message>
 </context>
 <context>
@@ -15376,170 +16068,219 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>TimelineBookmarkContextMenu</name>
+    <message>
+        <source>Go to bookmark</source>
+        <translation type="unfinished">ブックマークへ移動</translation>
+    </message>
+    <message>
+        <source>Rename…</source>
+        <translation type="unfinished">名前の変更…</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">削除</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineClipContextMenu</name>
+    <message>
+        <source>Properties</source>
+        <translation type="unfinished">プロパティ</translation>
+    </message>
+    <message>
+        <source>Select multiple</source>
+        <translation type="unfinished">複数選択</translation>
+    </message>
+    <message>
+        <source>Open composite</source>
+        <translation type="unfinished">コンポジットを開く</translation>
+    </message>
+    <message>
+        <source>Flatten composite</source>
+        <translation type="unfinished">コンポジットをフラット化</translation>
+    </message>
+    <message>
+        <source>Make composite</source>
+        <translation type="unfinished">コンポジットを作成</translation>
+    </message>
+    <message>
+        <source>Transform together</source>
+        <translation type="unfinished">まとめて変形</translation>
+    </message>
+    <message>
+        <source>Add transform layer</source>
+        <translation type="unfinished">変形レイヤーを追加</translation>
+    </message>
+    <message>
+        <source>Select transform layer</source>
+        <translation type="unfinished">変形レイヤーを選択</translation>
+    </message>
+    <message>
+        <source>Covers…</source>
+        <translation type="unfinished">カバー範囲…</translation>
+    </message>
+    <message>
+        <source>Select covered clips</source>
+        <translation type="unfinished">カバーされているクリップを選択</translation>
+    </message>
+    <message>
+        <source>Split at current time</source>
+        <translation type="unfinished">現在の時間で分割</translation>
+    </message>
+    <message>
+        <source>Split item at current time</source>
+        <translation type="unfinished">現在の時間で項目を分割</translation>
+    </message>
+    <message>
+        <source>Separate audio</source>
+        <translation type="unfinished">オーディオを分離</translation>
+    </message>
+    <message>
+        <source>Separate all audio tracks</source>
+        <translation type="unfinished">すべてのオーディオトラックを分離</translation>
+    </message>
+    <message>
+        <source>Convert to edit-friendly format</source>
+        <translation type="unfinished">編集に適した形式に変換</translation>
+    </message>
+    <message>
+        <source>Crop…</source>
+        <translation type="unfinished">切り抜き…</translation>
+    </message>
+    <message>
+        <source>Enhance video…</source>
+        <translation type="unfinished">ビデオを強化…</translation>
+    </message>
+    <message>
+        <source>Unlink</source>
+        <translation type="unfinished">リンク解除</translation>
+    </message>
+    <message>
+        <source>Link</source>
+        <translation type="unfinished">リンク</translation>
+    </message>
+    <message>
+        <source>Merge subtitle clips</source>
+        <translation type="unfinished">字幕クリップを結合</translation>
+    </message>
+    <message>
+        <source>Merge all subtitles on this track</source>
+        <translation type="unfinished">このトラックのすべての字幕を結合</translation>
+    </message>
+    <message>
+        <source>Convert to text clips</source>
+        <translation type="unfinished">テキストクリップに変換</translation>
+    </message>
+    <message>
+        <source>Convert to subtitle</source>
+        <translation type="unfinished">字幕に変換</translation>
+    </message>
+    <message>
+        <source>Cut</source>
+        <translation type="unfinished">切り取り</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished">コピー</translation>
+    </message>
+    <message>
+        <source>Paste attributes…</source>
+        <translation type="unfinished">属性を貼り付け…</translation>
+    </message>
+    <message>
+        <source>Duplicate</source>
+        <translation type="unfinished">複製</translation>
+    </message>
+    <message>
+        <source>Rename…</source>
+        <translation type="unfinished">名前の変更…</translation>
+    </message>
+    <message>
+        <source>Copy effects</source>
+        <translation type="unfinished">エフェクトをコピー</translation>
+    </message>
+    <message>
+        <source>Paste effects</source>
+        <translation type="unfinished">エフェクトを貼り付け</translation>
+    </message>
+    <message>
+        <source>Save effects as preset…</source>
+        <translation type="unfinished">エフェクトをプリセットとして保存…</translation>
+    </message>
+    <message>
+        <source>Unlink from clip</source>
+        <translation type="unfinished">クリップからリンク解除</translation>
+    </message>
+    <message>
+        <source>Move to its own track</source>
+        <translation type="unfinished">別のトラックに移動</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">削除</translation>
+    </message>
+</context>
+<context>
     <name>TimelineClipItem</name>
     <message>
         <source>%1, track %2</source>
         <translation>%1, トラック %2</translation>
     </message>
+</context>
+<context>
+    <name>TimelineEmptyState</name>
     <message>
-        <source>Properties</source>
-        <translation>プロパティ</translation>
+        <source>Your timeline is empty</source>
+        <translation type="unfinished">タイムラインは空です</translation>
     </message>
     <message>
-        <source>Select multiple</source>
-        <translation>複数選択</translation>
+        <source>Drag media here from the library, or add an empty track to start.</source>
+        <translation type="unfinished">ライブラリからメディアをここにドラッグするか、空のトラックを追加して開始してください。</translation>
     </message>
     <message>
-        <source>Open composite</source>
-        <translation>コンポジットを開く</translation>
+        <source>New track</source>
+        <translation type="unfinished">新しいトラック</translation>
     </message>
-    <message>
-        <source>Flatten composite</source>
-        <translation>コンポジットをフラット化</translation>
-    </message>
-    <message>
-        <source>Make composite</source>
-        <translation>コンポジットを作成</translation>
-    </message>
-    <message>
-        <source>Transform together</source>
-        <translation>まとめて変形</translation>
-    </message>
-    <message>
-        <source>Add transform layer</source>
-        <translation>変形レイヤーを追加</translation>
-    </message>
-    <message>
-        <source>Select transform layer</source>
-        <translation>変形レイヤーを選択</translation>
-    </message>
-    <message>
-        <source>Covers…</source>
-        <translation>カバー範囲…</translation>
-    </message>
-    <message>
-        <source>Select covered clips</source>
-        <translation>カバーされているクリップを選択</translation>
-    </message>
-    <message>
-        <source>Split at current time</source>
-        <translation>現在の時間で分割</translation>
-    </message>
-    <message>
-        <source>Separate audio</source>
-        <translation>オーディオを分離</translation>
-    </message>
-    <message>
-        <source>Separate all audio tracks</source>
-        <translation>すべてのオーディオトラックを分離</translation>
-    </message>
-    <message>
-        <source>Convert to edit-friendly format</source>
-        <translation>編集に適した形式に変換</translation>
-    </message>
-    <message>
-        <source>Crop…</source>
-        <translation>切り抜き…</translation>
-    </message>
-    <message>
-        <source>Enhance video…</source>
-        <translation>ビデオを強化…</translation>
-    </message>
-    <message>
-        <source>Unlink</source>
-        <translation>リンク解除</translation>
-    </message>
-    <message>
-        <source>Link</source>
-        <translation>リンク</translation>
-    </message>
-    <message>
-        <source>Merge subtitle clips</source>
-        <translation>字幕クリップを結合</translation>
-    </message>
-    <message>
-        <source>Merge all subtitles on this track</source>
-        <translation>このトラックのすべての字幕を結合</translation>
-    </message>
-    <message>
-        <source>Convert to text clips</source>
-        <translation>テキストクリップに変換</translation>
-    </message>
-    <message>
-        <source>Convert to subtitle</source>
-        <translation>字幕に変換</translation>
-    </message>
-    <message>
-        <source>Cut</source>
-        <translation>切り取り</translation>
-    </message>
-    <message>
-        <source>Copy</source>
-        <translation>コピー</translation>
-    </message>
-    <message>
-        <source>Paste attributes…</source>
-        <translation>属性を貼り付け…</translation>
-    </message>
-    <message>
-        <source>Duplicate</source>
-        <translation>複製</translation>
-    </message>
-    <message>
-        <source>Rename…</source>
-        <translation>名前の変更…</translation>
-    </message>
-    <message>
-        <source>Copy effects</source>
-        <translation>エフェクトをコピー</translation>
-    </message>
-    <message>
-        <source>Paste effects</source>
-        <translation>エフェクトを貼り付け</translation>
-    </message>
-    <message>
-        <source>Save effects as preset…</source>
-        <translation>エフェクトをプリセットとして保存…</translation>
-    </message>
-    <message>
-        <source>Unlink from clip</source>
-        <translation>クリップからリンク解除</translation>
-    </message>
-    <message>
-        <source>Move to its own track</source>
-        <translation>別のトラックに移動</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>削除</translation>
-    </message>
+</context>
+<context>
+    <name>TimelineFadeHandle</name>
     <message>
         <source>Adjust fade</source>
-        <translation>フェードを調整</translation>
-    </message>
-    <message>
-        <source>Fade in %1s</source>
-        <translation>%1秒 フェードイン</translation>
+        <translation type="unfinished">フェードを調整</translation>
     </message>
     <message>
         <source>Fade out %1s</source>
-        <translation>%1秒 フェードアウト</translation>
+        <translation type="unfinished">%1秒 フェードアウト</translation>
     </message>
     <message>
-        <source>Drag to trim the start</source>
-        <translation>ドラッグして開始をトリム</translation>
+        <source>Fade in %1s</source>
+        <translation type="unfinished">%1秒 フェードイン</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineLandingOutline</name>
+    <message>
+        <source>Importing…</source>
+        <translation type="unfinished">インポート中…</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineLiveRecordingBlock</name>
+    <message>
+        <source>PAUSED </source>
+        <translation type="unfinished">一時停止 </translation>
     </message>
     <message>
-        <source>Trim clip</source>
-        <translation>クリップをトリム</translation>
+        <source>REC </source>
+        <translation type="unfinished">録音 </translation>
     </message>
+</context>
+<context>
+    <name>TimelineNewTrackGhostClip</name>
     <message>
-        <source>Drag to trim the end</source>
-        <translation>ドラッグして終了をトリム</translation>
-    </message>
-    <message>
-        <source>Split item at current time</source>
-        <translation>現在の時間で項目を分割</translation>
+        <source>Importing…</source>
+        <translation type="unfinished">インポート中…</translation>
     </message>
 </context>
 <context>
@@ -15575,46 +16316,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Add new track</source>
         <translation>新しいトラックを追加</translation>
-    </message>
-    <message>
-        <source>Click or drag to seek</source>
-        <translation>クリックまたはドラッグしてシーク</translation>
-    </message>
-    <message>
-        <source>Go to bookmark</source>
-        <translation>ブックマークへ移動</translation>
-    </message>
-    <message>
-        <source>Rename…</source>
-        <translation>名前の変更…</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>削除</translation>
-    </message>
-    <message>
-        <source>Your timeline is empty</source>
-        <translation>タイムラインは空です</translation>
-    </message>
-    <message>
-        <source>Drag media here from the library, or add an empty track to start.</source>
-        <translation>ライブラリからメディアをここにドラッグするか、空のトラックを追加して開始してください。</translation>
-    </message>
-    <message>
-        <source>New track</source>
-        <translation>新しいトラック</translation>
-    </message>
-    <message>
-        <source>Importing…</source>
-        <translation>インポート中…</translation>
-    </message>
-    <message>
-        <source>PAUSED </source>
-        <translation>一時停止 </translation>
-    </message>
-    <message>
-        <source>REC </source>
-        <translation>録音 </translation>
     </message>
     <message>
         <source>Rename bookmark</source>
@@ -15667,6 +16368,22 @@ If playback stutters, try another.</source>
     <message>
         <source>Close Gap</source>
         <translation>ギャップを埋める</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineSeekStrip</name>
+    <message>
+        <source>Click or drag to seek</source>
+        <translation type="unfinished">クリックまたはドラッグしてシーク</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineSpanBracketChip</name>
+    <message numerus="yes">
+        <source>%n track(s)</source>
+        <translation type="unfinished">
+            <numerusform>%n トラック</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -15780,22 +16497,6 @@ If playback stutters, try another.</source>
         <translation>カメラを追加</translation>
     </message>
     <message>
-        <source>Main</source>
-        <translation>メイン</translation>
-    </message>
-    <message>
-        <source>Composite</source>
-        <translation>コンポジット</translation>
-    </message>
-    <message>
-        <source>Switch between the main timeline and composite clips</source>
-        <translation>メインタイムラインとコンポジットクリップを切り替えます</translation>
-    </message>
-    <message>
-        <source>No composite clips yet</source>
-        <translation>コンポジットクリップはまだありません</translation>
-    </message>
-    <message>
         <source>Toggle audio mixer strip</source>
         <translation>オーディオミキサーストリップの切り替え</translation>
     </message>
@@ -15816,20 +16517,12 @@ If playback stutters, try another.</source>
         <translation>現在の時間でフリーズフレーム</translation>
     </message>
     <message>
-        <source>More edit actions</source>
-        <translation>その他の編集アクション</translation>
-    </message>
-    <message>
         <source>Add adjustment layer</source>
         <translation>調整レイヤーを追加</translation>
     </message>
     <message>
         <source>Add camera — one viewpoint the whole timeline is seen through. With a camera already there, adds a new camera clip (a cut to a new framing) at the playhead</source>
         <translation>カメラを追加 — タイムライン全体をこの 1 つの視点を通して見る。すでにカメラがある場合は、再生ヘッド位置に新しいカメラクリップ (新しいフレーミングへのカット) を追加します</translation>
-    </message>
-    <message>
-        <source>Customize toolbar…</source>
-        <translation>ツールバーをカスタマイズ…</translation>
     </message>
     <message>
         <source>Toggle snapping</source>
@@ -15842,30 +16535,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Allow clip overlap</source>
         <translation>クリップの重複を許可</translation>
-    </message>
-    <message>
-        <source>Zoom out</source>
-        <translation>ズームアウト</translation>
-    </message>
-    <message>
-        <source>Timeline zoom</source>
-        <translation>タイムラインズーム</translation>
-    </message>
-    <message>
-        <source>Zoom %1×</source>
-        <translation>ズーム %1×</translation>
-    </message>
-    <message>
-        <source>Zoom level — click to reset to 1×. Ctrl+wheel over the timeline also zooms.</source>
-        <translation>ズームレベル — クリックで 1× にリセット。タイムライン上で Ctrl+ホイールでもズームします。</translation>
-    </message>
-    <message>
-        <source>Zoom in</source>
-        <translation>ズームイン</translation>
-    </message>
-    <message>
-        <source>Fit timeline in view</source>
-        <translation>タイムラインをビューに合わせる</translation>
     </message>
 </context>
 <context>
@@ -15890,25 +16559,97 @@ If playback stutters, try another.</source>
         <source>Reset to defaults</source>
         <translation>デフォルトにリセット</translation>
     </message>
+</context>
+<context>
+    <name>TimelineToolbarCustomizeDivider</name>
     <message>
         <source>More menu</source>
-        <translation>その他メニュー</translation>
+        <translation type="unfinished">その他メニュー</translation>
     </message>
+</context>
+<context>
+    <name>TimelineToolbarCustomizeRow</name>
     <message>
         <source>— Separator —</source>
-        <translation>— 区切り線 —</translation>
+        <translation type="unfinished">— 区切り線 —</translation>
     </message>
     <message>
         <source>Move up</source>
-        <translation>上に移動</translation>
+        <translation type="unfinished">上に移動</translation>
     </message>
     <message>
         <source>Move down</source>
-        <translation>下に移動</translation>
+        <translation type="unfinished">下に移動</translation>
     </message>
     <message>
         <source>Remove separator</source>
-        <translation>区切り線を削除</translation>
+        <translation type="unfinished">区切り線を削除</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarOverflowButton</name>
+    <message>
+        <source>More edit actions</source>
+        <translation type="unfinished">その他の編集アクション</translation>
+    </message>
+    <message>
+        <source>Customize toolbar…</source>
+        <translation type="unfinished">ツールバーをカスタマイズ…</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarSceneBadge</name>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished">メイン</translation>
+    </message>
+    <message>
+        <source>Composite</source>
+        <translation type="unfinished">コンポジット</translation>
+    </message>
+    <message>
+        <source>Switch between the main timeline and composite clips</source>
+        <translation type="unfinished">メインタイムラインとコンポジットクリップを切り替えます</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarSceneEmptyItem</name>
+    <message>
+        <source>No composite clips yet</source>
+        <translation type="unfinished">コンポジットクリップはまだありません</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarZoomControl</name>
+    <message>
+        <source>Zoom out</source>
+        <translation type="unfinished">ズームアウト</translation>
+    </message>
+    <message>
+        <source>Zoom in</source>
+        <translation type="unfinished">ズームイン</translation>
+    </message>
+    <message>
+        <source>Fit timeline in view</source>
+        <translation type="unfinished">タイムラインをビューに合わせる</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarZoomReadout</name>
+    <message>
+        <source>Zoom level — click to reset to 1×. Ctrl+wheel over the timeline also zooms.</source>
+        <translation type="unfinished">ズームレベル — クリックで 1× にリセット。タイムライン上で Ctrl+ホイールでもズームします。</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarZoomSlider</name>
+    <message>
+        <source>Timeline zoom</source>
+        <translation type="unfinished">タイムラインズーム</translation>
+    </message>
+    <message>
+        <source>Zoom %1×</source>
+        <translation type="unfinished">ズーム %1×</translation>
     </message>
 </context>
 <context>
@@ -15939,6 +16680,21 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>TimelineTrimHandle</name>
+    <message>
+        <source>Drag to trim the start</source>
+        <translation type="unfinished">ドラッグして開始をトリム</translation>
+    </message>
+    <message>
+        <source>Drag to trim the end</source>
+        <translation type="unfinished">ドラッグして終了をトリム</translation>
+    </message>
+    <message>
+        <source>Trim clip</source>
+        <translation type="unfinished">クリップをトリム</translation>
+    </message>
+</context>
+<context>
     <name>ToastHost</name>
     <message>
         <source>%1  (×%2)</source>
@@ -15960,25 +16716,25 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>TrackHeaderChannelLanesButton</name>
+    <message>
+        <source>Show one combined waveform</source>
+        <translation type="unfinished">1つの合成波形を表示</translation>
+    </message>
+    <message>
+        <source>Show each channel separately (%1)</source>
+        <translation type="unfinished">各チャンネルを個別に表示 (%1)</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderClipDisplayButton</name>
+    <message>
+        <source>Clips show: %1 (click to change)</source>
+        <translation type="unfinished">クリップの表示 : %1 (クリックして変更)</translation>
+    </message>
+</context>
+<context>
     <name>TrackHeaderColumn</name>
-    <message>
-        <source>Delete this track?</source>
-        <translation>このトラックを削除しますか?</translation>
-    </message>
-    <message>
-        <source>Delete track</source>
-        <translation>トラックを削除</translation>
-    </message>
-    <message numerus="yes">
-        <source>This removes the track and its %n clips. You can undo afterwards.</source>
-        <translation>
-            <numerusform>これによりトラックとその %n 個のクリップが削除されます。後で元に戻せます。</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>This removes the empty track. You can undo afterwards.</source>
-        <translation>これにより空のトラックが削除されます。後で元に戻せます。</translation>
-    </message>
     <message>
         <source>Waveform</source>
         <translation>波形</translation>
@@ -16060,140 +16816,201 @@ If playback stutters, try another.</source>
         <translation>%1 から %2</translation>
     </message>
     <message>
-        <source>Turn adjustment on</source>
-        <translation>調整をオンにする</translation>
-    </message>
-    <message>
-        <source>Turn adjustment off</source>
-        <translation>調整をオフにする</translation>
-    </message>
-    <message>
-        <source>Stop recording</source>
-        <translation>録音を停止</translation>
-    </message>
-    <message>
-        <source>Record voiceover</source>
-        <translation>ボイスオーバーを録音</translation>
-    </message>
-    <message>
-        <source>Record voiceover (mic)</source>
-        <translation>ボイスオーバーを録音 (マイク)</translation>
-    </message>
-    <message>
-        <source>Turn transform on</source>
-        <translation>変形をオンにする</translation>
-    </message>
-    <message>
-        <source>Turn transform off</source>
-        <translation>変形をオフにする</translation>
-    </message>
-    <message>
-        <source>Add camera clip at playhead</source>
-        <translation>再生ヘッド位置にカメラクリップを追加</translation>
-    </message>
-    <message>
-        <source>Covers…</source>
-        <translation>カバー範囲…</translation>
-    </message>
-    <message>
-        <source>Select covered clips</source>
-        <translation>カバーされているクリップを選択</translation>
-    </message>
-    <message>
-        <source>Add transform layer above</source>
-        <translation>上に変形レイヤーを追加</translation>
-    </message>
-    <message>
-        <source>Track height</source>
-        <translation>トラックの高さ</translation>
-    </message>
-    <message>
-        <source>Short</source>
-        <translation>低い</translation>
-    </message>
-    <message>
-        <source>Tall</source>
-        <translation>高い</translation>
-    </message>
-    <message>
-        <source>Taller</source>
-        <translation>さらに高い</translation>
-    </message>
-    <message>
-        <source>Scroll over the header to fine-tune</source>
-        <translation>ヘッダー上でスクロールして微調整</translation>
-    </message>
-    <message>
-        <source>Covers</source>
-        <translation>カバー範囲</translation>
-    </message>
-    <message>
         <source>Video</source>
         <translation>ビデオ</translation>
     </message>
+</context>
+<context>
+    <name>TrackHeaderContextMenu</name>
     <message>
-        <source>Drag the header to reorder this track</source>
-        <translation>ヘッダーをドラッグしてこのトラックの順序を変更</translation>
-    </message>
-    <message>
-        <source>Paused — click to finish recording</source>
-        <translation>一時停止中 — クリックして録音を完了</translation>
-    </message>
-    <message>
-        <source>Recording — click to finish recording</source>
-        <translation>録音中 — クリックして録音を完了</translation>
+        <source>Rename…</source>
+        <translation type="unfinished">名前の変更…</translation>
     </message>
     <message>
         <source>Unmute track</source>
-        <translation>トラックのミュートを解除</translation>
+        <translation type="unfinished">トラックのミュートを解除</translation>
     </message>
     <message>
         <source>Mute track</source>
-        <translation>トラックをミュート</translation>
-    </message>
-    <message>
-        <source>Show one combined waveform</source>
-        <translation>1つの合成波形を表示</translation>
-    </message>
-    <message>
-        <source>Show each channel separately (%1)</source>
-        <translation>各チャンネルを個別に表示 (%1)</translation>
+        <translation type="unfinished">トラックをミュート</translation>
     </message>
     <message>
         <source>Show track</source>
-        <translation>トラックを表示</translation>
+        <translation type="unfinished">トラックを表示</translation>
     </message>
     <message>
         <source>Hide track</source>
-        <translation>トラックを非表示</translation>
+        <translation type="unfinished">トラックを非表示</translation>
+    </message>
+    <message>
+        <source>Add camera clip at playhead</source>
+        <translation type="unfinished">再生ヘッド位置にカメラクリップを追加</translation>
+    </message>
+    <message>
+        <source>Covers…</source>
+        <translation type="unfinished">カバー範囲…</translation>
+    </message>
+    <message>
+        <source>Select covered clips</source>
+        <translation type="unfinished">カバーされているクリップを選択</translation>
+    </message>
+    <message>
+        <source>Add transform layer above</source>
+        <translation type="unfinished">上に変形レイヤーを追加</translation>
+    </message>
+    <message>
+        <source>Track height</source>
+        <translation type="unfinished">トラックの高さ</translation>
+    </message>
+    <message>
+        <source>Short</source>
+        <translation type="unfinished">低い</translation>
+    </message>
+    <message>
+        <source>Tall</source>
+        <translation type="unfinished">高い</translation>
+    </message>
+    <message>
+        <source>Taller</source>
+        <translation type="unfinished">さらに高い</translation>
+    </message>
+    <message>
+        <source>Scroll over the header to fine-tune</source>
+        <translation type="unfinished">ヘッダー上でスクロールして微調整</translation>
     </message>
     <message>
         <source>Taller row</source>
-        <translation>行を高く</translation>
+        <translation type="unfinished">行を高く</translation>
     </message>
     <message>
         <source>Shorter row</source>
-        <translation>行を低く</translation>
+        <translation type="unfinished">行を低く</translation>
     </message>
     <message>
+        <source>Delete track</source>
+        <translation type="unfinished">トラックを削除</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderCoversMenu</name>
+    <message>
+        <source>Covers</source>
+        <translation type="unfinished">カバー範囲</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderDeleteDialog</name>
+    <message>
+        <source>Delete this track?</source>
+        <translation type="unfinished">このトラックを削除しますか?</translation>
+    </message>
+    <message>
+        <source>Delete track</source>
+        <translation type="unfinished">トラックを削除</translation>
+    </message>
+    <message numerus="yes">
+        <source>This removes the track and its %n clips. You can undo afterwards.</source>
+        <translation type="unfinished">
+            <numerusform>これによりトラックとその %n 個のクリップが削除されます。後で元に戻せます。</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>This removes the empty track. You can undo afterwards.</source>
+        <translation type="unfinished">これにより空のトラックが削除されます。後で元に戻せます。</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderGrip</name>
+    <message>
+        <source>Drag the header to reorder this track</source>
+        <translation type="unfinished">ヘッダーをドラッグしてこのトラックの順序を変更</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderLaneEye</name>
+    <message>
+        <source>Turn adjustment on</source>
+        <translation type="unfinished">調整をオンにする</translation>
+    </message>
+    <message>
+        <source>Turn adjustment off</source>
+        <translation type="unfinished">調整をオフにする</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderMicButton</name>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished">録音を停止</translation>
+    </message>
+    <message>
+        <source>Record voiceover</source>
+        <translation type="unfinished">ボイスオーバーを録音</translation>
+    </message>
+    <message>
+        <source>Paused — click to finish recording</source>
+        <translation type="unfinished">一時停止中 — クリックして録音を完了</translation>
+    </message>
+    <message>
+        <source>Recording — click to finish recording</source>
+        <translation type="unfinished">録音中 — クリックして録音を完了</translation>
+    </message>
+    <message>
+        <source>Record voiceover (mic)</source>
+        <translation type="unfinished">ボイスオーバーを録音 (マイク)</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderMuteButton</name>
+    <message>
+        <source>Unmute track</source>
+        <translation type="unfinished">トラックのミュートを解除</translation>
+    </message>
+    <message>
+        <source>Mute track</source>
+        <translation type="unfinished">トラックをミュート</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderRenameDialog</name>
+    <message>
         <source>Rename track</source>
-        <translation>トラック名を変更</translation>
+        <translation type="unfinished">トラック名を変更</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation>名前の変更</translation>
+        <translation type="unfinished">名前の変更</translation>
     </message>
     <message>
         <source>Track name</source>
-        <translation>トラック名</translation>
+        <translation type="unfinished">トラック名</translation>
+    </message>
+</context>
+<context>
+    <name>TrackHeaderRow</name>
+    <message>
+        <source>Turn transform on</source>
+        <translation type="unfinished">変形をオンにする</translation>
     </message>
     <message>
-        <source>Clips show: %1 (click to change)</source>
-        <translation>クリップの表示 : %1 (クリックして変更)</translation>
+        <source>Turn transform off</source>
+        <translation type="unfinished">変形をオフにする</translation>
     </message>
     <message>
-        <source>Rename…</source>
-        <translation>名前の変更…</translation>
+        <source>Turn adjustment on</source>
+        <translation type="unfinished">調整をオンにする</translation>
+    </message>
+    <message>
+        <source>Turn adjustment off</source>
+        <translation type="unfinished">調整をオフにする</translation>
+    </message>
+    <message>
+        <source>Show track</source>
+        <translation type="unfinished">トラックを表示</translation>
+    </message>
+    <message>
+        <source>Hide track</source>
+        <translation type="unfinished">トラックを非表示</translation>
     </message>
 </context>
 <context>
@@ -16461,34 +17278,35 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>TransformOverlay</name>
+    <name>TransformOverlayLayerChip</name>
     <message numerus="yes">
         <source>%1 · %n clip(s)</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>%1 · %n 個のクリップ</numerusform>
         </translation>
     </message>
     <message>
         <source>Transform</source>
-        <translation>変形</translation>
+        <translation type="unfinished">変形</translation>
     </message>
+</context>
+<context>
+    <name>TransformOverlayParentChip</name>
     <message>
         <source>Select %1</source>
-        <translation>%1 を選択</translation>
+        <translation type="unfinished">%1 を選択</translation>
+    </message>
+    <message>
+        <source>Transform</source>
+        <translation type="unfinished">変形</translation>
     </message>
     <message>
         <source>Select the transform layer moving this clip (%1)</source>
-        <translation>このクリップを移動している変形レイヤー (%1) を選択</translation>
+        <translation type="unfinished">このクリップを移動している変形レイヤー (%1) を選択</translation>
     </message>
 </context>
 <context>
     <name>TransformSpanBracket</name>
-    <message numerus="yes">
-        <source>%n track(s)</source>
-        <translation>
-            <numerusform>%n トラック</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Transform layer span end</source>
         <translation>変形レイヤースパンの終端</translation>
@@ -16607,6 +17425,21 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>TransitionPresetCard</name>
+    <message>
+        <source>%1 — drag onto where two clips meet, or on touch hold then drag</source>
+        <translation type="unfinished">%1 — 2 つのクリップが接する位置にドラッグ、タッチの場合は長押ししてからドラッグ</translation>
+    </message>
+    <message>
+        <source>Remove from favorites</source>
+        <translation type="unfinished">お気に入りから削除</translation>
+    </message>
+    <message>
+        <source>Add to favorites</source>
+        <translation type="unfinished">お気に入りに追加</translation>
+    </message>
+</context>
+<context>
     <name>TransitionsTab</name>
     <message>
         <source>Search transitions</source>
@@ -16667,18 +17500,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Import</source>
         <translation>インポート</translation>
-    </message>
-    <message>
-        <source>%1 — drag onto where two clips meet, or on touch hold then drag</source>
-        <translation>%1 — 2 つのクリップが接する位置にドラッグ、タッチの場合は長押ししてからドラッグ</translation>
-    </message>
-    <message>
-        <source>Remove from favorites</source>
-        <translation>お気に入りから削除</translation>
-    </message>
-    <message>
-        <source>Add to favorites</source>
-        <translation>お気に入りに追加</translation>
     </message>
 </context>
 <context>
@@ -16941,30 +17762,14 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>Vec2Param</name>
+    <name>Vec2ParamPad</name>
     <message>
         <source>Edit %1</source>
-        <translation>%1 を編集</translation>
+        <translation type="unfinished">%1 を編集</translation>
     </message>
 </context>
 <context>
     <name>VectorInspector</name>
-    <message>
-        <source>Toggle %1&apos;s keyframes</source>
-        <translation>%1 のキーフレームを切り替え</translation>
-    </message>
-    <message>
-        <source>Key %1 at the playhead</source>
-        <translation>再生ヘッドで %1 をキー設定</translation>
-    </message>
-    <message>
-        <source>Override the %1 colour</source>
-        <translation>%1 の色を上書き</translation>
-    </message>
-    <message>
-        <source>Back to the drawing&apos;s own %1</source>
-        <translation>描画自体の %1 に戻す</translation>
-    </message>
     <message>
         <source>Replace Animation</source>
         <translation>アニメーションを置き換え</translation>
@@ -17162,6 +17967,25 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>VectorSvgColorRow</name>
+    <message>
+        <source>Toggle %1&apos;s keyframes</source>
+        <translation type="unfinished">%1 のキーフレームを切り替え</translation>
+    </message>
+    <message>
+        <source>Key %1 at the playhead</source>
+        <translation type="unfinished">再生ヘッドで %1 をキー設定</translation>
+    </message>
+    <message>
+        <source>Override the %1 colour</source>
+        <translation type="unfinished">%1 の色を上書き</translation>
+    </message>
+    <message>
+        <source>Back to the drawing&apos;s own %1</source>
+        <translation type="unfinished">描画自体の %1 に戻す</translation>
+    </message>
+</context>
+<context>
     <name>VfrWarning</name>
     <message>
         <source>Variable frame rate. This clip can drift out of sync with its audio. Right-click it and choose Convert to edit-friendly format.</source>
@@ -17317,53 +18141,6 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>VoiceoverControlBar</name>
-    <message>
-        <source>PAUSED</source>
-        <translation>一時停止中</translation>
-    </message>
-    <message>
-        <source>REC</source>
-        <translation>録音中</translation>
-    </message>
-    <message>
-        <source>Default Mic</source>
-        <translation>デフォルトマイク</translation>
-    </message>
-    <message>
-        <source>Input microphone: %1 (click to switch)</source>
-        <translation>入力マイク : %1 (クリックして切り替え)</translation>
-    </message>
-    <message>
-        <source>Mic gain</source>
-        <translation>マイクゲイン</translation>
-    </message>
-    <message>
-        <source>Voice input gain: %1% (adjust voice level)</source>
-        <translation>音声入力ゲイン : %1% (音声レベルを調整)</translation>
-    </message>
-    <message>
-        <source>Live voice level: %1%</source>
-        <translation>ライブ音声レベル : %1%</translation>
-    </message>
-    <message>
-        <source>Resume recording</source>
-        <translation>録音を再開</translation>
-    </message>
-    <message>
-        <source>Pause recording</source>
-        <translation>録音を一時停止</translation>
-    </message>
-    <message>
-        <source>Done — finish recording and save to track</source>
-        <translation>完了 — 録音をトラックに保存</translation>
-    </message>
-    <message>
-        <source>Cancel — discard recording</source>
-        <translation>破棄 — 録音をキャンセル</translation>
-    </message>
-</context>
-<context>
     <name>VoiceoverDialog</name>
     <message>
         <source>Generate voiceover</source>
@@ -17400,6 +18177,65 @@ If playback stutters, try another.</source>
     <message>
         <source>Close</source>
         <translation>閉じる</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceoverGainControl</name>
+    <message>
+        <source>Mic gain</source>
+        <translation type="unfinished">マイクゲイン</translation>
+    </message>
+    <message>
+        <source>Voice input gain: %1% (adjust voice level)</source>
+        <translation type="unfinished">音声入力ゲイン : %1% (音声レベルを調整)</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceoverLevelMeter</name>
+    <message>
+        <source>Live voice level: %1%</source>
+        <translation type="unfinished">ライブ音声レベル : %1%</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceoverMicPicker</name>
+    <message>
+        <source>Default Mic</source>
+        <translation type="unfinished">デフォルトマイク</translation>
+    </message>
+    <message>
+        <source>Input microphone: %1 (click to switch)</source>
+        <translation type="unfinished">入力マイク : %1 (クリックして切り替え)</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceoverRecLabel</name>
+    <message>
+        <source>PAUSED</source>
+        <translation type="unfinished">一時停止中</translation>
+    </message>
+    <message>
+        <source>REC</source>
+        <translation type="unfinished">録音中</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceoverTransport</name>
+    <message>
+        <source>Resume recording</source>
+        <translation type="unfinished">録音を再開</translation>
+    </message>
+    <message>
+        <source>Pause recording</source>
+        <translation type="unfinished">録音を一時停止</translation>
+    </message>
+    <message>
+        <source>Done — finish recording and save to track</source>
+        <translation type="unfinished">完了 — 録音をトラックに保存</translation>
+    </message>
+    <message>
+        <source>Cancel — discard recording</source>
+        <translation type="unfinished">破棄 — 録音をキャンセル</translation>
     </message>
 </context>
 <context>

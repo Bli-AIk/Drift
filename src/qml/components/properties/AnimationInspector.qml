@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Window
 import Drift
-import ".."
-
 // CapCut-style Animation: In / Out only.
 // Fade is one kind among slide/zoom/pop — same duration + style (Linear/Smooth/Natural/Custom).
 Item {

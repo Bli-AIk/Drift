@@ -1,7 +1,5 @@
 import QtQuick
 import Drift
-import ".."
-
 // Makes whatever it covers draggable as an asset. The gesture follows the device of each press, not
 // the form factor: a mouse/touchpad/stylus clicks for the card's primary action (tapped), drags as a
 // platform drag (the mime type comes from AssetDrag) and right-clicks for contextMenuRequested; a

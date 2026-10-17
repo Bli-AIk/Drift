@@ -1,7 +1,5 @@
 import QtQuick
 import Drift
-import ".."
-
 // Top row of the catalog tabs: the search field, which also names the tab (these tabs
 // have no panel header), with the tab's actions as icon buttons at its right end.
 Item {

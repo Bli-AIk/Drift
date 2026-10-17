@@ -3,8 +3,6 @@ import QtQuick.Controls.Basic
 import QtQuick.Window
 import QtMultimedia
 import Drift
-import ".."
-
 // One stock result: its preview, who made it and under what licence, and Download. Replaces
 // the modal dialog; it slides over the results so Back returns to the same scroll position.
 Rectangle {

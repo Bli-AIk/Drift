@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // The marketplace opt-in. Shown by the Market tab and by the shared-link sheet, which are the
 // two ways into a store download — one component so the wording cannot drift apart between them.
 //

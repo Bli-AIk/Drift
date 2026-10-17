@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Window
 import Drift
-import "components"
-
 // Android entry shell: home (layout + recent + import) → CapCut editor.
 ApplicationWindow {
     id: window

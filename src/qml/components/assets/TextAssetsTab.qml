@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // Text tab: click a style pack to drop a styled text clip on the timeline
 // (placeholder copy + inline edit). Timed captions live under Subtitles.
 // Styles the user saved from the properties Text tab sit behind the "My styles" chip.
@@ -111,68 +109,9 @@ Item {
         visible: root.section === "builtin"
         model: root.presets
 
-        delegate: Column {
-            id: packCard
-            required property var modelData
-            width: packGrid.cardSize
-            spacing: Theme.spacingSm
-
-            opacity: packDrag.active ? 0.85 : 1
-            scale: packDrag.active ? 1.04 : packDrag.pressed ? 0.97 : (packDrag.hovered ? 1.02 : 1.0)
-            Behavior on scale {
-                NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-            }
-
-            TextStylePackThumb {
-                width: parent.width
-                height: Math.round(width * 0.55)
-                presetId: packCard.modelData.id
-                hovered: packDrag.hovered
-
-                AssetDragSource {
-                    id: packDrag
-                    hasContextMenu: true
-                    onContextMenuRequested: cardMenu.popup()
-                    anchors.fill: parent
-                    kind: "textStyle"
-                    payload: packCard.modelData.id
-                    label: packCard.modelData.label
-                    glyph: Theme.icons.type
-                    onTapped: {
-                        EditorState.addTextClip("", -1, packCard.modelData.id)
-                        root.added()
-                    }
-                }
-
-                ThemedToolTip {
-                    text: qsTr("%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.").arg(packCard.modelData.label)
-                    visible: packDrag.hovered && !packDrag.active
-                }
-
-                ThemedContextMenu {
-                    id: cardMenu
-
-                    ThemedMenuItem {
-                        text: qsTr("Add at playhead")
-                        icon.name: Theme.icons.plus
-                        onTriggered: packDrag.tapped()
-                    }
-                }
-            }
-
-            Text {
-                width: parent.width
-                text: packCard.modelData.label
-                elide: Text.ElideRight
-                horizontalAlignment: Text.AlignHCenter
-                color: packDrag.hovered ? Theme.panelForeground : Theme.mutedForeground
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSizeXs
-
-                Behavior on color {
-                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                }
-            }
+        delegate: TextStylePackCard {
+            cardSize: packGrid.cardSize
+            onAdded: root.added()
         }
     }
 
@@ -198,92 +137,12 @@ Item {
         visible: root.section === "mine" && root.userPresets.length > 0
         model: root.userPresets
 
-        delegate: Column {
-            id: userCard
-            required property var modelData
-            width: userGrid.cardSize
-            spacing: Theme.spacingSm
-
-            opacity: userDrag.active ? 0.85 : 1
-            scale: userDrag.active ? 1.04 : userDrag.pressed ? 0.97 : (userDrag.hovered ? 1.02 : 1.0)
-            Behavior on scale {
-                NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-            }
-
-            TextStylePackThumb {
-                width: parent.width
-                height: Math.round(width * 0.55)
-                presetId: userCard.modelData.id
-                hovered: userDrag.hovered
-
-                AssetDragSource {
-                    id: userDrag
-                    anchors.fill: parent
-                    kind: "textStyle"
-                    payload: userCard.modelData.id
-                    label: userCard.modelData.label
-                    glyph: Theme.icons.type
-                    hasContextMenu: true
-                    onContextMenuRequested: cardMenu.popup()
-                    onTapped: {
-                        EditorState.addTextClip("", -1, userCard.modelData.id)
-                        root.added()
-                    }
-                }
-
-                ThemedToolTip {
-                    text: qsTr("%1 — click to add at the playhead, or drag to the timeline. Double-click it on the preview to edit.").arg(userCard.modelData.label)
-                    visible: userDrag.hovered && !userDrag.active
-                }
-
-                IconButton {
-                    anchors.top: parent.top
-                    anchors.right: parent.right
-                    anchors.margins: 2
-                    visible: userDrag.hovered || cardMenu.visible
-                    glyph: Theme.icons.ellipsis
-                    variant: "ghost"
-                    buttonSize: 20
-                    iconSize: 12
-                    tooltip: qsTr("Style options")
-                    onClicked: cardMenu.popup()
-                }
-
-                ThemedContextMenu {
-                    id: cardMenu
-
-                    ThemedMenuItem {
-                        text: qsTr("Rename…")
-                        icon.name: Theme.icons.pencil
-                        onTriggered: renameDialog.openFor(userCard.modelData)
-                    }
-                    ThemedMenuItem {
-                        text: qsTr("Export…")
-                        icon.name: Theme.icons.folderOutput
-                        onTriggered: root.exportStyle(userCard.modelData)
-                    }
-                    ThemedMenuSeparator { }
-                    ThemedMenuItem {
-                        text: qsTr("Delete")
-                        icon.name: Theme.icons.trash
-                        onTriggered: deleteDialog.openFor(userCard.modelData)
-                    }
-                }
-            }
-
-            Text {
-                width: parent.width
-                text: userCard.modelData.label
-                elide: Text.ElideRight
-                horizontalAlignment: Text.AlignHCenter
-                color: userDrag.hovered ? Theme.panelForeground : Theme.mutedForeground
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSizeXs
-
-                Behavior on color {
-                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                }
-            }
+        delegate: TextStyleUserCard {
+            cardSize: userGrid.cardSize
+            onAdded: root.added()
+            onExportRequested: (preset) => root.exportStyle(preset)
+            onRenameRequested: (preset) => renameDialog.openFor(preset)
+            onDeleteRequested: (preset) => deleteDialog.openFor(preset)
         }
     }
 

@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Window
 import Drift
-import "components"
-
 // The contextual layer above the timeline: what you can do to the thing you have selected.
 //
 // Replaces the 26-icon horizontally-scrolling strip, of which four were visible at a time and
@@ -198,18 +196,13 @@ Item {
         anchors.leftMargin: root.leftInset
         anchors.rightMargin: root.rightInset
 
-        Text {
+        AndroidClipToolbarHint {
             anchors.left: parent.left
             anchors.leftMargin: Theme.androidPagePadding
             anchors.right: toolRow.left
             anchors.rightMargin: Theme.spacingLg
             anchors.verticalCenter: parent.verticalCenter
             visible: root.showHint
-            text: qsTr("Tap a clip to edit")
-            color: Theme.mutedForeground
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSizeSm
-            elide: Text.ElideRight
         }
 
         Row {
@@ -231,38 +224,10 @@ Item {
             Repeater {
                 model: root.entries
 
-                delegate: Item {
-                    id: slot
-                    required property var modelData
+                delegate: AndroidClipToolbarSlot {
                     width: toolRow.slotWidth
                     height: toolRow.height
-
-                    // Delete sits next to the two edits it cannot be undone from as easily;
-                    // the rule separating it is cheaper than the width a real gutter costs.
-                    Rectangle {
-                        anchors.left: parent.left
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: slot.modelData.gutter === true
-                        width: Theme.borderWidth
-                        height: Theme.spacing3xl
-                        color: Theme.panelBorder
-                    }
-
-                    NavRailButton {
-                        anchors.fill: parent
-                        entry: slot.modelData
-                        tint: slot.modelData.destructive === true ? Theme.destructive
-                                                                  : Theme.mutedForeground
-                        onClicked: {
-                            // Explicit rather than inherited: a signal handler declared on the
-                            // instance replaces the one in NavRailButton's own definition.
-                            if (slot.modelData.destructive === true)
-                                Haptics.confirm()
-                            else
-                                Haptics.select()
-                            root.run(slot.modelData.id)
-                        }
-                    }
+                    onActivated: (actionId) => root.run(actionId)
                 }
             }
         }

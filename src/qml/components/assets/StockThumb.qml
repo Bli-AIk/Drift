@@ -1,8 +1,6 @@
 import QtQuick
 import QtMultimedia
 import Drift
-import ".."
-
 // One stock result as a tile: thumbnail, price and duration badges, and the download state
 // drawn over it (progress with cancel, or failure with retry). A video tile plays its preview,
 // muted, while hovered.

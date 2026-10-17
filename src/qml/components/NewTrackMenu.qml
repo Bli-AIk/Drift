@@ -175,57 +175,8 @@ Popup {
         Repeater {
             model: root.trackTypes
 
-            delegate: Rectangle {
-                id: trackTypeRow
-                required property var modelData
-                required property int index
-
-                width: parent.width
-                height: Theme.controlHeight + Theme.spacingXs
-                radius: Theme.radiusSm
-                color: itemMouse.containsMouse || root.highlightIndex === index
-                       ? Theme.popoverHover : "transparent"
-
-                Behavior on color {
-                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                }
-
-                Row {
-                    anchors.fill: parent
-                    anchors.leftMargin: Theme.spacingLg
-                    anchors.rightMargin: Theme.spacingLg
-                    spacing: Theme.spacingLg + Theme.spacingXs
-
-                    IconGlyph {
-                        anchors.verticalCenter: parent.verticalCenter
-                        glyph: trackTypeRow.modelData.icon
-                        iconSize: Theme.iconSizeMd
-                        iconColor: Theme.mutedForeground
-                    }
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: trackTypeRow.modelData.label
-                        color: Theme.panelForeground
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeSm
-                    }
-                }
-
-                MouseArea {
-                    id: itemMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onEntered: root.highlightIndex = trackTypeRow.index
-                    onClicked: {
-                        // Adding a track rebuilds trackTypes and destroys this delegate,
-                        // so close first while root is still reachable.
-                        Haptics.confirm()
-                        root.close()
-                        root.addTrackOfType(trackTypeRow.modelData.type)
-                    }
-                }
+            delegate: NewTrackMenuEntry {
+                menu: root
             }
         }
     }
