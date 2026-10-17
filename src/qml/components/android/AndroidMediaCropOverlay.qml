@@ -40,8 +40,8 @@ Item {
         width: cropHost.frameW
         height: cropHost.frameH
         color: "transparent"
-        border.width: Theme.borderWidthFocus
-        border.color: Theme.primary
+        border.width: Theme.c.androidMediaCropOverlay.borderWidth
+        border.color: Theme.c.androidMediaCropOverlay.border
     }
 
     MouseArea {

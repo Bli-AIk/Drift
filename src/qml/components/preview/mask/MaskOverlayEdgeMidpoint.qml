@@ -25,8 +25,8 @@ Rectangle {
     height: Theme.spacingMd
     radius: width / 2
     color: "transparent"
-    border.width: Theme.borderWidth
-    border.color: Theme.primary
+    border.width: Theme.c.maskOverlayEdgeMidpoint.borderWidth
+    border.color: Theme.c.maskOverlayEdgeMidpoint.border
     opacity: midArea.containsMouse ? 1.0 : 0.5
     x: mxN * midpoint.frame.width - width / 2
     y: myN * midpoint.frame.height - height / 2

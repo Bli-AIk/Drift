@@ -12,16 +12,16 @@ Rectangle {
     anchors.bottomMargin: Theme.spacingLg
     width: hintText.width + Theme.spacingLg * 2
     height: hintText.height + Theme.spacingMd * 2
-    radius: Theme.radiusSm
-    color: Theme.panelBackground
-    opacity: 0.9
+    radius: Theme.c.maskOverlayEmptyHint.radius
+    color: Theme.c.maskOverlayEmptyHint.background
+    opacity: Theme.c.maskOverlayEmptyHint.opacity
 
     Text {
         id: hintText
         anchors.centerIn: parent
         text: hint.hasFrame ? qsTr("Drag a mask from the Masks tab onto a clip to edit it here")
                             : qsTr("Select a clip at the playhead to edit its masks")
-        color: Theme.mutedForeground
+        color: Theme.c.maskOverlayEmptyHint.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

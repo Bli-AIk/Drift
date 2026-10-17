@@ -7,7 +7,7 @@ Text {
     property string query: ""
     visible: available && matchCount === 0
     text: qsTr("No emoji match “%1”.").arg(query)
-    color: Theme.mutedForeground
+    color: Theme.c.emojiPickerEmptyLabel.foregroundMuted
     font.family: Theme.fontFamily
     font.pixelSize: Theme.fontSizeSm
     elide: Text.ElideRight

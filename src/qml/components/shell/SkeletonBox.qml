@@ -13,8 +13,8 @@ Rectangle {
     property bool animated: true
     property real shimmerWidth: 80
 
-    color: Theme.skeletonColor
-    radius: Theme.radiusSm
+    color: Theme.c.skeletonBox.background
+    radius: Theme.c.skeletonBox.radius
     clip: true
 
     Rectangle {
@@ -28,7 +28,7 @@ Rectangle {
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop { position: 0.0; color: "transparent" }
-            GradientStop { position: 0.5; color: Theme.skeletonHighlight }
+            GradientStop { position: 0.5; color: Theme.c.skeletonBox.highlight }
             GradientStop { position: 1.0; color: "transparent" }
         }
 

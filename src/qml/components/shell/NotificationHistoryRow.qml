@@ -24,7 +24,14 @@ Item {
         anchors.topMargin: Theme.spacingLg
         glyph: host._glyph(row.severity)
         iconSize: Theme.iconSizeBase
-        iconColor: host._accent(row.severity)
+        iconColor: {
+            switch (row.severity) {
+            case "error": return Theme.c.notificationHistoryRow.accentError
+            case "warning": return Theme.c.notificationHistoryRow.accentWarning
+            case "success": return Theme.c.notificationHistoryRow.accentSuccess
+            default: return Theme.c.notificationHistoryRow.accent
+            }
+        }
     }
 
     Column {
@@ -41,7 +48,7 @@ Item {
             text: row.repeats > 1
                   ? qsTr("%1  (×%2)").arg(row.message).arg(row.repeats)
                   : row.message
-            color: Theme.panelForeground
+            color: Theme.c.notificationHistoryRow.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: row.unread ? Font.Medium : Font.Normal
@@ -51,7 +58,7 @@ Item {
         Text {
             width: parent.width
             text: row.time
-            color: Theme.mutedForeground
+            color: Theme.c.notificationHistoryRow.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -78,8 +85,8 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         width: 8
         height: 8
-        radius: 4
-        color: Theme.primary
+        radius: Theme.c.notificationHistoryRow.indicatorRadius
+        color: Theme.c.notificationHistoryRow.indicator
         opacity: row.unread ? 1 : 0
     }
 
@@ -89,7 +96,7 @@ Item {
         anchors.right: parent.right
         anchors.rightMargin: host.horizontalPadding
         anchors.bottom: parent.bottom
-        height: Theme.borderWidth
-        color: Theme.panelBorder
+        height: Theme.c.notificationHistoryRow.borderWidth
+        color: Theme.c.notificationHistoryRow.divider
     }
 }

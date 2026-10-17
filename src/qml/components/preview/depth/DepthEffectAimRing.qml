@@ -12,13 +12,13 @@ Rectangle {
     visible: ring.source.isLight && ring.source.values.spot
     width: 16
     height: 16
-    radius: 8
+    radius: Theme.c.depthEffectAimRing.radius
     x: ring.source.ax * ring.frame.width - width / 2
     y: ring.source.ay * ring.frame.height - height / 2
     color: "transparent"
-    border.width: 2
+    border.width: Theme.c.depthEffectAimRing.borderWidth
     border.color: aimArea.containsMouse || aimArea.pressed
-                  ? Theme.primary : (ring.source.values.color || "#ffffff")
+                  ? Theme.c.depthEffectAimRing.borderHover : (ring.source.values.color || Theme.c.depthEffectAimRing.border)
 
     MouseArea {
         id: aimArea

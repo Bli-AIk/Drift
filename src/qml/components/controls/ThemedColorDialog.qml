@@ -7,7 +7,7 @@ import Drift
 ThemedDialog {
     id: root
 
-    property color selectedColor: "white"
+    property color selectedColor: Theme.c.themedColorDialog.defaultColor
 
     // Around an eyedropper pick, so a caller can bypass whatever would hide the colour being
     // picked (a chroma key samples its own keyed-out result otherwise).
@@ -20,7 +20,7 @@ ThemedDialog {
     property real _sat: 0
     property real _val: 1
     property real _alpha: 1
-    property color _initial: "white"
+    property color _initial: Theme.c.themedColorDialog.defaultColor
 
     preferredWidth: Theme.dialogWidthSm
 
@@ -71,26 +71,26 @@ ThemedDialog {
 
             Rectangle {
                 anchors.fill: parent
-                radius: Theme.radiusSm
+                radius: Theme.c.themedColorDialog.fieldRadius
                 color: Qt.hsva(root._hue, 1, 1, 1)
             }
             Rectangle {
                 anchors.fill: parent
-                radius: Theme.radiusSm
+                radius: Theme.c.themedColorDialog.fieldRadius
                 gradient: Gradient {
                     orientation: Gradient.Horizontal
-                    GradientStop { position: 0; color: "#ffffffff" }
-                    GradientStop { position: 1; color: "#00ffffff" }
+                    GradientStop { position: 0; color: Theme.c.themedColorDialog.saturationWhite }
+                    GradientStop { position: 1; color: Theme.c.themedColorDialog.saturationWhiteClear }
                 }
             }
             Rectangle {
                 anchors.fill: parent
-                radius: Theme.radiusSm
-                border.width: Theme.borderWidth
-                border.color: Qt.rgba(0, 0, 0, 0.12)
+                radius: Theme.c.themedColorDialog.fieldRadius
+                border.width: Theme.c.themedColorDialog.fieldBorderWidth
+                border.color: Theme.c.themedColorDialog.fieldBorder
                 gradient: Gradient {
-                    GradientStop { position: 0; color: "#00000000" }
-                    GradientStop { position: 1; color: "#ff000000" }
+                    GradientStop { position: 0; color: Theme.c.themedColorDialog.valueBlackClear }
+                    GradientStop { position: 1; color: Theme.c.themedColorDialog.valueBlack }
                 }
             }
 
@@ -128,13 +128,13 @@ ThemedDialog {
                 radius: height / 2
                 gradient: Gradient {
                     orientation: Gradient.Horizontal
-                    GradientStop { position: 0 / 6; color: "#ff0000" }
-                    GradientStop { position: 1 / 6; color: "#ffff00" }
-                    GradientStop { position: 2 / 6; color: "#00ff00" }
-                    GradientStop { position: 3 / 6; color: "#00ffff" }
-                    GradientStop { position: 4 / 6; color: "#0000ff" }
-                    GradientStop { position: 5 / 6; color: "#ff00ff" }
-                    GradientStop { position: 6 / 6; color: "#ff0000" }
+                    GradientStop { position: 0 / 6; color: Theme.c.themedColorDialog.hueRed }
+                    GradientStop { position: 1 / 6; color: Theme.c.themedColorDialog.hueYellow }
+                    GradientStop { position: 2 / 6; color: Theme.c.themedColorDialog.hueGreen }
+                    GradientStop { position: 3 / 6; color: Theme.c.themedColorDialog.hueCyan }
+                    GradientStop { position: 4 / 6; color: Theme.c.themedColorDialog.hueBlue }
+                    GradientStop { position: 5 / 6; color: Theme.c.themedColorDialog.hueMagenta }
+                    GradientStop { position: 6 / 6; color: Theme.c.themedColorDialog.hueRed }
                 }
             }
 
@@ -167,21 +167,21 @@ ThemedDialog {
                 id: compare
                 width: Theme.controlHeight * 2
                 height: Theme.controlHeight
-                radius: Theme.radiusSm
+                radius: Theme.c.themedColorDialog.compareRadius
                 clip: true
                 color: "transparent"
-                border.width: Theme.borderWidth
-                border.color: Theme.panelBorder
+                border.width: Theme.c.themedColorDialog.compareBorderWidth
+                border.color: Theme.c.themedColorDialog.compareBorder
 
                 Row {
                     anchors.fill: parent
-                    anchors.margins: Theme.borderWidth
+                    anchors.margins: Theme.c.themedColorDialog.compareBorderWidth
                     Rectangle {
                         width: parent.width / 2
                         height: parent.height
                         color: root._initial
-                        topLeftRadius: Theme.radiusSm - 1
-                        bottomLeftRadius: Theme.radiusSm - 1
+                        topLeftRadius: Theme.c.themedColorDialog.compareRadius - 1
+                        bottomLeftRadius: Theme.c.themedColorDialog.compareRadius - 1
 
                         ThemedToolTip {
                             text: qsTr("Original colour")
@@ -202,8 +202,8 @@ ThemedDialog {
                         width: parent.width / 2
                         height: parent.height
                         color: root.selectedColor
-                        topRightRadius: Theme.radiusSm - 1
-                        bottomRightRadius: Theme.radiusSm - 1
+                        topRightRadius: Theme.c.themedColorDialog.compareRadius - 1
+                        bottomRightRadius: Theme.c.themedColorDialog.compareRadius - 1
                     }
                 }
             }

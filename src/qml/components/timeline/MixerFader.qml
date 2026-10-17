@@ -22,8 +22,8 @@ Item {
         y: fader.capH / 2
         width: 3
         height: fader.travel
-        radius: 1.5
-        color: Theme.sliderTrack
+        radius: Theme.c.mixerFader.trackRadius
+        color: Theme.c.mixerFader.trackBackground
 
         Rectangle {
             anchors.left: parent.left
@@ -41,7 +41,7 @@ Item {
         y: fader.capH / 2 + fader.travel * (1.0 - fader.channel.mixer.dbToRatio(0)) - 0.5
         width: 16
         height: 1
-        color: Theme.mutedForeground
+        color: Theme.c.mixerFader.foregroundMuted
     }
 
     Rectangle {
@@ -50,11 +50,11 @@ Item {
         y: fader.capY
         width: 24
         height: fader.capH
-        radius: Theme.radiusXs
+        radius: Theme.c.mixerFader.handleRadius
         color: faderMouse.pressed ? fader.channel.fillColor
-             : faderMouse.containsMouse ? Theme.panelMuted : Theme.panelAccent
-        border.width: Theme.borderWidth
-        border.color: faderMouse.pressed ? fader.channel.fillColor : Theme.sliderTrack
+             : faderMouse.containsMouse ? Theme.c.mixerFader.handleBackgroundHover : Theme.c.mixerFader.handleBackground
+        border.width: Theme.c.mixerFader.borderWidth
+        border.color: faderMouse.pressed ? fader.channel.fillColor : Theme.c.mixerFader.handleBorder
 
         Behavior on color {
             ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -64,7 +64,7 @@ Item {
             anchors.centerIn: parent
             width: 12
             height: 1
-            color: faderMouse.pressed ? Theme.primaryForeground : Theme.panelForeground
+            color: faderMouse.pressed ? Theme.c.mixerFader.handleForegroundPressed : Theme.c.mixerFader.handleForeground
         }
     }
 

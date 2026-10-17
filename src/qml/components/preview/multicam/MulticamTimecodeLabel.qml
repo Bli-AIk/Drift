@@ -8,7 +8,7 @@ Text {
 
     anchors.verticalCenter: parent.verticalCenter
     text: label.textValue
-    color: Theme.panelForeground
+    color: Theme.c.multicamTimecodeLabel.foreground
     font.family: Theme.monoFontFamily
     font.pixelSize: Theme.fontSizeSm
 }

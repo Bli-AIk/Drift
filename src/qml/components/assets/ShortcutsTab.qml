@@ -57,7 +57,7 @@ Item {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: qsTr("Click a shortcut, then press the keys. Esc cancels, Backspace clears.")
-                color: Theme.mutedForeground
+                color: Theme.c.shortcutsTab.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 bottomPadding: Theme.spacingSm

@@ -6,32 +6,32 @@ Rectangle {
     id: root
     width: parent.width
     height: Math.min(parent.width * 0.6, 140)
-    radius: Theme.radiusSm
-    color: Theme.panelAccent
-    border.width: 1
-    border.color: dragArea.pressed ? Theme.primary : Theme.panelBorder
+    radius: Theme.c.vec2ParamPad.radius
+    color: Theme.c.vec2ParamPad.background
+    border.width: Theme.c.vec2ParamPad.borderWidth
+    border.color: dragArea.pressed ? Theme.c.vec2ParamPad.borderPressed : Theme.c.vec2ParamPad.border
 
     Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
-        width: 1
+        width: Theme.c.vec2ParamPad.crosshairWidth
         height: parent.height
-        color: Theme.panelBorder
-        opacity: 0.5
+        color: Theme.c.vec2ParamPad.crosshair
+        opacity: Theme.c.vec2ParamPad.crosshairOpacity
     }
     Rectangle {
         anchors.verticalCenter: parent.verticalCenter
-        height: 1
+        height: Theme.c.vec2ParamPad.crosshairWidth
         width: parent.width
-        color: Theme.panelBorder
-        opacity: 0.5
+        color: Theme.c.vec2ParamPad.crosshair
+        opacity: Theme.c.vec2ParamPad.crosshairOpacity
     }
     Rectangle {
         width: 12
         height: 12
-        radius: 6
-        color: Theme.primary
-        border.width: 2
-        border.color: Theme.panelForeground
+        radius: Theme.c.vec2ParamPad.handleRadius
+        color: Theme.c.vec2ParamPad.handleBackground
+        border.width: Theme.c.vec2ParamPad.handleBorderWidth
+        border.color: Theme.c.vec2ParamPad.handleBorder
         readonly property real span: host.hi - host.lo
         x: (span > 0 ? (host.curX - host.lo) / span : 0) * root.width - width / 2
         // Up is larger Y, matching the shader's bottom-left uv origin.

@@ -15,14 +15,14 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.panelBackground
+        color: Theme.c.androidMediaPreviewHeader.background
     }
 
     Rectangle {
         anchors.bottom: parent.bottom
         width: parent.width
-        height: 1
-        color: Theme.panelBorder
+        height: Theme.c.androidMediaPreviewHeader.borderWidth
+        color: Theme.c.androidMediaPreviewHeader.border
     }
 
     IconButton {

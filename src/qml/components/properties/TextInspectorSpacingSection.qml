@@ -43,7 +43,7 @@ CollapsibleSection {
             spacing: 4
             Text {
                 text: qsTr("Wrapping")
-                color: Theme.mutedForeground
+                color: Theme.c.textInspectorSpacingSection.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }

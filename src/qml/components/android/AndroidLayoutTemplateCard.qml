@@ -40,12 +40,13 @@ AbstractButton {
     }
 
     background: Rectangle {
-        radius: Theme.radiusMd
-        color: card.selected ? Theme.panelSecondaryBg
-                             : Theme.panelAccent
-        border.width: card.selected ? 2 : Theme.borderWidth
-        border.color: card.selected ? Theme.primary
-                                    : Theme.panelBorder
+        radius: Theme.c.androidLayoutTemplateCard.radius
+        color: card.selected ? Theme.c.androidLayoutTemplateCard.backgroundSelected
+                             : Theme.c.androidLayoutTemplateCard.background
+        border.width: card.selected ? Theme.c.androidLayoutTemplateCard.borderWidthSelected
+                                    : Theme.c.androidLayoutTemplateCard.borderWidth
+        border.color: card.selected ? Theme.c.androidLayoutTemplateCard.borderSelected
+                                    : Theme.c.androidLayoutTemplateCard.border
 
         Behavior on color {
             ColorAnimation {
@@ -71,18 +72,18 @@ AbstractButton {
                 anchors.centerIn: parent
                 width: Math.max(12, card.ratio.w * swatchBox.scaleToBox)
                 height: Math.max(12, card.ratio.h * swatchBox.scaleToBox)
-                radius: Theme.radiusXs
-                color: Theme.appBackground
-                border.width: Theme.borderWidth
-                border.color: card.selected ? Theme.primary
-                                            : Theme.panelBorder
+                radius: Theme.c.androidLayoutTemplateCard.swatchRadius
+                color: Theme.c.androidLayoutTemplateCard.swatchBackground
+                border.width: Theme.c.androidLayoutTemplateCard.swatchBorderWidth
+                border.color: card.selected ? Theme.c.androidLayoutTemplateCard.swatchBorderSelected
+                                            : Theme.c.androidLayoutTemplateCard.swatchBorder
 
                 IconGlyph {
                     anchors.centerIn: parent
                     glyph: card.modelData.icon
                     iconSize: Theme.iconSizeMd
-                    iconColor: card.selected ? Theme.primary
-                                             : Theme.mutedForeground
+                    iconColor: card.selected ? Theme.c.androidLayoutTemplateCard.iconSelected
+                                             : Theme.c.androidLayoutTemplateCard.icon
                 }
             }
         }
@@ -99,8 +100,8 @@ AbstractButton {
             Text {
                 width: parent.width
                 text: card.modelData.label
-                color: card.selected ? Theme.panelSecondaryForeground
-                                     : Theme.panelForeground
+                color: card.selected ? Theme.c.androidLayoutTemplateCard.foregroundSelected
+                                     : Theme.c.androidLayoutTemplateCard.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 font.weight: Font.Medium
@@ -111,7 +112,7 @@ AbstractButton {
             Text {
                 width: parent.width
                 text: card.modelData.detail
-                color: Theme.mutedForeground
+                color: Theme.c.androidLayoutTemplateCard.foregroundMuted
                 font.family: Theme.monoFontFamily
                 font.pixelSize: Theme.fontSizeTiny
                 horizontalAlignment: Text.AlignHCenter

@@ -8,7 +8,7 @@ Text {
     anchors.centerIn: parent
     visible: parent.width >= 28
     text: hasTransition && labelText ? labelText.charAt(0) : "≫"
-    color: Theme.onMedia
+    color: Theme.c.timelineTransitionLabel.foreground
     font.family: Theme.fontFamily
     font.pixelSize: Theme.fontSizeTiny
     font.weight: Font.Bold

@@ -7,7 +7,7 @@ Column {
 
     Text {
         text: "Drift"
-        color: Theme.foreground
+        color: Theme.c.startScreenTitle.foreground
         font.family: Theme.fontFamily
         font.pixelSize: 26
         font.weight: Font.Bold
@@ -15,7 +15,7 @@ Column {
 
     Text {
         text: qsTr("Create polished videos fast")
-        color: Theme.mutedForeground
+        color: Theme.c.startScreenTitle.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeBase
     }

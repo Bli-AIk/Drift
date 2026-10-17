@@ -9,9 +9,9 @@ Rectangle {
     x: panel.transitionDropStart * panel.pxPerSecond
     width: Math.max(8, (panel.transitionDropEnd - panel.transitionDropStart) * panel.pxPerSecond)
     height: parent.height
-    radius: Theme.radiusSm
-    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
-    border.width: 2
-    border.color: Theme.transitionOverlap
+    radius: Theme.c.timelineTransitionDropOutline.radius
+    color: Qt.rgba(Theme.c.timelineTransitionDropOutline.background.r, Theme.c.timelineTransitionDropOutline.background.g, Theme.c.timelineTransitionDropOutline.background.b, 0.12)
+    border.width: Theme.c.timelineTransitionDropOutline.borderWidth
+    border.color: Theme.c.timelineTransitionDropOutline.border
     z: 11
 }

@@ -15,7 +15,7 @@ Item {
         x: grip.edge < 0 ? 0 : parent.width - width
         width: grip.cue.gripW
         height: parent.height
-        color: grip.cue.isSelected ? Theme.primary : "transparent"
+        color: grip.cue.isSelected ? Theme.c.subtitleCueEdgeGrip.background : "transparent"
         opacity: 0.6
     }
 

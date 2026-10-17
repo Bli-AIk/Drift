@@ -24,7 +24,7 @@ MouseArea {
         anchors.right: parent.right
         width: 2
         height: parent.height
-        color: Theme.primary
+        color: Theme.c.trackHeaderResizeHandle.foreground
         opacity: widthHandle.pressed || widthHandle.containsMouse ? 1 : 0
 
         Behavior on opacity {

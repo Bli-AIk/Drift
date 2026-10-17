@@ -55,10 +55,10 @@ Popup {
     }
 
     background: Rectangle {
-        color: Theme.panelBackground
-        border.width: Theme.borderWidth
-        border.color: Theme.panelBorder
-        radius: Theme.radiusMd
+        color: Theme.c.recentProjectsPopup.background
+        border.width: Theme.c.recentProjectsPopup.borderWidth
+        border.color: Theme.c.recentProjectsPopup.border
+        radius: Theme.c.recentProjectsPopup.radius
     }
 
     // Opacity plus scale, matching ThemedContextMenu.
@@ -112,7 +112,8 @@ Popup {
             subtitle: root.currentSaved ? qsTr("All changes saved")
                                         : qsTr("Unsaved changes")
             tip: root.currentPath.length > 0 ? root.currentPath : ""
-            statusColor: root.currentSaved ? Theme.constructive : Theme.destructive
+            statusColor: root.currentSaved ? Theme.c.recentProjectsPopup.statusSaved
+                                           : Theme.c.recentProjectsPopup.statusUnsaved
             showCheck: true
             interactive: false
         }
@@ -125,7 +126,7 @@ Popup {
             bottomPadding: Theme.spacingXs
             visible: root.previousItems.length > 0
             text: qsTr("Previous projects")
-            color: Theme.mutedForeground
+            color: Theme.c.recentProjectsPopup.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             font.weight: Font.Medium
@@ -138,7 +139,7 @@ Popup {
             bottomPadding: Theme.spacingSm
             visible: root.previousItems.length === 0
             text: qsTr("No previous projects")
-            color: Theme.mutedForeground
+            color: Theme.c.recentProjectsPopup.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
         }
@@ -180,8 +181,8 @@ Popup {
                 tip: previousRow.modelData.exists
                      ? previousRow.modelData.path
                      : qsTr("This file has been moved or deleted:\n%1").arg(previousRow.modelData.path)
-                statusColor: previousRow.modelData.exists ? Theme.constructive
-                                                          : Theme.mutedForeground
+                statusColor: previousRow.modelData.exists ? Theme.c.recentProjectsPopup.statusExists
+                                                          : Theme.c.recentProjectsPopup.statusMissing
                 interactive: previousRow.modelData.exists
                 removable: true
                 highlighted: previousList.currentIndex === index
@@ -193,8 +194,8 @@ Popup {
 
         Rectangle {
             width: parent.width
-            height: Theme.borderWidth
-            color: Theme.panelBorder
+            height: Theme.c.recentProjectsPopup.borderWidth
+            color: Theme.c.recentProjectsPopup.divider
             opacity: 0.5
         }
 
@@ -215,8 +216,8 @@ Popup {
 
         Rectangle {
             width: parent.width
-            height: Theme.borderWidth
-            color: Theme.panelBorder
+            height: Theme.c.recentProjectsPopup.borderWidth
+            color: Theme.c.recentProjectsPopup.divider
             opacity: 0.5
         }
 
@@ -296,8 +297,8 @@ Popup {
 
         Rectangle {
             width: parent.width
-            height: Theme.borderWidth
-            color: Theme.panelBorder
+            height: Theme.c.recentProjectsPopup.borderWidth
+            color: Theme.c.recentProjectsPopup.divider
             opacity: 0.5
         }
 

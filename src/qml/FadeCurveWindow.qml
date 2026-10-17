@@ -28,7 +28,7 @@ ToolWindow {
     minimumWidth: 420
     minimumHeight: 340
     title: qsTr("Custom curve")
-    color: Theme.appBackground
+    color: Theme.c.fadeCurveWindow.background
 
     // Which session the editor is driving. Everything below goes through these four.
     function sessionPoints() {
@@ -276,7 +276,7 @@ ToolWindow {
                       : (EditorState.curves.fadeClipName.length
                          ? qsTr("Fade shape — %1").arg(EditorState.curves.fadeClipName)
                          : qsTr("Fade shape"))
-                color: Theme.panelForeground
+                color: Theme.c.fadeCurveWindow.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeBase
                 font.weight: Font.Medium
@@ -327,7 +327,7 @@ ToolWindow {
             text: root.isBezier
                   ? qsTr("Drag the two handles to shape the cubic. The ends stay pinned, and handles are held inside the box so the curve cannot fold back on itself.")
                   : qsTr("Drag the middle points to shape the ramp (ends stay silent→full). Double-click to add a point; Delete removes the selection.")
-            color: Theme.mutedForeground
+            color: Theme.c.fadeCurveWindow.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             wrapMode: Text.WordWrap
@@ -383,11 +383,11 @@ ToolWindow {
 
                     width: 14
                     height: 14
-                    radius: 7
+                    radius: Theme.c.fadeCurveWindow.knobRadius
                     z: 4
-                    color: root.selectedPoint === index ? Theme.primary : Theme.panelBackground
-                    border.width: 2
-                    border.color: Theme.primary
+                    color: root.selectedPoint === index ? Theme.c.fadeCurveWindow.pointBackgroundSelected : Theme.c.fadeCurveWindow.pointBackground
+                    border.width: Theme.c.fadeCurveWindow.knobBorderWidth
+                    border.color: Theme.c.fadeCurveWindow.pointBorder
                     x: plot.xForT(point.t) - width / 2
                     y: plot.yForG(point.g) - height / 2
 
@@ -446,11 +446,11 @@ ToolWindow {
 
                     width: 14
                     height: 14
-                    radius: 7
+                    radius: Theme.c.fadeCurveWindow.knobRadius
                     z: 4
-                    color: root.selectedHandle === index ? Theme.primary : Theme.panelBackground
-                    border.width: 2
-                    border.color: Theme.primary
+                    color: root.selectedHandle === index ? Theme.c.fadeCurveWindow.handleBackgroundSelected : Theme.c.fadeCurveWindow.handleBackground
+                    border.width: Theme.c.fadeCurveWindow.knobBorderWidth
+                    border.color: Theme.c.fadeCurveWindow.handleBorder
                     x: plot.xForT(hx) - width / 2
                     y: plot.yForG(hy) - height / 2
 
@@ -500,9 +500,9 @@ ToolWindow {
                     required property int index
                     width: 9
                     height: 9
-                    radius: 4.5
+                    radius: Theme.c.fadeCurveWindow.anchorRadius
                     z: 3
-                    color: Theme.primary
+                    color: Theme.c.fadeCurveWindow.anchorBackground
                     x: plot.xForT(index === 0 ? 0.0 : 1.0) - width / 2
                     y: plot.yForG(index === 0 ? 0.0 : 1.0) - height / 2
                 }

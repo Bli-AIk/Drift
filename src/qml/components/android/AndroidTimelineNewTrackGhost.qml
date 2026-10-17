@@ -34,20 +34,21 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: Theme.radiusSm
-        color: Qt.rgba(Theme.panelBackground.r, Theme.panelBackground.g,
-                       Theme.panelBackground.b, 0.92)
-        border.width: Theme.borderWidth
-        border.color: Theme.primary
+        radius: Theme.c.androidTimelineNewTrackGhost.radius
+        color: Qt.rgba(Theme.c.androidTimelineNewTrackGhost.background.r,
+                       Theme.c.androidTimelineNewTrackGhost.background.g,
+                       Theme.c.androidTimelineNewTrackGhost.background.b, 0.92)
+        border.width: Theme.c.androidTimelineNewTrackGhost.borderWidth
+        border.color: Theme.c.androidTimelineNewTrackGhost.border
     }
 
     // The boundary itself, so which gap the lane is going into
     // is unambiguous.
     Rectangle {
         width: parent.width
-        height: 2
+        height: Theme.c.androidTimelineNewTrackGhost.guideWidth
         anchors.verticalCenter: parent.verticalCenter
-        color: Theme.primary
+        color: Theme.c.androidTimelineNewTrackGhost.guide
     }
 
     // Where in time the clip would land, inside the lane it would
@@ -57,10 +58,12 @@ Item {
         x: newTrackIndicator.panel.dropStartSeconds * newTrackIndicator.panel.pxPerSecond
         width: newTrackIndicator.panel.dropDurationSeconds * newTrackIndicator.panel.pxPerSecond
         height: parent.height
-        radius: Theme.radiusSm
-        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.18)
-        border.width: 2
-        border.color: Theme.primary
+        radius: Theme.c.androidTimelineNewTrackGhost.radius
+        color: Qt.rgba(Theme.c.androidTimelineNewTrackGhost.dropBackground.r,
+                       Theme.c.androidTimelineNewTrackGhost.dropBackground.g,
+                       Theme.c.androidTimelineNewTrackGhost.dropBackground.b, 0.18)
+        border.width: Theme.c.androidTimelineNewTrackGhost.dropBorderWidth
+        border.color: Theme.c.androidTimelineNewTrackGhost.dropBorder
     }
 
     // Pinned to the viewport: the lane spans the whole timeline,
@@ -69,7 +72,7 @@ Item {
         x: newTrackIndicator.viewX + Theme.spacingLg
         anchors.verticalCenter: parent.verticalCenter
         text: qsTr("New track")
-        color: Theme.primary
+        color: Theme.c.androidTimelineNewTrackGhost.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         font.weight: Font.Medium

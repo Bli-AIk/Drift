@@ -10,7 +10,7 @@ Rectangle {
 
     signal cancelRequested()
 
-    color: Theme.scrimColor
+    color: Theme.c.androidMediaSavingScrim.background
 
     MouseArea {
         anchors.fill: parent

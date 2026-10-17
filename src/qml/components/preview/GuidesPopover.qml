@@ -33,10 +33,10 @@ Popup {
     }
 
     background: Rectangle {
-        color: Theme.panelBackground
-        border.width: Theme.borderWidth
-        border.color: Theme.panelBorder
-        radius: Theme.radiusMd
+        color: Theme.c.guidesPopover.background
+        border.width: Theme.c.guidesPopover.borderWidth
+        border.color: Theme.c.guidesPopover.border
+        radius: Theme.c.guidesPopover.radius
     }
 
     contentItem: Column {

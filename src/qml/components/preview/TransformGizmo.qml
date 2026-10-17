@@ -45,8 +45,8 @@ Item {
     }
 
     function colorFor(id) {
-        return id === "x" ? Theme.gizmoX : id === "y" ? Theme.gizmoY
-             : id === "z" ? Theme.gizmoZ : Theme.gizmoUniform
+        return id === "x" ? Theme.c.transformGizmo.x : id === "y" ? Theme.c.transformGizmo.y
+             : id === "z" ? Theme.c.transformGizmo.z : Theme.c.transformGizmo.uniform
     }
 
     visible: !!box && !!geometry && geometry.valid

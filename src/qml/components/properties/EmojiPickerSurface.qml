@@ -2,8 +2,8 @@ import QtQuick
 import Drift
 
 Rectangle {
-    radius: Theme.radiusSm
-    color: Theme.panelBackground
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
+    radius: Theme.c.emojiPickerSurface.radius
+    color: Theme.c.emojiPickerSurface.background
+    border.width: Theme.c.emojiPickerSurface.borderWidth
+    border.color: Theme.c.emojiPickerSurface.border
 }

@@ -14,7 +14,7 @@ Rectangle {
     width: panel.marqueeWidth
     height: panel.marqueeHeight
     z: 8
-    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
-    border.width: Theme.borderWidth
-    border.color: Theme.primary
+    color: Qt.rgba(Theme.c.timelineMarqueeRect.background.r, Theme.c.timelineMarqueeRect.background.g, Theme.c.timelineMarqueeRect.background.b, 0.12)
+    border.width: Theme.c.timelineMarqueeRect.borderWidth
+    border.color: Theme.c.timelineMarqueeRect.border
 }

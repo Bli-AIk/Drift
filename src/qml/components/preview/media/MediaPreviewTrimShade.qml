@@ -12,5 +12,5 @@ Rectangle {
     x: shade.leading ? 0 : shade.edge
     width: shade.leading ? shade.edge : Math.max(0, shade.span - shade.edge)
     height: parent.height
-    color: Theme.scrimStrong
+    color: Theme.c.mediaPreviewTrimShade.background
 }

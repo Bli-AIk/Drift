@@ -13,10 +13,10 @@ Rectangle {
     anchors.bottomMargin: Theme.spacingLg
     width: barRow.implicitWidth + Theme.spacingLg * 2
     height: barRow.implicitHeight + Theme.spacingMd * 2
-    radius: Theme.radiusMd
-    color: Theme.panelBackground
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
+    radius: Theme.c.guideEditBar.radius
+    color: Theme.c.guideEditBar.background
+    border.width: Theme.c.guideEditBar.borderWidth
+    border.color: Theme.c.guideEditBar.border
 
     Row {
         id: barRow
@@ -28,7 +28,7 @@ Rectangle {
 
             Text {
                 text: qsTr("Editing %1").arg(bar.setName)
-                color: Theme.foreground
+                color: Theme.c.guideEditBar.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
                 font.weight: Font.Medium
@@ -37,7 +37,7 @@ Rectangle {
                 width: Math.min(implicitWidth, bar.maxHintWidth)
                 wrapMode: Text.WordWrap
                 text: qsTr("Drag from the top or left edge to add a guide, off the canvas to remove one. Shift steps by 1%.")
-                color: Theme.mutedForeground
+                color: Theme.c.guideEditBar.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }

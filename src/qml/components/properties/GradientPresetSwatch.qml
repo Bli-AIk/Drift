@@ -15,9 +15,9 @@ Canvas {
     Rectangle {
         anchors.fill: parent
         color: "transparent"
-        radius: Theme.radiusXs
-        border.width: presetHover.hovered ? Theme.borderWidthFocus : Theme.borderWidth
-        border.color: presetHover.hovered ? Theme.primary : Theme.panelBorder
+        radius: Theme.c.gradientPresetSwatch.radius
+        border.width: presetHover.hovered ? Theme.c.gradientPresetSwatch.borderWidthFocus : Theme.c.gradientPresetSwatch.borderWidth
+        border.color: presetHover.hovered ? Theme.c.gradientPresetSwatch.borderHover : Theme.c.gradientPresetSwatch.border
     }
     HoverHandler { id: presetHover }
     ThemedToolTip {

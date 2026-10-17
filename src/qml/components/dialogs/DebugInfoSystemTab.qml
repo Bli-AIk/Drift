@@ -46,10 +46,10 @@ Column {
             Rectangle {
                 width: parent.width
                 height: tableCol.height
-                radius: Theme.radiusSm
+                radius: Theme.c.debugInfoSystemTab.radius
                 color: "transparent"
-                border.width: Theme.borderWidth
-                border.color: Theme.panelBorder
+                border.width: Theme.c.debugInfoSystemTab.borderWidth
+                border.color: Theme.c.debugInfoSystemTab.border
                 clip: true
 
                 Column {
@@ -70,13 +70,13 @@ Column {
 
                                 width: tableCol.width / 3
                                 height: Theme.controlHeightSm
-                                color: Theme.panelAccent
+                                color: Theme.c.debugInfoSystemTab.stripe
 
                                 Rectangle {
                                     anchors.right: parent.right
-                                    width: Theme.borderWidth
+                                    width: Theme.c.debugInfoSystemTab.borderWidth
                                     height: parent.height
-                                    color: Theme.panelBorder
+                                    color: Theme.c.debugInfoSystemTab.border
                                     visible: index < 2
                                 }
 
@@ -113,20 +113,20 @@ Column {
                             Rectangle {
                                 width: tableCol.width / 3
                                 height: parent.height
-                                color: codecRow.striped ? Theme.panelAccent : "transparent"
+                                color: codecRow.striped ? Theme.c.debugInfoSystemTab.stripe : "transparent"
 
                                 Rectangle {
                                     anchors.right: parent.right
-                                    width: Theme.borderWidth
+                                    width: Theme.c.debugInfoSystemTab.borderWidth
                                     height: parent.height
-                                    color: Theme.panelBorder
+                                    color: Theme.c.debugInfoSystemTab.border
                                 }
 
                                 Rectangle {
                                     anchors.top: parent.top
                                     width: parent.width
-                                    height: Theme.borderWidth
-                                    color: Theme.panelBorder
+                                    height: Theme.c.debugInfoSystemTab.borderWidth
+                                    color: Theme.c.debugInfoSystemTab.border
                                 }
 
                                 ThemedLabel {
@@ -174,17 +174,17 @@ Column {
 
                                     Rectangle {
                                         anchors.right: parent.right
-                                        width: Theme.borderWidth
+                                        width: Theme.c.debugInfoSystemTab.borderWidth
                                         height: parent.height
-                                        color: Theme.panelBorder
+                                        color: Theme.c.debugInfoSystemTab.border
                                         visible: index === 0
                                     }
 
                                     Rectangle {
                                         anchors.top: parent.top
                                         width: parent.width
-                                        height: Theme.borderWidth
-                                        color: Theme.panelBorder
+                                        height: Theme.c.debugInfoSystemTab.borderWidth
+                                        color: Theme.c.debugInfoSystemTab.border
                                     }
 
                                     Text {
@@ -231,10 +231,10 @@ Column {
 
                 width: parent.width
                 implicitHeight: hintCol.height + Theme.spacingLg * 2
-                radius: Theme.radiusSm
+                radius: Theme.c.debugInfoSystemTab.radius
                 color: "transparent"
-                border.width: Theme.borderWidth
-                border.color: Theme.panelBorder
+                border.width: Theme.c.debugInfoSystemTab.borderWidth
+                border.color: Theme.c.debugInfoSystemTab.border
 
                 Column {
                     id: hintCol
@@ -310,8 +310,8 @@ Column {
 
                 Rectangle {
                     anchors.fill: parent
-                    color: index % 2 === 1 ? Theme.panelAccent : "transparent"
-                    radius: Theme.radiusXs
+                    color: index % 2 === 1 ? Theme.c.debugInfoSystemTab.stripe : "transparent"
+                    radius: Theme.c.debugInfoSystemTab.stripeRadius
                 }
 
                 ThemedLabel {

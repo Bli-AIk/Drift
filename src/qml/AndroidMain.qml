@@ -6,7 +6,7 @@ import Drift
 ApplicationWindow {
     id: window
     visible: true
-    color: Theme.appBackground
+    color: Theme.c.androidMain.background
     title: "CutWire Drift"
 
     // On Android the platform sizes the window. Chosen on a desktop, this shell opens phone-shaped
@@ -39,26 +39,26 @@ ApplicationWindow {
     // rendered in that scheme's colours next to Drift's own. Palette propagates down the item
     // hierarchy, popups included, so setting the roles the Basic style reads brings Qt's own
     // chrome under Theme — and binding them keeps it following the light/dark toggle.
-    palette.window: Theme.panelBackground
-    palette.windowText: Theme.panelForeground
-    palette.base: Theme.panelAccent
-    palette.text: Theme.panelForeground
-    palette.button: Theme.panelAccent
-    palette.buttonText: Theme.panelForeground
-    palette.placeholderText: Theme.mutedForeground
+    palette.window: Theme.c.androidMain.paletteWindow
+    palette.windowText: Theme.c.androidMain.paletteWindowText
+    palette.base: Theme.c.androidMain.paletteBase
+    palette.text: Theme.c.androidMain.paletteText
+    palette.button: Theme.c.androidMain.paletteButton
+    palette.buttonText: Theme.c.androidMain.paletteButtonText
+    palette.placeholderText: Theme.c.androidMain.palettePlaceholder
     // Menu border and item states: dark draws the frame, light the hovered row,
     // midlight the pressed one.
-    palette.dark: Theme.panelBorder
-    palette.mid: Theme.panelMuted
-    palette.midlight: Theme.panelAccent
-    palette.light: Theme.popoverHover
+    palette.dark: Theme.c.androidMain.paletteDark
+    palette.mid: Theme.c.androidMain.paletteMid
+    palette.midlight: Theme.c.androidMain.paletteMidlight
+    palette.light: Theme.c.androidMain.paletteLight
     // Drawn at 12% and 50% alpha for the menu's drop shadow; appBackground would
     // make that a white glow in light mode.
-    palette.shadow: "#000000"
-    palette.highlight: Theme.primary
-    palette.highlightedText: Theme.primaryForeground
-    palette.toolTipBase: Theme.panelBackground
-    palette.toolTipText: Theme.panelForeground
+    palette.shadow: Theme.c.androidMain.paletteShadow
+    palette.highlight: Theme.c.androidMain.paletteHighlight
+    palette.highlightedText: Theme.c.androidMain.paletteHighlightedText
+    palette.toolTipBase: Theme.c.androidMain.paletteToolTipBase
+    palette.toolTipText: Theme.c.androidMain.paletteToolTipText
 
     readonly property var projectFilter: [qsTr("Drift project (*.drift)")]
     property bool inEditor: false

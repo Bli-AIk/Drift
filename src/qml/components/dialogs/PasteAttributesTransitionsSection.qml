@@ -11,7 +11,7 @@ Column {
     ThemedLabel {
         text: qsTr("Transitions")
         size: "xs"
-        color: Theme.primary
+        color: Theme.c.pasteAttributesTransitionsSection.foreground
         font.weight: Font.DemiBold
     }
 

@@ -13,10 +13,10 @@ Rectangle {
     // Above the duration badge, which is a later sibling.
     z: 1
     anchors.fill: parent
-    // Matches the thumbnail under it (Theme.radiusSm). Bound locally so this
+    // Matches the thumbnail under it. Bound locally so this
     // overlay does not read a radius off a generic parent item.
-    radius: Theme.radiusSm
-    color: Theme.scrimStrong
+    radius: Theme.c.mediaAssetsGridBusyOverlay.radius
+    color: Theme.c.mediaAssetsGridBusyOverlay.scrim
     readonly property bool busy:
         !folder && EditorState.bin.replacingAssetId.length > 0
         && EditorState.bin.replacingAssetId === AssetLibrary.assetIdAt(assetIndex)
@@ -39,6 +39,6 @@ Rectangle {
         anchors.centerIn: parent
         indeterminate: true
         size: Theme.spacing3xl
-        progressColor: Theme.onMedia
+        progressColor: Theme.c.mediaAssetsGridBusyOverlay.progress
     }
 }

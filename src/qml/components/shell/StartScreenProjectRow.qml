@@ -11,10 +11,11 @@ Rectangle {
 
     width: ListView.view ? ListView.view.width : 0
     height: 56
-    radius: Theme.radiusMd
-    color: hovered && exists ? Theme.accent : Theme.panelBackground
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
+    radius: Theme.c.startScreenProjectRow.radius
+    color: hovered && exists ? Theme.c.startScreenProjectRow.backgroundHover
+                             : Theme.c.startScreenProjectRow.background
+    border.width: Theme.c.startScreenProjectRow.borderWidth
+    border.color: Theme.c.startScreenProjectRow.border
     opacity: exists ? 1 : 0.6
 
     Behavior on color {
@@ -36,9 +37,10 @@ Rectangle {
         Rectangle {
             width: 8
             height: 8
-            radius: 4
+            radius: Theme.c.startScreenProjectRow.statusRadius
             anchors.verticalCenter: parent.verticalCenter
-            color: projectRow.exists ? Theme.constructive : Theme.mutedForeground
+            color: projectRow.exists ? Theme.c.startScreenProjectRow.statusExists
+                                     : Theme.c.startScreenProjectRow.statusMissing
         }
 
         Column {
@@ -49,7 +51,7 @@ Rectangle {
             Text {
                 width: parent.width
                 text: projectRow.modelData.name + (projectRow.exists ? "" : qsTr(" (missing)"))
-                color: Theme.panelForeground
+                color: Theme.c.startScreenProjectRow.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
                 font.weight: Font.Medium
@@ -59,7 +61,7 @@ Rectangle {
             Text {
                 width: parent.width
                 text: projectRow.modelData.path
-                color: Theme.mutedForeground
+                color: Theme.c.startScreenProjectRow.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 elide: Text.ElideLeft
@@ -91,7 +93,8 @@ Rectangle {
             anchors.centerIn: parent
             glyph: Theme.icons.x
             iconSize: Theme.iconSizeMd
-            iconColor: removeArea.containsMouse ? Theme.foreground : Theme.mutedForeground
+            iconColor: removeArea.containsMouse ? Theme.c.startScreenProjectRow.iconHover
+                                                : Theme.c.startScreenProjectRow.icon
         }
 
         ThemedToolTip {

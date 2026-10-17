@@ -10,7 +10,7 @@ Text {
     anchors.verticalCenter: parent.verticalCenter
     width: 44
     text: panel.zoom.toFixed(2) + "×"
-    color: Theme.mutedForeground
+    color: Theme.c.timelineToolbarZoomReadout.foregroundMuted
     font.family: Theme.monoFontFamily
     font.pixelSize: Theme.fontSizeTick
     horizontalAlignment: Text.AlignHCenter

@@ -7,7 +7,7 @@ SettingsSectionCard {
     ThemedLabel {
         width: parent.width
         wrapMode: Text.Wrap
-        color: Theme.mutedForeground
+        color: Theme.c.settingsCloudProvidersSection.foregroundMuted
         text: qsTr("Keys are stored unencrypted in Drift's settings. ELEVENLABS_API_KEY and FISH_API_KEY in the environment take precedence. Use is billed to your own account.")
     }
 
@@ -30,8 +30,8 @@ SettingsSectionCard {
 
             Rectangle {
                 width: parent.width
-                height: Theme.borderWidth
-                color: Theme.panelBorder
+                height: Theme.c.settingsCloudProvidersSection.borderWidth
+                color: Theme.c.settingsCloudProvidersSection.divider
             }
 
             ThemedLabel {
@@ -41,7 +41,7 @@ SettingsSectionCard {
 
             ThemedLabel {
                 width: parent.width
-                color: Theme.mutedForeground
+                color: Theme.c.settingsCloudProvidersSection.foregroundMuted
                 text: {
                     void provider.rev
                     if (!provider.cloud.configured(provider.modelData.id))
@@ -100,7 +100,7 @@ SettingsSectionCard {
                 width: parent.width
                 visible: provider.testMessage.length > 0
                 text: provider.testMessage
-                color: Theme.mutedForeground
+                color: Theme.c.settingsCloudProvidersSection.foregroundMuted
             }
 
             Connections {

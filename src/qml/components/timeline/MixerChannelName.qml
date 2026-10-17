@@ -19,11 +19,11 @@ Item {
             id: nameDot
             width: 6
             height: 6
-            radius: 3
+            radius: Theme.c.mixerChannelName.dotRadius
             anchors.verticalCenter: parent.verticalCenter
-            color: nameRow.channel.armed ? (nameRow.channel.armPaused ? "#eab308" : Theme.destructive)
-                 : nameRow.channel.master ? Theme.primary
-                 : nameRow.channel.isVideo ? Theme.clipVideoOverview : Theme.clipAudio
+            color: nameRow.channel.armed ? (nameRow.channel.armPaused ? Theme.c.mixerChannelName.paused : Theme.c.mixerChannelName.recording)
+                 : nameRow.channel.master ? Theme.c.mixerChannelName.master
+                 : nameRow.channel.isVideo ? Theme.c.mixerChannelName.video : Theme.c.mixerChannelName.audio
         }
 
         Text {
@@ -31,7 +31,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             text: nameRow.channel.name
             elide: Text.ElideRight
-            color: nameRow.channel.master ? Theme.accentOnPanel : Theme.panelForeground
+            color: nameRow.channel.master ? Theme.c.mixerChannelName.masterForeground : Theme.c.mixerChannelName.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.DemiBold

@@ -24,8 +24,9 @@ Item {
     Rectangle {
         anchors.fill: parent
         visible: gapPress.pressed
-        color: Qt.rgba(Theme.panelAccent.r, Theme.panelAccent.g,
-                       Theme.panelAccent.b, 0.35)
+        color: Qt.rgba(Theme.c.androidTimelineGapPress.background.r,
+                       Theme.c.androidTimelineGapPress.background.g,
+                       Theme.c.androidTimelineGapPress.background.b, 0.35)
     }
 
     MouseArea {

@@ -9,6 +9,6 @@ Rectangle {
     width: spanWidth
     y: 0
     height: parent.height - 1
-    color: Theme.panelBackground
+    color: Theme.c.timelineOverviewShade.background
     opacity: 0.6
 }

@@ -10,9 +10,9 @@ Rectangle {
 
     width: parent.width
     height: Theme.controlHeight + Theme.spacingXs
-    radius: Theme.radiusSm
+    radius: Theme.c.newTrackMenuEntry.radius
     color: itemMouse.containsMouse || menu.highlightIndex === index
-           ? Theme.popoverHover : "transparent"
+           ? Theme.c.newTrackMenuEntry.backgroundHover : "transparent"
 
     Behavior on color {
         ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -28,13 +28,13 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             glyph: trackTypeRow.modelData.icon
             iconSize: Theme.iconSizeMd
-            iconColor: Theme.mutedForeground
+            iconColor: Theme.c.newTrackMenuEntry.icon
         }
 
         Text {
             anchors.verticalCenter: parent.verticalCenter
             text: trackTypeRow.modelData.label
-            color: Theme.panelForeground
+            color: Theme.c.newTrackMenuEntry.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
         }

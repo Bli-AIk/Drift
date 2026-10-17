@@ -16,7 +16,7 @@ Column {
 
     // Lift on grab: the card dims and grows slightly, so it reads as picked
     // up rather than merely faded.
-    opacity: maskDrag.active ? 0.85 : 1
+    opacity: maskDrag.active ? Theme.c.maskPresetCard.dragOpacity : 1
     scale: maskDrag.active ? 1.04 : (maskDrag.pressed ? 0.97 : 1.0)
 
     Behavior on opacity {
@@ -29,10 +29,10 @@ Column {
     Rectangle {
         width: cardSize
         height: cardSize
-        radius: Theme.radiusSm
-        color: maskDrag.hovered ? Theme.popoverHover : Theme.panelAccent
-        border.width: maskDrag.active ? 1 : 0
-        border.color: Theme.primary
+        radius: Theme.c.maskPresetCard.radius
+        color: maskDrag.hovered ? Theme.c.maskPresetCard.backgroundHover : Theme.c.maskPresetCard.background
+        border.width: maskDrag.active ? Theme.c.maskPresetCard.borderWidth : 0
+        border.color: Theme.c.maskPresetCard.border
         clip: true
 
         Behavior on color {
@@ -61,9 +61,9 @@ Column {
                     antialiasing: true
 
                     ShapePath {
-                        strokeColor: Theme.onMedia
-                        strokeWidth: 1
-                        fillColor: Theme.clipAdjustmentMask
+                        strokeColor: Theme.c.maskPresetCard.shapeStroke
+                        strokeWidth: Theme.c.maskPresetCard.shapeStrokeWidth
+                        fillColor: Theme.c.maskPresetCard.shapeFill
                         PathSvg { path: EditorState.maskShapeSvgPath(root.modelData.id) }
                     }
                 }
@@ -109,7 +109,7 @@ Column {
     Text {
         width: parent.width
         text: root.modelData.label
-        color: Theme.mutedForeground
+        color: Theme.c.maskPresetCard.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeCard
         horizontalAlignment: Text.AlignHCenter

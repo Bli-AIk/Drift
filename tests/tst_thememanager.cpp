@@ -6,10 +6,13 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
+#include <QCoreApplication>
 #include <QQmlComponent>
 #include <QQmlEngine>
+#include <QSettings>
 #include <QSignalSpy>
 #include <QStandardPaths>
+#include <QUrl>
 #include <QVariantList>
 
 #include "theme/ThemeManager.h"
@@ -31,11 +34,20 @@ private slots:
     void singletonRegistrationExposesThemeManager();
     void mainRegistersThemeManager();
     void liveBindingUpdates();
+    void componentTokenUpdatesLive();
+    void themeSlotOverrideFollowsTrust();
+    void untrustedThemeHasNoOverride();
+    void trustedThemeOverrideUrl();
+    void missingOverrideSlotIsEmpty();
 
 private:
     QString themesDir() const;
     bool writeJson(const QString &relativePath, const char *json) const;
+    bool installOverrideTheme() const;
     static QColor tokenColor(const ThemeManager &manager, const char *path);
+    // qmlRegisterSingletonInstance pins ThemeManager to the first engine that
+    // touches it. Later engines get a null singleton, so every QML case shares this one.
+    static QQmlEngine *sharedEngine();
 };
 
 void ThemeManagerTest::initTestCase()
@@ -50,6 +62,9 @@ void ThemeManagerTest::init()
     QDir dir(themesDir());
     if (dir.exists())
         QVERIFY(dir.removeRecursively());
+    QSettings settings;
+    settings.beginGroup(QStringLiteral("Theme"));
+    settings.remove(QStringLiteral("trusted"));
 }
 
 QString ThemeManagerTest::themesDir() const
@@ -69,9 +84,32 @@ bool ThemeManagerTest::writeJson(const QString &relativePath, const char *json) 
     return file.write(bytes) == bytes.size();
 }
 
+bool ThemeManagerTest::installOverrideTheme() const
+{
+    if (!writeJson("pack/theme.json", R"({
+        "name": "pack",
+        "extends": "dark"
+    })"))
+        return false;
+    const QString qmlPath = themesDir() + QStringLiteral("/pack/qml/ThemedButtonBackground.qml");
+    if (!QDir().mkpath(QFileInfo(qmlPath).path()))
+        return false;
+    QFile file(qmlPath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        return false;
+    const QByteArray body = "import QtQuick\nItem { property var control }\n";
+    return file.write(body) == body.size();
+}
+
 QColor ThemeManagerTest::tokenColor(const ThemeManager &manager, const char *path)
 {
     return manager.token(QString::fromLatin1(path)).value<QColor>();
+}
+
+QQmlEngine *ThemeManagerTest::sharedEngine()
+{
+    static QQmlEngine *engine = new QQmlEngine;
+    return engine;
 }
 
 void ThemeManagerTest::builtinsLoadDarkAndLight()
@@ -97,8 +135,14 @@ void ThemeManagerTest::builtinsLoadDarkAndLight()
     QCOMPARE(manager.token(QStringLiteral("window.translucent")).toBool(), false);
     QCOMPARE(manager.token(QStringLiteral("window.backdrop")).toString(), QStringLiteral("none"));
     QCOMPARE(manager.token(QStringLiteral("window.backgroundOpacity")).toDouble(), 1.0);
-    QVERIFY(manager.components()->isEmpty());
+    // Built-in documents carry one group per visual component. A missing key
+    // stays undefined in QML and never starts updating, so the map must not be empty.
+    QVERIFY(!manager.components()->isEmpty());
+    QCOMPARE(tokenColor(manager, "components.themedButton.background"), QColor(QStringLiteral("#262626")));
+    QCOMPARE(tokenColor(manager, "components.appWindow.background"), QColor(QStringLiteral("#0d0d0d")));
     QVERIFY(manager.overrideUrl(QStringLiteral("button")).isEmpty());
+    QVERIFY(manager.overrideSlots(QStringLiteral("dark")).isEmpty());
+    QVERIFY(!manager.isThemeTrusted(QStringLiteral("dark")));
 
     const QVariantList ramp = manager.token(QStringLiteral("semantic.keyframe.ramp")).toList();
     QCOMPARE(ramp.size(), 8);
@@ -278,7 +322,7 @@ void ThemeManagerTest::singletonRegistrationExposesThemeManager()
     ThemeManager::registerSingleton();
     QVERIFY(ThemeManager::shared()->loadTheme(QStringLiteral("dark")));
 
-    QQmlEngine engine;
+    QQmlEngine &engine = *sharedEngine();
     QQmlComponent component(&engine);
     component.setData(R"(import QtQuick
 import Drift
@@ -309,7 +353,7 @@ void ThemeManagerTest::liveBindingUpdates()
     ThemeManager *manager = ThemeManager::shared();
     QVERIFY(manager->loadTheme(QStringLiteral("dark")));
 
-    QQmlEngine engine;
+    QQmlEngine &engine = *sharedEngine();
     QQmlComponent component(&engine);
     component.setData(R"(import QtQuick
 import Drift
@@ -359,6 +403,190 @@ QtObject {
 
     delete button;
     delete object;
+}
+
+void ThemeManagerTest::componentTokenUpdatesLive()
+{
+    ThemeManager::registerSingleton();
+    ThemeManager *manager = ThemeManager::shared();
+    QVERIFY(manager->loadTheme(QStringLiteral("dark")));
+
+    QQmlEngine &engine = *sharedEngine();
+    QQmlComponent component(&engine);
+    component.setData(R"(import QtQuick
+import Drift
+QtObject {
+    property color background: ThemeManager.components.themedButton.background
+    property color windowBackground: ThemeManager.components.appWindow.background
+})", QUrl());
+    QVERIFY2(!component.isError(), qPrintable(component.errorString()));
+    QObject *object = component.create();
+    QVERIFY(object);
+    QCOMPARE(object->property("background").value<QColor>(), QColor(QStringLiteral("#262626")));
+    QCOMPARE(object->property("windowBackground").value<QColor>(), QColor(QStringLiteral("#0d0d0d")));
+
+    QVERIFY(writeJson("translucent.json", R"({
+        "name": "translucent",
+        "extends": "dark",
+        "components": {
+            "themedButton": { "background": "#ff0000" },
+            "appWindow": { "background": "#00000000" }
+        }
+    })"));
+    QVERIFY(manager->loadTheme(QStringLiteral("translucent")));
+    QCOMPARE(object->property("background").value<QColor>(), QColor(QStringLiteral("#ff0000")));
+    QCOMPARE(object->property("windowBackground").value<QColor>(), QColor(QStringLiteral("#00000000")));
+    QCOMPARE(object->property("windowBackground").value<QColor>().alpha(), 0);
+    // Untouched tokens stay on the dark base.
+    QCOMPARE(tokenColor(*manager, "semantic.surface.app"), QColor(QStringLiteral("#0d0d0d")));
+    QCOMPARE(tokenColor(*manager, "components.themedButton.foreground"),
+             tokenColor(*manager, "semantic.panel.foreground"));
+
+    delete object;
+}
+
+void ThemeManagerTest::themeSlotOverrideFollowsTrust()
+{
+    QVERIFY(writeJson("slotpack/theme.json", R"({
+        "name": "slotpack",
+        "extends": "dark",
+        "components": { "themedButton": { "background": "#ff0000" } }
+    })"));
+    const QString qmlPath = themesDir() + QStringLiteral("/slotpack/qml/ThemedButtonBackground.qml");
+    QVERIFY(QDir().mkpath(QFileInfo(qmlPath).path()));
+    QFile file(qmlPath);
+    QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    const QByteArray body =
+        "import QtQuick\n"
+        "Rectangle {\n"
+        "    property var control\n"
+        "    objectName: \"override\"\n"
+        "    color: \"#ff00ff\"\n"
+        "}\n";
+    QCOMPARE(file.write(body), body.size());
+    file.close();
+
+    ThemeManager::registerSingleton();
+    ThemeManager *manager = ThemeManager::shared();
+    QVERIFY(manager->loadTheme(QStringLiteral("slotpack")));
+    QVERIFY(!manager->isThemeTrusted(QStringLiteral("slotpack")));
+    QVERIFY(manager->overrideUrl(QStringLiteral("ThemedButtonBackground")).isEmpty());
+
+    QQmlEngine &engine = *sharedEngine();
+    QQmlComponent component(&engine);
+    // tst_thememanager registers ThemeManager itself and does not link the Drift
+    // QML module, so ThemeSlot is loaded from its source file.
+    const QString slotDir = QFileInfo(QStringLiteral(DRIFT_MAIN_CPP)).dir().filePath(
+        QStringLiteral("qml/components/controls"));
+    const QByteArray qml = QStringLiteral(
+        "import QtQuick\n"
+        "import Drift\n"
+        "import \"%1\" as Controls\n"
+        "Item {\n"
+        "    objectName: \"host\"\n"
+        "    Controls.ThemeSlot {\n"
+        "        objectName: \"slot\"\n"
+        "        slot: \"ThemedButtonBackground\"\n"
+        "        fallback: Component {\n"
+        "            Rectangle { objectName: \"fallback\"; color: \"#0000ff\" }\n"
+        "        }\n"
+        "    }\n"
+        "}\n").arg(QUrl::fromLocalFile(slotDir).toString()).toUtf8();
+    component.setData(qml, QUrl::fromLocalFile(slotDir + QStringLiteral("/theme-slot-test.qml")));
+    QVERIFY2(!component.isError(), qPrintable(component.errorString()));
+    QObject *host = component.create();
+    QVERIFY(host);
+    QObject *slot = host->findChild<QObject *>(QStringLiteral("slot"));
+    QVERIFY(slot);
+    QCoreApplication::processEvents();
+
+    auto loadedName = [&]() {
+        QObject *loaded = slot->property("loadedItem").value<QObject *>();
+        return loaded ? loaded->objectName() : QString();
+    };
+    auto loadedColor = [&]() {
+        QObject *loaded = slot->property("loadedItem").value<QObject *>();
+        return loaded ? loaded->property("color").value<QColor>() : QColor();
+    };
+
+    QCOMPARE(loadedName(), QStringLiteral("fallback"));
+    QCOMPARE(loadedColor(), QColor(QStringLiteral("#0000ff")));
+
+    manager->setThemeTrusted(QStringLiteral("slotpack"), true);
+    QCoreApplication::processEvents();
+    QCOMPARE(loadedName(), QStringLiteral("override"));
+    QCOMPARE(loadedColor(), QColor(QStringLiteral("#ff00ff")));
+
+    manager->setThemeTrusted(QStringLiteral("slotpack"), false);
+    QCoreApplication::processEvents();
+    QCOMPARE(loadedName(), QStringLiteral("fallback"));
+    QCOMPARE(loadedColor(), QColor(QStringLiteral("#0000ff")));
+
+    delete host;
+}
+
+void ThemeManagerTest::untrustedThemeHasNoOverride()
+{
+    QVERIFY(installOverrideTheme());
+    ThemeManager manager;
+    QVERIFY(manager.loadTheme(QStringLiteral("pack")));
+    QVERIFY(!manager.isThemeTrusted(QStringLiteral("pack")));
+    QVERIFY(manager.overrideUrl(QStringLiteral("ThemedButtonBackground")).isEmpty());
+
+    QSignalSpy spy(&manager, &ThemeManager::themeChanged);
+    manager.setThemeTrusted(QStringLiteral("other"), true);
+    QCOMPARE(spy.count(), 0);
+    QVERIFY(manager.overrideUrl(QStringLiteral("ThemedButtonBackground")).isEmpty());
+}
+
+void ThemeManagerTest::trustedThemeOverrideUrl()
+{
+    QVERIFY(installOverrideTheme());
+    const QString qmlPath = themesDir() + QStringLiteral("/pack/qml/ThemedButtonBackground.qml");
+    const QUrl expected = QUrl::fromLocalFile(QFileInfo(qmlPath).absoluteFilePath());
+
+    ThemeManager manager;
+    QVERIFY(manager.loadTheme(QStringLiteral("pack")));
+    QSignalSpy spy(&manager, &ThemeManager::themeChanged);
+    manager.setThemeTrusted(QStringLiteral("pack"), true);
+    QCOMPARE(spy.count(), 1);
+    manager.setThemeTrusted(QStringLiteral("pack"), true);
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(manager.overrideUrl(QStringLiteral("ThemedButtonBackground")), expected);
+    QCOMPARE(manager.overrideSlots(QStringLiteral("pack")),
+             QStringList{QStringLiteral("ThemedButtonBackground")});
+
+    ThemeManager again;
+    QVERIFY(again.loadTheme(QStringLiteral("pack")));
+    QVERIFY(again.isThemeTrusted(QStringLiteral("pack")));
+    QCOMPARE(again.overrideUrl(QStringLiteral("ThemedButtonBackground")), expected);
+
+    QSignalSpy revoke(&again, &ThemeManager::themeChanged);
+    again.setThemeTrusted(QStringLiteral("pack"), false);
+    QCOMPARE(revoke.count(), 1);
+    QVERIFY(!again.isThemeTrusted(QStringLiteral("pack")));
+    QVERIFY(again.overrideUrl(QStringLiteral("ThemedButtonBackground")).isEmpty());
+}
+
+void ThemeManagerTest::missingOverrideSlotIsEmpty()
+{
+    QVERIFY(installOverrideTheme());
+    ThemeManager manager;
+    QVERIFY(manager.loadTheme(QStringLiteral("pack")));
+    manager.setThemeTrusted(QStringLiteral("pack"), true);
+    QVERIFY(manager.overrideUrl(QStringLiteral("MissingSlot")).isEmpty());
+    QVERIFY(manager.overrideUrl(QStringLiteral("../ThemedButtonBackground")).isEmpty());
+    QVERIFY(manager.overrideUrl(QString()).isEmpty());
+
+    QVERIFY(writeJson("flat.json", R"({
+        "name": "flat",
+        "extends": "dark"
+    })"));
+    QVERIFY(manager.loadTheme(QStringLiteral("flat")));
+    manager.setThemeTrusted(QStringLiteral("flat"), true);
+    QVERIFY(manager.isThemeTrusted(QStringLiteral("flat")));
+    QVERIFY(manager.overrideUrl(QStringLiteral("ThemedButtonBackground")).isEmpty());
+    QVERIFY(manager.overrideSlots(QStringLiteral("flat")).isEmpty());
 }
 
 QTEST_MAIN(ThemeManagerTest)

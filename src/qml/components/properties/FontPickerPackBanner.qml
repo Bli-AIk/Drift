@@ -9,7 +9,7 @@ Rectangle {
     width: rowWidth
     height: shown ? 40 : 0
     visible: shown
-    color: Theme.panelSecondaryBg
+    color: Theme.c.fontPickerPackBanner.backgroundSecondary
 
     Text {
         anchors.left: parent.left
@@ -20,7 +20,7 @@ Rectangle {
         // The count was baked into the translated string, so it could
         // not be updated or pluralised.
         text: qsTr("Install the font pack for curated families →")
-        color: Theme.primary
+        color: Theme.c.fontPickerPackBanner.foregroundAccent
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeSm
         elide: Text.ElideRight

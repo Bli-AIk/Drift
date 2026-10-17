@@ -8,5 +8,5 @@ Rectangle {
     anchors.right: parent.right
     width: 1
     height: column.trackHeight(trackIndex)
-    color: Theme.panelBorder
+    color: Theme.c.trackHeaderEdge.border
 }

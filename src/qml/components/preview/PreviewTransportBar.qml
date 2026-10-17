@@ -23,6 +23,19 @@ Item {
 
     implicitHeight: Theme.iconButtonSize + Theme.previewTransportPadding * 2
 
+    ThemeSlot {
+        anchors.fill: parent
+        z: -1
+        slot: "PreviewTransportBarBackground"
+        control: bar
+        fallback: Component {
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.c.previewTransportBar.background
+            }
+        }
+    }
+
     RowLayout {
         anchors.fill: parent
         anchors.leftMargin: Theme.spacing2xl + Theme.spacingSm

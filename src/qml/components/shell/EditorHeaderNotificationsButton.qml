@@ -34,14 +34,14 @@ Item {
         anchors.margins: Theme.spacingXs
         width: Math.max(Theme.spacingXl, unreadCount.implicitWidth + Theme.spacingSm)
         height: Theme.spacingXl
-        radius: height / 2
-        color: Theme.primary
+        radius: Theme.c.editorHeaderNotificationsButton.badgeRadius
+        color: Theme.c.editorHeaderNotificationsButton.badge
 
         Text {
             id: unreadCount
             anchors.centerIn: parent
             text: Toasts.unreadCount > 99 ? "99+" : String(Toasts.unreadCount)
-            color: Theme.primaryForeground
+            color: Theme.c.editorHeaderNotificationsButton.badgeForeground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -51,10 +51,10 @@ Item {
         visible: bellButton.updatePending && Toasts.unreadCount === 0
         width: 8
         height: 8
-        radius: width / 2
-        color: Theme.primary
-        border.width: Theme.borderWidth
-        border.color: Theme.panelBackground
+        radius: Theme.c.editorHeaderNotificationsButton.badgeRadius
+        color: Theme.c.editorHeaderNotificationsButton.dot
+        border.width: Theme.c.editorHeaderNotificationsButton.dotBorderWidth
+        border.color: Theme.c.editorHeaderNotificationsButton.dotBorder
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.margins: 3

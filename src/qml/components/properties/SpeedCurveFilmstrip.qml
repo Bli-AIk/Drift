@@ -5,15 +5,15 @@ Rectangle {
     id: strip
     width: parent.width
     height: 56
-    radius: Theme.radiusSm
-    color: Theme.panelBackground
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
+    radius: Theme.c.speedCurveFilmstrip.radius
+    color: Theme.c.speedCurveFilmstrip.background
+    border.width: Theme.c.speedCurveFilmstrip.borderWidth
+    border.color: Theme.c.speedCurveFilmstrip.border
     clip: true
 
     ClipFilmstrip {
         anchors.fill: parent
-        anchors.margins: Theme.borderWidth
+        anchors.margins: Theme.c.speedCurveFilmstrip.borderWidth
         filmstripPath: EditorState.speedCurve.filmstripPath
         // One pass of the strip's eight frames across the clip, rather than the repeating
         // tile the timeline draws — here the x axis *is* the source.
@@ -29,7 +29,7 @@ Rectangle {
     Canvas {
         id: waveCanvas
         anchors.fill: parent
-        anchors.margins: Theme.borderWidth
+        anchors.margins: Theme.c.speedCurveFilmstrip.borderWidth
         visible: !EditorState.speedCurve.filmstripPath
 
         // The x axis here is the clip's trimmed source window, the same one the filmstrip
@@ -54,12 +54,15 @@ Rectangle {
             }
         }
 
+        readonly property color waveformColor: Theme.c.speedCurveFilmstrip.waveform
+        onWaveformColorChanged: requestPaint()
+
         onPaint: {
             const ctx = getContext("2d")
             ctx.clearRect(0, 0, width, height)
             if (!peaks || peaks.length === 0)
                 return
-            ctx.fillStyle = Theme.panelWaveformColor
+            ctx.fillStyle = waveformColor
             const mid = height / 2
             const w = Math.max(1, Math.floor(width))
             for (let x = 0; x < w; x++) {
@@ -78,7 +81,7 @@ Rectangle {
     Rectangle {
         width: Theme.playheadLineWidth
         height: parent.height
-        color: Theme.primary
+        color: Theme.c.speedCurveFilmstrip.accent
         x: EditorState.speedCurve.sourcePosition * parent.width
     }
 

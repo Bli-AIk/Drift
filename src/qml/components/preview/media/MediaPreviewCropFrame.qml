@@ -15,8 +15,8 @@ Rectangle {
     width: frame.host.frameW
     height: frame.host.frameH
     color: "transparent"
-    border.width: Theme.borderWidthFocus
-    border.color: Theme.primary
+    border.width: Theme.c.mediaPreviewCropFrame.borderWidth
+    border.color: Theme.c.mediaPreviewCropFrame.border
 
     MouseArea {
         anchors.fill: parent

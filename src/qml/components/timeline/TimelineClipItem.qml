@@ -301,6 +301,17 @@ Item {
                 effectiveStart * panel.pxPerSecond + Theme.clipSelectionRingWidth + followOffsetX)
     y: Theme.clipSelectionRingWidth + followOffsetY
 
+    // Override point for the clip body. The default body is painted by
+    // TimelineTrackClips; this slot draws nothing unless a theme supplies one.
+    ThemeSlot {
+        slot: "TimelineClipBody"
+        control: clipItem
+        anchors.fill: parent
+        fallback: Component {
+            Item { }
+        }
+    }
+
     // Stands in for the rect the Menu used to be parented to, so it resolves the same parent item
     // and clamps against the same bounds.
     Loader {

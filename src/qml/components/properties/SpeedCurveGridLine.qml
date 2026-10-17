@@ -9,17 +9,17 @@ Item {
 
     Rectangle {
         width: parent.width
-        height: 1
+        height: Theme.c.speedCurveGridLine.lineWidth
         y: host.yForSpeed(modelData, plotItem.height)
-        color: modelData === 1 ? Theme.panelSecondaryForeground : Theme.panelBorder
-        opacity: modelData === 1 ? 0.6 : 0.35
+        color: modelData === 1 ? Theme.c.speedCurveGridLine.emphasis : Theme.c.speedCurveGridLine.line
+        opacity: modelData === 1 ? Theme.c.speedCurveGridLine.emphasisOpacity : Theme.c.speedCurveGridLine.opacity
     }
 
     Text {
         x: 2
         y: host.yForSpeed(modelData, plotItem.height) - height - 1
         text: modelData + "×"
-        color: Theme.mutedForeground
+        color: Theme.c.speedCurveGridLine.foregroundMuted
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeXs
     }

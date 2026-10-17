@@ -14,9 +14,9 @@ Rectangle {
     x: line.source.hx * line.frame.width
     y: line.source.hy * line.frame.height - height / 2
     width: Math.sqrt(dx * dx + dy * dy)
-    height: 1.5
-    color: line.source.values.color || "#ffffff"
-    opacity: 0.7
+    height: Theme.c.depthEffectAimLine.strokeWidth
+    color: line.source.values.color || Theme.c.depthEffectAimLine.background
+    opacity: Theme.c.depthEffectAimLine.opacity
     transformOrigin: Item.Left
     rotation: Math.atan2(dy, dx) * 180 / Math.PI
 }

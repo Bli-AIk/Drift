@@ -9,10 +9,10 @@ Rectangle {
 
     implicitHeight: 34
     implicitWidth: mainRow.implicitWidth + 20
-    radius: Theme.radiusSm
-    color: Qt.rgba(Theme.panelBackground.r, Theme.panelBackground.g, Theme.panelBackground.b, 0.96)
-    border.color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
-    border.width: 1
+    radius: Theme.c.voiceoverControlBar.radius
+    color: Qt.rgba(Theme.c.voiceoverControlBar.background.r, Theme.c.voiceoverControlBar.background.g, Theme.c.voiceoverControlBar.background.b, 0.96)
+    border.color: EditorState.isAudioRecordingPaused ? Theme.c.voiceoverControlBar.borderPaused : Theme.c.voiceoverControlBar.border
+    border.width: Theme.c.voiceoverControlBar.borderWidth
 
     VoiceoverGlow {
         paused: EditorState.isAudioRecordingPaused

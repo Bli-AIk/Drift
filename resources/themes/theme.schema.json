@@ -28,6 +28,7 @@
       "$ref": "#/$defs/tokenObject"
     },
     "components": {
+      "description": "Per-component groups, variant-independent. Each group name is lowerCamel of the QML file basename (appWindow and androidMain are the shell exceptions). Values are colors, numbers, strings, or $references.",
       "$ref": "#/$defs/tokenObject"
     },
     "metrics": {

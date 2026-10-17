@@ -15,7 +15,7 @@ Rectangle {
                       : Theme.spacingXl
     height: Theme.spacingXl
     radius: height / 2
-    color: Theme.primary
+    color: Theme.c.androidTopBarCountBadge.background
 
     Text {
         id: label
@@ -23,7 +23,7 @@ Rectangle {
         text: badge.cap > 0 && badge.count > badge.cap
               ? String(badge.cap) + "+"
               : String(badge.count)
-        color: Theme.primaryForeground
+        color: Theme.c.androidTopBarCountBadge.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

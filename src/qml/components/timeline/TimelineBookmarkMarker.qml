@@ -25,7 +25,7 @@ Item {
         y: 0
         width: 1
         height: parent.height + 6
-        color: Theme.primary
+        color: Theme.c.timelineBookmarkMarker.foreground
         opacity: 0.7
     }
 
@@ -35,10 +35,10 @@ Item {
         width: 8
         height: 8
         rotation: 45
-        radius: 1
-        color: Theme.primary
-        border.width: bookmarkMouse.containsMouse ? Theme.borderWidth : 0
-        border.color: Theme.primaryForeground
+        radius: Theme.c.timelineBookmarkMarker.radius
+        color: Theme.c.timelineBookmarkMarker.foreground
+        border.width: bookmarkMouse.containsMouse ? Theme.c.timelineBookmarkMarker.borderWidth : 0
+        border.color: Theme.c.timelineBookmarkMarker.border
     }
 
     ThemedToolTip {

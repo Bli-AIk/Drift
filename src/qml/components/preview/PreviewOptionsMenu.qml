@@ -17,10 +17,10 @@ Popup {
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
 
     background: Rectangle {
-        color: Theme.panelBackground
-        border.width: Theme.borderWidth
-        border.color: Theme.panelBorder
-        radius: Theme.radiusMd
+        color: Theme.c.previewOptionsMenu.background
+        border.width: Theme.c.previewOptionsMenu.borderWidth
+        border.color: Theme.c.previewOptionsMenu.border
+        radius: Theme.c.previewOptionsMenu.radius
     }
 
     contentItem: GridLayout {

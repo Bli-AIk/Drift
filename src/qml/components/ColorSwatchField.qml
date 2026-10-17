@@ -38,7 +38,7 @@ Row {
         id: hexField
         width: 92
         text: root.hex
-        color: Theme.panelForeground
+        color: Theme.c.colorSwatchField.foreground
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeSm
         // Rejects malformed input instead of silently applying a typo.

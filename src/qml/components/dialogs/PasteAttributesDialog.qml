@@ -87,7 +87,7 @@ ThemedDialog {
         Text {
             width: parent.width
             wrapMode: Text.WordWrap
-            color: Theme.mutedForeground
+            color: Theme.c.pasteAttributesDialog.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             text: {
@@ -106,8 +106,8 @@ ThemedDialog {
         // Options separator
         Rectangle {
             width: parent.width
-            height: Theme.borderWidth
-            color: Theme.panelBorder
+            height: Theme.c.pasteAttributesDialog.borderWidth
+            color: Theme.c.pasteAttributesDialog.divider
         }
 
         // Effect Options

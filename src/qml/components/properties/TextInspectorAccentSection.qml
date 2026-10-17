@@ -80,7 +80,7 @@ CollapsibleSection {
                     text: qsTr("Size of the accented words relative to the rest of the line")
                     visible: tipHoverAccentSize.hovered || held
                 }
-                color: Theme.mutedForeground
+                color: Theme.c.textInspectorAccentSection.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -118,7 +118,7 @@ CollapsibleSection {
                 spacing: 4
                 Text {
                     text: qsTr("Width")
-                    color: Theme.mutedForeground
+                    color: Theme.c.textInspectorAccentSection.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }

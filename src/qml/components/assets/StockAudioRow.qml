@@ -18,8 +18,8 @@ Rectangle {
     }
     width: ListView.view ? ListView.view.width : 0
     height: Theme.touchUi ? Theme.androidMinTouchTarget + Theme.spacingLg : Theme.controlHeight + Theme.spacingLg
-    radius: Theme.radiusSm
-    color: rowHover.hovered ? Theme.popoverHover : "transparent"
+    radius: Theme.c.stockAudioRow.radius
+    color: rowHover.hovered ? Theme.c.stockAudioRow.backgroundHover : "transparent"
 
     HoverHandler { id: rowHover; cursorShape: Qt.PointingHandCursor }
     TapHandler { onTapped: openRequested(root.modelData) }
@@ -54,7 +54,7 @@ Rectangle {
         Text {
             width: parent.width
             text: root.modelData.title || ""
-            color: Theme.panelForeground
+            color: Theme.c.stockAudioRow.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             elide: Text.ElideRight
@@ -63,7 +63,7 @@ Rectangle {
             width: parent.width
             visible: text.length > 0
             text: root.modelData.creator ? (root.modelData.creator.name || "") : ""
-            color: Theme.mutedForeground
+            color: Theme.c.stockAudioRow.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             elide: Text.ElideRight
@@ -72,14 +72,14 @@ Rectangle {
         Rectangle {
             width: parent.width
             height: 2
-            radius: 1
-            color: Theme.panelMuted
+            radius: Theme.c.stockAudioRow.trackRadius
+            color: Theme.c.stockAudioRow.trackBackground
             visible: previewPlayer.itemId === root.modelData.id && previewPlayer.duration > 0
             Rectangle {
                 width: parent.width * Math.min(1, previewPlayer.position / Math.max(1, previewPlayer.duration))
                 height: parent.height
-                radius: 1
-                color: Theme.primary
+                radius: Theme.c.stockAudioRow.trackRadius
+                color: Theme.c.stockAudioRow.accent
             }
         }
     }
@@ -100,7 +100,7 @@ Rectangle {
                 const n = Math.round(Number(root.modelData.duration_ms || 0) / 1000)
                 return n > 0 ? Math.floor(n / 60) + ":" + (n % 60 < 10 ? "0" : "") + (n % 60) : ""
             }
-            color: Theme.mutedForeground
+            color: Theme.c.stockAudioRow.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }

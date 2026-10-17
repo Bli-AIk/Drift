@@ -7,7 +7,7 @@ Rectangle {
     required property real progress
 
     anchors.fill: parent
-    color: Theme.scrimColor
+    color: Theme.c.mediaPreviewSavingScrim.background
     z: 10
 
     Column {

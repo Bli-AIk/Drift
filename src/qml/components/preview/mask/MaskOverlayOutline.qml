@@ -14,8 +14,8 @@ Rectangle {
 
     anchors.fill: parent
     color: "transparent"
-    border.width: Theme.borderWidth
-    border.color: outline.selected ? Theme.primary : Theme.mutedForeground
-    opacity: !outline.enabledMask ? 0.25 : (outline.selected ? 1.0 : 0.5)
+    border.width: Theme.c.maskOverlayOutline.borderWidth
+    border.color: outline.selected ? Theme.c.maskOverlayOutline.borderSelected : Theme.c.maskOverlayOutline.border
+    opacity: !outline.enabledMask ? Theme.c.maskOverlayOutline.opacityDisabled : (outline.selected ? 1.0 : Theme.c.maskOverlayOutline.opacity)
     radius: outline.shape === "ellipse" ? Math.min(width, height) / 2 : 0
 }

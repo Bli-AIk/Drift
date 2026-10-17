@@ -11,7 +11,7 @@ Rectangle {
     width: 64
     height: 64
     radius: width / 2
-    color: Theme.scrimStrong
+    color: Theme.c.androidMediaPlayBadge.background
     opacity: badge.playing ? 0 : 1
 
     Behavior on opacity {
@@ -22,6 +22,6 @@ Rectangle {
         anchors.centerIn: parent
         glyph: Theme.icons.play
         iconSize: Theme.iconSizeLg
-        iconColor: Theme.onMedia
+        iconColor: Theme.c.androidMediaPlayBadge.icon
     }
 }

@@ -15,7 +15,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: 2
-        color: Theme.primary
+        radius: Theme.c.mediaPreviewPlayheadCap.radius
+        color: Theme.c.mediaPreviewPlayheadCap.background
     }
 }

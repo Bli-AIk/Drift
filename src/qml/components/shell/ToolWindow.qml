@@ -17,7 +17,7 @@ Item {
     default property alias content: holder.data
 
     property string title: ""
-    property color color: Theme.appBackground
+    property color color: Theme.c.toolWindow.background
     property real minimumWidth: 0
     property real minimumHeight: 0
 

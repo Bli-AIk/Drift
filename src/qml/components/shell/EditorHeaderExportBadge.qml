@@ -7,8 +7,8 @@ Rectangle {
     signal reopenRequested()
     width: Theme.iconButtonSize
     height: Theme.iconButtonSize
-    radius: width / 2
-    color: badgeMouse.containsMouse ? Theme.popoverHover : "transparent"
+    radius: Theme.c.editorHeaderExportBadge.radius
+    color: badgeMouse.containsMouse ? Theme.c.editorHeaderExportBadge.backgroundHover : "transparent"
     anchors.verticalCenter: parent.verticalCenter
     visible: opacity > 0
     opacity: EditorState.exportInProgress && dismissed ? 1 : 0

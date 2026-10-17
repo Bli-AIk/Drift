@@ -14,13 +14,13 @@ Rectangle {
     width: parentChipLabel.implicitWidth + Theme.spacingLg
     height: parentChipLabel.implicitHeight + Theme.spacingSm
     radius: height / 2
-    color: parentChipMouse.containsMouse ? Qt.lighter(Theme.clipTransform, 1.15) : Theme.clipTransform
+    color: parentChipMouse.containsMouse ? Qt.lighter(Theme.c.transformOverlayParentChip.background, 1.15) : Theme.c.transformOverlayParentChip.background
 
     Text {
         id: parentChipLabel
         anchors.centerIn: parent
         text: qsTr("Select %1").arg(chip.layerName || qsTr("Transform"))
-        color: Theme.onMedia
+        color: Theme.c.transformOverlayParentChip.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

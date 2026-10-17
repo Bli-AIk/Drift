@@ -35,7 +35,7 @@ Item {
     signal panSet(real value)
 
     readonly property real curDb: mixer.linearToDb(volume)
-    readonly property color fillColor: armed ? Theme.destructive : Theme.primary
+    readonly property color fillColor: armed ? Theme.c.mixerChannelStrip.armedFill : Theme.c.mixerChannelStrip.fill
 
     function nudgeDb(step) {
         volumeSet(mixer.dbToLinear(mixer.snapDb(mixer.linearToDb(volume) + step)))

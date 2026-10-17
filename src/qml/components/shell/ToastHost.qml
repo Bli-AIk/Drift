@@ -24,10 +24,10 @@ Item {
 
     function _accent(severity) {
         switch (severity) {
-        case "error": return Theme.destructive
-        case "warning": return Theme.warning
-        case "success": return Theme.constructive
-        default: return Theme.primary
+        case "error": return Theme.c.toastHost.accentError
+        case "warning": return Theme.c.toastHost.accentWarning
+        case "success": return Theme.c.toastHost.accentSuccess
+        default: return Theme.c.toastHost.accent
         }
     }
 
@@ -118,7 +118,7 @@ Item {
                 Accessible.name: toast.message
                 Accessible.description: toast.severity
 
-                Rectangle {
+                ThemeSlot {
                     id: card
 
                     readonly property real contentWidth: toastRow.implicitWidth
@@ -129,26 +129,35 @@ Item {
                     height: Math.max(toast.compact ? Theme.controlHeight + Theme.spacingMd : 0,
                                      toastRow.height + (toast.compact ? Theme.spacingMd
                                                                       : Theme.spacingXl) * 2)
-                    radius: toast.compact ? height / 2 : Theme.radiusMd
-                    color: Theme.panelBackground
-                    border.width: Theme.borderWidth
-                    border.color: Theme.panelBorder
+                    slot: "ToastCardBackground"
+                    control: toast
+                    fallback: Component {
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: toast.compact ? Theme.c.toastHost.radiusCompact
+                                                  : Theme.c.toastHost.radius
+                            color: Theme.c.toastHost.background
+                            border.width: Theme.c.toastHost.borderWidth
+                            border.color: Theme.c.toastHost.border
 
-                    // Severity is carried by a leading accent bar rather than a full
-                    // color wash, so the message stays readable in both themes. The pill
-                    // already says it with its glyph.
-                    Rectangle {
-                        visible: !toast.compact
-                        anchors.left: parent.left
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        width: 3
-                        radius: Theme.radiusMd
-                        color: root._accent(toast.severity)
+                            // Severity is carried by a leading accent bar rather than a full
+                            // color wash, so the message stays readable in both themes. The pill
+                            // already says it with its glyph.
+                            Rectangle {
+                                visible: !toast.compact
+                                anchors.left: parent.left
+                                anchors.top: parent.top
+                                anchors.bottom: parent.bottom
+                                width: Theme.c.toastHost.accentWidth
+                                radius: Theme.c.toastHost.radius
+                                color: root._accent(toast.severity)
+                            }
+                        }
                     }
 
                     Row {
                         id: toastRow
+                        z: 1
                         anchors.left: parent.left
                         anchors.leftMargin: toast.compact ? Theme.spacingXl : Theme.spacingXl + Theme.spacingSm
                         anchors.verticalCenter: parent.verticalCenter
@@ -177,7 +186,7 @@ Item {
                             text: toast.repeats > 1
                                   ? qsTr("%1  (×%2)").arg(toast.message).arg(toast.repeats)
                                   : toast.message
-                            color: Theme.panelForeground
+                            color: Theme.c.toastHost.foreground
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSizeSm
                             wrapMode: toast.compact ? Text.NoWrap : Text.WordWrap

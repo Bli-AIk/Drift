@@ -12,11 +12,11 @@ Rectangle {
     id: root
     width: root.tileWidth
     height: Math.round(root.tileWidth * 58 / 104)
-    radius: Theme.radiusSm
-    color: Theme.textStylePreviewBg
-    border.width: root.selected ? Theme.borderWidthFocus : Theme.borderWidth
-    border.color: root.selected ? Theme.primary
-                                : (tileHover.hovered ? Theme.panelMuted : Theme.textStylePreviewBorder)
+    radius: Theme.c.textAnimPresetFrame.radius
+    color: Theme.c.textAnimPresetFrame.background
+    border.width: root.selected ? Theme.c.textAnimPresetFrame.borderWidthFocus : Theme.c.textAnimPresetFrame.borderWidth
+    border.color: root.selected ? Theme.c.textAnimPresetFrame.borderSelected
+                                : (tileHover.hovered ? Theme.c.textAnimPresetFrame.borderHover : Theme.c.textAnimPresetFrame.border)
     clip: true
 
     Behavior on border.color {
@@ -55,7 +55,7 @@ Rectangle {
         anchors.centerIn: parent
         visible: root.presetId.length === 0
         text: qsTr("None")
-        color: Theme.mutedForeground
+        color: Theme.c.textAnimPresetFrame.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

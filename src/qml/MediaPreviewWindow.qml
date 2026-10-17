@@ -94,7 +94,7 @@ Window {
     title: clipId.length > 0
            ? (assetName.length > 0 ? qsTr("Crop — %1").arg(assetName) : qsTr("Crop"))
            : (assetName.length > 0 ? qsTr("Preview — %1").arg(assetName) : qsTr("Preview"))
-    color: Theme.appBackground
+    color: Theme.c.mediaPreviewWindow.background
 
     function openFor(index) {
         const asset = AssetLibrary.assetAt(index)
@@ -391,8 +391,8 @@ Window {
                     h -= stripBlock.height + Theme.spacingLg
                 return Math.max(80, h)
             }
-            radius: Theme.radiusMd
-            color: Theme.overlayColor
+            radius: Theme.c.mediaPreviewWindow.stageRadius
+            color: Theme.c.mediaPreviewWindow.stageBackground
             clip: true
 
             // Stills come straight from the file; video frames arrive already rotated from the
@@ -669,10 +669,10 @@ Window {
                 id: strip
                 width: parent.width
                 height: 64
-                radius: Theme.radiusSm
-                color: Theme.panelBackground
-                border.width: Theme.borderWidth
-                border.color: Theme.panelBorder
+                radius: Theme.c.mediaPreviewWindow.stripRadius
+                color: Theme.c.mediaPreviewWindow.stripBackground
+                border.width: Theme.c.mediaPreviewWindow.stripBorderWidth
+                border.color: Theme.c.mediaPreviewWindow.stripBorder
                 clip: true
 
                 ClipFilmstrip {

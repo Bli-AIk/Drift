@@ -59,7 +59,7 @@ Item {
             text: root.hasVisualSelection
                   ? qsTr("Click to apply to the selection, or drag onto a clip")
                   : qsTr("Select a clip, or drag a mask onto one")
-            color: Theme.mutedForeground
+            color: Theme.c.masksTab.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -97,7 +97,7 @@ Item {
             Text {
                 width: parent.width
                 text: qsTr("Subject")
-                color: Theme.mutedForeground
+                color: Theme.c.masksTab.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }

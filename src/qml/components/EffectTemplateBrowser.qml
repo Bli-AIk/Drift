@@ -115,7 +115,7 @@ Column {
                   : (root.activeCategory === root.favoritesId
                      ? qsTr("No favorites yet. Star templates to save them here.")
                      : qsTr("Nothing in this category."))
-            color: Theme.mutedForeground
+            color: Theme.c.effectTemplateBrowser.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             wrapMode: Text.WordWrap

@@ -12,10 +12,10 @@ Rectangle {
 
     width: 72
     height: 72
-    radius: Theme.radiusSm
-    color: Theme.appBackground
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
+    radius: Theme.c.androidLayoutSummarySwatch.radius
+    color: Theme.c.androidLayoutSummarySwatch.background
+    border.width: Theme.c.androidLayoutSummarySwatch.borderWidth
+    border.color: Theme.c.androidLayoutSummarySwatch.border
 
     readonly property real scaleToBox:
         Math.min(width / Math.max(1, aspectBox.outWidth),
@@ -25,10 +25,10 @@ Rectangle {
         anchors.centerIn: parent
         width: Math.max(8, aspectBox.outWidth * aspectBox.scaleToBox)
         height: Math.max(8, aspectBox.outHeight * aspectBox.scaleToBox)
-        radius: Theme.radiusXs
-        color: Theme.panelAccent
-        border.width: Theme.borderWidth
-        border.color: Theme.primary
+        radius: Theme.c.androidLayoutSummarySwatch.innerRadius
+        color: Theme.c.androidLayoutSummarySwatch.innerBackground
+        border.width: Theme.c.androidLayoutSummarySwatch.innerBorderWidth
+        border.color: Theme.c.androidLayoutSummarySwatch.innerBorder
 
         // A morph between two aspect ratios, not an entrance.
         Behavior on width {
@@ -47,7 +47,7 @@ Rectangle {
         Text {
             anchors.centerIn: parent
             text: aspectBox.aspectLabel
-            color: Theme.panelForeground
+            color: Theme.c.androidLayoutSummarySwatch.foreground
             font.family: Theme.monoFontFamily
             font.pixelSize: Theme.fontSizeXs
             font.weight: Font.Medium

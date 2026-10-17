@@ -10,7 +10,7 @@ Column {
     width: cardSize
     spacing: 4
     // Lift on grab — matches the media and effect cards.
-    opacity: transitionDrag.active ? 0.85 : 1
+    opacity: transitionDrag.active ? Theme.c.transitionPresetCard.dragOpacity : 1
     scale: transitionDrag.active ? 1.04 : 1.0
 
     GridView.onPooled: root.scrub = 0.45
@@ -63,10 +63,10 @@ Column {
     Rectangle {
         width: cardSize
         height: cardSize
-        radius: Theme.radiusSm
-        color: transitionHover.hovered ? Theme.panelSecondaryBg : Theme.panelAccent
-        border.width: transitionDrag.active ? Theme.borderWidth : 0
-        border.color: Theme.transitionOverlap
+        radius: Theme.c.transitionPresetCard.radius
+        color: transitionHover.hovered ? Theme.c.transitionPresetCard.backgroundHover : Theme.c.transitionPresetCard.background
+        border.width: transitionDrag.active ? Theme.c.transitionPresetCard.borderWidth : 0
+        border.color: Theme.c.transitionPresetCard.border
         clip: true
 
         // The card already had a considered hover
@@ -167,14 +167,14 @@ Column {
                      || transitionStrip.status === Image.Error
             glyph: Theme.icons.chevronsRight
             iconSize: Theme.iconSizeXl
-            iconColor: Theme.transitionOverlap
+            iconColor: Theme.c.transitionPresetCard.icon
         }
     }
 
     Text {
         width: parent.width
         text: root.modelData.label
-        color: Theme.panelForeground
+        color: Theme.c.transitionPresetCard.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeCard
         font.weight: Font.Medium

@@ -11,10 +11,10 @@ Rectangle {
     y: Theme.spacingLg
     width: tool.width - sidebarWidth - Theme.spacingLg * 3
     height: tool.height - Theme.spacingLg * 2
-    radius: Theme.radiusMd
-    color: Theme.appBackground
-    border.width: 1
-    border.color: Theme.panelBorder
+    radius: Theme.c.restoreUpscalerPicker.radius
+    color: Theme.c.restoreUpscalerPicker.background
+    border.width: Theme.c.restoreUpscalerPicker.borderWidth
+    border.color: Theme.c.restoreUpscalerPicker.border
 
     property string filter: ""
     // Only the content types something installed is made for.

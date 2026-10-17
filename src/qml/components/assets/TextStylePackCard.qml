@@ -11,7 +11,7 @@ Column {
     width: cardSize
     spacing: Theme.spacingSm
 
-    opacity: packDrag.active ? 0.85 : 1
+    opacity: packDrag.active ? Theme.c.textStylePackCard.dragOpacity : 1
     scale: packDrag.active ? 1.04 : packDrag.pressed ? 0.97 : (packDrag.hovered ? 1.02 : 1.0)
     Behavior on scale {
         NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -59,7 +59,7 @@ Column {
         text: root.modelData.label
         elide: Text.ElideRight
         horizontalAlignment: Text.AlignHCenter
-        color: packDrag.hovered ? Theme.panelForeground : Theme.mutedForeground
+        color: packDrag.hovered ? Theme.c.textStylePackCard.foregroundHover : Theme.c.textStylePackCard.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
 

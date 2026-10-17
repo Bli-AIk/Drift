@@ -4,6 +4,14 @@ import Drift
 Canvas {
     property var host
     id: root
+    readonly property color curveColor: Theme.c.speedCurveCanvas.curve
+    readonly property color handleColor: Theme.c.speedCurveCanvas.handle
+    readonly property real curveLineWidth: Theme.c.speedCurveCanvas.curveLineWidth
+    readonly property real handleLineWidth: Theme.c.speedCurveCanvas.handleLineWidth
+    onCurveColorChanged: requestPaint()
+    onHandleColorChanged: requestPaint()
+    onCurveLineWidthChanged: requestPaint()
+    onHandleLineWidthChanged: requestPaint()
     anchors.fill: parent
 
     onPaint: {
@@ -13,8 +21,8 @@ Canvas {
         if (pts.length < 2)
             return
 
-        ctx.strokeStyle = String(Theme.primary)
-        ctx.lineWidth = 2
+        ctx.strokeStyle = String(root.curveColor)
+        ctx.lineWidth = root.curveLineWidth
         ctx.beginPath()
         ctx.moveTo(pts[0].pos * width, host.yForSpeed(pts[0].speed, height))
         for (let i = 0; i + 1 < pts.length; ++i) {
@@ -31,8 +39,8 @@ Canvas {
         // graph into a thicket.
         const sel = host.selected
         if (sel) {
-            ctx.strokeStyle = String(Theme.mutedForeground)
-            ctx.lineWidth = 1
+            ctx.strokeStyle = String(root.handleColor)
+            ctx.lineWidth = root.handleLineWidth
             const px = sel.pos * width
             const py = host.yForSpeed(sel.speed, height)
             ctx.beginPath()

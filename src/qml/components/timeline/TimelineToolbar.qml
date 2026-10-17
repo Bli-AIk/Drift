@@ -22,11 +22,24 @@ Item {
         return key.length > 0 ? qsTr("%1 (%2)").arg(label).arg(key) : label
     }
 
+    ThemeSlot {
+        slot: "TimelineToolbarBackground"
+        control: toolbar
+        anchors.fill: parent
+        z: -1
+        fallback: Component {
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.c.timelineToolbar.background
+            }
+        }
+    }
+
     Rectangle {
         anchors.bottom: parent.bottom
         width: parent.width
         height: 1
-        color: Theme.panelBorder
+        color: Theme.c.timelineToolbar.border
     }
 
     // Every customisable edit action, keyed by the id stored in the toolbar layout.

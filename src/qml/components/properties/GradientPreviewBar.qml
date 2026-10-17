@@ -19,8 +19,8 @@ Canvas {
     Rectangle {
         anchors.fill: parent
         color: "transparent"
-        radius: Theme.radiusSm
-        border.width: Theme.borderWidth
-        border.color: Theme.panelBorder
+        radius: Theme.c.gradientPreviewBar.radius
+        border.width: Theme.c.gradientPreviewBar.borderWidth
+        border.color: Theme.c.gradientPreviewBar.border
     }
 }

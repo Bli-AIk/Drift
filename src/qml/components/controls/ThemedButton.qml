@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
@@ -14,7 +15,7 @@ Button {
     property string tooltip: ""
     // Corner rounding of the background. Segments merged into one bordered group
     // (the media bin's split Import button) tuck a smaller radius inside the box.
-    property real radius: Theme.radiusSm
+    property real radius: Theme.c.themedButton.radius
     // "auto" | "press" | "confirm" | "select" | "none". auto is confirm for primary
     // and destructive (those commit something) and press for everything else.
     property string haptic: "auto"
@@ -44,9 +45,9 @@ Button {
 
     readonly property color _fg: {
         switch (variant) {
-        case "primary": return Theme.primaryForeground
-        case "destructive": return Theme.destructive
-        default: return Theme.panelForeground
+        case "primary": return Theme.c.themedButton.primaryForeground
+        case "destructive": return Theme.c.themedButton.destructiveForeground
+        default: return Theme.c.themedButton.foreground
         }
     }
 
@@ -57,24 +58,25 @@ Button {
         switch (variant) {
         case "primary":
             if (!enabled)
-                return Qt.darker(Theme.primary, 1.5)
-            return down ? Qt.darker(Theme.primary, 1.12)
-                        : (hovered ? Qt.lighter(Theme.primary, 1.08) : Theme.primary)
+                return Qt.darker(Theme.c.themedButton.primaryBackground, 1.5)
+            return down ? Qt.darker(Theme.c.themedButton.primaryBackground, 1.12)
+                        : (hovered ? Qt.lighter(Theme.c.themedButton.primaryBackground, 1.08)
+                                   : Theme.c.themedButton.primaryBackground)
         case "ghost":
             if (!enabled)
                 return "transparent"
-            return down ? Theme.panelMuted
-                        : (hovered ? Theme.popoverHover : "transparent")
+            return down ? Theme.c.themedButton.ghostBackgroundPressed
+                        : (hovered ? Theme.c.themedButton.ghostBackgroundHover : "transparent")
         case "destructive":
             if (!enabled)
                 return "transparent"
-            return down ? Theme.panelMuted
-                        : (hovered ? Theme.popoverHover : "transparent")
+            return down ? Theme.c.themedButton.destructiveBackgroundPressed
+                        : (hovered ? Theme.c.themedButton.destructiveBackgroundHover : "transparent")
         default: // secondary
             if (!enabled)
-                return Theme.panelAccent
-            return down ? Theme.panelMuted
-                        : (hovered ? Theme.popoverHover : Theme.panelAccent)
+                return Theme.c.themedButton.backgroundDisabled
+            return down ? Theme.c.themedButton.backgroundPressed
+                        : (hovered ? Theme.c.themedButton.backgroundHover : Theme.c.themedButton.background)
         }
     }
 
@@ -131,25 +133,31 @@ Button {
         }
     }
 
-    background: Rectangle {
-        implicitHeight: Theme.controlHeight
-        radius: root.radius
-        color: root._bg
-        border.width: root._drawBorder ? Theme.borderWidth : 0
-        border.color: Theme.panelBorder
-        opacity: root.enabled ? 1 : 0.6
+    background: ThemeSlot {
+        slot: "ThemedButtonBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                implicitHeight: Theme.controlHeight
+                radius: root.radius
+                color: root._bg
+                border.width: root._drawBorder ? Theme.c.themedButton.borderWidth : 0
+                border.color: Theme.c.themedButton.border
+                opacity: root.enabled ? 1 : 0.6
 
-        Behavior on color {
-            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
+                Behavior on color {
+                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
 
-        Rectangle {
-            anchors.fill: parent
-            radius: parent.radius
-            color: "transparent"
-            border.width: Theme.borderWidthFocus
-            border.color: Theme.focusRing
-            visible: root.visualFocus
+                Rectangle {
+                    anchors.fill: parent
+                    radius: parent.radius
+                    color: "transparent"
+                    border.width: Theme.c.themedButton.focusBorderWidth
+                    border.color: Theme.c.themedButton.focusBorder
+                    visible: root.visualFocus
+                }
+            }
         }
     }
 

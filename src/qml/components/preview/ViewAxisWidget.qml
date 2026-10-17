@@ -6,7 +6,7 @@ import Drift
 Item {
     id: widget
 
-    readonly property real radius: 34
+    readonly property real radius: Theme.c.viewAxisWidget.radius
     readonly property var axes: {
         void EditorState.preview.viewRevision
         return EditorState.preview.axes()
@@ -24,7 +24,7 @@ Item {
     }
 
     function colorFor(axis) {
-        return axis === "x" ? Theme.gizmoX : axis === "y" ? Theme.gizmoY : Theme.gizmoZ
+        return axis === "x" ? Theme.c.viewAxisWidget.x : axis === "y" ? Theme.c.viewAxisWidget.y : Theme.c.viewAxisWidget.z
     }
 
     width: radius * 2 + 16

@@ -63,7 +63,7 @@ Column {
             width: parent.width - 148 - 24
             elide: Text.ElideRight
             text: row.paramData.label
-            color: Theme.mutedForeground
+            color: Theme.c.effectsColorParam.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             anchors.verticalCenter: parent.verticalCenter

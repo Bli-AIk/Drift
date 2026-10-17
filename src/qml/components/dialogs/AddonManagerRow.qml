@@ -13,12 +13,14 @@ Rectangle {
 
     width: ListView.view.width
     height: body.implicitHeight + Theme.spacing3xl
-    radius: Theme.radiusMd
+    radius: Theme.c.addonManagerRow.radius
     // Rows had no hover state at all; only the highlighted row
     // differed from the rest.
-    color: rowHover.hovered ? Theme.popoverHover : Theme.panelSecondaryBg
-    border.width: Theme.borderWidth
-    border.color: modelData.id === dialog.highlightId ? Theme.primary : Theme.panelSecondaryBorder
+    color: rowHover.hovered ? Theme.c.addonManagerRow.backgroundHover
+                            : Theme.c.addonManagerRow.background
+    border.width: Theme.c.addonManagerRow.borderWidth
+    border.color: modelData.id === dialog.highlightId ? Theme.c.addonManagerRow.borderHighlight
+                                                      : Theme.c.addonManagerRow.border
 
     Behavior on color {
         ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -124,7 +126,8 @@ Rectangle {
                     parts.push(row.modelData.license)
                 return parts.join(" · ")
             }
-            color: row.modelData.state === "failed" ? Theme.destructive : Theme.mutedForeground
+            color: row.modelData.state === "failed" ? Theme.c.addonManagerRow.foregroundError
+                                                    : Theme.c.addonManagerRow.foregroundMuted
         }
     }
 

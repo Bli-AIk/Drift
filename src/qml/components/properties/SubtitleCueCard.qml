@@ -16,10 +16,10 @@ Item {
         id: card
         width: parent.width
         height: lineCol.implicitHeight + 14
-        radius: Theme.radiusMd
-        color: cueDelegate.isSelected ? Theme.panelAccent : (rowHover.containsMouse ? Theme.panelAccent : "transparent")
-        border.width: (cueDelegate.isSelected || cueDelegate.isActive || rowHover.containsMouse) ? 1 : 0
-        border.color: cueDelegate.isActive ? Theme.clipSubtitle : (cueDelegate.isSelected ? Theme.panelBorder : (rowHover.containsMouse ? Theme.panelBorder : "transparent"))
+        radius: Theme.c.subtitleCueCard.radius
+        color: cueDelegate.isSelected ? Theme.c.subtitleCueCard.backgroundSelected : (rowHover.containsMouse ? Theme.c.subtitleCueCard.backgroundHover : "transparent")
+        border.width: (cueDelegate.isSelected || cueDelegate.isActive || rowHover.containsMouse) ? Theme.c.subtitleCueCard.borderWidth : 0
+        border.color: cueDelegate.isActive ? Theme.c.subtitleCueCard.borderActive : (cueDelegate.isSelected ? Theme.c.subtitleCueCard.borderSelected : (rowHover.containsMouse ? Theme.c.subtitleCueCard.borderHover : "transparent"))
 
         Behavior on color { ColorAnimation { duration: Theme.durationFast } }
         Behavior on border.color { ColorAnimation { duration: Theme.durationFast } }
@@ -48,7 +48,7 @@ Item {
             Text {
                 text: editor.formatCueTime(cueDelegate.modelData.start) + "  →  "
                       + editor.formatCueTime(cueDelegate.modelData.end)
-                color: Theme.mutedForeground
+                color: Theme.c.subtitleCueCard.foregroundMuted
                 font.family: Theme.monoFontFamily
                 font.pixelSize: Theme.fontSizeXs
                 opacity: (cueDelegate.isActive || cueDelegate.isSelected) ? 0.95 : (rowHover.containsMouse ? 0.85 : 0.65)
@@ -64,8 +64,8 @@ Item {
                 font.pixelSize: cueDelegate.isActive ? Theme.fontSizeBase : Theme.fontSizeSm
                 font.weight: cueDelegate.isActive ? Font.DemiBold : Font.Normal
                 font.italic: !(cueDelegate.modelData.text && cueDelegate.modelData.text.length)
-                color: cueDelegate.isActive ? Theme.clipSubtitle
-                       : (cueDelegate.isSelected || rowHover.containsMouse ? Theme.panelForeground : Theme.foreground)
+                color: cueDelegate.isActive ? Theme.c.subtitleCueCard.accentClip
+                       : (cueDelegate.isSelected || rowHover.containsMouse ? Theme.c.subtitleCueCard.foreground : Theme.c.subtitleCueCard.foregroundBase)
                 opacity: (cueDelegate.isActive || cueDelegate.isSelected) ? 1.0 : (rowHover.containsMouse ? 0.95 : 0.82)
                 Behavior on opacity { NumberAnimation { duration: 200 } }
                 Behavior on color { ColorAnimation { duration: 200 } }

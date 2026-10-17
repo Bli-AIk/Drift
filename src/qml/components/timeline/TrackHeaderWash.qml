@@ -8,7 +8,7 @@ Rectangle {
     property real rowHeight: 0
     width: parent.width
     height: rowHeight
-    color: Theme.clipTransform
+    color: Theme.c.trackHeaderWash.background
     opacity: spanPreviewed ? 0.18 : (transformLayer ? 0.08 : 0)
 
     Behavior on opacity {

@@ -19,7 +19,7 @@ Column {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             text: qsTr("Subtitles")
-            color: Theme.panelForeground
+            color: Theme.c.subtitleEditorHeader.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.Medium
@@ -29,7 +29,7 @@ Column {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             text: qsTr("%1 captions").arg(editor.cues.length)
-            color: Theme.mutedForeground
+            color: Theme.c.subtitleEditorHeader.foregroundMuted
             font.family: Theme.monoFontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -41,7 +41,7 @@ Column {
         text: editor.compactEdit
               ? qsTr("Play the timeline — the line on screen lights up. Tap any line to edit it.")
               : qsTr("Play the timeline — the line on screen lights up. Click any line to jump to it and edit it below.")
-        color: Theme.mutedForeground
+        color: Theme.c.subtitleEditorHeader.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         opacity: 0.8

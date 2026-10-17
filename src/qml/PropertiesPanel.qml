@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
@@ -7,9 +8,25 @@ PanelFrame {
     // Android bottom sheet: keep the inspector tab rail but drop the panel border
     // chrome that fights the sheet frame.
     property bool sheetMode: false
-    border.width: sheetMode ? 0 : 1
-    radius: sheetMode ? 0 : Theme.radiusSm
-    color: sheetMode ? "transparent" : Theme.panelBackground
+    border.color: Theme.c.propertiesPanel.border
+    border.width: sheetMode ? 0 : Theme.c.propertiesPanel.borderWidth
+    radius: sheetMode ? 0 : Theme.c.propertiesPanel.radius
+    color: "transparent"
+
+    // Surface lives in the slot so a theme can make the panel translucent
+    // without a second opaque layer underneath.
+    ThemeSlot {
+        slot: "PropertiesPanelBackground"
+        control: root
+        anchors.fill: parent
+        anchors.margins: root.border.width
+        z: -1
+        fallback: Component {
+            Rectangle {
+                color: root.sheetMode ? "transparent" : Theme.c.propertiesPanel.background
+            }
+        }
+    }
 
     // Raised by the Effects / Audio empty states; Main wires them to the
     // assets panel so the browse CTAs actually take the user somewhere.
@@ -273,8 +290,8 @@ PanelFrame {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                height: Theme.borderWidth
-                color: Theme.panelBorder
+                height: Theme.c.propertiesPanel.borderWidth
+                color: Theme.c.propertiesPanel.border
             }
         }
 
@@ -367,9 +384,9 @@ PanelFrame {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: propertiesTabRail.right
-            width: root.sheetMode ? 0 : Theme.borderWidth
+            width: root.sheetMode ? 0 : Theme.c.propertiesPanel.borderWidth
             visible: !root.sheetMode
-            color: Theme.panelBorder
+            color: Theme.c.propertiesPanel.border
         }
 
         Flickable {

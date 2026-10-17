@@ -33,16 +33,23 @@ Item {
     height: Theme.androidTopBarHeight + topInset
     width: parent ? parent.width : 0
 
-    Rectangle {
+    ThemeSlot {
         anchors.fill: parent
-        color: Theme.panelBackground
+        slot: "AndroidTopBarBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.c.androidTopBar.background
+            }
+        }
     }
 
     Rectangle {
         anchors.bottom: parent.bottom
         width: parent.width
-        height: 1
-        color: Theme.panelBorder
+        height: Theme.c.androidTopBar.borderWidth
+        color: Theme.c.androidTopBar.border
     }
 
     Item {

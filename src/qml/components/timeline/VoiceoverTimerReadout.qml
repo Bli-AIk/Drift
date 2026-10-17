@@ -13,6 +13,6 @@ Text {
     font.family: Theme.monoFontFamily
     font.bold: true
     font.pixelSize: 11
-    color: Theme.panelForeground
+    color: Theme.c.voiceoverTimerReadout.foreground
     anchors.verticalCenter: parent.verticalCenter
 }

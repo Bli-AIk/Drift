@@ -16,11 +16,19 @@ Item {
         antialiasing: true
 
         readonly property real value: panArea.channel.pan
-        readonly property bool dark: Theme.darkMode
         readonly property bool hot: panMouse.containsMouse || panMouse.pressed
+        readonly property color track: Theme.c.mixerPanControl.track
+        readonly property color accent: Theme.c.mixerPanControl.accent
+        readonly property color knob: hot ? Theme.c.mixerPanControl.knobBackgroundHover : Theme.c.mixerPanControl.knobBackground
+        readonly property color knobBorder: Theme.c.mixerPanControl.knobBorder
+        readonly property color indicator: Theme.c.mixerPanControl.indicator
         onValueChanged: requestPaint()
-        onDarkChanged: requestPaint()
         onHotChanged: requestPaint()
+        onTrackChanged: requestPaint()
+        onAccentChanged: requestPaint()
+        onKnobChanged: requestPaint()
+        onKnobBorderChanged: requestPaint()
+        onIndicatorChanged: requestPaint()
 
         onPaint: {
             const ctx = getContext("2d")
@@ -33,14 +41,14 @@ Item {
             const target = center + value * 0.75 * Math.PI
 
             ctx.lineCap = "round"
-            ctx.lineWidth = 2.5
-            ctx.strokeStyle = "" + Theme.sliderTrack
+            ctx.lineWidth = Theme.c.mixerPanControl.trackBorderWidth
+            ctx.strokeStyle = "" + track
             ctx.beginPath()
             ctx.arc(cx, cy, r, 0.75 * Math.PI, 2.25 * Math.PI, false)
             ctx.stroke()
 
             if (Math.abs(value) > 0.005) {
-                ctx.strokeStyle = "" + Theme.primary
+                ctx.strokeStyle = "" + accent
                 ctx.beginPath()
                 ctx.arc(cx, cy, r, Math.min(center, target), Math.max(center, target), false)
                 ctx.stroke()
@@ -48,14 +56,14 @@ Item {
 
             ctx.beginPath()
             ctx.arc(cx, cy, 12, 0, 2 * Math.PI, false)
-            ctx.fillStyle = "" + (hot ? Theme.panelMuted : Theme.panelAccent)
+            ctx.fillStyle = "" + knob
             ctx.fill()
-            ctx.lineWidth = 1
-            ctx.strokeStyle = "" + Theme.panelBorder
+            ctx.lineWidth = Theme.c.mixerPanControl.borderWidth
+            ctx.strokeStyle = "" + knobBorder
             ctx.stroke()
 
-            ctx.lineWidth = 2
-            ctx.strokeStyle = "" + Theme.panelForeground
+            ctx.lineWidth = Theme.c.mixerPanControl.indicatorBorderWidth
+            ctx.strokeStyle = "" + indicator
             ctx.beginPath()
             ctx.moveTo(cx + 4 * Math.cos(target), cy + 4 * Math.sin(target))
             ctx.lineTo(cx + 11 * Math.cos(target), cy + 11 * Math.sin(target))
@@ -103,7 +111,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         text: panArea.channel.mixer.formatPan(panArea.channel.pan)
-        color: Math.abs(panArea.channel.pan) > 0.005 ? Theme.accentOnPanel : Theme.mutedForeground
+        color: Math.abs(panArea.channel.pan) > 0.005 ? Theme.c.mixerPanControl.foreground : Theme.c.mixerPanControl.foregroundMuted
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeXs
     }

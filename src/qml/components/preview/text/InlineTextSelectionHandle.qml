@@ -30,7 +30,7 @@ Item {
         topLeftRadius: handle.kind === "start" ? radius : 0
         topRightRadius: handle.kind === "start" ? 0 : radius
         rotation: handle.kind === "start" ? -45 : 45
-        color: Theme.primary
+        color: Theme.c.inlineTextSelectionHandle.background
     }
 
     DragHandler {

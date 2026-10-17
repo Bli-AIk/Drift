@@ -11,17 +11,17 @@ Rectangle {
     anchors.bottomMargin: Theme.spacingLg
     width: hint.implicitWidth + Theme.spacingLg * 2
     height: hint.implicitHeight + Theme.spacingSm * 2
-    radius: Theme.radiusMd
-    color: Theme.panelBackground
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
+    radius: Theme.c.preview3DFlyHint.radius
+    color: Theme.c.preview3DFlyHint.background
+    border.width: Theme.c.preview3DFlyHint.borderWidth
+    border.color: Theme.c.preview3DFlyHint.border
 
     Text {
         id: hint
         anchors.centerIn: parent
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeSm
-        color: Theme.foreground
+        color: Theme.c.preview3DFlyHint.foreground
         text: hintBox.message
     }
 }

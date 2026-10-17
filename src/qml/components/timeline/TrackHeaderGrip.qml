@@ -19,7 +19,7 @@ IconGlyph {
     anchors.verticalCenterOffset: centerOffset
     glyph: Theme.icons.gripVertical
     iconSize: compact ? 12 : 14
-    iconColor: hot || dragging ? Theme.panelForeground : Theme.mutedForeground
+    iconColor: hot || dragging ? Theme.c.trackHeaderGrip.foreground : Theme.c.trackHeaderGrip.foregroundMuted
 
     Behavior on iconColor {
         ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }

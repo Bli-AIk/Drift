@@ -14,7 +14,7 @@ Row {
         anchors.verticalCenter: parent.verticalCenter
         glyph: Theme.icons.spinner
         iconSize: Theme.iconSizeLg
-        iconColor: Theme.mutedForeground
+        iconColor: Theme.c.androidLinkBusyStatus.icon
 
         RotationAnimator on rotation {
             running: busyGlyph.visible

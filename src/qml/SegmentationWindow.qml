@@ -23,7 +23,7 @@ ToolWindow {
     minimumWidth: 780
     minimumHeight: 520
     title: qsTr("Cut out subject")
-    color: Theme.appBackground
+    color: Theme.c.segmentationWindow.background
 
     function openFor(track, clip, startSeconds, durationSeconds, sessionAlreadyStarted) {
         root.trackIndex = track

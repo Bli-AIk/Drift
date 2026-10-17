@@ -90,7 +90,7 @@ Item {
                 text: root.ready
                       ? qsTr("Turn a script into speech with a built-in or cloned voice. It is generated on this device and added at the playhead.")
                       : qsTr("Speech generation runs on this device and needs the voice model.")
-                color: Theme.mutedForeground
+                color: Theme.c.speechTab.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -119,14 +119,14 @@ Item {
                     height: 140
                     enabled: !EditorState.tts.running
                     placeholderText: qsTr("Type what the voice should say")
-                    placeholderTextColor: Theme.mutedForeground
+                    placeholderTextColor: Theme.c.speechTab.foregroundMuted
                 }
 
                 Text {
                     width: parent.width
                     text: qsTr("%1 characters, about %2 s").arg(scriptField.text.length)
                           .arg(Math.ceil(scriptField.text.length / 14))
-                    color: Theme.mutedForeground
+                    color: Theme.c.speechTab.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }
@@ -136,7 +136,7 @@ Item {
                     width: parent.width
                     wrapMode: Text.WordWrap
                     text: qsTr("Speech longer than 30 seconds often ends in gibberish or silence. Split the script into shorter parts.")
-                    color: Theme.destructive
+                    color: Theme.c.speechTab.destructive
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }
@@ -243,7 +243,7 @@ Item {
                     text: EditorState.tts.loading
                           ? qsTr("Loading voice model (first use takes a while)…")
                           : qsTr("Learning the voice…")
-                    color: Theme.mutedForeground
+                    color: Theme.c.speechTab.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }
@@ -285,7 +285,7 @@ Item {
                     width: parent.width
                     wrapMode: Text.WordWrap
                     text: qsTr("Higher values sound more dramatic and speak faster")
-                    color: Theme.mutedForeground
+                    color: Theme.c.speechTab.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }
@@ -322,7 +322,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         wrapMode: Text.WordWrap
                         text: qsTr("Loading voice model (first use takes a while)…")
-                        color: Theme.mutedForeground
+                        color: Theme.c.speechTab.foregroundMuted
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontSizeXs
                     }
@@ -338,7 +338,7 @@ Item {
                         text: EditorState.tts.loading
                               ? qsTr("Loading voice model (first use takes a while)…")
                               : EditorState.tts.status
-                        color: Theme.panelForeground
+                        color: Theme.c.speechTab.foreground
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontSizeXs
                         elide: Text.ElideRight
@@ -347,7 +347,7 @@ Item {
                     ThemedProgressBar {
                         width: parent.width
                         value: EditorState.tts.progress
-                        opacity: EditorState.tts.loading ? 0.4 : 1
+                        opacity: EditorState.tts.loading ? Theme.c.speechTab.progressDimOpacity : 1
                     }
 
                     ThemedButton {
@@ -364,7 +364,7 @@ Item {
                     width: parent.width
                     wrapMode: Text.WordWrap
                     text: root.resultText
-                    color: root.resultOk ? Theme.mutedForeground : Theme.destructive
+                    color: root.resultOk ? Theme.c.speechTab.foregroundMuted : Theme.c.speechTab.destructive
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }
@@ -491,7 +491,7 @@ Item {
                     width: parent.width
                     wrapMode: Text.WordWrap
                     text: qsTr("The quick brown fox jumps over the lazy dog, while a gentle breeze moves through the quiet garden and the evening light fades slowly.")
-                    color: Theme.panelForeground
+                    color: Theme.c.speechTab.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeSm
                 }
@@ -499,14 +499,14 @@ Item {
                 Rectangle {
                     width: parent.width
                     height: Theme.spacingMd
-                    radius: height / 2
-                    color: Theme.panelMuted
+                    radius: Theme.c.speechTab.meterRadius
+                    color: Theme.c.speechTab.meterBackground
 
                     Rectangle {
                         width: parent.width * Math.max(0, Math.min(1, EditorState.voices.level))
                         height: parent.height
                         radius: parent.radius
-                        color: Theme.primary
+                        color: Theme.c.speechTab.accent
                     }
                 }
 
@@ -524,7 +524,7 @@ Item {
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: qsTr("%1 s").arg(EditorState.voices.recordingSeconds.toFixed(1))
-                        color: Theme.panelForeground
+                        color: Theme.c.speechTab.foreground
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontSizeSm
                     }

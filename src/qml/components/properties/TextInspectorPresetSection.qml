@@ -15,7 +15,7 @@ CollapsibleSection {
         width: parent.width
         wrapMode: Text.WordWrap
         text: qsTr("Font, colour and effect in one tap. Save your own to reuse it.")
-        color: Theme.mutedForeground
+        color: Theme.c.textInspectorPresetSection.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }
@@ -80,7 +80,7 @@ CollapsibleSection {
         width: parent.width
         wrapMode: Text.WordWrap
         text: qsTr("Install the AI engine and the voice model from the add-on manager to generate voiceovers.")
-        color: Theme.mutedForeground
+        color: Theme.c.textInspectorPresetSection.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

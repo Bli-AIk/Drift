@@ -93,7 +93,7 @@ FocusScope {
 
                 Rectangle {
                     anchors.fill: parent
-                    color: Theme.panelAccent
+                    color: Theme.c.driftAssetCard.background
                 }
 
                 Image {
@@ -125,7 +125,7 @@ FocusScope {
             Rectangle {
                 id: mask
                 anchors.fill: parent
-                radius: root.kind === "face-prop" ? height / 2 : Theme.radiusMd
+                radius: root.kind === "face-prop" ? Theme.c.driftAssetCard.radiusPill : Theme.c.driftAssetCard.radius
                 visible: false
                 layer.enabled: true
             }
@@ -149,8 +149,8 @@ FocusScope {
                 anchors.fill: parent
                 radius: mask.radius
                 color: "transparent"
-                border.width: Theme.borderWidthFocus
-                border.color: Theme.focusRing
+                border.width: Theme.c.driftAssetCard.borderWidth
+                border.color: Theme.c.driftAssetCard.borderFocus
                 visible: root.activeFocus && !hover.hovered
             }
 
@@ -170,7 +170,7 @@ FocusScope {
                     visible: root.installState === "installing"
                     indeterminate: true
                     size: Theme.spacing2xl + Theme.spacingSm
-                    progressColor: Theme.primary
+                    progressColor: Theme.c.driftAssetCard.accent
                 }
 
                 ThemedButton {
@@ -191,7 +191,7 @@ FocusScope {
         Text {
             width: parent.width
             text: root.asset.name || ""
-            color: Theme.panelForeground
+            color: Theme.c.driftAssetCard.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.Medium
@@ -208,7 +208,7 @@ FocusScope {
                 id: meta
                 width: Math.min(implicitWidth, parent.width - (installed.visible ? installed.width + parent.spacing : 0))
                 text: root.metaText()
-                color: Theme.mutedForeground
+                color: Theme.c.driftAssetCard.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 elide: Text.ElideRight
@@ -219,7 +219,7 @@ FocusScope {
                 visible: root.installState === "installed"
                 glyph: Theme.icons.check
                 iconSize: Theme.iconSizeSm
-                iconColor: Theme.mutedForeground
+                iconColor: Theme.c.driftAssetCard.icon
                 anchors.verticalCenter: meta.verticalCenter
 
                 ThemedToolTip {

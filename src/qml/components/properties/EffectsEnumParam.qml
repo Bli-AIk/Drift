@@ -11,7 +11,7 @@ Column {
         width: parent.width
         elide: Text.ElideRight
         text: row.paramData.label
-        color: Theme.mutedForeground
+        color: Theme.c.effectsEnumParam.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

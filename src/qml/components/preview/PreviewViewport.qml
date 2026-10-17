@@ -77,6 +77,19 @@ Item {
         function onCanvasCropModeChanged() { viewport.resetView() }
     }
 
+    ThemeSlot {
+        anchors.fill: parent
+        z: -2
+        slot: "PreviewLetterbox"
+        control: viewport
+        fallback: Component {
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.c.previewViewport.letterbox
+            }
+        }
+    }
+
     Rectangle {
         id: canvasRect
         width: viewport.fitWidth
@@ -86,9 +99,9 @@ Item {
         // The 3D view draws the whole panel, with its own outline of the stage; this rect only
         // keeps the project frame's place for the tools.
         color: viewport.mode3d || (EditorState.projectFile.background && EditorState.projectFile.background.kind === "transparent")
-               ? "transparent" : Theme.overlayColor
-        border.width: viewport.mode3d ? 0 : Theme.borderWidth
-        border.color: Theme.border
+               ? "transparent" : Theme.c.previewViewport.background
+        border.width: viewport.mode3d ? 0 : Theme.c.previewViewport.borderWidth
+        border.color: Theme.c.previewViewport.border
         clip: !viewport.mode3d
 
         Checkerboard {

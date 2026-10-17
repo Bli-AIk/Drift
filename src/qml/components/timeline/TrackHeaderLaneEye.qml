@@ -16,7 +16,7 @@ Item {
         anchors.centerIn: parent
         glyph: laneEye.laneHidden ? Theme.icons.eyeOff : Theme.icons.eye
         iconSize: 14
-        iconColor: laneEye.laneHidden ? Theme.destructive : Theme.mutedForeground
+        iconColor: laneEye.laneHidden ? Theme.c.trackHeaderLaneEye.destructive : Theme.c.trackHeaderLaneEye.foregroundMuted
 
         ThemedToolTip {
             visible: laneEyeMouse.containsMouse

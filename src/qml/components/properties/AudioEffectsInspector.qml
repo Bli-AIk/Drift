@@ -55,7 +55,7 @@ Item {
             width: parent.width
             wrapMode: Text.WordWrap
             text: qsTr("No audio effects installed. Get the Audio Effects pack from Extras.")
-            color: Theme.mutedForeground
+            color: Theme.c.audioEffectsInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -88,7 +88,7 @@ Item {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: qsTr("Move to a time, set a value, then click the diamond to add a keyframe. With Auto keyframes on, dragging a slider also creates them.")
-                color: Theme.mutedForeground
+                color: Theme.c.audioEffectsInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -159,7 +159,7 @@ Item {
                                     width: parent.width - 48 - 30
                                     elide: Text.ElideRight
                                     text: audioParamRow.paramData.label
-                                    color: Theme.mutedForeground
+                                    color: Theme.c.audioEffectsInspector.foregroundMuted
                                     font.family: Theme.fontFamily
                                     font.pixelSize: Theme.fontSizeXs
                                     anchors.verticalCenter: parent.verticalCenter

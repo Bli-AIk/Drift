@@ -69,7 +69,7 @@ Column {
             spacing: 4
             Text {
                 text: qsTr("Paint")
-                color: Theme.mutedForeground
+                color: Theme.c.paintEditor.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -88,7 +88,7 @@ Column {
             visible: root.kind === "solid"
             Text {
                 text: qsTr("Colour")
-                color: Theme.mutedForeground
+                color: Theme.c.paintEditor.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -127,7 +127,7 @@ Column {
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.texture.path ? String(root.texture.path).split("/").pop() : qsTr("No image")
                 elide: Text.ElideMiddle
-                color: Theme.mutedForeground
+                color: Theme.c.paintEditor.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -142,7 +142,7 @@ Column {
                 spacing: 4
                 Text {
                     text: qsTr("Fit")
-                    color: Theme.mutedForeground
+                    color: Theme.c.paintEditor.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -168,7 +168,7 @@ Column {
                 spacing: 4
                 Text {
                     text: qsTr("Scale")
-                    color: Theme.mutedForeground
+                    color: Theme.c.paintEditor.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -194,7 +194,7 @@ Column {
             spacing: 4
             Text {
                 text: qsTr("Angle")
-                color: Theme.mutedForeground
+                color: Theme.c.paintEditor.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -225,7 +225,7 @@ Column {
             spacing: 4
             Text {
                 text: qsTr("Effect")
-                color: Theme.mutedForeground
+                color: Theme.c.paintEditor.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }

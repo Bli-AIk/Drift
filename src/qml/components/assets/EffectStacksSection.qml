@@ -126,7 +126,7 @@ Item {
             wrapMode: Text.WordWrap
             text: qsTr("Remove “%1” from your saved presets? Clips already using it keep their effects.")
                       .arg(deleteStackDialog.presetLabel)
-            color: Theme.panelForeground
+            color: Theme.c.effectStacksSection.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
         }

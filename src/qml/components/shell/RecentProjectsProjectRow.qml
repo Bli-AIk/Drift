@@ -11,7 +11,7 @@ Rectangle {
     property string title
     property string subtitle
     property string tip
-    property color statusColor: Theme.constructive
+    property color statusColor: Theme.c.recentProjectsProjectRow.status
     property bool showCheck: false
     property bool removable: false
     property bool interactive: true
@@ -22,8 +22,9 @@ Rectangle {
 
     width: parent ? parent.width : 0
     height: subtitle.length > 0 ? 48 : 40
-    radius: Theme.radiusSm
-    color: (hovered && interactive) || highlighted ? Theme.accent : "transparent"
+    radius: Theme.c.recentProjectsProjectRow.radius
+    color: (hovered && interactive) || highlighted ? Theme.c.recentProjectsProjectRow.backgroundHover
+                                                   : "transparent"
 
     Behavior on color {
         ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -45,7 +46,7 @@ Rectangle {
         Rectangle {
             width: 8
             height: 8
-            radius: 4
+            radius: Theme.c.recentProjectsProjectRow.statusRadius
             color: projectRow.statusColor
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -59,7 +60,8 @@ Rectangle {
                 width: parent.width
                 text: projectRow.title
                 color: projectRow.interactive || projectRow.showCheck
-                       ? Theme.foreground : Theme.mutedForeground
+                       ? Theme.c.recentProjectsProjectRow.foreground
+                       : Theme.c.recentProjectsProjectRow.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
                 font.weight: projectRow.showCheck ? Font.DemiBold : Font.Normal
@@ -70,7 +72,7 @@ Rectangle {
                 width: parent.width
                 visible: projectRow.subtitle.length > 0
                 text: projectRow.subtitle
-                color: Theme.mutedForeground
+                color: Theme.c.recentProjectsProjectRow.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 elide: Text.ElideLeft
@@ -90,7 +92,7 @@ Rectangle {
             visible: projectRow.showCheck
             glyph: Theme.icons.check
             iconSize: Theme.iconSizeMd
-            iconColor: Theme.mutedForeground
+            iconColor: Theme.c.recentProjectsProjectRow.icon
             anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -110,7 +112,8 @@ Rectangle {
                 anchors.centerIn: parent
                 glyph: Theme.icons.x
                 iconSize: Theme.iconSizeMd
-                iconColor: removeArea.containsMouse ? Theme.foreground : Theme.mutedForeground
+                iconColor: removeArea.containsMouse ? Theme.c.recentProjectsProjectRow.iconHover
+                                                   : Theme.c.recentProjectsProjectRow.icon
             }
 
             ThemedToolTip {

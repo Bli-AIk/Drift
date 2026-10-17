@@ -7,7 +7,7 @@ Text {
     text: qsTr("GPU preview unavailable")
     horizontalAlignment: Text.AlignHCenter
     wrapMode: Text.Wrap
-    color: Theme.guideMedium
+    color: Theme.c.previewCompactGpuCaption.foreground
     font.family: Theme.fontFamily
     font.pixelSize: Theme.fontSizeSm
 }

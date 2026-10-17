@@ -29,7 +29,7 @@ IconGlyph {
     }
     glyph: column.clipDisplayGlyph(clipDisplay)
     iconSize: corner ? Theme.iconSizeMd : 16
-    iconColor: clipDisplay === 0 ? Theme.mutedForeground : Theme.primary
+    iconColor: clipDisplay === 0 ? Theme.c.trackHeaderClipDisplayButton.foregroundMuted : Theme.c.trackHeaderClipDisplayButton.accent
 
     ThemedToolTip {
         visible: !displayButton.corner && waveMouse.containsMouse

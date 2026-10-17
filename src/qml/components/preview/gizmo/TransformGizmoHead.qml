@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Shapes
+import Drift
 
 // Arrow head or scale square at the end of a gizmo handle.
 Shape {
@@ -14,7 +15,7 @@ Shape {
 
     ShapePath {
         strokeColor: head.ink
-        strokeWidth: 1
+        strokeWidth: Theme.c.transformGizmoHead.strokeWidth
         fillColor: head.ink
         joinStyle: ShapePath.RoundJoin
         PathPolyline { path: head.headPath }

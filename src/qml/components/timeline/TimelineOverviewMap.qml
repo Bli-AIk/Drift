@@ -22,6 +22,20 @@ Canvas {
     // strip's width.
     readonly property real pps: host.overviewPxPerSecond
     readonly property int revision: EditorState.tracksRevision
+    // Repaint when the overview's clip colours change. onPaint reads them
+    // through host.blockColor, which Canvas does not track on its own.
+    readonly property color audioFill: Theme.c.timelineOverview.audioBackground
+    readonly property color textFill: Theme.c.timelineOverview.textBackground
+    readonly property color subtitleFill: Theme.c.timelineOverview.subtitleBackground
+    readonly property color effectFill: Theme.c.timelineOverview.effectBackground
+    readonly property color graphicFill: Theme.c.timelineOverview.graphicBackground
+    readonly property color videoFill: Theme.c.timelineOverview.videoBackground
+    onAudioFillChanged: requestPaint()
+    onTextFillChanged: requestPaint()
+    onSubtitleFillChanged: requestPaint()
+    onEffectFillChanged: requestPaint()
+    onGraphicFillChanged: requestPaint()
+    onVideoFillChanged: requestPaint()
 
     function refresh() {
         if (!host.visible)

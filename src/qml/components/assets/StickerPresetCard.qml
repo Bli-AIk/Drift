@@ -11,7 +11,7 @@ Column {
     signal added()
     width: cardSize
     spacing: Theme.spacingSm
-    opacity: stickerDrag.active ? 0.85 : 1
+    opacity: stickerDrag.active ? Theme.c.stickerPresetCard.dragOpacity : 1
     scale: stickerDrag.active ? 1.04 : (stickerDrag.pressed ? 0.97 : 1.0)
 
     Behavior on opacity {
@@ -24,8 +24,8 @@ Column {
     Rectangle {
         width: cardSize
         height: cardSize
-        radius: Theme.radiusSm
-        color: stickerDrag.hovered ? Theme.popoverHover : Theme.panelAccent
+        radius: Theme.c.stickerPresetCard.radius
+        color: stickerDrag.hovered ? Theme.c.stickerPresetCard.backgroundHover : Theme.c.stickerPresetCard.background
         clip: true
 
         Behavior on color {
@@ -59,7 +59,7 @@ Column {
             visible: stickerImage.status === Image.Error
             glyph: Theme.icons.error
             iconSize: Theme.iconSizeLg
-            iconColor: Theme.mutedForeground
+            iconColor: Theme.c.stickerPresetCard.icon
         }
 
         ThemedToolTip {
@@ -113,7 +113,7 @@ Column {
     Text {
         width: parent.width
         text: modelData.label
-        color: Theme.mutedForeground
+        color: Theme.c.stickerPresetCard.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeCard
         horizontalAlignment: Text.AlignHCenter

@@ -197,7 +197,7 @@ Item {
             wrapMode: Text.WordWrap
             text: qsTr("Remove “%1” from your saved styles? Clips already using it keep their look.")
                       .arg(deleteDialog.presetLabel)
-            color: Theme.panelForeground
+            color: Theme.c.textAssetsTab.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
         }

@@ -29,26 +29,26 @@ Item {
         width: Math.max(0, parent.outX - parent.inX)
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
+        color: Qt.rgba(Theme.c.androidTimelineWorkArea.background.r, Theme.c.androidTimelineWorkArea.background.g, Theme.c.androidTimelineWorkArea.background.b, 0.08)
     }
 
     Rectangle {
         visible: EditorState.workAreaInSeconds >= 0
         x: parent.inX
-        width: 2
+        width: Theme.c.androidTimelineWorkArea.edgeWidth
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        color: Theme.primary
+        color: Theme.c.androidTimelineWorkArea.edge
         opacity: 0.85
     }
 
     Rectangle {
         visible: EditorState.workAreaOutSeconds >= 0
         x: parent.outX - width
-        width: 2
+        width: Theme.c.androidTimelineWorkArea.edgeWidth
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        color: Theme.primary
+        color: Theme.c.androidTimelineWorkArea.edge
         opacity: 0.85
     }
 }

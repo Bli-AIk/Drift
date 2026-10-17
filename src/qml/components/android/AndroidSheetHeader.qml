@@ -17,7 +17,7 @@ Rectangle {
     anchors.right: parent.right
     anchors.top: parent.top
     height: Theme.androidSheetHeaderHeight
-    color: Theme.panelBackground
+    color: Theme.c.androidSheetHeader.background
     z: 2
 
     AndroidSheetHandle {
@@ -37,7 +37,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         text: header.title.length > 0 ? header.title : qsTr("Sheet")
-        color: Theme.panelForeground
+        color: Theme.c.androidSheetHeader.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeBase
         font.weight: Font.DemiBold
@@ -80,8 +80,8 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        height: Theme.borderWidth
-        color: Theme.panelBorder
+        height: Theme.c.androidSheetHeader.borderWidth
+        color: Theme.c.androidSheetHeader.border
     }
 
     // Whole header is the primary drag affordance (except close).

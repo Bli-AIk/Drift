@@ -9,7 +9,7 @@ Item {
         y: Theme.timelineRulerHeight * 0.55
         width: parent.width
         height: parent.height - y
-        color: Theme.primary
+        color: Theme.c.androidTimelinePlayhead.background
     }
 
     Item {
@@ -23,8 +23,8 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width
             height: parent.height * 0.55
-            radius: 2
-            color: Theme.primary
+            radius: Theme.c.androidTimelinePlayhead.handleRadius
+            color: Theme.c.androidTimelinePlayhead.background
         }
 
         Canvas {
@@ -41,7 +41,7 @@ Item {
                 ctx.lineTo(width, 0)
                 ctx.lineTo(width * 0.5, height)
                 ctx.closePath()
-                ctx.fillStyle = Theme.primary
+                ctx.fillStyle = Theme.c.androidTimelinePlayhead.background
                 ctx.fill()
             }
             onWidthChanged: requestPaint()

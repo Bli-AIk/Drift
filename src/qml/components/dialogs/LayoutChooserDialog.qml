@@ -159,10 +159,10 @@ ThemedDialog {
         Rectangle {
             width: parent.width
             height: Math.min(220, Math.max(44, root.categoryTemplates.length * 44) + 2)
-            radius: Theme.radiusSm
-            color: Theme.appBackground
-            border.width: Theme.borderWidth
-            border.color: Theme.panelBorder
+            radius: Theme.c.layoutChooserDialog.listRadius
+            color: Theme.c.layoutChooserDialog.listBackground
+            border.width: Theme.c.layoutChooserDialog.listBorderWidth
+            border.color: Theme.c.layoutChooserDialog.listBorder
             clip: true
 
             ListView {
@@ -208,19 +208,19 @@ ThemedDialog {
             Rectangle {
                 width: root.aspectBoxSize
                 height: root.aspectBoxSize
-                radius: Theme.radiusSm
-                color: Theme.appBackground
-                border.width: Theme.borderWidth
-                border.color: Theme.panelBorder
+                radius: Theme.c.layoutChooserDialog.previewRadius
+                color: Theme.c.layoutChooserDialog.previewBackground
+                border.width: Theme.c.layoutChooserDialog.previewBorderWidth
+                border.color: Theme.c.layoutChooserDialog.previewBorder
 
                 Rectangle {
                     anchors.centerIn: parent
                     width: root.previewW
                     height: root.previewH
-                    radius: 3
-                    color: Theme.panelAccent
-                    border.width: Theme.borderWidth
-                    border.color: Theme.primary
+                    radius: Theme.c.layoutChooserDialog.frameRadius
+                    color: Theme.c.layoutChooserDialog.frameBackground
+                    border.width: Theme.c.layoutChooserDialog.frameBorderWidth
+                    border.color: Theme.c.layoutChooserDialog.frameBorder
 
                     // A morph between two aspect ratios, not an entrance.
                     Behavior on width {
@@ -233,7 +233,7 @@ ThemedDialog {
                     Text {
                         anchors.centerIn: parent
                         text: root.aspect
-                        color: Theme.panelForeground
+                        color: Theme.c.layoutChooserDialog.foreground
                         font.family: Theme.monoFontFamily
                         font.pixelSize: Theme.fontSizeXs
                         font.weight: Font.Medium
@@ -253,7 +253,7 @@ ThemedDialog {
                         anchors.verticalCenter: parent.verticalCenter
                         glyph: root.selectedTemplate.icon || ""
                         iconSize: 16
-                        iconColor: Theme.panelForeground
+                        iconColor: Theme.c.layoutChooserDialog.icon
                     }
 
                     ThemedLabel {

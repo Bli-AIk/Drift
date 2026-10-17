@@ -18,8 +18,8 @@ SettingsSectionCard {
 
         Rectangle {
             width: parent.width
-            height: Theme.borderWidth
-            color: Theme.panelBorder
+            height: Theme.c.settingsAppSection.borderWidth
+            color: Theme.c.settingsAppSection.divider
         }
 
         ThemedLabel {
@@ -60,8 +60,8 @@ SettingsSectionCard {
 
     Rectangle {
         width: parent.width
-        height: Theme.borderWidth
-        color: Theme.panelBorder
+        height: Theme.c.settingsAppSection.borderWidth
+        color: Theme.c.settingsAppSection.divider
     }
 
     ThemedLabel {
@@ -84,8 +84,8 @@ SettingsSectionCard {
 
     Rectangle {
         width: parent.width
-        height: Theme.borderWidth
-        color: Theme.panelBorder
+        height: Theme.c.settingsAppSection.borderWidth
+        color: Theme.c.settingsAppSection.divider
     }
 
     ThemedLabel {

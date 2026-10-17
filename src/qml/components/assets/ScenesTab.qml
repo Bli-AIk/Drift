@@ -64,7 +64,7 @@ Item {
             width: header.width
             wrapMode: Text.WordWrap
             text: qsTr("Finds where the picture cuts in the selected video clip, and ranks each shot by movement and loudness. Click a shot to jump to it.")
-            color: Theme.mutedForeground
+            color: Theme.c.scenesTab.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -116,7 +116,7 @@ Item {
 
             Text {
                 text: qsTr("Sensitivity")
-                color: Theme.mutedForeground
+                color: Theme.c.scenesTab.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -143,7 +143,7 @@ Item {
 
             Text {
                 text: EditorState.scenes.status
-                color: Theme.foreground
+                color: Theme.c.scenesTab.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 elide: Text.ElideRight
@@ -177,7 +177,7 @@ Item {
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr("%1 scenes").arg(root.visibleScenes.length)
-                color: Theme.mutedForeground
+                color: Theme.c.scenesTab.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -206,7 +206,7 @@ Item {
             visible: EditorState.scenes.list.length > 0 && !root.showingSelected
                      && !EditorState.scenes.detecting
             text: qsTr("These scenes are from another clip. Select it again, or run Find scenes on the current one.")
-            color: Theme.warning
+            color: Theme.c.scenesTab.warning
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }

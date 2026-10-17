@@ -5,7 +5,7 @@ import Drift
 Rectangle {
     anchors.fill: parent
     color: "transparent"
-    border.width: Theme.borderWidth
-    border.color: Theme.mutedForeground
+    border.width: Theme.c.maskOverlayClipBounds.borderWidth
+    border.color: Theme.c.maskOverlayClipBounds.border
     opacity: 0.35
 }

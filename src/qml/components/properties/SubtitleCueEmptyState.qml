@@ -12,14 +12,14 @@ Column {
         anchors.horizontalCenter: parent.horizontalCenter
         glyph: Theme.icons.captions
         iconSize: 24
-        iconColor: Theme.mutedForeground
+        iconColor: Theme.c.subtitleCueEmptyState.icon
     }
     Text {
         width: parent.width
         horizontalAlignment: Text.AlignHCenter
         wrapMode: Text.WordWrap
         text: qsTr("No subtitles yet. Move to a time inside this clip and add one below.")
-        color: Theme.mutedForeground
+        color: Theme.c.subtitleCueEmptyState.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

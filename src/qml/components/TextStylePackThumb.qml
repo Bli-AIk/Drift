@@ -15,11 +15,11 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: Theme.radiusSm
-        color: Theme.textStylePreviewBg
-        border.width: root.selected ? Theme.borderWidthFocus : Theme.borderWidth
-        border.color: root.selected ? Theme.primary
-                                    : (root.hovered ? Theme.panelMuted : Theme.textStylePreviewBorder)
+        radius: Theme.c.textStylePackThumb.radius
+        color: Theme.c.textStylePackThumb.background
+        border.width: root.selected ? Theme.c.textStylePackThumb.borderWidthFocus : Theme.c.textStylePackThumb.borderWidth
+        border.color: root.selected ? Theme.c.textStylePackThumb.borderSelected
+                                    : (root.hovered ? Theme.c.textStylePackThumb.borderHover : Theme.c.textStylePackThumb.border)
         clip: true
 
         Behavior on border.color {
@@ -41,7 +41,7 @@ Item {
             anchors.centerIn: parent
             visible: root.presetId.length === 0
             text: qsTr("Custom")
-            color: Theme.mutedForeground
+            color: Theme.c.textStylePackThumb.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }

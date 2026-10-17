@@ -74,7 +74,7 @@ Column {
         }
         Text {
             text: root.paramData.label
-            color: Theme.mutedForeground
+            color: Theme.c.vec2Param.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             anchors.verticalCenter: parent.verticalCenter

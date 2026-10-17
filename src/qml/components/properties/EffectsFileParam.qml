@@ -17,8 +17,8 @@ Row {
             const parts = String(p).split(/[/\\]/)
             return parts[parts.length - 1] || p
         }
-        color: row.paramData.missing ? Theme.destructive
-                                         : Theme.mutedForeground
+        color: row.paramData.missing ? Theme.c.effectsFileParam.destructive
+                                         : Theme.c.effectsFileParam.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         anchors.verticalCenter: parent.verticalCenter

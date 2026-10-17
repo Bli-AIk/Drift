@@ -18,10 +18,10 @@ Item {
         anchors.centerIn: parent
         width: 16
         height: 16
-        radius: 8
+        radius: Theme.c.gradientStopChip.radius
         color: stopChip.stop.color
-        border.width: stopChip.dragging || chipMouse.containsMouse ? Theme.borderWidthFocus : Theme.borderWidth
-        border.color: stopChip.dragging || chipMouse.containsMouse ? Theme.primary : Theme.panelForeground
+        border.width: stopChip.dragging || chipMouse.containsMouse ? Theme.c.gradientStopChip.borderWidthFocus : Theme.c.gradientStopChip.borderWidth
+        border.color: stopChip.dragging || chipMouse.containsMouse ? Theme.c.gradientStopChip.borderActive : Theme.c.gradientStopChip.borderHover
         scale: stopChip.dragging ? 1.15 : 1
         Behavior on scale {
             NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }

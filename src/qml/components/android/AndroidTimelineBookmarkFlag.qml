@@ -20,9 +20,9 @@ Item {
     Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         y: -6
-        width: 1
+        width: Theme.c.androidTimelineBookmarkFlag.stemWidth
         height: parent.height + 6
-        color: Theme.primary
+        color: Theme.c.androidTimelineBookmarkFlag.stem
         opacity: 0.7
     }
 
@@ -32,8 +32,8 @@ Item {
         width: 8
         height: 8
         rotation: 45
-        radius: 1
-        color: Theme.primary
+        radius: Theme.c.androidTimelineBookmarkFlag.radius
+        color: Theme.c.androidTimelineBookmarkFlag.background
     }
 
     // A project marked up on desktop arrived as a row of
@@ -43,7 +43,7 @@ Item {
         x: 8
         anchors.verticalCenter: parent.verticalCenter
         text: bookmarkFlag.modelData.label
-        color: Theme.mutedForeground
+        color: Theme.c.androidTimelineBookmarkFlag.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeTiny
     }

@@ -31,12 +31,12 @@ Rectangle {
     x: dragging ? dragX : lane.xForSeconds(modelData.start)
     width: Math.max(3, dragging ? dragW
                                  : (modelData.end - modelData.start) * lane.pxPerSecond)
-    radius: Theme.radiusSm
-    color: isSelected ? Theme.clipSubtitle
-                      : (isActive ? Qt.lighter(Theme.clipSubtitle, 1.15) : Theme.clipSubtitle)
+    radius: Theme.c.subtitleCueBlock.radius
+    color: isSelected ? Theme.c.subtitleCueBlock.backgroundSelected
+                      : (isActive ? Qt.lighter(Theme.c.subtitleCueBlock.background, 1.15) : Theme.c.subtitleCueBlock.background)
     opacity: isSelected ? 1.0 : (isActive ? 0.85 : 0.5)
-    border.width: isSelected ? 2 : 0
-    border.color: Theme.primary
+    border.width: isSelected ? Theme.c.subtitleCueBlock.borderWidth : 0
+    border.color: Theme.c.subtitleCueBlock.border
     z: isSelected ? 20 : 10
 
     Behavior on opacity { NumberAnimation { duration: 120 } }
@@ -78,7 +78,7 @@ Rectangle {
         elide: Text.ElideRight
         text: (block.modelData.text && block.modelData.text.length)
               ? block.modelData.text : qsTr("(empty)")
-        color: Theme.onMedia
+        color: Theme.c.subtitleCueBlock.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         font.italic: !(block.modelData.text && block.modelData.text.length)

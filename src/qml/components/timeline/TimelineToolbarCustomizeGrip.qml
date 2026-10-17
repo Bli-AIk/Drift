@@ -12,7 +12,7 @@ IconGlyph {
 
     glyph: Theme.icons.gripVertical
     iconSize: Theme.iconSizeMd
-    iconColor: Theme.mutedForeground
+    iconColor: Theme.c.timelineToolbarCustomizeGrip.icon
 
     // Moves the row live as the pointer crosses other rows; the model
     // move keeps this delegate, so the press survives it.

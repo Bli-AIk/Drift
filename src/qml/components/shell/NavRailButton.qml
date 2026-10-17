@@ -17,7 +17,8 @@ AbstractButton {
     property bool selected: false
     // Glyph and label colour. Default follows nav selection; the clip toolbar overrides it
     // so a destructive slot reads as one without a second copy of this control.
-    property color tint: root.selected ? Theme.accentOnPanel : Theme.mutedForeground
+    property color tint: root.selected ? Theme.c.navRailButton.foreground
+                                      : Theme.c.navRailButton.foregroundMuted
 
     hoverEnabled: true
 
@@ -49,20 +50,29 @@ AbstractButton {
 
             // The pill, not a tint, carries selection: Theme.primary sits at 1.69:1 on the
             // light panel and said nothing at all in light mode.
-            Rectangle {
+            ThemeSlot {
+                id: pill
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: Theme.iconSizeLg + Theme.spacing2xl
                 height: Theme.iconSizeLg + Theme.spacingLg
-                radius: Theme.radiusPill
-                color: root.selected ? Theme.panelSecondaryBg
-                                     : (root.down ? Theme.panelAccent : "transparent")
+                slot: "NavRailButtonBackground"
+                control: root
+                fallback: Component {
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: Theme.c.navRailButton.radius
+                        color: root.selected ? Theme.c.navRailButton.backgroundSelected
+                                             : (root.down ? Theme.c.navRailButton.backgroundPressed : "transparent")
 
-                Behavior on color {
-                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                        Behavior on color {
+                            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                        }
+                    }
                 }
 
                 IconGlyph {
                     anchors.centerIn: parent
+                    z: 1
                     glyph: root.entry.icon
                     iconSize: Theme.iconSizeLg
                     iconColor: root.tint

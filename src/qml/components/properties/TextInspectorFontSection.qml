@@ -11,7 +11,7 @@ CollapsibleSection {
 
     Text {
         text: qsTr("Font")
-        color: Theme.mutedForeground
+        color: Theme.c.textInspectorFontSection.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }
@@ -31,7 +31,7 @@ CollapsibleSection {
             spacing: 4
             Text {
                 text: qsTr("Weight")
-                color: Theme.mutedForeground
+                color: Theme.c.textInspectorFontSection.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -65,7 +65,7 @@ CollapsibleSection {
             spacing: 4
             Text {
                 text: qsTr("Colour")
-                color: Theme.mutedForeground
+                color: Theme.c.textInspectorFontSection.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -82,7 +82,7 @@ CollapsibleSection {
                 width: parent.width
                 text: qsTr("Edits the first gradient stop")
                 wrapMode: Text.WordWrap
-                color: Theme.mutedForeground
+                color: Theme.c.textInspectorFontSection.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -105,7 +105,7 @@ CollapsibleSection {
             spacing: 4
             Text {
                 text: qsTr("Style")
-                color: Theme.mutedForeground
+                color: Theme.c.textInspectorFontSection.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }

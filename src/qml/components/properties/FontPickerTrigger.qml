@@ -9,10 +9,10 @@ Rectangle {
     property bool popupOpen: false
     signal toggled()
     anchors.fill: parent
-    radius: Theme.radiusSm
-    color: Theme.panelAccent
-    border.width: (popupOpen || fieldFocused) ? 1 : 0
-    border.color: fieldFocused ? Theme.primary : Theme.panelSecondaryBorder
+    radius: Theme.c.fontPickerTrigger.radius
+    color: Theme.c.fontPickerTrigger.background
+    border.width: (popupOpen || fieldFocused) ? Theme.c.fontPickerTrigger.borderWidth : 0
+    border.color: fieldFocused ? Theme.c.fontPickerTrigger.borderFocus : Theme.c.fontPickerTrigger.borderSecondary
 
     Text {
         anchors.left: parent.left
@@ -24,7 +24,7 @@ Rectangle {
         // Preview the current selection in the face it actually is.
         font.family: previewFamily === "" ? Theme.fontFamily : previewFamily
         font.pixelSize: Theme.fontSizeSm
-        color: Theme.panelForeground
+        color: Theme.c.fontPickerTrigger.foreground
         elide: Text.ElideRight
     }
 
@@ -35,7 +35,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         glyph: Theme.icons.chevronDown
         iconSize: 12
-        iconColor: Theme.mutedForeground
+        iconColor: Theme.c.fontPickerTrigger.icon
     }
 
     MouseArea {

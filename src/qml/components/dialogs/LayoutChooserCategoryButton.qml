@@ -21,20 +21,20 @@ AbstractButton {
     readonly property bool selected: modelData.id === dialog.activeCategory
 
     background: Rectangle {
-        radius: Theme.radiusSm
+        radius: Theme.c.layoutChooserCategoryButton.radius
         color: {
             if (catBtn.selected)
-                return Theme.panelSecondaryBg
+                return Theme.c.layoutChooserCategoryButton.backgroundSelected
             if (catBtn.down)
-                return Theme.panelMuted
+                return Theme.c.layoutChooserCategoryButton.backgroundPressed
             if (catBtn.hovered)
-                return Theme.popoverHover
-            return Theme.panelAccent
+                return Theme.c.layoutChooserCategoryButton.backgroundHover
+            return Theme.c.layoutChooserCategoryButton.background
         }
-        border.width: Theme.borderWidth
+        border.width: Theme.c.layoutChooserCategoryButton.borderWidth
         border.color: catBtn.selected
-                      ? Theme.panelSecondaryBorder
-                      : Theme.panelBorder
+                      ? Theme.c.layoutChooserCategoryButton.borderSelected
+                      : Theme.c.layoutChooserCategoryButton.border
     }
 
     contentItem: Item {
@@ -53,8 +53,8 @@ AbstractButton {
                 glyph: catBtn.modelData.icon
                 iconSize: Theme.fontSizeSm
                 iconColor: catBtn.selected
-                           ? Theme.panelSecondaryForeground
-                           : Theme.panelForeground
+                           ? Theme.c.layoutChooserCategoryButton.iconSelected
+                           : Theme.c.layoutChooserCategoryButton.icon
             }
 
             Text {
@@ -66,8 +66,8 @@ AbstractButton {
                 verticalAlignment: Text.AlignVCenter
                 text: catBtn.modelData.label
                 color: catBtn.selected
-                       ? Theme.panelSecondaryForeground
-                       : Theme.panelForeground
+                       ? Theme.c.layoutChooserCategoryButton.foregroundSelected
+                       : Theme.c.layoutChooserCategoryButton.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 font.weight: catBtn.selected ? Font.Medium : Font.Normal

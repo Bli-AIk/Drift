@@ -1,7 +1,7 @@
 import QtQuick
 import Drift
 
-Rectangle {
+Item {
     id: section
     property string title: ""
     default property alias content: body.data
@@ -9,10 +9,21 @@ Rectangle {
     width: parent ? parent.width : 0
     implicitHeight: cardCol.implicitHeight
     height: implicitHeight
-    radius: Theme.radiusMd
-    color: Theme.darkMode ? Theme.panelAccent : Theme.appBackground
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
+
+    ThemeSlot {
+        anchors.fill: parent
+        slot: "SettingsSectionCardBackground"
+        control: section
+        fallback: Component {
+            Rectangle {
+                anchors.fill: parent
+                radius: Theme.c.settingsSectionCard.radius
+                color: Theme.c.settingsSectionCard.background
+                border.width: Theme.c.settingsSectionCard.borderWidth
+                border.color: Theme.c.settingsSectionCard.border
+            }
+        }
+    }
 
     Column {
         id: cardCol
@@ -25,7 +36,7 @@ Rectangle {
         Text {
             width: parent.width
             text: section.title
-            color: Theme.panelForeground
+            color: Theme.c.settingsSectionCard.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.DemiBold
@@ -33,8 +44,8 @@ Rectangle {
 
         Rectangle {
             width: parent.width
-            height: Theme.borderWidth
-            color: Theme.panelBorder
+            height: Theme.c.settingsSectionCard.borderWidth
+            color: Theme.c.settingsSectionCard.divider
         }
 
         Column {

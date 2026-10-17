@@ -14,9 +14,28 @@ PanelFrame {
     // on the timeline. The phone shell closes the sheet on this; desktop, where
     // the panel is docked, simply leaves it unconnected.
     signal addCompleted()
-    border.width: sheetMode ? 0 : 1
-    radius: sheetMode ? 0 : Theme.radiusSm
-    color: sheetMode ? "transparent" : Theme.panelBackground
+    // The slot paints the docked surface. Sheet mode draws nothing so the
+    // sheet chrome stays the only background.
+    color: "transparent"
+    border.width: 0
+    radius: sheetMode ? 0 : Theme.c.assetsPanel.radius
+
+    ThemeSlot {
+        anchors.fill: parent
+        visible: !root.sheetMode
+        z: -1
+        slot: "AssetsPanelBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                anchors.fill: parent
+                radius: Theme.c.assetsPanel.radius
+                color: Theme.c.assetsPanel.background
+                border.width: Theme.c.assetsPanel.borderWidth
+                border.color: Theme.c.assetsPanel.border
+            }
+        }
+    }
 
     Component.onCompleted: AssetLibrary.ensureAllMedia()
 
@@ -390,16 +409,16 @@ PanelFrame {
             Rectangle {
                 width: parent.width
                 height: Math.min(pickerList.contentHeight + 2, 280)
-                radius: Theme.radiusSm
-                color: Theme.appBackground
-                border.width: Theme.borderWidth
-                border.color: Theme.panelBorder
+                radius: Theme.c.assetsPanel.pickerRadius
+                color: Theme.c.assetsPanel.pickerBackground
+                border.width: Theme.c.assetsPanel.pickerBorderWidth
+                border.color: Theme.c.assetsPanel.pickerBorder
                 clip: true
 
                 ListView {
                     id: pickerList
                     anchors.fill: parent
-                    anchors.margins: 1
+                    anchors.margins: Theme.c.assetsPanel.pickerBorderWidth
                     clip: true
                     model: folderPickerDialog.folderOptions
                     interactive: contentHeight > height
@@ -418,7 +437,7 @@ PanelFrame {
                         }
 
                         background: Rectangle {
-                            color: optionRow.hovered ? Theme.popoverHover : "transparent"
+                            color: optionRow.hovered ? Theme.c.assetsPanel.optionBackgroundHover : "transparent"
                         }
 
                         contentItem: Text {
@@ -428,7 +447,7 @@ PanelFrame {
                             verticalAlignment: Text.AlignVCenter
                             text: optionRow.modelData.path
                             elide: Text.ElideRight
-                            color: Theme.panelForeground
+                            color: Theme.c.assetsPanel.optionForeground
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSizeSm
                         }
@@ -516,9 +535,9 @@ PanelFrame {
                 readOnly: true
                 selectByMouse: true
                 wrapMode: TextEdit.Wrap
-                color: Theme.foreground
-                selectionColor: Theme.primary
-                selectedTextColor: Theme.primaryForeground
+                color: Theme.c.assetsPanel.fallbackForeground
+                selectionColor: Theme.c.assetsPanel.fallbackSelection
+                selectedTextColor: Theme.c.assetsPanel.fallbackSelectionForeground
                 font.family: Theme.monoFontFamily
                 font.pixelSize: Theme.fontSizeSm
                 text: proxyFallbackDialog.folders
@@ -835,15 +854,15 @@ PanelFrame {
         }
 
         Rectangle {
-            width: root.sheetMode ? 0 : Theme.borderWidth
+            width: root.sheetMode ? 0 : Theme.c.assetsPanel.borderWidth
             height: parent.height
             visible: !root.sheetMode
-            color: Theme.panelBorder
+            color: Theme.c.assetsPanel.railBorder
         }
 
         Column {
             id: assetsContent
-            width: parent.width - (root.sheetMode ? 0 : (Theme.tabRailWidth + Theme.borderWidth))
+            width: parent.width - (root.sheetMode ? 0 : (Theme.tabRailWidth + Theme.c.assetsPanel.borderWidth))
             height: parent.height
 
             AssetsPanelHeader {

@@ -13,10 +13,10 @@ Rectangle {
     x: segment.laneWidth * (modelData.start / segment.span)
     width: Math.max(1, segment.laneWidth * (modelData.duration / segment.span))
     height: segment.laneHeight
-    radius: Theme.radiusSm
-    color: Theme.panelSecondaryBg
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
+    radius: Theme.c.multicamProgramSegment.radius
+    color: Theme.c.multicamProgramSegment.background
+    border.width: Theme.c.multicamProgramSegment.borderWidth
+    border.color: Theme.c.multicamProgramSegment.border
 
     Text {
         anchors.left: parent.left
@@ -25,7 +25,7 @@ Rectangle {
         width: parent.width - Theme.spacingSm
         text: segment.modelData.name
         elide: Text.ElideRight
-        color: Theme.panelForeground
+        color: Theme.c.multicamProgramSegment.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

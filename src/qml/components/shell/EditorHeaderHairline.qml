@@ -4,7 +4,7 @@ import Drift
 Rectangle {
     anchors.bottom: parent.bottom
     width: parent.width
-    height: Theme.borderWidth
-    color: Theme.panelBorder
+    height: Theme.c.editorHeaderHairline.borderWidth
+    color: Theme.c.editorHeaderHairline.border
     opacity: 0.5
 }

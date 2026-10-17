@@ -18,7 +18,7 @@ Column {
             width: parent.width - 48
             elide: Text.ElideRight
             text: row.paramData.label
-            color: Theme.mutedForeground
+            color: Theme.c.effectsBoolParam.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             anchors.verticalCenter: parent.verticalCenter
@@ -27,7 +27,7 @@ Column {
             width: 40
             horizontalAlignment: Text.AlignRight
             text: row.paramData.value ? qsTr("On") : qsTr("Off")
-            color: Theme.panelForeground
+            color: Theme.c.effectsBoolParam.foreground
             font.family: Theme.monoFontFamily
             font.pixelSize: Theme.fontSizeXs
             anchors.verticalCenter: parent.verticalCenter

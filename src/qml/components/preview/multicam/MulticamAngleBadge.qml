@@ -12,14 +12,14 @@ Rectangle {
     y: Theme.spacingSm
     width: badgeText.width + Theme.spacingMd
     height: badgeText.height + Theme.spacingXs
-    radius: Theme.radiusSm
-    color: badge.active ? Theme.primary : Theme.scrimStrong
+    radius: Theme.c.multicamAngleBadge.radius
+    color: badge.active ? Theme.c.multicamAngleBadge.backgroundActive : Theme.c.multicamAngleBadge.background
 
     Text {
         id: badgeText
         anchors.centerIn: parent
         text: badge.number
-        color: badge.active ? Theme.primaryForeground : "#ffffff"
+        color: badge.active ? Theme.c.multicamAngleBadge.foregroundActive : Theme.c.multicamAngleBadge.foreground
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeXs
         font.weight: Font.Medium

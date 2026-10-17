@@ -52,7 +52,7 @@ Column {
         wrapMode: Text.WordWrap
         visible: !panel.canDepth && panel.cannotText !== ""
         text: panel.cannotText
-        color: Theme.warning
+        color: Theme.c.effectsDepthPanel.warning
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }
@@ -63,7 +63,7 @@ Column {
         wrapMode: Text.WordWrap
         visible: panel.canDepth && panel.depthReady && !panel.hasDepth && !panel.running
         text: panel.missingText
-        color: Theme.warning
+        color: Theme.c.effectsDepthPanel.warning
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }
@@ -73,7 +73,7 @@ Column {
         wrapMode: Text.WordWrap
         visible: !panel.running && !!panel.job.error
         text: panel.job.error || ""
-        color: Theme.destructive
+        color: Theme.c.effectsDepthPanel.destructive
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }
@@ -108,7 +108,7 @@ Column {
         wrapMode: Text.WordWrap
         visible: panel.running
         text: panel.job.status || ""
-        color: Theme.mutedForeground
+        color: Theme.c.effectsDepthPanel.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

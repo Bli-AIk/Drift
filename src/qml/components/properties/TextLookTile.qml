@@ -14,11 +14,11 @@ Column {
     Rectangle {
         width: parent.width
         height: Math.round(width * 0.56)
-        radius: Theme.radiusSm
-        color: Theme.textStylePreviewBg
-        border.width: lookTile.selected ? Theme.borderWidthFocus : Theme.borderWidth
-        border.color: lookTile.selected ? Theme.primary
-                                        : (lookHover.hovered ? Theme.panelMuted : Theme.textStylePreviewBorder)
+        radius: Theme.c.textLookTile.radius
+        color: Theme.c.textLookTile.background
+        border.width: lookTile.selected ? Theme.c.textLookTile.borderWidthFocus : Theme.c.textLookTile.borderWidth
+        border.color: lookTile.selected ? Theme.c.textLookTile.borderSelected
+                                        : (lookHover.hovered ? Theme.c.textLookTile.borderHover : Theme.c.textLookTile.border)
         clip: true
 
         Behavior on border.color {
@@ -53,7 +53,7 @@ Column {
         text: lookTile.modelData.label
         elide: Text.ElideRight
         horizontalAlignment: Text.AlignHCenter
-        color: lookTile.selected ? Theme.primary : Theme.panelForeground
+        color: lookTile.selected ? Theme.c.textLookTile.foregroundSelected : Theme.c.textLookTile.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

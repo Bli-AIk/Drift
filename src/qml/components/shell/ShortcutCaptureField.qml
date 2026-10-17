@@ -35,12 +35,15 @@ AbstractButton {
     onClicked: root.arm()
 
     background: Rectangle {
-        radius: Theme.radiusSm
-        color: root.capturing ? Theme.panelSecondaryBg
-                              : (root.hovered ? Theme.popoverHover : Theme.panelAccent)
-        border.width: root.capturing || root.visualFocus ? Theme.borderWidthFocus : 1
-        border.color: root.capturing ? Theme.primary
-                                     : (root.visualFocus ? Theme.focusRing : Theme.panelBorder)
+        radius: Theme.c.shortcutCaptureField.radius
+        color: root.capturing ? Theme.c.shortcutCaptureField.backgroundCapturing
+                              : (root.hovered ? Theme.c.shortcutCaptureField.backgroundHover
+                                             : Theme.c.shortcutCaptureField.background)
+        border.width: root.capturing || root.visualFocus ? Theme.c.shortcutCaptureField.borderWidthFocus
+                                                         : Theme.c.shortcutCaptureField.borderWidth
+        border.color: root.capturing ? Theme.c.shortcutCaptureField.borderCapturing
+                                     : (root.visualFocus ? Theme.c.shortcutCaptureField.borderFocus
+                                                         : Theme.c.shortcutCaptureField.border)
 
         Behavior on color {
             ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -63,7 +66,8 @@ AbstractButton {
                              : (root.shortcut.length > 0
                                 ? Theme.shortcutDisplay(root.shortcut)
                                 : qsTr("Click to set"))
-        color: root.capturing ? Theme.primary : Theme.panelForeground
+        color: root.capturing ? Theme.c.shortcutCaptureField.foregroundCapturing
+                              : Theme.c.shortcutCaptureField.foreground
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeXs
     }

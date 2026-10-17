@@ -23,15 +23,14 @@ Item {
         y: parent.height - 10
         width: 1
         height: 8
-        color: Qt.rgba(Theme.mutedForeground.r, Theme.mutedForeground.g,
-                       Theme.mutedForeground.b, 0.28)
+        color: Qt.rgba(Theme.c.timelineRulerTick.tick.r, Theme.c.timelineRulerTick.tick.g, Theme.c.timelineRulerTick.tick.b, 0.28)
     }
 
     Text {
         x: 4
         y: 4
         text: tick.formatTick(tick.tickSeconds)
-        color: Theme.mutedForeground
+        color: Theme.c.timelineRulerTick.foregroundMuted
         font.pixelSize: Theme.fontSizeTick
         font.family: Theme.fontFamily
     }

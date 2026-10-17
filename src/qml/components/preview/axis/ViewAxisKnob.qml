@@ -18,14 +18,14 @@ Rectangle {
     x: knob.tipX - width / 2
     y: knob.tipY - height / 2
     color: knob.positive ? knob.ink : Qt.darker(knob.ink, 1.8)
-    border.width: knobArea.containsMouse ? 2 : 0
-    border.color: Theme.onMedia
+    border.width: knobArea.containsMouse ? Theme.c.viewAxisKnob.borderWidthHover : 0
+    border.color: Theme.c.viewAxisKnob.border
 
     Text {
         visible: knob.positive
         anchors.centerIn: parent
         text: knob.letter
-        color: Theme.onMedia
+        color: Theme.c.viewAxisKnob.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         font.bold: true

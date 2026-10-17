@@ -307,10 +307,10 @@ Popup {
     onClosed: _index = []
 
     background: Rectangle {
-        color: Theme.panelBackground
-        border.width: 1
-        border.color: Theme.panelBorder
-        radius: Theme.radiusMd
+        color: Theme.c.globalSearchPopup.background
+        border.width: Theme.c.globalSearchPopup.borderWidth
+        border.color: Theme.c.globalSearchPopup.border
+        radius: Theme.c.globalSearchPopup.radius
     }
 
     contentItem: Item {
@@ -322,7 +322,7 @@ Popup {
             width: parent.width
             padding: Theme.spacingLg
             text: qsTr("No matches")
-            color: Theme.mutedForeground
+            color: Theme.c.globalSearchPopup.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
         }

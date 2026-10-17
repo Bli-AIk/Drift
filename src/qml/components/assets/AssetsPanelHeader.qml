@@ -18,13 +18,13 @@ Rectangle {
     // Matches the surrounding PanelFrame; it used to paint the app
     // background, so the header read as a different surface than the
     // panel it belongs to.
-    color: Theme.panelBackground
+    color: Theme.c.assetsPanelHeader.background
 
     Rectangle {
         anchors.bottom: parent.bottom
         width: parent.width
-        height: Theme.borderWidth
-        color: Theme.panelBorder
+        height: Theme.c.assetsPanelHeader.borderWidth
+        color: Theme.c.assetsPanelHeader.border
     }
 
     Text {
@@ -34,7 +34,7 @@ Rectangle {
         // Sheet chrome already shows the tab title.
         visible: root.showTitle
         text: root.title
-        color: Theme.mutedForeground
+        color: Theme.c.assetsPanelHeader.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeSm
     }

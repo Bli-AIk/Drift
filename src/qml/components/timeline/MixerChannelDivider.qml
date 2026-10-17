@@ -6,5 +6,5 @@ Rectangle {
     anchors.right: parent.right
     width: 1
     height: parent.height
-    color: Theme.panelBorder
+    color: Theme.c.mixerChannelDivider.border
 }

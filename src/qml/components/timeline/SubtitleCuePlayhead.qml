@@ -7,6 +7,6 @@ Rectangle {
     x: lane.xForSeconds(EditorState.playheadSeconds - lane.clipStart) - Theme.playheadLineWidth / 2
     width: Theme.playheadLineWidth
     height: parent.height
-    color: Theme.primary
+    color: Theme.c.subtitleCuePlayhead.foreground
     z: 50
 }

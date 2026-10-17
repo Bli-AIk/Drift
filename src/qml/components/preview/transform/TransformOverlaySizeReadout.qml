@@ -20,12 +20,12 @@ Rectangle {
     anchors.topMargin: Theme.spacingLg
     width: sizeLabel.width + Theme.spacingLg
     height: sizeLabel.height + Theme.spacingSm
-    radius: Theme.radiusSm
+    radius: Theme.c.transformOverlaySizeReadout.radius
     // Sits on the preview, not a panel surface, so it uses the fixed
     // scrim and on-media foreground rather than panel tokens.
-    color: Theme.scrimStrong
-    border.width: Theme.borderWidth
-    border.color: Theme.guideWeak
+    color: Theme.c.transformOverlaySizeReadout.background
+    border.width: Theme.c.transformOverlaySizeReadout.borderWidth
+    border.color: Theme.c.transformOverlaySizeReadout.border
     // Keeps the number upright on a rotated clip.
     rotation: -readout.spin
 
@@ -35,7 +35,7 @@ Rectangle {
         text: readout.rotating
               ? Math.round(readout.layoutRotation) + "°"
               : Math.round(readout.layoutW) + "×" + Math.round(readout.layoutH)
-        color: Theme.onMedia
+        color: Theme.c.transformOverlaySizeReadout.foreground
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeXs
     }

@@ -11,7 +11,7 @@ Column {
     width: cardSize
     spacing: Theme.spacingSm
 
-    opacity: shapeDrag.active ? 0.85 : 1
+    opacity: shapeDrag.active ? Theme.c.shapePresetCard.dragOpacity : 1
     scale: shapeDrag.active ? 1.04 : (shapeDrag.pressed ? 0.97 : 1.0)
 
     Behavior on opacity {
@@ -24,10 +24,10 @@ Column {
     Rectangle {
         width: cardSize
         height: cardSize
-        radius: Theme.radiusSm
-        color: shapeDrag.hovered ? Theme.popoverHover : Theme.panelAccent
-        border.width: 1
-        border.color: shapeDrag.hovered ? Theme.accent : "transparent"
+        radius: Theme.c.shapePresetCard.radius
+        color: shapeDrag.hovered ? Theme.c.shapePresetCard.backgroundHover : Theme.c.shapePresetCard.background
+        border.width: Theme.c.shapePresetCard.borderWidth
+        border.color: shapeDrag.hovered ? Theme.c.shapePresetCard.borderHover : "transparent"
 
         Behavior on color {
             ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -103,7 +103,7 @@ Column {
     Text {
         width: parent.width
         text: modelData.label
-        color: Theme.mutedForeground
+        color: Theme.c.shapePresetCard.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeCard
         horizontalAlignment: Text.AlignHCenter

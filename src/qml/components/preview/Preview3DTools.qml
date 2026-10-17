@@ -11,10 +11,10 @@ Rectangle {
 
     width: column.implicitWidth + Theme.spacingXs * 2
     height: column.implicitHeight + Theme.spacingXs * 2
-    radius: Theme.radiusMd
-    color: Theme.panelBackground
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
+    radius: Theme.c.preview3DTools.radius
+    color: Theme.c.preview3DTools.background
+    border.width: Theme.c.preview3DTools.borderWidth
+    border.color: Theme.c.preview3DTools.border
 
     Column {
         id: column

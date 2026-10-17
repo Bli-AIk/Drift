@@ -16,7 +16,7 @@ Rectangle {
     width: Theme.touchUi ? 14 : 8
     height: parent.height
     x: (handle.modelData.edge === "in" ? handle.inX : handle.outX) - width / 2
-    color: Theme.primary
+    color: Theme.c.mediaPreviewTrimHandle.background
     z: 3
 
     MouseArea {

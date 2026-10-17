@@ -25,7 +25,7 @@ Column {
     Text {
         width: parent.width
         text: qsTr("Depth")
-        color: Theme.mutedForeground
+        color: Theme.c.effectsDepthSection.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

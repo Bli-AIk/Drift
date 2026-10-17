@@ -10,7 +10,7 @@ Item {
 
     property string glyph: ""
     property real iconSize: 16
-    property color iconColor: Theme.mutedForeground
+    property color iconColor: Theme.c.iconGlyph.icon
     // Set for loader glyphs, which otherwise render as a frozen circle.
     property bool spinning: false
 

@@ -7,7 +7,7 @@ Text {
     property string tone: "muted"
     property string size: "xs"
 
-    color: tone === "default" ? Theme.panelForeground : Theme.mutedForeground
+    color: tone === "default" ? Theme.c.themedLabel.foreground : Theme.c.themedLabel.foregroundMuted
     font.family: Theme.fontFamily
     font.pixelSize: size === "base" ? Theme.fontSizeBase
                      : (size === "sm" ? Theme.fontSizeSm : Theme.fontSizeXs)

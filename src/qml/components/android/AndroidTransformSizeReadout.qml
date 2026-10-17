@@ -12,12 +12,12 @@ Rectangle {
     anchors.topMargin: overlay.gripTouch / 2 + Theme.spacingSm
     width: sizeLabel.width + Theme.spacingLg
     height: sizeLabel.height + Theme.spacingSm
-    radius: Theme.radiusSm
+    radius: Theme.c.androidTransformSizeReadout.radius
     // Sits on the preview, not a panel surface, so it uses the fixed
     // scrim and on-media foreground rather than panel tokens.
-    color: Theme.scrimStrong
-    border.width: Theme.borderWidth
-    border.color: Theme.guideWeak
+    color: Theme.c.androidTransformSizeReadout.background
+    border.width: Theme.c.androidTransformSizeReadout.borderWidth
+    border.color: Theme.c.androidTransformSizeReadout.border
     // Keeps the number upright on a rotated frameItem.
     rotation: -frameItem.rotation
 
@@ -25,7 +25,7 @@ Rectangle {
         id: sizeLabel
         anchors.centerIn: parent
         text: Math.round(frameItem.layoutW) + "×" + Math.round(frameItem.layoutH)
-        color: Theme.onMedia
+        color: Theme.c.androidTransformSizeReadout.foreground
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeXs
     }

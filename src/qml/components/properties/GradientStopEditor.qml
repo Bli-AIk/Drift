@@ -130,7 +130,7 @@ Column {
 
     Text {
         text: qsTr("Presets")
-        color: Theme.mutedForeground
+        color: Theme.c.gradientStopEditor.foregroundMuted
         font.pixelSize: Theme.fontSizeXs
         font.family: Theme.fontFamily
     }
@@ -166,7 +166,7 @@ Column {
             spacing: 4
             Text {
                 text: qsTr("Type")
-                color: Theme.mutedForeground
+                color: Theme.c.gradientStopEditor.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -205,7 +205,7 @@ Column {
                     text: qsTr("What one run of the gradient spans: the whole block, each line, word or glyph")
                     visible: mapHover.hovered
                 }
-                color: Theme.mutedForeground
+                color: Theme.c.gradientStopEditor.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -242,7 +242,7 @@ Column {
                     text: qsTr("Slides the gradient along its axis, in cycles per second")
                     visible: speedHover.hovered
                 }
-                color: Theme.mutedForeground
+                color: Theme.c.gradientStopEditor.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -267,7 +267,7 @@ Column {
             spacing: 4
             Text {
                 text: qsTr("Options")
-                color: Theme.mutedForeground
+                color: Theme.c.gradientStopEditor.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }

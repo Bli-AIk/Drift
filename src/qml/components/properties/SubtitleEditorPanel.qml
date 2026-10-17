@@ -21,14 +21,14 @@ Rectangle {
     height: Math.min(naturalHeight,
                      Math.max(minEditorHeight,
                               parent.height - headerBlock - minListHeight))
-    color: Theme.panelBackground
+    color: Theme.c.subtitleEditorPanel.background
 
     Rectangle {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 1
-        color: Theme.panelBorder
+        height: Theme.c.subtitleEditorPanel.ruleWidth
+        color: Theme.c.subtitleEditorPanel.border
     }
 
     Flickable {
@@ -76,10 +76,10 @@ Rectangle {
                         id: applyButton
                         width: 40
                         height: 56
-                        radius: Theme.radiusSm
+                        radius: Theme.c.subtitleEditorPanel.radius
                         readonly property bool dirty: editor.selectedCue !== null
                                                       && cueText.text !== (editor.selectedCue ? editor.selectedCue.text : "")
-                        color: applyMouse.containsMouse ? Qt.lighter(Theme.primary, 1.08) : Theme.primary
+                        color: applyMouse.containsMouse ? Qt.lighter(Theme.c.subtitleEditorPanel.applyBackgroundHover, 1.08) : Theme.c.subtitleEditorPanel.applyBackground
                         opacity: (dirty || applyMouse.containsMouse) ? 1 : 0.5
 
                         // Was a raw "✓" glyph while every other button in the app
@@ -88,7 +88,7 @@ Rectangle {
                             anchors.centerIn: parent
                             glyph: Theme.icons.check
                             iconSize: Theme.iconSizeBase
-                            iconColor: Theme.primaryForeground
+                            iconColor: Theme.c.subtitleEditorPanel.iconOnAccent
                         }
 
                         MouseArea {
@@ -119,7 +119,7 @@ Rectangle {
                         spacing: 4
                         Text {
                             text: qsTr("Start")
-                            color: Theme.mutedForeground
+                            color: Theme.c.subtitleEditorPanel.foregroundMuted
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSizeXs
                         }
@@ -152,7 +152,7 @@ Rectangle {
                         spacing: 4
                         Text {
                             text: qsTr("End")
-                            color: Theme.mutedForeground
+                            color: Theme.c.subtitleEditorPanel.foregroundMuted
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSizeXs
                         }
@@ -192,9 +192,9 @@ Rectangle {
 
                 Rectangle {
                     width: parent.width
-                    height: 1
-                    color: Theme.panelBorder
-                    opacity: 0.6
+                    height: Theme.c.subtitleEditorPanel.ruleWidth
+                    color: Theme.c.subtitleEditorPanel.border
+                    opacity: Theme.c.subtitleEditorPanel.ruleOpacity
                 }
             }
 
@@ -203,7 +203,7 @@ Rectangle {
                 text: editor.localPlayhead >= 0
                       ? qsTr("At %1").arg(editor.formatCueTime(editor.localPlayhead))
                       : qsTr("Move to a time inside this clip to add a subtitle")
-                color: Theme.mutedForeground
+                color: Theme.c.subtitleEditorPanel.foregroundMuted
                 font.family: Theme.monoFontFamily
                 font.pixelSize: Theme.fontSizeXs
             }

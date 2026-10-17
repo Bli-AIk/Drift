@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
@@ -17,7 +18,7 @@ ToolTip {
 
     contentItem: Text {
         text: root.text
-        color: Theme.panelForeground
+        color: Theme.c.themedToolTip.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         wrapMode: Text.WordWrap
@@ -25,11 +26,17 @@ ToolTip {
         width: Math.min(implicitWidth, 260)
     }
 
-    background: Rectangle {
-        color: Theme.panelBackground
-        border.width: Theme.borderWidth
-        border.color: Theme.panelBorder
-        radius: Theme.radiusSm
+    background: ThemeSlot {
+        slot: "ThemedToolTipBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                color: Theme.c.themedToolTip.background
+                border.width: Theme.c.themedToolTip.borderWidth
+                border.color: Theme.c.themedToolTip.border
+                radius: Theme.c.themedToolTip.radius
+            }
+        }
     }
 
     // A hair of scale for presence, but durationFast both ways and a shallower

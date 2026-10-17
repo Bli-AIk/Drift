@@ -1,4 +1,5 @@
 import QtQuick
+import Drift
 
 // Soft border glow behind the voiceover bar.
 Rectangle {
@@ -8,7 +9,7 @@ Rectangle {
     anchors.margins: -1
     radius: barRadius + 1
     color: "transparent"
-    border.color: paused ? Qt.rgba(0.9, 0.7, 0, 0.25) : Qt.rgba(0.9, 0.1, 0.1, 0.25)
-    border.width: 1
+    border.color: paused ? Theme.c.voiceoverGlow.borderPaused : Theme.c.voiceoverGlow.border
+    border.width: Theme.c.voiceoverGlow.borderWidth
     z: -1
 }

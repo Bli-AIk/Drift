@@ -162,36 +162,36 @@ PanelFrame {
         effectDropTrack: root.effectDropTrackIndex
         effectDropClip: root.effectDropClipIndex
         style: ({
-            "clipVideo": Theme.clipVideoPlaceholder,
-            "clipAudio": Theme.clipAudio,
-            "clipText": Theme.clipText,
-            "clipSubtitle": Theme.clipSubtitle,
-            "clipGraphic": Theme.clipGraphic,
-            "clipEffect": Theme.clipEffect,
-            "clipComposite": Theme.clipComposite,
-            "adjustmentVideo": Theme.clipAdjustmentVideo,
-            "adjustmentAudio": Theme.clipAdjustmentAudio,
-            "adjustmentMask": Theme.clipAdjustmentMask,
-            "adjustmentTransform": Theme.clipTransform,
-            "primary": Theme.primary,
-            "scrim": Theme.scrimColor,
-            "proxyBand": Theme.clipProxyBand,
-            "onMedia": Theme.onMedia,
-            "waveform": Theme.waveformColor,
-            "mutedForeground": Theme.mutedForeground,
-            "panelBorder": Theme.panelBorder,
-            "proxyPill": Theme.clipProxy,
-            "proxyPillForeground": Theme.clipProxyForeground,
-            "editFriendlyPill": Theme.clipEditFriendly,
-            "editFriendlyPillForeground": Theme.clipEditFriendlyForeground,
-            "warning": Theme.warning,
+            "clipVideo": Theme.c.timelineClipItem.videoBackground,
+            "clipAudio": Theme.c.timelineClipItem.audioBackground,
+            "clipText": Theme.c.timelineClipItem.textBackground,
+            "clipSubtitle": Theme.c.timelineClipItem.subtitleBackground,
+            "clipGraphic": Theme.c.timelineClipItem.graphicBackground,
+            "clipEffect": Theme.c.timelineClipItem.effectBackground,
+            "clipComposite": Theme.c.timelineClipItem.compositeBackground,
+            "adjustmentVideo": Theme.c.timelineClipItem.adjustmentVideoBackground,
+            "adjustmentAudio": Theme.c.timelineClipItem.adjustmentAudioBackground,
+            "adjustmentMask": Theme.c.timelineClipItem.adjustmentMaskBackground,
+            "adjustmentTransform": Theme.c.timelineClipItem.transformBackground,
+            "primary": Theme.c.timelineClipItem.accent,
+            "scrim": Theme.c.timelineClipItem.scrim,
+            "proxyBand": Theme.c.timelineClipItem.proxyBand,
+            "onMedia": Theme.c.timelineClipItem.foreground,
+            "waveform": Theme.c.timelineClipItem.waveform,
+            "mutedForeground": Theme.c.timelineClipItem.foregroundMuted,
+            "panelBorder": Theme.c.timelineClipItem.border,
+            "proxyPill": Theme.c.timelineClipItem.proxyBackground,
+            "proxyPillForeground": Theme.c.timelineClipItem.proxyForeground,
+            "editFriendlyPill": Theme.c.timelineClipItem.editFriendlyBackground,
+            "editFriendlyPillForeground": Theme.c.timelineClipItem.editFriendlyForeground,
+            "warning": Theme.c.timelineClipItem.warning,
             "fontFamily": Theme.fontFamily,
             "fontSizeTiny": Theme.fontSizeTiny,
             "fontSizeXs": Theme.fontSizeXs,
-            "radiusSm": Theme.radiusSm,
-            "radiusXs": Theme.radiusXs,
-            "ringWidth": Theme.clipSelectionRingWidth,
-            "borderWidthFocus": Theme.borderWidthFocus,
+            "radiusSm": Theme.c.timelineClipItem.radius,
+            "radiusXs": Theme.c.timelineClipItem.radiusXs,
+            "ringWidth": Theme.c.timelineClipItem.selectionBorderWidth,
+            "borderWidthFocus": Theme.c.timelineClipItem.focusBorderWidth,
             "headerBandHeight": Theme.clipHeaderBandHeight,
             "clipMinWidth": Theme.clipMinWidth,
             "iconSizeSm": Theme.iconSizeSm,
@@ -593,19 +593,19 @@ PanelFrame {
     // Adjustment layers are tinted by what they act on, so a glance at a lane says whether it is
     // grading the picture, treating the audio, or cutting a mask.
     function adjustmentColor(kind) {
-        if (kind === "audioEffects") return Theme.clipAdjustmentAudio
-        if (kind === "mask") return Theme.clipAdjustmentMask
-        if (kind === "transform") return Theme.clipTransform
-        return Theme.clipAdjustmentVideo
+        if (kind === "audioEffects") return Theme.c.timelineClipItem.adjustmentAudioBackground
+        if (kind === "mask") return Theme.c.timelineClipItem.adjustmentMaskBackground
+        if (kind === "transform") return Theme.c.timelineClipItem.transformBackground
+        return Theme.c.timelineClipItem.adjustmentVideoBackground
     }
     function clipColor(type) {
-        if (type === "text") return Theme.clipText;
-        if (type === "subtitle") return Theme.clipSubtitle;
-        if (type === "audio") return Theme.clipAudio;
-        if (type === "graphic") return Theme.clipGraphic;
-        if (type === "effect" || type === "adjustment") return Theme.clipEffect;
-        if (type === "composite") return Theme.clipComposite;
-        return Theme.clipVideoPlaceholder; // video: no flat fill, thumbnails would go here
+        if (type === "text") return Theme.c.timelineClipItem.textBackground;
+        if (type === "subtitle") return Theme.c.timelineClipItem.subtitleBackground;
+        if (type === "audio") return Theme.c.timelineClipItem.audioBackground;
+        if (type === "graphic") return Theme.c.timelineClipItem.graphicBackground;
+        if (type === "effect" || type === "adjustment") return Theme.c.timelineClipItem.effectBackground;
+        if (type === "composite") return Theme.c.timelineClipItem.compositeBackground;
+        return Theme.c.timelineClipItem.videoBackground; // video: no flat fill, thumbnails would go here
     }
 
     // Computed once per model change instead of at each of the ten call sites below — one of
@@ -1359,14 +1359,14 @@ PanelFrame {
                         anchors.bottom: parent.bottom
                         width: 1
                         height: parent.height
-                        color: Theme.panelBorder
+                        color: Theme.c.timelinePanel.headerBorder
                     }
                     Rectangle {
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         height: 1
-                        color: Theme.panelBorder
+                        color: Theme.c.timelinePanel.headerBorder
                     }
                 }
 
@@ -1436,6 +1436,14 @@ PanelFrame {
                     id: timelineContent
                     width: flick.contentWidth
                     height: flick.contentHeight
+
+                    // Track-area surface. Same panel colour as the frame behind it,
+                    // so a theme can make this layer translucent on its own.
+                    Rectangle {
+                        anchors.fill: parent
+                        color: Theme.c.timelinePanel.background
+                        z: -1
+                    }
 
                     // Wheel + middle-click pan: scoped to the ruler so it does not
                     // block timeline drops. Left/right clicks fall through.
@@ -1591,10 +1599,12 @@ PanelFrame {
                                 // Faint row tint on hover, and an empty track now
                                 // reads as a track rather than as blank space.
                                 color: trackHover.hovered
-                                       ? Qt.rgba(Theme.panelAccent.r, Theme.panelAccent.g,
-                                                 Theme.panelAccent.b, 0.5)
-                                       : Qt.rgba(Theme.panelAccent.r, Theme.panelAccent.g,
-                                                 Theme.panelAccent.b, 0.22)
+                                       ? Qt.rgba(Theme.c.timelinePanel.trackBackground.r,
+                                                 Theme.c.timelinePanel.trackBackground.g,
+                                                 Theme.c.timelinePanel.trackBackground.b, 0.5)
+                                       : Qt.rgba(Theme.c.timelinePanel.trackBackground.r,
+                                                 Theme.c.timelinePanel.trackBackground.g,
+                                                 Theme.c.timelinePanel.trackBackground.b, 0.22)
 
                                 Behavior on color {
                                     ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }

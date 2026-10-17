@@ -9,7 +9,8 @@ Rectangle {
     id: updateRow
     visible: showUpdate
     height: visible ? rowHeight + Theme.spacingSm : 0
-    color: updateArea.containsMouse ? Qt.darker(Theme.accent, 1.08) : Theme.accent
+    color: updateArea.containsMouse ? Qt.darker(Theme.c.notificationUpdateRow.background, 1.08)
+                                    : Theme.c.notificationUpdateRow.background
 
     // The whole row opens the dialog, not just its button.
     MouseArea {
@@ -26,7 +27,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         glyph: Theme.icons.download
         iconSize: Theme.iconSizeBase
-        iconColor: Theme.primary
+        iconColor: Theme.c.notificationUpdateRow.icon
     }
 
     Text {
@@ -38,7 +39,7 @@ Rectangle {
         text: Updates.readyToInstall
               ? qsTr("Drift %1 is ready to install").arg(Updates.latestVersion)
               : qsTr("Drift %1 is available").arg(Updates.latestVersion)
-        color: Theme.panelForeground
+        color: Theme.c.notificationUpdateRow.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeSm
         font.weight: Font.Medium

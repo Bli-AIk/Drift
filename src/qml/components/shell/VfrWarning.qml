@@ -10,13 +10,13 @@ Rectangle {
 
     width: size
     height: size
-    radius: size / 2
-    color: Theme.warning
+    radius: Theme.c.vfrWarning.radius
+    color: Theme.c.vfrWarning.background
 
     Text {
         anchors.centerIn: parent
         text: "!"
-        color: Theme.onMedia
+        color: Theme.c.vfrWarning.foreground
         font.pixelSize: root.size * 0.75
         font.family: Theme.fontFamily
         font.weight: Font.Bold

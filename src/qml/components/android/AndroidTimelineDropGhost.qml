@@ -18,9 +18,11 @@ Rectangle {
     y: ghost.seekHeaderHeight + ghost.trackOffsetY
     width: ghost.dropDurationSeconds * ghost.pxPerSecond
     height: ghost.dropTrackIndex >= 0 ? ghost.trackHeight : 0
-    radius: Theme.radiusSm
-    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
-    border.width: 2
-    border.color: Theme.primary
+    radius: Theme.c.androidTimelineDropGhost.radius
+    color: Qt.rgba(Theme.c.androidTimelineDropGhost.background.r,
+                   Theme.c.androidTimelineDropGhost.background.g,
+                   Theme.c.androidTimelineDropGhost.background.b, 0.12)
+    border.width: Theme.c.androidTimelineDropGhost.borderWidth
+    border.color: Theme.c.androidTimelineDropGhost.border
     z: 5
 }

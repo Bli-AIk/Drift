@@ -7,10 +7,10 @@ Rectangle {
     property int tileRevision: 0
     width: ListView.view ? ListView.view.width : 0
     height: 56
-    radius: Theme.radiusSm
-    color: rowMouse.containsMouse ? Theme.panelMuted : "transparent"
-    border.width: Theme.borderWidth
-    border.color: rowMouse.containsMouse ? Theme.panelBorder : "transparent"
+    radius: Theme.c.scenesShotRow.radius
+    color: rowMouse.containsMouse ? Theme.c.scenesShotRow.backgroundHover : "transparent"
+    border.width: Theme.c.scenesShotRow.borderWidth
+    border.color: rowMouse.containsMouse ? Theme.c.scenesShotRow.borderHover : "transparent"
 
     required property var modelData
 
@@ -22,8 +22,8 @@ Rectangle {
         Rectangle {
             width: 80
             height: parent.height
-            radius: Theme.radiusXs
-            color: Theme.skeletonColor
+            radius: Theme.c.scenesShotRow.thumbRadius
+            color: Theme.c.scenesShotRow.thumbBackground
             clip: true
 
             Image {
@@ -53,7 +53,7 @@ Rectangle {
 
             Text {
                 text: qsTr("Scene %1").arg(root.modelData.index + 1)
-                color: Theme.foreground
+                color: Theme.c.scenesShotRow.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 font.bold: true
@@ -64,7 +64,7 @@ Rectangle {
                     .arg(Number(root.modelData.sourceStart).toFixed(2))
                     .arg(Number(root.modelData.sourceEnd).toFixed(2))
                     .arg(Number(root.modelData.duration).toFixed(2))
-                color: Theme.mutedForeground
+                color: Theme.c.scenesShotRow.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -72,7 +72,7 @@ Rectangle {
             Text {
                 visible: (root.modelData.labels || []).length > 0
                 text: (root.modelData.labels || []).slice(0, 4).join(", ")
-                color: Theme.mutedForeground
+                color: Theme.c.scenesShotRow.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 elide: Text.ElideRight
@@ -91,15 +91,15 @@ Rectangle {
 
         Repeater {
             model: [
-                { value: root.modelData.motion, tint: Theme.primary },
-                { value: root.modelData.loudness, tint: Theme.beatOnsetColor }
+                { value: root.modelData.motion, tint: Theme.c.scenesShotRow.motionAccent },
+                { value: root.modelData.loudness, tint: Theme.c.scenesShotRow.loudnessAccent }
             ]
             Rectangle {
                 required property var modelData
                 width: 48
                 height: 4
-                radius: 2
-                color: Theme.panelMuted
+                radius: Theme.c.scenesShotRow.meterRadius
+                color: Theme.c.scenesShotRow.meterBackground
 
                 Rectangle {
                     width: parent.width * Math.max(0, Math.min(1, parent.modelData.value))

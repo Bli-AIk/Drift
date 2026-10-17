@@ -21,8 +21,9 @@ Rectangle {
     // Cap width so a long name does not shove the right-side actions.
     width: Math.min(projectsRow.implicitWidth + Theme.spacingXl * 2, 260)
     height: 32
-    radius: Theme.radiusPill
-    color: projectsArea.containsMouse || open ? Theme.popoverHover : Theme.accent
+    radius: Theme.c.editorHeaderProjectsButton.radius
+    color: projectsArea.containsMouse || open ? Theme.c.editorHeaderProjectsButton.backgroundHover
+                                              : Theme.c.editorHeaderProjectsButton.background
     anchors.verticalCenter: parent.verticalCenter
     clip: true
 
@@ -45,8 +46,9 @@ Rectangle {
         Rectangle {
             width: 8
             height: 8
-            radius: 4
-            color: projectsButton.saved ? Theme.constructive : Theme.destructive
+            radius: Theme.c.editorHeaderProjectsButton.statusRadius
+            color: projectsButton.saved ? Theme.c.editorHeaderProjectsButton.statusSaved
+                                        : Theme.c.editorHeaderProjectsButton.statusUnsaved
             anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -57,7 +59,7 @@ Rectangle {
                                                  - Theme.spacingMd * 2
             width: Math.min(implicitWidth, maxTextWidth)
             text: projectsButton.projectName
-            color: Theme.foreground
+            color: Theme.c.editorHeaderProjectsButton.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.Medium
@@ -68,7 +70,7 @@ Rectangle {
         IconGlyph {
             glyph: Theme.icons.chevronDown
             iconSize: Theme.iconSizeSm
-            iconColor: Theme.mutedForeground
+            iconColor: Theme.c.editorHeaderProjectsButton.icon
             anchors.verticalCenter: parent.verticalCenter
         }
     }

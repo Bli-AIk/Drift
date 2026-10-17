@@ -12,12 +12,12 @@ Rectangle {
     id: root
     width: ListView.view ? ListView.view.width : 0
     height: 48
-    radius: Theme.radiusSm
-    color: rowHover.hovered ? Theme.popoverHover : Theme.panelAccent
+    radius: Theme.c.mediaAssetsListRow.radius
+    color: rowHover.hovered ? Theme.c.mediaAssetsListRow.backgroundHover : Theme.c.mediaAssetsListRow.background
     // Matches the grid card's selection ring.
-    border.width: root.selected ? Theme.clipSelectionRingWidth : 0
-    border.color: Theme.primary
-    opacity: rowDrag.active ? 0.85 : 1
+    border.width: root.selected ? Theme.c.mediaAssetsListRow.borderWidth : 0
+    border.color: Theme.c.mediaAssetsListRow.border
+    opacity: rowDrag.active ? Theme.c.mediaAssetsListRow.dragOpacity : 1
     scale: rowDrag.active ? 1.02 : 1.0
 
     Behavior on color {

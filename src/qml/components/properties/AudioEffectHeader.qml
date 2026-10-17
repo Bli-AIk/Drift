@@ -6,8 +6,8 @@ Rectangle {
     property var inspector
     width: parent.width
     height: audioEffectHeader.implicitHeight + 8
-    radius: Theme.radiusSm
-    color: Theme.panelAccent
+    radius: Theme.c.audioEffectHeader.radius
+    color: Theme.c.audioEffectHeader.background
 
     Row {
         id: audioEffectHeader
@@ -22,7 +22,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             glyph: card.effectData.icon || "audio-lines"
             iconSize: 14
-            iconColor: Theme.mutedForeground
+            iconColor: Theme.c.audioEffectHeader.icon
             opacity: card.effectEnabled ? 1 : 0.5
         }
         Text {
@@ -30,7 +30,7 @@ Rectangle {
                   ? qsTr("%1 (not installed)").arg(card.effectData.label)
                   : card.effectData.label
             color: card.effectEnabled
-                   ? Theme.panelForeground : Theme.mutedForeground
+                   ? Theme.c.audioEffectHeader.foreground : Theme.c.audioEffectHeader.foregroundDisabled
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.Medium

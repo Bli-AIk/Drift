@@ -10,12 +10,12 @@ Rectangle {
 
     width: hintLabel.width + Theme.spacing2xl
     height: hintLabel.height + Theme.spacingLg
-    radius: Theme.radiusSm
+    radius: Theme.c.androidCropHint.radius
     // Sits on the preview scrim, not a panel surface, so it uses the on-media
     // tokens — panelForeground would go dark-on-dark in light mode.
-    color: Theme.scrimStrong
-    border.width: Theme.borderWidth
-    border.color: Theme.guideWeak
+    color: Theme.c.androidCropHint.background
+    border.width: Theme.c.androidCropHint.borderWidth
+    border.color: Theme.c.androidCropHint.border
 
     opacity: hint.retired ? 0 : 1
     visible: opacity > 0
@@ -28,7 +28,7 @@ Rectangle {
         id: hintLabel
         anchors.centerIn: parent
         text: qsTr("Drag the edges to reframe · pinch to zoom")
-        color: Theme.onMedia
+        color: Theme.c.androidCropHint.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

@@ -120,7 +120,7 @@ ToolWindow {
     minimumWidth: 780
     minimumHeight: 520
     title: qsTr("Enhance video")
-    color: Theme.appBackground
+    color: Theme.c.restoreWindow.background
 
     function openFor(track, clip) {
         root.forAsset = false

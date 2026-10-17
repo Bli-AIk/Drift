@@ -25,7 +25,7 @@ Rectangle {
     width: mixerVisible ? Math.max(minMixerWidth, Math.min(maxMixerWidth, preferredWidth)) : 0
     visible: width > 0
     clip: true
-    color: Theme.panelBackground
+    color: Theme.c.audioMixerStrip.background
 
     property bool resizing: false
 
@@ -241,13 +241,13 @@ Rectangle {
                         IconGlyph {
                             glyph: Theme.icons.slidersVertical
                             iconSize: Theme.iconSizeMd
-                            iconColor: Theme.mutedForeground
+                            iconColor: Theme.c.audioMixerStrip.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
                         Text {
                             text: qsTr("Audio Mixer")
-                            color: Theme.panelForeground
+                            color: Theme.c.audioMixerStrip.foreground
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSizeSm
                             font.weight: Font.DemiBold
@@ -274,7 +274,7 @@ Rectangle {
                         anchors.bottom: parent.bottom
                         width: parent.width
                         height: 1
-                        color: Theme.panelBorder
+                        color: Theme.c.audioMixerStrip.border
                     }
                 }
 
@@ -286,8 +286,8 @@ Rectangle {
                     height: visible ? 60 : 0
                     clip: true
                     color: EditorState.isAudioRecordingPaused
-                           ? Qt.rgba(0.92, 0.70, 0.03, Theme.darkMode ? 0.10 : 0.07)
-                           : Qt.rgba(Theme.destructive.r, Theme.destructive.g, Theme.destructive.b, Theme.darkMode ? 0.08 : 0.05)
+                           ? Theme.c.audioMixerStrip.recordingPausedBackground
+                           : Theme.c.audioMixerStrip.recordingBackground
 
                     Behavior on height {
                         NumberAnimation { duration: Theme.durationBase; easing.type: Theme.easing }
@@ -297,7 +297,7 @@ Rectangle {
                         anchors.bottom: parent.bottom
                         width: parent.width
                         height: 1
-                        color: Theme.panelBorder
+                        color: Theme.c.audioMixerStrip.border
                     }
 
                     Column {
@@ -319,8 +319,8 @@ Rectangle {
                                 Rectangle {
                                     width: 8
                                     height: 8
-                                    radius: 4
-                                    color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
+                                    radius: Theme.c.audioMixerStrip.recordDotRadius
+                                    color: EditorState.isAudioRecordingPaused ? Theme.c.audioMixerStrip.recordPaused : Theme.c.audioMixerStrip.destructive
                                     anchors.verticalCenter: parent.verticalCenter
                                     SequentialAnimation on opacity {
                                         running: voPanel.visible && !EditorState.isAudioRecordingPaused
@@ -335,7 +335,7 @@ Rectangle {
                                     font.family: Theme.fontFamily
                                     font.pixelSize: Theme.fontSizeXs
                                     font.weight: Font.DemiBold
-                                    color: EditorState.isAudioRecordingPaused ? "#d97706" : Theme.destructive
+                                    color: EditorState.isAudioRecordingPaused ? Theme.c.audioMixerStrip.recordPausedForeground : Theme.c.audioMixerStrip.destructive
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
 
@@ -349,7 +349,7 @@ Rectangle {
                                     }
                                     font.family: Theme.monoFontFamily
                                     font.pixelSize: Theme.fontSizeXs
-                                    color: Theme.panelForeground
+                                    color: Theme.c.audioMixerStrip.foreground
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                             }
@@ -391,10 +391,10 @@ Rectangle {
 
                             Rectangle {
                                 anchors.fill: parent
-                                radius: Theme.radiusXs
-                                color: voMicMouse.containsMouse || voMicMenu.opened ? Theme.popoverHover : Theme.panelAccent
-                                border.color: Theme.panelBorder
-                                border.width: Theme.borderWidth
+                                radius: Theme.c.audioMixerStrip.pickerRadius
+                                color: voMicMouse.containsMouse || voMicMenu.opened ? Theme.c.audioMixerStrip.pickerBackgroundHover : Theme.c.audioMixerStrip.pickerBackground
+                                border.color: Theme.c.audioMixerStrip.pickerBorder
+                                border.width: Theme.c.audioMixerStrip.pickerBorderWidth
                             }
 
                             Row {
@@ -408,7 +408,7 @@ Rectangle {
                                 IconGlyph {
                                     glyph: Theme.icons.mic
                                     iconSize: Theme.iconSizeSm
-                                    iconColor: Theme.mutedForeground
+                                    iconColor: Theme.c.audioMixerStrip.icon
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
 
@@ -416,7 +416,7 @@ Rectangle {
                                     text: EditorState.currentMicrophoneName || qsTr("Default Mic")
                                     font.family: Theme.fontFamily
                                     font.pixelSize: Theme.fontSizeXs
-                                    color: Theme.panelForeground
+                                    color: Theme.c.audioMixerStrip.foreground
                                     elide: Text.ElideRight
                                     width: Math.max(10, voMicPickerBtn.width - Theme.iconSizeSm * 2 - Theme.spacingMd * 2 - Theme.spacingSm * 2)
                                     anchors.verticalCenter: parent.verticalCenter
@@ -425,7 +425,7 @@ Rectangle {
                                 IconGlyph {
                                     glyph: Theme.icons.chevronDown
                                     iconSize: Theme.iconSizeSm
-                                    iconColor: Theme.mutedForeground
+                                    iconColor: Theme.c.audioMixerStrip.icon
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                             }
@@ -495,10 +495,10 @@ Rectangle {
                                 Rectangle {
                                     anchors.fill: parent
                                     anchors.margins: Theme.spacingSm
-                                    radius: Theme.radiusSm
-                                    color: addTrackMouse.containsMouse ? Theme.popoverHover : "transparent"
-                                    border.width: Theme.borderWidth
-                                    border.color: addTrackMouse.containsMouse ? Theme.panelMuted : Theme.panelBorder
+                                    radius: Theme.c.audioMixerStrip.addTrackRadius
+                                    color: addTrackMouse.containsMouse ? Theme.c.audioMixerStrip.addTrackBackgroundHover : "transparent"
+                                    border.width: Theme.c.audioMixerStrip.addTrackBorderWidth
+                                    border.color: addTrackMouse.containsMouse ? Theme.c.audioMixerStrip.addTrackBorderHover : Theme.c.audioMixerStrip.addTrackBorder
 
                                     Behavior on color {
                                         ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -513,7 +513,7 @@ Rectangle {
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             glyph: Theme.icons.plus
                                             iconSize: Theme.iconSizeBase
-                                            iconColor: addTrackMouse.containsMouse ? Theme.panelForeground : Theme.mutedForeground
+                                            iconColor: addTrackMouse.containsMouse ? Theme.c.audioMixerStrip.addTrackForeground : Theme.c.audioMixerStrip.addTrackForegroundMuted
                                         }
 
                                         Text {
@@ -523,7 +523,7 @@ Rectangle {
                                             wrapMode: Text.WordWrap
                                             font.family: Theme.fontFamily
                                             font.pixelSize: Theme.fontSizeXs
-                                            color: addTrackMouse.containsMouse ? Theme.panelForeground : Theme.mutedForeground
+                                            color: addTrackMouse.containsMouse ? Theme.c.audioMixerStrip.addTrackForeground : Theme.c.audioMixerStrip.addTrackForegroundMuted
                                         }
                                     }
 
@@ -646,7 +646,7 @@ Rectangle {
                         Rectangle {
                             z: -1
                             anchors.fill: parent
-                            color: Theme.panelAccent
+                            color: Theme.c.audioMixerStrip.masterBackground
                             opacity: 0.5
                         }
                     }
@@ -687,9 +687,13 @@ Rectangle {
                 // Resting edge line; turns amber while the handle is hovered or dragged.
                 Rectangle {
                     anchors.left: parent.left
-                    width: resizeHandle.pressed || resizeHandle.containsMouse ? 2 : 1
+                    width: resizeHandle.pressed || resizeHandle.containsMouse
+                           ? Theme.c.audioMixerStrip.handleBorderWidth
+                           : Theme.c.audioMixerStrip.handleBorderWidthRest
                     height: parent.height
-                    color: resizeHandle.pressed || resizeHandle.containsMouse ? Theme.primary : Theme.panelBorder
+                    color: resizeHandle.pressed || resizeHandle.containsMouse
+                           ? Theme.c.audioMixerStrip.handleBackground
+                           : Theme.c.audioMixerStrip.handleBackgroundRest
 
                     Behavior on color {
                         ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }

@@ -15,7 +15,7 @@ ToolWindow {
     minimumWidth: 720
     minimumHeight: 520
     title: qsTr("Multicam")
-    color: Theme.appBackground
+    color: Theme.c.multicamWindow.background
 
     readonly property var angles: EditorState.multicamAngles
     readonly property real currentSeconds: EditorState.playheadSeconds
@@ -157,10 +157,10 @@ ToolWindow {
                 id: programPane
                 width: body.width - gridPane.width - Theme.spacingLg
                 height: parent.height
-                color: Theme.overlayColor
-                radius: Theme.radiusMd
-                border.width: Theme.borderWidth
-                border.color: Theme.border
+                color: Theme.c.multicamWindow.programBackground
+                radius: Theme.c.multicamWindow.programRadius
+                border.width: Theme.c.multicamWindow.programBorderWidth
+                border.color: Theme.c.multicamWindow.programBorder
                 clip: true
 
                 PreviewItem {

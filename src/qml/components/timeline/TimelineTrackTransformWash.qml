@@ -7,6 +7,5 @@ Rectangle {
     property int trackIndex: -1
     anchors.fill: parent
     visible: panel.tracks[trackIndex].isTransformLayer === true
-    color: Qt.rgba(Theme.clipTransform.r, Theme.clipTransform.g,
-                   Theme.clipTransform.b, 0.07)
+    color: Qt.rgba(Theme.c.timelineTrackTransformWash.background.r, Theme.c.timelineTrackTransformWash.background.g, Theme.c.timelineTrackTransformWash.background.b, 0.07)
 }

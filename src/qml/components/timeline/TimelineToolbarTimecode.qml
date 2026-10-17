@@ -6,7 +6,7 @@ Text {
     property var panel
 
     text: panel.formatTime(EditorState.playheadSeconds) + " / " + panel.formatTime(EditorState.durationSeconds)
-    color: Theme.mutedForeground
+    color: Theme.c.timelineToolbarTimecode.foregroundMuted
     font.family: Theme.monoFontFamily
     font.pixelSize: Theme.fontSizeXs
     anchors.verticalCenter: parent.verticalCenter

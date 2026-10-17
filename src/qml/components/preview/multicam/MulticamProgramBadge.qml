@@ -6,9 +6,9 @@ Text {
     anchors.top: parent.top
     anchors.margins: Theme.spacingSm
     text: qsTr("Program")
-    color: "#ffffff"
+    color: Theme.c.multicamProgramBadge.foreground
     font.family: Theme.fontFamily
     font.pixelSize: Theme.fontSizeXs
     style: Text.Outline
-    styleColor: Theme.overlayColor
+    styleColor: Theme.c.multicamProgramBadge.shadow
 }

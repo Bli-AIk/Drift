@@ -9,5 +9,5 @@ Rectangle {
     y: 0
     width: 2
     height: parent.height
-    color: Theme.destructive
+    color: Theme.c.timelineOverviewPlayhead.foreground
 }

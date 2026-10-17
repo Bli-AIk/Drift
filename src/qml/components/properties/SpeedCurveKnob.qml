@@ -11,11 +11,11 @@ Rectangle {
 
     width: 11
     height: 11
-    radius: 2
+    radius: Theme.c.speedCurveKnob.radius
     z: 4
-    color: host.selectedPoint === index ? Theme.primary : Theme.panelBackground
-    border.width: 2
-    border.color: Theme.primary
+    color: host.selectedPoint === index ? Theme.c.speedCurveKnob.backgroundSelected : Theme.c.speedCurveKnob.background
+    border.width: Theme.c.speedCurveKnob.borderWidth
+    border.color: Theme.c.speedCurveKnob.border
     x: point.pos * plotItem.width - width / 2
     y: host.yForSpeed(point.speed, plotItem.height) - height / 2
 

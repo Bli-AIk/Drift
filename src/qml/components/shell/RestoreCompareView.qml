@@ -58,8 +58,8 @@ Column {
 
         Rectangle {
             anchors.fill: parent
-            color: Theme.panelBackground
-            radius: Theme.radiusMd
+            color: Theme.c.restoreCompareView.background
+            radius: Theme.c.restoreCompareView.radius
         }
 
         Image {
@@ -125,23 +125,23 @@ Column {
         // Divider.
         Rectangle {
             x: stage.splitX - width / 2
-            width: 2
+            width: Theme.c.restoreCompareView.dividerWidth
             height: stage.height
-            color: Theme.primary
+            color: Theme.c.restoreCompareView.divider
             visible: tool.hasEnhanced
 
             Rectangle {
                 anchors.centerIn: parent
                 width: 24
                 height: 24
-                radius: 12
-                color: Theme.primary
+                radius: Theme.c.restoreCompareView.handleRadius
+                color: Theme.c.restoreCompareView.handle
 
                 IconGlyph {
                     anchors.centerIn: parent
                     glyph: "move-horizontal"
                     iconSize: 14
-                    iconColor: Theme.primaryForeground
+                    iconColor: Theme.c.restoreCompareView.icon
                 }
             }
 
@@ -182,8 +182,8 @@ Column {
                      && (tool.preview.loading || (!tool.hasEnhanced && tool.preview.width > 0) || tool.running)
             width: stageLabel.width + Theme.spacingXl
             height: stageLabel.height + Theme.spacingLg
-            radius: Theme.radiusMd
-            color: Theme.scrimStrong
+            radius: Theme.c.restoreCompareView.radius
+            color: Theme.c.restoreCompareView.scrim
 
             ThemedLabel {
                 id: stageLabel

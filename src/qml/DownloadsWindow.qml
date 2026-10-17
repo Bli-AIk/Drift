@@ -18,7 +18,7 @@ ToolWindow {
     minimumWidth: 460
     minimumHeight: 320
     title: qsTr("Downloads")
-    color: Theme.appBackground
+    color: Theme.c.downloadsWindow.background
 
     // The update row has the same shape as a marketplace job; its buttons route to Updates.
     readonly property var updateJob: Updates.downloadJob
@@ -65,7 +65,7 @@ ToolWindow {
                 text: root.activeCount > 0
                       ? qsTr("%n active", "", root.activeCount)
                       : qsTr("No downloads running")
-                color: Theme.foreground
+                color: Theme.c.downloadsWindow.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeBase
                 font.weight: Font.DemiBold
@@ -92,8 +92,8 @@ ToolWindow {
 
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: Theme.borderWidth
-            color: Theme.border
+            Layout.preferredHeight: Theme.c.downloadsWindow.borderWidth
+            color: Theme.c.downloadsWindow.border
         }
 
         EmptyState {

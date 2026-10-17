@@ -10,12 +10,12 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: Theme.radiusSm
+        radius: Theme.c.voiceoverMicPicker.radius
         color: micPickerMouse.containsMouse || micMenu.opened
-               ? Theme.popoverHover
-               : Qt.rgba(Theme.panelForeground.r, Theme.panelForeground.g, Theme.panelForeground.b, 0.05)
-        border.color: Theme.panelBorder
-        border.width: 1
+               ? Theme.c.voiceoverMicPicker.backgroundHover
+               : Qt.rgba(Theme.c.voiceoverMicPicker.background.r, Theme.c.voiceoverMicPicker.background.g, Theme.c.voiceoverMicPicker.background.b, 0.05)
+        border.color: Theme.c.voiceoverMicPicker.border
+        border.width: Theme.c.voiceoverMicPicker.borderWidth
     }
 
     Row {
@@ -26,14 +26,14 @@ Item {
         IconGlyph {
             glyph: Theme.icons.mic
             iconSize: 12
-            iconColor: Theme.panelForeground
+            iconColor: Theme.c.voiceoverMicPicker.icon
             anchors.verticalCenter: parent.verticalCenter
         }
 
         Text {
             text: EditorState.currentMicrophoneName || qsTr("Default Mic")
             font.pixelSize: 11
-            color: Theme.panelForeground
+            color: Theme.c.voiceoverMicPicker.foreground
             elide: Text.ElideRight
             width: Math.min(85, implicitWidth)
             anchors.verticalCenter: parent.verticalCenter
@@ -42,7 +42,7 @@ Item {
         IconGlyph {
             glyph: Theme.icons.chevronDown
             iconSize: 10
-            iconColor: Theme.mutedForeground
+            iconColor: Theme.c.voiceoverMicPicker.iconMuted
             anchors.verticalCenter: parent.verticalCenter
         }
     }

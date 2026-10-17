@@ -13,9 +13,9 @@ Rectangle {
 
     width: setRow.rowWidth
     height: Theme.controlHeight + Theme.spacingXs
-    radius: Theme.radiusSm
-    color: setRow.chosen ? Theme.accent
-           : setHover.hovered ? Theme.popoverHover : "transparent"
+    radius: Theme.c.guidesPopoverSetRow.radius
+    color: setRow.chosen ? Theme.c.guidesPopoverSetRow.backgroundSelected
+           : setHover.hovered ? Theme.c.guidesPopoverSetRow.backgroundHover : "transparent"
 
     HoverHandler { id: setHover }
     TapHandler { onTapped: setRow.picked(setRow.modelData.id) }
@@ -37,7 +37,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         text: setRow.modelData.name
         elide: Text.ElideRight
-        color: Theme.foreground
+        color: Theme.c.guidesPopoverSetRow.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeSm
     }
@@ -49,7 +49,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         text: setRow.modelData.builtIn ? qsTr("Built-in")
               : setRow.modelData.inLibrary ? "" : qsTr("From project")
-        color: Theme.mutedForeground
+        color: Theme.c.guidesPopoverSetRow.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

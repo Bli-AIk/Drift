@@ -29,14 +29,16 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: Theme.radiusSm
-        color: Qt.rgba(Theme.transitionOverlap.r,
-                       Theme.transitionOverlap.g,
-                       Theme.transitionOverlap.b,
+        radius: Theme.c.androidTimelineTransitionMark.radius
+        color: Qt.rgba(Theme.c.androidTimelineTransitionMark.background.r,
+                       Theme.c.androidTimelineTransitionMark.background.g,
+                       Theme.c.androidTimelineTransitionMark.background.b,
                        transitionRegion.transitionSelected ? 0.85
                        : (transitionRegion.hasTransition ? 0.65 : 0.35))
-        border.width: transitionRegion.transitionSelected ? 2 : 1
-        border.color: Theme.transitionOverlap
+        border.width: transitionRegion.transitionSelected
+                      ? Theme.c.androidTimelineTransitionMark.borderWidthSelected
+                      : Theme.c.androidTimelineTransitionMark.borderWidth
+        border.color: Theme.c.androidTimelineTransitionMark.border
 
         Canvas {
             anchors.fill: parent
@@ -45,8 +47,8 @@ Item {
             onPaint: {
                 const ctx = getContext("2d")
                 ctx.clearRect(0, 0, width, height)
-                ctx.strokeStyle = Theme.onMedia
-                ctx.lineWidth = 1
+                ctx.strokeStyle = Theme.c.androidTimelineTransitionMark.hatch
+                ctx.lineWidth = Theme.c.androidTimelineTransitionMark.hatchWidth
                 for (var x = -height; x < width; x += 6) {
                     ctx.beginPath()
                     ctx.moveTo(x, height)
@@ -63,7 +65,7 @@ Item {
             text: transitionRegion.hasTransition && transitionRegion.modelData.label
                   ? transitionRegion.modelData.label.charAt(0)
                   : "≫"
-            color: Theme.onMedia
+            color: Theme.c.androidTimelineTransitionMark.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeTiny
             font.weight: Font.Bold

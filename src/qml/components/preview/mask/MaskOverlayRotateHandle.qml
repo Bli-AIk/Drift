@@ -15,10 +15,10 @@ Rectangle {
     height: Theme.spacingLg
     radius: width / 2
     color: rotateArea.containsMouse || rotateArea.pressed
-           ? Theme.primaryForeground : Theme.primary
-    border.width: Theme.borderWidth
+           ? Theme.c.maskOverlayRotateHandle.backgroundHover : Theme.c.maskOverlayRotateHandle.background
+    border.width: Theme.c.maskOverlayRotateHandle.borderWidth
     border.color: rotateArea.containsMouse || rotateArea.pressed
-                  ? Theme.primary : Theme.primaryForeground
+                  ? Theme.c.maskOverlayRotateHandle.borderHover : Theme.c.maskOverlayRotateHandle.border
     x: parent.width / 2 - width / 2
     y: -28 - height / 2
 

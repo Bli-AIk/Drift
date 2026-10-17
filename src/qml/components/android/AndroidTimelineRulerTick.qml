@@ -20,17 +20,17 @@ Item {
     Rectangle {
         x: 0
         y: parent.height - 10
-        width: 1
+        width: Theme.c.androidTimelineRulerTick.tickWidth
         height: 8
-        color: Qt.rgba(Theme.mutedForeground.r,
-                       Theme.mutedForeground.g,
-                       Theme.mutedForeground.b, 0.28)
+        color: Qt.rgba(Theme.c.androidTimelineRulerTick.tick.r,
+                       Theme.c.androidTimelineRulerTick.tick.g,
+                       Theme.c.androidTimelineRulerTick.tick.b, 0.28)
     }
     Text {
         x: 4
         y: 4
         text: tick.formatTick(tick.tickSeconds)
-        color: Theme.mutedForeground
+        color: Theme.c.androidTimelineRulerTick.foreground
         font.pixelSize: Theme.fontSizeTick
         font.family: Theme.fontFamily
     }

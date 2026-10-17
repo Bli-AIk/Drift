@@ -12,7 +12,7 @@ Row {
     Text {
         width: Math.max(90, parent.width - 128)
         text: modelData.label
-        color: Theme.panelForeground
+        color: Theme.c.shortcutsBindingRow.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         wrapMode: Text.WordWrap

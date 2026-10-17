@@ -5,8 +5,8 @@ Rectangle {
     property var shading
     width: parent.width
     height: Math.max(Theme.controlHeightSm, header.implicitHeight + 8)
-    radius: Theme.radiusSm
-    color: Theme.panelAccent
+    radius: Theme.c.shadingLayerHeader.radius
+    color: Theme.c.shadingLayerHeader.background
 
     Row {
         id: header
@@ -29,12 +29,12 @@ Rectangle {
         IconGlyph {
             glyph: shading.kindGlyphs[shading.kind] || Theme.icons.layers
             iconSize: 12
-            iconColor: shading.layerEnabled ? Theme.panelForeground : Theme.mutedForeground
+            iconColor: shading.layerEnabled ? Theme.c.shadingLayerHeader.icon : Theme.c.shadingLayerHeader.iconDisabled
             anchors.verticalCenter: parent.verticalCenter
         }
         Text {
             text: (shading.kindLabels[shading.kind] || shading.kind) + " · " + (shading.paintLabels[shading.paintKind] || shading.paintKind)
-            color: shading.layerEnabled ? Theme.panelForeground : Theme.mutedForeground
+            color: shading.layerEnabled ? Theme.c.shadingLayerHeader.foreground : Theme.c.shadingLayerHeader.foregroundDisabled
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.Medium

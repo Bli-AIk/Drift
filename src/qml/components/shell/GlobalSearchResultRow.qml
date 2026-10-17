@@ -15,8 +15,9 @@ Rectangle {
 
     width: ListView.view.width
     height: column.implicitHeight + Theme.spacingMd * 2
-    radius: Theme.radiusSm
-    color: rowMouse.containsMouse || highlightIndex === index ? Theme.popoverHover : "transparent"
+    radius: Theme.c.globalSearchResultRow.radius
+    color: rowMouse.containsMouse || highlightIndex === index
+           ? Theme.c.globalSearchResultRow.backgroundHover : "transparent"
     opacity: modelData.enabled ? 1.0 : 0.5
 
     Column {
@@ -32,7 +33,7 @@ Rectangle {
             width: parent.width
             text: resultRow.modelData.label
             elide: Text.ElideRight
-            color: Theme.panelForeground
+            color: Theme.c.globalSearchResultRow.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
         }
@@ -42,7 +43,7 @@ Rectangle {
             visible: text.length > 0
             text: resultRow.detail
             elide: Text.ElideRight
-            color: Theme.mutedForeground
+            color: Theme.c.globalSearchResultRow.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -58,14 +59,14 @@ Rectangle {
         Text {
             visible: text.length > 0
             text: resultRow.modelData.shortcut
-            color: Theme.mutedForeground
+            color: Theme.c.globalSearchResultRow.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
 
         Text {
             text: kindLabels[resultRow.modelData.kind] || ""
-            color: Theme.mutedForeground
+            color: Theme.c.globalSearchResultRow.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             font.weight: Font.Medium

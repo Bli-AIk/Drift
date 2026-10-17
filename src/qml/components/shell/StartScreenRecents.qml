@@ -10,7 +10,7 @@ Column {
 
     Text {
         text: qsTr("Recent Projects")
-        color: Theme.mutedForeground
+        color: Theme.c.startScreenRecents.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         font.weight: Font.Medium

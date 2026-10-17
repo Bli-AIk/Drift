@@ -11,10 +11,10 @@ Rectangle {
     signal openRequested(string path)
 
     height: Theme.androidHomeRecentCardHeight
-    radius: Theme.radiusMd
-    color: Theme.panelBackground
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
+    radius: Theme.c.androidHomeRecentCard.radius
+    color: Theme.c.androidHomeRecentCard.background
+    border.width: Theme.c.androidHomeRecentCard.borderWidth
+    border.color: Theme.c.androidHomeRecentCard.border
     opacity: modelData.exists === false ? 0.55 : 1
 
     Accessible.role: Accessible.Button
@@ -33,14 +33,14 @@ Rectangle {
         Rectangle {
             width: parent.width
             height: 32
-            radius: Theme.radiusSm
-            color: Theme.panelAccent
+            radius: Theme.c.androidHomeRecentCard.thumbRadius
+            color: Theme.c.androidHomeRecentCard.thumbBackground
 
             IconGlyph {
                 anchors.centerIn: parent
                 glyph: Theme.icons.film
                 iconSize: 18
-                iconColor: Theme.mutedForeground
+                iconColor: Theme.c.androidHomeRecentCard.icon
             }
 
             // Same on-disk signal the desktop recents list carries;
@@ -50,14 +50,15 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.margins: 4
                 dotColor: card.modelData.exists === false
-                          ? Theme.mutedForeground : Theme.constructive
+                          ? Theme.c.androidHomeRecentCard.missingDot
+                          : Theme.c.androidHomeRecentCard.presentDot
             }
         }
 
         Text {
             width: parent.width
             text: card.projectLabel
-            color: Theme.panelForeground
+            color: Theme.c.androidHomeRecentCard.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             font.weight: Font.Medium
@@ -69,7 +70,7 @@ Rectangle {
         Text {
             width: parent.width
             text: card.modelData.path
-            color: Theme.mutedForeground
+            color: Theme.c.androidHomeRecentCard.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             elide: Text.ElideLeft

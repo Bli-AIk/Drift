@@ -31,7 +31,7 @@ Column {
             id: fadeValue
             anchors.right: parent.right
             text: fadeRow.formatSeconds(fadeSlider.pressed ? fadeSlider.value : fadeRow.current)
-            color: Theme.mutedForeground
+            color: Theme.c.androidFadeSliderRow.foregroundMuted
             font.family: Theme.monoFontFamily
             font.pixelSize: Theme.fontSizeSm
         }

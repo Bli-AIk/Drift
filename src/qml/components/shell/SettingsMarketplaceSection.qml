@@ -10,7 +10,7 @@ SettingsSectionCard {
         text: Market.accountName.length > 0
               ? qsTr("Account connected (%1)").arg(Market.accountName)
               : qsTr("Marketplace account connected")
-        color: Theme.panelForeground
+        color: Theme.c.settingsMarketplaceSection.foreground
     }
 
     ThemedButton {

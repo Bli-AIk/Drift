@@ -16,16 +16,17 @@ Item {
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         visible: slot.modelData.gutter === true
-        width: Theme.borderWidth
+        width: Theme.c.androidClipToolbarSlot.gutterWidth
         height: Theme.spacing3xl
-        color: Theme.panelBorder
+        color: Theme.c.androidClipToolbarSlot.gutter
     }
 
     NavRailButton {
         anchors.fill: parent
         entry: slot.modelData
-        tint: slot.modelData.destructive === true ? Theme.destructive
-                                                  : Theme.mutedForeground
+        tint: slot.modelData.destructive === true
+              ? Theme.c.androidClipToolbarSlot.foregroundDestructive
+              : Theme.c.androidClipToolbarSlot.foreground
         onClicked: {
             // Explicit rather than inherited: a signal handler declared on the
             // instance replaces the one in NavRailButton's own definition.

@@ -14,14 +14,14 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.panelBackground
+        color: Theme.c.androidTimelineLaneBar.background
     }
     Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        height: 1
-        color: Theme.panelBorder
+        height: Theme.c.androidTimelineLaneBar.borderWidth
+        color: Theme.c.androidTimelineLaneBar.border
     }
 
     Row {
@@ -54,7 +54,7 @@ Item {
         Text {
             anchors.verticalCenter: parent.verticalCenter
             text: qsTr("%n clip(s)", "", EditorState.selectionCount)
-            color: Theme.panelForeground
+            color: Theme.c.androidTimelineLaneBar.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }

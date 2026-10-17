@@ -10,10 +10,10 @@ Rectangle {
     x: panel.dropStartSeconds * panel.pxPerSecond
     width: panel.dropDurationSeconds * panel.pxPerSecond
     height: parent.height
-    radius: Theme.radiusSm
-    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
-    border.width: 2
-    border.color: Theme.primary
+    radius: Theme.c.timelineLandingOutline.radius
+    color: Qt.rgba(Theme.c.timelineLandingOutline.background.r, Theme.c.timelineLandingOutline.background.g, Theme.c.timelineLandingOutline.background.b, 0.12)
+    border.width: Theme.c.timelineLandingOutline.borderWidth
+    border.color: Theme.c.timelineLandingOutline.border
     z: 5
 
     // The outline is held on screen after a file drop for as
@@ -23,7 +23,7 @@ Rectangle {
         anchors.centerIn: parent
         visible: panel.importDropPending
         text: qsTr("Importing…")
-        color: Theme.primary
+        color: Theme.c.timelineLandingOutline.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeTiny
         font.weight: Font.Medium

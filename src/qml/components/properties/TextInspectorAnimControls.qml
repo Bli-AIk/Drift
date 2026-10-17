@@ -18,7 +18,7 @@ Column {
             anchors.verticalCenter: parent.verticalCenter
             text: inspector.selectedPreset ? inspector.selectedPreset.label : ""
             elide: Text.ElideRight
-            color: Theme.panelForeground
+            color: Theme.c.textInspectorAnimControls.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.DemiBold
@@ -50,13 +50,13 @@ Column {
             spacing: 6
             Text {
                 text: inspector.animSlot === "loop" ? qsTr("Period") : qsTr("Duration")
-                color: Theme.mutedForeground
+                color: Theme.c.textInspectorAnimControls.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
             Text {
                 text: Number(durationSlider.value).toFixed(2) + " s"
-                color: Theme.mutedForeground
+                color: Theme.c.textInspectorAnimControls.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.monoFontFamily
             }
@@ -103,7 +103,7 @@ Column {
             visible: !inspector.presetFlags.unitLocked
             Text {
                 text: qsTr("By")
-                color: Theme.mutedForeground
+                color: Theme.c.textInspectorAnimControls.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -135,7 +135,7 @@ Column {
                           : qsTr("Delay between one unit starting and the next")
                     visible: staggerHover.hovered || held
                 }
-                color: Theme.mutedForeground
+                color: Theme.c.textInspectorAnimControls.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -163,7 +163,7 @@ Column {
         visible: !inspector.presetFlags.orderLocked
         Text {
             text: qsTr("Order")
-            color: Theme.mutedForeground
+            color: Theme.c.textInspectorAnimControls.foregroundMuted
             font.pixelSize: Theme.fontSizeXs
             font.family: Theme.fontFamily
         }
@@ -182,7 +182,7 @@ Column {
         visible: !inspector.presetFlags.easeLocked
         Text {
             text: qsTr("Ease")
-            color: Theme.mutedForeground
+            color: Theme.c.textInspectorAnimControls.foregroundMuted
             font.pixelSize: Theme.fontSizeXs
             font.family: Theme.fontFamily
         }

@@ -21,30 +21,30 @@ Item {
         anchors.fill: parent
         radius: width / 2
         color: "transparent"
-        border.width: 2
+        border.width: Theme.c.depthEffectFocusReticle.borderWidth
         border.color: focusArea.containsMouse || focusArea.pressed
-                      ? Theme.primary : Theme.primaryForeground
+                      ? Theme.c.depthEffectFocusReticle.borderHover : Theme.c.depthEffectFocusReticle.border
     }
     Rectangle {
         anchors.centerIn: parent
-        width: 2
+        width: Theme.c.depthEffectFocusReticle.strokeWidth
         height: parent.height * 0.5
-        color: Theme.primaryForeground
+        color: Theme.c.depthEffectFocusReticle.foreground
     }
     Rectangle {
         anchors.centerIn: parent
         width: parent.width * 0.5
-        height: 2
-        color: Theme.primaryForeground
+        height: Theme.c.depthEffectFocusReticle.strokeWidth
+        color: Theme.c.depthEffectFocusReticle.foreground
     }
     Text {
         anchors.top: parent.bottom
         anchors.topMargin: 2
         anchors.horizontalCenter: parent.horizontalCenter
         text: reticle.source.values.follow ? qsTr("Focus") : qsTr("Pick focus")
-        color: Theme.primaryForeground
+        color: Theme.c.depthEffectFocusReticle.foreground
         style: Text.Outline
-        styleColor: "#80000000"
+        styleColor: Theme.c.depthEffectFocusReticle.shadow
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

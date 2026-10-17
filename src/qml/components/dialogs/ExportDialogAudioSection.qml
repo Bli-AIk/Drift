@@ -104,7 +104,7 @@ Column {
                 anchors.verticalCenter: parent.verticalCenter
                 glyph: Theme.icons.chevronRight
                 iconSize: Theme.iconSizeSm
-                iconColor: Theme.mutedForeground
+                iconColor: Theme.c.exportDialogAudioSection.icon
                 rotation: dialog.advancedOpen ? 90 : 0
                 Behavior on rotation {
                     NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }

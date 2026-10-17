@@ -160,7 +160,7 @@ Item {
 
     SkeletonBox {
         anchors.fill: parent
-        radius: 0
+        radius: Theme.c.clipFilmstrip.radius
         animated: root.width < 4000
         visible: root.loading
     }

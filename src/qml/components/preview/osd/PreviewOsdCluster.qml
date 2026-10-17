@@ -2,7 +2,7 @@ import QtQuick
 import Drift
 
 // The top-right plate: zoom, guides, and preview options.
-Rectangle {
+Item {
     id: cluster
 
     property var viewport
@@ -12,10 +12,21 @@ Rectangle {
 
     width: rightRow.implicitWidth + Theme.spacingXs * 2
     height: rightRow.implicitHeight + Theme.spacingXs * 2
-    radius: Theme.radiusMd
-    color: Theme.panelBackground
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
+
+    ThemeSlot {
+        anchors.fill: parent
+        slot: "PreviewOsdClusterBackground"
+        control: cluster
+        fallback: Component {
+            Rectangle {
+                anchors.fill: parent
+                radius: Theme.c.previewOsdCluster.radius
+                color: Theme.c.previewOsdCluster.background
+                border.width: Theme.c.previewOsdCluster.borderWidth
+                border.color: Theme.c.previewOsdCluster.border
+            }
+        }
+    }
 
     HoverHandler { id: rightHover }
 

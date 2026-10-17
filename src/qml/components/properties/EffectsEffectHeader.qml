@@ -6,8 +6,8 @@ Rectangle {
     property var inspector
     width: parent.width
     height: effectHeader.implicitHeight + 8
-    radius: Theme.radiusSm
-    color: Theme.panelAccent
+    radius: Theme.c.effectsEffectHeader.radius
+    color: Theme.c.effectsEffectHeader.background
 
     // Save-as-preset lives here rather than in the header row: a fifth ghost
     // button already crowds a 22px row at panel width, and a sixth would leave
@@ -52,7 +52,7 @@ Rectangle {
                   ? qsTr("%1 (not installed)").arg(card.effectData.label)
                   : card.effectData.label
             color: card.effectEnabled
-                   ? Theme.panelForeground : Theme.mutedForeground
+                   ? Theme.c.effectsEffectHeader.foreground : Theme.c.effectsEffectHeader.foregroundDisabled
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.Medium

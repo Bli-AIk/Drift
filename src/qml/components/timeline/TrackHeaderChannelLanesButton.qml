@@ -19,7 +19,7 @@ IconGlyph {
     visible: shown && laneChannels > 1
     glyph: Theme.icons.split
     iconSize: 16
-    iconColor: lanesOn ? Theme.primary : Theme.mutedForeground
+    iconColor: lanesOn ? Theme.c.trackHeaderChannelLanesButton.accent : Theme.c.trackHeaderChannelLanesButton.foregroundMuted
     anchors.verticalCenter: parent.verticalCenter
 
     Behavior on iconColor {

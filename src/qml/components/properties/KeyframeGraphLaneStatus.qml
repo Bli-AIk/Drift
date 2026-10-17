@@ -19,7 +19,7 @@ Text {
         return (host.bpm > 0 ? keys + " · " + Math.round(host.bpm) + qsTr(" BPM")
                              : keys + qsTr(" · no beat found")) + hint
     }
-    color: (!host.curveEditing && host.keyCount > 0) ? Theme.primary : Theme.mutedForeground
+    color: (!host.curveEditing && host.keyCount > 0) ? Theme.c.keyframeGraphLaneStatus.foregroundAccent : Theme.c.keyframeGraphLaneStatus.foregroundMuted
     font.family: Theme.fontFamily
     font.pixelSize: Theme.fontSizeXs
 

@@ -10,8 +10,8 @@ Rectangle {
     width: parent.width
     height: parent.height - transportItem.height - stripItem.height - toolbarItem.height - graphItem.height
             - Theme.spacingMd * 4
-    radius: Theme.radiusMd
-    color: Theme.panelBackground
+    radius: Theme.c.speedCurvePreviewStage.radius
+    color: Theme.c.speedCurvePreviewStage.background
 
     Image {
         anchors.centerIn: parent

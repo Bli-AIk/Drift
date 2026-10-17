@@ -11,8 +11,8 @@ Rectangle {
     y: drawnBottom - 1
     width: indentStep - 2
     height: 2
-    radius: 1
-    color: Theme.clipTransform
+    radius: Theme.c.timelineSpanBracketFoot.radius
+    color: Theme.c.timelineSpanBracketFoot.foreground
     scale: hot ? 1.4 : 1.0
 
     Behavior on scale {

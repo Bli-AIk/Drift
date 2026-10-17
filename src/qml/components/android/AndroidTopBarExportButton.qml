@@ -23,13 +23,22 @@ ThemedButton {
     onClicked: exportPill.exportInProgress ? exportPill.progressRequested()
                                            : exportPill.exportRequested()
 
-    CircularProgress {
+    ThemeSlot {
         anchors.left: parent.left
         anchors.leftMargin: Theme.spacingXl + Theme.iconSizeMd / 2 - width / 2
         anchors.verticalCenter: parent.verticalCenter
         visible: exportPill.exportInProgress
-        size: Theme.iconSizeXl
-        strokeWidth: 2
-        value: exportPill.exportProgress
+        width: Theme.iconSizeXl
+        height: Theme.iconSizeXl
+        slot: "AndroidTopBarExportButton"
+        control: exportPill
+        fallback: Component {
+            CircularProgress {
+                anchors.centerIn: parent
+                size: Theme.iconSizeXl
+                strokeWidth: Theme.c.androidTopBarExportButton.progressStrokeWidth
+                value: exportPill.exportProgress
+            }
+        }
     }
 }

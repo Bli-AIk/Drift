@@ -157,7 +157,7 @@ QtObject {
     Component.onCompleted: syncVariant()
     onDarkModeChanged: syncVariant()
 
-    // Per-component tokens (empty until a later wave fills components in the JSON).
+    // Per-component tokens. Each group is lowerCamel of the QML type name.
     readonly property var c: ThemeManager.components
     readonly property var tokens: ThemeManager
 

@@ -14,7 +14,7 @@ Text {
     text: caption.message
     // Drawn on the letterbox scrim, not a panel surface, so it follows the on-media tokens in
     // both themes.
-    color: Theme.guideMedium
+    color: Theme.c.previewGapCaption.foreground
     font.family: Theme.fontFamily
     font.pixelSize: Theme.fontSizeSm
 

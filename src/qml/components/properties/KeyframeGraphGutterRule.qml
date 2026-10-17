@@ -4,7 +4,7 @@ import Drift
 // Vertical rule between the property gutter and the curves.
 Rectangle {
     anchors.right: parent.right
-    width: 1
+    width: Theme.c.keyframeGraphGutterRule.borderWidth
     height: parent.height
-    color: Theme.panelBorder
+    color: Theme.c.keyframeGraphGutterRule.border
 }

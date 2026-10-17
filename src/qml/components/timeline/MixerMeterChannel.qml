@@ -14,7 +14,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: 1
+        radius: Theme.c.mixerMeterChannel.radius
         gradient: MixerZoneGradient {}
     }
 
@@ -29,7 +29,7 @@ Item {
             anchors.bottom: parent.bottom
             width: parent.width
             height: channel.height
-            radius: 1
+            radius: Theme.c.mixerMeterChannel.radius
             gradient: MixerZoneGradient { vivid: true }
         }
     }
@@ -40,6 +40,6 @@ Item {
         width: parent.width
         height: 2
         y: Math.max(0, parent.height * (1.0 - channel.peakRatio) - 1)
-        color: channel.peak >= 1.0 ? Theme.destructive : Theme.panelForeground
+        color: channel.peak >= 1.0 ? Theme.c.mixerMeterChannel.peakHot : Theme.c.mixerMeterChannel.peak
     }
 }

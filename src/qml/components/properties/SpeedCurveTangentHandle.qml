@@ -16,11 +16,11 @@ Rectangle {
 
     width: 9
     height: 9
-    radius: 4.5
+    radius: Theme.c.speedCurveTangentHandle.radius
     z: 5
-    color: Theme.panelBackground
-    border.width: 2
-    border.color: Theme.mutedForeground
+    color: Theme.c.speedCurveTangentHandle.background
+    border.width: Theme.c.speedCurveTangentHandle.borderWidth
+    border.color: Theme.c.speedCurveTangentHandle.border
     x: (host.selected.pos + dx) * plotItem.width - width / 2
     y: host.yForSpeed(host.selected.speed + dy, plotItem.height) - height / 2
 

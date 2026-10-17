@@ -59,7 +59,7 @@ Column {
 
                 Text {
                     text: root.labelOf(slotRow.spec)
-                    color: Theme.mutedForeground
+                    color: Theme.c.textParamSlots.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                     anchors.verticalCenter: parent.verticalCenter
@@ -72,7 +72,7 @@ Column {
                         const decimals = step > 0 && step < 1 ? Math.min(3, Math.ceil(-Math.log10(step))) : 0
                         return v.toFixed(decimals) + (slotRow.spec.unit || "")
                     }
-                    color: Theme.mutedForeground
+                    color: Theme.c.textParamSlots.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.monoFontFamily
                     anchors.verticalCenter: parent.verticalCenter

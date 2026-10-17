@@ -115,7 +115,7 @@ SettingsSectionCard {
         width: parent.width
         wrapMode: Text.WordWrap
         text: qsTr("Linking a proxy teaches Drift its name pattern. Proxies next to your media that match a pattern below link automatically.")
-        color: Theme.panelSecondaryForeground
+        color: Theme.c.settingsPreviewSection.foreground
     }
 
     Repeater {

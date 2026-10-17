@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
@@ -45,30 +46,37 @@ ComboBox {
         rightPadding: root.indicator.width + root.spacing
         text: root.displayText
         font: root.font
-        color: Theme.panelForeground
+        color: Theme.c.themedComboBox.foreground
         opacity: root.enabled ? 1 : 0.5
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideRight
     }
 
-    background: Rectangle {
-        radius: Theme.radiusSm
-        color: Theme.panelAccent
-        // Disabled used to be visually identical to enabled, so `enabled:` bindings
-        // on combo boxes had no perceptible effect.
-        opacity: root.enabled ? 1 : 0.5
-        border.width: root.activeFocus || root.down ? Theme.borderWidthFocus
-                                                    : (root.hovered ? Theme.borderWidth : 0)
-        border.color: root.activeFocus ? Theme.focusRing : Theme.panelMuted
+    background: ThemeSlot {
+        slot: "ThemedComboBoxBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                radius: Theme.c.themedComboBox.radius
+                color: Theme.c.themedComboBox.background
+                // Disabled used to be visually identical to enabled, so `enabled:` bindings
+                // on combo boxes had no perceptible effect.
+                opacity: root.enabled ? 1 : 0.5
+                border.width: root.activeFocus || root.down ? Theme.c.themedComboBox.borderWidthFocus
+                                                            : (root.hovered ? Theme.c.themedComboBox.borderWidth : 0)
+                border.color: root.activeFocus ? Theme.c.themedComboBox.borderFocus
+                                               : Theme.c.themedComboBox.border
 
-        Behavior on border.width {
-            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
-        Behavior on border.color {
-            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
-        Behavior on opacity {
-            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                Behavior on border.width {
+                    NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
+                Behavior on border.color {
+                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
+                Behavior on opacity {
+                    NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
+            }
         }
     }
 
@@ -77,7 +85,7 @@ ComboBox {
         y: root.topPadding + (root.availableHeight - height) / 2
         glyph: Theme.icons.chevronDown
         iconSize: Theme.iconSizeSm
-        iconColor: Theme.mutedForeground
+        iconColor: Theme.c.themedComboBox.icon
         opacity: root.enabled ? 1 : 0.5
 
         // Points up while the list is open.
@@ -123,11 +131,17 @@ ComboBox {
             ScrollBar.vertical: AppScrollBar { }
         }
 
-        background: Rectangle {
-            radius: Theme.radiusSm
-            color: Theme.panelBackground
-            border.width: Theme.borderWidth
-            border.color: Theme.panelBorder
+        background: ThemeSlot {
+            slot: "ThemedComboBoxPopupBackground"
+            control: root
+            fallback: Component {
+                Rectangle {
+                    radius: Theme.c.themedComboBox.popupRadius
+                    color: Theme.c.themedComboBox.popupBackground
+                    border.width: Theme.c.themedComboBox.popupBorderWidth
+                    border.color: Theme.c.themedComboBox.popupBorder
+                }
+            }
         }
 
         // Opacity plus scale, matching ThemedDialog and ThemedContextMenu, so the

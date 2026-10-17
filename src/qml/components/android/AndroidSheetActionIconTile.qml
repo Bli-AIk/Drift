@@ -6,12 +6,12 @@ Rectangle {
     id: tile
 
     property string glyph: ""
-    property color tint: Theme.panelForeground
+    property color tint: Theme.c.androidSheetActionIconTile.foreground
 
     width: 40
     height: 40
-    radius: Theme.radiusMd
-    color: Theme.panelAccent
+    radius: Theme.c.androidSheetActionIconTile.radius
+    color: Theme.c.androidSheetActionIconTile.background
 
     IconGlyph {
         anchors.centerIn: parent

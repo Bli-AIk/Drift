@@ -6,7 +6,7 @@ Rectangle {
     anchors.centerIn: parent
     width: 3
     height: Math.min(16, parent.height * 0.4)
-    radius: 1.5
-    color: Theme.onMedia
+    radius: Theme.c.timelineTrimGrip.radius
+    color: Theme.c.timelineTrimGrip.foreground
     opacity: 0.9
 }

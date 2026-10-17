@@ -10,10 +10,14 @@ Rectangle {
     x: (EditorState.playheadSeconds - EditorState.audioRecordSeconds) * liveRecordingBlock.pxPerSecond
     width: Math.max(2, EditorState.audioRecordSeconds * liveRecordingBlock.pxPerSecond)
     height: parent.height
-    color: Qt.rgba(Theme.destructive.r, Theme.destructive.g, Theme.destructive.b, 0.25)
-    border.color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
-    border.width: 1
-    radius: Theme.radiusSm
+    color: Qt.rgba(Theme.c.androidTimelineLiveRecording.background.r,
+                   Theme.c.androidTimelineLiveRecording.background.g,
+                   Theme.c.androidTimelineLiveRecording.background.b, 0.25)
+    border.color: EditorState.isAudioRecordingPaused
+                  ? Theme.c.androidTimelineLiveRecording.borderPaused
+                  : Theme.c.androidTimelineLiveRecording.border
+    border.width: Theme.c.androidTimelineLiveRecording.borderWidth
+    radius: Theme.c.androidTimelineLiveRecording.radius
     clip: true
     z: 2
 
@@ -46,15 +50,15 @@ Rectangle {
             var n = peaks.length;
 
             // Centerline guideline
-            ctx.strokeStyle = Qt.rgba(1.0, 1.0, 1.0, 0.15);
-            ctx.lineWidth = 1;
+            ctx.strokeStyle = Theme.c.androidTimelineLiveRecording.waveStroke;
+            ctx.lineWidth = Theme.c.androidTimelineLiveRecording.borderWidth;
             ctx.beginPath();
             ctx.moveTo(0, mid);
             ctx.lineTo(w, mid);
             ctx.stroke();
 
             // Mirrored waveform fill
-            ctx.fillStyle = Qt.rgba(1.0, 1.0, 1.0, 0.85);
+            ctx.fillStyle = Theme.c.androidTimelineLiveRecording.waveFill;
             ctx.beginPath();
             for (var x = 0; x < w; x++) {
                 var i0 = Math.floor(x * n / w);
@@ -94,10 +98,12 @@ Rectangle {
         anchors.top: parent.top
         anchors.topMargin: 3
         height: 18
-        radius: 3
-        color: Qt.rgba(0, 0, 0, 0.7)
-        border.color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
-        border.width: 1
+        radius: Theme.c.androidTimelineLiveRecording.badgeRadius
+        color: Theme.c.androidTimelineLiveRecording.badgeBackground
+        border.color: EditorState.isAudioRecordingPaused
+                      ? Theme.c.androidTimelineLiveRecording.borderPaused
+                      : Theme.c.androidTimelineLiveRecording.border
+        border.width: Theme.c.androidTimelineLiveRecording.borderWidth
         width: liveRecRow.implicitWidth + 8
 
         Row {
@@ -108,8 +114,10 @@ Rectangle {
             Rectangle {
                 width: 6
                 height: 6
-                radius: 3
-                color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
+                radius: Theme.c.androidTimelineLiveRecording.indicatorRadius
+                color: EditorState.isAudioRecordingPaused
+                       ? Theme.c.androidTimelineLiveRecording.indicatorPaused
+                       : Theme.c.androidTimelineLiveRecording.indicator
                 anchors.verticalCenter: parent.verticalCenter
                 SequentialAnimation on opacity {
                     running: liveRecordingBlock.visible && !EditorState.isAudioRecordingPaused
@@ -124,7 +132,7 @@ Rectangle {
                       + EditorState.audioRecordSeconds.toFixed(1) + "s"
                 font.pixelSize: 10
                 font.bold: true
-                color: Theme.panelForeground
+                color: Theme.c.androidTimelineLiveRecording.foreground
                 anchors.verticalCenter: parent.verticalCenter
             }
         }

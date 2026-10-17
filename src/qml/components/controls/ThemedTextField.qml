@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
@@ -9,16 +10,19 @@ TextField {
     // destructive and the message renders below the field.
     property string errorText: ""
     readonly property bool hasError: errorText.length > 0
+    // ThemedNumberField points these at its own group so the two fields theme apart.
+    property var colorTokens: Theme.c.themedTextField
+    property string backgroundSlot: "ThemedTextFieldBackground"
 
-    color: Theme.panelForeground
+    color: colorTokens.foreground
     // The Basic style defaults placeholderTextColor to a fixed dark gray that
     // vanishes against panelAccent in dark mode; track the theme instead.
-    placeholderTextColor: Theme.mutedForeground
+    placeholderTextColor: colorTokens.placeholderForeground
     font.family: Theme.monoFontFamily
     font.pixelSize: Theme.fontSizeSm
     selectByMouse: true
-    selectedTextColor: Theme.primaryForeground
-    selectionColor: Theme.primary
+    selectedTextColor: colorTokens.selectionForeground
+    selectionColor: colorTokens.selectionBackground
     leftPadding: Theme.spacingLg
     rightPadding: Theme.spacingLg
     topPadding: Theme.spacingMd
@@ -30,21 +34,28 @@ TextField {
     Accessible.role: Accessible.EditableText
     Accessible.description: errorText
 
-    background: Rectangle {
-        radius: Theme.radiusSm
-        color: Theme.panelAccent
-        // The focus ring used to be panelSecondaryBorder (#002b47 in dark), which
-        // was near-invisible against panelAccent (#262626).
-        border.width: root.hasError || root.activeFocus ? Theme.borderWidthFocus
-                                                        : (root.hovered ? Theme.borderWidth : 0)
-        border.color: root.hasError ? Theme.destructive
-                                    : (root.activeFocus ? Theme.focusRing : Theme.panelMuted)
+    background: ThemeSlot {
+        slot: root.backgroundSlot
+        control: root
+        fallback: Component {
+            Rectangle {
+                radius: root.colorTokens.radius
+                color: root.colorTokens.background
+                // The focus ring used to be panelSecondaryBorder (#002b47 in dark), which
+                // was near-invisible against panelAccent (#262626).
+                border.width: root.hasError || root.activeFocus ? root.colorTokens.borderWidthFocus
+                                                                : (root.hovered ? root.colorTokens.borderWidth : 0)
+                border.color: root.hasError ? root.colorTokens.borderError
+                                            : (root.activeFocus ? root.colorTokens.borderFocus
+                                                                : root.colorTokens.border)
 
-        Behavior on border.width {
-            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
-        Behavior on border.color {
-            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                Behavior on border.width {
+                    NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
+                Behavior on border.color {
+                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
+            }
         }
     }
 
@@ -58,7 +69,7 @@ TextField {
         width: parent.width
         text: root.errorText
         visible: root.hasError
-        color: Theme.destructive
+        color: root.colorTokens.errorForeground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeTiny
         wrapMode: Text.WordWrap

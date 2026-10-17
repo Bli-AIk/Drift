@@ -7,8 +7,8 @@ Rectangle {
     property bool running: false
     width: 8
     height: 8
-    radius: 4
-    color: paused ? "#eab308" : Theme.destructive
+    radius: Theme.c.voiceoverRecDot.radius
+    color: paused ? Theme.c.voiceoverRecDot.paused : Theme.c.voiceoverRecDot.recording
     anchors.verticalCenter: parent.verticalCenter
 
     SequentialAnimation on opacity {

@@ -65,7 +65,7 @@ Column {
         Text {
             anchors.verticalCenter: parent.verticalCenter
             text: colorRow.label
-            color: colorRow.overridden || colorRow.animated ? Theme.panelForeground : Theme.mutedForeground
+            color: colorRow.overridden || colorRow.animated ? Theme.c.vectorSvgColorRow.foreground : Theme.c.vectorSvgColorRow.foregroundMuted
             font.pixelSize: Theme.fontSizeXs
             font.family: Theme.fontFamily
         }

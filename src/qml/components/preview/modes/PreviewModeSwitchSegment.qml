@@ -24,9 +24,9 @@ Item {
         anchors.centerIn: parent
         glyph: segment.modelData.glyph
         iconSize: Theme.iconSizeBase
-        iconColor: segment.selected ? Theme.panelSecondaryForeground
-                                    : segmentArea.containsMouse ? Theme.panelForeground
-                                                                : Theme.mutedForeground
+        iconColor: segment.selected ? Theme.c.previewModeSwitchSegment.iconSelected
+                                    : segmentArea.containsMouse ? Theme.c.previewModeSwitchSegment.iconHover
+                                                                : Theme.c.previewModeSwitchSegment.icon
 
         Behavior on iconColor {
             ColorAnimation { duration: Theme.durationBase; easing.type: Theme.easing }

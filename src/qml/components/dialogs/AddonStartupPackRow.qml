@@ -12,10 +12,10 @@ Rectangle {
 
     width: parent ? parent.width : 0
     height: rowBody.implicitHeight + Theme.spacingXl
-    radius: Theme.radiusMd
-    color: Theme.panelSecondaryBg
-    border.width: Theme.borderWidth
-    border.color: Theme.panelSecondaryBorder
+    radius: Theme.c.addonStartupPackRow.radius
+    color: Theme.c.addonStartupPackRow.background
+    border.width: Theme.c.addonStartupPackRow.borderWidth
+    border.color: Theme.c.addonStartupPackRow.border
 
     Column {
         id: rowBody

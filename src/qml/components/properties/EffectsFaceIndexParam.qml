@@ -21,7 +21,7 @@ Column {
     spacing: 4
     Text {
         text: row.paramData.label
-        color: Theme.mutedForeground
+        color: Theme.c.effectsFaceIndexParam.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

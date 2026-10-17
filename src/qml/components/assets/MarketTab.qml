@@ -150,8 +150,8 @@ Item {
 
         Rectangle {
             width: parent.width
-            height: Theme.borderWidth
-            color: Theme.panelBorder
+            height: Theme.c.marketTab.borderWidth
+            color: Theme.c.marketTab.border
         }
     }
 

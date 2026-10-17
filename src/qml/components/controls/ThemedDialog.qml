@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Window
@@ -148,30 +149,36 @@ Dialog {
         }
     }
 
-    background: Rectangle {
-        color: Theme.panelBackground
-        border.width: Theme.borderWidth
-        border.color: Theme.panelBorder
-        radius: Theme.radiusMd
+    background: ThemeSlot {
+        slot: "ThemedDialogBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                color: Theme.c.themedDialog.background
+                border.width: Theme.c.themedDialog.borderWidth
+                border.color: Theme.c.themedDialog.border
+                radius: Theme.c.themedDialog.radius
 
-        // Attached here rather than on the Dialog: a Dialog is a Popup, not an Item,
-        // and Accessible only attaches to Item or Action — the same constraint the
-        // Return shortcut above works around.
-        Accessible.role: Accessible.Dialog
-        Accessible.name: root.title
+                // Attached here rather than on the Dialog: a Dialog is a Popup, not an Item,
+                // and Accessible only attaches to Item or Action — the same constraint the
+                // Return shortcut above works around.
+                Accessible.role: Accessible.Dialog
+                Accessible.name: root.title
 
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.AllButtons
-            hoverEnabled: true
-            preventStealing: true
-            onPressed: (mouse) => { mouse.accepted = true }
-            onWheel: (wheel) => { wheel.accepted = true }
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.AllButtons
+                    hoverEnabled: true
+                    preventStealing: true
+                    onPressed: (mouse) => { mouse.accepted = true }
+                    onWheel: (wheel) => { wheel.accepted = true }
+                }
+            }
         }
     }
 
     Overlay.modal: Rectangle {
-        color: Qt.rgba(0, 0, 0, 0.5)
+        color: Theme.c.themedDialog.scrim
 
         MouseArea {
             anchors.fill: parent
@@ -196,7 +203,7 @@ Dialog {
             anchors.rightMargin: Theme.spacing2xl
             anchors.verticalCenter: parent.verticalCenter
             text: root.title
-            color: Theme.panelForeground
+            color: Theme.c.themedDialog.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeBase
             font.weight: Font.Medium
@@ -207,8 +214,8 @@ Dialog {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            height: Theme.borderWidth
-            color: Theme.panelBorder
+            height: Theme.c.themedDialog.borderWidth
+            color: Theme.c.themedDialog.border
         }
     }
 
@@ -222,8 +229,8 @@ Dialog {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            height: Theme.borderWidth
-            color: Theme.panelBorder
+            height: Theme.c.themedDialog.borderWidth
+            color: Theme.c.themedDialog.border
             visible: root.showFooter
         }
 

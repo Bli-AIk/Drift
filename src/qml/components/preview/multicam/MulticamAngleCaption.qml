@@ -12,9 +12,9 @@ Text {
     anchors.margins: Theme.spacingSm
     text: caption.name
     elide: Text.ElideMiddle
-    color: "#ffffff"
+    color: Theme.c.multicamAngleCaption.foreground
     font.family: Theme.fontFamily
     font.pixelSize: Theme.fontSizeXs
     style: Text.Outline
-    styleColor: Theme.overlayColor
+    styleColor: Theme.c.multicamAngleCaption.shadow
 }

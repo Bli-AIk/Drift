@@ -35,7 +35,7 @@ Item {
         Text {
             width: parent.width
             text: row.modelData.title || ""
-            color: Theme.panelForeground
+            color: Theme.c.androidDownloadJobRow.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.Medium
@@ -45,8 +45,9 @@ Item {
         Text {
             width: parent.width
             text: DownloadFormat.detailLine(row.modelData)
-            color: row.modelData.status === "failed" ? Theme.destructive
-                                                     : Theme.mutedForeground
+            color: row.modelData.status === "failed"
+                  ? Theme.c.androidDownloadJobRow.foregroundFailed
+                  : Theme.c.androidDownloadJobRow.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             elide: Text.ElideRight
@@ -69,7 +70,7 @@ Item {
             value: Number(row.modelData.progress || 0)
             indeterminate: Number(row.modelData.progress || 0) <= 0
             size: Theme.iconSizeXl
-            strokeWidth: 2
+            strokeWidth: Theme.c.androidDownloadJobRow.progressStrokeWidth
         }
 
         IconButton {

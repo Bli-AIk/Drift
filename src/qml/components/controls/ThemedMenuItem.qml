@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
@@ -40,14 +41,16 @@ MenuItem {
             width: visible ? implicitWidth : 0
             glyph: root.icon.name
             iconSize: Theme.iconSizeMd
-            iconColor: root.enabled ? Theme.panelForeground : Theme.mutedForeground
+            iconColor: root.enabled ? Theme.c.themedMenuItem.foreground
+                                    : Theme.c.themedMenuItem.foregroundDisabled
             opacity: root.enabled ? 1 : 0.5
         }
 
         Text {
             anchors.verticalCenter: parent.verticalCenter
             text: root.text
-            color: root.sectionHeader ? Theme.mutedForeground : Theme.panelForeground
+            color: root.sectionHeader ? Theme.c.themedMenuItem.sectionForeground
+                                      : Theme.c.themedMenuItem.foreground
             // A header is dimmer by design, so it must not also take the disabled dimming.
             opacity: root.sectionHeader || root.enabled ? 1 : 0.5
             font.family: Theme.fontFamily
@@ -64,15 +67,22 @@ MenuItem {
         visible: root.subMenu !== null
         glyph: Theme.icons.chevronRight
         iconSize: Theme.iconSizeMd
-        iconColor: Theme.mutedForeground
+        iconColor: Theme.c.themedMenuItem.icon
     }
 
-    background: Rectangle {
-        radius: Theme.radiusXs
-        color: root.highlighted && root.enabled ? Theme.panelAccent : "transparent"
+    background: ThemeSlot {
+        slot: "ThemedMenuItemBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                radius: Theme.c.themedMenuItem.radius
+                color: root.highlighted && root.enabled ? Theme.c.themedMenuItem.backgroundHighlighted
+                                                       : "transparent"
 
-        Behavior on color {
-            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                Behavior on color {
+                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
+            }
         }
     }
 

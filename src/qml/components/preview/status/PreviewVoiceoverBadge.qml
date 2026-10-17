@@ -9,10 +9,10 @@ Rectangle {
     required property real seconds
 
     height: 28
-    radius: Theme.radiusSm
-    color: Qt.rgba(0, 0, 0, 0.75)
-    border.color: badge.paused ? "#eab308" : Theme.destructive
-    border.width: 1
+    radius: Theme.c.previewVoiceoverBadge.radius
+    color: Theme.c.previewVoiceoverBadge.background
+    border.color: badge.paused ? Theme.c.previewVoiceoverBadge.borderPaused : Theme.c.previewVoiceoverBadge.border
+    border.width: Theme.c.previewVoiceoverBadge.borderWidth
     width: recordRow.implicitWidth + 16
 
     Row {
@@ -23,8 +23,8 @@ Rectangle {
         Rectangle {
             width: 8
             height: 8
-            radius: 4
-            color: badge.paused ? "#eab308" : Theme.destructive
+            radius: Theme.c.previewVoiceoverBadge.dotRadius
+            color: badge.paused ? Theme.c.previewVoiceoverBadge.accentPaused : Theme.c.previewVoiceoverBadge.accent
             anchors.verticalCenter: parent.verticalCenter
             SequentialAnimation on opacity {
                 running: badge.visible && !badge.paused
@@ -38,7 +38,7 @@ Rectangle {
             text: (badge.paused ? qsTr("PAUSED %1s") : qsTr("REC %1s")).arg(badge.seconds.toFixed(1))
             font.pixelSize: 11
             font.bold: true
-            color: Theme.panelForeground
+            color: Theme.c.previewVoiceoverBadge.foreground
             anchors.verticalCenter: parent.verticalCenter
         }
     }

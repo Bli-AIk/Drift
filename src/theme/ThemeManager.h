@@ -65,8 +65,14 @@ public:
     // Selects the built-in dark or light theme. A loaded user theme is left in
     // place; Theme.qml still calls this on every darkMode change.
     Q_INVOKABLE void setVariant(const QString &variant);
-    // Trusted QML overrides land in a later wave. Empty until then.
+    // File URL of qml/<slot>.qml when the current theme is a trusted folder
+    // theme that contains that file. Empty for built-ins, single-file themes,
+    // untrusted themes, and missing slots.
     Q_INVOKABLE QUrl overrideUrl(const QString &slot) const;
+    Q_INVOKABLE bool isThemeTrusted(const QString &name) const;
+    Q_INVOKABLE void setThemeTrusted(const QString &name, bool trusted);
+    // Basenames of qml/*.qml in a folder theme, for the trust dialog.
+    Q_INVOKABLE QStringList overrideSlots(const QString &name) const;
 
 signals:
     void themeChanged();
@@ -88,6 +94,12 @@ private:
     std::optional<Loaded> readTheme(const QString &nameOrPath, QString *error) const;
     void apply(const Loaded &loaded);
     void updateWatch();
+    // Directory of qml overrides for a folder theme (theme.json). Empty otherwise.
+    QString themeQmlDirectory(const QString &themeJsonPath) const;
+    bool isFolderTheme(const QString &themeJsonPath) const;
+    bool isThemeWatchPath(const QString &path) const;
+    QStringList readTrustedThemes() const;
+    void writeTrustedThemes(const QStringList &names);
 
     QQmlPropertyMap *m_palette = nullptr;
     QQmlPropertyMap *m_semantic = nullptr;

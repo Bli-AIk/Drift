@@ -19,10 +19,10 @@ Popup {
     onClosed: Toasts.markAllRead()
 
     background: Rectangle {
-        color: Theme.panelBackground
-        border.width: Theme.borderWidth
-        border.color: Theme.panelBorder
-        radius: Theme.radiusMd
+        color: Theme.c.notificationsPopup.background
+        border.width: Theme.c.notificationsPopup.borderWidth
+        border.color: Theme.c.notificationsPopup.border
+        radius: Theme.c.notificationsPopup.radius
     }
 
     // Opacity plus scale, matching ThemedContextMenu.

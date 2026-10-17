@@ -18,6 +18,8 @@ Canvas {
     visible: lane.mediaWaveformRange.duration > 0 && windowX1 > windowX0
     opacity: 0.75
     z: 1
+    readonly property color wave: Theme.c.subtitleCueWaveform.foreground
+    onWaveChanged: requestPaint()
 
     readonly property real waveStart: windowX0 / lane.pxPerSecond
     readonly property real waveDuration: Math.max(0, windowX1 - windowX0) / lane.pxPerSecond
@@ -62,7 +64,7 @@ Canvas {
         if (!peaks || peaks.length === 0)
             return;
         // One filled column per screen pixel so bars stay contiguous at any zoom.
-        ctx.fillStyle = Theme.panelWaveformColor;
+        ctx.fillStyle = wave;
         var mid = height / 2;
         var w = Math.max(1, Math.floor(width));
         var n = peaks.length;

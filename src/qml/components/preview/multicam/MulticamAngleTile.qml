@@ -15,12 +15,12 @@ Rectangle {
     // PreserveAspectFit letterboxes every camera whose aspect is not the
     // cell's. Bars have to read as bars, which a light panel colour does
     // not — and the overlaid badge and filename are drawn white.
-    color: Theme.overlayColor
-    radius: Theme.radiusMd
-    border.width: modelData.active ? 2 : Theme.borderWidth
-    border.color: modelData.active ? Theme.primary
-                                   : (tileMouse.containsMouse ? Theme.panelForeground
-                                                              : Theme.panelBorder)
+    color: Theme.c.multicamAngleTile.background
+    radius: Theme.c.multicamAngleTile.radius
+    border.width: modelData.active ? Theme.c.multicamAngleTile.borderWidthActive : Theme.c.multicamAngleTile.borderWidth
+    border.color: modelData.active ? Theme.c.multicamAngleTile.borderActive
+                                   : (tileMouse.containsMouse ? Theme.c.multicamAngleTile.borderHover
+                                                              : Theme.c.multicamAngleTile.border)
     clip: true
 
     Behavior on border.color {
@@ -46,7 +46,7 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         // Sits on the tile's video ground, not on a panel, so it takes
         // the same treatment as the badge and filename above it.
-        color: "#ffffff"
+        color: Theme.c.multicamAngleTile.foreground
         text: qsTr("Nothing here")
     }
 

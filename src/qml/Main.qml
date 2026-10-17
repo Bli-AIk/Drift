@@ -22,26 +22,26 @@ ApplicationWindow {
     // rendered in that scheme's colours next to Drift's own. Palette propagates down the item
     // hierarchy, popups included, so setting the roles the Basic style reads brings Qt's own
     // chrome under Theme — and binding them keeps it following the light/dark toggle.
-    palette.window: Theme.panelBackground
-    palette.windowText: Theme.panelForeground
-    palette.base: Theme.panelAccent
-    palette.text: Theme.panelForeground
-    palette.button: Theme.panelAccent
-    palette.buttonText: Theme.panelForeground
-    palette.placeholderText: Theme.mutedForeground
+    palette.window: Theme.c.appWindow.paletteWindow
+    palette.windowText: Theme.c.appWindow.paletteWindowText
+    palette.base: Theme.c.appWindow.paletteBase
+    palette.text: Theme.c.appWindow.paletteText
+    palette.button: Theme.c.appWindow.paletteButton
+    palette.buttonText: Theme.c.appWindow.paletteButtonText
+    palette.placeholderText: Theme.c.appWindow.palettePlaceholder
     // Menu border and item states: dark draws the frame, light the hovered row,
     // midlight the pressed one.
-    palette.dark: Theme.panelBorder
-    palette.mid: Theme.panelMuted
-    palette.midlight: Theme.panelAccent
-    palette.light: Theme.popoverHover
+    palette.dark: Theme.c.appWindow.paletteDark
+    palette.mid: Theme.c.appWindow.paletteMid
+    palette.midlight: Theme.c.appWindow.paletteMidlight
+    palette.light: Theme.c.appWindow.paletteLight
     // Drawn at 12% and 50% alpha for the menu's drop shadow; appBackground would
     // make that a white glow in light mode.
-    palette.shadow: "#000000"
-    palette.highlight: Theme.primary
-    palette.highlightedText: Theme.primaryForeground
-    palette.toolTipBase: Theme.panelBackground
-    palette.toolTipText: Theme.panelForeground
+    palette.shadow: Theme.c.appWindow.paletteShadow
+    palette.highlight: Theme.c.appWindow.paletteHighlight
+    palette.highlightedText: Theme.c.appWindow.paletteHighlightedText
+    palette.toolTipBase: Theme.c.appWindow.paletteToolTipBase
+    palette.toolTipText: Theme.c.appWindow.paletteToolTipText
 
     width: 1280
     height: 800
@@ -59,7 +59,7 @@ ApplicationWindow {
     // "Conflicting properties 'visible' and 'visibility'" (Maximized + hidden).
     visibility: Window.Hidden
     title: "CutWire Drift"
-    color: Theme.appBackground
+    color: Theme.c.appWindow.background
 
     LayoutMirroring.enabled: Qt.application.layoutDirection === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true

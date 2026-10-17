@@ -20,10 +20,10 @@ Column {
     Rectangle {
         width: cardSize
         height: cardSize
-        radius: Theme.radiusSm
-        color: cardHover.hovered ? Theme.panelSecondaryBg : Theme.panelAccent
-        border.width: 1
-        border.color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.35)
+        radius: Theme.c.effectTemplateCard.radius
+        color: cardHover.hovered ? Theme.c.effectTemplateCard.backgroundHover : Theme.c.effectTemplateCard.background
+        border.width: Theme.c.effectTemplateCard.borderWidth
+        border.color: Qt.rgba(Theme.c.effectTemplateCard.accent.r, Theme.c.effectTemplateCard.accent.g, Theme.c.effectTemplateCard.accent.b, 0.35)
         clip: true
         // Matches the media cards in MediaAssetsTab; these snapped.
         scale: cardHover.hovered ? 1.03 : 1.0
@@ -72,12 +72,12 @@ Column {
                     Rectangle {
                         anchors.fill: parent
                         visible: index === 3 && root.effectCount > 4
-                        color: Theme.scrimStrong
+                        color: Theme.c.effectTemplateCard.scrim
 
                         Text {
                             anchors.centerIn: parent
                             text: "+" + (root.effectCount - 3)
-                            color: Theme.onMedia
+                            color: Theme.c.effectTemplateCard.foregroundOnMedia
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSizeCard
                             font.weight: Font.DemiBold
@@ -86,17 +86,17 @@ Column {
 
                     Rectangle {
                         anchors.right: parent.right
-                        width: 1
+                        width: Theme.c.effectTemplateCard.mosaicDividerWidth
                         height: parent.height
-                        color: Theme.panelBackground
+                        color: Theme.c.effectTemplateCard.mosaicDivider
                         visible: index % root.mosaicColumns
                                   !== root.mosaicColumns - 1
                     }
                     Rectangle {
                         anchors.bottom: parent.bottom
                         width: parent.width
-                        height: 1
-                        color: Theme.panelBackground
+                        height: Theme.c.effectTemplateCard.mosaicDividerWidth
+                        color: Theme.c.effectTemplateCard.mosaicDivider
                         visible: index < root.mosaicCells - root.mosaicColumns
                     }
                 }
@@ -108,7 +108,7 @@ Column {
             visible: root.effectThumbs.length === 0
             width: parent.width - 12
             text: root.modelData.label
-            color: Theme.mutedForeground
+            color: Theme.c.effectTemplateCard.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeCard
             font.weight: Font.Medium
@@ -124,8 +124,8 @@ Column {
             anchors.margins: 4
             width: stackBadgeRow.implicitWidth + 8
             height: stackBadgeRow.implicitHeight + 4
-            radius: Theme.radiusXs
-            color: Theme.scrimStrong
+            radius: Theme.c.effectTemplateCard.badgeRadius
+            color: Theme.c.effectTemplateCard.scrim
 
             Row {
                 id: stackBadgeRow
@@ -136,13 +136,13 @@ Column {
                     anchors.verticalCenter: parent.verticalCenter
                     glyph: Theme.icons.layers
                     iconSize: 10
-                    iconColor: Theme.onMedia
+                    iconColor: Theme.c.effectTemplateCard.foregroundOnMedia
                 }
 
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.effectCount > 0 ? root.effectCount : "?"
-                    color: Theme.onMedia
+                    color: Theme.c.effectTemplateCard.foregroundOnMedia
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                     font.weight: Font.Medium
@@ -191,14 +191,14 @@ Column {
             visible: root.modelData.requiresSegmentation === true
             width: segBadge.implicitWidth + 8
             height: segBadge.implicitHeight + 4
-            radius: Theme.radiusXs
-            color: Theme.scrimStrong
+            radius: Theme.c.effectTemplateCard.badgeRadius
+            color: Theme.c.effectTemplateCard.scrim
 
             Text {
                 id: segBadge
                 anchors.centerIn: parent
                 text: qsTr("Needs cutout")
-                color: Theme.onMedia
+                color: Theme.c.effectTemplateCard.foregroundOnMedia
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 font.weight: Font.Medium
@@ -230,7 +230,7 @@ Column {
     Text {
         width: parent.width
         text: root.modelData.label
-        color: Theme.panelForeground
+        color: Theme.c.effectTemplateCard.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeCard
         font.weight: Font.Medium

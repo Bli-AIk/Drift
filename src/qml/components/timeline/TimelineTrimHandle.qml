@@ -19,8 +19,8 @@ Rectangle {
     width: !owner.touchMode && hot
            ? Math.max(2, owner.trimHandleWidth * 0.35)
            : owner.trimHandleWidth
-    radius: owner.touchMode ? Theme.radiusXs : 0
-    color: owner.showTrimHandles ? Theme.primary : "transparent"
+    radius: owner.touchMode ? Theme.c.timelineTrimHandle.radius : 0
+    color: owner.showTrimHandles ? Theme.c.timelineTrimHandle.background : "transparent"
     opacity: !owner.showTrimHandles ? 0 : (hot ? 1.0 : 0.85)
     z: 30
 

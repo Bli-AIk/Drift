@@ -58,14 +58,14 @@ Row {
                 anchors.verticalCenter: crumbLabel.verticalCenter
                 glyph: Theme.icons.chevronRight
                 iconSize: Theme.iconSizeSm
-                iconColor: Theme.mutedForeground
+                iconColor: Theme.c.binBreadcrumb.icon
             }
 
             Text {
                 id: crumbLabel
                 text: modelData.name
                 color: modelData.id === root.currentFolderId
-                       ? Theme.panelForeground : Theme.mutedForeground
+                       ? Theme.c.binBreadcrumb.foreground : Theme.c.binBreadcrumb.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
                 font.weight: modelData.id === root.currentFolderId ? Font.Medium : Font.Normal

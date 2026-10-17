@@ -40,12 +40,12 @@ AbstractButton {
     }
 
     background: Rectangle {
-        radius: Theme.radiusMd
+        radius: Theme.c.propertiesSheetTabChip.radius
         color: tabChip.current
-               ? Theme.primary
-               : (tabChip.down ? Theme.panelMuted : Theme.panelAccent)
-        border.width: Theme.borderWidth
-        border.color: tabChip.current ? Theme.primary : Theme.panelBorder
+               ? Theme.c.propertiesSheetTabChip.backgroundSelected
+               : (tabChip.down ? Theme.c.propertiesSheetTabChip.backgroundPressed : Theme.c.propertiesSheetTabChip.background)
+        border.width: Theme.c.propertiesSheetTabChip.borderWidth
+        border.color: tabChip.current ? Theme.c.propertiesSheetTabChip.borderSelected : Theme.c.propertiesSheetTabChip.border
 
         Behavior on color {
             ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -58,8 +58,8 @@ AbstractButton {
             anchors.fill: parent
             radius: parent.radius
             color: "transparent"
-            border.width: Theme.borderWidthFocus
-            border.color: Theme.focusRing
+            border.width: Theme.c.propertiesSheetTabChip.borderWidthFocus
+            border.color: Theme.c.propertiesSheetTabChip.borderFocus
             visible: tabChip.visualFocus
         }
     }
@@ -75,16 +75,16 @@ AbstractButton {
                 anchors.horizontalCenter: parent.horizontalCenter
                 glyph: tabChip.modelData.icon
                 iconSize: Theme.iconSizeLg
-                iconColor: tabChip.current ? Theme.primaryForeground
-                                           : Theme.panelForeground
+                iconColor: tabChip.current ? Theme.c.propertiesSheetTabChip.iconOnAccent
+                                           : Theme.c.propertiesSheetTabChip.icon
             }
 
             Text {
                 id: tabChipLabel
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: tabChip.modelData.label
-                color: tabChip.current ? Theme.primaryForeground
-                                       : Theme.panelForeground
+                color: tabChip.current ? Theme.c.propertiesSheetTabChip.foregroundOnAccent
+                                       : Theme.c.propertiesSheetTabChip.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 font.weight: tabChip.current ? Font.Medium : Font.Normal

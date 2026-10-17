@@ -133,7 +133,7 @@ Item {
                     spacing: 4
                     Text {
                         text: qsTr("First page")
-                        color: Theme.mutedForeground
+                        color: Theme.c.pdfInspector.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -151,7 +151,7 @@ Item {
                     spacing: 4
                     Text {
                         text: qsTr("Last page")
-                        color: Theme.mutedForeground
+                        color: Theme.c.pdfInspector.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -175,7 +175,7 @@ Item {
                     spacing: 4
                     Text {
                         text: qsTr("Layout")
-                        color: Theme.mutedForeground
+                        color: Theme.c.pdfInspector.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -194,7 +194,7 @@ Item {
                     visible: root.pdf.layout === "grid"
                     Text {
                         text: qsTr("Columns")
-                        color: Theme.mutedForeground
+                        color: Theme.c.pdfInspector.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -213,7 +213,7 @@ Item {
                 spacing: 4
                 Text {
                     text: qsTr("Gap")
-                    color: Theme.mutedForeground
+                    color: Theme.c.pdfInspector.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }

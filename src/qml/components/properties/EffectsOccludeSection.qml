@@ -30,7 +30,7 @@ Column {
                     .arg(occludeSection.targetName)
               : qsTr("Anything in “%1” (the clip beneath at the playhead) nearer than Distance passes in front of this layer.")
                     .arg(occludeSection.targetName)
-        color: Theme.mutedForeground
+        color: Theme.c.effectsOccludeSection.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

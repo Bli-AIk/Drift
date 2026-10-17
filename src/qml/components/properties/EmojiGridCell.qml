@@ -14,8 +14,8 @@ Item {
     Rectangle {
         anchors.fill: parent
         anchors.margins: 2
-        radius: Theme.radiusSm
-        color: cellDrag.hovered ? Theme.popoverHover : "transparent"
+        radius: Theme.c.emojiGridCell.radius
+        color: cellDrag.hovered ? Theme.c.emojiGridCell.backgroundHover : "transparent"
 
         Behavior on color {
             ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }

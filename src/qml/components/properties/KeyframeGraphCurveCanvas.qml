@@ -5,6 +5,14 @@ Canvas {
     property var host
     property real viewportWidth: 0
     id: root
+    readonly property real lineWidth: Theme.c.keyframeGraphCurveCanvas.lineWidth
+    readonly property real lineWidthMuted: Theme.c.keyframeGraphCurveCanvas.lineWidthMuted
+    readonly property real opacityContext: Theme.c.keyframeGraphCurveCanvas.opacityContext
+    readonly property real opacityDisabled: Theme.c.keyframeGraphCurveCanvas.opacityDisabled
+    onLineWidthChanged: requestPaint()
+    onLineWidthMutedChanged: requestPaint()
+    onOpacityContextChanged: requestPaint()
+    onOpacityDisabledChanged: requestPaint()
     // Only as wide as the visible strip, parked at the viewport's left edge
     // (content is offset by -contentX, so x: contentX cancels the scroll).
     // Filling the scrollable content instead would size the backing texture
@@ -98,10 +106,10 @@ Canvas {
             // Whole pixels. A 1.8px stroke lands ~40/100/40% across three
             // rows, which reads as a glow wherever the curve runs shallow —
             // exactly the flat tops and troughs between keys.
-            ctx.lineWidth = focused ? 2 : 1
-            ctx.globalAlpha = (host.curveEditing && !focused) ? 0.35 : 1.0
+            ctx.lineWidth = focused ? root.lineWidth : root.lineWidthMuted
+            ctx.globalAlpha = (host.curveEditing && !focused) ? root.opacityContext : 1.0
             if (entry.enabled === false)
-                ctx.globalAlpha *= 0.45
+                ctx.globalAlpha *= root.opacityDisabled
             ctx.strokeStyle = String(entry.color)
             ctx.beginPath()
 

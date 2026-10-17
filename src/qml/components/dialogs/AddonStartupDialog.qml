@@ -182,8 +182,8 @@ ThemedDialog {
 
             Rectangle {
                 width: parent.width
-                height: Theme.borderWidth
-                color: Theme.panelBorder
+                height: Theme.c.addonStartupDialog.borderWidth
+                color: Theme.c.addonStartupDialog.divider
                 visible: root.showEssential && root.showUpdates
             }
 

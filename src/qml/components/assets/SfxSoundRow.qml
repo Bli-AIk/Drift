@@ -34,8 +34,8 @@ Rectangle {
 
     width: ListView.view ? ListView.view.width : 0
     height: Theme.touchUi ? Theme.androidMinTouchTarget + Theme.spacingLg : Theme.controlHeight + Theme.spacingLg
-    radius: Theme.radiusSm
-    color: rowHover.hovered ? Theme.popoverHover : "transparent"
+    radius: Theme.c.sfxSoundRow.radius
+    color: rowHover.hovered ? Theme.c.sfxSoundRow.backgroundHover : "transparent"
 
     HoverHandler { id: rowHover }
 
@@ -71,7 +71,7 @@ Rectangle {
         Text {
             width: parent.width
             text: root.modelData.name || ""
-            color: Theme.panelForeground
+            color: Theme.c.sfxSoundRow.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             elide: Text.ElideRight
@@ -79,7 +79,7 @@ Rectangle {
         Text {
             width: parent.width
             text: formatDuration(root.modelData.duration)
-            color: Theme.mutedForeground
+            color: Theme.c.sfxSoundRow.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             elide: Text.ElideRight
@@ -106,7 +106,7 @@ Rectangle {
             const bar = Math.max(1, step * 0.6)
             for (let i = 0; i < n; ++i) {
                 const h = Math.max(2, root.peaks[i] * height)
-                ctx.fillStyle = (i + 0.5) / n <= root.progress ? Theme.primary : Theme.mutedForeground
+                ctx.fillStyle = (i + 0.5) / n <= root.progress ? Theme.c.sfxSoundRow.waveAccent : Theme.c.sfxSoundRow.waveMuted
                 ctx.fillRect(i * step, (height - h) / 2, bar, h)
             }
         }

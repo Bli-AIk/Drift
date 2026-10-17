@@ -57,7 +57,7 @@ Item {
             text: root.keyframeMode
                   ? qsTr("Smooths camera shake by writing position keyframes. Linear pans stay as two keys far apart; only direction changes get extra keys. Changing smoothness or tripod does not update the preview until you apply.")
                   : qsTr("Smooths camera shake. Drift scans the clip once, then renders a stabilized copy into the media bin and switches the clip to it. Changing smoothness or tripod does not update the preview until you apply.")
-            color: Theme.mutedForeground
+            color: Theme.c.stabilizeInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -68,7 +68,7 @@ Item {
 
             Text {
                 text: qsTr("Mode")
-                color: Theme.mutedForeground
+                color: Theme.c.stabilizeInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 font.weight: Font.Medium
@@ -94,7 +94,7 @@ Item {
 
             Text {
                 text: qsTr("Smoothing")
-                color: Theme.mutedForeground
+                color: Theme.c.stabilizeInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 font.weight: Font.Medium
@@ -126,7 +126,7 @@ Item {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: qsTr("How many frames the smoother looks ahead and behind. Higher values hide more shake but crop the picture more.")
-                color: Theme.mutedForeground
+                color: Theme.c.stabilizeInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -148,7 +148,7 @@ Item {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: qsTr("Locks the framing as if the camera were on a tripod. Crops more aggressively than smoothing alone.")
-                color: Theme.mutedForeground
+                color: Theme.c.stabilizeInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -162,7 +162,7 @@ Item {
             IconGlyph {
                 glyph: Theme.icons.warning
                 iconSize: Theme.iconSizeMd
-                iconColor: Theme.warning
+                iconColor: Theme.c.stabilizeInspector.iconWarning
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -172,7 +172,7 @@ Item {
                 text: root.keyframeMode
                       ? qsTr("Position keys still use the last run. Update to apply these settings.")
                       : qsTr("Preview still uses the last run. Update to apply these settings.")
-                color: Theme.warning
+                color: Theme.c.stabilizeInspector.warning
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 anchors.verticalCenter: parent.verticalCenter
@@ -208,7 +208,7 @@ Item {
             text: (root.clipData && root.clipData.stabilizeStatus)
                   ? root.clipData.stabilizeStatus
                   : qsTr("Stabilizing…")
-            color: Theme.mutedForeground
+            color: Theme.c.stabilizeInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }

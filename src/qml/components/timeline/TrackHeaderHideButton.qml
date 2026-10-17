@@ -13,7 +13,7 @@ IconGlyph {
     visible: shown
     glyph: trackHidden ? Theme.icons.eyeOff : Theme.icons.eye
     iconSize: 16
-    iconColor: trackHidden ? Theme.destructive : Theme.mutedForeground
+    iconColor: trackHidden ? Theme.c.trackHeaderHideButton.destructive : Theme.c.trackHeaderHideButton.foregroundMuted
     anchors.verticalCenter: parent.verticalCenter
 
     ThemedToolTip {

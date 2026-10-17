@@ -12,6 +12,6 @@ Rectangle {
     y: topY
     width: 2
     height: Math.max(0, drawnBottom - topY)
-    radius: 1
-    color: Theme.clipTransform
+    radius: Theme.c.timelineSpanBracketLine.radius
+    color: Theme.c.timelineSpanBracketLine.foreground
 }

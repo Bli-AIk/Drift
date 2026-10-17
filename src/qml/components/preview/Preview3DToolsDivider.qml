@@ -5,6 +5,6 @@ import Drift
 Rectangle {
     anchors.horizontalCenter: parent.horizontalCenter
     width: Theme.iconSizeBase
-    height: Theme.borderWidth
-    color: Theme.panelBorder
+    height: Theme.c.preview3DToolsDivider.strokeWidth
+    color: Theme.c.preview3DToolsDivider.background
 }

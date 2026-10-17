@@ -13,8 +13,8 @@ Rectangle {
 
     width: rowWidth
     height: 34
-    color: rowMouse.containsMouse ? Theme.panelAccent
-                                  : (row.name === selectedFamily ? Theme.panelSecondaryBg
+    color: rowMouse.containsMouse ? Theme.c.fontPickerFamilyRow.backgroundHover
+                                  : (row.name === selectedFamily ? Theme.c.fontPickerFamilyRow.backgroundSelected
                                                               : "transparent")
 
     Behavior on color {
@@ -30,7 +30,7 @@ Rectangle {
         text: row.name
         font.family: row.previewFamily
         font.pixelSize: 18
-        color: Theme.panelForeground
+        color: Theme.c.fontPickerFamilyRow.foreground
         elide: Text.ElideRight
     }
 

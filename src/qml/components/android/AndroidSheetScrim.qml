@@ -11,7 +11,7 @@ Rectangle {
     required property var sheet
 
     visible: scrim.sheet.blocking
-    color: Qt.rgba(0, 0, 0, 0.45)
+    color: Theme.c.androidSheetScrim.background
     opacity: {
         if (!scrim.sheet.opened || scrim.sheet.height <= 0)
             return 0

@@ -24,9 +24,9 @@ Item {
         y: root.keyY
         width: Math.hypot(root.tipX - root.keyX + root.dragDx,
                           root.tipY - root.keyY + root.dragDy)
-        height: 1
+        height: Theme.c.keyframeGraphTangentHandle.leaderWidth
         color: root.modelData.color
-        opacity: 0.55
+        opacity: Theme.c.keyframeGraphTangentHandle.leaderOpacity
         transformOrigin: Item.TopLeft
         rotation: Math.atan2(root.tipY - root.keyY + root.dragDy,
                              root.tipX - root.keyX + root.dragDx)
@@ -40,9 +40,9 @@ Item {
         id: grip
         width: 8
         height: 8
-        radius: 4
-        color: Theme.panelBackground
-        border.width: 1.5
+        radius: Theme.c.keyframeGraphTangentHandle.radius
+        color: Theme.c.keyframeGraphTangentHandle.background
+        border.width: Theme.c.keyframeGraphTangentHandle.borderWidth
         border.color: root.modelData.color
         x: root.tipX - width / 2 + root.dragDx
         y: root.tipY - height / 2 + root.dragDy

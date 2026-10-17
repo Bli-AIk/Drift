@@ -13,6 +13,6 @@ Rectangle {
     y: guide.alongX ? 0 : guide.position
     width: guide.alongX ? 1 : parent.width
     height: guide.alongX ? parent.height : 1
-    color: Theme.primary
+    color: Theme.c.transformOverlaySnapGuide.background
     z: 400
 }

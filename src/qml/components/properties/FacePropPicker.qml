@@ -82,7 +82,7 @@ Column {
             width: parent.width - importButton.width - 8
             elide: Text.ElideRight
             text: qsTr("Prop")
-            color: Theme.mutedForeground
+            color: Theme.c.facePropPicker.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             anchors.verticalCenter: parent.verticalCenter
@@ -123,7 +123,7 @@ Column {
         width: parent.width
         wrapMode: Text.WordWrap
         text: qsTr("No face props installed. Import a .zip from Drift-Assets, or any folder of props that carry a prop.json.")
-        color: Theme.mutedForeground
+        color: Theme.c.facePropPicker.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }
@@ -159,7 +159,7 @@ Column {
             return root.modelParam.missing ? qsTr("Custom model: %1 (missing)").arg(name)
                                            : qsTr("Custom model: %1").arg(name)
         }
-        color: root.modelParam.missing ? Theme.destructive : Theme.mutedForeground
+        color: root.modelParam.missing ? Theme.c.facePropPicker.destructive : Theme.c.facePropPicker.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

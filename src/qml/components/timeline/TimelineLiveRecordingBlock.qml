@@ -10,10 +10,10 @@ Rectangle {
     x: (EditorState.playheadSeconds - EditorState.audioRecordSeconds) * panel.pxPerSecond
     width: Math.max(2, EditorState.audioRecordSeconds * panel.pxPerSecond)
     height: parent.height
-    color: Qt.rgba(Theme.destructive.r, Theme.destructive.g, Theme.destructive.b, 0.25)
-    border.color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
-    border.width: 1
-    radius: Theme.radiusSm
+    color: Qt.rgba(Theme.c.timelineLiveRecordingBlock.background.r, Theme.c.timelineLiveRecordingBlock.background.g, Theme.c.timelineLiveRecordingBlock.background.b, 0.25)
+    border.color: EditorState.isAudioRecordingPaused ? Theme.c.timelineLiveRecordingBlock.borderPaused : Theme.c.timelineLiveRecordingBlock.border
+    border.width: Theme.c.timelineLiveRecordingBlock.borderWidth
+    radius: Theme.c.timelineLiveRecordingBlock.radius
     clip: true
     z: 2
 
@@ -36,6 +36,10 @@ Rectangle {
                 liveWaveCanvas.requestPaint()
             }
         }
+        readonly property color waveformGuide: Theme.c.timelineLiveRecordingBlock.waveformGuide
+        readonly property color waveform: Theme.c.timelineLiveRecordingBlock.waveform
+        onWaveformGuideChanged: requestPaint()
+        onWaveformChanged: requestPaint()
         onWidthChanged: requestPaint()
         onHeightChanged: requestPaint()
 
@@ -54,7 +58,7 @@ Rectangle {
             var n = peaks.length - first;
 
             // Centerline guideline
-            ctx.strokeStyle = Qt.rgba(1.0, 1.0, 1.0, 0.15);
+            ctx.strokeStyle = waveformGuide;
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(0, mid);
@@ -62,7 +66,7 @@ Rectangle {
             ctx.stroke();
 
             // Mirrored waveform fill
-            ctx.fillStyle = Qt.rgba(1.0, 1.0, 1.0, 0.85);
+            ctx.fillStyle = waveform;
             ctx.beginPath();
             for (var x = 0; x < w; x++) {
                 var i0 = Math.floor(first + x * n / w);
@@ -102,10 +106,10 @@ Rectangle {
         anchors.top: parent.top
         anchors.topMargin: 3
         height: 18
-        radius: 3
-        color: Qt.rgba(0, 0, 0, 0.7)
-        border.color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
-        border.width: 1
+        radius: Theme.c.timelineLiveRecordingBlock.badgeRadius
+        color: Theme.c.timelineLiveRecordingBlock.badgeBackground
+        border.color: EditorState.isAudioRecordingPaused ? Theme.c.timelineLiveRecordingBlock.borderPaused : Theme.c.timelineLiveRecordingBlock.border
+        border.width: Theme.c.timelineLiveRecordingBlock.borderWidth
         width: liveRecRow.implicitWidth + 8
 
         Row {
@@ -116,8 +120,8 @@ Rectangle {
             Rectangle {
                 width: 6
                 height: 6
-                radius: 3
-                color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
+                radius: Theme.c.timelineLiveRecordingBlock.dotRadius
+                color: EditorState.isAudioRecordingPaused ? Theme.c.timelineLiveRecordingBlock.recordPaused : Theme.c.timelineLiveRecordingBlock.border
                 anchors.verticalCenter: parent.verticalCenter
                 SequentialAnimation on opacity {
                     running: liveRecordingBlock.visible && !EditorState.isAudioRecordingPaused
@@ -132,7 +136,7 @@ Rectangle {
                       + EditorState.audioRecordSeconds.toFixed(1) + "s"
                 font.pixelSize: 10
                 font.bold: true
-                color: Theme.panelForeground
+                color: Theme.c.timelineLiveRecordingBlock.foreground
                 anchors.verticalCenter: parent.verticalCenter
             }
         }

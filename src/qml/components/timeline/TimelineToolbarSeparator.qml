@@ -3,8 +3,8 @@ import Drift
 
 // Hairline between toolbar groups.
 Rectangle {
-    width: Theme.borderWidth
+    width: Theme.c.timelineToolbarSeparator.borderWidth
     height: Theme.spacing3xl
-    color: Theme.panelBorder
+    color: Theme.c.timelineToolbarSeparator.foreground
     anchors.verticalCenter: parent.verticalCenter
 }

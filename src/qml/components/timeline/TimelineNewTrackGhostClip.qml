@@ -9,10 +9,10 @@ Rectangle {
     anchors.top: parent.top
     anchors.bottom: parent.bottom
     anchors.margins: 2
-    radius: Theme.radiusSm
-    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3)
-    border.width: 2
-    border.color: Theme.primary
+    radius: Theme.c.timelineNewTrackGhostClip.radius
+    color: Qt.rgba(Theme.c.timelineNewTrackGhostClip.background.r, Theme.c.timelineNewTrackGhostClip.background.g, Theme.c.timelineNewTrackGhostClip.background.b, 0.3)
+    border.width: Theme.c.timelineNewTrackGhostClip.borderWidth
+    border.color: Theme.c.timelineNewTrackGhostClip.border
 
     // The outline is held on screen after a file drop for as
     // long as the import it started is still probing, so it has
@@ -21,7 +21,7 @@ Rectangle {
         anchors.centerIn: parent
         visible: panel.importDropPending
         text: qsTr("Importing…")
-        color: Theme.primary
+        color: Theme.c.timelineNewTrackGhostClip.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeTiny
         font.weight: Font.Medium

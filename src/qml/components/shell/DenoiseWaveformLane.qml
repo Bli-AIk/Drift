@@ -31,11 +31,12 @@ Column {
     Rectangle {
         width: parent.width
         height: 80
-        radius: Theme.radiusMd
-        color: Theme.panelBackground
-        border.width: Theme.borderWidth
+        radius: Theme.c.denoiseWaveformLane.radius
+        color: Theme.c.denoiseWaveformLane.background
+        border.width: Theme.c.denoiseWaveformLane.borderWidth
         border.color: showClean === lane.modelData.clean
-                      ? Theme.panelSecondaryForeground : Theme.panelBorder
+                      ? Theme.c.denoiseWaveformLane.borderActive
+                      : Theme.c.denoiseWaveformLane.border
 
         SkeletonBox {
             anchors.fill: parent
@@ -71,7 +72,7 @@ Column {
                 ctx.clearRect(0, 0, width, height);
                 if (!peaks || peaks.length === 0)
                     return;
-                ctx.fillStyle = Theme.panelWaveformColor;
+                ctx.fillStyle = Theme.c.denoiseWaveformLane.waveform;
                 var mid = height / 2;
                 var w = Math.max(1, Math.floor(width));
                 var n = peaks.length;
@@ -97,8 +98,8 @@ Column {
             visible: showClean === lane.modelData.clean
                      && sourcePlayer.duration > 0
                      && sourcePlayer.playbackState !== MediaPlayer.StoppedState
-            width: 1
-            color: Theme.panelSecondaryForeground
+            width: Theme.c.denoiseWaveformLane.playheadWidth
+            color: Theme.c.denoiseWaveformLane.playhead
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             x: sourcePlayer.duration > 0

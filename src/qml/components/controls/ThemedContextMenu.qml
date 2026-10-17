@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
@@ -17,11 +18,17 @@ Menu {
     // Escape closes; clicking outside dismisses.
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
-    background: Rectangle {
-        radius: Theme.radiusSm
-        color: Theme.panelBackground
-        border.width: Theme.borderWidth
-        border.color: Theme.panelBorder
+    background: ThemeSlot {
+        slot: "ThemedContextMenuBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                radius: Theme.c.themedContextMenu.radius
+                color: Theme.c.themedContextMenu.background
+                border.width: Theme.c.themedContextMenu.borderWidth
+                border.color: Theme.c.themedContextMenu.border
+            }
+        }
     }
 
     onAboutToShow: Haptics.press()

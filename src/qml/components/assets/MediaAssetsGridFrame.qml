@@ -31,13 +31,13 @@ Rectangle {
 
     width: cardSize
     height: cardSize * 9 / 16
-    radius: Theme.radiusSm
-    color: Theme.panelAccent
+    radius: Theme.c.mediaAssetsGridFrame.radius
+    color: Theme.c.mediaAssetsGridFrame.background
     clip: true
     // Hover ring only here; the selection ring is a separate overlay
     // (below) so it always paints on top of the thumbnail image.
-    border.width: (!root.selected && root.hovered) ? Theme.borderWidth : 0
-    border.color: Theme.primary
+    border.width: (!root.selected && root.hovered) ? Theme.c.mediaAssetsGridFrame.borderWidth : 0
+    border.color: Theme.c.mediaAssetsGridFrame.border
     scale: (!root.isFolder && root.hovered) ? 1.03 : 1.0
 
     Behavior on scale {
@@ -55,7 +55,7 @@ Rectangle {
         anchors.centerIn: parent
         glyph: Theme.icons.folder
         iconSize: Theme.spacing3xl
-        iconColor: Theme.mutedForeground
+        iconColor: Theme.c.mediaAssetsGridFrame.icon
     }
 
     // Placeholder while the thumbnail decodes. The
@@ -101,7 +101,7 @@ Rectangle {
                 : kind === "composite" ? Theme.icons.layers
                 : Theme.icons.film
         iconSize: Theme.spacing3xl
-        iconColor: Theme.mutedForeground
+        iconColor: Theme.c.mediaAssetsGridFrame.icon
     }
 
     MediaAssetsGridBusyOverlay {

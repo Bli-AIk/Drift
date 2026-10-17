@@ -63,8 +63,8 @@ ThemedDialog {
 
         Rectangle {
             width: parent.width
-            height: Theme.borderWidth
-            color: Theme.panelBorder
+            height: Theme.c.updateDialog.borderWidth
+            color: Theme.c.updateDialog.divider
             visible: notesFlick.visible
         }
 

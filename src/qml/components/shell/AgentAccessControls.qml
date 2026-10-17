@@ -52,7 +52,7 @@ Column {
         width: parent.width
         visible: EditorState.mcp.error.length > 0
         text: EditorState.mcp.error
-        color: Theme.destructive
+        color: Theme.c.agentAccessControls.foregroundError
     }
 
     ThemedLabel {
@@ -73,13 +73,13 @@ Column {
             IconGlyph {
                 glyph: Theme.icons.success
                 iconSize: Theme.iconSizeMd
-                iconColor: Theme.constructive
+                iconColor: Theme.c.agentAccessControls.icon
                 anchors.verticalCenter: parent.verticalCenter
             }
 
             Text {
                 text: qsTr("Access is on")
-                color: Theme.constructive
+                color: Theme.c.agentAccessControls.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
                 font.weight: Font.Medium

@@ -2,8 +2,8 @@ import QtQuick
 import Drift
 
 Rectangle {
-    width: Theme.borderWidth
+    width: Theme.c.fadeCurveToolbarRule.borderWidth
     height: 18
-    color: Theme.panelBorder
+    color: Theme.c.fadeCurveToolbarRule.border
     anchors.verticalCenter: parent.verticalCenter
 }

@@ -12,9 +12,11 @@ Rectangle {
     width: 40
     height: 22
     radius: height / 2
-    color: switchTrack.checked ? Theme.primary : Theme.panelMuted
-    border.width: Theme.borderWidth
-    border.color: switchTrack.checked ? Theme.primary : Theme.panelBorder
+    color: switchTrack.checked ? Theme.c.androidSheetActionSwitch.backgroundChecked
+                              : Theme.c.androidSheetActionSwitch.background
+    border.width: Theme.c.androidSheetActionSwitch.borderWidth
+    border.color: switchTrack.checked ? Theme.c.androidSheetActionSwitch.borderChecked
+                                      : Theme.c.androidSheetActionSwitch.border
 
     Behavior on color {
         ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -26,7 +28,7 @@ Rectangle {
         width: 18
         height: 18
         radius: height / 2
-        color: switchTrack.checked ? Theme.primaryForeground : Theme.panelBackground
+        color: switchTrack.checked ? Theme.c.androidSheetActionSwitch.handleChecked : Theme.c.androidSheetActionSwitch.handle
 
         Behavior on x {
             NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }

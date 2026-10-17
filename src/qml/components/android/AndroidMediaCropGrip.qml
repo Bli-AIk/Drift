@@ -15,8 +15,8 @@ Rectangle {
 
     width: gripSize
     height: gripSize
-    radius: Theme.radiusXs
-    color: Theme.primary
+    radius: Theme.c.androidMediaCropGrip.radius
+    color: Theme.c.androidMediaCropGrip.background
     x: host.frameX + modelData.x * host.frameW - width / 2
     y: host.frameY + modelData.y * host.frameH - height / 2
     z: 2

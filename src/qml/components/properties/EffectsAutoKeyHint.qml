@@ -11,7 +11,7 @@ Column {
         width: parent.width
         wrapMode: Text.WordWrap
         text: qsTr("Move to a time, set a value, then click the diamond to add a keyframe. With Auto keyframes on, dragging a slider also creates them.")
-        color: Theme.mutedForeground
+        color: Theme.c.effectsAutoKeyHint.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

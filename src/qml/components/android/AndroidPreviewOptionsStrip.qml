@@ -14,7 +14,7 @@ Rectangle {
     signal resetViewRequested()
 
     height: optionsFlow.height + Theme.spacingLg * 2
-    color: Theme.scrimStrong
+    color: Theme.c.androidPreviewOptionsStrip.background
     visible: opacity > 0
     opacity: strip.optionsOpen && !EditorState.preview.canvasCropMode ? 1 : 0
 

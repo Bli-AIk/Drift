@@ -7,7 +7,7 @@ Rectangle {
     signal addRequested()
     Layout.fillWidth: true
     Layout.preferredHeight: 34
-    color: addMouse.containsMouse ? Theme.panelAccent : "transparent"
+    color: addMouse.containsMouse ? Theme.c.fontPickerAddRow.backgroundHover : "transparent"
 
     Text {
         anchors.left: parent.left
@@ -16,7 +16,7 @@ Rectangle {
         anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         text: qsTr("Add font file…")
-        color: Theme.primary
+        color: Theme.c.fontPickerAddRow.foregroundAccent
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeSm
         elide: Text.ElideRight

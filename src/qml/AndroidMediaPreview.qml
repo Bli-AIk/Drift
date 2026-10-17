@@ -292,7 +292,7 @@ Item {
     Rectangle {
         id: pageBackground
         anchors.fill: parent
-        color: Theme.appBackground
+        color: Theme.c.androidMediaPreview.background
     }
 
     readonly property real safeTop: SafeArea.margins.top
@@ -338,8 +338,8 @@ Item {
         anchors.bottomMargin: Theme.spacingMd
         anchors.leftMargin: root.safeLeft + Theme.spacingMd
         anchors.rightMargin: root.safeRight + Theme.spacingMd
-        radius: Theme.radiusMd
-        color: Theme.overlayColor
+        radius: Theme.c.androidMediaPreview.stageRadius
+        color: Theme.c.androidMediaPreview.stageBackground
         clip: true
 
         readonly property real aspect: {
@@ -387,7 +387,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 glyph: Theme.icons.music
                 iconSize: Theme.iconSizeXl * 2
-                iconColor: Theme.mutedForeground
+                iconColor: Theme.c.androidMediaPreview.audioIcon
             }
             ThemedLabel {
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -538,10 +538,10 @@ Item {
                 id: strip
                 width: parent.width
                 height: 72
-                radius: Theme.radiusSm
-                color: Theme.panelBackground
-                border.width: Theme.borderWidth
-                border.color: Theme.panelBorder
+                radius: Theme.c.androidMediaPreview.stripRadius
+                color: Theme.c.androidMediaPreview.stripBackground
+                border.width: Theme.c.androidMediaPreview.stripBorderWidth
+                border.color: Theme.c.androidMediaPreview.stripBorder
                 clip: true
 
                 readonly property real dur: Math.max(0.001, root.durationSeconds)
@@ -551,7 +551,7 @@ Item {
 
                 ClipFilmstrip {
                     anchors.fill: parent
-                    anchors.margins: Theme.borderWidth
+                    anchors.margins: Theme.c.androidMediaPreview.stripBorderWidth
                     visible: root.filmstripPath.length > 0
                     filmstripPath: root.filmstripPath
                     frameWidth: Math.max(1, width / frameCount)
@@ -565,27 +565,27 @@ Item {
                 Rectangle {
                     width: strip.inX
                     height: parent.height
-                    color: Theme.scrimStrong
+                    color: Theme.c.androidMediaPreview.trimShade
                 }
                 Rectangle {
                     x: strip.outX
                     width: Math.max(0, parent.width - x)
                     height: parent.height
-                    color: Theme.scrimStrong
+                    color: Theme.c.androidMediaPreview.trimShade
                 }
                 Rectangle {
                     x: strip.inX
                     width: Math.max(2, strip.outX - strip.inX)
                     height: parent.height
                     color: "transparent"
-                    border.width: Theme.borderWidthFocus
-                    border.color: Theme.primary
+                    border.width: Theme.c.androidMediaPreview.selectionBorderWidth
+                    border.color: Theme.c.androidMediaPreview.selectionBorder
                 }
                 Rectangle {
                     x: strip.playX - 1
-                    width: 2
+                    width: Theme.c.androidMediaPreview.playheadWidth
                     height: parent.height
-                    color: Theme.onMedia
+                    color: Theme.c.androidMediaPreview.playhead
                 }
 
                 MouseArea {

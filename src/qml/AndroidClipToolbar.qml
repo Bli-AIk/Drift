@@ -180,14 +180,14 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.panelBackground
+        color: Theme.c.androidClipToolbar.background
     }
 
     Rectangle {
         anchors.bottom: parent.bottom
         width: parent.width
-        height: Theme.borderWidth
-        color: Theme.panelBorder
+        height: Theme.c.androidClipToolbar.borderWidth
+        color: Theme.c.androidClipToolbar.border
     }
 
     Item {

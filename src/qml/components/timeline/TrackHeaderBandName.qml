@@ -11,7 +11,7 @@ Text {
     anchors.top: parent.top
     anchors.topMargin: Theme.spacingMd
     text: label
-    color: Theme.mutedForeground
+    color: Theme.c.trackHeaderBandName.foregroundMuted
     font.family: Theme.fontFamily
     font.pixelSize: Theme.fontSizeTiny
     elide: Text.ElideRight

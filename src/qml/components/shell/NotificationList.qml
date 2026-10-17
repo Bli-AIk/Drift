@@ -21,10 +21,10 @@ Item {
 
     function _accent(severity) {
         switch (severity) {
-        case "error": return Theme.destructive
-        case "warning": return Theme.warning
-        case "success": return Theme.constructive
-        default: return Theme.primary
+        case "error": return Theme.c.notificationList.accentError
+        case "warning": return Theme.c.notificationList.accentWarning
+        case "success": return Theme.c.notificationList.accentSuccess
+        default: return Theme.c.notificationList.accent
         }
     }
 
@@ -50,7 +50,7 @@ Item {
             anchors.leftMargin: root.horizontalPadding
             anchors.verticalCenter: parent.verticalCenter
             text: qsTr("Notifications")
-            color: Theme.panelForeground
+            color: Theme.c.notificationList.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.Medium

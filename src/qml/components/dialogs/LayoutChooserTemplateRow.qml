@@ -15,9 +15,9 @@ ItemDelegate {
     background: Rectangle {
         color: {
             if (row.highlighted)
-                return Theme.panelSecondaryBg
+                return Theme.c.layoutChooserTemplateRow.backgroundSelected
             if (row.hovered)
-                return Theme.popoverHover
+                return Theme.c.layoutChooserTemplateRow.backgroundHover
             return "transparent"
         }
     }
@@ -38,8 +38,8 @@ ItemDelegate {
                 glyph: row.modelData.icon
                 iconSize: 16
                 iconColor: row.highlighted
-                           ? Theme.panelSecondaryForeground
-                           : Theme.panelForeground
+                           ? Theme.c.layoutChooserTemplateRow.iconSelected
+                           : Theme.c.layoutChooserTemplateRow.icon
             }
 
             Column {
@@ -49,8 +49,8 @@ ItemDelegate {
                 Text {
                     text: row.modelData.label
                     color: row.highlighted
-                           ? Theme.panelSecondaryForeground
-                           : Theme.panelForeground
+                           ? Theme.c.layoutChooserTemplateRow.foregroundSelected
+                           : Theme.c.layoutChooserTemplateRow.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeSm
                     font.weight: Font.Medium
@@ -58,7 +58,7 @@ ItemDelegate {
 
                 Text {
                     text: row.modelData.detail
-                    color: Theme.mutedForeground
+                    color: Theme.c.layoutChooserTemplateRow.foregroundMuted
                     font.family: Theme.monoFontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }
@@ -93,10 +93,11 @@ ItemDelegate {
                 anchors.centerIn: parent
                 width: parent.aw
                 height: parent.ah
-                radius: 2
+                radius: Theme.c.layoutChooserTemplateRow.previewRadius
                 color: "transparent"
-                border.width: Theme.borderWidth
-                border.color: row.highlighted ? Theme.primary : Theme.panelBorder
+                border.width: Theme.c.layoutChooserTemplateRow.previewBorderWidth
+                border.color: row.highlighted ? Theme.c.layoutChooserTemplateRow.previewBorderSelected
+                                              : Theme.c.layoutChooserTemplateRow.previewBorder
             }
         }
     }

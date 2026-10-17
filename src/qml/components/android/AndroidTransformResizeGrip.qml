@@ -34,10 +34,12 @@ Item {
         anchors.centerIn: parent
         width: overlay.gripSize
         height: overlay.gripSize
-        radius: Theme.radiusXs
-        color: gripArea.pressed ? Theme.primaryForeground : Theme.primary
-        border.width: Theme.borderWidth
-        border.color: gripArea.pressed ? Theme.primary : Theme.primaryForeground
+        radius: Theme.c.androidTransformResizeGrip.radius
+        color: gripArea.pressed ? Theme.c.androidTransformResizeGrip.backgroundPressed
+                                : Theme.c.androidTransformResizeGrip.background
+        border.width: Theme.c.androidTransformResizeGrip.borderWidth
+        border.color: gripArea.pressed ? Theme.c.androidTransformResizeGrip.borderPressed
+                                       : Theme.c.androidTransformResizeGrip.border
 
         Behavior on color {
             ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }

@@ -10,10 +10,10 @@ Item {
 
     readonly property bool hot: handleItem.host.dragging === modelData.id
                                 || (handleItem.host.dragging === "" && handleItem.host.hovered === modelData.id)
-    readonly property color ink: hot ? Theme.gizmoHot : handleItem.host.colorFor(modelData.id)
-    readonly property real lineWidth: (hot ? 3 : 2) * (handleItem.host.touch ? 1.25 : 1)
+    readonly property color ink: hot ? Theme.c.transformGizmoHandle.hot : handleItem.host.colorFor(modelData.id)
+    readonly property real lineWidth: (hot ? Theme.c.transformGizmoHandle.strokeWidthHot : Theme.c.transformGizmoHandle.strokeWidth) * (handleItem.host.touch ? 1.25 : 1)
     // While one handle is dragged the others step back, so the one in use reads clearly.
-    opacity: handleItem.host.dragging === "" || hot ? 1 : 0.35
+    opacity: handleItem.host.dragging === "" || hot ? 1 : Theme.c.transformGizmoHandle.opacity
 
     // The far half of a ring, behind the clip.
     Repeater {
@@ -21,7 +21,7 @@ Item {
         delegate: TransformGizmoStroke {
             ink: handleItem.ink
             thickness: handleItem.lineWidth
-            fade: 0.3
+            fade: Theme.c.transformGizmoHandle.backOpacity
         }
     }
 
@@ -30,7 +30,7 @@ Item {
         delegate: TransformGizmoStroke {
             ink: handleItem.ink
             thickness: handleItem.lineWidth
-            fade: 1
+            fade: Theme.c.transformGizmoHandle.frontOpacity
         }
     }
 

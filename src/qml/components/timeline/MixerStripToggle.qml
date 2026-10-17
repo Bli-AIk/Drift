@@ -11,7 +11,7 @@ AbstractButton {
     property string tone: "destructive"
     property bool blinking: false
 
-    readonly property color _checkedFg: tone === "active" ? Theme.panelSecondaryForeground : Theme.destructive
+    readonly property color _checkedFg: tone === "active" ? Theme.c.mixerStripToggle.activeForeground : Theme.c.mixerStripToggle.destructive
 
     implicitWidth: 28
     implicitHeight: 28
@@ -28,15 +28,15 @@ AbstractButton {
     Accessible.checked: checked
 
     background: Rectangle {
-        radius: Theme.radiusXs
+        radius: Theme.c.mixerStripToggle.radius
         color: toggle.checked
-               ? (toggle.tone === "active" ? Theme.panelSecondaryBg
-                                           : Qt.rgba(Theme.destructive.r, Theme.destructive.g, Theme.destructive.b, 0.16))
-               : (toggle.down ? Theme.panelMuted : (toggle.hovered ? Theme.popoverHover : "transparent"))
-        border.width: toggle.checked || toggle.visualFocus ? Theme.borderWidth : 0
-        border.color: toggle.visualFocus ? Theme.focusRing
-                    : toggle.tone === "active" ? Theme.panelSecondaryBorder
-                    : Qt.rgba(Theme.destructive.r, Theme.destructive.g, Theme.destructive.b, 0.45)
+               ? (toggle.tone === "active" ? Theme.c.mixerStripToggle.activeBackground
+                                           : Qt.rgba(Theme.c.mixerStripToggle.destructive.r, Theme.c.mixerStripToggle.destructive.g, Theme.c.mixerStripToggle.destructive.b, 0.16))
+               : (toggle.down ? Theme.c.mixerStripToggle.backgroundPressed : (toggle.hovered ? Theme.c.mixerStripToggle.backgroundHover : "transparent"))
+        border.width: toggle.checked || toggle.visualFocus ? Theme.c.mixerStripToggle.borderWidth : 0
+        border.color: toggle.visualFocus ? Theme.c.mixerStripToggle.borderFocus
+                    : toggle.tone === "active" ? Theme.c.mixerStripToggle.activeBorder
+                    : Qt.rgba(Theme.c.mixerStripToggle.destructive.r, Theme.c.mixerStripToggle.destructive.g, Theme.c.mixerStripToggle.destructive.b, 0.45)
 
         Behavior on color {
             ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -50,7 +50,7 @@ AbstractButton {
             glyph: toggle.glyph
             iconSize: Theme.iconSizeBase
             iconColor: toggle.checked ? toggle._checkedFg
-                     : (toggle.hovered ? Theme.panelForeground : Theme.mutedForeground)
+                     : (toggle.hovered ? Theme.c.mixerStripToggle.foreground : Theme.c.mixerStripToggle.foregroundMuted)
 
             SequentialAnimation on opacity {
                 running: toggle.blinking

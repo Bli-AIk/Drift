@@ -14,32 +14,32 @@ Item {
     anchors.fill: parent
 
     Rectangle {
-        color: Theme.overlayColor
-        opacity: 0.65
+        color: Theme.c.cropOverlayScrim.background
+        opacity: Theme.c.cropOverlayScrim.opacity
         x: 0
         y: 0
         width: Math.max(0, scrim.frameX)
         height: parent.height
     }
     Rectangle {
-        color: Theme.overlayColor
-        opacity: 0.65
+        color: Theme.c.cropOverlayScrim.background
+        opacity: Theme.c.cropOverlayScrim.opacity
         x: scrim.frameX + scrim.frameW
         y: 0
         width: Math.max(0, scrim.width - x)
         height: parent.height
     }
     Rectangle {
-        color: Theme.overlayColor
-        opacity: 0.65
+        color: Theme.c.cropOverlayScrim.background
+        opacity: Theme.c.cropOverlayScrim.opacity
         x: scrim.frameX
         y: 0
         width: Math.max(0, scrim.frameW)
         height: Math.max(0, scrim.frameY)
     }
     Rectangle {
-        color: Theme.overlayColor
-        opacity: 0.65
+        color: Theme.c.cropOverlayScrim.background
+        opacity: Theme.c.cropOverlayScrim.opacity
         x: scrim.frameX
         y: scrim.frameY + scrim.frameH
         width: Math.max(0, scrim.frameW)

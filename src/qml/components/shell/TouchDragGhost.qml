@@ -22,11 +22,13 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: Theme.radiusSm
-        color: Theme.panelAccent
+        radius: Theme.c.touchDragGhost.radius
+        color: Theme.c.touchDragGhost.background
         clip: true
-        border.width: TouchDrag.overTarget ? 2 : Theme.borderWidth
-        border.color: TouchDrag.overTarget ? Theme.primary : Theme.panelBorder
+        border.width: TouchDrag.overTarget ? Theme.c.touchDragGhost.borderWidthOver
+                                           : Theme.c.touchDragGhost.borderWidth
+        border.color: TouchDrag.overTarget ? Theme.c.touchDragGhost.borderOver
+                                           : Theme.c.touchDragGhost.border
         opacity: 0.94
 
         Behavior on border.width {
@@ -51,7 +53,7 @@ Item {
             visible: !ghostImage.visible && TouchDrag.glyph.length > 0
             glyph: TouchDrag.glyph
             iconSize: Theme.iconSizeXl
-            iconColor: Theme.panelForeground
+            iconColor: Theme.c.touchDragGhost.icon
         }
 
         Text {
@@ -61,7 +63,7 @@ Item {
             anchors.margins: Theme.spacingXs
             visible: !ghostImage.visible && TouchDrag.label.length > 0
             text: TouchDrag.label
-            color: Theme.panelForeground
+            color: Theme.c.touchDragGhost.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             horizontalAlignment: Text.AlignHCenter

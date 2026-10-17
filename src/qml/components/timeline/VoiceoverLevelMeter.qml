@@ -9,10 +9,10 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: 2
-        color: Qt.rgba(0, 0, 0, 0.4)
-        border.color: Theme.panelBorder
-        border.width: 1
+        radius: Theme.c.voiceoverLevelMeter.radius
+        color: Theme.c.voiceoverLevelMeter.background
+        border.color: Theme.c.voiceoverLevelMeter.border
+        border.width: Theme.c.voiceoverLevelMeter.borderWidth
     }
 
     Rectangle {
@@ -21,10 +21,10 @@ Item {
         anchors.bottom: parent.bottom
         anchors.margins: 1
         width: Math.max(1, Math.min(parent.width - 2, (parent.width - 2) * EditorState.audioRecordLevel))
-        radius: 1
+        radius: Theme.c.voiceoverLevelMeter.levelRadius
         color: EditorState.audioRecordLevel > 0.85
-               ? Theme.destructive
-               : (EditorState.audioRecordLevel > 0.6 ? "#eab308" : "#22c55e")
+               ? Theme.c.voiceoverLevelMeter.levelHot
+               : (EditorState.audioRecordLevel > 0.6 ? Theme.c.voiceoverLevelMeter.levelWarm : Theme.c.voiceoverLevelMeter.level)
     }
 
     ThemedToolTip {

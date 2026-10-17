@@ -16,7 +16,7 @@ MenuSeparator {
     height: visible ? implicitHeight : 0
 
     contentItem: Rectangle {
-        implicitHeight: Theme.borderWidth
-        color: Theme.panelBorder
+        implicitHeight: Theme.c.themedMenuSeparator.borderWidth
+        color: Theme.c.themedMenuSeparator.background
     }
 }

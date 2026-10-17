@@ -9,7 +9,7 @@ Row {
     Text {
         anchors.verticalCenter: parent.verticalCenter
         text: qsTr("Keyframes")
-        color: Theme.mutedForeground
+        color: Theme.c.keyframeGraphHeaderBar.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         font.weight: Font.Medium

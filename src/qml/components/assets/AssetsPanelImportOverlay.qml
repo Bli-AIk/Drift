@@ -9,8 +9,8 @@ Rectangle {
 
     anchors.fill: parent
     z: 60
-    color: Theme.panelBackground
-    opacity: active ? 0.92 : 0
+    color: Theme.c.assetsPanelImportOverlay.background
+    opacity: active ? Theme.c.assetsPanelImportOverlay.scrimOpacity : 0
     visible: opacity > 0
 
     Behavior on opacity {

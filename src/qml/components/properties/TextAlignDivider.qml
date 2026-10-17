@@ -3,7 +3,7 @@ import Drift
 
 // Hairline between the horizontal and vertical alignment toggles.
 Rectangle {
-    width: Theme.borderWidth
+    width: Theme.c.textAlignDivider.borderWidth
     height: Theme.controlHeightSm
-    color: Theme.panelBorder
+    color: Theme.c.textAlignDivider.border
 }

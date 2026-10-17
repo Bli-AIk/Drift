@@ -7,5 +7,5 @@ Rectangle {
     anchors.right: parent.right
     anchors.bottom: parent.bottom
     height: 1
-    color: Theme.panelBorder
+    color: Theme.c.timelineSeekStripEdge.border
 }

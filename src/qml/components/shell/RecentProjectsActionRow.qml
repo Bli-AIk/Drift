@@ -12,8 +12,8 @@ Rectangle {
 
     width: parent ? parent.width : 0
     height: Theme.controlHeight + Theme.spacingSm
-    radius: Theme.radiusSm
-    color: actionArea.containsMouse ? Theme.accent : "transparent"
+    radius: Theme.c.recentProjectsActionRow.radius
+    color: actionArea.containsMouse ? Theme.c.recentProjectsActionRow.backgroundHover : "transparent"
 
     Row {
         anchors.left: parent.left
@@ -24,13 +24,13 @@ Rectangle {
         IconGlyph {
             id: rowIcon
             iconSize: Theme.iconSizeMd
-            iconColor: Theme.foreground
+            iconColor: Theme.c.recentProjectsActionRow.icon
             anchors.verticalCenter: parent.verticalCenter
         }
 
         Text {
             id: rowLabel
-            color: Theme.foreground
+            color: Theme.c.recentProjectsActionRow.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             anchors.verticalCenter: parent.verticalCenter

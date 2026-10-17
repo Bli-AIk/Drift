@@ -51,7 +51,7 @@ AbstractButton {
             wrapMode: Text.Wrap
             maximumLineCount: 2
             elide: Text.ElideRight
-            color: Theme.panelForeground
+            color: Theme.c.sheetActionTile.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             lineHeight: 1.1

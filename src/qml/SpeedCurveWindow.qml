@@ -30,7 +30,7 @@ ToolWindow {
     minimumWidth: 680
     minimumHeight: 560
     title: qsTr("Custom speed")
-    color: Theme.appBackground
+    color: Theme.c.speedCurveWindow.background
 
     function openFor(track, clip) {
         root.trackIndex = track
@@ -272,10 +272,10 @@ ToolWindow {
             id: graph
             width: parent.width
             height: 220
-            radius: Theme.radiusSm
-            color: Theme.panelBackground
-            border.width: Theme.borderWidth
-            border.color: Theme.panelBorder
+            radius: Theme.c.speedCurveWindow.graphRadius
+            color: Theme.c.speedCurveWindow.graphBackground
+            border.width: Theme.c.speedCurveWindow.graphBorderWidth
+            border.color: Theme.c.speedCurveWindow.graphBorder
             clip: true
 
             Item {

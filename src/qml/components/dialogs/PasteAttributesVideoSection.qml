@@ -10,7 +10,7 @@ Column {
     ThemedLabel {
         text: qsTr("Video Attributes")
         size: "xs"
-        color: Theme.primary
+        color: Theme.c.pasteAttributesVideoSection.foreground
         font.weight: Font.DemiBold
     }
 

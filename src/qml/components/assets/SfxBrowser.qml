@@ -200,7 +200,7 @@ Item {
         visible: Sfx.sounds.length > 0 && root.results.length === 0
         text: root.query.length > 0 ? qsTr("No sound effects match “%1”.").arg(root.query)
                                     : qsTr("No sound effects here.")
-        color: Theme.mutedForeground
+        color: Theme.c.sfxBrowser.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeSm
         wrapMode: Text.WordWrap

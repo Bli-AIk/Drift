@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import Drift
 
@@ -15,19 +16,25 @@ Item {
     implicitHeight: barHeight
     height: barHeight
 
-    Rectangle {
+    ThemeSlot {
         anchors.fill: parent
-        radius: height / 2
-        color: Theme.panelMuted
+        slot: "ThemedProgressBarBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                radius: Theme.c.themedProgressBar.trackRadius
+                color: Theme.c.themedProgressBar.trackBackground
 
-        Rectangle {
-            width: parent.width * Math.max(0, Math.min(1, root.value))
-            height: parent.height
-            radius: parent.radius
-            color: Theme.primary
+                Rectangle {
+                    width: parent.width * Math.max(0, Math.min(1, root.value))
+                    height: parent.height
+                    radius: parent.radius
+                    color: Theme.c.themedProgressBar.fillBackground
 
-            Behavior on width {
-                NumberAnimation { duration: Theme.durationBase; easing.type: Theme.easing }
+                    Behavior on width {
+                        NumberAnimation { duration: Theme.durationBase; easing.type: Theme.easing }
+                    }
+                }
             }
         }
     }

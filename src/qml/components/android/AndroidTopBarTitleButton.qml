@@ -30,8 +30,8 @@ AbstractButton {
     }
 
     background: Rectangle {
-        radius: Theme.radiusSm
-        color: titleBtn.down ? Theme.panelAccent : "transparent"
+        radius: Theme.c.androidTopBarTitleButton.radius
+        color: titleBtn.down ? Theme.c.androidTopBarTitleButton.backgroundPressed : "transparent"
 
         Behavior on color {
             ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -48,7 +48,7 @@ AbstractButton {
             anchors.verticalCenter: parent.verticalCenter
             width: Math.min(implicitWidth, Math.max(0, titleBtn.maxTextWidth))
             text: titleBtn.projectName.length > 0 ? titleBtn.projectName : qsTr("Untitled")
-            color: Theme.foreground
+            color: Theme.c.androidTopBarTitleButton.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.Medium
@@ -57,14 +57,15 @@ AbstractButton {
 
         AndroidAttentionDot {
             anchors.verticalCenter: parent.verticalCenter
-            dotColor: titleBtn.unsaved ? Theme.destructive : Theme.constructive
+            dotColor: titleBtn.unsaved ? Theme.c.androidTopBarTitleButton.unsaved
+                      : Theme.c.androidTopBarTitleButton.saved
         }
 
         IconGlyph {
             anchors.verticalCenter: parent.verticalCenter
             glyph: Theme.icons.chevronDown
             iconSize: Theme.iconSizeMd
-            iconColor: Theme.mutedForeground
+            iconColor: Theme.c.androidTopBarTitleButton.icon
 
             // The update row lives in the project sheet's App section.
             AndroidAttentionDot {

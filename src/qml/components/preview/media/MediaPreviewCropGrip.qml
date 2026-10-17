@@ -13,8 +13,8 @@ Rectangle {
     readonly property int gripSize: Theme.touchUi ? 16 : 10
     width: gripSize
     height: gripSize
-    radius: 1
-    color: Theme.primary
+    radius: Theme.c.mediaPreviewCropGrip.radius
+    color: Theme.c.mediaPreviewCropGrip.background
     x: grip.host.frameX + modelData.x * grip.host.frameW - width / 2
     y: grip.host.frameY + modelData.y * grip.host.frameH - height / 2
     z: 2

@@ -12,6 +12,6 @@ Rectangle {
     width: Math.max(2, span.outX - span.inX)
     height: parent.height
     color: "transparent"
-    border.width: Theme.borderWidth
-    border.color: Theme.primary
+    border.width: Theme.c.mediaPreviewTrimSpan.borderWidth
+    border.color: Theme.c.mediaPreviewTrimSpan.border
 }

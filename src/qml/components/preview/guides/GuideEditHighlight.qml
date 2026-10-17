@@ -14,7 +14,7 @@ Rectangle {
     readonly property bool vertical: mark.edge ? mark.edge.axis === "x" : false
     x: !mark.edge ? 0 : vertical ? mark.at - 1 : mark.edge.from
     y: !mark.edge ? 0 : vertical ? mark.edge.from : mark.at - 1
-    width: !mark.edge ? 0 : vertical ? 3 : mark.edge.to - mark.edge.from
-    height: !mark.edge ? 0 : vertical ? mark.edge.to - mark.edge.from : 3
-    color: mark.removing ? Theme.destructive : Theme.primary
+    width: !mark.edge ? 0 : vertical ? Theme.c.guideEditHighlight.strokeWidth : mark.edge.to - mark.edge.from
+    height: !mark.edge ? 0 : vertical ? mark.edge.to - mark.edge.from : Theme.c.guideEditHighlight.strokeWidth
+    color: mark.removing ? Theme.c.guideEditHighlight.backgroundRemoving : Theme.c.guideEditHighlight.background
 }

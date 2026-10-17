@@ -165,7 +165,7 @@ Item {
                     spacing: 4
                     Text {
                         text: qsTr("Fit")
-                        color: Theme.mutedForeground
+                        color: Theme.c.vectorInspector.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -185,7 +185,7 @@ Item {
                     visible: root.vector.durationSec > 0
                     Text {
                         text: qsTr("After the end")
-                        color: Theme.mutedForeground
+                        color: Theme.c.vectorInspector.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -206,7 +206,7 @@ Item {
                 visible: root.vector.durationSec > 0
                 Text {
                     text: qsTr("Start offset")
-                    color: Theme.mutedForeground
+                    color: Theme.c.vectorInspector.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -242,7 +242,7 @@ Item {
                 spacing: 4
                 Text {
                     text: qsTr("Target")
-                    color: Theme.mutedForeground
+                    color: Theme.c.vectorInspector.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }

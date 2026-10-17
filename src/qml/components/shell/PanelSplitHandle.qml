@@ -36,8 +36,8 @@ Rectangle {
 
     implicitWidth: horizontal ? Theme.spacingMd : (view ? view.width : 0)
     implicitHeight: horizontal ? (view ? view.height : 0) : Theme.spacingMd
-    color: handlePressed ? Theme.primary
-                         : (handleHovered ? Theme.panelBorder : "transparent")
+    color: handlePressed ? Theme.c.panelSplitHandle.backgroundPressed
+                         : (handleHovered ? Theme.c.panelSplitHandle.backgroundHover : "transparent")
 
     Behavior on color {
         ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -63,8 +63,8 @@ Rectangle {
             Rectangle {
                 width: 2
                 height: 2
-                radius: 1
-                color: Theme.panelBorder
+                radius: Theme.c.panelSplitHandle.gripRadius
+                color: Theme.c.panelSplitHandle.grip
             }
         }
     }

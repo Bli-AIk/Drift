@@ -21,9 +21,9 @@ Rectangle {
     height: vs
     radius: vs / 2
     color: vertexArea.containsMouse || vertexArea.pressed
-           ? Theme.primaryForeground : Theme.primary
-    border.width: Theme.borderWidth
-    border.color: Theme.primaryForeground
+           ? Theme.c.maskOverlayVertexHandle.backgroundHover : Theme.c.maskOverlayVertexHandle.background
+    border.width: Theme.c.maskOverlayVertexHandle.borderWidth
+    border.color: Theme.c.maskOverlayVertexHandle.border
 
     // Live position during a drag, so the dot tracks the cursor without
     // waiting for the model to come back.

@@ -36,13 +36,13 @@ Column {
             anchors.verticalCenter: parent.verticalCenter
             text: qsTr("Edit-friendly")
             tooltip: qsTr("Converted to a constant frame rate for smooth editing")
-            accent: Theme.clipEditFriendly
-            foreground: Theme.clipEditFriendlyForeground
+            accent: Theme.c.mediaPill.editFriendlyBackground
+            foreground: Theme.c.mediaPill.editFriendlyForeground
             visible: root.editFriendly
         }
         Text {
             text: root.assetName
-            color: Theme.panelForeground
+            color: Theme.c.mediaAssetsListLabels.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             elide: Text.ElideRight
@@ -55,7 +55,7 @@ Column {
     Text {
         visible: !root.folder
         text: root.kind + (root.duration.length > 0 ? " · " + root.duration : "")
-        color: Theme.mutedForeground
+        color: Theme.c.mediaAssetsListLabels.foregroundMuted
         font.pixelSize: Theme.fontSizeXs
         font.family: Theme.fontFamily
         // Was unbounded, so it overflowed the row

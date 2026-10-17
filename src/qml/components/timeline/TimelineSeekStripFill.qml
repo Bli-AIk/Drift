@@ -2,7 +2,14 @@ import QtQuick
 import Drift
 
 // Background of the pinned ruler and bookmark strip.
-Rectangle {
+ThemeSlot {
+    slot: "TimelineRulerBackground"
+    control: parent
     anchors.fill: parent
-    color: Theme.panelBackground
+    fallback: Component {
+        Rectangle {
+            anchors.fill: parent
+            color: Theme.c.timelineSeekStripFill.background
+        }
+    }
 }

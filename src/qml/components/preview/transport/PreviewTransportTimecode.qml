@@ -22,21 +22,21 @@ Row {
 
     Text {
         text: timecode.formatTimecode(timecode.currentSeconds)
-        color: Theme.primary
+        color: Theme.c.previewTransportTimecode.foreground
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeXs
         anchors.verticalCenter: parent.verticalCenter
     }
     Text {
         text: " / "
-        color: Theme.mutedForeground
+        color: Theme.c.previewTransportTimecode.foregroundMuted
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeXs
         anchors.verticalCenter: parent.verticalCenter
     }
     Text {
         text: timecode.formatTimecode(timecode.durationSeconds)
-        color: Theme.mutedForeground
+        color: Theme.c.previewTransportTimecode.foregroundMuted
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeXs
         anchors.verticalCenter: parent.verticalCenter

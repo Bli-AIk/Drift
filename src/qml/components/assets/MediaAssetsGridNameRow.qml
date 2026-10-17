@@ -28,8 +28,8 @@ Row {
         anchors.verticalCenter: parent.verticalCenter
         text: qsTr("Edit-friendly")
         tooltip: qsTr("Converted to a constant frame rate for smooth editing")
-        accent: Theme.clipEditFriendly
-        foreground: Theme.clipEditFriendlyForeground
+        accent: Theme.c.mediaPill.editFriendlyBackground
+        foreground: Theme.c.mediaPill.editFriendlyForeground
         visible: root.editFriendly
         fontSize: Theme.fontSizeTiny
     }
@@ -39,7 +39,7 @@ Row {
                            - (cardEditFriendlyPill.visible
                               ? cardEditFriendlyPill.width + parent.spacing : 0))
         text: root.assetName
-        color: Theme.mutedForeground
+        color: Theme.c.mediaAssetsGridNameRow.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeCard
         elide: Text.ElideRight

@@ -6,6 +6,6 @@ Rectangle {
     x: host.xForSeconds(EditorState.playheadSeconds) - Theme.playheadLineWidth / 2
     width: Theme.playheadLineWidth
     height: parent.height
-    color: Theme.primary
+    color: Theme.c.keyframeGraphPlayhead.accent
     z: 3
 }

@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
@@ -20,7 +21,7 @@ AbstractButton {
     property string tooltip: ""
     // Selected fill/border for the "primary" variant. Override to tint a chip to
     // the series it stands for (e.g. keyframe curve colors).
-    property color accentColor: Theme.primary
+    property color accentColor: Theme.c.themedChip.primaryBackground
 
     checked: selected
     checkable: false
@@ -47,61 +48,69 @@ AbstractButton {
 
     readonly property color _fill: {
         if (!enabled)
-            return variant === "outline" ? "transparent" : Theme.panelAccent
+            return variant === "outline" ? "transparent" : Theme.c.themedChip.backgroundDisabled
         if (selected) {
             switch (variant) {
-            case "secondary": return down ? Qt.darker(Theme.panelSecondaryBg, 1.2) : Theme.panelSecondaryBg
-            case "outline": return down ? Theme.panelMuted : Theme.panelAccent
+            case "secondary": return down ? Qt.darker(Theme.c.themedChip.secondaryBackground, 1.2)
+                                          : Theme.c.themedChip.secondaryBackground
+            case "outline": return down ? Theme.c.themedChip.outlineBackgroundPressed
+                                        : Theme.c.themedChip.outlineBackground
             default: return down ? Qt.darker(accentColor, 1.15) : accentColor
             }
         }
         if (down)
-            return Theme.panelMuted
+            return Theme.c.themedChip.backgroundPressed
         if (hovered)
-            return Theme.popoverHover
-        return variant === "outline" ? "transparent" : Theme.panelAccent
+            return Theme.c.themedChip.backgroundHover
+        return variant === "outline" ? "transparent" : Theme.c.themedChip.background
     }
 
     readonly property color _border: {
         if (selected) {
             switch (variant) {
-            case "secondary": return Theme.panelSecondaryBorder
-            case "outline": return Theme.panelBorder
+            case "secondary": return Theme.c.themedChip.secondaryBorder
+            case "outline": return Theme.c.themedChip.border
             default: return accentColor
             }
         }
-        return Theme.panelBorder
+        return Theme.c.themedChip.border
     }
 
     readonly property color _fg: {
         if (selected && variant === "primary")
-            return Theme.primaryForeground
+            return Theme.c.themedChip.primaryForeground
         if (selected && variant === "secondary")
-            return Theme.panelSecondaryForeground
-        return Theme.panelForeground
+            return Theme.c.themedChip.secondaryForeground
+        return Theme.c.themedChip.foreground
     }
 
-    background: Rectangle {
-        radius: Theme.radiusSm
-        color: root._fill
-        border.width: Theme.borderWidth
-        border.color: root._border
-        opacity: root.enabled ? 1 : 0.5
+    background: ThemeSlot {
+        slot: "ThemedChipBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                radius: Theme.c.themedChip.radius
+                color: root._fill
+                border.width: Theme.c.themedChip.borderWidth
+                border.color: root._border
+                opacity: root.enabled ? 1 : 0.5
 
-        Behavior on color {
-            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
-        Behavior on border.color {
-            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
+                Behavior on color {
+                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
+                Behavior on border.color {
+                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
 
-        Rectangle {
-            anchors.fill: parent
-            radius: parent.radius
-            color: "transparent"
-            border.width: Theme.borderWidthFocus
-            border.color: Theme.focusRing
-            visible: root.visualFocus
+                Rectangle {
+                    anchors.fill: parent
+                    radius: parent.radius
+                    color: "transparent"
+                    border.width: Theme.c.themedChip.focusBorderWidth
+                    border.color: Theme.c.themedChip.focusBorder
+                    visible: root.visualFocus
+                }
+            }
         }
     }
 

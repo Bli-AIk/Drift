@@ -10,15 +10,15 @@ Item {
 
     visible: shown
     width: parent ? parent.width : implicitWidth
-    height: visible ? Theme.spacingLg + Theme.borderWidth : 0
+    height: visible ? Theme.spacingLg + Theme.c.propertiesTabRailSeparator.borderWidth : 0
 
     Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         width: Theme.iconSizeSm
-        height: Theme.borderWidth
+        height: Theme.c.propertiesTabRailSeparator.borderWidth
         radius: height / 2
-        color: Theme.panelBorder
+        color: Theme.c.propertiesTabRailSeparator.border
         opacity: 0.85
     }
 }

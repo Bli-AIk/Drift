@@ -12,12 +12,12 @@ Rectangle {
 
     width: 22
     height: 22
-    radius: Theme.radiusSm
+    radius: Theme.c.effectsColorSwatchChip.radius
     color: modelData
-    border.width: current ? 2 : 1
-    border.color: current ? Theme.primary
-                : swatchMouse.containsMouse ? Theme.panelForeground
-                : Theme.panelBorder
+    border.width: current ? Theme.c.effectsColorSwatchChip.borderWidthSelected : Theme.c.effectsColorSwatchChip.borderWidth
+    border.color: current ? Theme.c.effectsColorSwatchChip.borderSelected
+                : swatchMouse.containsMouse ? Theme.c.effectsColorSwatchChip.borderForeground
+                : Theme.c.effectsColorSwatchChip.border
 
     MouseArea {
         id: swatchMouse

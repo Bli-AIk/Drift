@@ -9,8 +9,8 @@ Rectangle {
     width: Math.max(3, spanWidth)
     y: 1
     height: parent.height - 3
-    radius: 2
+    radius: Theme.c.timelineOverviewFrame.radius
     color: "transparent"
-    border.width: 1
-    border.color: Theme.primary
+    border.width: Theme.c.timelineOverviewFrame.borderWidth
+    border.color: Theme.c.timelineOverviewFrame.border
 }

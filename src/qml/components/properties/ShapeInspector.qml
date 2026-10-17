@@ -144,7 +144,7 @@ Item {
                     width: parent.width - addLayerButton.width - parent.spacing
                     anchors.verticalCenter: parent.verticalCenter
                     text: qsTr("Layers")
-                    color: Theme.panelForeground
+                    color: Theme.c.shapeInspector.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeSm
                     font.weight: Font.DemiBold
@@ -173,7 +173,7 @@ Item {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: qsTr("No layers. Add a fill to start.")
-                color: Theme.mutedForeground
+                color: Theme.c.shapeInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }

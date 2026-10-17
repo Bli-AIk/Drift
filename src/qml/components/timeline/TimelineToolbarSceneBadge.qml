@@ -28,10 +28,10 @@ Rectangle {
     visible: gapEnd - gapStart >= width
     width: sceneRow.implicitWidth + 20
     height: 26
-    radius: Theme.radiusSm
+    radius: Theme.c.timelineToolbarSceneBadge.radius
     color: "transparent"
-    border.width: 1
-    border.color: Qt.rgba(Theme.panelForeground.r, Theme.panelForeground.g, Theme.panelForeground.b, 0.1)
+    border.width: Theme.c.timelineToolbarSceneBadge.borderWidth
+    border.color: Qt.rgba(Theme.c.timelineToolbarSceneBadge.border.r, Theme.c.timelineToolbarSceneBadge.border.g, Theme.c.timelineToolbarSceneBadge.border.b, 0.1)
 
     // The active timeline: "Main", or the open composite's name.
     readonly property string activeName: {
@@ -54,12 +54,12 @@ Rectangle {
         IconGlyph {
             glyph: EditorState.activeSequenceId === "" ? Theme.icons.film : Theme.icons.layers
             iconSize: 14
-            iconColor: Theme.mutedForeground
+            iconColor: Theme.c.timelineToolbarSceneBadge.icon
             anchors.verticalCenter: parent.verticalCenter
         }
         Text {
             text: sceneBadge.activeName
-            color: Theme.panelForeground
+            color: Theme.c.timelineToolbarSceneBadge.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             elide: Text.ElideRight
@@ -69,7 +69,7 @@ Rectangle {
         IconGlyph {
             glyph: Theme.icons.chevronDown
             iconSize: 12
-            iconColor: Theme.mutedForeground
+            iconColor: Theme.c.timelineToolbarSceneBadge.icon
             anchors.verticalCenter: parent.verticalCenter
         }
     }

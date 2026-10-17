@@ -9,14 +9,14 @@ Row {
     Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         width: (parent.width - dividerLabel.width) / 2 - parent.spacing
-        height: Theme.borderWidth
-        color: Theme.panelBorder
+        height: Theme.c.timelineToolbarCustomizeDivider.borderWidth
+        color: Theme.c.timelineToolbarCustomizeDivider.border
     }
     Text {
         id: dividerLabel
         anchors.verticalCenter: parent.verticalCenter
         text: qsTr("More menu")
-        color: Theme.mutedForeground
+        color: Theme.c.timelineToolbarCustomizeDivider.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         font.weight: Font.DemiBold
@@ -24,7 +24,7 @@ Row {
     Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         width: (parent.width - dividerLabel.width) / 2 - parent.spacing
-        height: Theme.borderWidth
-        color: Theme.panelBorder
+        height: Theme.c.timelineToolbarCustomizeDivider.borderWidth
+        color: Theme.c.timelineToolbarCustomizeDivider.border
     }
 }

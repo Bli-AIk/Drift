@@ -12,7 +12,7 @@ IconGlyph {
     visible: shown
     glyph: trackMuted ? Theme.icons.volumeOff : Theme.icons.volumeHigh
     iconSize: 16
-    iconColor: trackMuted ? Theme.destructive : Theme.mutedForeground
+    iconColor: trackMuted ? Theme.c.trackHeaderMuteButton.destructive : Theme.c.trackHeaderMuteButton.foregroundMuted
     anchors.verticalCenter: parent.verticalCenter
 
     // The tooltip above never renders on touch, so the same string has to

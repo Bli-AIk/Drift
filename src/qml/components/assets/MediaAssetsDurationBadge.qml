@@ -11,8 +11,8 @@ Rectangle {
     anchors.right: parent.right
     anchors.bottom: parent.bottom
     anchors.margins: Theme.spacingSm
-    color: Theme.scrimStrong
-    radius: Theme.radiusXs
+    color: Theme.c.mediaAssetsDurationBadge.background
+    radius: Theme.c.mediaAssetsDurationBadge.radius
     width: durationLabel.implicitWidth + Theme.spacingLg
     height: durationLabel.implicitHeight + Theme.spacingSm
 
@@ -20,7 +20,7 @@ Rectangle {
         id: durationLabel
         anchors.centerIn: parent
         text: root.label
-        color: Theme.onMedia
+        color: Theme.c.mediaAssetsDurationBadge.foreground
         font.pixelSize: Theme.fontSizeXs
         font.family: Theme.fontFamily
     }

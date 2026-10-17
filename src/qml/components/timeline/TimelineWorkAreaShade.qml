@@ -12,5 +12,5 @@ Rectangle {
     width: spanWidth
     anchors.top: parent.top
     anchors.bottom: parent.bottom
-    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
+    color: Qt.rgba(Theme.c.timelineWorkAreaShade.background.r, Theme.c.timelineWorkAreaShade.background.g, Theme.c.timelineWorkAreaShade.background.b, 0.08)
 }

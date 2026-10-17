@@ -27,7 +27,7 @@ Rectangle {
             : kind === "rect" ? mark.canvasHeight * (1 - modelData.top - modelData.bottom)
             : kind === "aspect" ? frameH : mark.canvasHeight
     color: outline ? "transparent" : modelData.color
-    border.width: outline ? 1 : 0
+    border.width: outline ? Theme.c.guideLayerMark.borderWidth : 0
     border.color: modelData.color
     opacity: modelData.opacity
 }

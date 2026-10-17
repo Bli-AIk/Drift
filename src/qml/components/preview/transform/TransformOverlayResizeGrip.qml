@@ -1,10 +1,11 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import Drift
 
 // One resize grip on a clip box. dx/dy say which edges it moves
 // (-1 = left/top, +1 = right/bottom, 0 = stays put). The opposite
 // edge or corner is the anchor and does not move.
-Rectangle {
+Item {
     id: grip
 
     required property var modelData
@@ -26,15 +27,28 @@ Rectangle {
 
     width: hs
     height: hs
-    radius: Theme.radiusXs
-    color: gripArea.containsMouse || gripArea.pressed
-           ? Theme.primaryForeground : Theme.primary
-    border.width: Theme.borderWidth
-    border.color: gripArea.containsMouse || gripArea.pressed
-                  ? Theme.primary : Theme.primaryForeground
 
-    Behavior on color {
-        ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+    ThemeSlot {
+        anchors.fill: parent
+        slot: "TransformOverlayResizeGrip"
+        control: grip
+        fallback: Component {
+            Rectangle {
+                anchors.fill: parent
+                radius: Theme.c.transformOverlayResizeGrip.radius
+                color: gripArea.containsMouse || gripArea.pressed
+                       ? Theme.c.transformOverlayResizeGrip.backgroundHover
+                       : Theme.c.transformOverlayResizeGrip.background
+                border.width: Theme.c.transformOverlayResizeGrip.borderWidth
+                border.color: gripArea.containsMouse || gripArea.pressed
+                              ? Theme.c.transformOverlayResizeGrip.borderHover
+                              : Theme.c.transformOverlayResizeGrip.border
+
+                Behavior on color {
+                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
+            }
+        }
     }
 
     x: (modelData.dx === 0 ? grip.target.width / 2

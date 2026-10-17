@@ -13,13 +13,13 @@ Rectangle {
 
     height: Theme.iconButtonSize + Theme.spacingMd * 2
     visible: editing
-    color: Theme.panelBackground
+    color: Theme.c.androidTextEditBar.background
 
     Rectangle {
         anchors.top: parent.top
         width: parent.width
-        height: Theme.borderWidth
-        color: Theme.panelBorder
+        height: Theme.c.androidTextEditBar.borderWidth
+        color: Theme.c.androidTextEditBar.border
     }
 
     // Swallows touches that miss a control so they do not fall through to the timeline below.

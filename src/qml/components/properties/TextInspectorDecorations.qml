@@ -49,7 +49,7 @@ CollapsibleSection {
                         onPressedChanged: if (!pressed) tip1088.held = false
                     }
                     ThemedToolTip { id: tip1088; property bool held: false; text: qsTr("Space between the text and the edge of its background box"); visible: tipHover1088.hovered || held }
-                    color: Theme.mutedForeground
+                    color: Theme.c.textInspectorDecorations.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -78,7 +78,7 @@ CollapsibleSection {
                         onPressedChanged: if (!pressed) tip1109.held = false
                     }
                     ThemedToolTip { id: tip1109; property bool held: false; text: qsTr("Roundness of the background box corners"); visible: tipHover1109.hovered || held }
-                    color: Theme.mutedForeground
+                    color: Theme.c.textInspectorDecorations.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -124,7 +124,7 @@ CollapsibleSection {
                         onPressedChanged: if (!pressed) tipHlPad.held = false
                     }
                     ThemedToolTip { id: tipHlPad; property bool held: false; text: qsTr("How far the pill extends past the word"); visible: tipHoverHlPad.hovered || held }
-                    color: Theme.mutedForeground
+                    color: Theme.c.textInspectorDecorations.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -145,7 +145,7 @@ CollapsibleSection {
                 spacing: 4
                 Text {
                     text: qsTr("Corner radius")
-                    color: Theme.mutedForeground
+                    color: Theme.c.textInspectorDecorations.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -167,7 +167,7 @@ CollapsibleSection {
             spacing: 4
             Text {
                 text: qsTr("Highlight colour")
-                color: Theme.mutedForeground
+                color: Theme.c.textInspectorDecorations.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -199,7 +199,7 @@ CollapsibleSection {
                 spacing: 4
                 Text {
                     text: qsTr("Thickness")
-                    color: Theme.mutedForeground
+                    color: Theme.c.textInspectorDecorations.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -228,7 +228,7 @@ CollapsibleSection {
                         onPressedChanged: if (!pressed) tipUnderlineOffset.held = false
                     }
                     ThemedToolTip { id: tipUnderlineOffset; property bool held: false; text: qsTr("Gap between the baseline and the rule"); visible: tipHoverUnderlineOffset.hovered || held }
-                    color: Theme.mutedForeground
+                    color: Theme.c.textInspectorDecorations.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -250,7 +250,7 @@ CollapsibleSection {
             spacing: 4
             Text {
                 text: qsTr("Underline colour")
-                color: Theme.mutedForeground
+                color: Theme.c.textInspectorDecorations.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }

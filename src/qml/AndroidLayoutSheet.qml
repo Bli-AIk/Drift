@@ -337,7 +337,7 @@ AndroidBottomSheet {
                                 anchors.verticalCenter: parent.verticalCenter
                                 glyph: root.selectedTemplate.icon || ""
                                 iconSize: Theme.iconSizeMd
-                                iconColor: Theme.panelForeground
+                                iconColor: Theme.c.androidLayoutSheet.icon
                             }
 
                             ThemedLabel {

@@ -302,7 +302,8 @@ ThemedDialog {
             anchors.right: parent.right
             visible: Addons.status.length > 0 || Addons.refreshing
             text: Addons.refreshing ? qsTr("Checking for extras…") : Addons.status
-            color: Addons.refreshing ? Theme.mutedForeground : Theme.destructive
+            color: Addons.refreshing ? Theme.c.addonManagerDialog.statusBusy
+                                      : Theme.c.addonManagerDialog.status
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             wrapMode: Text.WordWrap
@@ -373,7 +374,7 @@ ThemedDialog {
                 wrapMode: Text.WordWrap
                 size: "sm"
                 visible: accelerationPanel.restartRequired
-                color: Theme.destructive
+                color: Theme.c.addonManagerDialog.restartForeground
                 tone: "default"
                 text: qsTr("Restart Drift for this to take effect.")
             }
@@ -419,7 +420,7 @@ ThemedDialog {
                     SkeletonBox {
                         width: parent.width
                         height: 72
-                        radius: Theme.radiusMd
+                        radius: Theme.c.addonManagerDialog.skeletonRadius
                     }
                 }
             }

@@ -14,8 +14,8 @@ Shape {
     preferredRendererType: Shape.CurveRenderer
 
     ShapePath {
-        strokeColor: Theme.clipTransform
-        strokeWidth: Theme.borderWidthFocus
+        strokeColor: Theme.c.transformOverlayParentOutline.border
+        strokeWidth: Theme.c.transformOverlayParentOutline.borderWidth
         strokeStyle: ShapePath.DashLine
         dashPattern: [4, 3]
         fillColor: "transparent"

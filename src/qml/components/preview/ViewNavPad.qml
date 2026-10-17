@@ -14,10 +14,10 @@ Rectangle {
 
     width: grid.implicitWidth + Theme.spacingXs * 2
     height: grid.implicitHeight + Theme.spacingXs * 2
-    radius: Theme.radiusMd
-    color: Theme.panelBackground
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
+    radius: Theme.c.viewNavPad.radius
+    color: Theme.c.viewNavPad.background
+    border.width: Theme.c.viewNavPad.borderWidth
+    border.color: Theme.c.viewNavPad.border
 
     Grid {
         id: grid

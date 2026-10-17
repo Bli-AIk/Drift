@@ -20,7 +20,7 @@ CollapsibleSection {
         width: parent.width
         wrapMode: Text.WordWrap
         text: qsTr("Shadow, outline, neon… built as layers you can fine-tune below.")
-        color: Theme.mutedForeground
+        color: Theme.c.textInspectorLookSection.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }
@@ -57,7 +57,7 @@ CollapsibleSection {
             width: parent.width - addLayerButton.width - parent.spacing
             anchors.verticalCenter: parent.verticalCenter
             text: qsTr("Layers")
-            color: Theme.panelForeground
+            color: Theme.c.textInspectorLookSection.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.DemiBold
@@ -86,7 +86,7 @@ CollapsibleSection {
         width: parent.width
         wrapMode: Text.WordWrap
         text: qsTr("No layers. Pick an effect above or add a fill to start.")
-        color: Theme.mutedForeground
+        color: Theme.c.textInspectorLookSection.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

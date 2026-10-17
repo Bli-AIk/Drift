@@ -88,7 +88,7 @@ Column {
     Text {
         width: parent.width
         text: qsTr("Face tracking")
-        color: Theme.mutedForeground
+        color: Theme.c.effectsFaceSection.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }
@@ -100,7 +100,7 @@ Column {
         wrapMode: Text.WordWrap
         visible: !faceSection.canTrack
         text: qsTr("Face effects follow one clip's faces. Add this to a clip rather than to an adjustment layer.")
-        color: Theme.warning
+        color: Theme.c.effectsFaceSection.warning
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }
@@ -113,7 +113,7 @@ Column {
         visible: faceSection.canTrack && faceSection.faceReady && !faceSection.hasTrack
                  && !EditorState.faces.detecting
         text: qsTr("These effects follow a face, so the clip has to be scanned before they do anything.")
-        color: Theme.warning
+        color: Theme.c.effectsFaceSection.warning
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }
@@ -128,7 +128,7 @@ Column {
                  && !faceSection.trackHasContours && faceSection.faceUse.beauty
                  && !EditorState.faces.detecting
         text: qsTr("This clip was scanned before makeup was supported. Re-detect faces to enable the Beauty effects.")
-        color: Theme.warning
+        color: Theme.c.effectsFaceSection.warning
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }
@@ -143,7 +143,7 @@ Column {
                  && !faceSection.trackHasMesh && faceSection.faceUse.mesh
                  && !EditorState.faces.detecting
         text: qsTr("This clip was scanned before the face mesh was supported. Re-detect faces to enable 3D Face Mesh and Face Retouch.")
-        color: Theme.warning
+        color: Theme.c.effectsFaceSection.warning
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }
@@ -172,7 +172,7 @@ Column {
         wrapMode: Text.WordWrap
         visible: EditorState.faces.detecting
         text: EditorState.faces.status
-        color: Theme.mutedForeground
+        color: Theme.c.effectsFaceSection.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

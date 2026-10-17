@@ -132,7 +132,7 @@ Item {
         readonly property string shortText: transport.formatTimecode(transport.currentSeconds)
         visible: width > 0
         text: width >= fullMetrics.width ? full : shortText
-        color: Theme.mutedForeground
+        color: Theme.c.androidPreviewTransport.foregroundMuted
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeTick
         elide: Text.ElideRight

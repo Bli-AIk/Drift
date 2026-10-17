@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
@@ -92,28 +93,34 @@ Slider {
 
     Component.onDestruction: restoreFlickable()
 
-    background: Rectangle {
+    background: ThemeSlot {
         x: root.leftPadding
         y: root.topPadding + root.availableHeight / 2 - height / 2
         width: root.availableWidth
         height: Theme.spacingSm
-        radius: height / 2
-        color: Theme.sliderTrack
+        slot: "ThemedSliderTrack"
+        control: root
+        fallback: Component {
+            Rectangle {
+                radius: Theme.c.themedSlider.trackRadius
+                color: Theme.c.themedSlider.trackBackground
 
-        Rectangle {
-            width: root.visualPosition * parent.width
-            height: parent.height
-            radius: parent.radius
-            color: Theme.primary
+                Rectangle {
+                    width: root.visualPosition * parent.width
+                    height: parent.height
+                    radius: parent.radius
+                    color: Theme.c.themedSlider.fillBackground
 
-            // Eases programmatic value changes (a preset chip, a reset button)
-            // without fighting the drag, which sets position continuously.
-            // Must share the handle's curve below, or fill and handle desync.
-            // Off during any preview drag too: a slider slaved to a preview handle would
-            // otherwise trail it by the animation.
-            Behavior on width {
-                enabled: !root.pressed && !EditorState.previewDragActive
-                NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easingInOut }
+                    // Eases programmatic value changes (a preset chip, a reset button)
+                    // without fighting the drag, which sets position continuously.
+                    // Must share the handle's curve below, or fill and handle desync.
+                    // Off during any preview drag too: a slider slaved to a preview handle would
+                    // otherwise trail it by the animation.
+                    Behavior on width {
+                        enabled: !root.pressed && !EditorState.previewDragActive
+                        NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easingInOut }
+                    }
+                }
             }
         }
     }

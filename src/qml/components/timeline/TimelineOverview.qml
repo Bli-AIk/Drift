@@ -23,15 +23,15 @@ Item {
     // Matches drift::ClipType's order, which is what timelineOverviewBlocks() emits.
     function blockColor(typeCode) {
         switch (typeCode) {
-        case 1: return Theme.clipAudio       // audio
-        case 3: return Theme.clipText        // text
-        case 4: return Theme.clipSubtitle    // subtitle
-        case 6: return Theme.clipEffect      // adjustment
-        case 2:                              // image
-        case 5:                              // shape
-        case 7:                              // vector
-        case 8: return Theme.clipGraphic     // 3D model
-        default: return Theme.clipVideoOverview
+        case 1: return Theme.c.timelineOverview.audioBackground       // audio
+        case 3: return Theme.c.timelineOverview.textBackground        // text
+        case 4: return Theme.c.timelineOverview.subtitleBackground    // subtitle
+        case 6: return Theme.c.timelineOverview.effectBackground      // adjustment
+        case 2:                                                       // image
+        case 5:                                                       // shape
+        case 7:                                                       // vector
+        case 8: return Theme.c.timelineOverview.graphicBackground     // 3D model
+        default: return Theme.c.timelineOverview.videoBackground
         }
     }
 

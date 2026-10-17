@@ -37,7 +37,7 @@ Column {
         text: tile.label
         elide: Text.ElideRight
         horizontalAlignment: Text.AlignHCenter
-        color: tile.selected ? Theme.primary : Theme.panelForeground
+        color: tile.selected ? Theme.c.textAnimPresetTile.foregroundSelected : Theme.c.textAnimPresetTile.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

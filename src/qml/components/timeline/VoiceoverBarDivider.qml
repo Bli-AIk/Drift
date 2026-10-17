@@ -5,6 +5,6 @@ import Drift
 Rectangle {
     width: 1
     height: 18
-    color: Theme.panelBorder
+    color: Theme.c.voiceoverBarDivider.foreground
     anchors.verticalCenter: parent.verticalCenter
 }

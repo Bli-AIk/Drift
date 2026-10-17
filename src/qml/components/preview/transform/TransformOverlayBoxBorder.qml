@@ -12,11 +12,11 @@ Rectangle {
     anchors.fill: parent
     color: "transparent"
     border.width: boxBorder.selected
-                  ? Theme.borderWidthFocus : Theme.borderWidth
-    border.color: boxBorder.selected ? (boxBorder.transformClip ? Theme.clipTransform : Theme.primary)
-                  : boxBorder.coveredBySelectedLayer ? Theme.clipTransform
-                  : hover.hovered ? Theme.guideStrong : "transparent"
-    radius: Theme.radiusXs
+                  ? Theme.c.transformOverlayBoxBorder.borderWidthSelected : Theme.c.transformOverlayBoxBorder.borderWidth
+    border.color: boxBorder.selected ? (boxBorder.transformClip ? Theme.c.transformOverlayBoxBorder.borderSelectedTransform : Theme.c.transformOverlayBoxBorder.borderSelected)
+                  : boxBorder.coveredBySelectedLayer ? Theme.c.transformOverlayBoxBorder.borderCovered
+                  : hover.hovered ? Theme.c.transformOverlayBoxBorder.borderHover : "transparent"
+    radius: Theme.c.transformOverlayBoxBorder.radius
 
     HoverHandler {
         id: hover

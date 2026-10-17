@@ -10,8 +10,8 @@ Rectangle {
     width: overlay.layerClip ? overlay.layerClip.duration * overlay.pxPerSecond : 0
     y: overlay.rowTop ? overlay.rowTop(modelData) : 0
     height: overlay.rowHeight ? overlay.rowHeight(modelData) : 0
-    color: Qt.rgba(Theme.clipTransform.r, Theme.clipTransform.g, Theme.clipTransform.b, 0.14)
-    border.width: 1
-    border.color: Qt.rgba(Theme.clipTransform.r, Theme.clipTransform.g, Theme.clipTransform.b, 0.45)
-    radius: Theme.radiusSm
+    color: Qt.rgba(Theme.c.transformCoverageTint.background.r, Theme.c.transformCoverageTint.background.g, Theme.c.transformCoverageTint.background.b, 0.14)
+    border.width: Theme.c.transformCoverageTint.borderWidth
+    border.color: Qt.rgba(Theme.c.transformCoverageTint.border.r, Theme.c.transformCoverageTint.border.g, Theme.c.transformCoverageTint.border.b, 0.45)
+    radius: Theme.c.transformCoverageTint.radius
 }

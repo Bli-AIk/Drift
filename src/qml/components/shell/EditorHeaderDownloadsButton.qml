@@ -36,14 +36,14 @@ Item {
         anchors.margins: Theme.spacingXs
         width: Math.max(Theme.spacingXl, downloadCount.implicitWidth + Theme.spacingSm)
         height: Theme.spacingXl
-        radius: height / 2
-        color: Theme.primary
+        radius: Theme.c.editorHeaderDownloadsButton.badgeRadius
+        color: Theme.c.editorHeaderDownloadsButton.badge
 
         Text {
             id: downloadCount
             anchors.centerIn: parent
             text: String(downloadsButton.activeCount)
-            color: Theme.primaryForeground
+            color: Theme.c.editorHeaderDownloadsButton.badgeForeground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }

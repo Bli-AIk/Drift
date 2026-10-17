@@ -201,7 +201,7 @@ Item {
                             text: q && q.remaining !== undefined
                                   ? qsTr("%1 (%2 left)").arg(modelData.label).arg(q.remaining)
                                   : modelData.label
-                            color: active || sourceHover.hovered ? Theme.panelForeground : Theme.mutedForeground
+                            color: active || sourceHover.hovered ? Theme.c.stockBrowser.foreground : Theme.c.stockBrowser.foregroundMuted
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSizeSm
                             font.weight: active ? Font.DemiBold : Font.Normal
@@ -234,12 +234,12 @@ Item {
                     anchors.top: parent.top
                     width: Theme.spacingXl
                     height: width
-                    radius: width / 2
-                    color: Theme.primary
+                    radius: Theme.c.stockBrowser.badgeRadius
+                    color: Theme.c.stockBrowser.accent
                     Text {
                         anchors.centerIn: parent
                         text: String(root.activeFilterCount)
-                        color: Theme.primaryForeground
+                        color: Theme.c.stockBrowser.accentForeground
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontSizeXs
                     }
@@ -307,8 +307,8 @@ Item {
             x: root.sidePadding
             width: parent.width - root.sidePadding * 2
             height: Theme.touchUi ? Theme.androidMinTouchTarget + Theme.spacingLg : Theme.controlHeight * 1.6
-            radius: Theme.radiusMd
-            color: linkHover.hovered ? Theme.popoverHover : Theme.panelAccent
+            radius: Theme.c.stockBrowser.linkRadius
+            color: linkHover.hovered ? Theme.c.stockBrowser.linkBackgroundHover : Theme.c.stockBrowser.linkBackground
             visible: root.queryIsLink && !(root.lastRequestWasResolve && root.submittedQuery === root.query
                                            && (Market.searching || Market.items.length > 0))
 
@@ -319,7 +319,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 glyph: root.linkSource.glyph
                 iconSize: Theme.iconSizeLg
-                iconColor: Theme.panelForeground
+                iconColor: Theme.c.stockBrowser.foreground
             }
             Column {
                 anchors.left: linkGlyph.right
@@ -332,7 +332,7 @@ Item {
                     width: parent.width
                     text: root.linkSource.label.length > 0 ? qsTr("Get from %1").arg(root.linkSource.label)
                                                            : qsTr("Get from this link")
-                    color: Theme.panelForeground
+                    color: Theme.c.stockBrowser.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeSm
                     font.weight: Font.Medium
@@ -341,7 +341,7 @@ Item {
                 Text {
                     width: parent.width
                     text: root.query
-                    color: Theme.mutedForeground
+                    color: Theme.c.stockBrowser.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                     elide: Text.ElideMiddle
@@ -453,7 +453,7 @@ Item {
                 Text {
                     width: parent.width
                     text: modelData.title || ""
-                    color: Theme.panelForeground
+                    color: Theme.c.stockBrowser.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                     elide: Text.ElideRight
@@ -548,7 +548,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.scrimColor
+        color: Theme.c.stockBrowser.scrim
         visible: root.compact && opacity > 0
         opacity: root.detailShown ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: Theme.durationSlow; easing.type: Theme.easing } }
@@ -567,7 +567,7 @@ Item {
         x: root.compact ? 0 : (root.detailShown ? 0 : parent.width)
         y: root.compact ? (root.detailShown ? parent.height - height : parent.height) : 0
         visible: root.compact ? y < parent.height : x < parent.width
-        radius: root.compact ? Theme.radiusLg : 0
+        radius: root.compact ? Theme.c.stockBrowser.sheetRadius : 0
         compact: root.compact
         shown: root.detailShown
         item: root.detailItem

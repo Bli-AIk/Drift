@@ -124,10 +124,10 @@ Popup {
     ]
 
     background: Rectangle {
-        color: Theme.panelBackground
-        border.width: 1
-        border.color: Theme.panelBorder
-        radius: Theme.radiusMd
+        color: Theme.c.newTrackMenu.background
+        border.width: Theme.c.newTrackMenu.borderWidth
+        border.color: Theme.c.newTrackMenu.border
+        radius: Theme.c.newTrackMenu.radius
     }
 
     contentItem: Column {
@@ -159,7 +159,7 @@ Popup {
             topPadding: 4
             bottomPadding: 6
             text: qsTr("New track")
-            color: Theme.mutedForeground
+            color: Theme.c.newTrackMenu.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             font.weight: Font.Medium
@@ -168,7 +168,7 @@ Popup {
         Rectangle {
             width: parent.width
             height: 1
-            color: Theme.panelBorder
+            color: Theme.c.newTrackMenu.separator
             opacity: 0.5
         }
 

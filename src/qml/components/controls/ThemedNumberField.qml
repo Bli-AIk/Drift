@@ -12,6 +12,9 @@ import Drift
 ThemedTextField {
     id: root
 
+    colorTokens: Theme.c.themedNumberField
+    backgroundSlot: "ThemedNumberFieldBackground"
+
     property real value: 0
     property real from: -1e9
     property real to: 1e9

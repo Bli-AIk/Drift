@@ -15,9 +15,9 @@ Rectangle {
 
     width: view.width
     height: dialog.rowHeight
-    radius: Theme.radiusXs
+    radius: Theme.c.timelineToolbarCustomizeRow.radius
     color: isDivider ? "transparent"
-           : (grip.pressed ? Theme.panelAccent : "transparent")
+           : (grip.pressed ? Theme.c.timelineToolbarCustomizeRow.backgroundPressed : "transparent")
 
     TimelineToolbarCustomizeDivider {
         visible: row.isDivider
@@ -43,7 +43,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         glyph: visible ? row.dialog.toolbar.actionMeta[row.itemId].glyph : ""
         iconSize: Theme.iconSizeBase
-        iconColor: Theme.panelForeground
+        iconColor: Theme.c.timelineToolbarCustomizeRow.icon
     }
 
     Text {
@@ -55,7 +55,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         text: row.isSeparator ? qsTr("— Separator —")
                               : (row.isDivider ? "" : row.dialog.toolbar.actionMeta[row.itemId].label)
-        color: row.isSeparator ? Theme.mutedForeground : Theme.panelForeground
+        color: row.isSeparator ? Theme.c.timelineToolbarCustomizeRow.foregroundMuted : Theme.c.timelineToolbarCustomizeRow.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         elide: Text.ElideRight

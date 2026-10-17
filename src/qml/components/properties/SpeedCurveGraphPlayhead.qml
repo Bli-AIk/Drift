@@ -29,7 +29,7 @@ Item {
         anchors.left: parent.left
         width: Theme.playheadLineWidth
         height: parent.height
-        color: Theme.primary
+        color: Theme.c.speedCurveGraphPlayhead.accent
     }
 
     Rectangle {
@@ -37,7 +37,7 @@ Item {
         height: Theme.playheadHandleSize
         radius: Theme.playheadHandleSize / 2
         x: -width / 2 + Theme.playheadLineWidth / 2
-        color: Theme.primary
+        color: Theme.c.speedCurveGraphPlayhead.accent
     }
 
     MouseArea {

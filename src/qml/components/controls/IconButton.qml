@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
@@ -40,8 +41,8 @@ AbstractButton {
     }
 
     readonly property bool hasLabel: text.length > 0
-    readonly property color _fg: active ? Theme.panelSecondaryForeground : Theme.mutedForeground
-    readonly property color _labelFg: active ? Theme.panelSecondaryForeground : Theme.foreground
+    readonly property color _fg: active ? Theme.c.iconButton.foregroundActive : Theme.c.iconButton.foreground
+    readonly property color _labelFg: active ? Theme.c.iconButton.labelForegroundActive : Theme.c.iconButton.labelForeground
 
     implicitWidth: hasLabel ? Math.ceil(labeledRow.implicitWidth + Theme.spacingMd * 2)
                             : buttonSize
@@ -63,41 +64,48 @@ AbstractButton {
     Accessible.name: text.length > 0 ? text : (tooltip.length > 0 ? tooltip : glyph)
     Accessible.onPressAction: root.clicked()
 
-    background: Rectangle {
-        radius: Theme.radiusSm
-        color: {
-            if (root.active)
-                return Theme.panelSecondaryBg
-            if (!root.enabled)
-                return "transparent"
-            // Both variants now tint on hover. The old "text" variant dimmed to
-            // 0.75 opacity, which read as disabled rather than as hover.
-            if (root.down)
-                return Theme.panelMuted
-            if (root.hovered)
-                return root.variant === "ghost" ? Theme.panelAccent : Theme.popoverHover
-            return "transparent"
-        }
-        border.width: root.active ? Theme.borderWidth : 0
-        border.color: Theme.panelSecondaryBorder
-        opacity: root.enabled ? 1 : 0.5
+    background: ThemeSlot {
+        slot: "IconButtonBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                radius: Theme.c.iconButton.radius
+                color: {
+                    if (root.active)
+                        return Theme.c.iconButton.backgroundActive
+                    if (!root.enabled)
+                        return "transparent"
+                    // Both variants now tint on hover. The old "text" variant dimmed to
+                    // 0.75 opacity, which read as disabled rather than as hover.
+                    if (root.down)
+                        return Theme.c.iconButton.backgroundPressed
+                    if (root.hovered)
+                        return root.variant === "ghost" ? Theme.c.iconButton.ghostBackgroundHover
+                                                       : Theme.c.iconButton.textBackgroundHover
+                    return "transparent"
+                }
+                border.width: root.active ? Theme.c.iconButton.borderWidth : 0
+                border.color: Theme.c.iconButton.border
+                opacity: root.enabled ? 1 : 0.5
 
-        Behavior on color {
-            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
-        Behavior on opacity {
-            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
+                Behavior on color {
+                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
+                Behavior on opacity {
+                    NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
 
-        // Keyboard focus ring. Drawn outside the fill so it stays visible on the
-        // active/selected state too.
-        Rectangle {
-            anchors.fill: parent
-            radius: parent.radius
-            color: "transparent"
-            border.width: Theme.borderWidthFocus
-            border.color: Theme.focusRing
-            visible: root.visualFocus
+                // Keyboard focus ring. Drawn outside the fill so it stays visible on the
+                // active/selected state too.
+                Rectangle {
+                    anchors.fill: parent
+                    radius: parent.radius
+                    color: "transparent"
+                    border.width: Theme.c.iconButton.focusBorderWidth
+                    border.color: Theme.c.iconButton.focusBorder
+                    visible: root.visualFocus
+                }
+            }
         }
     }
 

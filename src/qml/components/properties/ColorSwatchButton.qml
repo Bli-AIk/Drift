@@ -11,11 +11,11 @@ Rectangle {
 
     width: Theme.spacing3xl
     height: Theme.spacing3xl
-    radius: Theme.radiusSm
+    radius: Theme.c.colorSwatchButton.radius
     anchors.verticalCenter: parent.verticalCenter
     color: root.hex
-    border.width: swatchMouse.containsMouse ? Theme.borderWidthFocus : Theme.borderWidth
-    border.color: swatchMouse.containsMouse ? Theme.primary : Theme.panelBorder
+    border.width: swatchMouse.containsMouse ? Theme.c.colorSwatchButton.borderWidthFocus : Theme.c.colorSwatchButton.borderWidth
+    border.color: swatchMouse.containsMouse ? Theme.c.colorSwatchButton.borderHover : Theme.c.colorSwatchButton.border
 
     Behavior on border.color {
         ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }

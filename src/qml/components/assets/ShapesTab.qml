@@ -81,7 +81,7 @@ Item {
                       : (root.activeCategory === root.favoritesId
                          ? qsTr("No favorites yet. Star shapes to save them here.")
                          : qsTr("Nothing in this category."))
-                color: Theme.mutedForeground
+                color: Theme.c.shapesTab.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
                 wrapMode: Text.WordWrap

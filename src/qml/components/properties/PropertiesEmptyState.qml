@@ -15,16 +15,16 @@ Column {
         anchors.horizontalCenter: parent.horizontalCenter
         width: 48
         height: 48
-        radius: Theme.radiusMd
+        radius: Theme.c.propertiesEmptyState.radius
         color: "transparent"
-        border.width: 1
-        border.color: Theme.panelBorder
+        border.width: Theme.c.propertiesEmptyState.borderWidth
+        border.color: Theme.c.propertiesEmptyState.border
 
         IconGlyph {
             anchors.centerIn: parent
             glyph: Theme.icons.sliders
             iconSize: 22
-            iconColor: Theme.mutedForeground
+            iconColor: Theme.c.propertiesEmptyState.icon
         }
     }
 
@@ -32,7 +32,7 @@ Column {
         width: parent.width
         horizontalAlignment: Text.AlignHCenter
         text: qsTr("It's empty here")
-        color: Theme.panelForeground
+        color: Theme.c.propertiesEmptyState.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeBase
         font.weight: Font.Medium
@@ -45,7 +45,7 @@ Column {
         text: root.sheetMode
               ? qsTr("Tap a clip on the timeline to edit its properties")
               : qsTr("Click a clip on the timeline to edit its properties")
-        color: Theme.mutedForeground
+        color: Theme.c.propertiesEmptyState.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

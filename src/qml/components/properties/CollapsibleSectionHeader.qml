@@ -14,6 +14,19 @@ Item {
     signal switchToggled(bool checked)
     id: root
     width: parent.width
+
+    ThemeSlot {
+        anchors.fill: parent
+        z: -1
+        slot: "CollapsibleSectionHeaderBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+            }
+        }
+    }
     height: Math.max(Theme.controlHeightSm,
                      titleLabel.implicitHeight,
                      root.showSwitch ? 20 : 0) + Theme.spacingMd
@@ -37,7 +50,7 @@ Item {
                 anchors.centerIn: parent
                 glyph: root.expanded ? Theme.icons.chevronDown : Theme.icons.chevronRight
                 iconSize: 12
-                iconColor: Theme.mutedForeground
+                iconColor: Theme.c.collapsibleSectionHeader.icon
             }
         }
 
@@ -46,7 +59,7 @@ Item {
             width: Math.max(0, titleRow.width - (root.collapsible ? 14 + titleRow.spacing : 0))
             text: root.title
             elide: Text.ElideRight
-            color: Theme.panelForeground
+            color: Theme.c.collapsibleSectionHeader.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.DemiBold

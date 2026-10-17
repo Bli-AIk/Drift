@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
@@ -11,28 +12,35 @@ ScrollBar {
     padding: 2
     hoverEnabled: true
 
-    contentItem: Rectangle {
-        implicitWidth: control.interactive ? 8 : 2
-        implicitHeight: control.interactive ? 8 : 2
-        radius: Math.min(width, height) / 2
-        color: control.pressed ? Theme.scrollbarHandlePressed
-                              : (control.hovered ? Theme.scrollbarHandleHover : Theme.scrollbarHandle)
-        opacity: 0.0
+    contentItem: ThemeSlot {
+        slot: "AppScrollBarHandle"
+        control: control
+        fallback: Component {
+            Rectangle {
+                id: handle
+                implicitWidth: control.interactive ? 8 : 2
+                implicitHeight: control.interactive ? 8 : 2
+                radius: Theme.c.appScrollBar.handleRadius
+                color: control.pressed ? Theme.c.appScrollBar.handleBackgroundPressed
+                                      : (control.hovered ? Theme.c.appScrollBar.handleBackgroundHover
+                                                         : Theme.c.appScrollBar.handleBackground)
+                opacity: 0.0
 
-        states: State {
-            name: "active"
-            when: control.policy === ScrollBar.AlwaysOn || (control.active && control.size < 1.0)
-            PropertyChanges {
-                target: control.contentItem
-                opacity: control.policy === ScrollBar.AlwaysOn ? 1.0 : 0.85
-            }
-        }
+                states: State {
+                    name: "active"
+                    when: control.policy === ScrollBar.AlwaysOn || (control.active && control.size < 1.0)
+                    PropertyChanges {
+                        handle.opacity: control.policy === ScrollBar.AlwaysOn ? 1.0 : 0.85
+                    }
+                }
 
-        transitions: Transition {
-            from: "active"
-            SequentialAnimation {
-                PauseAnimation { duration: 450 }
-                NumberAnimation { target: control.contentItem; duration: 200; property: "opacity"; to: 0.0 }
+                transitions: Transition {
+                    from: "active"
+                    SequentialAnimation {
+                        PauseAnimation { duration: 450 }
+                        NumberAnimation { target: handle; duration: 200; property: "opacity"; to: 0.0 }
+                    }
+                }
             }
         }
     }
@@ -40,8 +48,8 @@ ScrollBar {
     // Visible track for always-on bars (e.g. the timeline) so the handle reads as
     // a position indicator; transient bars keep an invisible track.
     background: Rectangle {
-        radius: Math.min(width, height) / 2
-        color: Theme.scrollbarTrack
+        radius: Theme.c.appScrollBar.trackRadius
+        color: Theme.c.appScrollBar.trackBackground
         opacity: control.policy === ScrollBar.AlwaysOn ? 0.45 : 0.0
     }
 }

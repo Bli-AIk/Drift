@@ -10,6 +10,7 @@
 #include <QQmlEngine>
 #include <QtQml/qqml.h>
 #include <QRegularExpression>
+#include <QSettings>
 #include <QStandardPaths>
 
 namespace {
@@ -104,6 +105,12 @@ bool isReference(const QString &text)
     static const QRegularExpression re(
         QStringLiteral("^\\$[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*$"));
     return re.match(text).hasMatch();
+}
+
+bool isValidSlotName(const QString &slot)
+{
+    static const QRegularExpression re(QStringLiteral("^[A-Za-z_][A-Za-z0-9_]*$"));
+    return re.match(slot).hasMatch();
 }
 
 QVariantMap readObject(const QString &path, QString *error, bool warn = true)
@@ -379,6 +386,7 @@ ThemeManager::ThemeManager(QObject *parent)
     , m_watcher(this)
 {
     connect(&m_watcher, &QFileSystemWatcher::fileChanged, this, &ThemeManager::onThemeFileChanged);
+    connect(&m_watcher, &QFileSystemWatcher::directoryChanged, this, &ThemeManager::onThemeFileChanged);
 
     QString error;
     if (auto dark = readTheme(QStringLiteral("dark"), &error))
@@ -506,8 +514,103 @@ void ThemeManager::setVariant(const QString &variant)
 
 QUrl ThemeManager::overrideUrl(const QString &slot) const
 {
-    Q_UNUSED(slot);
-    return {};
+    if (!isValidSlotName(slot) || !m_userTheme || !isFolderTheme(m_sourcePath))
+        return {};
+    if (!isThemeTrusted(m_currentTheme))
+        return {};
+    const QString qmlFile = QDir(themeQmlDirectory(m_sourcePath)).filePath(slot + QStringLiteral(".qml"));
+    if (!QFileInfo::exists(qmlFile))
+        return {};
+    return QUrl::fromLocalFile(QFileInfo(qmlFile).absoluteFilePath());
+}
+
+bool ThemeManager::isThemeTrusted(const QString &name) const
+{
+    const QString theme = name.trimmed();
+    if (theme.isEmpty())
+        return false;
+    return readTrustedThemes().contains(theme);
+}
+
+void ThemeManager::setThemeTrusted(const QString &name, bool trusted)
+{
+    const QString theme = name.trimmed();
+    if (theme.isEmpty())
+        return;
+    QStringList names = readTrustedThemes();
+    const bool listed = names.contains(theme);
+    if (trusted == listed)
+        return;
+    if (trusted)
+        names.append(theme);
+    else
+        names.removeAll(theme);
+    writeTrustedThemes(names);
+    if (theme == m_currentTheme)
+        emit themeChanged();
+}
+
+QStringList ThemeManager::overrideSlots(const QString &name) const
+{
+    QString error;
+    const QString path = pathForThemeName(name.trimmed(), &error);
+    if (path.isEmpty() || !isFolderTheme(path))
+        return {};
+    const QDir dir(themeQmlDirectory(path));
+    if (!dir.exists())
+        return {};
+    const QStringList files = dir.entryList({QStringLiteral("*.qml")}, QDir::Files, QDir::Name);
+    // `slots` is a Qt macro, so the list cannot use that name.
+    QStringList slotNames;
+    slotNames.reserve(files.size());
+    for (const QString &file : files) {
+        const QString base = QFileInfo(file).completeBaseName();
+        if (isValidSlotName(base))
+            slotNames.append(base);
+    }
+    return slotNames;
+}
+
+QString ThemeManager::themeQmlDirectory(const QString &themeJsonPath) const
+{
+    const QFileInfo info(themeJsonPath);
+    if (info.fileName() != QLatin1String("theme.json") || themeJsonPath.startsWith(QLatin1Char(':')))
+        return {};
+    return info.dir().absoluteFilePath(QStringLiteral("qml"));
+}
+
+bool ThemeManager::isFolderTheme(const QString &themeJsonPath) const
+{
+    return !themeQmlDirectory(themeJsonPath).isEmpty();
+}
+
+bool ThemeManager::isThemeWatchPath(const QString &path) const
+{
+    const QString absolute = QFileInfo(path).absoluteFilePath();
+    if (absolute == QFileInfo(m_sourcePath).absoluteFilePath())
+        return true;
+    const QFileInfo source(m_sourcePath);
+    if (source.fileName() != QLatin1String("theme.json") || m_sourcePath.startsWith(QLatin1Char(':')))
+        return false;
+    const QString themeDir = source.dir().absolutePath();
+    if (absolute == themeDir)
+        return true;
+    const QString qmlDir = themeQmlDirectory(m_sourcePath);
+    return absolute == qmlDir || absolute.startsWith(qmlDir + QLatin1Char('/'));
+}
+
+QStringList ThemeManager::readTrustedThemes() const
+{
+    QSettings settings;
+    settings.beginGroup(QStringLiteral("Theme"));
+    return settings.value(QStringLiteral("trusted")).toStringList();
+}
+
+void ThemeManager::writeTrustedThemes(const QStringList &names)
+{
+    QSettings settings;
+    settings.beginGroup(QStringLiteral("Theme"));
+    settings.setValue(QStringLiteral("trusted"), names);
 }
 
 void ThemeManager::setHotReload(bool enabled)
@@ -685,18 +788,37 @@ void ThemeManager::apply(const Loaded &loaded)
 
 void ThemeManager::updateWatch()
 {
-    const QStringList watched = m_watcher.files();
-    if (!watched.isEmpty())
-        m_watcher.removePaths(watched);
+    const QStringList watchedFiles = m_watcher.files();
+    if (!watchedFiles.isEmpty())
+        m_watcher.removePaths(watchedFiles);
+    const QStringList watchedDirs = m_watcher.directories();
+    if (!watchedDirs.isEmpty())
+        m_watcher.removePaths(watchedDirs);
     if (!m_hotReload || m_sourcePath.isEmpty() || m_sourcePath.startsWith(QLatin1Char(':')))
         return;
+
+    QStringList paths;
     if (QFile::exists(m_sourcePath))
-        m_watcher.addPath(m_sourcePath);
+        paths.append(m_sourcePath);
+    if (isFolderTheme(m_sourcePath)) {
+        const QFileInfo source(m_sourcePath);
+        paths.append(source.dir().absolutePath());
+        const QString qmlDirPath = themeQmlDirectory(m_sourcePath);
+        if (QDir(qmlDirPath).exists()) {
+            paths.append(qmlDirPath);
+            const QDir qmlDir(qmlDirPath);
+            const QFileInfoList qmlFiles = qmlDir.entryInfoList({QStringLiteral("*.qml")}, QDir::Files);
+            for (const QFileInfo &qmlFile : qmlFiles)
+                paths.append(qmlFile.absoluteFilePath());
+        }
+    }
+    if (!paths.isEmpty())
+        m_watcher.addPaths(paths);
 }
 
 void ThemeManager::onThemeFileChanged(const QString &path)
 {
-    if (!m_hotReload || m_inReload || path != m_sourcePath)
+    if (!m_hotReload || m_inReload || !isThemeWatchPath(path))
         return;
     m_inReload = true;
     reload();

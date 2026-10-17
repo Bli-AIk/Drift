@@ -29,12 +29,13 @@ AbstractButton {
             anchors.centerIn: parent
             width: Theme.androidRailFabSize
             height: Theme.androidRailFabSize
-            radius: Theme.radiusLg
+            radius: Theme.c.androidRailAddButton.radius
             // The one filled control in the shell, so "add something" reads
             // as the rail's primary action rather than a fifth tab. `primary`
             // is a fill here, not a foreground, so it needs no light-mode
             // variant — primaryForeground is 9.8:1 on it in both themes.
-            color: addButton.down ? Qt.darker(Theme.primary, 1.12) : Theme.primary
+            color: addButton.down ? Qt.darker(Theme.c.androidRailAddButton.background, 1.12)
+                                  : Theme.c.androidRailAddButton.background
 
             Behavior on color {
                 ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -44,7 +45,7 @@ AbstractButton {
                 anchors.centerIn: parent
                 glyph: Theme.icons.plus
                 iconSize: Theme.iconSizeXl
-                iconColor: Theme.primaryForeground
+                iconColor: Theme.c.androidRailAddButton.icon
             }
         }
     }

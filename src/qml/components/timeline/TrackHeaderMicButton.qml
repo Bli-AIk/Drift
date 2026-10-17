@@ -15,8 +15,8 @@ IconGlyph {
     iconSize: 16
     anchors.verticalCenter: parent.verticalCenter
     iconColor: isRecordingHere
-               ? (EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive)
-               : (micMouse.containsMouse ? Theme.panelForeground : Theme.mutedForeground)
+               ? (EditorState.isAudioRecordingPaused ? Theme.c.trackHeaderMicButton.paused : Theme.c.trackHeaderMicButton.recording)
+               : (micMouse.containsMouse ? Theme.c.trackHeaderMicButton.foreground : Theme.c.trackHeaderMicButton.foregroundMuted)
 
     Accessible.role: Accessible.Button
     Accessible.name: isRecordingHere ? qsTr("Stop recording") : qsTr("Record voiceover")

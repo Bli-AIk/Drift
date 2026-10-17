@@ -58,8 +58,8 @@ Column {
 
                     Rectangle {
                         anchors.fill: parent
-                        color: index % 2 === 1 ? Theme.panelAccent : "transparent"
-                        radius: Theme.radiusXs
+                        color: index % 2 === 1 ? Theme.c.debugInfoPlaybackTab.stripe : "transparent"
+                        radius: Theme.c.debugInfoPlaybackTab.stripeRadius
                     }
 
                     ThemedLabel {
@@ -218,10 +218,10 @@ Column {
 
                 width: parent.width
                 implicitHeight: playHintCol.height + Theme.spacingLg * 2
-                radius: Theme.radiusSm
+                radius: Theme.c.debugInfoPlaybackTab.radius
                 color: "transparent"
-                border.width: Theme.borderWidth
-                border.color: Theme.panelBorder
+                border.width: Theme.c.debugInfoPlaybackTab.borderWidth
+                border.color: Theme.c.debugInfoPlaybackTab.border
 
                 Column {
                     id: playHintCol

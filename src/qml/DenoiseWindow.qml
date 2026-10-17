@@ -26,7 +26,7 @@ ToolWindow {
     minimumWidth: 560
     minimumHeight: 460
     title: qsTr("Remove noise")
-    color: Theme.appBackground
+    color: Theme.c.denoiseWindow.background
 
     function openFor(track, clip, durationSeconds) {
         root.trackIndex = track

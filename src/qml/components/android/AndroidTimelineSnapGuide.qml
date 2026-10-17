@@ -15,9 +15,9 @@ Rectangle {
     opacity: guide.snapSeconds >= 0 ? 1 : 0
     x: guide.snapSeconds * guide.pxPerSecond
     y: guide.seekHeaderHeight
-    width: Theme.borderWidth
+    width: Theme.c.androidTimelineSnapGuide.borderWidth
     height: guide.tracksHeight
-    color: Theme.snapGuide
+    color: Theme.c.androidTimelineSnapGuide.background
     z: 6
 
     Behavior on opacity {
@@ -30,14 +30,14 @@ Rectangle {
         anchors.topMargin: Theme.spacingSm
         width: snapLabel.implicitWidth + Theme.spacingMd * 2
         height: snapLabel.implicitHeight + Theme.spacingSm
-        radius: Theme.radiusSm
-        color: Theme.snapGuide
+        radius: Theme.c.androidTimelineSnapGuide.radius
+        color: Theme.c.androidTimelineSnapGuide.background
 
         Text {
             id: snapLabel
             anchors.centerIn: parent
             text: guide.formatTime(guide.snapSeconds)
-            color: Theme.primaryForeground
+            color: Theme.c.androidTimelineSnapGuide.foreground
             font.family: Theme.monoFontFamily
             font.pixelSize: Theme.fontSizeTick
         }

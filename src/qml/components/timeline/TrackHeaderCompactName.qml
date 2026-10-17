@@ -13,7 +13,7 @@ Text {
     anchors.verticalCenter: parent.verticalCenter
     anchors.verticalCenterOffset: centerOffset
     text: label
-    color: Theme.mutedForeground
+    color: Theme.c.trackHeaderCompactName.foregroundMuted
     font.family: Theme.fontFamily
     font.pixelSize: Theme.fontSizeTiny
     elide: Text.ElideRight

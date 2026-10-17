@@ -344,12 +344,12 @@ Item {
                 if (px < -2 || px > w + 2)
                     continue
                 const isBar = ((i - first) % perBar + perBar) % perBar === 0
-                ctx.fillStyle = String(isBar ? Theme.beatBarColor : Theme.beatGridColor)
+                ctx.fillStyle = String(isBar ? Theme.c.androidTimeline.beatBar : Theme.c.androidTimeline.beatGrid)
                 ctx.fillRect(px, isBar ? 0 : h * 0.35, isBar ? 2 : 1, isBar ? h : h * 0.65)
             }
         }
         if (root.onsetsOn) {
-            ctx.fillStyle = String(Theme.beatOnsetColor)
+            ctx.fillStyle = String(Theme.c.androidTimeline.beatOnset)
             const onsets = a.onsets || []
             for (var j = 0; j < onsets.length; j++) {
                 if (root.beatGridOn && root.nearAnyBeat(onsets[j].seconds))
@@ -433,36 +433,36 @@ Item {
         effectDropTrack: root.effectDropTrackIndex
         effectDropClip: root.effectDropClipIndex
         style: ({
-            "clipVideo": Theme.clipVideoPlaceholder,
-            "clipAudio": Theme.clipAudio,
-            "clipText": Theme.clipText,
-            "clipSubtitle": Theme.clipSubtitle,
-            "clipGraphic": Theme.clipGraphic,
-            "clipEffect": Theme.clipEffect,
-            "clipComposite": Theme.clipComposite,
-            "adjustmentVideo": Theme.clipAdjustmentVideo,
-            "adjustmentAudio": Theme.clipAdjustmentAudio,
-            "adjustmentMask": Theme.clipAdjustmentMask,
-            "adjustmentTransform": Theme.clipTransform,
-            "primary": Theme.primary,
-            "scrim": Theme.scrimColor,
-            "proxyBand": Theme.clipProxyBand,
-            "onMedia": Theme.onMedia,
-            "waveform": Theme.waveformColor,
-            "mutedForeground": Theme.mutedForeground,
-            "panelBorder": Theme.panelBorder,
-            "proxyPill": Theme.clipProxy,
-            "proxyPillForeground": Theme.clipProxyForeground,
-            "editFriendlyPill": Theme.clipEditFriendly,
-            "editFriendlyPillForeground": Theme.clipEditFriendlyForeground,
-            "warning": Theme.warning,
+            "clipVideo": Theme.c.androidTimeline.clipVideo,
+            "clipAudio": Theme.c.androidTimeline.clipAudio,
+            "clipText": Theme.c.androidTimeline.clipText,
+            "clipSubtitle": Theme.c.androidTimeline.clipSubtitle,
+            "clipGraphic": Theme.c.androidTimeline.clipGraphic,
+            "clipEffect": Theme.c.androidTimeline.clipEffect,
+            "clipComposite": Theme.c.androidTimeline.clipComposite,
+            "adjustmentVideo": Theme.c.androidTimeline.adjustmentVideo,
+            "adjustmentAudio": Theme.c.androidTimeline.adjustmentAudio,
+            "adjustmentMask": Theme.c.androidTimeline.adjustmentMask,
+            "adjustmentTransform": Theme.c.androidTimeline.adjustmentTransform,
+            "primary": Theme.c.androidTimeline.primary,
+            "scrim": Theme.c.androidTimeline.scrim,
+            "proxyBand": Theme.c.androidTimeline.proxyBand,
+            "onMedia": Theme.c.androidTimeline.onMedia,
+            "waveform": Theme.c.androidTimeline.waveform,
+            "mutedForeground": Theme.c.androidTimeline.mutedForeground,
+            "panelBorder": Theme.c.androidTimeline.panelBorder,
+            "proxyPill": Theme.c.androidTimeline.proxyPill,
+            "proxyPillForeground": Theme.c.androidTimeline.proxyPillForeground,
+            "editFriendlyPill": Theme.c.androidTimeline.editFriendlyPill,
+            "editFriendlyPillForeground": Theme.c.androidTimeline.editFriendlyPillForeground,
+            "warning": Theme.c.androidTimeline.warning,
             "fontFamily": Theme.fontFamily,
             "fontSizeTiny": Theme.fontSizeTiny,
             "fontSizeXs": Theme.fontSizeXs,
-            "radiusSm": Theme.radiusSm,
-            "radiusXs": Theme.radiusXs,
+            "radiusSm": Theme.c.androidTimeline.radiusSm,
+            "radiusXs": Theme.c.androidTimeline.radiusXs,
             "ringWidth": Theme.clipSelectionRingWidth,
-            "borderWidthFocus": Theme.borderWidthFocus,
+            "borderWidthFocus": Theme.c.androidTimeline.borderWidthFocus,
             "headerBandHeight": Theme.clipHeaderBandHeight,
             "clipMinWidth": Theme.clipMinWidth,
             "iconSizeSm": Theme.iconSizeSm,
@@ -936,19 +936,19 @@ Item {
     // Adjustment layers are tinted by what they act on, so a glance at a lane says whether it is
     // grading the picture, treating the audio, or cutting a mask.
     function adjustmentColor(kind) {
-        if (kind === "audioEffects") return Theme.clipAdjustmentAudio
-        if (kind === "mask") return Theme.clipAdjustmentMask
-        if (kind === "transform") return Theme.clipTransform
-        return Theme.clipAdjustmentVideo
+        if (kind === "audioEffects") return Theme.c.androidTimeline.adjustmentAudio
+        if (kind === "mask") return Theme.c.androidTimeline.adjustmentMask
+        if (kind === "transform") return Theme.c.androidTimeline.adjustmentTransform
+        return Theme.c.androidTimeline.adjustmentVideo
     }
     function clipColor(type) {
-        if (type === "text") return Theme.clipText
-        if (type === "subtitle") return Theme.clipSubtitle
-        if (type === "audio") return Theme.clipAudio
-        if (type === "graphic") return Theme.clipGraphic
-        if (type === "effect" || type === "adjustment") return Theme.clipEffect
-        if (type === "composite") return Theme.clipComposite
-        return Theme.clipVideoPlaceholder
+        if (type === "text") return Theme.c.androidTimeline.clipText
+        if (type === "subtitle") return Theme.c.androidTimeline.clipSubtitle
+        if (type === "audio") return Theme.c.androidTimeline.clipAudio
+        if (type === "graphic") return Theme.c.androidTimeline.clipGraphic
+        if (type === "effect" || type === "adjustment") return Theme.c.androidTimeline.clipEffect
+        if (type === "composite") return Theme.c.androidTimeline.clipComposite
+        return Theme.c.androidTimeline.clipVideo
     }
 
     // Top of a row inside the track column, which stacks the visible rows with a gap.
@@ -1088,16 +1088,16 @@ Item {
                     Rectangle {
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
-                        width: 1
+                        width: Theme.c.androidTimeline.labelBorderWidth
                         height: parent.height
-                        color: Theme.panelBorder
+                        color: Theme.c.androidTimeline.labelBorder
                     }
                     Rectangle {
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
-                        height: 1
-                        color: Theme.panelBorder
+                        height: Theme.c.androidTimeline.labelBorderWidth
+                        color: Theme.c.androidTimeline.labelBorder
                     }
 
                     // Desktop puts the add-track button in this exact corner; on the
@@ -1262,14 +1262,14 @@ Item {
 
                         Rectangle {
                             anchors.fill: parent
-                            color: Theme.panelBackground
+                            color: Theme.c.androidTimeline.seekBackground
                         }
                         Rectangle {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.bottom: parent.bottom
-                            height: 1
-                            color: Theme.panelBorder
+                            height: Theme.c.androidTimeline.seekBorderWidth
+                            color: Theme.c.androidTimeline.seekBorder
                         }
 
                         AndroidTimelineRuler {
@@ -1302,7 +1302,7 @@ Item {
                                 width: Math.max(0, (EditorState.workAreaOutSeconds
                                                     - EditorState.workAreaInSeconds)
                                              * root.pxPerSecond)
-                                color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.18)
+                                color: Qt.rgba(Theme.c.androidTimeline.primary.r, Theme.c.androidTimeline.primary.g, Theme.c.androidTimeline.primary.b, 0.18)
                             }
 
                             ThemedContextMenu {
@@ -1407,8 +1407,9 @@ Item {
                                 visible: !root.tracks[trackIndex].isAdjustmentLane
                                 width: flick.contentWidth
                                 height: root.trackHeight(trackIndex)
-                                color: Qt.rgba(Theme.panelAccent.r, Theme.panelAccent.g,
-                                               Theme.panelAccent.b, 0.22)
+                                color: Qt.rgba(Theme.c.androidTimeline.track.r,
+                                               Theme.c.androidTimeline.track.g,
+                                               Theme.c.androidTimeline.track.b, 0.22)
 
                                 // A transform layer's row carries a faint wash of its colour.
                                 AndroidTimelineTrackWash {

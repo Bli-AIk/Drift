@@ -8,7 +8,7 @@ Rectangle {
     required property var modelData
     width: ListView.view ? ListView.view.width : 0
     height: rowLayout.implicitHeight + Theme.spacingXl * 2
-    color: rowHover.hovered ? Theme.popoverHover : "transparent"
+    color: rowHover.hovered ? Theme.c.downloadsJobRow.backgroundHover : "transparent"
 
     Behavior on color {
         ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -28,14 +28,14 @@ Rectangle {
             Layout.alignment: Qt.AlignTop
             implicitWidth: Theme.spacing3xl + Theme.spacingLg
             implicitHeight: Theme.spacing3xl + Theme.spacingLg
-            radius: Theme.radiusSm
-            color: Theme.panelAccent
+            radius: Theme.c.downloadsJobRow.iconRadius
+            color: Theme.c.downloadsJobRow.iconBackground
 
             IconGlyph {
                 anchors.centerIn: parent
                 glyph: DownloadFormat.kindGlyph(root.modelData)
                 iconSize: Theme.iconSizeBase
-                iconColor: Theme.mutedForeground
+                iconColor: Theme.c.downloadsJobRow.icon
             }
 
             // Painted on the window background rather than the tile so the
@@ -46,8 +46,8 @@ Rectangle {
                 anchors.margins: -Theme.spacingXs
                 width: Theme.spacingXl + Theme.spacingXs
                 height: width
-                radius: width / 2
-                color: Theme.appBackground
+                radius: Theme.c.downloadsJobRow.badgeRadius
+                color: Theme.c.downloadsJobRow.badgeBackground
 
                 IconGlyph {
                     anchors.centerIn: parent
@@ -65,7 +65,7 @@ Rectangle {
             Text {
                 Layout.fillWidth: true
                 text: root.modelData.title
-                color: Theme.foreground
+                color: Theme.c.downloadsJobRow.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
                 elide: Text.ElideRight
@@ -83,8 +83,8 @@ Rectangle {
             Text {
                 Layout.fillWidth: true
                 text: DownloadFormat.detailLine(root.modelData)
-                color: root.modelData.status === "failed" ? Theme.destructive
-                                                        : Theme.mutedForeground
+                color: root.modelData.status === "failed" ? Theme.c.downloadsJobRow.destructive
+                                                        : Theme.c.downloadsJobRow.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 elide: Text.ElideRight
@@ -100,7 +100,7 @@ Rectangle {
                 visible: root.modelData.status === "done"
                          && String(root.modelData.destinationDir).length > 0
                 text: root.modelData.destinationDir
-                color: Theme.mutedForeground
+                color: Theme.c.downloadsJobRow.foregroundMuted
                 font.family: Theme.monoFontFamily
                 font.pixelSize: Theme.fontSizeXs
                 elide: Text.ElideLeft
@@ -112,7 +112,7 @@ Rectangle {
             visible: root.modelData.status === "downloading"
                      && Number(root.modelData.bytesTotal) > 0
             text: Math.round(Number(root.modelData.progress || 0) * 100) + "%"
-            color: Theme.mutedForeground
+            color: Theme.c.downloadsJobRow.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }

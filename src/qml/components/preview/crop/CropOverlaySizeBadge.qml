@@ -10,18 +10,18 @@ Rectangle {
     anchors.verticalCenter: parent.verticalCenter
     width: sizeLabel.width + Theme.spacingLg
     height: sizeLabel.height + Theme.spacingSm
-    radius: Theme.radiusSm
+    radius: Theme.c.cropOverlaySizeBadge.radius
     // On-media surface, same as the hint: fixed dark scrim
     // with an on-media foreground rather than panel tokens.
-    color: Theme.scrimStrong
-    border.width: Theme.borderWidth
-    border.color: Theme.guideWeak
+    color: Theme.c.cropOverlaySizeBadge.background
+    border.width: Theme.c.cropOverlaySizeBadge.borderWidth
+    border.color: Theme.c.cropOverlaySizeBadge.border
 
     Text {
         id: sizeLabel
         anchors.centerIn: parent
         text: badge.label
-        color: Theme.onMedia
+        color: Theme.c.cropOverlaySizeBadge.foreground
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeXs
     }

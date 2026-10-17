@@ -4,14 +4,25 @@ import QtQuick.Layouts
 import QtQuick.Window
 import Drift
 
-Rectangle {
+Item {
     id: root
 
     // Main owns the window; the header only asks for it.
     signal downloadsRequested()
 
     height: Theme.headerHeight
-    color: Theme.appBackground
+
+    ThemeSlot {
+        anchors.fill: parent
+        slot: "EditorHeaderBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.c.editorHeader.background
+            }
+        }
+    }
 
     property string projectName: EditorState.projectFile.projectName
 

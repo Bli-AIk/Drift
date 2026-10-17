@@ -39,7 +39,7 @@ SettingsSectionCard {
         width: parent.width
         visible: EditorState.preferences.uiScaleNeedsRestart
         text: qsTr("Restart Drift to apply this size.")
-        color: Theme.panelSecondaryForeground
+        color: Theme.c.settingsInterfaceSection.foreground
     }
 
     ThemedLabel {
@@ -74,7 +74,7 @@ SettingsSectionCard {
         width: parent.width
         visible: EditorState.preferences.interfaceShellNeedsRestart
         text: qsTr("Restart Drift to switch layouts.")
-        color: Theme.panelSecondaryForeground
+        color: Theme.c.settingsInterfaceSection.foreground
     }
 
     ThemedButton {

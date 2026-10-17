@@ -19,7 +19,7 @@ Item {
               : header.item.kind === "h" ? qsTr("Horizontal line")
               : header.item.kind === "rect" ? qsTr("Margins")
               : qsTr("Aspect frame")
-        color: Theme.foreground
+        color: Theme.c.guidesPopoverItemHeader.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeSm
         font.weight: Font.Medium

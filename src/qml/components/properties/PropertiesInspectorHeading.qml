@@ -5,7 +5,7 @@ import Drift
 Text {
     id: root
 
-    color: Theme.mutedForeground
+    color: Theme.c.propertiesInspectorHeading.foregroundMuted
     font.family: Theme.fontFamily
     font.pixelSize: Theme.fontSizeXs
     font.weight: Font.Medium

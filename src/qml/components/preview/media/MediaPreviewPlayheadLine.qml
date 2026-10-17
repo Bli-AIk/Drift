@@ -9,6 +9,6 @@ Rectangle {
     x: line.playX - 1
     width: 2
     height: parent.height
-    color: Theme.primary
+    color: Theme.c.mediaPreviewPlayheadLine.background
     z: 3
 }

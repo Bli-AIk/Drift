@@ -9,10 +9,10 @@ Rectangle {
 
     anchors.fill: parent
     z: 50
-    radius: Theme.radiusMd
-    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
-    border.width: Theme.borderWidthFocus
-    border.color: Theme.primary
+    radius: Theme.c.assetsPanelDropOverlay.radius
+    color: Qt.rgba(Theme.c.assetsPanelDropOverlay.accent.r, Theme.c.assetsPanelDropOverlay.accent.g, Theme.c.assetsPanelDropOverlay.accent.b, 0.08)
+    border.width: Theme.c.assetsPanelDropOverlay.borderWidth
+    border.color: Theme.c.assetsPanelDropOverlay.accent
     visible: opacity > 0
     opacity: active ? 1 : 0
 

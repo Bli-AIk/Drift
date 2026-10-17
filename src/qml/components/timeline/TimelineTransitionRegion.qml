@@ -36,13 +36,16 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: Theme.radiusSm
-        color: Qt.rgba(Theme.transitionOverlap.r, Theme.transitionOverlap.g,
-                       Theme.transitionOverlap.b,
+        radius: Theme.c.timelineTransitionRegion.radius
+        color: Qt.rgba(Theme.c.timelineTransitionRegion.background.r,
+                       Theme.c.timelineTransitionRegion.background.g,
+                       Theme.c.timelineTransitionRegion.background.b,
                        transitionRegion.transitionSelected ? 0.85
                        : (transitionRegion.hasTransition ? 0.65 : 0.35))
-        border.width: transitionRegion.transitionSelected ? 2 : 1
-        border.color: Theme.transitionOverlap
+        border.width: transitionRegion.transitionSelected
+                      ? Theme.c.timelineTransitionRegion.borderWidthSelected
+                      : Theme.c.timelineTransitionRegion.borderWidth
+        border.color: Theme.c.timelineTransitionRegion.border
 
         // Diagonal hatch so overlaps read as a blend zone.
         TimelineTransitionHatch {

@@ -17,8 +17,8 @@ Item {
         anchors.centerIn: parent
         width: 32
         height: 3
-        radius: 1.5
-        color: gripArea.pressed || gripArea.containsMouse ? Theme.mutedForeground : Theme.panelBorder
+        radius: Theme.c.textContentResizeGrip.radius
+        color: gripArea.pressed || gripArea.containsMouse ? Theme.c.textContentResizeGrip.backgroundActive : Theme.c.textContentResizeGrip.background
     }
 
     MouseArea {

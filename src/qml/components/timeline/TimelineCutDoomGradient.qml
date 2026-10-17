@@ -17,10 +17,8 @@ Rectangle {
         ? (host.hoverClip.start + host.hoverClip.duration) * panel.pxPerSecond : 0
     readonly property real cutX: Math.max(clipStartX,
         Math.min(clipEndX, panel.cutHoverSeconds * panel.pxPerSecond))
-    readonly property color solid: Qt.rgba(Theme.destructive.r, Theme.destructive.g,
-                                           Theme.destructive.b, 0.55)
-    readonly property color clear: Qt.rgba(Theme.destructive.r, Theme.destructive.g,
-                                           Theme.destructive.b, 0.0)
+    readonly property color solid: Qt.rgba(Theme.c.timelineCutDoomGradient.foreground.r, Theme.c.timelineCutDoomGradient.foreground.g, Theme.c.timelineCutDoomGradient.foreground.b, 0.55)
+    readonly property color clear: Qt.rgba(Theme.c.timelineCutDoomGradient.foreground.r, Theme.c.timelineCutDoomGradient.foreground.g, Theme.c.timelineCutDoomGradient.foreground.b, 0.0)
 
     x: panel.timelineTool === "trimStart"
        ? Math.max(clipStartX, cutX - bandLength)
@@ -31,7 +29,7 @@ Rectangle {
     y: panel.trackOffsetY(panel.cutHoverTrack)
     height: host.hoverClip
         ? panel.trackHeight(panel.cutHoverTrack) : 0
-    radius: Theme.radiusSm
+    radius: Theme.c.timelineCutDoomGradient.radius
 
     gradient: Gradient {
         orientation: Gradient.Horizontal

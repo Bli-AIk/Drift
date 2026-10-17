@@ -15,11 +15,11 @@ Rectangle {
     width: importFilesHalf.width
            + (importMenuHalf.visible ? importSplitDivider.width + importMenuHalf.width : 0)
     height: Theme.controlHeight
-    radius: Theme.radiusSm
+    radius: Theme.c.assetsPanelImportSplit.radius
     color: "transparent"
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
-    opacity: importing ? 0.6 : 1
+    border.width: Theme.c.assetsPanelImportSplit.borderWidth
+    border.color: Theme.c.assetsPanelImportSplit.border
+    opacity: importing ? Theme.c.assetsPanelImportSplit.busyOpacity : 1
 
     Row {
         anchors.fill: parent
@@ -30,21 +30,21 @@ Rectangle {
             text: qsTr("Import")
             variant: "ghost"
             flat: true
-            radius: Theme.radiusXs
+            radius: Theme.c.assetsPanelImportSplit.buttonRadius
             glyph: Theme.icons.upload
             tooltip: qsTr("Import video, audio or image files")
             enabled: !root.importing
-            height: parent.height - Theme.borderWidth * 2
+            height: parent.height - Theme.c.assetsPanelImportSplit.borderWidth * 2
             anchors.verticalCenter: parent.verticalCenter
             onClicked: root.importFilesRequested()
         }
 
         Rectangle {
             id: importSplitDivider
-            width: Theme.borderWidth
+            width: Theme.c.assetsPanelImportSplit.borderWidth
             height: parent.height - Theme.spacingLg
             anchors.verticalCenter: parent.verticalCenter
-            color: Theme.panelBorder
+            color: Theme.c.assetsPanelImportSplit.divider
             visible: importMenuHalf.visible
         }
 
@@ -52,7 +52,7 @@ Rectangle {
             id: importMenuHalf
             variant: "ghost"
             flat: true
-            radius: Theme.radiusXs
+            radius: Theme.c.assetsPanelImportSplit.buttonRadius
             glyph: Theme.icons.chevronDown
             glyphSize: Theme.iconSizeSm
             leftPadding: Theme.spacingLg
@@ -60,7 +60,7 @@ Rectangle {
             tooltip: qsTr("More import options")
             enabled: !root.importing
             visible: !Theme.touchUi
-            height: parent.height - Theme.borderWidth * 2
+            height: parent.height - Theme.c.assetsPanelImportSplit.borderWidth * 2
             anchors.verticalCenter: parent.verticalCenter
             onClicked: importMenu.popup(0, root.height + Theme.spacingSm)
         }

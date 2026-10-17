@@ -376,7 +376,7 @@ Item {
 
                 Rectangle {
                     anchors.fill: parent
-                    color: Theme.panelBackground
+                    color: Theme.c.androidEditor.splitterBackground
                 }
 
                 Rectangle {
@@ -387,8 +387,9 @@ Item {
                     // land a thumb on.
                     width: editorSplit.sideBySide ? 6 : 48
                     height: editorSplit.sideBySide ? 48 : 6
-                    radius: 3
-                    color: T.SplitHandle.pressed ? Theme.primary : Theme.panelBorder
+                    radius: Theme.c.androidEditor.handleRadius
+                    color: T.SplitHandle.pressed ? Theme.c.androidEditor.handleBackgroundPressed
+                                                 : Theme.c.androidEditor.handleBackground
                 }
 
                 MouseArea {
@@ -469,8 +470,9 @@ Item {
                                 return false
                             return EditorState.clipCount === 0
                         }
-                        color: Qt.rgba(Theme.appBackground.r, Theme.appBackground.g,
-                                       Theme.appBackground.b, 0.82)
+                        color: Qt.rgba(Theme.c.androidEditor.emptyBackground.r,
+                                       Theme.c.androidEditor.emptyBackground.g,
+                                       Theme.c.androidEditor.emptyBackground.b, 0.82)
                         z: 5
 
                         Column {
@@ -482,7 +484,7 @@ Item {
                                 width: parent.width
                                 horizontalAlignment: Text.AlignHCenter
                                 text: qsTr("Your timeline is empty")
-                                color: Theme.foreground
+                                color: Theme.c.androidEditor.foreground
                                 font.family: Theme.fontFamily
                                 font.pixelSize: Theme.fontSizeBase
                                 font.weight: Font.Medium
@@ -493,7 +495,7 @@ Item {
                                 horizontalAlignment: Text.AlignHCenter
                                 wrapMode: Text.WordWrap
                                 text: qsTr("Import media or open the Media library to start editing.")
-                                color: Theme.mutedForeground
+                                color: Theme.c.androidEditor.foregroundMuted
                                 font.family: Theme.fontFamily
                                 font.pixelSize: Theme.fontSizeSm
                             }

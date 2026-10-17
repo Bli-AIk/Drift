@@ -7,5 +7,5 @@ Rectangle {
     y: Theme.timelineRulerHeight * 0.55
     width: Theme.playheadLineWidth
     height: parent.height - y
-    color: Theme.primary
+    color: Theme.c.timelinePlayheadLine.foreground
 }

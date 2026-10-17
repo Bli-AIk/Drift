@@ -51,15 +51,17 @@ ThemedDialog {
 
     function cellFill(state, striped) {
         if (state === "unavailable")
-            return striped ? Theme.panelAccent : "transparent"
-        const c = state === "supported" ? Theme.constructive : Theme.destructive
+            return striped ? Theme.c.debugInfoDialog.rowStripe : "transparent"
+        const c = state === "supported" ? Theme.c.debugInfoDialog.cellSupported
+                                        : Theme.c.debugInfoDialog.cellUnsupported
         return Qt.rgba(c.r, c.g, c.b, striped ? 0.10 : 0.16)
     }
 
     function cellTextColor(state) {
         if (state === "unavailable")
-            return Theme.mutedForeground
-        return state === "supported" ? Theme.constructive : Theme.destructive
+            return Theme.c.debugInfoDialog.foregroundMuted
+        return state === "supported" ? Theme.c.debugInfoDialog.cellSupported
+                                     : Theme.c.debugInfoDialog.cellUnsupported
     }
 
     function cellLabel(state) {
@@ -125,8 +127,8 @@ ThemedDialog {
 
             Rectangle {
                 width: parent.width
-                height: Theme.borderWidth
-                color: Theme.panelBorder
+                height: Theme.c.debugInfoDialog.borderWidth
+                color: Theme.c.debugInfoDialog.divider
             }
 
             Column {
@@ -144,7 +146,7 @@ ThemedDialog {
                     size: "sm"
                     tone: "default"
                     textFormat: Text.RichText
-                    linkColor: Theme.primary
+                    linkColor: Theme.c.debugInfoDialog.link
                     text: "<a href=\"https://github.com/CutWire-Studios/Drift/issues\">%1</a>"
                           .arg(qsTr("Report a bug"))
                     onLinkActivated: (link) => Qt.openUrlExternally(link)
@@ -158,7 +160,7 @@ ThemedDialog {
                     size: "sm"
                     tone: "default"
                     textFormat: Text.RichText
-                    linkColor: Theme.primary
+                    linkColor: Theme.c.debugInfoDialog.link
                     text: "<a href=\"https://docs.cutwire.org/drift\">%1</a>"
                           .arg(qsTr("Documentation"))
                     onLinkActivated: (link) => Qt.openUrlExternally(link)
@@ -172,7 +174,7 @@ ThemedDialog {
                     size: "sm"
                     tone: "default"
                     textFormat: Text.RichText
-                    linkColor: Theme.primary
+                    linkColor: Theme.c.debugInfoDialog.link
                     text: "<a href=\"https://cutwire.org/discord\">%1</a>"
                           .arg(qsTr("Questions and support on Discord"))
                     onLinkActivated: (link) => Qt.openUrlExternally(link)

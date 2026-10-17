@@ -38,10 +38,10 @@ Item {
     Rectangle {
         id: trigger
         anchors.fill: parent
-        radius: Theme.radiusSm
-        color: Theme.panelAccent
-        border.width: (dialog.visible || root.activeFocus) ? 1 : 0
-        border.color: root.activeFocus ? Theme.primary : Theme.panelSecondaryBorder
+        radius: Theme.c.textLookPicker.radius
+        color: Theme.c.textLookPicker.background
+        border.width: (dialog.visible || root.activeFocus) ? Theme.c.textLookPicker.borderWidth : 0
+        border.color: root.activeFocus ? Theme.c.textLookPicker.borderFocus : Theme.c.textLookPicker.borderSecondary
 
         Rectangle {
             id: triggerThumb
@@ -52,10 +52,10 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 6
             width: Math.round(height * 2.0)
-            radius: Theme.radiusSm
-            color: Theme.textStylePreviewBg
-            border.width: Theme.borderWidth
-            border.color: Theme.textStylePreviewBorder
+            radius: Theme.c.textLookPicker.radius
+            color: Theme.c.textLookPicker.thumbBackground
+            border.width: Theme.c.textLookPicker.borderWidth
+            border.color: Theme.c.textLookPicker.thumbBorder
             clip: true
 
             Image {
@@ -74,7 +74,7 @@ Item {
                 anchors.centerIn: parent
                 visible: root.lookId.length === 0
                 text: qsTr("Aa")
-                color: Theme.mutedForeground
+                color: Theme.c.textLookPicker.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
             }
@@ -88,7 +88,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             text: root.displayLabel
             elide: Text.ElideRight
-            color: Theme.panelForeground
+            color: Theme.c.textLookPicker.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
         }
@@ -100,7 +100,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             glyph: Theme.icons.chevronRight
             iconSize: 12
-            iconColor: Theme.mutedForeground
+            iconColor: Theme.c.textLookPicker.icon
         }
 
         MouseArea {

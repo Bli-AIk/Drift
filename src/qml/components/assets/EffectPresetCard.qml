@@ -13,7 +13,7 @@ Column {
     spacing: 4
     // Lift on grab: the card dims and grows slightly, so it reads
     // as picked up rather than merely faded.
-    opacity: presetDrag.active ? 0.85 : 1
+    opacity: presetDrag.active ? Theme.c.effectPresetCard.dragOpacity : 1
     scale: presetDrag.active ? 1.04 : 1.0
 
     Behavior on opacity {
@@ -36,23 +36,39 @@ Column {
     Rectangle {
         width: cardSize
         height: cardSize
-        radius: Theme.radiusSm
-        color: cardHover.hovered ? Theme.panelSecondaryBg : Theme.panelAccent
-        border.width: presetDrag.active ? 1 : 0
-        border.color: Theme.primary
+        // The slot paints the card surface. This rectangle only clips and scales.
+        color: "transparent"
+        radius: Theme.c.effectPresetCard.radius
         clip: true
         // Matches the media cards in MediaAssetsTab, which already
         // grow and animate on hover; these snapped.
         scale: cardHover.hovered ? 1.03 : 1.0
 
-        Behavior on color {
-            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
         Behavior on scale {
             NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
         }
-        Behavior on border.width {
-            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+
+        ThemeSlot {
+            anchors.fill: parent
+            z: -1
+            slot: "EffectPresetCardBackground"
+            control: root
+            fallback: Component {
+                Rectangle {
+                    anchors.fill: parent
+                    radius: Theme.c.effectPresetCard.radius
+                    color: cardHover.hovered ? Theme.c.effectPresetCard.backgroundHover : Theme.c.effectPresetCard.background
+                    border.width: presetDrag.active ? Theme.c.effectPresetCard.borderWidth : 0
+                    border.color: Theme.c.effectPresetCard.border
+
+                    Behavior on color {
+                        ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                    }
+                    Behavior on border.width {
+                        NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                    }
+                }
+            }
         }
 
         HoverHandler { id: cardHover }
@@ -81,7 +97,7 @@ Column {
             visible: root.thumb.length === 0
             width: parent.width - 12
             text: root.modelData.label
-            color: Theme.mutedForeground
+            color: Theme.c.effectPresetCard.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeCard
             font.weight: Font.Medium
@@ -192,7 +208,7 @@ Column {
     Text {
         width: parent.width
         text: root.modelData.label
-        color: Theme.panelForeground
+        color: Theme.c.effectPresetCard.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeCard
         font.weight: Font.Medium
@@ -206,7 +222,7 @@ Column {
         width: parent.width
         visible: root.modelData.compositorOnly === true
         text: qsTr("Built-in")
-        color: Theme.mutedForeground
+        color: Theme.c.effectPresetCard.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs - 1
         horizontalAlignment: Text.AlignHCenter

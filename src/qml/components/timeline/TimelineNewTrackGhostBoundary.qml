@@ -6,5 +6,5 @@ Rectangle {
     width: parent.width
     height: 2
     anchors.verticalCenter: parent.verticalCenter
-    color: Theme.primary
+    color: Theme.c.timelineNewTrackGhostBoundary.foreground
 }

@@ -151,9 +151,9 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.panelBackground
-        border.width: 1
-        border.color: Theme.panelBorder
+        color: Theme.c.subtitleCueLane.background
+        border.width: Theme.c.subtitleCueLane.borderWidth
+        border.color: Theme.c.subtitleCueLane.border
     }
 
     Row {

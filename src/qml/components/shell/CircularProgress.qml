@@ -13,8 +13,8 @@ Item {
     property bool indeterminate: false
     property real size: 28
     property real strokeWidth: 3
-    property color trackColor: Theme.panelMuted
-    property color progressColor: Theme.primary
+    property color trackColor: Theme.c.circularProgress.track
+    property color progressColor: Theme.c.circularProgress.progress
 
     width: size
     height: size

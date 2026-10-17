@@ -10,7 +10,7 @@ Column {
     signal applyRequested(string effectId)
     width: cardSize
     spacing: 4
-    opacity: presetDrag.active ? 0.85 : 1
+    opacity: presetDrag.active ? Theme.c.audioEffectPresetCard.dragOpacity : 1
     scale: presetDrag.active ? 1.04 : 1.0
 
     Behavior on opacity {
@@ -34,10 +34,10 @@ Column {
     Rectangle {
         width: cardSize
         height: cardSize
-        radius: Theme.radiusSm
-        color: cardHover.hovered ? Theme.panelAccent : Theme.panelBackground
-        border.width: presetDrag.active ? 1 : 0
-        border.color: Theme.primary
+        radius: Theme.c.audioEffectPresetCard.radius
+        color: cardHover.hovered ? Theme.c.audioEffectPresetCard.backgroundHover : Theme.c.audioEffectPresetCard.background
+        border.width: presetDrag.active ? Theme.c.audioEffectPresetCard.borderWidth : 0
+        border.color: Theme.c.audioEffectPresetCard.border
         clip: true
         scale: cardHover.hovered ? 1.03 : 1.0
 
@@ -78,7 +78,7 @@ Column {
                      || presetThumb.status === Image.Error
             glyph: root.iconGlyph
             iconSize: 28
-            iconColor: Theme.mutedForeground
+            iconColor: Theme.c.audioEffectPresetCard.icon
         }
 
         TapHandler {
@@ -160,7 +160,7 @@ Column {
     Text {
         width: parent.width
         text: root.modelData.label
-        color: Theme.panelForeground
+        color: Theme.c.audioEffectPresetCard.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeCard
         font.weight: Font.Medium

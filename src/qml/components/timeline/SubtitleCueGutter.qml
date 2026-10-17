@@ -14,14 +14,14 @@ Item {
 
         Text {
             text: qsTr("Subtitles")
-            color: Theme.mutedForeground
+            color: Theme.c.subtitleCueGutter.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             font.weight: Font.Medium
         }
         Text {
             text: qsTr("%n captions", "", lane.cues.length)
-            color: Theme.mutedForeground
+            color: Theme.c.subtitleCueGutter.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             opacity: 0.8
@@ -32,6 +32,6 @@ Item {
         anchors.right: parent.right
         width: 1
         height: parent.height
-        color: Theme.panelBorder
+        color: Theme.c.subtitleCueGutter.border
     }
 }

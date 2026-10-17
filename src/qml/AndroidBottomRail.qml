@@ -49,14 +49,14 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.panelBackground
+        color: Theme.c.androidBottomRail.background
     }
 
     Rectangle {
         anchors.top: parent.top
         width: parent.width
-        height: 1
-        color: Theme.panelBorder
+        height: Theme.c.androidBottomRail.borderWidth
+        color: Theme.c.androidBottomRail.border
         z: 1
     }
 

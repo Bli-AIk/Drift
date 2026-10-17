@@ -54,9 +54,9 @@ Item {
         Rectangle {
             id: divider
             anchors.verticalCenter: parent.verticalCenter
-            width: Theme.borderWidth
+            width: Theme.c.assetCategoryChips.dividerWidth
             height: Theme.controlHeightSm - 6
-            color: Theme.panelBorder
+            color: Theme.c.assetCategoryChips.divider
         }
 
         Flickable {

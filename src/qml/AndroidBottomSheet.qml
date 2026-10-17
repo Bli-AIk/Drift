@@ -334,21 +334,41 @@ Popup {
             onClicked: root.dismiss()
         }
 
-        Rectangle {
+        Item {
             id: panel
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.bottomMargin: root._lift
             height: Math.min(root.panelHeight, root.usableHeight)
-            color: Theme.panelBackground
-            radius: Theme.radiusMd
 
             // Translated rather than resized or hidden while a lifted card is in
             // flight: `height` feeds the drag maths and `visible: false` would drop
             // the grab the gesture is riding on.
             transform: Translate {
                 y: (1 - root._asideFade) * (root.panelHeight + root.safeBottom)
+            }
+
+            ThemeSlot {
+                anchors.fill: parent
+                slot: "AndroidSheetBackground"
+                control: root
+                fallback: Component {
+                    Item {
+                        Rectangle {
+                            anchors.fill: parent
+                            color: Theme.c.androidBottomSheet.background
+                            radius: Theme.c.androidBottomSheet.radius
+                        }
+                        Rectangle {
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
+                            height: Theme.c.androidBottomSheet.radius
+                            color: Theme.c.androidBottomSheet.background
+                        }
+                    }
+                }
             }
 
             // PointerHandlers (preview pinch, clip taps) hit-test their parent's
@@ -373,14 +393,6 @@ Popup {
                     grabPermissions: PointerHandler.CanTakeOverFromHandlersOfSameType
                                      | PointerHandler.CanTakeOverFromHandlersOfDifferentType
                 }
-
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                height: Theme.radiusMd
-                color: Theme.panelBackground
-            }
 
             AndroidSheetHeader {
                 id: header

@@ -6,7 +6,7 @@ Column {
 
     Text {
         text: "Drift"
-        color: Theme.foreground
+        color: Theme.c.androidHomeWordmark.foreground
         font.family: Theme.fontFamily
         font.pixelSize: 22
         font.weight: Font.Bold
@@ -14,7 +14,7 @@ Column {
 
     Text {
         text: qsTr("Create polished videos fast")
-        color: Theme.mutedForeground
+        color: Theme.c.androidHomeWordmark.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeSm
     }

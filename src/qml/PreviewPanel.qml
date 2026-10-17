@@ -39,9 +39,9 @@ PanelFrame {
 
     // Fullscreen gives the whole screen to the picture: no gutter, and the transport joins the OSD
     // over it instead of taking a strip of its own.
-    color: previewFullscreen ? Theme.overlayColor : Theme.panelBackground
-    border.width: previewFullscreen ? 0 : 1
-    radius: previewFullscreen ? 0 : Theme.radiusSm
+    color: previewFullscreen ? Theme.c.previewPanel.backgroundFullscreen : Theme.c.previewPanel.background
+    border.width: previewFullscreen ? Theme.c.previewPanel.borderWidthFullscreen : Theme.c.previewPanel.borderWidth
+    radius: previewFullscreen ? Theme.c.previewPanel.radiusFullscreen : Theme.c.previewPanel.radius
 
     Item {
         id: viewportOuter

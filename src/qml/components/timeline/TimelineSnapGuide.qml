@@ -10,9 +10,9 @@ Rectangle {
     opacity: panel.snapGuideSeconds >= 0 ? 1 : 0
     x: panel.snapGuideSeconds * panel.pxPerSecond
     y: Theme.timelineRulerHeight + Theme.timelineBookmarkRowHeight
-    width: Theme.borderWidth
+    width: Theme.c.timelineSnapGuide.borderWidth
     height: panel.totalTracksHeightCached
-    color: Theme.snapGuide
+    color: Theme.c.timelineSnapGuide.foreground
     z: 6
 
     Behavior on opacity {

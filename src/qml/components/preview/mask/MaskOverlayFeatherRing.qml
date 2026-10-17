@@ -17,8 +17,8 @@ Rectangle {
     width: parent.width + 2 * ring.feather * ring.scaleX
     height: parent.height + 2 * ring.feather * ring.scaleY
     color: "transparent"
-    border.width: Theme.borderWidth
-    border.color: Theme.primary
+    border.width: Theme.c.maskOverlayFeatherRing.borderWidth
+    border.color: Theme.c.maskOverlayFeatherRing.border
     opacity: 0.35
     radius: ring.shape === "ellipse" ? Math.min(width, height) / 2 : 0
 }

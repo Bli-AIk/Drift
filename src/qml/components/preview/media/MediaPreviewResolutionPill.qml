@@ -10,14 +10,14 @@ Rectangle {
     required property int outputWidth
     required property int outputHeight
 
-    readonly property color tint: pill.suggestUpscale ? Theme.warning : Theme.constructive
-    readonly property color ink: Theme.darkMode ? tint : Qt.darker(tint, 1.7)
+    readonly property color tint: pill.suggestUpscale ? Theme.c.mediaPreviewResolutionPill.warning : Theme.c.mediaPreviewResolutionPill.constructive
+    readonly property color ink: pill.suggestUpscale ? Theme.c.mediaPreviewResolutionPill.warningForeground : Theme.c.mediaPreviewResolutionPill.constructiveForeground
 
     width: pillRow.width + 2
     height: 38
     radius: height / 2
     color: Qt.rgba(tint.r, tint.g, tint.b, 0.12)
-    border.width: 1
+    border.width: Theme.c.mediaPreviewResolutionPill.borderWidth
     border.color: Qt.rgba(tint.r, tint.g, tint.b, 0.55)
 
     Row {

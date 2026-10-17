@@ -21,10 +21,11 @@ Rectangle {
         searchInput.focus = false
     }
     implicitHeight: Theme.controlHeight
-    radius: height / 2
-    color: Theme.panelAccent
-    border.width: searchInput.activeFocus ? Theme.borderWidthFocus : 0
-    border.color: Theme.focusRing
+    radius: Theme.c.editorHeaderSearchField.radius
+    color: Theme.c.editorHeaderSearchField.background
+    border.width: searchInput.activeFocus ? Theme.c.editorHeaderSearchField.borderWidthFocus
+                                          : Theme.c.editorHeaderSearchField.borderWidth
+    border.color: Theme.c.editorHeaderSearchField.border
 
     IconGlyph {
         id: searchLens
@@ -33,7 +34,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         glyph: Theme.icons.search
         iconSize: Theme.iconSizeMd
-        iconColor: Theme.mutedForeground
+        iconColor: Theme.c.editorHeaderSearchField.icon
     }
 
     TextField {
@@ -46,18 +47,18 @@ Rectangle {
         background: null
         leftPadding: 0
         rightPadding: 0
-        color: Theme.panelForeground
+        color: Theme.c.editorHeaderSearchField.foreground
         placeholderText: {
             const keys = EditorState.shortcutFor("search")
             return keys.length > 0 ? qsTr("Search  %1").arg(Theme.shortcutDisplay(keys))
                                    : qsTr("Search")
         }
-        placeholderTextColor: Theme.mutedForeground
+        placeholderTextColor: Theme.c.editorHeaderSearchField.placeholder
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeSm
         selectByMouse: true
-        selectedTextColor: Theme.primaryForeground
-        selectionColor: Theme.primary
+        selectedTextColor: Theme.c.editorHeaderSearchField.selectionForeground
+        selectionColor: Theme.c.editorHeaderSearchField.selection
 
         onTextEdited: searchPopup.search(text)
         onActiveFocusChanged: if (activeFocus && text.trim().length > 0) searchPopup.search(text)

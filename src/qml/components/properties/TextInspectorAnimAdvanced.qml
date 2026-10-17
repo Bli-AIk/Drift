@@ -13,7 +13,7 @@ CollapsibleSection {
         width: parent.width
         wrapMode: Text.WordWrap
         text: qsTr("Custom animator (set via MCP). Preset controls are disabled.")
-        color: Theme.mutedForeground
+        color: Theme.c.textInspectorAnimAdvanced.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

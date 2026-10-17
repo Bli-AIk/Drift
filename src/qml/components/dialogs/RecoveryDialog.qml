@@ -37,10 +37,10 @@ ThemedDialog {
 
         Rectangle {
             width: parent.width
-            radius: Theme.radiusSm
-            color: Theme.appBackground
-            border.width: 1
-            border.color: Theme.panelBorder
+            radius: Theme.c.recoveryDialog.radius
+            color: Theme.c.recoveryDialog.background
+            border.width: Theme.c.recoveryDialog.borderWidth
+            border.color: Theme.c.recoveryDialog.border
             height: infoColumn.implicitHeight + 20
 
             Column {

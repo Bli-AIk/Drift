@@ -28,8 +28,8 @@ Column {
 
         Rectangle {
             anchors.fill: parent
-            color: Theme.panelBackground
-            radius: Theme.radiusMd
+            color: Theme.c.segmentationFrameColumn.background
+            radius: Theme.c.segmentationFrameColumn.radius
         }
 
         Image {
@@ -104,12 +104,13 @@ Column {
 
                 width: 14
                 height: 14
-                radius: 7
+                radius: Theme.c.segmentationFrameColumn.markerRadius
                 x: stage.fitX + modelData.x * stage.fitW - 7
                 y: stage.fitY + modelData.y * stage.fitH - 7
-                color: modelData.include ? Theme.constructive : Theme.destructive
-                border.width: 2
-                border.color: Theme.primaryForeground
+                color: modelData.include ? Theme.c.segmentationFrameColumn.markerInclude
+                                         : Theme.c.segmentationFrameColumn.markerExclude
+                border.width: Theme.c.segmentationFrameColumn.markerBorderWidth
+                border.color: Theme.c.segmentationFrameColumn.markerBorder
 
                 MouseArea {
                     anchors.fill: parent
@@ -125,8 +126,8 @@ Column {
             visible: EditorState.segmentation.encoding
             width: encodingLabel.width + Theme.spacingXl
             height: encodingLabel.height + Theme.spacingLg
-            radius: Theme.radiusMd
-            color: Theme.scrimStrong
+            radius: Theme.c.segmentationFrameColumn.radius
+            color: Theme.c.segmentationFrameColumn.scrim
 
             ThemedLabel {
                 id: encodingLabel

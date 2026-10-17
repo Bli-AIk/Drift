@@ -31,7 +31,7 @@ Item {
                 width: subtitleColumn.contentWidth
                 wrapMode: Text.WordWrap
                 text: qsTr("Subtitle track — one clip holds many timed captions. Place it on the timeline, trim its length, then add caption lines at each moment in the clip panel.")
-                color: Theme.mutedForeground
+                color: Theme.c.subtitlesTab.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -64,8 +64,8 @@ Item {
 
             Rectangle {
                 width: subtitleColumn.contentWidth
-                height: Theme.borderWidth
-                color: Theme.panelBorder
+                height: Theme.c.subtitlesTab.borderWidth
+                color: Theme.c.subtitlesTab.border
             }
 
             // Same transcriber as the clip inspector's Audio tab, surfaced here so
@@ -74,7 +74,7 @@ Item {
             Text {
                 width: subtitleColumn.contentWidth
                 text: qsTr("Add auto caption")
-                color: Theme.foreground
+                color: Theme.c.subtitlesTab.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
             }
@@ -85,7 +85,7 @@ Item {
                 text: root.captionTargetReady
                       ? qsTr("Creates captions from the speech in the selected clip.")
                       : qsTr("Select a video or audio clip on the timeline first.")
-                color: Theme.mutedForeground
+                color: Theme.c.subtitlesTab.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -120,7 +120,7 @@ Item {
                 width: subtitleColumn.contentWidth
                 wrapMode: Text.WordWrap
                 text: qsTr("Shorter captions are timed by splitting each phrase evenly, so they can drift slightly out of sync with the speech.")
-                color: Theme.mutedForeground
+                color: Theme.c.subtitlesTab.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -153,7 +153,7 @@ Item {
                     text: EditorState.subtitleGenStatus.length > 0
                           ? EditorState.subtitleGenStatus
                           : qsTr("Creating captions… %1%").arg(Math.round(EditorState.subtitleGenProgress * 100))
-                    color: Theme.panelForeground
+                    color: Theme.c.subtitlesTab.statusForeground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                     elide: Text.ElideRight
@@ -162,14 +162,14 @@ Item {
                 Rectangle {
                     width: parent.width
                     height: Theme.spacingMd
-                    radius: height / 2
-                    color: Theme.panelMuted
+                    radius: Theme.c.subtitlesTab.meterRadius
+                    color: Theme.c.subtitlesTab.meterBackground
 
                     Rectangle {
                         width: parent.width * Math.max(0, Math.min(1, EditorState.subtitleGenProgress))
                         height: parent.height
                         radius: parent.radius
-                        color: Theme.primary
+                        color: Theme.c.subtitlesTab.accent
 
                         Behavior on width {
                             NumberAnimation { duration: Theme.durationBase; easing.type: Theme.easing }

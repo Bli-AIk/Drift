@@ -10,6 +10,6 @@ Rectangle {
     y: topY - 1
     width: indentStep - 2
     height: 2
-    radius: 1
-    color: Theme.clipTransform
+    radius: Theme.c.timelineSpanBracketTick.radius
+    color: Theme.c.timelineSpanBracketTick.foreground
 }

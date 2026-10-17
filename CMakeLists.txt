@@ -1679,6 +1679,7 @@ qt_add_qml_module(drift
         src/qml/components/timeline/MixerChannelArmTint.qml
         src/qml/components/timeline/ClipFilmstripTile.qml
         src/qml/components/controls/IconGlyph.qml
+        src/qml/components/controls/ThemeSlot.qml
         src/qml/components/controls/IconButton.qml
         src/qml/components/shell/PanelFrame.qml
         src/qml/components/shell/PanelSplitHandle.qml

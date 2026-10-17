@@ -22,9 +22,9 @@ Rectangle {
     radius: height / 2
     // The same tokens as the app's other segmented toggles (ThemedToggleButton): the track is an
     // unchecked control, the pill a checked one.
-    color: Theme.panelAccent
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
+    color: Theme.c.previewModeSwitch.background
+    border.width: Theme.c.previewModeSwitch.borderWidth
+    border.color: Theme.c.previewModeSwitch.border
 
     PreviewModeSwitchPill {
         inset: modeSwitch.inset

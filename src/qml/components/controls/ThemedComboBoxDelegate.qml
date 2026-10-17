@@ -34,7 +34,7 @@ ItemDelegate {
                                ? modelData[combo.textRole]
                                : (model[combo.textRole] !== undefined ? model[combo.textRole] : modelData))
                             : (combo.labels ? (combo.labels[modelData] || modelData) : modelData)
-        color: Theme.panelForeground
+        color: Theme.c.themedComboBoxDelegate.foreground
         opacity: comboDelegate.enabled ? 1 : 0.4
         font: combo.font
         elide: Text.ElideRight
@@ -48,15 +48,15 @@ ItemDelegate {
         visible: comboDelegate.warned
         glyph: Theme.icons.warning
         iconSize: Theme.iconSizeSm
-        iconColor: Theme.warning
+        iconColor: Theme.c.themedComboBoxDelegate.icon
         anchors.right: parent.right
         anchors.rightMargin: Theme.spacingLg
         anchors.verticalCenter: parent.verticalCenter
     }
 
     background: Rectangle {
-        color: comboDelegate.highlighted ? Theme.panelSecondaryBg
-                                         : (comboDelegate.hovered ? Theme.panelAccent : "transparent")
+        color: comboDelegate.highlighted ? Theme.c.themedComboBoxDelegate.backgroundHighlighted
+                                         : (comboDelegate.hovered ? Theme.c.themedComboBoxDelegate.backgroundHover : "transparent")
 
         Behavior on color {
             ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }

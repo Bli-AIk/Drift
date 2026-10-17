@@ -14,10 +14,10 @@ Rectangle {
 
     width: parent ? parent.width : 0
     height: rowBody.implicitHeight + Theme.spacingXl
-    radius: Theme.radiusMd
-    color: Theme.panelSecondaryBg
-    border.width: Theme.borderWidth
-    border.color: Theme.panelSecondaryBorder
+    radius: Theme.c.missingAddonsRow.radius
+    color: Theme.c.missingAddonsRow.background
+    border.width: Theme.c.missingAddonsRow.borderWidth
+    border.color: Theme.c.missingAddonsRow.border
 
     Column {
         id: rowBody
@@ -79,7 +79,7 @@ Rectangle {
             visible: row.installed
             glyph: Theme.icons.success
             iconSize: Theme.iconSizeMd
-            iconColor: Theme.primary
+            iconColor: Theme.c.missingAddonsRow.icon
         }
     }
 }

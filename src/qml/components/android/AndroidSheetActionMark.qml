@@ -5,6 +5,6 @@ import Drift
 Rectangle {
     width: 8
     height: 8
-    radius: 4
-    color: Theme.destructive
+    radius: Theme.c.androidSheetActionMark.radius
+    color: Theme.c.androidSheetActionMark.background
 }

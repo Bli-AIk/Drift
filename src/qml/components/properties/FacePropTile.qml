@@ -14,10 +14,10 @@ Column {
     Rectangle {
         width: parent.width
         height: width
-        radius: Theme.radiusSm
-        color: tileMouse.containsMouse ? Theme.popoverHover : Theme.panelAccent
-        border.width: propTile.selected ? Theme.borderWidthFocus : 0
-        border.color: Theme.primary
+        radius: Theme.c.facePropTile.radius
+        color: tileMouse.containsMouse ? Theme.c.facePropTile.backgroundHover : Theme.c.facePropTile.background
+        border.width: propTile.selected ? Theme.c.facePropTile.borderWidthFocus : 0
+        border.color: Theme.c.facePropTile.borderSelected
         clip: true
 
         Image {
@@ -40,7 +40,7 @@ Column {
             visible: !propTile.modelData.thumbnailPath || propImage.status === Image.Error
             glyph: Theme.icons.package
             iconSize: Theme.iconSizeLg
-            iconColor: Theme.mutedForeground
+            iconColor: Theme.c.facePropTile.icon
         }
 
         ThemedToolTip {
@@ -100,7 +100,7 @@ Column {
         text: propTile.modelData.name
         elide: Text.ElideRight
         horizontalAlignment: Text.AlignHCenter
-        color: propTile.selected ? Theme.primary : Theme.mutedForeground
+        color: propTile.selected ? Theme.c.facePropTile.accent : Theme.c.facePropTile.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

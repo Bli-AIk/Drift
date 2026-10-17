@@ -14,14 +14,14 @@ Rectangle {
     visible: edge.bars.isSelected
     width: Theme.spacingLg * 2
     height: Theme.spacingSm
-    radius: Theme.radiusXs
+    radius: Theme.c.maskOverlayBarEdge.radius
     x: (parent.width - width) / 2
     y: (edge.atTop ? parent.height : 0) - height / 2
     color: edgeArea.containsMouse || edgeArea.pressed
-           ? Theme.primaryForeground : Theme.primary
-    border.width: Theme.borderWidth
+           ? Theme.c.maskOverlayBarEdge.backgroundHover : Theme.c.maskOverlayBarEdge.background
+    border.width: Theme.c.maskOverlayBarEdge.borderWidth
     border.color: edgeArea.containsMouse || edgeArea.pressed
-                  ? Theme.primary : Theme.primaryForeground
+                  ? Theme.c.maskOverlayBarEdge.borderHover : Theme.c.maskOverlayBarEdge.border
 
     MouseArea {
         id: edgeArea

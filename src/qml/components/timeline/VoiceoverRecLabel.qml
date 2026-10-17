@@ -7,6 +7,6 @@ Text {
     text: paused ? qsTr("PAUSED") : qsTr("REC")
     font.bold: true
     font.pixelSize: 11
-    color: paused ? "#eab308" : Theme.destructive
+    color: paused ? Theme.c.voiceoverRecLabel.paused : Theme.c.voiceoverRecLabel.recording
     anchors.verticalCenter: parent.verticalCenter
 }

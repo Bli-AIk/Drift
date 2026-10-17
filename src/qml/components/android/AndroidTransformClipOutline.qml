@@ -13,10 +13,14 @@ Rectangle {
     anchors.fill: parent
     color: "transparent"
     border.width: outline.selected
-                  ? Theme.borderWidthFocus : Theme.borderWidth
-    border.color: outline.selected ? (outline.transformLayer ? Theme.clipTransform : Theme.primary)
-                  : outline.coveredBySelectedLayer ? Theme.clipTransform : Theme.guideStrong
-    radius: Theme.radiusXs
+                  ? Theme.c.androidTransformClipOutline.borderWidthSelected
+                  : Theme.c.androidTransformClipOutline.borderWidth
+    border.color: outline.selected
+                  ? (outline.transformLayer ? Theme.c.androidTransformClipOutline.borderTransform
+                                            : Theme.c.androidTransformClipOutline.borderSelected)
+                  : outline.coveredBySelectedLayer ? Theme.c.androidTransformClipOutline.borderTransform
+                                                   : Theme.c.androidTransformClipOutline.border
+    radius: Theme.c.androidTransformClipOutline.radius
 
     Behavior on border.width {
         NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }

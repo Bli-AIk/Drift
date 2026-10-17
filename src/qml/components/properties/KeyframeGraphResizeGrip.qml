@@ -10,8 +10,8 @@ Rectangle {
     anchors.bottom: parent.bottom
     height: 5
     z: 100
-    color: resizeHover.hovered || resizeDrag.active ? Theme.primary : "transparent"
-    opacity: 0.6
+    color: resizeHover.hovered || resizeDrag.active ? Theme.c.keyframeGraphResizeGrip.backgroundActive : "transparent"
+    opacity: Theme.c.keyframeGraphResizeGrip.opacity
 
     HoverHandler {
         id: resizeHover

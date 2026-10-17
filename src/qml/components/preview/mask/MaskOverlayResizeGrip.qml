@@ -15,12 +15,12 @@ Rectangle {
 
     width: hs
     height: hs
-    radius: Theme.radiusXs
+    radius: Theme.c.maskOverlayResizeGrip.radius
     color: gripArea.containsMouse || gripArea.pressed
-           ? Theme.primaryForeground : Theme.primary
-    border.width: Theme.borderWidth
+           ? Theme.c.maskOverlayResizeGrip.backgroundHover : Theme.c.maskOverlayResizeGrip.background
+    border.width: Theme.c.maskOverlayResizeGrip.borderWidth
     border.color: gripArea.containsMouse || gripArea.pressed
-                  ? Theme.primary : Theme.primaryForeground
+                  ? Theme.c.maskOverlayResizeGrip.borderHover : Theme.c.maskOverlayResizeGrip.border
 
     x: (modelData.dx === 0 ? grip.mask.width / 2
                            : (modelData.dx < 0 ? 0 : grip.mask.width)) - hs / 2

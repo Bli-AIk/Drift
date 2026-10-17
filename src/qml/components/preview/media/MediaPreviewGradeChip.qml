@@ -19,6 +19,6 @@ Rectangle {
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeSm
         font.weight: Font.Bold
-        color: "#1a1206"
+        color: Theme.c.mediaPreviewGradeChip.foreground
     }
 }

@@ -9,7 +9,7 @@ Rectangle {
 
     anchors.fill: parent
     color: "transparent"
-    border.width: Theme.borderWidth
-    border.color: band.selected ? Theme.primary : Theme.mutedForeground
-    opacity: band.selected ? 1.0 : 0.5
+    border.width: Theme.c.maskOverlayBarBand.borderWidth
+    border.color: band.selected ? Theme.c.maskOverlayBarBand.borderSelected : Theme.c.maskOverlayBarBand.border
+    opacity: band.selected ? 1.0 : Theme.c.maskOverlayBarBand.opacity
 }

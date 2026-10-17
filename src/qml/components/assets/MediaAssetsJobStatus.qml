@@ -21,7 +21,7 @@ Item {
         anchors.rightMargin: Theme.spacingMd
         anchors.top: parent.top
         text: root.label
-        color: Theme.mutedForeground
+        color: Theme.c.mediaAssetsJobStatus.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         elide: Text.ElideMiddle

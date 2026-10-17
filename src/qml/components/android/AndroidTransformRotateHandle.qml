@@ -16,9 +16,9 @@ Item {
     Rectangle {
         anchors.top: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
-        width: 1
+        width: Theme.c.androidTransformRotateHandle.stemWidth
         height: rotateGrip.height / 2 + Theme.spacingLg
-        color: Theme.primary
+        color: Theme.c.androidTransformRotateHandle.stem
     }
 
     Rectangle {
@@ -26,9 +26,11 @@ Item {
         width: overlay.gripSize + 6
         height: width
         radius: width / 2
-        color: rotateDrag.active ? Theme.primaryForeground : Theme.primary
-        border.width: 1
-        border.color: rotateDrag.active ? Theme.primary : Theme.onMedia
+        color: rotateDrag.active ? Theme.c.androidTransformRotateHandle.backgroundActive
+                               : Theme.c.androidTransformRotateHandle.background
+        border.width: Theme.c.androidTransformRotateHandle.borderWidth
+        border.color: rotateDrag.active ? Theme.c.androidTransformRotateHandle.borderActive
+                                        : Theme.c.androidTransformRotateHandle.border
     }
 
     DragHandler {

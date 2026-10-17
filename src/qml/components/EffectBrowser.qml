@@ -154,7 +154,7 @@ Column {
                          : root.activeCategory === root.favoritesId
                          ? qsTr("No favorites yet. Star presets to save them here.")
                          : qsTr("Nothing in this category."))
-                color: Theme.mutedForeground
+                color: Theme.c.effectBrowser.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
                 wrapMode: Text.WordWrap
@@ -251,7 +251,7 @@ Column {
                         .arg(deleteEffectDialog.effectLabel)
                   : qsTr("Delete “%1” from My Effects? You can import its .driftfx file again later.")
                         .arg(deleteEffectDialog.effectLabel)
-            color: Theme.panelForeground
+            color: Theme.c.effectBrowser.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
         }

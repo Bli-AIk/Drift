@@ -13,12 +13,12 @@ Rectangle {
     readonly property real hs: Theme.spacingLg
     width: hs
     height: hs
-    radius: Theme.radiusXs
+    radius: Theme.c.cropOverlayGrip.radius
     color: gripArea.containsMouse || gripArea.pressed
-           ? Theme.primaryForeground : Theme.primary
-    border.width: Theme.borderWidth
+           ? Theme.c.cropOverlayGrip.backgroundHover : Theme.c.cropOverlayGrip.background
+    border.width: Theme.c.cropOverlayGrip.borderWidth
     border.color: gripArea.containsMouse || gripArea.pressed
-                  ? Theme.primary : Theme.primaryForeground
+                  ? Theme.c.cropOverlayGrip.borderHover : Theme.c.cropOverlayGrip.border
 
     Behavior on color {
         ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }

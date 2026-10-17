@@ -23,8 +23,8 @@ Item {
         visible: parentFrame.quad.length === 4
         preferredRendererType: Shape.CurveRenderer
         ShapePath {
-            strokeColor: Theme.clipTransform
-            strokeWidth: Theme.borderWidthFocus
+            strokeColor: Theme.c.androidTransformParentFrame.stroke
+            strokeWidth: Theme.c.androidTransformParentFrame.strokeWidth
             strokeStyle: ShapePath.DashLine
             dashPattern: [4, 3]
             fillColor: "transparent"
@@ -44,13 +44,13 @@ Item {
         width: androidParentChipLabel.implicitWidth + Theme.spacingXl * 2
         height: 48
         radius: height / 2
-        color: parentChipTap.pressed ? Qt.lighter(Theme.clipTransform, 1.15) : Theme.clipTransform
+        color: parentChipTap.pressed ? Qt.lighter(Theme.c.androidTransformParentFrame.background, 1.15) : Theme.c.androidTransformParentFrame.background
 
         Text {
             id: androidParentChipLabel
             anchors.centerIn: parent
             text: qsTr("Select %1").arg(overlay.parentFrameBox ? (overlay.parentFrameBox.name || qsTr("Transform")) : "")
-            color: Theme.onMedia
+            color: Theme.c.androidTransformParentFrame.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
         }

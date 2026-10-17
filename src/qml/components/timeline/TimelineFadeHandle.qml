@@ -18,9 +18,9 @@ Rectangle {
     z: 40
     visible: owner.timelineFadeHandles && owner.selected
              && owner.width > owner.fadeHandleMinWidth
-    color: Theme.primary
-    border.color: Theme.onMedia
-    border.width: 2
+    color: Theme.c.timelineFadeHandle.background
+    border.color: Theme.c.timelineFadeHandle.border
+    border.width: Theme.c.timelineFadeHandle.borderWidth
 
     Binding {
         target: handle

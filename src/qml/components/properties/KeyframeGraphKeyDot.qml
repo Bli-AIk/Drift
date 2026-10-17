@@ -9,12 +9,12 @@ Rectangle {
     width: 10
     height: 10
     rotation: 45
-    radius: 1
+    radius: Theme.c.keyframeGraphKeyDot.radius
     color: modelData.color
-    border.width: 1
-    border.color: "#ffffff"
+    border.width: Theme.c.keyframeGraphKeyDot.borderWidth
+    border.color: Theme.c.keyframeGraphKeyDot.border
     opacity: (host.curveEditing && !host.isFocused(modelData.seriesIndex))
-             ? 0.4 : 1.0
+             ? Theme.c.keyframeGraphKeyDot.opacityUnfocused : 1.0
     readonly property bool isLinkedPartnerKey: EditorState.positionLinked
         && ((host.dragProp === "x" && modelData.prop === "y") || (host.dragProp === "y" && modelData.prop === "x"))
         && host.dragIndex >= 0 && host.focusedIndex >= 0 && host.focusedIndex < host.series.length

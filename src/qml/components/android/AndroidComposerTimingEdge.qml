@@ -17,7 +17,7 @@ Column {
 
     Text {
         text: group.modelData.label + "  " + group.readout
-        color: Theme.mutedForeground
+        color: Theme.c.androidComposerTimingEdge.foregroundMuted
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeXs
     }

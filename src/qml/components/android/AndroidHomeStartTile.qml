@@ -28,12 +28,14 @@ AbstractButton {
     }
 
     background: Rectangle {
-        radius: Theme.radiusMd
+        radius: Theme.c.androidHomeStartTile.radius
         color: tile.modelData.primary
-               ? (tile.down ? Qt.darker(Theme.primary, 1.15) : Theme.primary)
-               : (tile.down ? Theme.panelMuted : Theme.panelBackground)
-        border.width: tile.modelData.primary ? 0 : Theme.borderWidth
-        border.color: Theme.panelBorder
+               ? (tile.down ? Qt.darker(Theme.c.androidHomeStartTile.primaryBackground, 1.15)
+                            : Theme.c.androidHomeStartTile.primaryBackground)
+               : (tile.down ? Theme.c.androidHomeStartTile.backgroundPressed
+                            : Theme.c.androidHomeStartTile.background)
+        border.width: tile.modelData.primary ? 0 : Theme.c.androidHomeStartTile.borderWidth
+        border.color: Theme.c.androidHomeStartTile.border
     }
 
     contentItem: Row {
@@ -46,7 +48,8 @@ AbstractButton {
             glyph: tile.modelData.icon
             iconSize: Theme.iconSizeLg
             iconColor: tile.modelData.primary
-                       ? Theme.primaryForeground : Theme.panelForeground
+                       ? Theme.c.androidHomeStartTile.primaryForeground
+                       : Theme.c.androidHomeStartTile.foreground
         }
 
         Column {
@@ -56,7 +59,8 @@ AbstractButton {
             Text {
                 text: tile.modelData.label
                 color: tile.modelData.primary
-                       ? Theme.primaryForeground : Theme.panelForeground
+                       ? Theme.c.androidHomeStartTile.primaryForeground
+                       : Theme.c.androidHomeStartTile.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeBase
                 font.weight: Font.Medium
@@ -65,7 +69,8 @@ AbstractButton {
             Text {
                 text: tile.modelData.detail
                 color: tile.modelData.primary
-                       ? Theme.primaryForeground : Theme.mutedForeground
+                       ? Theme.c.androidHomeStartTile.primaryForeground
+                       : Theme.c.androidHomeStartTile.foregroundMuted
                 opacity: tile.modelData.primary ? 0.85 : 1
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs

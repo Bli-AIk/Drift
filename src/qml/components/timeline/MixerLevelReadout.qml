@@ -10,15 +10,15 @@ Rectangle {
     anchors.horizontalCenter: parent.horizontalCenter
     width: Math.min(parent.width - Theme.spacingLg, 64)
     height: 24
-    radius: Theme.radiusXs
-    color: readoutMouse.containsMouse ? Theme.popoverHover : Theme.panelAccent
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
+    radius: Theme.c.mixerLevelReadout.radius
+    color: readoutMouse.containsMouse ? Theme.c.mixerLevelReadout.backgroundHover : Theme.c.mixerLevelReadout.background
+    border.width: Theme.c.mixerLevelReadout.borderWidth
+    border.color: Theme.c.mixerLevelReadout.border
 
     Text {
         anchors.centerIn: parent
         text: readout.channel.mixer.formatDb(readout.channel.curDb)
-        color: readout.channel.armed || readout.channel.curDb > 0.05 ? Theme.destructive : Theme.panelForeground
+        color: readout.channel.armed || readout.channel.curDb > 0.05 ? Theme.c.mixerLevelReadout.foregroundHot : Theme.c.mixerLevelReadout.foreground
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeXs
     }

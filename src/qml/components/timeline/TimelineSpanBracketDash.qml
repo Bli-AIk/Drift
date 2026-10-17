@@ -5,6 +5,6 @@ import Drift
 Rectangle {
     width: 2
     height: 4
-    radius: 1
-    color: Theme.clipTransform
+    radius: Theme.c.timelineSpanBracketDash.radius
+    color: Theme.c.timelineSpanBracketDash.foreground
 }

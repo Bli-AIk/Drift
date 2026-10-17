@@ -12,7 +12,7 @@ Column {
         anchors.horizontalCenter: parent.horizontalCenter
         glyph: Theme.icons.music
         iconSize: Theme.iconSizeXl * 2
-        iconColor: Theme.mutedForeground
+        iconColor: Theme.c.mediaPreviewAudioPlaceholder.icon
     }
     ThemedLabel {
         anchors.horizontalCenter: parent.horizontalCenter

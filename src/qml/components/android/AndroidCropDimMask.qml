@@ -12,7 +12,7 @@ Item {
     property real frameH: 0
 
     Rectangle {
-        color: Theme.overlayColor
+        color: Theme.c.androidCropDimMask.background
         opacity: 0.65
         x: 0
         y: 0
@@ -20,7 +20,7 @@ Item {
         height: mask.height
     }
     Rectangle {
-        color: Theme.overlayColor
+        color: Theme.c.androidCropDimMask.background
         opacity: 0.65
         x: mask.frameX + mask.frameW
         y: 0
@@ -28,7 +28,7 @@ Item {
         height: mask.height
     }
     Rectangle {
-        color: Theme.overlayColor
+        color: Theme.c.androidCropDimMask.background
         opacity: 0.65
         x: mask.frameX
         y: 0
@@ -36,7 +36,7 @@ Item {
         height: Math.max(0, mask.frameY)
     }
     Rectangle {
-        color: Theme.overlayColor
+        color: Theme.c.androidCropDimMask.background
         opacity: 0.65
         x: mask.frameX
         y: mask.frameY + mask.frameH

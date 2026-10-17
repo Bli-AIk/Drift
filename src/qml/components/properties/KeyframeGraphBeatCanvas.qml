@@ -5,6 +5,16 @@ Canvas {
     property var host
     property real viewportWidth: 0
     id: root
+    readonly property color beatBarColor: Theme.c.keyframeGraphBeatCanvas.beatBar
+    readonly property color beatGridColor: Theme.c.keyframeGraphBeatCanvas.beatGrid
+    readonly property color beatOnsetColor: Theme.c.keyframeGraphBeatCanvas.beatOnset
+    readonly property real beatBarWidth: Theme.c.keyframeGraphBeatCanvas.beatBarWidth
+    readonly property real beatGridWidth: Theme.c.keyframeGraphBeatCanvas.beatGridWidth
+    onBeatBarColorChanged: requestPaint()
+    onBeatGridColorChanged: requestPaint()
+    onBeatOnsetColorChanged: requestPaint()
+    onBeatBarWidthChanged: requestPaint()
+    onBeatGridWidthChanged: requestPaint()
     // Viewport-sized, not content-sized — see curveCanvas.
     x: host.paintOriginX
     width: viewportWidth + 2 * host.paintChunk
@@ -32,9 +42,9 @@ Canvas {
                 const px = localX(a.beats[i])
                 if (px < -2 || px > width + 2)
                     continue
-                ctx.fillStyle = String(isBar ? Theme.beatBarColor
-                                             : Theme.beatGridColor)
-                ctx.fillRect(px, 0, isBar ? 2 : 1, height)
+                ctx.fillStyle = String(isBar ? root.beatBarColor
+                                             : root.beatGridColor)
+                ctx.fillRect(px, 0, isBar ? root.beatBarWidth : root.beatGridWidth, height)
             }
         }
 
@@ -43,7 +53,7 @@ Canvas {
 
         // With the grid up, only transients that miss it — the rest would
         // just double-draw lines already there. Height tracks strength.
-        ctx.fillStyle = String(Theme.beatOnsetColor)
+        ctx.fillStyle = String(root.beatOnsetColor)
         const onsets = a.onsets || []
         for (let j = 0; j < onsets.length; ++j) {
             if (host.hasGrid && host.nearAnyBeat(onsets[j].seconds))

@@ -8,7 +8,7 @@ IconGlyph {
 
     glyph: Theme.icons.warning
     iconSize: Theme.iconSizeSm
-    iconColor: Theme.warning
+    iconColor: Theme.c.previewOptionsDecodeWarning.icon
     visible: glyph.mode !== undefined && glyph.mode.warn === true
 
     HoverHandler { id: decodeWarnHover }

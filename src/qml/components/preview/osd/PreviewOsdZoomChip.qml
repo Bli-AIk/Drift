@@ -14,7 +14,7 @@ Item {
         id: zoomText
         anchors.centerIn: parent
         text: chip.viewport ? Math.round(chip.viewport.userZoom * 100) + "%" : ""
-        color: zoomMouse.containsMouse ? Theme.panelForeground : Theme.mutedForeground
+        color: zoomMouse.containsMouse ? Theme.c.previewOsdZoomChip.foregroundHover : Theme.c.previewOsdZoomChip.foreground
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeXs
     }

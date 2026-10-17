@@ -5,5 +5,5 @@ import Drift
 Rectangle {
     width: 2
     height: 4
-    color: Theme.destructive
+    color: Theme.c.timelineCutDash.foreground
 }

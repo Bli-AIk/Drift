@@ -17,7 +17,7 @@ AbstractButton {
     property string glyph: ""
     // A toggle shows its state as a switch and does not dismiss its sheet; an action does.
     property bool toggle: false
-    property color tint: Theme.panelForeground
+    property color tint: Theme.c.sheetActionRow.foreground
     // Landscape cutout / gesture-bar inset, passed down from the hosting sheet.
     property real sideInset: 0
     property real sideInsetRight: 0
@@ -41,7 +41,7 @@ AbstractButton {
     }
 
     background: Rectangle {
-        color: root.down ? Theme.panelAccent : "transparent"
+        color: root.down ? Theme.c.sheetActionRow.backgroundPressed : "transparent"
 
         Behavior on color {
             ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -83,7 +83,7 @@ AbstractButton {
                 width: parent.width
                 visible: root.detail.length > 0
                 text: root.detail
-                color: Theme.mutedForeground
+                color: Theme.c.sheetActionRow.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
                 elide: Text.ElideRight

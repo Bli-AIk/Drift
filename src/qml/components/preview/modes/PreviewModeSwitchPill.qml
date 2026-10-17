@@ -14,9 +14,9 @@ Rectangle {
     width: pill.segmentWidth
     height: parent.height - pill.inset * 2
     radius: height / 2
-    color: Theme.panelSecondaryBg
-    border.width: Theme.borderWidth
-    border.color: Theme.panelSecondaryBorder
+    color: Theme.c.previewModeSwitchPill.background
+    border.width: Theme.c.previewModeSwitchPill.borderWidth
+    border.color: Theme.c.previewModeSwitchPill.border
 
     Behavior on x {
         NumberAnimation { duration: Theme.durationBase; easing.type: Theme.easing }

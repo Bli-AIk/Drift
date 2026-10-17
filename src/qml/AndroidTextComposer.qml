@@ -186,14 +186,14 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.panelBackground
+        color: Theme.c.androidTextComposer.background
     }
 
     Rectangle {
         anchors.top: parent.top
         width: parent.width
-        height: Theme.borderWidth
-        color: Theme.panelBorder
+        height: Theme.c.androidTextComposer.borderWidth
+        color: Theme.c.androidTextComposer.border
     }
 
     // Swallows touches that miss a control so they do not fall through to the timeline below.
@@ -239,7 +239,7 @@ Item {
                 anchors.rightMargin: Theme.spacingSm
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr("Caption %1 / %2").arg(root.cueIndex + 1).arg(root.cueCount)
-                color: Theme.mutedForeground
+                color: Theme.c.androidTextComposer.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
                 elide: Text.ElideRight

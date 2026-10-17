@@ -13,14 +13,14 @@ Item {
     visible: isSeparator
              ? host.separatorNeeded(host.layout.toolbar, index, host.actionShownOnToolbar)
              : host.actionShownOnToolbar(modelData)
-    width: isSeparator ? Theme.borderWidth : actionButton.width
+    width: isSeparator ? Theme.c.timelineToolbarActionSlot.borderWidth : actionButton.width
     height: isSeparator ? Theme.spacing3xl : actionButton.height
     anchors.verticalCenter: parent ? parent.verticalCenter : undefined
 
     Rectangle {
         visible: slot.isSeparator
         anchors.fill: parent
-        color: Theme.panelBorder
+        color: Theme.c.timelineToolbarActionSlot.foreground
     }
 
     TimelineToolbarToolButton {

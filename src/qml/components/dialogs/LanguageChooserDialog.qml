@@ -84,10 +84,10 @@ ThemedDialog {
             width: parent.width
             height: Math.min(languageList.contentHeight + 2,
                              Math.min(280, root.availableContentHeight - 48))
-            radius: Theme.radiusSm
-            color: Theme.appBackground
-            border.width: Theme.borderWidth
-            border.color: Theme.panelBorder
+            radius: Theme.c.languageChooserDialog.radius
+            color: Theme.c.languageChooserDialog.background
+            border.width: Theme.c.languageChooserDialog.borderWidth
+            border.color: Theme.c.languageChooserDialog.border
             clip: true
 
             ListView {
@@ -112,9 +112,9 @@ ThemedDialog {
                     background: Rectangle {
                         color: {
                             if (row.highlighted)
-                                return Theme.panelSecondaryBg
+                                return Theme.c.languageChooserDialog.backgroundSelected
                             if (row.hovered)
-                                return Theme.popoverHover
+                                return Theme.c.languageChooserDialog.backgroundHover
                             return "transparent"
                         }
                     }
@@ -132,8 +132,8 @@ ThemedDialog {
                             text: row.modelData.label
                             elide: Text.ElideRight
                             color: row.highlighted
-                                   ? Theme.panelSecondaryForeground
-                                   : Theme.panelForeground
+                                   ? Theme.c.languageChooserDialog.foregroundSelected
+                                   : Theme.c.languageChooserDialog.foreground
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSizeSm
                             font.weight: row.highlighted ? Font.Medium : Font.Normal
@@ -145,7 +145,7 @@ ThemedDialog {
                             anchors.verticalCenter: parent.verticalCenter
                             glyph: Theme.icons.check
                             iconSize: 16
-                            iconColor: Theme.panelSecondaryForeground
+                            iconColor: Theme.c.languageChooserDialog.icon
                             visible: row.highlighted
                         }
                     }

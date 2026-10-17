@@ -17,10 +17,10 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: width / 2
+        radius: Theme.c.editorHeaderExtrasWave.radius
         color: "transparent"
-        border.width: 2
-        border.color: Theme.destructive
+        border.width: Theme.c.editorHeaderExtrasWave.borderWidth
+        border.color: Theme.c.editorHeaderExtrasWave.border
     }
 
     SequentialAnimation {

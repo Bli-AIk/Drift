@@ -8,9 +8,9 @@ Rectangle {
              && column.draggingTrackFrom !== column.draggingTrackTo
     width: parent.width - 8
     height: 2
-    radius: 1
+    radius: Theme.c.trackHeaderInsertLine.radius
     x: 4
-    color: Theme.primary
+    color: Theme.c.trackHeaderInsertLine.foreground
     z: 10
     // Drawn at the insertion boundary itself, in the same frame as the
     // header rows — without -contentY it drifts off the boundary as soon as

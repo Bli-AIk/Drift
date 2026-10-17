@@ -13,16 +13,16 @@ Rectangle {
 
     width: label.width + padH
     height: label.height + padV
-    radius: Theme.radiusSm
-    color: Theme.scrimStrong
-    border.width: Theme.borderWidth
-    border.color: Theme.guideWeak
+    radius: Theme.c.androidOnMediaReadout.radius
+    color: Theme.c.androidOnMediaReadout.background
+    border.width: Theme.c.androidOnMediaReadout.borderWidth
+    border.color: Theme.c.androidOnMediaReadout.border
 
     Text {
         id: label
         anchors.centerIn: parent
         text: badge.text
-        color: Theme.onMedia
+        color: Theme.c.androidOnMediaReadout.foreground
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeXs
     }

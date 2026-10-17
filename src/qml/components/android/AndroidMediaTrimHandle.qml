@@ -17,8 +17,8 @@ Rectangle {
     width: 22
     height: parent ? parent.height : 0
     x: handle.isIn ? handle.inX : handle.outX - width
-    color: Theme.primary
-    radius: Theme.radiusXs
+    color: Theme.c.androidMediaTrimHandle.background
+    radius: Theme.c.androidMediaTrimHandle.radius
     z: 3
 
     Column {
@@ -29,8 +29,8 @@ Rectangle {
             Rectangle {
                 width: 10
                 height: 2
-                radius: 1
-                color: Theme.primaryForeground
+                radius: Theme.c.androidMediaTrimHandle.gripRadius
+                color: Theme.c.androidMediaTrimHandle.grip
                 opacity: 0.9
             }
         }

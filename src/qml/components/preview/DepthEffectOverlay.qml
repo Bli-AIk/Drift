@@ -67,7 +67,7 @@ Item {
                     out.push({
                         kind: "light", effect: effect.index, light: n,
                         x: Number(p[k + "x"]), y: Number(p[k + "y"]), z: Number(p[k + "z"]),
-                        color: p[k + "color"] || "#ffffff",
+                        color: p[k + "color"] || Theme.c.depthEffectOverlay.light,
                         spot: Number(p[k + "cone"]) < 179.5,
                         aimX: Number(p[k + "aimX"]), aimY: Number(p[k + "aimY"])
                     })

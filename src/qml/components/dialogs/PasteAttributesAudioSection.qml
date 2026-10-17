@@ -10,7 +10,7 @@ Column {
     ThemedLabel {
         text: qsTr("Audio Attributes")
         size: "xs"
-        color: Theme.primary
+        color: Theme.c.pasteAttributesAudioSection.foreground
         font.weight: Font.DemiBold
     }
 

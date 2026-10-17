@@ -14,7 +14,7 @@ Text {
     text: note.selected && note.selected.builtIn
           ? qsTr("Built-in sets can't be changed. Duplicate one to make an editable copy.")
           : qsTr("This set came with the project. Save it to your guide sets to edit it.")
-    color: Theme.mutedForeground
+    color: Theme.c.guidesPopoverReadOnlyNote.foreground
     font.family: Theme.fontFamily
     font.pixelSize: Theme.fontSizeXs
 }

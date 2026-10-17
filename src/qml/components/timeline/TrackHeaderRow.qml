@@ -67,6 +67,19 @@ Item {
     y: rowTop - column.contentY
     opacity: column.draggingTrackFrom === index ? 0.45 : 1.0
 
+    ThemeSlot {
+        slot: "TrackHeaderRowBackground"
+        control: trackLabelRow
+        anchors.fill: parent
+        z: -1
+        fallback: Component {
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.c.trackHeaderRow.background
+            }
+        }
+    }
+
     // Reorder drag. Covers the whole header rather than just the grip:
     // reaching for the header body is the instinctive gesture, and the
     // grip alone was a ~22px target that was easy to miss entirely.

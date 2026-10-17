@@ -11,8 +11,8 @@ Rectangle {
 
     width: parent ? parent.width : implicitWidth
     height: groupLabel.implicitHeight + 8
-    radius: Theme.radiusSm
-    color: groupMouse.containsMouse ? Theme.panelAccent : "transparent"
+    radius: Theme.c.effectsParamGroupHeader.radius
+    color: groupMouse.containsMouse ? Theme.c.effectsParamGroupHeader.backgroundHover : "transparent"
 
     Text {
         id: groupLabel
@@ -20,7 +20,7 @@ Rectangle {
         anchors.leftMargin: 4
         anchors.verticalCenter: parent.verticalCenter
         text: (root.groupOpen ? "▾  " : "▸  ") + root.groupTitle
-        color: Theme.panelForeground
+        color: Theme.c.effectsParamGroupHeader.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         font.weight: Font.Medium

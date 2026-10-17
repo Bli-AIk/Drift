@@ -8,6 +8,7 @@ Canvas {
     anchors.topMargin: parent.height * 0.4
     width: parent.width
     height: parent.height * 0.6
+    readonly property color fill: Theme.c.timelinePlayheadTip.background
     onPaint: {
         const ctx = getContext("2d")
         ctx.reset()
@@ -16,9 +17,10 @@ Canvas {
         ctx.lineTo(width, 0)
         ctx.lineTo(width * 0.5, height)
         ctx.closePath()
-        ctx.fillStyle = Theme.primary
+        ctx.fillStyle = fill
         ctx.fill()
     }
+    onFillChanged: requestPaint()
     onWidthChanged: requestPaint()
     onHeightChanged: requestPaint()
     Component.onCompleted: requestPaint()

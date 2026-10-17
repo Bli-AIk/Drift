@@ -6,14 +6,24 @@ import Drift
 // mobile equivalent is AndroidProjectsPage; this mirrors its structure (new project,
 // open project, recent projects) with desktop-sized controls and ProjectRow's
 // styling (RecentProjectsPopup) for the recents list.
-Rectangle {
+Item {
     id: root
 
     signal newProjectRequested()
     signal openProjectRequested()
     signal openRecentRequested(string path)
 
-    color: Theme.appBackground
+    ThemeSlot {
+        anchors.fill: parent
+        slot: "StartScreenBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.c.startScreen.background
+            }
+        }
+    }
 
     readonly property var items: EditorState.projectFile.recentProjects
 

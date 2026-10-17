@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
@@ -38,39 +39,48 @@ AbstractButton {
     Accessible.checked: root.checked
     Accessible.onToggleAction: root.toggle()
 
-    readonly property color _fg: checked ? Theme.panelSecondaryForeground : Theme.panelForeground
+    readonly property color _fg: checked ? Theme.c.themedToggleButton.foregroundChecked
+                                        : Theme.c.themedToggleButton.foreground
 
-    background: Rectangle {
-        radius: Theme.radiusSm
-        color: {
-            if (!root.enabled)
-                return Theme.panelAccent
-            if (root.checked)
-                return root.down ? Qt.darker(Theme.panelSecondaryBg, 1.2) : Theme.panelSecondaryBg
-            if (root.down)
-                return Theme.panelMuted
-            if (root.hovered)
-                return Theme.popoverHover
-            return Theme.panelAccent
-        }
-        border.width: Theme.borderWidth
-        border.color: root.checked ? Theme.panelSecondaryBorder : Theme.panelBorder
-        opacity: root.enabled ? 1 : 0.5
+    background: ThemeSlot {
+        slot: "ThemedToggleButtonBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                radius: Theme.c.themedToggleButton.radius
+                color: {
+                    if (!root.enabled)
+                        return Theme.c.themedToggleButton.backgroundDisabled
+                    if (root.checked)
+                        return root.down ? Qt.darker(Theme.c.themedToggleButton.backgroundChecked, 1.2)
+                                         : Theme.c.themedToggleButton.backgroundChecked
+                    if (root.down)
+                        return Theme.c.themedToggleButton.backgroundPressed
+                    if (root.hovered)
+                        return Theme.c.themedToggleButton.backgroundHover
+                    return Theme.c.themedToggleButton.background
+                }
+                border.width: Theme.c.themedToggleButton.borderWidth
+                border.color: root.checked ? Theme.c.themedToggleButton.borderChecked
+                                           : Theme.c.themedToggleButton.border
+                opacity: root.enabled ? 1 : 0.5
 
-        Behavior on color {
-            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
-        Behavior on border.color {
-            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
+                Behavior on color {
+                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
+                Behavior on border.color {
+                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
 
-        Rectangle {
-            anchors.fill: parent
-            radius: parent.radius
-            color: "transparent"
-            border.width: Theme.borderWidthFocus
-            border.color: Theme.focusRing
-            visible: root.visualFocus
+                Rectangle {
+                    anchors.fill: parent
+                    radius: parent.radius
+                    color: "transparent"
+                    border.width: Theme.c.themedToggleButton.focusBorderWidth
+                    border.color: Theme.c.themedToggleButton.focusBorder
+                    visible: root.visualFocus
+                }
+            }
         }
     }
 

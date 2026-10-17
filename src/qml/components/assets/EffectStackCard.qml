@@ -14,7 +14,7 @@ Column {
     width: cardSize
     spacing: Theme.spacingSm
 
-    opacity: cardDrag.active ? 0.85 : 1
+    opacity: cardDrag.active ? Theme.c.effectStackCard.dragOpacity : 1
     scale: cardDrag.active ? 1.04 : cardDrag.pressed ? 0.97 : (cardDrag.hovered ? 1.02 : 1.0)
     Behavior on scale {
         NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -23,10 +23,10 @@ Column {
     Rectangle {
         width: parent.width
         height: Math.round(width * 0.55)
-        radius: Theme.radiusSm
-        color: cardDrag.hovered ? Theme.panelAccent : Theme.panelBackground
-        border.width: Theme.borderWidth
-        border.color: Theme.panelBorder
+        radius: Theme.c.effectStackCard.radius
+        color: cardDrag.hovered ? Theme.c.effectStackCard.backgroundHover : Theme.c.effectStackCard.background
+        border.width: Theme.c.effectStackCard.borderWidth
+        border.color: Theme.c.effectStackCard.border
 
         Behavior on color {
             ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -57,7 +57,7 @@ Column {
                     width: parent.width
                     text: root.modelData.labels[index]
                     elide: Text.ElideRight
-                    color: Theme.mutedForeground
+                    color: Theme.c.effectStackCard.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }
@@ -68,7 +68,7 @@ Column {
                 visible: (root.modelData.labels || []).length > 3
                 text: qsTr("+%1 more").arg(
                           (root.modelData.labels || []).length - 3)
-                color: Theme.mutedForeground
+                color: Theme.c.effectStackCard.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -114,7 +114,7 @@ Column {
         text: root.modelData.label
         elide: Text.ElideRight
         horizontalAlignment: Text.AlignHCenter
-        color: cardDrag.hovered ? Theme.panelForeground : Theme.mutedForeground
+        color: cardDrag.hovered ? Theme.c.effectStackCard.foregroundHover : Theme.c.effectStackCard.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
 

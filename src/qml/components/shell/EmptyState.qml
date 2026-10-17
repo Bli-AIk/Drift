@@ -41,14 +41,14 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             width: 48
             height: 48
-            radius: Theme.radiusMd
-            color: Theme.panelAccent
+            radius: Theme.c.emptyState.radius
+            color: Theme.c.emptyState.background
 
             IconGlyph {
                 anchors.centerIn: parent
                 glyph: root.glyph
                 iconSize: Theme.iconSizeXl
-                iconColor: Theme.mutedForeground
+                iconColor: Theme.c.emptyState.icon
                 spinning: root.glyphSpinning
             }
         }
@@ -57,7 +57,7 @@ Item {
             visible: root.title.length > 0
             width: parent.width
             text: root.title
-            color: Theme.panelForeground
+            color: Theme.c.emptyState.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.Medium
@@ -69,7 +69,7 @@ Item {
             visible: root.hint.length > 0
             width: parent.width
             text: root.hint
-            color: Theme.mutedForeground
+            color: Theme.c.emptyState.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             horizontalAlignment: Text.AlignHCenter

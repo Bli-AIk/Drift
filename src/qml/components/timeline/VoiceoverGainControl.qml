@@ -16,7 +16,7 @@ Item {
         IconGlyph {
             glyph: Theme.icons.volumeHigh
             iconSize: 13
-            iconColor: Theme.mutedForeground
+            iconColor: Theme.c.voiceoverGainControl.icon
             anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -38,7 +38,7 @@ Item {
             text: Math.round(EditorState.audioRecordGain * 100) + "%"
             font.family: Theme.monoFontFamily
             font.pixelSize: 10
-            color: Theme.mutedForeground
+            color: Theme.c.voiceoverGainControl.foregroundMuted
             width: 32
             anchors.verticalCenter: parent.verticalCenter
         }

@@ -24,21 +24,21 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             width: 48
             height: 48
-            radius: Theme.radiusMd
-            color: Theme.panelAccent
+            radius: Theme.c.mediaAssetsEmptyState.iconRadius
+            color: Theme.c.mediaAssetsEmptyState.iconBackground
 
             IconGlyph {
                 anchors.centerIn: parent
                 glyph: Theme.icons.film
                 iconSize: Theme.iconSizeXl
-                iconColor: Theme.mutedForeground
+                iconColor: Theme.c.mediaAssetsEmptyState.icon
             }
         }
 
         Text {
             width: parent.width
             text: qsTr("No media yet")
-            color: Theme.panelForeground
+            color: Theme.c.mediaAssetsEmptyState.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
             font.weight: Font.Medium
@@ -51,7 +51,7 @@ Item {
             // The formats table below now carries the kind list, so the hint only has to
             // say how media gets in and what to do with it once it is here.
             text: qsTr("Import files or drop them here, then drag them onto the timeline. Right-click a clip to preview and trim it first.")
-            color: Theme.mutedForeground
+            color: Theme.c.mediaAssetsEmptyState.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             horizontalAlignment: Text.AlignHCenter
@@ -80,10 +80,10 @@ Item {
         Rectangle {
             width: parent.width
             height: formatColumn.height + Theme.spacingXl * 2
-            radius: Theme.radiusMd
+            radius: Theme.c.mediaAssetsEmptyState.formatsRadius
             color: "transparent"
-            border.width: Theme.borderWidth
-            border.color: Theme.panelBorder
+            border.width: Theme.c.mediaAssetsEmptyState.formatsBorderWidth
+            border.color: Theme.c.mediaAssetsEmptyState.formatsBorder
 
             Column {
                 id: formatColumn
@@ -94,7 +94,7 @@ Item {
                 Text {
                     width: parent.width
                     text: qsTr("Supported formats")
-                    color: Theme.mutedForeground
+                    color: Theme.c.mediaAssetsEmptyState.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeTiny
                     font.weight: Font.Medium

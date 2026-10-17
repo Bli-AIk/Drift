@@ -12,7 +12,7 @@ Item {
             width: 1
             height: parent.height
             x: parent.width * (index + 1) / 3
-            color: Theme.guideWeak
+            color: Theme.c.cropOverlayThirdGuides.background
         }
     }
     Repeater {
@@ -22,7 +22,7 @@ Item {
             height: 1
             width: parent.width
             y: parent.height * (index + 1) / 3
-            color: Theme.guideWeak
+            color: Theme.c.cropOverlayThirdGuides.background
         }
     }
 }

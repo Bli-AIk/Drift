@@ -16,7 +16,7 @@ Rectangle {
     radius: width / 2
     x: pivot.shown ? pivot.originX - width / 2 : 0
     y: pivot.shown ? pivot.originY - height / 2 : 0
-    color: Theme.gizmoUniform
-    border.width: 1
-    border.color: Theme.scrimStrong
+    color: Theme.c.transformGizmoPivot.background
+    border.width: Theme.c.transformGizmoPivot.borderWidth
+    border.color: Theme.c.transformGizmoPivot.border
 }

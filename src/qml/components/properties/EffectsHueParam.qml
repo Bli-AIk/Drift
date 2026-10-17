@@ -26,7 +26,7 @@ Row {
         width: parent.width - 148
         elide: Text.ElideRight
         text: qsTr("Pick %1").arg(row.paramData.label)
-        color: Theme.mutedForeground
+        color: Theme.c.effectsHueParam.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         anchors.verticalCenter: parent.verticalCenter

@@ -15,16 +15,16 @@ Rectangle {
     radius: width / 2
     x: knob.source.hx * knob.frame.width - width / 2
     y: knob.source.hy * knob.frame.height - height / 2
-    color: knob.source.values.color || "#ffffff"
-    border.width: 2
+    color: knob.source.values.color || Theme.c.depthEffectLightKnob.background
+    border.width: Theme.c.depthEffectLightKnob.borderWidth
     border.color: lightArea.containsMouse || lightArea.pressed
-                  ? Theme.primary : Theme.primaryForeground
+                  ? Theme.c.depthEffectLightKnob.borderHover : Theme.c.depthEffectLightKnob.border
 
     Text {
         anchors.centerIn: parent
         text: knob.source.modelData.light || ""
         // Dark on the light's own colour: every default is a pale tint.
-        color: "#1a1a1a"
+        color: Theme.c.depthEffectLightKnob.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         font.weight: Font.Medium

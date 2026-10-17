@@ -21,8 +21,8 @@ Item {
         anchors.bottom: parent.bottom
         width: 1
         height: 6
-        color: Theme.mutedForeground
-        opacity: 0.35
+        color: Theme.c.mediaPreviewRulerTick.foreground
+        opacity: Theme.c.mediaPreviewRulerTick.opacity
     }
     Text {
         anchors.bottom: parent.bottom
@@ -32,6 +32,6 @@ Item {
         text: tick.label
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeTick
-        color: Theme.mutedForeground
+        color: Theme.c.mediaPreviewRulerTick.foreground
     }
 }

@@ -78,14 +78,14 @@ Column {
         width: parent.width
         wrapMode: Text.WordWrap
         text: qsTr("Moves, scales, turns and fades every track under it as one. Each clip keeps its own transform inside the group.")
-        color: Theme.mutedForeground
+        color: Theme.c.transformLayerCard.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }
 
     Text {
         text: qsTr("Covers")
-        color: Theme.mutedForeground
+        color: Theme.c.transformLayerCard.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         font.weight: Font.Medium
@@ -108,7 +108,7 @@ Column {
 
     Text {
         text: qsTr("At the playhead")
-        color: Theme.mutedForeground
+        color: Theme.c.transformLayerCard.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         font.weight: Font.Medium
@@ -119,7 +119,7 @@ Column {
         width: parent.width
         wrapMode: Text.WordWrap
         text: qsTr("No covered clip plays here.")
-        color: Theme.mutedForeground
+        color: Theme.c.transformLayerCard.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
     }

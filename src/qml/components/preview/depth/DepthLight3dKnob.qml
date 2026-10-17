@@ -10,19 +10,19 @@ Rectangle {
 
     width: 18
     height: 18
-    radius: 9
+    radius: Theme.c.depthLight3dKnob.radius
     x: knob.source.hx - width / 2
     y: knob.source.hy - height / 2
-    color: knob.source.values.color || "#ffffff"
-    border.width: 2
+    color: knob.source.values.color || Theme.c.depthLight3dKnob.background
+    border.width: Theme.c.depthLight3dKnob.borderWidth
     border.color: lightArea.containsMouse || lightArea.pressed
-                  ? Theme.primary : Theme.primaryForeground
+                  ? Theme.c.depthLight3dKnob.borderHover : Theme.c.depthLight3dKnob.border
 
     Text {
         anchors.centerIn: parent
         text: knob.source.modelData.light || ""
         // Dark on the light's own colour: every default is a pale tint.
-        color: "#1a1a1a"
+        color: Theme.c.depthLight3dKnob.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         font.weight: Font.Medium

@@ -85,7 +85,7 @@ Column {
                 spacing: 4
                 Text {
                     text: qsTr("Blend")
-                    color: Theme.mutedForeground
+                    color: Theme.c.shadingLayerRow.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -128,7 +128,7 @@ Column {
                 spacing: 4
                 Text {
                     text: qsTr("Placement")
-                    color: Theme.mutedForeground
+                    color: Theme.c.shadingLayerRow.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -152,7 +152,7 @@ Column {
                 spacing: 4
                 Text {
                     text: qsTr("Dash")
-                    color: Theme.mutedForeground
+                    color: Theme.c.shadingLayerRow.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -220,7 +220,7 @@ Column {
                 Text {
                     text: qsTr("Sketchy")
                     anchors.verticalCenter: parent.verticalCenter
-                    color: row.sketchy ? Theme.panelForeground : Theme.mutedForeground
+                    color: row.sketchy ? Theme.c.shadingLayerRow.foreground : Theme.c.shadingLayerRow.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                     MouseArea {
@@ -263,7 +263,7 @@ Column {
                     spacing: 4
                     Text {
                         text: qsTr("Seed")
-                        color: Theme.mutedForeground
+                        color: Theme.c.shadingLayerRow.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -290,7 +290,7 @@ Column {
             visible: row.kind === "shadow" || row.kind === "glow" || row.kind === "extrude"
             Text {
                 text: qsTr("Colour")
-                color: Theme.mutedForeground
+                color: Theme.c.shadingLayerRow.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -371,7 +371,7 @@ Column {
                 spacing: 4
                 Text {
                     text: qsTr("Angle")
-                    color: Theme.mutedForeground
+                    color: Theme.c.shadingLayerRow.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -403,7 +403,7 @@ Column {
                     text: qsTr("How much the extruded side fades toward black")
                     visible: darkenHover.hovered
                 }
-                color: Theme.mutedForeground
+                color: Theme.c.shadingLayerRow.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }

@@ -114,7 +114,7 @@ Item {
         Text {
             visible: root.clipKind === "audio"
             text: qsTr("Fade in / out (volume)")
-            color: Theme.mutedForeground
+            color: Theme.c.animationInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -153,7 +153,7 @@ Item {
         Text {
             visible: root.clipKind === "audio"
             text: qsTr("Style")
-            color: Theme.mutedForeground
+            color: Theme.c.animationInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -183,7 +183,7 @@ Item {
             width: parent.width
             wrapMode: Text.WordWrap
             text: qsTr("Pick how the clip enters and leaves. Fade is one option — same style controls as slide or zoom.")
-            color: Theme.mutedForeground
+            color: Theme.c.animationInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -216,7 +216,7 @@ Item {
         Text {
             visible: root.supportsBodyAnim
             text: qsTr("In")
-            color: Theme.mutedForeground
+            color: Theme.c.animationInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -253,7 +253,7 @@ Item {
         Text {
             visible: root.supportsBodyAnim
             text: qsTr("Out")
-            color: Theme.mutedForeground
+            color: Theme.c.animationInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -304,7 +304,7 @@ Item {
             width: parent.width
             wrapMode: Text.WordWrap
             text: qsTr("Letter and word animations live in the Text tab, under Animate. This moves the whole clip.")
-            color: Theme.mutedForeground
+            color: Theme.c.animationInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }

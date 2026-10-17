@@ -20,15 +20,15 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         width: 1
         height: 16
-        color: Theme.primary
+        color: Theme.c.transformOverlayRotateHandle.background
     }
 
     Rectangle {
         anchors.fill: parent
         radius: width / 2
-        color: Theme.primary
-        border.width: 1
-        border.color: Theme.onMedia
+        color: Theme.c.transformOverlayRotateHandle.background
+        border.width: Theme.c.transformOverlayRotateHandle.borderWidth
+        border.color: Theme.c.transformOverlayRotateHandle.border
     }
 
     DragHandler {

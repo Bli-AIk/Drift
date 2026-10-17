@@ -25,10 +25,12 @@ Item {
         anchors.centerIn: parent
         width: crop.gripSize
         height: crop.gripSize
-        radius: Theme.radiusXs
-        color: gripArea.pressed ? Theme.primaryForeground : Theme.primary
-        border.width: Theme.borderWidth
-        border.color: gripArea.pressed ? Theme.primary : Theme.primaryForeground
+        radius: Theme.c.androidCropGrip.radius
+        color: gripArea.pressed ? Theme.c.androidCropGrip.backgroundPressed
+                                : Theme.c.androidCropGrip.background
+        border.width: Theme.c.androidCropGrip.borderWidth
+        border.color: gripArea.pressed ? Theme.c.androidCropGrip.borderPressed
+                                       : Theme.c.androidCropGrip.border
 
         Behavior on color {
             ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }

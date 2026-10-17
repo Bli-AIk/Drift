@@ -9,6 +9,7 @@ Rectangle {
 
     anchors.fill: parent
     visible: wash.shown
-    color: Qt.rgba(Theme.clipTransform.r, Theme.clipTransform.g,
-                   Theme.clipTransform.b, 0.07)
+    color: Qt.rgba(Theme.c.androidTimelineTrackWash.background.r,
+                   Theme.c.androidTimelineTrackWash.background.g,
+                   Theme.c.androidTimelineTrackWash.background.b, 0.07)
 }

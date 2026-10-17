@@ -15,14 +15,14 @@ Row {
         anchors.verticalCenter: parent.verticalCenter
         glyph: root.modelData.glyph
         iconSize: Theme.iconSizeSm
-        iconColor: Theme.mutedForeground
+        iconColor: Theme.c.mediaAssetsFormatRow.icon
     }
 
     Text {
         anchors.verticalCenter: parent.verticalCenter
         width: 48
         text: root.modelData.label
-        color: Theme.panelForeground
+        color: Theme.c.mediaAssetsFormatRow.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
         elide: Text.ElideRight
@@ -32,7 +32,7 @@ Row {
         anchors.verticalCenter: parent.verticalCenter
         width: root.columnWidth - Theme.iconSizeSm - 48 - Theme.spacingMd * 2
         text: root.modelData.formats
-        color: Theme.mutedForeground
+        color: Theme.c.mediaAssetsFormatRow.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeTiny
         elide: Text.ElideRight

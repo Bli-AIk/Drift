@@ -13,8 +13,8 @@ Rectangle {
 
     width: 56
     height: 32
-    radius: Theme.radiusSm
-    color: Theme.panelBackground
+    radius: Theme.c.mediaAssetsListThumb.radius
+    color: Theme.c.mediaAssetsListThumb.background
     clip: true
 
     SkeletonBox {
@@ -49,14 +49,14 @@ Rectangle {
                   : kind === "model3d" ? Theme.icons.box
                   : kind === "composite" ? Theme.icons.layers : Theme.icons.film)
         iconSize: Theme.iconSizeBase
-        iconColor: Theme.mutedForeground
+        iconColor: Theme.c.mediaAssetsListThumb.icon
     }
 
     // Same busy treatment as the grid card, scaled to the row thumbnail.
     Rectangle {
         anchors.fill: parent
         radius: parent.radius
-        color: Theme.scrimStrong
+        color: Theme.c.mediaAssetsListThumb.scrim
         visible: opacity > 0
         opacity: replaceBusy ? 1 : 0
 
@@ -68,8 +68,8 @@ Rectangle {
             anchors.centerIn: parent
             indeterminate: true
             size: Theme.iconSizeBase
-            strokeWidth: 2
-            progressColor: Theme.onMedia
+            strokeWidth: Theme.c.mediaAssetsListThumb.progressStrokeWidth
+            progressColor: Theme.c.mediaAssetsListThumb.progress
         }
     }
 

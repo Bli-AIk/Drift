@@ -15,7 +15,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 1 + (parent.height - 2) * (1.0 - dbScale.mixer.dbToRatio(modelData)) - height / 2
             text: modelData === 0 ? "0" : String(-modelData)
-            color: Theme.mutedForeground
+            color: Theme.c.mixerDbScale.foregroundMuted
             font.family: Theme.monoFontFamily
             font.pixelSize: Theme.fontSizeTick
         }
