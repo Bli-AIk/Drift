@@ -1,0 +1,404 @@
+{
+  "name": "light",
+  "variant": "light",
+  "palette": {
+    "appBackground": "#ffffff",
+    "foreground": "#1c1c1c",
+    "border": "#e8e8e8",
+    "accent": "#f5f5f5",
+    "accentForeground": "#050505",
+    "mutedForeground": "#7a7a7a",
+    "popoverHover": "#f5f5f5",
+    "panelBackground": "#f9fafb",
+    "panelForeground": "#212121",
+    "panelBorder": "#dedede",
+    "panelAccent": "#ededed",
+    "panelAccentForeground": "#0d0d0d",
+    "panelMuted": "#d4d4d4",
+    "panelSecondaryBg": "#fff6da",
+    "panelSecondaryBorder": "#ffe7a3",
+    "panelSecondaryForeground": "#9a6f00",
+    "sliderTrack": "#505050",
+    "scrollbarTrack": "#2a2a2a",
+    "scrollbarHandle": "#6a6a6a",
+    "scrollbarHandleHover": "#888888",
+    "scrollbarHandlePressed": "#b8b8b8",
+    "sheetHandle": "#919191",
+    "accentOnPanel": "#8a6300",
+    "skeleton": "#e8e8e8",
+    "skeletonHighlight": "#f5f5f5",
+    "panelWaveform": "#212121b3",
+    "beatBar": "#1f6fb24d",
+    "beatGrid": "#1f6fb230",
+    "beatOnset": "#2121218c",
+    "textStylePreviewBorder": "#2a2a2a",
+    "primary": "#F8B81C",
+    "primaryForeground": "#221900",
+    "destructive": "#e91616",
+    "constructive": "#23d160",
+    "warning": "#f97316",
+    "exportGradientTop": "#ffcf4a",
+    "exportGradientBottom": "#f59e0b",
+    "exportGlow": "#fbbf24",
+    "scrim": "#00000066",
+    "scrimStrong": "#000000b3",
+    "overlay": "#000000",
+    "guideStrong": "#99ffffff",
+    "guideMedium": "#80ffffff",
+    "guideWeak": "#66ffffff",
+    "onMedia": "#ffffff",
+    "snapGuide": "#f5c542",
+    "clipText": "#5DBAA0",
+    "clipSubtitle": "#4A9FD4",
+    "clipAudio": "#8F5DBA",
+    "clipGraphic": "#BA5D7A",
+    "clipEffect": "#5d93ba",
+    "clipComposite": "#BA8F5D",
+    "clipProxy": "#3DBE8B",
+    "clipProxyForeground": "#06261A",
+    "clipProxyBand": "#D9174A36",
+    "clipEditFriendly": "#5AA9E6",
+    "clipEditFriendlyForeground": "#06203A",
+    "clipAdjustmentAudio": "#9B6BC9",
+    "clipAdjustmentMask": "#BA9B5D",
+    "clipTransform": "#8FBA5D",
+    "clipVideoOverview": "#6E7A85",
+    "transitionOverlap": "#9B5DE5",
+    "waveform": "#ffffffb3",
+    "clipVideoPlaceholder": "#2b2b2b",
+    "previewLetterbox": "#333333",
+    "textStylePreviewBg": "#1c1c1c",
+    "gizmoX": "#f0475a",
+    "gizmoY": "#5ccf5a",
+    "gizmoZ": "#4f8ff7",
+    "gizmoUniform": "#f2f2f2",
+    "gizmoHot": "#ffd43b",
+    "curveX": "#16a9f3",
+    "curveY": "#f59e0b",
+    "curveWidth": "#23d160",
+    "curveHeight": "#e879f9",
+    "curveRotation": "#f43f5e",
+    "curveRotationX": "#fb923c",
+    "curveRotationY": "#facc15",
+    "curveZ": "#60a5fa",
+    "curvePerspective": "#94a3b8",
+    "curveOpacity": "#a78bfa",
+    "curveVolume": "#2dd4bf",
+    "rampSky": "#38bdf8",
+    "rampGreen": "#4ade80",
+    "rampViolet": "#c084fc",
+    "rampRose": "#fb7185",
+    "rampIndigo": "#818cf8",
+    "categoryAmber": "#f59e0b",
+    "categoryRed": "#ef4444",
+    "categoryViolet": "#8b5cf6",
+    "categoryBlue": "#3b82f6",
+    "categoryEmerald": "#10b981",
+    "categoryPink": "#ec4899",
+    "categoryCyan": "#06b6d4",
+    "categoryLime": "#84cc16",
+    "categoryOrange": "#f97316",
+    "categoryIndigo": "#6366f1"
+  },
+  "semantic": {
+    "surface": {
+      "app": "$palette.appBackground",
+      "panel": "$palette.panelBackground"
+    },
+    "foreground": "$palette.foreground",
+    "border": "$palette.border",
+    "accent": "$palette.accent",
+    "accentForeground": "$palette.accentForeground",
+    "mutedForeground": "$palette.mutedForeground",
+    "popoverHover": "$palette.popoverHover",
+    "panel": {
+      "foreground": "$palette.panelForeground",
+      "border": "$palette.panelBorder",
+      "accent": "$palette.panelAccent",
+      "accentForeground": "$palette.panelAccentForeground",
+      "muted": "$palette.panelMuted",
+      "sliderTrack": "$semantic.panel.muted",
+      "scrollbar": {
+        "track": "$semantic.panel.border",
+        "handle": "$semantic.panel.muted",
+        "handleHover": "$semantic.mutedForeground",
+        "handlePressed": "$semantic.foreground"
+      },
+      "sheetHandle": "$palette.sheetHandle",
+      "secondary": {
+        "background": "$palette.panelSecondaryBg",
+        "border": "$palette.panelSecondaryBorder",
+        "foreground": "$palette.panelSecondaryForeground"
+      }
+    },
+    "primary": "$palette.primary",
+    "primaryForeground": "$palette.primaryForeground",
+    "accentOnPanel": "$palette.accentOnPanel",
+    "destructive": "$palette.destructive",
+    "constructive": "$palette.constructive",
+    "warning": "$palette.warning",
+    "focusRing": "$semantic.primary",
+    "export": {
+      "gradientTop": "$palette.exportGradientTop",
+      "gradientBottom": "$palette.exportGradientBottom",
+      "glow": "$palette.exportGlow"
+    },
+    "scrim": "$palette.scrim",
+    "scrimStrong": "$palette.scrimStrong",
+    "overlay": "$palette.overlay",
+    "guide": {
+      "strong": "$palette.guideStrong",
+      "medium": "$palette.guideMedium",
+      "weak": "$palette.guideWeak"
+    },
+    "onMedia": "$palette.onMedia",
+    "timeline": {
+      "snapGuide": "$palette.snapGuide"
+    },
+    "skeleton": "$palette.skeleton",
+    "skeletonHighlight": "$palette.skeletonHighlight",
+    "clip": {
+      "text": "$palette.clipText",
+      "subtitle": "$palette.clipSubtitle",
+      "audio": "$palette.clipAudio",
+      "graphic": "$palette.clipGraphic",
+      "effect": "$palette.clipEffect",
+      "composite": "$palette.clipComposite",
+      "proxy": "$palette.clipProxy",
+      "proxyForeground": "$palette.clipProxyForeground",
+      "proxyBand": "$palette.clipProxyBand",
+      "editFriendly": "$palette.clipEditFriendly",
+      "editFriendlyForeground": "$palette.clipEditFriendlyForeground",
+      "adjustment": {
+        "video": "$semantic.clip.effect",
+        "audio": "$palette.clipAdjustmentAudio",
+        "mask": "$palette.clipAdjustmentMask"
+      },
+      "transform": "$palette.clipTransform",
+      "videoOverview": "$palette.clipVideoOverview",
+      "transitionOverlap": "$palette.transitionOverlap",
+      "waveform": "$palette.waveform",
+      "panelWaveform": "$palette.panelWaveform",
+      "videoPlaceholder": "$palette.clipVideoPlaceholder",
+      "beat": {
+        "bar": "$palette.beatBar",
+        "grid": "$palette.beatGrid",
+        "onset": "$palette.beatOnset"
+      }
+    },
+    "preview": {
+      "letterbox": "$palette.previewLetterbox",
+      "textStyleBackground": "$palette.textStylePreviewBg",
+      "textStyleBorder": "$palette.textStylePreviewBorder"
+    },
+    "gizmo": {
+      "x": "$palette.gizmoX",
+      "y": "$palette.gizmoY",
+      "z": "$palette.gizmoZ",
+      "uniform": "$palette.gizmoUniform",
+      "hot": "$palette.gizmoHot"
+    },
+    "keyframe": {
+      "curves": {
+        "x": "$palette.curveX",
+        "y": "$palette.curveY",
+        "width": "$palette.curveWidth",
+        "height": "$palette.curveHeight",
+        "rotation": "$palette.curveRotation",
+        "rotationX": "$palette.curveRotationX",
+        "rotationY": "$palette.curveRotationY",
+        "z": "$palette.curveZ",
+        "perspective": "$palette.curvePerspective",
+        "opacity": "$palette.curveOpacity",
+        "volume": "$palette.curveVolume"
+      },
+      "ramp": [
+        "$palette.rampSky",
+        "$palette.curveRotationX",
+        "$palette.rampGreen",
+        "$palette.rampViolet",
+        "$palette.rampRose",
+        "$palette.curveRotationY",
+        "$palette.curveVolume",
+        "$palette.rampIndigo"
+      ]
+    },
+    "category": [
+      "$palette.categoryAmber",
+      "$palette.categoryRed",
+      "$palette.categoryViolet",
+      "$palette.categoryBlue",
+      "$palette.categoryEmerald",
+      "$palette.categoryPink",
+      "$palette.categoryCyan",
+      "$palette.categoryLime",
+      "$palette.categoryOrange",
+      "$palette.categoryIndigo"
+    ]
+  },
+  "components": {},
+  "metrics": {
+    "radius": {
+      "xs": 3,
+      "sm": 5.6,
+      "md": 10.4,
+      "lg": 13.12,
+      "pill": 999
+    },
+    "spacing": {
+      "xs": 2,
+      "sm": 4,
+      "md": 6,
+      "lg": 8,
+      "xl": 12,
+      "xxl": 16,
+      "xxxl": 24
+    },
+    "controlHeight": {
+      "pointer": 30,
+      "touch": 44
+    },
+    "controlHeightSm": {
+      "pointer": 26,
+      "touch": 36
+    },
+    "iconButtonSize": {
+      "pointer": 28,
+      "touch": 40
+    },
+    "borderWidth": 1,
+    "borderWidthFocus": 2,
+    "iconSize": {
+      "sm": 12,
+      "md": 14,
+      "base": 16,
+      "lg": 18,
+      "xl": 22
+    },
+    "dialog": {
+      "widthSm": 340,
+      "widthMd": 420,
+      "widthLg": 660,
+      "margin": 32
+    },
+    "headerHeight": 54.4,
+    "panelGap": 3,
+    "pagePadding": 12,
+    "panelHeaderHeight": {
+      "pointer": 44,
+      "touch": 52
+    },
+    "tabRailWidth": {
+      "pointer": 40,
+      "touch": 52
+    },
+    "assetCardWidth": 112,
+    "assetCardGap": 16,
+    "previewTransportPadding": 6,
+    "timeline": {
+      "toolbarHeight": 40,
+      "overviewHeight": 34,
+      "rulerHeight": 28,
+      "bookmarkRowHeight": 18,
+      "trackHeightVideo": 65,
+      "trackHeightAudio": 50,
+      "trackHeightText": {
+        "pointer": 25,
+        "touch": 44
+      },
+      "trackHeightSubtitle": {
+        "pointer": 25,
+        "touch": 44
+      },
+      "trackHeightShape": 50,
+      "trackHeightAdjustment": {
+        "pointer": 28,
+        "touch": 40
+      },
+      "adjustmentLaneHeight": {
+        "pointer": 20,
+        "touch": 24
+      },
+      "trackGap": 6,
+      "newTrackHitSlop": 24,
+      "trackLabelsWidth": 130,
+      "pixelsPerSecondBase": 50,
+      "endPadFraction": 0.25,
+      "endPadMinPx": 120,
+      "playheadLineWidth": 2,
+      "playheadHandleSize": 16,
+      "playheadSeekGrabWidth": 18,
+      "clipSelectionRingWidth": 1.5,
+      "clipHeaderBandHeight": 20,
+      "clipTrimHandleWidth": 12,
+      "clipMinInteractiveWidth": 28,
+      "clipMinDurationSeconds": 0.1
+    },
+    "android": {
+      "iconButtonSize": 48,
+      "timelineToolbarHeight": 56,
+      "previewTransportHeight": 56,
+      "topBarHeight": 56,
+      "bottomRailHeight": 64,
+      "clipToolbarHeight": 64,
+      "splitterHeight": 32,
+      "sheetHeightFraction": 0.5,
+      "sheetExpandedFraction": 0.92,
+      "sheetHeaderHeight": 56,
+      "sheetDismissFraction": 0.38,
+      "liftStepAsideDistance": 56,
+      "railFabSize": 48,
+      "addRowHeight": 64,
+      "trackLabelsWidth": 88,
+      "playheadCentreWidth": 2,
+      "clipTrimHandleWidth": 20,
+      "clipEdgeMargin": 22,
+      "trimHotspotExtra": 20,
+      "previewMaxScreenFraction": 0.5,
+      "previewMinFraction": 0.34,
+      "pagePadding": 16,
+      "minTouchTarget": 48,
+      "touchGap": 8,
+      "layoutCardWidth": 88,
+      "layoutCardHeight": 112,
+      "homeTileHeight": 96,
+      "homeRecentCardWidth": 140,
+      "homeRecentCardHeight": 96
+    },
+    "windowMinimumWidth": 900,
+    "windowMinimumHeight": 560
+  },
+  "typography": {
+    "fontSize": {
+      "xs": 11.52,
+      "sm": 12.64,
+      "base": 14.72,
+      "tiny": 9.6,
+      "tick": 10,
+      "card": 11.2
+    },
+    "fontWeight": {
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    },
+    "monoFontFamily": "monospace"
+  },
+  "motion": {
+    "durationFast": 90,
+    "durationBase": 140,
+    "durationSlow": 220,
+    "durationPress": 120,
+    "easing": "OutQuint",
+    "easingInOut": "InOutQuart",
+    "pressScale": 0.97,
+    "tooltipDelay": 400,
+    "touchLiftInterval": 320
+  },
+  "window": {
+    "translucent": false,
+    "backdrop": "none",
+    "backgroundOpacity": 1.0
+  }
+}

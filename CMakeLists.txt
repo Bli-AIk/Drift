@@ -1255,6 +1255,17 @@ qt_add_resources(drift "drift_diagnostics"
     FILES resources/diagnostics/bench1080p60.mp4
 )
 
+# Built-in theme documents. ThemeManager reads these; Theme.qml is a facade over the
+# resolved tokens, so the rest of the QML keeps using the same property names.
+qt_add_resources(drift "drift_themes"
+    PREFIX "/themes"
+    BASE resources/themes
+    FILES
+        resources/themes/dark.json
+        resources/themes/light.json
+        resources/themes/theme.schema.json
+)
+
 set_source_files_properties(src/qml/Theme.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
 # Canvas preset catalog + the (template, quality) -> pixels arithmetic, shared by the desktop
 # layout dialog and the phone layout sheet so the two cannot drift apart again.
@@ -1278,6 +1289,9 @@ file(GLOB DRIFT_LUCIDE_ICONS RELATIVE "${CMAKE_SOURCE_DIR}" CONFIGURE_DEPENDS
 qt_add_qml_module(drift
     URI Drift
     VERSION 1.0
+    SOURCES
+        src/theme/ThemeManager.h
+        src/theme/ThemeManager.cpp
     QML_FILES
         src/qml/Shell.qml
         src/qml/LayoutPresets.qml
@@ -1536,7 +1550,7 @@ target_link_libraries(drift PRIVATE
     driftcore
     driftengine
 )
-target_include_directories(drift PRIVATE src src/preview)
+target_include_directories(drift PRIVATE src src/theme src/preview)
 
 if(ANDROID)
     # FileDialogs registers a QtAndroidPrivate::NewIntentListener so a second ACTION_VIEW reaches a

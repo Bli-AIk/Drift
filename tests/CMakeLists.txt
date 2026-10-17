@@ -256,6 +256,20 @@ add_test(NAME Mcp COMMAND tst_mcp)
 drift_copy_effects(tst_mcp)
 drift_copy_transitions(tst_mcp)
 
+qt_add_executable(tst_thememanager tst_thememanager.cpp ../src/theme/ThemeManager.cpp)
+target_include_directories(tst_thememanager PRIVATE ../src)
+target_link_libraries(tst_thememanager PRIVATE Qt6::Test Qt6::Qml Qt6::Quick)
+qt_add_resources(tst_thememanager "drift_themes"
+    PREFIX "/themes"
+    BASE "${CMAKE_SOURCE_DIR}/resources/themes"
+    FILES
+        "${CMAKE_SOURCE_DIR}/resources/themes/dark.json"
+        "${CMAKE_SOURCE_DIR}/resources/themes/light.json"
+        "${CMAKE_SOURCE_DIR}/resources/themes/theme.schema.json"
+)
+add_test(NAME ThemeManager COMMAND tst_thememanager)
+set_tests_properties(ThemeManager PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
 # Runs lupdate and fails if i18n/*.ts would change — i.e. someone added qsTr/tr and
 # did not run `cmake --build build --target update_translations`. Skipped where lupdate cannot
 # parse QML: there the test would rewrite the checkout's catalogs without their QML strings

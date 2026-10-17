@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://drift.cutwire.org/schemas/theme.schema.json",
+  "title": "Drift theme",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "variant": {
+      "enum": ["dark", "light"]
+    },
+    "extends": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Theme name to deep-merge under this document. Built-in names are dark and light. Missing keys fall through to the base."
+    },
+    "palette": {
+      "type": "object",
+      "description": "Raw color strings (#rgb, #rrggbb, #aarrggbb) or $references. No nested objects.",
+      "additionalProperties": {
+        "$ref": "#/$defs/colorOrRef"
+      }
+    },
+    "semantic": {
+      "$ref": "#/$defs/tokenObject"
+    },
+    "components": {
+      "$ref": "#/$defs/tokenObject"
+    },
+    "metrics": {
+      "$ref": "#/$defs/tokenObject"
+    },
+    "typography": {
+      "$ref": "#/$defs/tokenObject"
+    },
+    "motion": {
+      "$ref": "#/$defs/tokenObject"
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "translucent": { "type": "boolean" },
+        "backdrop": { "type": "string" },
+        "backgroundOpacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  },
+  "$defs": {
+    "colorOrRef": {
+      "type": "string",
+      "pattern": "^(#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{4}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})|\\$[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*)$"
+    },
+    "tokenObject": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/tokenValue"
+      }
+    },
+    "tokenValue": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/$defs/tokenValue" }
+        },
+        { "$ref": "#/$defs/tokenObject" }
+      ]
+    }
+  }
+}
