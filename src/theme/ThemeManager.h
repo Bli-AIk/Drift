@@ -37,6 +37,11 @@ class ThemeManager : public QObject
 public:
     explicit ThemeManager(QObject *parent = nullptr);
 
+    // Process-wide instance QML binds to. main() publishes it with
+    // registerSingleton(); a ThemeManager constructed anywhere else stays private.
+    static ThemeManager *shared();
+    static void registerSingleton();
+
     QQmlPropertyMap *palette() const { return m_palette; }
     QQmlPropertyMap *semantic() const { return m_semantic; }
     QQmlPropertyMap *components() const { return m_components; }

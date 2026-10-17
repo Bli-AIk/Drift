@@ -30,6 +30,7 @@
 #include "TextStylePreviewImageProvider.h"
 #include "playback/PerfLog.h"
 #include "preview/PreviewItem.h"
+#include "theme/ThemeManager.h"
 #include "timeline/TimelineTrackItem.h"
 #include "timeline/TimelineViewState.h"
 
@@ -699,6 +700,12 @@ int main(int argc, char *argv[])
     qmlRegisterSingletonInstance("Drift", 1, 0, "LayoutMemory", &layoutStore);
     qmlRegisterSingletonInstance("Drift", 1, 0, "Haptics", &haptics);
     qmlRegisterSingletonInstance("Drift", 1, 0, "PointerDevices", &pointerDevices);
+    // QML_ELEMENT on ThemeManager is recorded in qml_register_types_Drift(), and
+    // that callback runs only when an import is the first thing to touch the
+    // Drift URI. The registrations above create the module first, so the
+    // callback never runs and QML reports ThemeManager as undefined. Publish
+    // it here, the same way as the other singletons.
+    ThemeManager::registerSingleton();
 
     app.installEventFilter(new FileOpenFilter(&editorState, &marketClient, &app));
     {

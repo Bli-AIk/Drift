@@ -8,6 +8,7 @@
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QQmlEngine>
+#include <QtQml/qqml.h>
 #include <QRegularExpression>
 #include <QStandardPaths>
 
@@ -348,6 +349,23 @@ void syncMap(QQmlPropertyMap *map, const QVariantMap &data)
 }
 
 } // namespace
+
+ThemeManager *ThemeManager::shared()
+{
+    static ThemeManager instance;
+    return &instance;
+}
+
+void ThemeManager::registerSingleton()
+{
+    // qmlRegisterSingletonInstance warns and no-ops if called twice. Tests and
+    // main() share this entry point, so the second call must stay quiet.
+    static bool registered = false;
+    if (registered)
+        return;
+    registered = true;
+    qmlRegisterSingletonInstance("Drift", 1, 0, "ThemeManager", shared());
+}
 
 ThemeManager::ThemeManager(QObject *parent)
     : QObject(parent)

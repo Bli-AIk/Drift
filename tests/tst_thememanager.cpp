@@ -28,6 +28,8 @@ private slots:
     void referenceCycleDoesNotHang();
     void extendsCycleDoesNotHang();
     void invalidThemeFallsBack();
+    void singletonRegistrationExposesThemeManager();
+    void mainRegistersThemeManager();
     void liveBindingUpdates();
 
 private:
@@ -270,10 +272,42 @@ void ThemeManagerTest::invalidThemeFallsBack()
     QCOMPARE(manager.currentTheme(), QStringLiteral("dark"));
 }
 
+void ThemeManagerTest::singletonRegistrationExposesThemeManager()
+{
+    // Same call main() makes. This test does not register the type itself.
+    ThemeManager::registerSingleton();
+    QVERIFY(ThemeManager::shared()->loadTheme(QStringLiteral("dark")));
+
+    QQmlEngine engine;
+    QQmlComponent component(&engine);
+    component.setData(R"(import QtQuick
+import Drift
+QtObject {
+    property color app: ThemeManager.semantic.surface.app
+})", QUrl());
+    QVERIFY2(!component.isError(), qPrintable(component.errorString()));
+    QObject *object = component.create();
+    QVERIFY(object);
+    QCOMPARE(object->property("app").value<QColor>(), QColor(QStringLiteral("#0d0d0d")));
+    delete object;
+}
+
+void ThemeManagerTest::mainRegistersThemeManager()
+{
+    // Drift is an executable-backed module, so a test process cannot import the
+    // app's plugin. The guard is that main() goes through registerSingleton(),
+    // which singletonRegistrationExposesThemeManager() actually loads QML through.
+    QFile mainFile(QStringLiteral(DRIFT_MAIN_CPP));
+    QVERIFY2(mainFile.open(QIODevice::ReadOnly | QIODevice::Text), qPrintable(mainFile.errorString()));
+    const QString source = QString::fromUtf8(mainFile.readAll());
+    QVERIFY(source.contains(QStringLiteral("ThemeManager::registerSingleton()")));
+}
+
 void ThemeManagerTest::liveBindingUpdates()
 {
-    static ThemeManager manager;
-    qmlRegisterSingletonInstance("Drift", 1, 0, "ThemeManager", &manager);
+    ThemeManager::registerSingleton();
+    ThemeManager *manager = ThemeManager::shared();
+    QVERIFY(manager->loadTheme(QStringLiteral("dark")));
 
     QQmlEngine engine;
     QQmlComponent component(&engine);
@@ -290,7 +324,7 @@ QtObject {
     QCOMPARE(object->property("app").value<QColor>(), QColor(QStringLiteral("#0d0d0d")));
     QCOMPARE(object->property("border").value<QColor>(), QColor(QStringLiteral("#2e2e2e")));
 
-    manager.setVariant(QStringLiteral("light"));
+    manager->setVariant(QStringLiteral("light"));
     QCOMPARE(object->property("app").value<QColor>(), QColor(QStringLiteral("#ffffff")));
     QCOMPARE(object->property("border").value<QColor>(), QColor(QStringLiteral("#dedede")));
     QCOMPARE(object->property("radius").toDouble(), 5.6);
@@ -300,7 +334,7 @@ QtObject {
         "extends": "dark",
         "components": { "button": { "primary": { "background": "#ff0000" } } }
     })"));
-    QVERIFY(manager.loadTheme(QStringLiteral("button-red")));
+    QVERIFY(manager->loadTheme(QStringLiteral("button-red")));
 
     QQmlComponent buttonComponent(&engine);
     buttonComponent.setData(R"(import QtQuick
@@ -318,7 +352,7 @@ QtObject {
         "extends": "dark",
         "components": { "button": { "primary": { "background": "#00ff00" } } }
     })"));
-    QVERIFY(manager.loadTheme(QStringLiteral("button-green")));
+    QVERIFY(manager->loadTheme(QStringLiteral("button-green")));
     QCOMPARE(button->property("background").value<QColor>(), QColor(QStringLiteral("#00ff00")));
     // The shell binding is still attached to the same nested map.
     QCOMPARE(object->property("app").value<QColor>(), QColor(QStringLiteral("#0d0d0d")));

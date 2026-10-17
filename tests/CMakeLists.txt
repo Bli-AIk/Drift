@@ -258,6 +258,9 @@ drift_copy_transitions(tst_mcp)
 
 qt_add_executable(tst_thememanager tst_thememanager.cpp ../src/theme/ThemeManager.cpp)
 target_include_directories(tst_thememanager PRIVATE ../src)
+target_compile_definitions(tst_thememanager PRIVATE
+    "DRIFT_MAIN_CPP=\"${CMAKE_SOURCE_DIR}/src/main.cpp\""
+)
 target_link_libraries(tst_thememanager PRIVATE Qt6::Test Qt6::Qml Qt6::Quick)
 qt_add_resources(tst_thememanager "drift_themes"
     PREFIX "/themes"
