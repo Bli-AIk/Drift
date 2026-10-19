@@ -1518,6 +1518,10 @@
         <translation type="unfinished">4分の1</translation>
     </message>
     <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Auto</source>
         <translation type="unfinished">自動</translation>
     </message>
@@ -4254,6 +4258,61 @@
     </message>
 </context>
 <context>
+    <name>AppSettingsMenu</name>
+    <message>
+        <source>Workspace</source>
+        <translation>ワークスペース</translation>
+    </message>
+    <message>
+        <source>Auto (follow canvas)</source>
+        <translation>自動 (キャンバスに追従)</translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation>横向き</translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation>縦向き</translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation>テーマ</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished">システム</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>ライト</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation>ダーク</translation>
+    </message>
+    <message>
+        <source>Language…</source>
+        <translation>言語…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished">モバイルレイアウトに切り替え…</translation>
+    </message>
+    <message>
+        <source>Multicam</source>
+        <translation>マルチカム</translation>
+    </message>
+    <message>
+        <source>Debug info…</source>
+        <translation>デバッグ情報…</translation>
+    </message>
+    <message>
+        <source>More settings…</source>
+        <translation>詳細設定…</translation>
+    </message>
+</context>
+<context>
     <name>AssetCategoryChips</name>
     <message>
         <source>My Effects</source>
@@ -6174,58 +6233,6 @@
     <message>
         <source>Workspace, theme, language and more</source>
         <translation type="unfinished">ワークスペース、テーマ、言語など</translation>
-    </message>
-    <message>
-        <source>Workspace</source>
-        <translation type="unfinished">ワークスペース</translation>
-    </message>
-    <message>
-        <source>Auto (follow canvas)</source>
-        <translation type="unfinished">自動 (キャンバスに追従)</translation>
-    </message>
-    <message>
-        <source>Landscape</source>
-        <translation type="unfinished">横向き</translation>
-    </message>
-    <message>
-        <source>Portrait</source>
-        <translation type="unfinished">縦向き</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation type="unfinished">テーマ</translation>
-    </message>
-    <message>
-        <source>System</source>
-        <translation type="unfinished">システム</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation type="unfinished">ライト</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation type="unfinished">ダーク</translation>
-    </message>
-    <message>
-        <source>Language…</source>
-        <translation type="unfinished">言語…</translation>
-    </message>
-    <message>
-        <source>Switch to mobile layout…</source>
-        <translation type="unfinished">モバイルレイアウトに切り替え…</translation>
-    </message>
-    <message>
-        <source>Multicam</source>
-        <translation type="unfinished">マルチカム</translation>
-    </message>
-    <message>
-        <source>Debug info…</source>
-        <translation type="unfinished">デバッグ情報…</translation>
-    </message>
-    <message>
-        <source>More settings…</source>
-        <translation type="unfinished">詳細設定…</translation>
     </message>
 </context>
 <context>
@@ -11229,14 +11236,19 @@
         <translation>4分の1</translation>
     </message>
     <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Auto</source>
         <translation>自動</translation>
     </message>
     <message>
         <source>Preview quality — lower is smoother while editing.
-Full, Half and Quarter are fixed fractions of the project resolution: Full composites exactly what an export would.
+Full, Half, Quarter and 1/8 are fixed fractions of the project resolution: Full composites exactly what an export would.
+1/8 (Eco) is for older laptops with integrated graphics.
 Auto renders only as many pixels as the preview actually shows, and lowers that further while playback cannot keep up.</source>
-        <translation>プレビュー品質 — 低いほど編集中は滑らかです。
+        <translation type="unfinished">プレビュー品質 — 低いほど編集中は滑らかです。
 フル、半分、4分の1はプロジェクト解像度に対する固定比率です : フルはエクスポートとまったく同じように合成します。
 自動はプレビューに実際に表示されるピクセル数だけをレンダリングし、再生が追いつかない場合はさらに解像度を下げます。</translation>
     </message>
@@ -14807,6 +14819,37 @@ If playback stutters, try another.</source>
     <message>
         <source>Cancel</source>
         <translation>キャンセル</translation>
+    </message>
+</context>
+<context>
+    <name>StartScreen</name>
+    <message>
+        <source>Settings</source>
+        <translation>設定</translation>
+    </message>
+    <message>
+        <source>Workspace, theme, language and more</source>
+        <translation>ワークスペース、テーマ、言語など</translation>
+    </message>
+    <message>
+        <source>Debug info</source>
+        <translation type="unfinished">デバッグ情報</translation>
+    </message>
+    <message>
+        <source>System, playback and codec details for bug reports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Agent</source>
+        <translation>エージェント</translation>
+    </message>
+    <message>
+        <source>Agent access is on</source>
+        <translation>エージェントアクセスがオン</translation>
+    </message>
+    <message>
+        <source>Agent access</source>
+        <translation>エージェントアクセス</translation>
     </message>
 </context>
 <context>

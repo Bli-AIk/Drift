@@ -2026,6 +2026,7 @@ qt_add_qml_module(drift
         src/qml/components/shell/GlobalSearchResultRow.qml
         src/qml/components/shell/EditorWorkspace.qml
         src/qml/components/shell/EditorHeaderSettingsButton.qml
+        src/qml/components/shell/AppSettingsMenu.qml
         src/qml/components/shell/EditorHeaderSeparator.qml
         src/qml/components/shell/EditorHeaderSearchField.qml
         src/qml/components/shell/EditorHeaderProjectsButton.qml

@@ -1518,6 +1518,10 @@
         <translation type="unfinished">এক-চতুর্থাংশ</translation>
     </message>
     <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Auto</source>
         <translation type="unfinished">স্বয়ংক্রিয়</translation>
     </message>
@@ -4267,6 +4271,61 @@
     </message>
 </context>
 <context>
+    <name>AppSettingsMenu</name>
+    <message>
+        <source>Workspace</source>
+        <translation>কর্মক্ষেত্র</translation>
+    </message>
+    <message>
+        <source>Auto (follow canvas)</source>
+        <translation>স্বয়ংক্রিয় (ক্যানভাস অনুযায়ী)</translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation>আড়াআড়ি</translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation>লম্বালম্বি</translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation>থিম</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished">সিস্টেম</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>লাইট</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation>ডার্ক</translation>
+    </message>
+    <message>
+        <source>Language…</source>
+        <translation>ভাষা…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multicam</source>
+        <translation>মাল্টিক্যাম</translation>
+    </message>
+    <message>
+        <source>Debug info…</source>
+        <translation>ডিবাগ তথ্য…</translation>
+    </message>
+    <message>
+        <source>More settings…</source>
+        <translation>আরও সেটিংস…</translation>
+    </message>
+</context>
+<context>
     <name>AssetCategoryChips</name>
     <message>
         <source>My Effects</source>
@@ -6201,58 +6260,6 @@
     <message>
         <source>Workspace, theme, language and more</source>
         <translation type="unfinished">কর্মক্ষেত্র, থিম, ভাষা ও আরও সেটিংস</translation>
-    </message>
-    <message>
-        <source>Workspace</source>
-        <translation type="unfinished">কর্মক্ষেত্র</translation>
-    </message>
-    <message>
-        <source>Auto (follow canvas)</source>
-        <translation type="unfinished">স্বয়ংক্রিয় (ক্যানভাস অনুযায়ী)</translation>
-    </message>
-    <message>
-        <source>Landscape</source>
-        <translation type="unfinished">আড়াআড়ি</translation>
-    </message>
-    <message>
-        <source>Portrait</source>
-        <translation type="unfinished">লম্বালম্বি</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation type="unfinished">থিম</translation>
-    </message>
-    <message>
-        <source>System</source>
-        <translation type="unfinished">সিস্টেম</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation type="unfinished">লাইট</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation type="unfinished">ডার্ক</translation>
-    </message>
-    <message>
-        <source>Language…</source>
-        <translation type="unfinished">ভাষা…</translation>
-    </message>
-    <message>
-        <source>Switch to mobile layout…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Multicam</source>
-        <translation type="unfinished">মাল্টিক্যাম</translation>
-    </message>
-    <message>
-        <source>Debug info…</source>
-        <translation type="unfinished">ডিবাগ তথ্য…</translation>
-    </message>
-    <message>
-        <source>More settings…</source>
-        <translation type="unfinished">আরও সেটিংস…</translation>
     </message>
 </context>
 <context>
@@ -11277,14 +11284,19 @@
         <translation>এক-চতুর্থাংশ</translation>
     </message>
     <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Auto</source>
         <translation>স্বয়ংক্রিয়</translation>
     </message>
     <message>
         <source>Preview quality — lower is smoother while editing.
-Full, Half and Quarter are fixed fractions of the project resolution: Full composites exactly what an export would.
+Full, Half, Quarter and 1/8 are fixed fractions of the project resolution: Full composites exactly what an export would.
+1/8 (Eco) is for older laptops with integrated graphics.
 Auto renders only as many pixels as the preview actually shows, and lowers that further while playback cannot keep up.</source>
-        <translation>প্রিভিউর মান — মান কমালে সম্পাদনার সময় আরও মসৃণভাবে চলে।
+        <translation type="unfinished">প্রিভিউর মান — মান কমালে সম্পাদনার সময় আরও মসৃণভাবে চলে।
 পূর্ণ, অর্ধেক ও এক-চতুর্থাংশ হলো প্রকল্পের রেজোলিউশনের নির্দিষ্ট অংশ: পূর্ণ মোড এক্সপোর্টের মতোই কম্পোজিট করে।
 স্বয়ংক্রিয় মোড শুধু প্রিভিউতে দেখা যায় এমন পিক্সেল রেন্ডার করে এবং প্লেব্যাক তাল রাখতে না পারলে রেজোলিউশন আরও কমায়.</translation>
     </message>
@@ -14857,6 +14869,37 @@ If playback stutters, try another.</source>
     <message>
         <source>Cancel</source>
         <translation>বাতিল করুন</translation>
+    </message>
+</context>
+<context>
+    <name>StartScreen</name>
+    <message>
+        <source>Settings</source>
+        <translation>সেটিংস</translation>
+    </message>
+    <message>
+        <source>Workspace, theme, language and more</source>
+        <translation>কর্মক্ষেত্র, থিম, ভাষা ও আরও সেটিংস</translation>
+    </message>
+    <message>
+        <source>Debug info</source>
+        <translation type="unfinished">ডিবাগ তথ্য</translation>
+    </message>
+    <message>
+        <source>System, playback and codec details for bug reports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Agent</source>
+        <translation>এজেন্ট</translation>
+    </message>
+    <message>
+        <source>Agent access is on</source>
+        <translation>এজেন্ট অ্যাক্সেস চালু আছে</translation>
+    </message>
+    <message>
+        <source>Agent access</source>
+        <translation>এজেন্ট অ্যাক্সেস</translation>
     </message>
 </context>
 <context>

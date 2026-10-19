@@ -143,9 +143,20 @@ QString FilmstripTileCache::tile(const QString &sourcePath, int level, qint64 in
     return {};
 }
 
+void FilmstripTileCache::setSuspended(bool suspended)
+{
+    if (m_suspended == suspended)
+        return;
+    m_suspended = suspended;
+    if (m_suspended)
+        m_abort.store(true, std::memory_order_relaxed);
+    else
+        scheduleBatch();
+}
+
 void FilmstripTileCache::scheduleBatch()
 {
-    if (m_busy || m_batchScheduled || m_queue.isEmpty())
+    if (m_suspended || m_busy || m_batchScheduled || m_queue.isEmpty())
         return;
 
     // Let the whole burst of requests from one layout pass land before picking a batch,
@@ -157,7 +168,8 @@ void FilmstripTileCache::scheduleBatch()
 void FilmstripTileCache::runBatch()
 {
     m_batchScheduled = false;
-    if (m_busy || m_queue.isEmpty())
+    // Re-checked here: playback can start between scheduleBatch() and this running.
+    if (m_suspended || m_busy || m_queue.isEmpty())
         return;
 
     // Newest first: those are the tiles the viewport asked for most recently.
@@ -177,6 +189,7 @@ void FilmstripTileCache::runBatch()
     m_busy = true;
     m_busySource = newest.sourcePath;
     m_discardBatch = false;
+    m_abort.store(false, std::memory_order_relaxed);
     const QString sourcePath = newest.sourcePath;
     const int level = newest.level;
     const int rotationCorrection = newest.rotationCorrection;
@@ -185,12 +198,13 @@ void FilmstripTileCache::runBatch()
         [this, sourcePath, level, rotationCorrection, indices] {
             m_idleTimer->stop();
             const QList<qint64> produced =
-                m_decoder.generateTiles(sourcePath, level, indices, rotationCorrection);
+                m_decoder.generateTiles(sourcePath, level, indices, rotationCorrection, &m_abort);
+            const bool aborted = m_abort.load(std::memory_order_relaxed);
             m_idleTimer->start();
             QMetaObject::invokeMethod(
                 this,
-                [this, sourcePath, level, rotationCorrection, produced, indices] {
-                    applyBatch(sourcePath, level, rotationCorrection, produced, indices);
+                [this, sourcePath, level, rotationCorrection, produced, indices, aborted] {
+                    applyBatch(sourcePath, level, rotationCorrection, produced, indices, aborted);
                 },
                 Qt::QueuedConnection);
         },
@@ -198,7 +212,8 @@ void FilmstripTileCache::runBatch()
 }
 
 void FilmstripTileCache::applyBatch(const QString &sourcePath, int level, int rotationCorrection,
-                                    const QList<qint64> &produced, const QList<qint64> &requested)
+                                    const QList<qint64> &produced, const QList<qint64> &requested,
+                                    bool aborted)
 {
     m_busy = false;
     m_busySource.clear();
@@ -209,8 +224,23 @@ void FilmstripTileCache::applyBatch(const QString &sourcePath, int level, int ro
         return;
     }
 
-    for (const qint64 index : requested)
+    for (const qint64 index : requested) {
+        // Cut short by playback: what it never reached goes back to the front of the queue,
+        // so requests made since still decode first. Unless clear() ran meanwhile — then the
+        // request belongs to sources that are gone.
+        if (aborted && !produced.contains(index)) {
+            // Requested runs newest-first, so prepending each one leaves them oldest-first.
+            if (m_queued.contains(keyFor(sourcePath, level, index, rotationCorrection)))
+                m_queue.prepend({sourcePath, level, index, rotationCorrection});
+            continue;
+        }
         m_queued.remove(keyFor(sourcePath, level, index, rotationCorrection));
+    }
+    while (m_queue.size() > kMaxQueued) {
+        const Request &first = m_queue.first();
+        m_queued.remove(keyFor(first.sourcePath, first.level, first.index, first.rotationCorrection));
+        m_queue.removeFirst();
+    }
 
     if (m_ready.size() + produced.size() > kMaxReadyEntries)
         m_ready.clear();
@@ -218,7 +248,9 @@ void FilmstripTileCache::applyBatch(const QString &sourcePath, int level, int ro
         m_ready.insert(keyFor(sourcePath, level, index, rotationCorrection),
                        MediaThumbnail::tilePath(sourcePath, level, index, rotationCorrection));
 
-    if (produced.isEmpty()) {
+    if (produced.isEmpty() && aborted) {
+        // Nothing to show, but not the source's fault: no strike towards m_failed.
+    } else if (produced.isEmpty()) {
         // Repeatedly empty means no video stream, or the file is gone. Stop asking; a single
         // empty batch can just be seeks landing past the end of a short source.
         if (++m_emptyBatches[sourcePath] >= 3)

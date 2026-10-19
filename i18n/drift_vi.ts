@@ -1518,6 +1518,10 @@
         <translation type="unfinished">Một phần tư</translation>
     </message>
     <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Auto</source>
         <translation type="unfinished">Tự động</translation>
     </message>
@@ -4254,6 +4258,61 @@
     </message>
 </context>
 <context>
+    <name>AppSettingsMenu</name>
+    <message>
+        <source>Workspace</source>
+        <translation>Không gian làm việc</translation>
+    </message>
+    <message>
+        <source>Auto (follow canvas)</source>
+        <translation>Tự động (theo canvas)</translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation>Ngang</translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation>Dọc</translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation>Chủ đề</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished">Hệ thống</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Sáng</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation>Tối</translation>
+    </message>
+    <message>
+        <source>Language…</source>
+        <translation>Ngôn ngữ…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multicam</source>
+        <translation>Đa góc quay</translation>
+    </message>
+    <message>
+        <source>Debug info…</source>
+        <translation>Thông tin gỡ lỗi…</translation>
+    </message>
+    <message>
+        <source>More settings…</source>
+        <translation>Thêm cài đặt…</translation>
+    </message>
+</context>
+<context>
     <name>AssetCategoryChips</name>
     <message>
         <source>My Effects</source>
@@ -6174,58 +6233,6 @@
     <message>
         <source>Workspace, theme, language and more</source>
         <translation type="unfinished">Không gian làm việc, giao diện, ngôn ngữ và hơn thế nữa</translation>
-    </message>
-    <message>
-        <source>Workspace</source>
-        <translation type="unfinished">Không gian làm việc</translation>
-    </message>
-    <message>
-        <source>Auto (follow canvas)</source>
-        <translation type="unfinished">Tự động (theo canvas)</translation>
-    </message>
-    <message>
-        <source>Landscape</source>
-        <translation type="unfinished">Ngang</translation>
-    </message>
-    <message>
-        <source>Portrait</source>
-        <translation type="unfinished">Dọc</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation type="unfinished">Chủ đề</translation>
-    </message>
-    <message>
-        <source>System</source>
-        <translation type="unfinished">Hệ thống</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation type="unfinished">Sáng</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation type="unfinished">Tối</translation>
-    </message>
-    <message>
-        <source>Language…</source>
-        <translation type="unfinished">Ngôn ngữ…</translation>
-    </message>
-    <message>
-        <source>Switch to mobile layout…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Multicam</source>
-        <translation type="unfinished">Đa góc quay</translation>
-    </message>
-    <message>
-        <source>Debug info…</source>
-        <translation type="unfinished">Thông tin gỡ lỗi…</translation>
-    </message>
-    <message>
-        <source>More settings…</source>
-        <translation type="unfinished">Thêm cài đặt…</translation>
     </message>
 </context>
 <context>
@@ -11229,12 +11236,17 @@
         <translation type="unfinished">Một phần tư</translation>
     </message>
     <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Auto</source>
         <translation type="unfinished">Tự động</translation>
     </message>
     <message>
         <source>Preview quality — lower is smoother while editing.
-Full, Half and Quarter are fixed fractions of the project resolution: Full composites exactly what an export would.
+Full, Half, Quarter and 1/8 are fixed fractions of the project resolution: Full composites exactly what an export would.
+1/8 (Eco) is for older laptops with integrated graphics.
 Auto renders only as many pixels as the preview actually shows, and lowers that further while playback cannot keep up.</source>
         <translation type="unfinished">Chất lượng xem trước - thấp hơn sẽ mượt mà hơn khi chỉnh sửa.
 Toàn bộ, Một nửa và Một phần tư là các phần cố định của độ phân giải dự án: Tổng hợp đầy đủ chính xác những gì xuất sẽ làm.
@@ -14807,6 +14819,37 @@ Nếu phát lại bị giật, hãy thử cái khác.</translation>
     <message>
         <source>Cancel</source>
         <translation>Hủy bỏ</translation>
+    </message>
+</context>
+<context>
+    <name>StartScreen</name>
+    <message>
+        <source>Settings</source>
+        <translation>Cài đặt</translation>
+    </message>
+    <message>
+        <source>Workspace, theme, language and more</source>
+        <translation>Không gian làm việc, giao diện, ngôn ngữ và hơn thế nữa</translation>
+    </message>
+    <message>
+        <source>Debug info</source>
+        <translation type="unfinished">Thông tin gỡ lỗi</translation>
+    </message>
+    <message>
+        <source>System, playback and codec details for bug reports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Agent</source>
+        <translation>Trợ lý</translation>
+    </message>
+    <message>
+        <source>Agent access is on</source>
+        <translation>Quyền truy cập trợ lý đang bật</translation>
+    </message>
+    <message>
+        <source>Agent access</source>
+        <translation>Quyền truy cập của trợ lý</translation>
     </message>
 </context>
 <context>

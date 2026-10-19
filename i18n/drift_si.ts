@@ -1518,6 +1518,10 @@
         <translation type="unfinished">කාර්තුවක් (Quarter)</translation>
     </message>
     <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Auto</source>
         <translation type="unfinished">ස්වයංක්‍රීය</translation>
     </message>
@@ -4267,6 +4271,61 @@
     </message>
 </context>
 <context>
+    <name>AppSettingsMenu</name>
+    <message>
+        <source>Workspace</source>
+        <translation>වැඩබිම</translation>
+    </message>
+    <message>
+        <source>Auto (follow canvas)</source>
+        <translation>ස්වයංක්‍රීය (කැන්වසය අනුව)</translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation>තිරස් (Landscape)</translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation>සිරස් (Portrait)</translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation>තේමාව</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished">පද්ධතිය</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>ලා පැහැති</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation>අඳුරු</translation>
+    </message>
+    <message>
+        <source>Language…</source>
+        <translation>භාෂාව…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multicam</source>
+        <translation>බහු කැමරා</translation>
+    </message>
+    <message>
+        <source>Debug info…</source>
+        <translation>දෝෂ නිවාරණ තොරතුරු…</translation>
+    </message>
+    <message>
+        <source>More settings…</source>
+        <translation>තවත් සැකසීම්…</translation>
+    </message>
+</context>
+<context>
     <name>AssetCategoryChips</name>
     <message>
         <source>My Effects</source>
@@ -6201,58 +6260,6 @@
     <message>
         <source>Workspace, theme, language and more</source>
         <translation type="unfinished">වැඩබිම, තේමාව, භාෂාව සහ තවත් දෑ</translation>
-    </message>
-    <message>
-        <source>Workspace</source>
-        <translation type="unfinished">වැඩබිම</translation>
-    </message>
-    <message>
-        <source>Auto (follow canvas)</source>
-        <translation type="unfinished">ස්වයංක්‍රීය (කැන්වසය අනුව)</translation>
-    </message>
-    <message>
-        <source>Landscape</source>
-        <translation type="unfinished">තිරස් (Landscape)</translation>
-    </message>
-    <message>
-        <source>Portrait</source>
-        <translation type="unfinished">සිරස් (Portrait)</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation type="unfinished">තේමාව</translation>
-    </message>
-    <message>
-        <source>System</source>
-        <translation type="unfinished">පද්ධතිය</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation type="unfinished">ආලෝක (Light)</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation type="unfinished">අඳුරු</translation>
-    </message>
-    <message>
-        <source>Language…</source>
-        <translation type="unfinished">භාෂාව…</translation>
-    </message>
-    <message>
-        <source>Switch to mobile layout…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Multicam</source>
-        <translation type="unfinished">බහු කැමරා</translation>
-    </message>
-    <message>
-        <source>Debug info…</source>
-        <translation type="unfinished">දෝෂ නිවාරණ තොරතුරු…</translation>
-    </message>
-    <message>
-        <source>More settings…</source>
-        <translation type="unfinished">තවත් සැකසීම්…</translation>
     </message>
 </context>
 <context>
@@ -11277,12 +11284,17 @@
         <translation type="unfinished">කාර්තුවක් (Quarter)</translation>
     </message>
     <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Auto</source>
         <translation type="unfinished">ස්වයංක්‍රීය</translation>
     </message>
     <message>
         <source>Preview quality — lower is smoother while editing.
-Full, Half and Quarter are fixed fractions of the project resolution: Full composites exactly what an export would.
+Full, Half, Quarter and 1/8 are fixed fractions of the project resolution: Full composites exactly what an export would.
+1/8 (Eco) is for older laptops with integrated graphics.
 Auto renders only as many pixels as the preview actually shows, and lowers that further while playback cannot keep up.</source>
         <translation type="unfinished">පෙරදසුන් ගුණාත්මකභාවය — සංස්කරණයේදී අඩු අගයක් වඩාත් සුමට වේ.
 Full, Half සහ Quarter යනු ව්‍යාපෘති විභේදනයේ නියත කොටස් වේ: Full මඟින් නිර්යාතයකදී ලැබෙන ආකාරයටම පෙන්වයි.
@@ -14857,6 +14869,37 @@ If playback stutters, try another.</source>
     <message>
         <source>Cancel</source>
         <translation>අවලංගු කරන්න</translation>
+    </message>
+</context>
+<context>
+    <name>StartScreen</name>
+    <message>
+        <source>Settings</source>
+        <translation>සැකසීම්</translation>
+    </message>
+    <message>
+        <source>Workspace, theme, language and more</source>
+        <translation>වැඩබිම, තේමාව, භාෂාව සහ තවත් දෑ</translation>
+    </message>
+    <message>
+        <source>Debug info</source>
+        <translation type="unfinished">දෝෂහරණ තොරතුරු</translation>
+    </message>
+    <message>
+        <source>System, playback and codec details for bug reports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Agent</source>
+        <translation>නියෝජිතයා</translation>
+    </message>
+    <message>
+        <source>Agent access is on</source>
+        <translation>නියෝජිත (Agent) ප්‍රවේශය ක්‍රියාත්මකයි</translation>
+    </message>
+    <message>
+        <source>Agent access</source>
+        <translation>නියෝජිත (Agent) ප්‍රවේශය</translation>
     </message>
 </context>
 <context>

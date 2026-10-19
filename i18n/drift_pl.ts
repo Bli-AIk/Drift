@@ -1518,6 +1518,10 @@
         <translation type="unfinished">Ćwierć</translation>
     </message>
     <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Auto</source>
         <translation type="unfinished">Auto</translation>
     </message>
@@ -4280,6 +4284,61 @@
     </message>
 </context>
 <context>
+    <name>AppSettingsMenu</name>
+    <message>
+        <source>Workspace</source>
+        <translation>Przestrzeń robocza</translation>
+    </message>
+    <message>
+        <source>Auto (follow canvas)</source>
+        <translation>Auto (podążaj za płótnem)</translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation>Poziomy</translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation>Pionowy</translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation>Motyw</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished">Systemowy</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Jasny</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation>Ciemny</translation>
+    </message>
+    <message>
+        <source>Language…</source>
+        <translation>Język…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multicam</source>
+        <translation>Multicam</translation>
+    </message>
+    <message>
+        <source>Debug info…</source>
+        <translation>Informacje diagnostyczne…</translation>
+    </message>
+    <message>
+        <source>More settings…</source>
+        <translation>Więcej ustawień…</translation>
+    </message>
+</context>
+<context>
     <name>AssetCategoryChips</name>
     <message>
         <source>My Effects</source>
@@ -6228,58 +6287,6 @@
     <message>
         <source>Workspace, theme, language and more</source>
         <translation type="unfinished">Przestrzeń robocza, motyw, język i więcej</translation>
-    </message>
-    <message>
-        <source>Workspace</source>
-        <translation type="unfinished">Przestrzeń robocza</translation>
-    </message>
-    <message>
-        <source>Auto (follow canvas)</source>
-        <translation type="unfinished">Auto (podążaj za płótnem)</translation>
-    </message>
-    <message>
-        <source>Landscape</source>
-        <translation type="unfinished">Poziomy</translation>
-    </message>
-    <message>
-        <source>Portrait</source>
-        <translation type="unfinished">Pionowy</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation type="unfinished">Motyw</translation>
-    </message>
-    <message>
-        <source>System</source>
-        <translation type="unfinished">Systemowy</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation type="unfinished">Jasny</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation type="unfinished">Ciemny</translation>
-    </message>
-    <message>
-        <source>Language…</source>
-        <translation type="unfinished">Język…</translation>
-    </message>
-    <message>
-        <source>Switch to mobile layout…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Multicam</source>
-        <translation type="unfinished">Multicam</translation>
-    </message>
-    <message>
-        <source>Debug info…</source>
-        <translation type="unfinished">Informacje diagnostyczne…</translation>
-    </message>
-    <message>
-        <source>More settings…</source>
-        <translation type="unfinished">Więcej ustawień…</translation>
     </message>
 </context>
 <context>
@@ -11325,12 +11332,17 @@
         <translation type="unfinished">Ćwierć</translation>
     </message>
     <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Auto</source>
         <translation type="unfinished">Auto</translation>
     </message>
     <message>
         <source>Preview quality — lower is smoother while editing.
-Full, Half and Quarter are fixed fractions of the project resolution: Full composites exactly what an export would.
+Full, Half, Quarter and 1/8 are fixed fractions of the project resolution: Full composites exactly what an export would.
+1/8 (Eco) is for older laptops with integrated graphics.
 Auto renders only as many pixels as the preview actually shows, and lowers that further while playback cannot keep up.</source>
         <translation type="unfinished">Jakość podglądu — niższa jest płynniejsza podczas edycji.
 Pełna, Połowa i Ćwierć to stałe ułamki rozdzielczości projektu: Pełna komponuje dokładnie to, co eksport.
@@ -14907,6 +14919,37 @@ Jeśli odtwarzanie się zacina, spróbuj innego.</translation>
     <message>
         <source>Cancel</source>
         <translation>Anuluj</translation>
+    </message>
+</context>
+<context>
+    <name>StartScreen</name>
+    <message>
+        <source>Settings</source>
+        <translation>Ustawienia</translation>
+    </message>
+    <message>
+        <source>Workspace, theme, language and more</source>
+        <translation>Przestrzeń robocza, motyw, język i więcej</translation>
+    </message>
+    <message>
+        <source>Debug info</source>
+        <translation type="unfinished">Informacje diagnostyczne</translation>
+    </message>
+    <message>
+        <source>System, playback and codec details for bug reports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Agent</source>
+        <translation>Agent</translation>
+    </message>
+    <message>
+        <source>Agent access is on</source>
+        <translation>Dostęp agenta jest włączony</translation>
+    </message>
+    <message>
+        <source>Agent access</source>
+        <translation>Dostęp agenta</translation>
     </message>
 </context>
 <context>
