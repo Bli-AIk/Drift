@@ -4293,7 +4293,7 @@
     </message>
     <message>
         <source>Switch to mobile layout…</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">モバイルレイアウトに切り替え…</translation>
     </message>
     <message>
         <source>Multicam</source>
