@@ -99,8 +99,8 @@ constexpr drift::TimeUs kReadAheadUs = 2 * drift::kUsPerSecond;
 // (kMinCurveSpeed..kMaxCurveSpeed), and nothing outside this list is accepted.
 constexpr std::array<double, 6> kPlaybackRates{0.25, 0.5, 1.0, 1.5, 2.0, 4.0};
 
-// "full", "half" and "quarter" are fractions of the preview panel (device pixels),
-// never of the project: Full matches the panel, Half/Quarter are 1/2 and 1/4 of
+// "full", "half", "quarter" and "eighth" are fractions of the preview panel (device pixels),
+// never of the project: Full matches the panel, Half/Quarter/Eighth are 1/2, 1/4 and 1/8 of
 // that, all capped at project resolution. "auto" is Full plus a compositor ratchet
 // that trades remaining resolution for cadence when playback cannot keep up.
 bool isKnownPreviewQuality(const QString &quality)
