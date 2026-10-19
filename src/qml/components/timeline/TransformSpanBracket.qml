@@ -1,6 +1,5 @@
 import QtQuick
 import Drift
-import ".."
 
 // The span of one transform layer, drawn in the track header column: a line from the middle of
 // the layer's row down to the bottom of the last row it covers, with a tick at the top and a foot
@@ -62,25 +61,18 @@ Item {
 
     readonly property real drawnBottom: topY + (bottomY - topY) * reveal
 
-    // Tick at the top.
-    Rectangle {
-        x: root.lineX
-        y: root.topY - 1
-        width: root.indentStep - 2
-        height: 2
-        radius: 1
-        color: Theme.clipTransform
+    TimelineSpanBracketTick {
+        lineX: root.lineX
+        topY: root.topY
+        indentStep: root.indentStep
     }
 
     // The line: solid, or dashed while the layer is turned off.
-    Rectangle {
-        visible: !root.bypassed
-        x: root.lineX
-        y: root.topY
-        width: 2
-        height: Math.max(0, root.drawnBottom - root.topY)
-        radius: 1
-        color: Theme.clipTransform
+    TimelineSpanBracketLine {
+        shown: !root.bypassed
+        lineX: root.lineX
+        topY: root.topY
+        drawnBottom: root.drawnBottom
     }
     Column {
         visible: root.bypassed
@@ -89,45 +81,24 @@ Item {
         spacing: 3
         Repeater {
             model: Math.max(0, Math.floor((root.drawnBottom - root.topY) / 7))
-            delegate: Rectangle { width: 2; height: 4; radius: 1; color: Theme.clipTransform }
+            delegate: TimelineSpanBracketDash { }
         }
     }
 
     // The foot, and its handle.
-    Rectangle {
-        id: foot
-        x: root.lineX
-        y: root.drawnBottom - 1
-        width: root.indentStep - 2
-        height: 2
-        radius: 1
-        color: Theme.clipTransform
-        scale: dragArea.containsMouse || dragArea.pressed ? 1.4 : 1.0
-
-        Behavior on scale {
-            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
+    TimelineSpanBracketFoot {
+        lineX: root.lineX
+        drawnBottom: root.drawnBottom
+        indentStep: root.indentStep
+        hot: dragArea.containsMouse || dragArea.pressed
     }
 
-    // "%n track(s)" beside the foot while it is dragged.
-    Rectangle {
-        visible: dragArea.pressed
-        x: root.lineX + root.indentStep + 4
-        y: root.bottomY - height / 2
-        width: chipLabel.implicitWidth + Theme.spacingMd * 2
-        height: chipLabel.implicitHeight + Theme.spacingXs * 2
-        radius: height / 2
-        color: Theme.clipTransform
-        z: 5
-
-        Text {
-            id: chipLabel
-            anchors.centerIn: parent
-            text: qsTr("%n track(s)", "", dragArea.snapCount)
-            color: Theme.onMedia
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSizeTiny
-        }
+    TimelineSpanBracketChip {
+        shown: dragArea.pressed
+        lineX: root.lineX
+        indentStep: root.indentStep
+        bottomY: root.bottomY
+        snapCount: dragArea.snapCount
     }
 
     MouseArea {

@@ -1,8 +1,5 @@
 import QtQuick
-import QtQuick.Controls.Basic
-import QtQuick.Shapes
 import Drift
-import ".."
 
 // Transform overlay: resize/rotate grips for the clips visible at the playhead.
 // Sits outside the (clipped) canvas rect,
@@ -394,26 +391,10 @@ Item {
                 event.accepted = true
             }
 
-            Rectangle {
-                anchors.fill: parent
-                color: "transparent"
-                border.width: handle.selected
-                              ? Theme.borderWidthFocus : Theme.borderWidth
-                border.color: handle.selected ? (handle.isTransform ? Theme.clipTransform : Theme.primary)
-                              : handle.coveredBySelectedLayer ? Theme.clipTransform
-                              : hover.hovered ? Theme.guideStrong : "transparent"
-                radius: Theme.radiusXs
-
-                Behavior on border.width {
-                    NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                }
-                Behavior on border.color {
-                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                }
-            }
-
-            HoverHandler {
-                id: hover
+            TransformOverlayBoxBorder {
+                selected: handle.selected
+                transformClip: handle.isTransform
+                coveredBySelectedLayer: handle.coveredBySelectedLayer
             }
 
             TapHandler {
@@ -437,24 +418,10 @@ Item {
             }
 
             // "Name · n clips" over a selected layer's frame.
-            Rectangle {
+            TransformOverlayLayerChip {
                 visible: handle.isTransform && handle.selected
-                x: 0
-                y: -height - Theme.spacingSm
-                width: layerLabel.implicitWidth + Theme.spacingLg
-                height: layerLabel.implicitHeight + Theme.spacingSm
-                radius: Theme.radiusSm
-                color: Theme.clipTransform
-
-                Text {
-                    id: layerLabel
-                    anchors.centerIn: parent
-                    text: qsTr("%1 · %n clip(s)", "", handle.box.childCount || 0)
-                              .arg(handle.box.name || qsTr("Transform"))
-                    color: Theme.onMedia
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeXs
-                }
+                clipName: handle.box.name || ""
+                childCount: handle.box.childCount || 0
             }
 
             DragHandler {
@@ -550,358 +517,25 @@ Item {
                        ]
                        : []
 
-                delegate: Rectangle {
-                    id: grip
-                    required property var modelData
-
-                    readonly property real hs: Theme.spacingLg
-                    // Corners drive both axes, edges only one — so an edge drag
-                    // is the deliberate way to stretch and corners are free to
-                    // keep the ratio.
-                    readonly property bool isCorner: modelData.dx !== 0 && modelData.dy !== 0
-                    // Footage has a real aspect to protect, so its corners hold
-                    // the ratio unless Shift asks for a stretch. Boxes that exist
-                    // to be reshaped (text, subtitles, shapes) work the other way.
-                    readonly property bool lockByDefault: handle.box.kind === "video"
-                                                          || handle.box.kind === "image"
-                                                          || handle.box.kind === "composite"
-
-                    width: hs
-                    height: hs
-                    radius: Theme.radiusXs
-                    color: gripArea.containsMouse || gripArea.pressed
-                           ? Theme.primaryForeground : Theme.primary
-                    border.width: Theme.borderWidth
-                    border.color: gripArea.containsMouse || gripArea.pressed
-                                  ? Theme.primary : Theme.primaryForeground
-
-                    Behavior on color {
-                        ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                    }
-
-                    x: (modelData.dx === 0 ? handle.width / 2
-                                           : (modelData.dx < 0 ? 0 : handle.width)) - hs / 2
-                    y: (modelData.dy === 0 ? handle.height / 2
-                                           : (modelData.dy < 0 ? 0 : handle.height)) - hs / 2
-
-                    // Press point in overlay coordinates. The grip rides the box
-                    // as it resizes, so deltas are measured against the overlay,
-                    // which stands still.
-                    property real startPx: 0
-                    property real startPy: 0
-                    // Tilted or under the camera: the grab mapped into the box's own layout px.
-                    property var toLocal: null
-                    property point startLocal: Qt.point(0, 0)
-                    property var startBox: null
-
-                    // Resize about the fixed anchor. The maths runs in the box's
-                    // own axes, so a rotated clip grows along the direction the
-                    // grip points; the resulting centre shift is rotated back to
-                    // canvas axes at the end. At rotation 0 it reduces to a plain
-                    // "opposite corner stays put".
-                    function resizeTo(px, py, modifiers) {
-                        const dxSign = grip.modelData.dx
-                        const dySign = grip.modelData.dy
-                        const a = handle.layoutRotation * Math.PI / 180
-                        let lx = 0
-                        let ly = 0
-                        if (grip.toLocal) {
-                            // Through the pose, so the pointer is read in the box's own plane. A
-                            // tilted box resizes about its centre, which is also the tilt pivot:
-                            // holding an edge still would drag it through depth. Doubling the
-                            // pointer's travel in the box plane keeps the grip under the pointer.
-                            const l = grip.toLocal(px, py)
-                            const k = handle.is3d ? 2 : 1
-                            lx = k * (l.x - grip.startLocal.x) / handle.sx
-                            ly = k * (l.y - grip.startLocal.y) / handle.sy
-                        } else {
-                            const ddx = (px - grip.startPx) / handle.sx
-                            const ddy = (py - grip.startPy) / handle.sy
-                            // Canvas axes -> box axes: the inverse of the rotation the
-                            // body drag applies to its translation.
-                            lx = ddx * Math.cos(a) + ddy * Math.sin(a)
-                            ly = -ddx * Math.sin(a) + ddy * Math.cos(a)
-                        }
-
-                        const shift = (modifiers & Qt.ShiftModifier) !== 0
-                        const locked = grip.isCorner && (grip.lockByDefault !== shift)
-
-                        let w = Math.max(1, handle.dragStartW + lx * dxSign)
-                        let h = Math.max(1, handle.dragStartH + ly * dySign)
-                        if (locked) {
-                            // Take the scale from whichever axis the pointer moved
-                            // further along, measured as the bigger departure from
-                            // the original size so it reads the same growing or
-                            // shrinking.
-                            const rw = w / handle.dragStartW
-                            const rh = h / handle.dragStartH
-                            const s = Math.abs(rw - 1) >= Math.abs(rh - 1) ? rw : rh
-                            w = Math.max(1, handle.dragStartW * s)
-                            h = Math.max(1, handle.dragStartH * s)
-                        }
-
-                        // Only the moving edge sticks; the anchor is already fixed.
-                        let guideX = -1
-                        let guideY = -1
-                        if (handle.canSnap && !(modifiers & Qt.ControlModifier)) {
-                            // Each moving edge is snapped as it projects, through the pose,
-                            // parents and camera.
-                            const snapped = EditorState.preview.snapResize(grip.startBox, w, h, dxSign, dySign,
-                                                                          handle.is3d,
-                                                                          root.snapTolPx / handle.sx)
-                            if (locked) {
-                                // The axes are tied, so only the closer of the two
-                                // snaps wins and it sets the scale for both.
-                                const rx = snapped.distX >= 0 ? snapped.distX : Infinity
-                                const ry = snapped.distY >= 0 ? snapped.distY : Infinity
-                                let s = -1
-                                if (rx <= ry && rx < Infinity) {
-                                    s = snapped.width / handle.dragStartW
-                                    guideX = snapped.guideX
-                                } else if (ry < Infinity) {
-                                    s = snapped.height / handle.dragStartH
-                                    guideY = snapped.guideY
-                                }
-                                if (s > 0) {
-                                    w = Math.max(1, handle.dragStartW * s)
-                                    h = Math.max(1, handle.dragStartH * s)
-                                }
-                            } else {
-                                if (snapped.distX >= 0) {
-                                    w = snapped.width
-                                    guideX = snapped.guideX
-                                }
-                                if (snapped.distY >= 0) {
-                                    h = snapped.height
-                                    guideY = snapped.guideY
-                                }
-                            }
-                        }
-                        handle.publishGuides(guideX, guideY)
-
-                        // Keeping the anchor still means the centre moves by half
-                        // the size change, toward the grip, in box axes.
-                        const shiftX = handle.is3d ? 0 : (w - handle.dragStartW) / 2 * dxSign
-                        const shiftY = handle.is3d ? 0 : (h - handle.dragStartH) / 2 * dySign
-                        const cx = handle.dragStartX + handle.dragStartW / 2
-                                   + shiftX * Math.cos(a) - shiftY * Math.sin(a)
-                        const cy = handle.dragStartY + handle.dragStartH / 2
-                                   + shiftX * Math.sin(a) + shiftY * Math.cos(a)
-                        const x = cx - w / 2
-                        const y = cy - h / 2
-
-                        handle.liveX = x
-                        handle.liveY = y
-                        handle.liveW = w
-                        handle.liveH = h
-                        if (handle.isText && grip.isCorner) {
-                            // Height drives the glyph scale; an edge drag just
-                            // re-wraps, since the box is the wrap width.
-                            const size = Math.round(handle.dragStartPixelSize
-                                                    * h / Math.max(1, handle.dragStartH))
-                            EditorState.previewSetTextRect(
-                                handle.box.track,
-                                handle.box.clip,
-                                x, y, w, h, size)
-                        } else {
-                            EditorState.previewSetClipRect(
-                                handle.box.track,
-                                handle.box.clip,
-                                x, y, w, h)
-                        }
-                    }
-
-                    MouseArea {
-                        id: gripArea
-                        anchors.fill: parent
-                        // Generous invisible margin: the visible dot stays small
-                        // enough not to hide the box edge it sits on.
-                        anchors.margins: -Theme.spacingMd
-                        hoverEnabled: true
-                        cursorShape: grip.modelData.cursor
-                        // The delegate's body DragHandler would otherwise take the
-                        // grab once the drag threshold is passed, turning a resize
-                        // into a move.
-                        preventStealing: true
-
-                        // Zooming with the pointer on a grip should still zoom.
-                        onWheel: (wheel) => { wheel.accepted = false }
-
-                        onPressed: (mouse) => {
-                            const raw = mapToItem(root, mouse.x, mouse.y)
-                            const throughPose = handle.is3d || handle.viaCamera
-                            const p = throughPose ? raw : handle.toParentLocal(raw)
-                            grip.startPx = p.x
-                            grip.startPy = p.y
-                            grip.toLocal = throughPose ? handle.overlayToLocalMapper() : null
-                            if (grip.toLocal)
-                                grip.startLocal = grip.toLocal(p.x, p.y)
-                            if (handle.isTransform)
-                                root.movingLayerTrack = handle.box.track
-                            handle.dragStartX = handle.layoutX
-                            handle.dragStartY = handle.layoutY
-                            handle.dragStartW = handle.layoutW
-                            handle.dragStartH = handle.layoutH
-                            handle.dragStartPixelSize = handle.box.pixelSize || 64
-                            grip.startBox = handle.grabBox()
-                            handle.liveX = handle.dragStartX
-                            handle.liveY = handle.dragStartY
-                            handle.liveW = handle.dragStartW
-                            handle.liveH = handle.dragStartH
-                            handle.resizing = true
-                            root.interacting = true
-                            EditorState.selectClip(handle.box.track, handle.box.clip)
-                            handle.forceActiveFocus()
-                            EditorState.beginPreviewDrag()
-                        }
-
-                        onPositionChanged: (mouse) => {
-                            if (!pressed)
-                                return
-                            const raw = mapToItem(root, mouse.x, mouse.y)
-                            const p = grip.toLocal ? raw : handle.toParentLocal(raw)
-                            grip.resizeTo(p.x, p.y, mouse.modifiers)
-                        }
-
-                        onReleased: grip.finishResize()
-                        onCanceled: grip.finishResize()
-                    }
-
-                    function finishResize() {
-                        if (!handle.resizing)
-                            return
-                        handle.resizing = false
-                        handle.liveX = -1e12
-                        handle.liveY = -1e12
-                        handle.liveW = -1
-                        handle.liveH = -1
-                        root.endInteraction()
-                    }
+                delegate: TransformOverlayResizeGrip {
+                    target: handle
+                    overlay: root
                 }
             }
 
-            // Live size while resizing, the same readout the crop tool shows;
-            // the live angle while rotating.
-            Rectangle {
-                visible: handle.resizing || handle.rotating
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.bottom
-                anchors.topMargin: Theme.spacingLg
-                width: sizeLabel.width + Theme.spacingLg
-                height: sizeLabel.height + Theme.spacingSm
-                radius: Theme.radiusSm
-                // Sits on the preview, not a panel surface, so it uses the fixed
-                // scrim and on-media foreground rather than panel tokens.
-                color: Theme.scrimStrong
-                border.width: Theme.borderWidth
-                border.color: Theme.guideWeak
-                // Keeps the number upright on a rotated clip.
-                rotation: -handle.rotation
-
-                Text {
-                    id: sizeLabel
-                    anchors.centerIn: parent
-                    text: handle.rotating
-                          ? Math.round(handle.layoutRotation) + "°"
-                          : Math.round(handle.layoutW) + "×" + Math.round(handle.layoutH)
-                    color: Theme.onMedia
-                    font.family: Theme.monoFontFamily
-                    font.pixelSize: Theme.fontSizeXs
-                }
+            TransformOverlaySizeReadout {
+                resizing: handle.resizing
+                rotating: handle.rotating
+                layoutRotation: handle.layoutRotation
+                layoutW: handle.layoutW
+                layoutH: handle.layoutH
+                spin: handle.rotation
             }
 
             // Rotation handle above the box (a 3D layer turns with the gizmo's rings instead)
-            Item {
-                visible: handle.selected && !root.mode3d
-                width: 14
-                height: 14
-                x: handle.width / 2 - width / 2
-                y: -28
-
-                Rectangle {
-                    anchors.top: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    width: 1
-                    height: 16
-                    color: Theme.primary
-                }
-
-                Rectangle {
-                    anchors.fill: parent
-                    radius: width / 2
-                    color: Theme.primary
-                    border.width: 1
-                    border.color: Theme.onMedia
-                }
-
-                DragHandler {
-                    id: rotateDrag
-                    target: null
-                    cursorShape: Qt.CrossCursor
-
-                    // Under the camera: the pointer read in the box's own plane, as it stood at
-                    // the grab.
-                    property var toLocal: null
-
-                    // Angle from the box centre to the pointer, in the same frame
-                    // as the clip rotation (the grip sits above the box, hence +90).
-                    function pointerAngle() {
-                        if (rotateDrag.toLocal) {
-                            const raw = root.mapFromItem(null, rotateDrag.centroid.scenePosition.x,
-                                                         rotateDrag.centroid.scenePosition.y)
-                            const l = rotateDrag.toLocal(raw.x, raw.y)
-                            return Math.atan2(l.y - handle.layoutH * handle.sy / 2,
-                                              l.x - handle.layoutW * handle.sx / 2) * 180 / Math.PI + 90
-                        }
-                        // Measured in the box's own frame: a parent's turn is not the clip's.
-                        const p = handle.toParentLocal(root.mapFromItem(null, rotateDrag.centroid.scenePosition.x,
-                                                                        rotateDrag.centroid.scenePosition.y))
-                        // A tilted box spins about its projected centre.
-                        const c = handle.is3d
-                                ? handle.toParentLocal(handle.mapToItem(root, handle.layoutW * handle.sx / 2,
-                                                                        handle.layoutH * handle.sy / 2))
-                                : Qt.point(handle.centerX, handle.centerY)
-                        const ang = Math.atan2(p.y - c.y, p.x - c.x)
-                        return ang * 180 / Math.PI + 90
-                    }
-
-                    onActiveChanged: {
-                        if (active) {
-                            root.interacting = true
-                            if (handle.isTransform)
-                                root.movingLayerTrack = handle.box.track
-                            handle.rotating = true
-                            handle.liveRotation = handle.box.rotation
-                            rotateDrag.toLocal = handle.viaCamera || handle.is3d
-                                    ? handle.overlayToLocalMapper() : null
-                            // Turning starts from where the grip was taken, so
-                            // grabbing it does not snap the clip to the pointer.
-                            handle.rotateGrabOffset = handle.box.rotation
-                                    - rotateDrag.pointerAngle()
-                            EditorState.selectClip(handle.box.track, handle.box.clip)
-                            handle.forceActiveFocus()
-                            EditorState.beginPreviewDrag()
-                        } else {
-                            handle.rotating = false
-                            handle.liveRotation = 1e9
-                            rotateDrag.toLocal = null
-                            root.endInteraction()
-                        }
-                    }
-                    onCentroidChanged: {
-                        if (!active)
-                            return
-                        let deg = root.normalizeDeg(rotateDrag.pointerAngle()
-                                                    + handle.rotateGrabOffset)
-                        if (!(rotateDrag.centroid.modifiers & Qt.ControlModifier))
-                            deg = root.snapAngle(deg)
-                        handle.liveRotation = deg
-                        EditorState.previewSetClipRotation(
-                            handle.box.track,
-                            handle.box.clip,
-                            deg)
-                    }
-                }
+            TransformOverlayRotateHandle {
+                target: handle
+                overlay: root
             }
         }
     }
@@ -921,56 +555,13 @@ Item {
             return q ? Qt.point(q.x * qsx, q.y * qsy) : Qt.point(0, 0)
         }
 
-        Shape {
-            anchors.fill: parent
-            visible: parentFrame.quad.length === 4
-            preferredRendererType: Shape.CurveRenderer
-            ShapePath {
-                strokeColor: Theme.clipTransform
-                strokeWidth: Theme.borderWidthFocus
-                strokeStyle: ShapePath.DashLine
-                dashPattern: [4, 3]
-                fillColor: "transparent"
-                startX: parentFrame.corner(0).x
-                startY: parentFrame.corner(0).y
-                PathLine { x: parentFrame.corner(1).x; y: parentFrame.corner(1).y }
-                PathLine { x: parentFrame.corner(2).x; y: parentFrame.corner(2).y }
-                PathLine { x: parentFrame.corner(3).x; y: parentFrame.corner(3).y }
-                PathLine { x: parentFrame.corner(0).x; y: parentFrame.corner(0).y }
-            }
+        TransformOverlayParentOutline {
+            frame: parentFrame
         }
 
-        Rectangle {
-            visible: parentFrame.quad.length === 4
-            x: parentFrame.corner(0).x
-            y: parentFrame.corner(0).y - height - Theme.spacingSm
-            width: parentChipLabel.implicitWidth + Theme.spacingLg
-            height: parentChipLabel.implicitHeight + Theme.spacingSm
-            radius: height / 2
-            color: parentChipMouse.containsMouse ? Qt.lighter(Theme.clipTransform, 1.15) : Theme.clipTransform
-
-            Text {
-                id: parentChipLabel
-                anchors.centerIn: parent
-                text: qsTr("Select %1").arg(root.parentFrameBox ? (root.parentFrameBox.name || qsTr("Transform")) : "")
-                color: Theme.onMedia
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSizeXs
-            }
-
-            MouseArea {
-                id: parentChipMouse
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: EditorState.selectTransformParent()
-            }
-
-            ThemedToolTip {
-                visible: parentChipMouse.containsMouse
-                text: qsTr("Select the transform layer moving this clip (%1)")
-                          .arg(EditorState.shortcutFor("selectTransformLayer"))
-            }
+        TransformOverlayParentChip {
+            frame: parentFrame
+            layerName: root.parentFrameBox ? (root.parentFrameBox.name || "") : ""
         }
     }
 
@@ -990,22 +581,12 @@ Item {
 
     // Alignment guides for whichever snap is currently engaged. Drawn once at
     // root level so a guide spans the whole canvas, not just the clip box.
-    Rectangle {
-        visible: root.snapGuideX >= 0
-        x: root.snapGuideX
-        y: 0
-        width: 1
-        height: root.height
-        color: Theme.primary
-        z: 400
+    TransformOverlaySnapGuide {
+        alongX: true
+        position: root.snapGuideX
     }
-    Rectangle {
-        visible: root.snapGuideY >= 0
-        x: 0
-        y: root.snapGuideY
-        width: root.width
-        height: 1
-        color: Theme.primary
-        z: 400
+    TransformOverlaySnapGuide {
+        alongX: false
+        position: root.snapGuideY
     }
 }

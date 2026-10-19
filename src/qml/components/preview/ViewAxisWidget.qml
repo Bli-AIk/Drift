@@ -6,7 +6,7 @@ import Drift
 Item {
     id: widget
 
-    readonly property real radius: 34
+    readonly property real radius: Theme.c.viewAxisWidget.radius
     readonly property var axes: {
         void EditorState.preview.viewRevision
         return EditorState.preview.axes()
@@ -24,18 +24,13 @@ Item {
     }
 
     function colorFor(axis) {
-        return axis === "x" ? Theme.gizmoX : axis === "y" ? Theme.gizmoY : Theme.gizmoZ
+        return axis === "x" ? Theme.c.viewAxisWidget.x : axis === "y" ? Theme.c.viewAxisWidget.y : Theme.c.viewAxisWidget.z
     }
 
     width: radius * 2 + 16
     height: width
 
-    Rectangle {
-        anchors.fill: parent
-        radius: width / 2
-        color: hover.hovered ? Qt.rgba(1, 1, 1, 0.08) : "transparent"
-        HoverHandler { id: hover }
-    }
+    ViewAxisDisc {}
 
     Repeater {
         model: widget.ends
@@ -50,46 +45,22 @@ Item {
             anchors.fill: parent
 
             // The shaft, for the positive end only.
-            Rectangle {
-                visible: end.positive
-                x: end.cx
-                y: end.cy - height / 2
-                width: Math.hypot(end.tipX - end.cx, end.tipY - end.cy)
-                height: 2
-                color: widget.colorFor(end.modelData.axis)
-                transformOrigin: Item.Left
-                rotation: Math.atan2(end.tipY - end.cy, end.tipX - end.cx) * 180 / Math.PI
+            ViewAxisShaft {
+                shown: end.positive
+                originX: end.cx
+                originY: end.cy
+                tipX: end.tipX
+                tipY: end.tipY
+                ink: widget.colorFor(end.modelData.axis)
             }
 
-            Rectangle {
-                id: knob
-                width: end.positive ? 18 : 12
-                height: width
-                radius: width / 2
-                x: end.tipX - width / 2
-                y: end.tipY - height / 2
-                color: end.positive ? widget.colorFor(end.modelData.axis)
-                                    : Qt.darker(widget.colorFor(end.modelData.axis), 1.8)
-                border.width: knobArea.containsMouse ? 2 : 0
-                border.color: Theme.onMedia
-
-                Text {
-                    visible: end.positive
-                    anchors.centerIn: parent
-                    text: end.modelData.axis.toUpperCase()
-                    color: Theme.onMedia
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeXs
-                    font.bold: true
-                }
-
-                MouseArea {
-                    id: knobArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: EditorState.preview.setAxisView(end.modelData.view)
-                }
+            ViewAxisKnob {
+                positive: end.positive
+                tipX: end.tipX
+                tipY: end.tipY
+                ink: widget.colorFor(end.modelData.axis)
+                letter: end.modelData.axis.toUpperCase()
+                viewName: end.modelData.view
             }
         }
     }

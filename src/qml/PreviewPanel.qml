@@ -1,9 +1,5 @@
 import QtQuick
 import Drift
-import "components"
-import "components/preview"
-import "components/preview/modes"
-
 // The desktop preview: the shared viewport and tools, the on-screen controls that fade over it,
 // and the transport bar underneath.
 PanelFrame {
@@ -43,9 +39,9 @@ PanelFrame {
 
     // Fullscreen gives the whole screen to the picture: no gutter, and the transport joins the OSD
     // over it instead of taking a strip of its own.
-    color: previewFullscreen ? Theme.overlayColor : Theme.panelBackground
-    border.width: previewFullscreen ? 0 : 1
-    radius: previewFullscreen ? 0 : Theme.radiusSm
+    color: previewFullscreen ? Theme.c.previewPanel.backgroundFullscreen : Theme.c.previewPanel.background
+    border.width: previewFullscreen ? Theme.c.previewPanel.borderWidthFullscreen : Theme.c.previewPanel.borderWidth
+    radius: previewFullscreen ? Theme.c.previewPanel.radiusFullscreen : Theme.c.previewPanel.radius
 
     Item {
         id: viewportOuter
@@ -100,12 +96,11 @@ PanelFrame {
     }
 
     // In fullscreen the bar sits over the picture, so it needs a surface of its own.
-    Rectangle {
+    PreviewFullscreenTransportScrim {
         anchors.fill: bottomBar
         z: 1
-        visible: root.previewFullscreen && bottomBar.visible
-        opacity: bottomBar.opacity
-        color: Qt.rgba(Theme.panelBackground.r, Theme.panelBackground.g, Theme.panelBackground.b, 0.9)
+        shown: root.previewFullscreen && bottomBar.visible
+        plateOpacity: bottomBar.opacity
     }
 
     // In fullscreen this is part of the OSD: it fades with it, and holds it up while in use.

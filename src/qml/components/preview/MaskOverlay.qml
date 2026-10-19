@@ -1,6 +1,5 @@
 import QtQuick
 import Drift
-import ".."
 
 // Mask editor: direct manipulation of the selected clip's mask layers. Geometry is driven by
 // PreviewToolHost, which mirrors the canvas rect here so grips on a mask that runs past a canvas
@@ -145,13 +144,7 @@ Item {
         }
 
         // The clip's own bounds, so it is obvious what the mask coordinates are relative to.
-        Rectangle {
-            anchors.fill: parent
-            color: "transparent"
-            border.width: Theme.borderWidth
-            border.color: Theme.mutedForeground
-            opacity: 0.35
-        }
+        MaskOverlayClipBounds { }
 
         Repeater {
             id: maskRepeater
@@ -346,30 +339,20 @@ Item {
                 // box plus a hint, rather than reproducing the rasterizer's geometry in QML — the
                 // point of the box is the handles, and the real shape is visible in the composite
                 // behind it.
-                Rectangle {
-                    anchors.fill: parent
-                    color: "transparent"
-                    border.width: Theme.borderWidth
-                    border.color: maskBox.isSelected ? Theme.primary : Theme.mutedForeground
-                    opacity: maskBox.maskData.enabled === false
-                             ? 0.25 : (maskBox.isSelected ? 1.0 : 0.5)
-                    radius: maskBox.maskData.shape === "ellipse"
-                            ? Math.min(width, height) / 2 : 0
+                MaskOverlayOutline {
+                    selected: maskBox.isSelected
+                    enabledMask: maskBox.maskData.enabled !== false
+                    shape: maskBox.maskData.shape || ""
                 }
 
                 // Feather reaches beyond the shape's edge, so show how far. Drawn outside so it
                 // reads as "the edge fades out to here".
-                Rectangle {
-                    visible: maskBox.isSelected && (maskBox.maskData.feather || 0) > 0
-                    anchors.centerIn: parent
-                    width: parent.width + 2 * (maskBox.maskData.feather || 0) * root.sx
-                    height: parent.height + 2 * (maskBox.maskData.feather || 0) * root.sy
-                    color: "transparent"
-                    border.width: Theme.borderWidth
-                    border.color: Theme.primary
-                    opacity: 0.35
-                    radius: maskBox.maskData.shape === "ellipse"
-                            ? Math.min(width, height) / 2 : 0
+                MaskOverlayFeatherRing {
+                    selected: maskBox.isSelected
+                    feather: maskBox.maskData.feather || 0
+                    scaleX: root.sx
+                    scaleY: root.sy
+                    shape: maskBox.maskData.shape || ""
                 }
 
                 TapHandler {
@@ -456,52 +439,10 @@ Item {
                 }
 
                 // Rotation handle, 28px above the box.
-                Rectangle {
-                    visible: maskBox.editable && maskBox.isSelected
-                    width: Theme.spacingLg
-                    height: Theme.spacingLg
-                    radius: width / 2
-                    color: rotateArea.containsMouse || rotateArea.pressed
-                           ? Theme.primaryForeground : Theme.primary
-                    border.width: Theme.borderWidth
-                    border.color: rotateArea.containsMouse || rotateArea.pressed
-                                  ? Theme.primary : Theme.primaryForeground
-                    x: parent.width / 2 - width / 2
-                    y: -28 - height / 2
-
-                    MouseArea {
-                        id: rotateArea
-                        anchors.fill: parent
-                        anchors.margins: -Theme.spacingMd
-                        hoverEnabled: true
-                        cursorShape: Qt.CrossCursor
-                        preventStealing: true
-                        onWheel: (wheel) => { wheel.accepted = false }
-
-                        onPressed: {
-                            root.interacting = true
-                            maskBox.forceActiveFocus()
-                            EditorState.beginPreviewDrag(qsTr("Mask changed"))
-                        }
-
-                        onPositionChanged: (mouse) => {
-                            if (!pressed)
-                                return
-                            // Angle is measured in the clip frame, so map through it rather than
-                            // through the rotating box.
-                            const p = mapToItem(clipFrame, mouse.x, mouse.y)
-                            const cx = maskBox.mx * clipFrame.width
-                            const cy = maskBox.my * clipFrame.height
-                            let deg = Math.atan2(p.y - cy, p.x - cx) * 180 / Math.PI + 90
-                            if ((mouse.modifiers & Qt.ShiftModifier) !== 0)
-                                deg = Math.round(deg / 15) * 15
-                            maskBox.liveRotation = deg
-                            maskBox.writeLive()
-                        }
-
-                        onReleased: { maskBox.clearLive(); root.endInteraction() }
-                        onCanceled: { maskBox.clearLive(); root.endInteraction() }
-                    }
+                MaskOverlayRotateHandle {
+                    mask: maskBox
+                    frame: clipFrame
+                    overlay: root
                 }
 
                 // Polygon vertices. Drawn in the clip frame rather than the mask box, because the
@@ -512,90 +453,10 @@ Item {
                             && maskBox.maskData.enabled !== false)
                            ? (maskBox.maskData.points || []) : []
 
-                    delegate: Rectangle {
-                        id: vertex
-                        required property var modelData
-                        required property int index
-
-                        // Deliberately larger than the resize grips: a vertex is a point target
-                        // rather than an edge to catch, and it is the only way to reshape a
-                        // freeform, so it has to be easy to hit.
-                        readonly property real vs: Theme.spacingLg * 1.25
-                        width: vs
-                        height: vs
-                        radius: vs / 2
-                        color: vertexArea.containsMouse || vertexArea.pressed
-                               ? Theme.primaryForeground : Theme.primary
-                        border.width: Theme.borderWidth
-                        border.color: Theme.primaryForeground
-
-                        // Live position during a drag, so the dot tracks the cursor without
-                        // waiting for the model to come back.
-                        property real liveVx: -1e12
-                        property real liveVy: -1e12
-                        readonly property real vx: liveVx > -1e11 ? liveVx : modelData.x
-                        readonly property real vy: liveVy > -1e11 ? liveVy : modelData.y
-
-                        parent: clipFrame
-                        x: vx * clipFrame.width - vs / 2
-                        y: vy * clipFrame.height - vs / 2
-                        z: 200
-
-                        MouseArea {
-                            id: vertexArea
-                            anchors.fill: parent
-                            anchors.margins: -Theme.spacingMd
-                            hoverEnabled: true
-                            cursorShape: Qt.SizeAllCursor
-                            preventStealing: true
-                            acceptedButtons: Qt.LeftButton | Qt.RightButton
-                            onWheel: (wheel) => { wheel.accepted = false }
-
-                            property bool pressedByTouch: false
-
-                            onPressed: (mouse) => {
-                                pressedByTouch = mouse.source !== Qt.MouseEventNotSynthesized
-                                if (mouse.button === Qt.RightButton) {
-                                    EditorState.removeMaskPoint(maskBox.layerTrack,
-                                                                maskBox.layerClip, vertex.index)
-                                    return
-                                }
-                                root.interacting = true
-                                maskBox.forceActiveFocus()
-                                EditorState.beginPreviewDrag(qsTr("Mask changed"))
-                            }
-
-                            onPositionChanged: (mouse) => {
-                                if (!pressed || mouse.buttons !== Qt.LeftButton)
-                                    return
-                                const p = mapToItem(clipFrame, mouse.x, mouse.y)
-                                vertex.liveVx = p.x / Math.max(1, clipFrame.width)
-                                vertex.liveVy = p.y / Math.max(1, clipFrame.height)
-                                maskBox.writePointAt(vertex.index, vertex.liveVx, vertex.liveVy)
-                            }
-
-                            function finish() {
-                                if (vertex.liveVx < -1e11)
-                                    return
-                                vertex.liveVx = -1e12
-                                vertex.liveVy = -1e12
-                                root.endInteraction()
-                            }
-
-                            onReleased: finish()
-                            onCanceled: finish()
-
-                            // Touch has no right button: hold a vertex still to delete it.
-                            onPressAndHold: (mouse) => {
-                                if (!pressedByTouch || vertex.liveVx > -1e11
-                                        || !(mouse.buttons & Qt.LeftButton))
-                                    return
-                                EditorState.cancelPreviewDrag()
-                                root.interacting = false
-                                EditorState.removeMaskPoint(maskBox.layerTrack,
-                                                            maskBox.layerClip, vertex.index)
-                            }
-                        }
+                    delegate: MaskOverlayVertexHandle {
+                        mask: maskBox
+                        frame: clipFrame
+                        overlay: root
                     }
                 }
 
@@ -605,46 +466,9 @@ Item {
                             && maskBox.maskData.enabled !== false)
                            ? (maskBox.maskData.points || []) : []
 
-                    delegate: Rectangle {
-                        id: midpoint
-                        required property var modelData
-                        required property int index
-
-                        // The edge from this vertex to the next, wrapping at the end.
-                        readonly property var nextPoint: {
-                            const pts = maskBox.maskData.points || []
-                            return pts[(midpoint.index + 1) % pts.length]
-                        }
-                        readonly property real mxN: nextPoint
-                                ? (modelData.x + nextPoint.x) / 2 : modelData.x
-                        readonly property real myN: nextPoint
-                                ? (modelData.y + nextPoint.y) / 2 : modelData.y
-
-                        parent: clipFrame
-                        width: Theme.spacingMd
-                        height: Theme.spacingMd
-                        radius: width / 2
-                        color: "transparent"
-                        border.width: Theme.borderWidth
-                        border.color: Theme.primary
-                        opacity: midArea.containsMouse ? 1.0 : 0.5
-                        x: mxN * clipFrame.width - width / 2
-                        y: myN * clipFrame.height - height / 2
-                        z: 199
-
-                        MouseArea {
-                            id: midArea
-                            anchors.fill: parent
-                            anchors.margins: -Theme.spacingSm
-                            hoverEnabled: true
-                            cursorShape: Qt.CrossCursor
-                            preventStealing: true
-                            onWheel: (wheel) => { wheel.accepted = false }
-                            // Inserting before the far end of the edge splits that edge.
-                            onClicked: EditorState.insertMaskPoint(
-                                maskBox.layerTrack, maskBox.layerClip,
-                                midpoint.index + 1, midpoint.mxN, midpoint.myN)
-                        }
+                    delegate: MaskOverlayEdgeMidpoint {
+                        mask: maskBox
+                        frame: clipFrame
                     }
                 }
 
@@ -663,110 +487,10 @@ Item {
                            ]
                            : []
 
-                    delegate: Rectangle {
-                        id: grip
-                        required property var modelData
-
-                        readonly property real hs: Theme.spacingLg
-                        readonly property bool isCorner: modelData.dx !== 0 && modelData.dy !== 0
-
-                        width: hs
-                        height: hs
-                        radius: Theme.radiusXs
-                        color: gripArea.containsMouse || gripArea.pressed
-                               ? Theme.primaryForeground : Theme.primary
-                        border.width: Theme.borderWidth
-                        border.color: gripArea.containsMouse || gripArea.pressed
-                                      ? Theme.primary : Theme.primaryForeground
-
-                        x: (modelData.dx === 0 ? maskBox.width / 2
-                                               : (modelData.dx < 0 ? 0 : maskBox.width)) - hs / 2
-                        y: (modelData.dy === 0 ? maskBox.height / 2
-                                               : (modelData.dy < 0 ? 0 : maskBox.height)) - hs / 2
-
-                        // Press point in clip-frame coordinates. The grip rides the box as it
-                        // resizes, so deltas are measured against the frame, which stands still.
-                        property real startPx: 0
-                        property real startPy: 0
-
-                        // Resize about the fixed opposite edge/corner. The maths runs in the box's
-                        // own axes so a rotated mask grows along the direction the grip points;
-                        // the resulting centre shift is rotated back into the clip frame at the end.
-                        function resizeTo(px, py, modifiers) {
-                            const dxSign = grip.modelData.dx
-                            const dySign = grip.modelData.dy
-                            const a = maskBox.rotation * Math.PI / 180
-                            const ddx = (px - grip.startPx) / Math.max(1, clipFrame.width)
-                            const ddy = (py - grip.startPy) / Math.max(1, clipFrame.height)
-                            // Clip axes -> box axes.
-                            const lx = ddx * Math.cos(a) + ddy * Math.sin(a)
-                            const ly = -ddx * Math.sin(a) + ddy * Math.cos(a)
-
-                            let w = Math.max(0.01, maskBox.dragStartW + lx * dxSign)
-                            let h = Math.max(0.01, maskBox.dragStartH + ly * dySign)
-
-                            // Shift locks the ratio on a corner drag.
-                            if (grip.isCorner && (modifiers & Qt.ShiftModifier) !== 0) {
-                                const s = Math.max(w / Math.max(0.01, maskBox.dragStartW),
-                                                   h / Math.max(0.01, maskBox.dragStartH))
-                                w = Math.max(0.01, maskBox.dragStartW * s)
-                                h = Math.max(0.01, maskBox.dragStartH * s)
-                            }
-
-                            // Keeping the anchor still means the centre moves by half the size
-                            // change, toward the grip, in box axes.
-                            const shiftX = (w - maskBox.dragStartW) / 2 * dxSign
-                            const shiftY = (h - maskBox.dragStartH) / 2 * dySign
-                            maskBox.liveX = maskBox.dragStartX
-                                          + shiftX * Math.cos(a) - shiftY * Math.sin(a)
-                            maskBox.liveY = maskBox.dragStartY
-                                          + shiftX * Math.sin(a) + shiftY * Math.cos(a)
-                            maskBox.liveW = w
-                            maskBox.liveH = h
-                            maskBox.writeLive()
-                        }
-
-                        MouseArea {
-                            id: gripArea
-                            anchors.fill: parent
-                            // Generous invisible margin: the visible dot stays small enough not to
-                            // hide the box edge it sits on.
-                            anchors.margins: -Theme.spacingMd
-                            hoverEnabled: true
-                            cursorShape: grip.modelData.cursor
-                            // The body DragHandler would otherwise take the grab once the drag
-                            // threshold is passed, turning a resize into a move.
-                            preventStealing: true
-                            // Zooming with the pointer on a grip should still zoom.
-                            onWheel: (wheel) => { wheel.accepted = false }
-
-                            onPressed: (mouse) => {
-                                const p = mapToItem(clipFrame, mouse.x, mouse.y)
-                                grip.startPx = p.x
-                                grip.startPy = p.y
-                                maskBox.dragStartX = maskBox.mx
-                                maskBox.dragStartY = maskBox.my
-                                maskBox.dragStartW = maskBox.mw
-                                maskBox.dragStartH = maskBox.mh
-                                maskBox.liveX = maskBox.dragStartX
-                                maskBox.liveY = maskBox.dragStartY
-                                maskBox.liveW = maskBox.dragStartW
-                                maskBox.liveH = maskBox.dragStartH
-                                root.interacting = true
-                                maskBox.forceActiveFocus()
-                                EditorState.beginPreviewDrag(qsTr("Mask changed"))
-                            }
-
-                            onPositionChanged: (mouse) => {
-                                if (!pressed)
-                                    return
-                                const p = mapToItem(clipFrame, mouse.x, mouse.y)
-                                grip.resizeTo(p.x, p.y, mouse.modifiers)
-                            }
-
-                            onReleased: { maskBox.clearLive(); root.endInteraction() }
-                            onCanceled: { maskBox.clearLive(); root.endInteraction() }
-                        }
+                    delegate: MaskOverlayResizeGrip {
+                        mask: maskBox
+                        frame: clipFrame
+                        overlay: root
                     }
                 }
             }
@@ -825,63 +549,17 @@ Item {
                         height: barsEntry.bandH
                         y: atTop ? 0 : clipFrame.height - barsEntry.bandH
 
-                        Rectangle {
-                            anchors.fill: parent
-                            color: "transparent"
-                            border.width: Theme.borderWidth
-                            border.color: barsEntry.isSelected ? Theme.primary
-                                                               : Theme.mutedForeground
-                            opacity: barsEntry.isSelected ? 1.0 : 0.5
+                        MaskOverlayBarBand {
+                            selected: barsEntry.isSelected
                         }
 
                         // The inner edge — the one `h` actually moves. Drawn as a bar rather than
                         // a dot because it spans the whole width, like the thing it resizes.
-                        Rectangle {
-                            visible: barsEntry.isSelected
-                            width: Theme.spacingLg * 2
-                            height: Theme.spacingSm
-                            radius: Theme.radiusXs
-                            x: (parent.width - width) / 2
-                            y: (band.atTop ? parent.height : 0) - height / 2
-                            color: edgeArea.containsMouse || edgeArea.pressed
-                                   ? Theme.primaryForeground : Theme.primary
-                            border.width: Theme.borderWidth
-                            border.color: edgeArea.containsMouse || edgeArea.pressed
-                                          ? Theme.primary : Theme.primaryForeground
-
-                            MouseArea {
-                                id: edgeArea
-                                anchors.fill: parent
-                                anchors.margins: -Theme.spacingMd
-                                hoverEnabled: true
-                                cursorShape: Qt.SizeVerCursor
-                                preventStealing: true
-                                onWheel: (wheel) => { wheel.accepted = false }
-
-                                onPressed: {
-                                    root.interacting = true
-                                    EditorState.beginPreviewDrag(qsTr("Mask changed"))
-                                }
-
-                                onPositionChanged: (mouse) => {
-                                    if (!pressed)
-                                        return
-                                    const p = mapToItem(clipFrame, mouse.x, mouse.y)
-                                    // Both bands come from one number, so the bottom edge is
-                                    // measured from the bottom of the frame.
-                                    const depth = band.atTop ? p.y : clipFrame.height - p.y
-                                    barsEntry.writeHeight(
-                                        2.0 * depth / Math.max(1, clipFrame.height))
-                                }
-
-                                function finish() {
-                                    barsEntry.liveH = -1
-                                    root.endInteraction()
-                                }
-
-                                onReleased: finish()
-                                onCanceled: finish()
-                            }
+                        MaskOverlayBarEdge {
+                            atTop: band.atTop
+                            bars: barsEntry
+                            frame: clipFrame
+                            overlay: root
                         }
                     }
                 }
@@ -890,25 +568,8 @@ Item {
     }
 
     // Nothing to manipulate: no clip under the playhead, or the clip has no mask layers.
-    Rectangle {
+    MaskOverlayEmptyHint {
         visible: !root.hasFrame || root.layers.length === 0
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: Theme.spacingLg
-        width: hintText.width + Theme.spacingLg * 2
-        height: hintText.height + Theme.spacingMd * 2
-        radius: Theme.radiusSm
-        color: Theme.panelBackground
-        opacity: 0.9
-
-        Text {
-            id: hintText
-            anchors.centerIn: parent
-            text: root.hasFrame ? qsTr("Drag a mask from the Masks tab onto a clip to edit it here")
-                                : qsTr("Select a clip at the playhead to edit its masks")
-            color: Theme.mutedForeground
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSizeXs
-        }
+        hasFrame: root.hasFrame
     }
 }

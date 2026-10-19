@@ -3,8 +3,6 @@ import QtQuick.Controls.Basic
 import QtQuick.Window
 import QtMultimedia
 import Drift
-import ".."
-
 // One stock result: its preview, who made it and under what licence, and Download. Replaces
 // the modal dialog; it slides over the results so Back returns to the same scroll position.
 Rectangle {
@@ -29,7 +27,7 @@ Rectangle {
                                  || job.status === "importing"
     readonly property int price: Number(item.price_coins || 0)
 
-    color: Theme.panelBackground
+    color: Theme.c.stockItemDetail.background
 
     // A Rectangle takes no input, and TapHandlers only grab passively, so without this a tap
     // on the panel (a colour swatch, a button) also reached the card lying underneath it.
@@ -86,8 +84,8 @@ Rectangle {
                     const w = Number(root.item.width || 16), h = Number(root.item.height || 9)
                     return Math.min(260, width * h / Math.max(1, w))
                 }
-                radius: Theme.radiusMd
-                color: Theme.panelAccent
+                radius: Theme.c.stockItemDetail.previewRadius
+                color: Theme.c.stockItemDetail.previewBackground
                 clip: true
 
                 Image {
@@ -117,7 +115,7 @@ Rectangle {
             Text {
                 width: parent.width
                 text: root.item.title || ""
-                color: Theme.panelForeground
+                color: Theme.c.stockItemDetail.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeBase * 1.2
                 font.weight: Font.DemiBold
@@ -132,7 +130,7 @@ Rectangle {
                     width: parent.width
                     visible: !!(root.item.creator && root.item.creator.name)
                     text: qsTr("By %1").arg(root.item.creator ? root.item.creator.name : "")
-                    color: Theme.panelForeground
+                    color: Theme.c.stockItemDetail.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeSm
                     wrapMode: Text.WordWrap
@@ -146,7 +144,7 @@ Rectangle {
                             return ""
                         return l.attribution || l.name || ""
                     }
-                    color: Theme.mutedForeground
+                    color: Theme.c.stockItemDetail.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                     wrapMode: Text.WordWrap
@@ -155,7 +153,7 @@ Rectangle {
                     width: parent.width
                     visible: root.price > 0
                     text: qsTr("%n coin(s)", "", root.price)
-                    color: Theme.panelForeground
+                    color: Theme.c.stockItemDetail.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }
@@ -181,7 +179,7 @@ Rectangle {
                     text: Market.lastDownloadDir.toString().length > 0
                           ? qsTr("Saves to %1").arg(root.folderName(Market.lastDownloadDir))
                           : qsTr("You’ll choose a folder the first time")
-                    color: Theme.mutedForeground
+                    color: Theme.c.stockItemDetail.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                     elide: Text.ElideMiddle
@@ -190,7 +188,7 @@ Rectangle {
                     id: changeFolder
                     visible: Market.lastDownloadDir.toString().length > 0
                     text: qsTr("Change")
-                    color: changeHover.hovered ? Theme.panelForeground : Theme.accentOnPanel
+                    color: changeHover.hovered ? Theme.c.stockItemDetail.foregroundHover : Theme.c.stockItemDetail.accent
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                     HoverHandler { id: changeHover; cursorShape: Qt.PointingHandCursor }

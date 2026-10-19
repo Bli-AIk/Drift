@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // The marketplace opt-in. Shown by the Market tab and by the shared-link sheet, which are the
 // two ways into a store download — one component so the wording cannot drift apart between them.
 //
@@ -33,14 +31,14 @@ Item {
             Rectangle {
                 width: 48
                 height: 48
-                radius: Theme.radiusMd
-                color: Theme.panelAccent
+                radius: Theme.c.marketConsentPanel.iconRadius
+                color: Theme.c.marketConsentPanel.iconBackground
 
                 IconGlyph {
                     anchors.centerIn: parent
                     glyph: Theme.icons.warning
                     iconSize: Theme.iconSizeXl
-                    iconColor: Theme.warning
+                    iconColor: Theme.c.marketConsentPanel.icon
                 }
             }
 
@@ -76,9 +74,9 @@ Item {
                         Rectangle {
                             width: Theme.spacingMd
                             height: width
-                            radius: width / 2
+                            radius: Theme.c.marketConsentPanel.bulletRadius
                             y: Theme.spacingLg
-                            color: Theme.mutedForeground
+                            color: Theme.c.marketConsentPanel.bullet
                         }
 
                         ThemedLabel {

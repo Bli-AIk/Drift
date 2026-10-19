@@ -2,9 +2,6 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Window
 import Drift
-import "components"
-import "components/assets"
-
 // A link shared into Drift, resolved through the marketplace.
 //
 // The provider is chosen, not guessed. A link's host does not reliably say which source can
@@ -259,34 +256,13 @@ AndroidBottomSheet {
             spacing: Theme.spacingXl
             visible: root.state !== "choosing" && root.state !== "consent"
 
-            Row {
+            AndroidLinkBusyStatus {
                 width: parent.width
-                spacing: Theme.spacingLg
                 visible: root.state === "catalog" || root.state === "resolving"
                          || root.state === "downloading"
-
-                IconGlyph {
-                    id: busyGlyph
-                    anchors.verticalCenter: parent.verticalCenter
-                    glyph: Theme.icons.spinner
-                    iconSize: Theme.iconSizeLg
-                    iconColor: Theme.mutedForeground
-
-                    RotationAnimator on rotation {
-                        running: busyGlyph.visible
-                        loops: Animation.Infinite
-                        from: 0
-                        to: 360
-                        duration: 900
-                    }
-                }
-
-                ThemedLabel {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: root.state === "catalog" ? qsTr("Loading sources…")
-                          : root.state === "resolving" ? qsTr("Asking that source…")
-                          : qsTr("Downloading…")
-                }
+                statusText: root.state === "catalog" ? qsTr("Loading sources…")
+                            : root.state === "resolving" ? qsTr("Asking that source…")
+                            : qsTr("Downloading…")
             }
 
             ThemedLabel {

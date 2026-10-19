@@ -9,8 +9,11 @@ Item {
     clip: true
 
     readonly property int cell: 8
-    readonly property color light: "#c8c8c8"
-    readonly property color dark: "#8c8c8c"
+    readonly property color light: Theme.c.checkerboard.light
+    readonly property color dark: Theme.c.checkerboard.dark
+
+    onLightChanged: canvas.requestPaint()
+    onDarkChanged: canvas.requestPaint()
 
     Canvas {
         id: canvas

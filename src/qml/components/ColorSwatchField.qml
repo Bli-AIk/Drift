@@ -23,36 +23,14 @@ Row {
         return "#" + pad(c.a) + pad(c.r) + pad(c.g) + pad(c.b)
     }
 
-    Rectangle {
-        width: Theme.spacing3xl
-        height: Theme.spacing3xl
-        radius: Theme.radiusSm
-        anchors.verticalCenter: parent.verticalCenter
-        color: root.hex
-        border.width: swatchMouse.containsMouse ? Theme.borderWidthFocus : Theme.borderWidth
-        border.color: swatchMouse.containsMouse ? Theme.primary : Theme.panelBorder
-
-        Behavior on border.color {
-            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
-
-        ThemedToolTip {
-            text: root.tooltip
-            visible: swatchMouse.containsMouse
-        }
-
-        MouseArea {
-            id: swatchMouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                Haptics.press()
-                const dialog = colorDialogLoader.ensure()
-                dialog.selectedColor = root.hex
-                dialog.open()
-            }
-            onWheel: (wheel) => { wheel.accepted = false }
+    ColorSwatchButton {
+        hex: root.hex
+        tip: root.tooltip
+        onActivated: {
+            Haptics.press()
+            const dialog = colorDialogLoader.ensure()
+            dialog.selectedColor = root.hex
+            dialog.open()
         }
     }
 
@@ -60,7 +38,7 @@ Row {
         id: hexField
         width: 92
         text: root.hex
-        color: Theme.panelForeground
+        color: Theme.c.colorSwatchField.foreground
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeSm
         // Rejects malformed input instead of silently applying a typo.

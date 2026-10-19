@@ -1,7 +1,5 @@
 import QtQuick
 import Drift
-import ".."
-
 // Discrete steps for the free 3D view, under the axis widget. The four orbits and the two zooms
 // are Blender's numpad 4/6/8/2 and +/−. Holding a button keeps stepping.
 Rectangle {
@@ -16,10 +14,10 @@ Rectangle {
 
     width: grid.implicitWidth + Theme.spacingXs * 2
     height: grid.implicitHeight + Theme.spacingXs * 2
-    radius: Theme.radiusMd
-    color: Theme.panelBackground
-    border.width: Theme.borderWidth
-    border.color: Theme.panelBorder
+    radius: Theme.c.viewNavPad.radius
+    color: Theme.c.viewNavPad.background
+    border.width: Theme.c.viewNavPad.borderWidth
+    border.color: Theme.c.viewNavPad.border
 
     Grid {
         id: grid

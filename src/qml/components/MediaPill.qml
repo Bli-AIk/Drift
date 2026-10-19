@@ -8,17 +8,17 @@ Rectangle {
     id: root
 
     property string text
-    property color accent: Theme.clipProxy
-    property color foreground: Theme.clipProxyForeground
+    property color accent: Theme.c.mediaPill.background
+    property color foreground: Theme.c.mediaPill.foreground
     property bool waiting: false
     property real fontSize: Theme.fontSizeXs
     property string tooltip: ""
 
     implicitWidth: label.implicitWidth + Theme.spacingMd
     implicitHeight: label.implicitHeight + 2
-    radius: Theme.radiusXs
+    radius: Theme.c.mediaPill.radius
     color: waiting ? "transparent" : accent
-    border.width: waiting ? 1 : 0
+    border.width: waiting ? Theme.c.mediaPill.borderWidth : 0
     border.color: accent
 
     Text {

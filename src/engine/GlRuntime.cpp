@@ -1115,6 +1115,12 @@ bool GlRuntime::initGlObjects()
 
     QSurfaceFormat format;
     if (shared) {
+        // Copy the realized format wholesale. main() may have added an 8-bit
+        // alpha plane (WindowBackdrop) on top of the 3.3 core profile Qt Quick
+        // created this share context with; rebuilding the format here would drop
+        // that plane or disagree on depth, stencil, version, or profile, and the
+        // two contexts have to be able to share textures. The offscreen surface
+        // is not a window — it does not request alpha on its own.
         format = shared->format();
     } else if (QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGLES) {
         // Asking for a 3.3 core profile on Android makes QOpenGLContext::create() fail outright.

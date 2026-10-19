@@ -45,10 +45,10 @@ Item {
     Rectangle {
         id: trigger
         anchors.fill: parent
-        radius: Theme.radiusSm
-        color: Theme.panelAccent
-        border.width: (dialog.visible || root.activeFocus) ? 1 : 0
-        border.color: root.activeFocus ? Theme.primary : Theme.panelSecondaryBorder
+        radius: Theme.c.textStylePackPicker.radius
+        color: Theme.c.textStylePackPicker.background
+        border.width: (dialog.visible || root.activeFocus) ? Theme.c.textStylePackPicker.borderWidth : 0
+        border.color: root.activeFocus ? Theme.c.textStylePackPicker.borderFocus : Theme.c.textStylePackPicker.borderSecondary
 
         TextStylePackThumb {
             id: triggerThumb
@@ -72,7 +72,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             text: root.displayLabel
             elide: Text.ElideRight
-            color: Theme.panelForeground
+            color: Theme.c.textStylePackPicker.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
         }
@@ -84,7 +84,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             glyph: Theme.icons.chevronRight
             iconSize: 12
-            iconColor: Theme.mutedForeground
+            iconColor: Theme.c.textStylePackPicker.icon
         }
 
         HoverHandler {
@@ -138,7 +138,7 @@ Item {
                 text: packCard.modelData.label
                 elide: Text.ElideRight
                 horizontalAlignment: Text.AlignHCenter
-                color: packCard.selected ? Theme.primary : Theme.panelForeground
+                color: packCard.selected ? Theme.c.textStylePackPicker.accent : Theme.c.textStylePackPicker.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -175,7 +175,7 @@ Item {
                     width: parent.width
                     visible: root.userPresets.length > 0
                     text: qsTr("My styles")
-                    color: Theme.mutedForeground
+                    color: Theme.c.textStylePackPicker.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }
@@ -199,7 +199,7 @@ Item {
                     width: parent.width
                     visible: root.userPresets.length > 0
                     text: qsTr("Built-in")
-                    color: Theme.mutedForeground
+                    color: Theme.c.textStylePackPicker.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }

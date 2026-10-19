@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 Item {
     id: root
 
@@ -32,7 +30,7 @@ Item {
 
         Text {
             text: qsTr("Blend mode")
-            color: Theme.mutedForeground
+            color: Theme.c.blendingInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -42,7 +40,7 @@ Item {
             width: parent.width
             wrapMode: Text.WordWrap
             text: qsTr("How this clip's colours combine with the tracks beneath it.")
-            color: Theme.mutedForeground
+            color: Theme.c.blendingInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             opacity: 0.8

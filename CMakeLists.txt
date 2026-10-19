@@ -1255,6 +1255,17 @@ qt_add_resources(drift "drift_diagnostics"
     FILES resources/diagnostics/bench1080p60.mp4
 )
 
+# Built-in theme documents. ThemeManager reads these; Theme.qml is a facade over the
+# resolved tokens, so the rest of the QML keeps using the same property names.
+qt_add_resources(drift "drift_themes"
+    PREFIX "/themes"
+    BASE resources/themes
+    FILES
+        resources/themes/dark.json
+        resources/themes/light.json
+        resources/themes/theme.schema.json
+)
+
 set_source_files_properties(src/qml/Theme.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
 # Canvas preset catalog + the (template, quality) -> pixels arithmetic, shared by the desktop
 # layout dialog and the phone layout sheet so the two cannot drift apart again.
@@ -1264,7 +1275,7 @@ set_source_files_properties(src/qml/LayoutPresets.qml PROPERTIES QT_QML_SINGLETO
 set_source_files_properties(src/qml/DownloadFormat.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
 # Import + reporting policy, needed by surfaces that have no AssetsPanel to borrow it from.
 set_source_files_properties(src/qml/MediaImport.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
-# App-wide notification queue; the visual host is components/ToastHost.qml.
+# App-wide notification queue; the visual host is components/shell/ToastHost.qml.
 set_source_files_properties(src/qml/Toasts.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
 # In-flight lift-and-drop state for the phone asset sheet; the ghost is drawn by
 # AndroidBottomSheet and the drop is performed by AndroidTimeline.
@@ -1275,9 +1286,51 @@ set_source_files_properties(src/qml/AssetDrag.qml PROPERTIES QT_QML_SINGLETON_TY
 file(GLOB DRIFT_LUCIDE_ICONS RELATIVE "${CMAKE_SOURCE_DIR}" CONFIGURE_DEPENDS
      "resources/icons/*.svg")
 
+# Native window backdrops. Linux blur is optional: KF6WindowSystem when the
+# package is present, otherwise the X11 _KDE_NET_WM_BLUR_BEHIND_REGION atom.
+set(DRIFT_BACKDROP_PLATFORM_SOURCES)
+set(DRIFT_BACKDROP_PLATFORM_LIBS)
+set(DRIFT_BACKDROP_PLATFORM_DEFS)
+if(WIN32)
+    list(APPEND DRIFT_BACKDROP_PLATFORM_SOURCES src/theme/WindowBackdrop_win.cpp)
+    list(APPEND DRIFT_BACKDROP_PLATFORM_LIBS dwmapi)
+elseif(APPLE AND CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    # .mm sources are Objective-C++. The project() languages are CXX and C so
+    # Linux configure does not ask for a language this host does not have.
+    set(CMAKE_OBJCXX_STANDARD 20)
+    set(CMAKE_OBJCXX_STANDARD_REQUIRED ON)
+    enable_language(OBJCXX)
+    list(APPEND DRIFT_BACKDROP_PLATFORM_SOURCES src/theme/WindowBackdrop_mac.mm)
+    list(APPEND DRIFT_BACKDROP_PLATFORM_LIBS "-framework Cocoa")
+elseif(UNIX AND NOT ANDROID AND NOT EMSCRIPTEN AND NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+    list(APPEND DRIFT_BACKDROP_PLATFORM_SOURCES src/theme/WindowBackdrop_linux.cpp)
+    find_package(KF6WindowSystem QUIET)
+    if(KF6WindowSystem_FOUND)
+        list(APPEND DRIFT_BACKDROP_PLATFORM_LIBS KF6::WindowSystem)
+        list(APPEND DRIFT_BACKDROP_PLATFORM_DEFS DRIFT_HAS_KF6_WINDOW_SYSTEM)
+        message(STATUS "Window backdrop: KF6WindowSystem blur")
+    else()
+        message(STATUS "Window backdrop: KF6WindowSystem not found; KDE blur disabled")
+    endif()
+    if(PkgConfig_FOUND)
+        pkg_check_modules(XCB QUIET IMPORTED_TARGET xcb)
+        if(XCB_FOUND)
+            list(APPEND DRIFT_BACKDROP_PLATFORM_LIBS PkgConfig::XCB)
+            list(APPEND DRIFT_BACKDROP_PLATFORM_DEFS DRIFT_HAS_XCB)
+            message(STATUS "Window backdrop: X11 blur atom via xcb")
+        endif()
+    endif()
+endif()
+
 qt_add_qml_module(drift
     URI Drift
     VERSION 1.0
+    SOURCES
+        src/theme/ThemeManager.h
+        src/theme/ThemeManager.cpp
+        src/theme/WindowBackdrop.h
+        src/theme/WindowBackdrop.cpp
+        ${DRIFT_BACKDROP_PLATFORM_SOURCES}
     QML_FILES
         src/qml/Shell.qml
         src/qml/LayoutPresets.qml
@@ -1289,7 +1342,7 @@ qt_add_qml_module(drift
         src/qml/DownloadFormat.qml
         src/qml/AndroidDownloadsSheet.qml
         src/qml/AndroidNotificationsSheet.qml
-        src/qml/components/NavRailButton.qml
+        src/qml/components/shell/NavRailButton.qml
         # Touch entry point, loaded instead of Main.qml on Android (see src/main.cpp).
         src/qml/AndroidLayoutSheet.qml
         src/qml/AndroidMain.qml
@@ -1327,6 +1380,10 @@ qt_add_qml_module(drift
         src/qml/components/preview/PreviewTransportBar.qml
         src/qml/components/preview/modes/Preview2DMode.qml
         src/qml/components/preview/modes/Preview3DMode.qml
+        src/qml/components/preview/modes/PreviewModeSwitchSegment.qml
+        src/qml/components/preview/modes/PreviewModeSwitchPill.qml
+        src/qml/components/preview/modes/Preview3DFlyHint.qml
+        src/qml/components/preview/modes/Preview3DFlyDeadZone.qml
         src/qml/components/preview/TransformGizmo.qml
         src/qml/components/preview/TransformOverlay.qml
         src/qml/components/preview/PreviewDropOverlay.qml
@@ -1338,8 +1395,8 @@ qt_add_qml_module(drift
         src/qml/components/preview/DepthEffectOverlay.qml
         src/qml/components/preview/DepthLight3dOverlay.qml
         src/qml/components/preview/Checkerboard.qml
-        src/qml/components/preview/AndroidTransformOverlay.qml
-        src/qml/components/preview/AndroidCropOverlay.qml
+        src/qml/components/android/AndroidTransformOverlay.qml
+        src/qml/components/android/AndroidCropOverlay.qml
         src/qml/SegmentationWindow.qml
         src/qml/MulticamWindow.qml
         src/qml/DenoiseWindow.qml
@@ -1375,6 +1432,93 @@ qt_add_qml_module(drift
         src/qml/components/properties/MasksInspector.qml
         src/qml/components/properties/EffectsInspector.qml
         src/qml/components/properties/FacePropPicker.qml
+        src/qml/components/properties/VectorSvgColorRow.qml
+        src/qml/components/properties/Vec2ParamPad.qml
+        src/qml/components/properties/TextLookTile.qml
+        src/qml/components/properties/TextInspectorTextPage.qml
+        src/qml/components/properties/TextInspectorTabBar.qml
+        src/qml/components/properties/TextInspectorStylePage.qml
+        src/qml/components/properties/TextInspectorSpacingSection.qml
+        src/qml/components/properties/TextInspectorPresetSection.qml
+        src/qml/components/properties/TextInspectorLookSection.qml
+        src/qml/components/properties/TextInspectorFontSection.qml
+        src/qml/components/properties/TextInspectorDecorations.qml
+        src/qml/components/properties/TextInspectorContentSection.qml
+        src/qml/components/properties/TextInspectorAnimatePage.qml
+        src/qml/components/properties/TextInspectorAnimateHint.qml
+        src/qml/components/properties/TextInspectorAnimSlotBar.qml
+        src/qml/components/properties/TextInspectorAnimPresetGrid.qml
+        src/qml/components/properties/TextInspectorAnimControls.qml
+        src/qml/components/properties/TextInspectorAnimCategoryStrip.qml
+        src/qml/components/properties/TextInspectorAnimAdvanced.qml
+        src/qml/components/properties/TextInspectorAccentSection.qml
+        src/qml/components/properties/TextContentResizeGrip.qml
+        src/qml/components/properties/TextAnimPresetFrame.qml
+        src/qml/components/properties/TextAlignDivider.qml
+        src/qml/components/properties/SubtitleEditorPanel.qml
+        src/qml/components/properties/SubtitleEditorHeader.qml
+        src/qml/components/properties/SubtitleCueEmptyState.qml
+        src/qml/components/properties/SubtitleCueCard.qml
+        src/qml/components/properties/SpeedCurveTangentHandle.qml
+        src/qml/components/properties/SpeedCurvePreviewStage.qml
+        src/qml/components/properties/SpeedCurveKnob.qml
+        src/qml/components/properties/SpeedCurveGridLine.qml
+        src/qml/components/properties/SpeedCurveGraphPlayhead.qml
+        src/qml/components/properties/SpeedCurveFilmstrip.qml
+        src/qml/components/properties/SpeedCurveCanvas.qml
+        src/qml/components/properties/ShadingLayerHeader.qml
+        src/qml/components/properties/PropertiesTabRailSeparator.qml
+        src/qml/components/properties/PropertiesSheetTabChip.qml
+        src/qml/components/properties/PropertiesInspectorHeading.qml
+        src/qml/components/properties/PropertiesEmptyState.qml
+        src/qml/components/properties/KeyframeGraphValueAxis.qml
+        src/qml/components/properties/KeyframeGraphTangentHandle.qml
+        src/qml/components/properties/KeyframeGraphResizeGrip.qml
+        src/qml/components/properties/KeyframeGraphPlayhead.qml
+        src/qml/components/properties/KeyframeGraphLaneStatus.qml
+        src/qml/components/properties/KeyframeGraphKeyDot.qml
+        src/qml/components/properties/KeyframeGraphHeaderBar.qml
+        src/qml/components/properties/KeyframeGraphGutterRule.qml
+        src/qml/components/properties/KeyframeGraphFrame.qml
+        src/qml/components/properties/KeyframeGraphCurveCanvas.qml
+        src/qml/components/properties/KeyframeGraphClipSpan.qml
+        src/qml/components/properties/KeyframeGraphBeatCanvas.qml
+        src/qml/components/properties/GradientStopChip.qml
+        src/qml/components/properties/GradientPreviewBar.qml
+        src/qml/components/properties/GradientPresetSwatch.qml
+        src/qml/components/properties/FontPickerTrigger.qml
+        src/qml/components/properties/FontPickerSectionHeader.qml
+        src/qml/components/properties/FontPickerPopupSurface.qml
+        src/qml/components/properties/FontPickerPackBanner.qml
+        src/qml/components/properties/FontPickerFamilyRow.qml
+        src/qml/components/properties/FontPickerAddRow.qml
+        src/qml/components/properties/FadeCurveToolbarRule.qml
+        src/qml/components/properties/FadeCurvePlotFrame.qml
+        src/qml/components/properties/FadeCurveCanvas.qml
+        src/qml/components/properties/FacePropTile.qml
+        src/qml/components/properties/EmojiPickerSurface.qml
+        src/qml/components/properties/EmojiPickerEmptyLabel.qml
+        src/qml/components/properties/EmojiGridCell.qml
+        src/qml/components/properties/EffectsStackActions.qml
+        src/qml/components/properties/EffectsParamGroupHeader.qml
+        src/qml/components/properties/EffectsOccludeSection.qml
+        src/qml/components/properties/EffectsHueParam.qml
+        src/qml/components/properties/EffectsFileParam.qml
+        src/qml/components/properties/EffectsFaceSection.qml
+        src/qml/components/properties/EffectsFaceIndexParam.qml
+        src/qml/components/properties/EffectsEnumParam.qml
+        src/qml/components/properties/EffectsEffectHeader.qml
+        src/qml/components/properties/EffectsDepthSection.qml
+        src/qml/components/properties/EffectsDepthPanel.qml
+        src/qml/components/properties/EffectsColorSwatchChip.qml
+        src/qml/components/properties/EffectsColorParam.qml
+        src/qml/components/properties/EffectsClipParam.qml
+        src/qml/components/properties/EffectsBoolParam.qml
+        src/qml/components/properties/EffectsAutoKeyHint.qml
+        src/qml/components/properties/ColorSwatchButton.qml
+        src/qml/components/properties/CollapsibleSectionRule.qml
+        src/qml/components/properties/CollapsibleSectionHeader.qml
+        src/qml/components/properties/AudioEffectHeader.qml
         src/qml/components/assets/TextAssetsTab.qml
         src/qml/components/assets/ScenesTab.qml
         src/qml/components/assets/SubtitlesTab.qml
@@ -1402,6 +1546,44 @@ qt_add_qml_module(drift
         src/qml/components/assets/AssetCategoryChips.qml
         src/qml/components/assets/EffectStacksSection.qml
         src/qml/components/assets/AssetFavoriteButton.qml
+        src/qml/components/assets/TransitionPresetCard.qml
+        src/qml/components/assets/TextStyleUserCard.qml
+        src/qml/components/assets/TextStylePackCard.qml
+        src/qml/components/assets/StockAudioRow.qml
+        src/qml/components/assets/StickerPresetCard.qml
+        src/qml/components/assets/ShortcutsBindingRow.qml
+        src/qml/components/assets/ShapePresetCard.qml
+        src/qml/components/assets/SfxSoundRow.qml
+        src/qml/components/assets/ScenesShotRow.qml
+        src/qml/components/assets/MediaAssetsViewToolbar.qml
+        src/qml/components/assets/MediaAssetsSelectionRing.qml
+        src/qml/components/assets/MediaAssetsListThumb.qml
+        src/qml/components/assets/MediaAssetsListRow.qml
+        src/qml/components/assets/MediaAssetsListLabels.qml
+        src/qml/components/assets/MediaAssetsJobStatus.qml
+        src/qml/components/assets/MediaAssetsItemMenu.qml
+        src/qml/components/assets/MediaAssetsGridNameRow.qml
+        src/qml/components/assets/MediaAssetsGridFrame.qml
+        src/qml/components/assets/MediaAssetsGridCard.qml
+        src/qml/components/assets/MediaAssetsGridBusyOverlay.qml
+        src/qml/components/assets/MediaAssetsFormatRow.qml
+        src/qml/components/assets/MediaAssetsFolderMenu.qml
+        src/qml/components/assets/MediaAssetsEmptyState.qml
+        src/qml/components/assets/MediaAssetsDurationBadge.qml
+        src/qml/components/assets/MaskPresetCard.qml
+        src/qml/components/assets/MarketSectionTab.qml
+        src/qml/components/assets/EffectTemplateCard.qml
+        src/qml/components/assets/EffectStackCard.qml
+        src/qml/components/assets/EffectPresetCard.qml
+        src/qml/components/assets/DownloadsJobRow.qml
+        src/qml/components/assets/AudioEffectPresetCard.qml
+        src/qml/components/assets/AssetsPanelTabRail.qml
+        src/qml/components/assets/AssetsPanelTabButton.qml
+        src/qml/components/assets/AssetsPanelImportSplit.qml
+        src/qml/components/assets/AssetsPanelImportOverlay.qml
+        src/qml/components/assets/AssetsPanelImportMenu.qml
+        src/qml/components/assets/AssetsPanelHeader.qml
+        src/qml/components/assets/AssetsPanelDropOverlay.qml
         src/qml/TimelinePanel.qml
         src/qml/components/timeline/TimelineToolbar.qml
         src/qml/components/timeline/TimelineToolbarCustomizeDialog.qml
@@ -1415,98 +1597,446 @@ qt_add_qml_module(drift
         src/qml/components/timeline/PlayheadInterpolator.qml
         src/qml/components/timeline/TimelineTrackArea.qml
         src/qml/components/timeline/TimelineDropRouter.qml
-        src/qml/components/IconGlyph.qml
-        src/qml/components/IconButton.qml
-        src/qml/components/PanelFrame.qml
-        src/qml/components/PanelSplitHandle.qml
+        src/qml/components/timeline/VoiceoverTransportButton.qml
+        src/qml/components/timeline/VoiceoverTransport.qml
+        src/qml/components/timeline/VoiceoverTimerReadout.qml
+        src/qml/components/timeline/VoiceoverStatus.qml
+        src/qml/components/timeline/VoiceoverRecLabel.qml
+        src/qml/components/timeline/VoiceoverRecDot.qml
+        src/qml/components/timeline/VoiceoverMicPicker.qml
+        src/qml/components/timeline/VoiceoverMicMenuItem.qml
+        src/qml/components/timeline/VoiceoverLevelMeter.qml
+        src/qml/components/timeline/VoiceoverGlow.qml
+        src/qml/components/timeline/VoiceoverGainControl.qml
+        src/qml/components/timeline/VoiceoverBarDivider.qml
+        src/qml/components/timeline/TransformCoverageTint.qml
+        src/qml/components/timeline/TrackHeaderWash.qml
+        src/qml/components/timeline/TrackHeaderRow.qml
+        src/qml/components/timeline/TrackHeaderResizeHandle.qml
+        src/qml/components/timeline/TrackHeaderRenameDialog.qml
+        src/qml/components/timeline/TrackHeaderMuteButton.qml
+        src/qml/components/timeline/TrackHeaderMicButton.qml
+        src/qml/components/timeline/TrackHeaderLaneEye.qml
+        src/qml/components/timeline/TrackHeaderInsertLine.qml
+        src/qml/components/timeline/TrackHeaderInlineName.qml
+        src/qml/components/timeline/TrackHeaderHideButton.qml
+        src/qml/components/timeline/TrackHeaderGrip.qml
+        src/qml/components/timeline/TrackHeaderEdge.qml
+        src/qml/components/timeline/TrackHeaderDeleteDialog.qml
+        src/qml/components/timeline/TrackHeaderCoversMenu.qml
+        src/qml/components/timeline/TrackHeaderContextMenu.qml
+        src/qml/components/timeline/TrackHeaderCompactName.qml
+        src/qml/components/timeline/TrackHeaderClipDisplayButton.qml
+        src/qml/components/timeline/TrackHeaderChannelLanesButton.qml
+        src/qml/components/timeline/TrackHeaderBandName.qml
+        src/qml/components/timeline/TimelineWorkAreaShade.qml
+        src/qml/components/timeline/TimelineWorkAreaOverlay.qml
+        src/qml/components/timeline/TimelineWorkAreaEdge.qml
+        src/qml/components/timeline/TimelineTrimHandle.qml
+        src/qml/components/timeline/TimelineTrimGrip.qml
+        src/qml/components/timeline/TimelineTransitionRegion.qml
+        src/qml/components/timeline/TimelineTransitionLabel.qml
+        src/qml/components/timeline/TimelineTransitionHatch.qml
+        src/qml/components/timeline/TimelineTransitionDropOutline.qml
+        src/qml/components/timeline/TimelineTrackTransformWash.qml
+        src/qml/components/timeline/TimelineToolbarZoomSlider.qml
+        src/qml/components/timeline/TimelineToolbarZoomReadout.qml
+        src/qml/components/timeline/TimelineToolbarZoomControl.qml
+        src/qml/components/timeline/TimelineToolbarToolButton.qml
+        src/qml/components/timeline/TimelineToolbarTimecode.qml
+        src/qml/components/timeline/TimelineToolbarSeparator.qml
+        src/qml/components/timeline/TimelineToolbarSceneMenuItem.qml
+        src/qml/components/timeline/TimelineToolbarSceneEmptyItem.qml
+        src/qml/components/timeline/TimelineToolbarSceneBadge.qml
+        src/qml/components/timeline/TimelineToolbarOverflowMenuItem.qml
+        src/qml/components/timeline/TimelineToolbarOverflowButton.qml
+        src/qml/components/timeline/TimelineToolbarHairline.qml
+        src/qml/components/timeline/TimelineToolbarCustomizeRow.qml
+        src/qml/components/timeline/TimelineToolbarCustomizeGrip.qml
+        src/qml/components/timeline/TimelineToolbarCustomizeDivider.qml
+        src/qml/components/timeline/TimelineToolbarActionSlot.qml
+        src/qml/components/timeline/TimelineSpanBracketTick.qml
+        src/qml/components/timeline/TimelineSpanBracketLine.qml
+        src/qml/components/timeline/TimelineSpanBracketFoot.qml
+        src/qml/components/timeline/TimelineSpanBracketDash.qml
+        src/qml/components/timeline/TimelineSpanBracketChip.qml
+        src/qml/components/timeline/TimelineSnapGuideLabel.qml
+        src/qml/components/timeline/TimelineSnapGuide.qml
+        src/qml/components/timeline/TimelineSeekStripFill.qml
+        src/qml/components/timeline/TimelineSeekStripEdge.qml
+        src/qml/components/timeline/TimelineSeekStrip.qml
+        src/qml/components/timeline/TimelineRulerTick.qml
+        src/qml/components/timeline/TimelineRuler.qml
+        src/qml/components/timeline/TimelinePlayheadTip.qml
+        src/qml/components/timeline/TimelinePlayheadLine.qml
+        src/qml/components/timeline/TimelinePlayheadHead.qml
+        src/qml/components/timeline/TimelinePlayhead.qml
+        src/qml/components/timeline/TimelineOverviewShade.qml
+        src/qml/components/timeline/TimelineOverviewPlayhead.qml
+        src/qml/components/timeline/TimelineOverviewMap.qml
+        src/qml/components/timeline/TimelineOverviewFrame.qml
+        src/qml/components/timeline/TimelineOverviewEdge.qml
+        src/qml/components/timeline/TimelineOverviewBackground.qml
+        src/qml/components/timeline/TimelineNewTrackGhostLane.qml
+        src/qml/components/timeline/TimelineNewTrackGhostClip.qml
+        src/qml/components/timeline/TimelineNewTrackGhostBoundary.qml
+        src/qml/components/timeline/TimelineNewTrackGhost.qml
+        src/qml/components/timeline/TimelineMarqueeRect.qml
+        src/qml/components/timeline/TimelineLiveRecordingBlock.qml
+        src/qml/components/timeline/TimelineLandingOutline.qml
+        src/qml/components/timeline/TimelineGapHover.qml
+        src/qml/components/timeline/TimelineFadeHandle.qml
+        src/qml/components/timeline/TimelineEmptyState.qml
+        src/qml/components/timeline/TimelineCutOverlay.qml
+        src/qml/components/timeline/TimelineCutDoomGradient.qml
+        src/qml/components/timeline/TimelineCutDash.qml
+        src/qml/components/timeline/TimelineClipContextMenu.qml
+        src/qml/components/timeline/TimelineBookmarkMarker.qml
+        src/qml/components/timeline/TimelineBookmarkLaneHighlight.qml
+        src/qml/components/timeline/TimelineBookmarkContextMenu.qml
+        src/qml/components/timeline/TimelineAdjustmentLaneStrip.qml
+        src/qml/components/timeline/TimelineAdjustmentLaneChrome.qml
+        src/qml/components/timeline/SubtitleCueWaveform.qml
+        src/qml/components/timeline/SubtitleCueSpan.qml
+        src/qml/components/timeline/SubtitleCuePlayhead.qml
+        src/qml/components/timeline/SubtitleCueGutter.qml
+        src/qml/components/timeline/SubtitleCueEdgeGrip.qml
+        src/qml/components/timeline/SubtitleCueBlock.qml
+        src/qml/components/timeline/NewTrackMenuEntry.qml
+        src/qml/components/timeline/MixerZoneGradient.qml
+        src/qml/components/timeline/MixerStripToggle.qml
+        src/qml/components/timeline/MixerPanControl.qml
+        src/qml/components/timeline/MixerMeterTick.qml
+        src/qml/components/timeline/MixerMeterChannel.qml
+        src/qml/components/timeline/MixerLevelReadout.qml
+        src/qml/components/timeline/MixerLevelMeter.qml
+        src/qml/components/timeline/MixerFader.qml
+        src/qml/components/timeline/MixerDbScale.qml
+        src/qml/components/timeline/MixerChannelStrip.qml
+        src/qml/components/timeline/MixerChannelName.qml
+        src/qml/components/timeline/MixerChannelDivider.qml
+        src/qml/components/timeline/MixerChannelArmTint.qml
+        src/qml/components/timeline/ClipFilmstripTile.qml
+        src/qml/components/controls/IconGlyph.qml
+        src/qml/components/controls/ThemeSlot.qml
+        src/qml/components/controls/IconButton.qml
+        src/qml/components/shell/PanelFrame.qml
+        src/qml/components/shell/PanelSplitHandle.qml
         src/qml/components/ClipFilmstrip.qml
-        src/qml/components/AppScrollBar.qml
+        src/qml/components/controls/AppScrollBar.qml
         src/qml/components/KeyframeDiamond.qml
         src/qml/components/ChannelKeyButton.qml
         src/qml/components/Vec2Param.qml
         src/qml/components/PropertyKeyframeRow.qml
         src/qml/components/KeyframeGraph.qml
         src/qml/components/SubtitleCueLane.qml
-        src/qml/components/ShortcutCaptureField.qml
+        src/qml/components/shell/ShortcutCaptureField.qml
         src/qml/components/ColorSwatchField.qml
-        src/qml/components/ThemedColorDialog.qml
+        src/qml/components/controls/ThemedColorDialog.qml
         src/qml/components/ColorEyedropper.qml
         src/qml/components/EffectBrowser.qml
         src/qml/components/AudioEffectBrowser.qml
         src/qml/components/EffectTemplateBrowser.qml
-        src/qml/components/ThemedSlider.qml
-        src/qml/components/ThemedTextField.qml
-        src/qml/components/ThemedNumberField.qml
-        src/qml/components/ThemedTextArea.qml
+        src/qml/components/controls/ThemedSlider.qml
+        src/qml/components/controls/ThemedTextField.qml
+        src/qml/components/controls/ThemedNumberField.qml
+        src/qml/components/controls/ThemedTextArea.qml
         src/qml/components/SubtitleEditor.qml
-        src/qml/components/ThemedComboBox.qml
+        src/qml/components/controls/ThemedComboBox.qml
         src/qml/components/FontPicker.qml
         src/qml/components/CollapsibleSection.qml
         src/qml/components/TextStylePackThumb.qml
         src/qml/components/TextStylePackPicker.qml
-        src/qml/components/NameDialog.qml
+        src/qml/components/dialogs/NameDialog.qml
         src/qml/components/EmojiPicker.qml
-        src/qml/components/ThemedButton.qml
-        src/qml/components/ThemedChip.qml
-        src/qml/components/ThemedProgressBar.qml
+        src/qml/components/controls/ThemedButton.qml
+        src/qml/components/controls/ThemedChip.qml
+        src/qml/components/controls/ThemedProgressBar.qml
         src/qml/components/MediaPill.qml
-        src/qml/components/VfrWarning.qml
-        src/qml/components/ThemedLabel.qml
-        src/qml/components/ThemedDialog.qml
-        src/qml/components/ToolWindow.qml
-        src/qml/components/LazyLoader.qml
-        src/qml/components/AndroidLifecycle.qml
-        src/qml/components/AddonManagerDialog.qml
-        src/qml/components/AddonStartupDialog.qml
-        src/qml/components/MissingAddonsDialog.qml
-        src/qml/components/AboutDialog.qml
-        src/qml/components/UpdateDialog.qml
-        src/qml/components/DebugInfoDialog.qml
+        src/qml/components/shell/VfrWarning.qml
+        src/qml/components/controls/ThemedLabel.qml
+        src/qml/components/controls/ThemedDialog.qml
+        src/qml/components/shell/ToolWindow.qml
+        src/qml/components/shell/LazyLoader.qml
+        src/qml/components/android/AndroidLifecycle.qml
+        src/qml/components/dialogs/AddonManagerDialog.qml
+        src/qml/components/dialogs/AddonStartupDialog.qml
+        src/qml/components/dialogs/MissingAddonsDialog.qml
+        src/qml/components/dialogs/AboutDialog.qml
+        src/qml/components/dialogs/UpdateDialog.qml
+        src/qml/components/dialogs/DebugInfoDialog.qml
+        src/qml/components/dialogs/ThemeTrustDialog.qml
         src/qml/components/preview/PlaybackStatsOverlay.qml
-        src/qml/components/ProjectSetupDialog.qml
-        src/qml/components/LayoutChooserDialog.qml
-        src/qml/components/LanguageChooserDialog.qml
-        src/qml/components/AgentAccessControls.qml
-        src/qml/components/AgentAccessDialog.qml
-        src/qml/components/VideoSizeDialog.qml
-        src/qml/components/VideoSizeControls.qml
-        src/qml/components/ProjectPropertiesDialog.qml
-        src/qml/components/SettingsPane.qml
-        src/qml/components/SheetActionRow.qml
-        src/qml/components/SheetActionTile.qml
-        src/qml/components/SettingsDialog.qml
-        src/qml/components/ShellSwitchDialog.qml
-        src/qml/components/PasteAttributesDialog.qml
-        src/qml/components/PackageProgressDialog.qml
-        src/qml/components/ProjectLoadDialog.qml
-        src/qml/components/ExportDialog.qml
-        src/qml/components/ExportProgressDialog.qml
-        src/qml/components/CollectMediaDialog.qml
-        src/qml/components/ImageSequenceDialog.qml
-        src/qml/components/ReverseProgressDialog.qml
-        src/qml/components/SubtitleProgressDialog.qml
-        src/qml/components/CircularProgress.qml
-        src/qml/components/RecoveryDialog.qml
-        src/qml/components/UnsavedChangesDialog.qml
+        src/qml/components/preview/transport/PreviewTransportTimecode.qml
+        src/qml/components/preview/transport/PreviewTransportStepForwardButton.qml
+        src/qml/components/preview/transport/PreviewTransportStepBackButton.qml
+        src/qml/components/preview/transport/PreviewTransportRewindButton.qml
+        src/qml/components/preview/transport/PreviewTransportPlayButton.qml
+        src/qml/components/preview/transport/PreviewTransportLoopButton.qml
+        src/qml/components/preview/transport/PreviewTransportFullscreenButton.qml
+        src/qml/components/preview/transport/PreviewTransportFastForwardButton.qml
+        src/qml/components/preview/transform/TransformOverlaySnapGuide.qml
+        src/qml/components/preview/transform/TransformOverlaySizeReadout.qml
+        src/qml/components/preview/transform/TransformOverlayRotateHandle.qml
+        src/qml/components/preview/transform/TransformOverlayResizeGrip.qml
+        src/qml/components/preview/transform/TransformOverlayParentOutline.qml
+        src/qml/components/preview/transform/TransformOverlayParentChip.qml
+        src/qml/components/preview/transform/TransformOverlayLayerChip.qml
+        src/qml/components/preview/transform/TransformOverlayBoxBorder.qml
+        src/qml/components/preview/text/InlineTextSelectionHandle.qml
+        src/qml/components/preview/status/PreviewVoiceoverBadge.qml
+        src/qml/components/preview/status/PreviewGapCaption.qml
+        src/qml/components/preview/status/PreviewCompactGpuCaption.qml
+        src/qml/components/preview/stats/PlaybackStatsLine.qml
+        src/qml/components/preview/osd/PreviewOsdZoomChip.qml
+        src/qml/components/preview/osd/PreviewOsdOptionsButton.qml
+        src/qml/components/preview/osd/PreviewOsdGuidesButton.qml
+        src/qml/components/preview/osd/PreviewOsdGuideMenuButton.qml
+        src/qml/components/preview/osd/PreviewOsdCluster.qml
+        src/qml/components/preview/options/PreviewOptionsRowLabel.qml
+        src/qml/components/preview/options/PreviewOptionsDecodeWarning.qml
+        src/qml/components/preview/options/PreviewOptionsDecodeDialog.qml
+        src/qml/components/preview/multicam/MulticamTimecodeLabel.qml
+        src/qml/components/preview/multicam/MulticamProgramSegment.qml
+        src/qml/components/preview/multicam/MulticamProgramBadge.qml
+        src/qml/components/preview/multicam/MulticamLaneTrack.qml
+        src/qml/components/preview/multicam/MulticamLanePlayhead.qml
+        src/qml/components/preview/multicam/MulticamAngleTile.qml
+        src/qml/components/preview/multicam/MulticamAngleCaption.qml
+        src/qml/components/preview/multicam/MulticamAngleBadge.qml
+        src/qml/components/preview/media/MediaPreviewTrimSpan.qml
+        src/qml/components/preview/media/MediaPreviewTrimShade.qml
+        src/qml/components/preview/media/MediaPreviewTrimHandle.qml
+        src/qml/components/preview/media/MediaPreviewSavingScrim.qml
+        src/qml/components/preview/media/MediaPreviewRulerTick.qml
+        src/qml/components/preview/media/MediaPreviewResolutionPill.qml
+        src/qml/components/preview/media/MediaPreviewPlayheadLine.qml
+        src/qml/components/preview/media/MediaPreviewPlayheadCap.qml
+        src/qml/components/preview/media/MediaPreviewGradeChip.qml
+        src/qml/components/preview/media/MediaPreviewCropScrim.qml
+        src/qml/components/preview/media/MediaPreviewCropGrip.qml
+        src/qml/components/preview/media/MediaPreviewCropFrame.qml
+        src/qml/components/preview/media/MediaPreviewAudioPlaceholder.qml
+        src/qml/components/preview/mask/MaskOverlayVertexHandle.qml
+        src/qml/components/preview/mask/MaskOverlayRotateHandle.qml
+        src/qml/components/preview/mask/MaskOverlayResizeGrip.qml
+        src/qml/components/preview/mask/MaskOverlayOutline.qml
+        src/qml/components/preview/mask/MaskOverlayFeatherRing.qml
+        src/qml/components/preview/mask/MaskOverlayEmptyHint.qml
+        src/qml/components/preview/mask/MaskOverlayEdgeMidpoint.qml
+        src/qml/components/preview/mask/MaskOverlayClipBounds.qml
+        src/qml/components/preview/mask/MaskOverlayBarEdge.qml
+        src/qml/components/preview/mask/MaskOverlayBarBand.qml
+        src/qml/components/preview/guides/GuidesPopoverSetRow.qml
+        src/qml/components/preview/guides/GuidesPopoverSectionLabel.qml
+        src/qml/components/preview/guides/GuidesPopoverReadOnlyNote.qml
+        src/qml/components/preview/guides/GuidesPopoverPercentField.qml
+        src/qml/components/preview/guides/GuidesPopoverMarginFields.qml
+        src/qml/components/preview/guides/GuidesPopoverLinePosition.qml
+        src/qml/components/preview/guides/GuidesPopoverItemRow.qml
+        src/qml/components/preview/guides/GuidesPopoverItemHeader.qml
+        src/qml/components/preview/guides/GuidesPopoverDivider.qml
+        src/qml/components/preview/guides/GuidesPopoverColorRow.qml
+        src/qml/components/preview/guides/GuidesPopoverAspectFields.qml
+        src/qml/components/preview/guides/GuideEditReadout.qml
+        src/qml/components/preview/guides/GuideEditHighlight.qml
+        src/qml/components/preview/guides/GuideEditBar.qml
+        src/qml/components/preview/guides/GuideEditAddStrip.qml
+        src/qml/components/preview/gizmo/TransformGizmoStroke.qml
+        src/qml/components/preview/gizmo/TransformGizmoPivot.qml
+        src/qml/components/preview/gizmo/TransformGizmoHead.qml
+        src/qml/components/preview/gizmo/TransformGizmoHandle.qml
+        src/qml/components/preview/depth/DepthLight3dKnob.qml
+        src/qml/components/preview/depth/DepthLight3dAimRing.qml
+        src/qml/components/preview/depth/DepthEffectLightKnob.qml
+        src/qml/components/preview/depth/DepthEffectFocusReticle.qml
+        src/qml/components/preview/depth/DepthEffectAimRing.qml
+        src/qml/components/preview/depth/DepthEffectAimLine.qml
+        src/qml/components/preview/crop/CropOverlayThirdGuides.qml
+        src/qml/components/preview/crop/CropOverlaySizeBadge.qml
+        src/qml/components/preview/crop/CropOverlayScrim.qml
+        src/qml/components/preview/crop/CropOverlayHint.qml
+        src/qml/components/preview/crop/CropOverlayGrip.qml
+        src/qml/components/preview/crop/CropOverlayFrame.qml
+        src/qml/components/preview/axis/ViewAxisShaft.qml
+        src/qml/components/preview/axis/ViewAxisKnob.qml
+        src/qml/components/preview/axis/ViewAxisDisc.qml
+        src/qml/components/preview/PreviewFullscreenTransportScrim.qml
+        src/qml/components/preview/PreviewDropClipFrame.qml
+        src/qml/components/preview/PreviewDropCanvasFrame.qml
+        src/qml/components/preview/Preview3DToolsDivider.qml
+        src/qml/components/preview/GuideLayerMark.qml
+        src/qml/components/dialogs/ProjectSetupDialog.qml
+        src/qml/components/dialogs/LayoutChooserDialog.qml
+        src/qml/components/dialogs/LanguageChooserDialog.qml
+        src/qml/components/shell/AgentAccessControls.qml
+        src/qml/components/dialogs/AgentAccessDialog.qml
+        src/qml/components/dialogs/VideoSizeDialog.qml
+        src/qml/components/shell/VideoSizeControls.qml
+        src/qml/components/dialogs/ProjectPropertiesDialog.qml
+        src/qml/components/shell/SettingsPane.qml
+        src/qml/components/android/SheetActionRow.qml
+        src/qml/components/android/SheetActionTile.qml
+        src/qml/components/android/AndroidTransformSnapLine.qml
+        src/qml/components/android/AndroidTransformSizeReadout.qml
+        src/qml/components/android/AndroidTransformRotateHandle.qml
+        src/qml/components/android/AndroidTransformResizeGrip.qml
+        src/qml/components/android/AndroidTransformParentFrame.qml
+        src/qml/components/android/AndroidTransformLayerChip.qml
+        src/qml/components/android/AndroidTransformClipOutline.qml
+        src/qml/components/android/AndroidTopBarTitleButton.qml
+        src/qml/components/android/AndroidTopBarExportButton.qml
+        src/qml/components/android/AndroidTopBarCountBadge.qml
+        src/qml/components/android/AndroidTimelineWorkArea.qml
+        src/qml/components/android/AndroidTimelineTransitionMark.qml
+        src/qml/components/android/AndroidTimelineTrackWash.qml
+        src/qml/components/android/AndroidTimelineSnapGuide.qml
+        src/qml/components/android/AndroidTimelineRulerTick.qml
+        src/qml/components/android/AndroidTimelineRuler.qml
+        src/qml/components/android/AndroidTimelinePlayhead.qml
+        src/qml/components/android/AndroidTimelineNewTrackGhost.qml
+        src/qml/components/android/AndroidTimelineLiveRecording.qml
+        src/qml/components/android/AndroidTimelineLaneBar.qml
+        src/qml/components/android/AndroidTimelineGapPress.qml
+        src/qml/components/android/AndroidTimelineDropGhost.qml
+        src/qml/components/android/AndroidTimelineBookmarkFlag.qml
+        src/qml/components/android/AndroidTimelineAdjustmentStrip.qml
+        src/qml/components/android/AndroidTextEditBar.qml
+        src/qml/components/android/AndroidSheetScrim.qml
+        src/qml/components/android/AndroidSheetHeader.qml
+        src/qml/components/android/AndroidSheetHandle.qml
+        src/qml/components/android/AndroidSheetDragArea.qml
+        src/qml/components/android/AndroidSheetActionTileFace.qml
+        src/qml/components/android/AndroidSheetActionSwitch.qml
+        src/qml/components/android/AndroidSheetActionMark.qml
+        src/qml/components/android/AndroidSheetActionIconTile.qml
+        src/qml/components/android/AndroidRailButton.qml
+        src/qml/components/android/AndroidRailAddButton.qml
+        src/qml/components/android/AndroidPreviewTransport.qml
+        src/qml/components/android/AndroidPreviewOptionsStrip.qml
+        src/qml/components/android/AndroidPreviewLetterbox.qml
+        src/qml/components/android/AndroidOnMediaReadout.qml
+        src/qml/components/android/AndroidMoreToolsHeading.qml
+        src/qml/components/android/AndroidMediaTrimHandle.qml
+        src/qml/components/android/AndroidMediaSavingScrim.qml
+        src/qml/components/android/AndroidMediaPreviewHeader.qml
+        src/qml/components/android/AndroidMediaPlayBadge.qml
+        src/qml/components/android/AndroidMediaCropShade.qml
+        src/qml/components/android/AndroidMediaCropOverlay.qml
+        src/qml/components/android/AndroidMediaCropGrip.qml
+        src/qml/components/android/AndroidLinkBusyStatus.qml
+        src/qml/components/android/AndroidLayoutTemplateCard.qml
+        src/qml/components/android/AndroidLayoutSummarySwatch.qml
+        src/qml/components/android/AndroidLayoutSectionLabel.qml
+        src/qml/components/android/AndroidHomeWordmark.qml
+        src/qml/components/android/AndroidHomeStartTile.qml
+        src/qml/components/android/AndroidHomeRecentCard.qml
+        src/qml/components/android/AndroidFadeSliderRow.qml
+        src/qml/components/android/AndroidDownloadJobRow.qml
+        src/qml/components/android/AndroidCropHint.qml
+        src/qml/components/android/AndroidCropGrip.qml
+        src/qml/components/android/AndroidCropFrame.qml
+        src/qml/components/android/AndroidCropDimMask.qml
+        src/qml/components/android/AndroidComposerTimingEdge.qml
+        src/qml/components/android/AndroidClipToolbarSlot.qml
+        src/qml/components/android/AndroidClipToolbarHint.qml
+        src/qml/components/android/AndroidAttentionDot.qml
+        src/qml/components/dialogs/SettingsDialog.qml
+        src/qml/components/dialogs/ShellSwitchDialog.qml
+        src/qml/components/dialogs/PasteAttributesDialog.qml
+        src/qml/components/dialogs/PackageProgressDialog.qml
+        src/qml/components/dialogs/ProjectLoadDialog.qml
+        src/qml/components/dialogs/ExportDialog.qml
+        src/qml/components/dialogs/ExportProgressDialog.qml
+        src/qml/components/dialogs/CollectMediaDialog.qml
+        src/qml/components/dialogs/ImageSequenceDialog.qml
+        src/qml/components/dialogs/ReverseProgressDialog.qml
+        src/qml/components/dialogs/SubtitleProgressDialog.qml
+        src/qml/components/shell/CircularProgress.qml
+        src/qml/components/dialogs/RecoveryDialog.qml
+        src/qml/components/dialogs/UnsavedChangesDialog.qml
+        src/qml/components/dialogs/PasteAttributesVideoSection.qml
+        src/qml/components/dialogs/PasteAttributesTransitionsSection.qml
+        src/qml/components/dialogs/PasteAttributesAudioSection.qml
+        src/qml/components/dialogs/MissingAddonsRow.qml
+        src/qml/components/dialogs/LayoutChooserTemplateRow.qml
+        src/qml/components/dialogs/LayoutChooserCategoryButton.qml
+        src/qml/components/dialogs/ExportDialogWorkAreaCheck.qml
+        src/qml/components/dialogs/ExportDialogVideoSection.qml
+        src/qml/components/dialogs/ExportDialogModeBar.qml
+        src/qml/components/dialogs/ExportDialogGifSection.qml
+        src/qml/components/dialogs/ExportDialogAudioSection.qml
+        src/qml/components/dialogs/DebugInfoSystemTab.qml
+        src/qml/components/dialogs/DebugInfoPlaybackTab.qml
+        src/qml/components/dialogs/DebugInfoBenchRow.qml
+        src/qml/components/dialogs/AddonStartupPackRow.qml
+        src/qml/components/dialogs/AddonManagerRow.qml
         src/qml/components/UpscaleModelCard.qml
-        src/qml/components/RecentProjectsPopup.qml
-        src/qml/components/StartScreen.qml
+        src/qml/components/shell/RecentProjectsPopup.qml
+        src/qml/components/shell/StartScreen.qml
         src/qml/components/NewTrackMenu.qml
-        src/qml/components/ToastHost.qml
-        src/qml/components/NotificationList.qml
-        src/qml/components/NotificationsPopup.qml
-        src/qml/components/EmptyState.qml
-        src/qml/components/TouchLiftArea.qml
-        src/qml/components/TouchDragGhost.qml
-        src/qml/components/SkeletonBox.qml
-        src/qml/components/ThemedSwitch.qml
-        src/qml/components/ThemedCheckBox.qml
-        src/qml/components/ThemedToggleButton.qml
-        src/qml/components/ThemedToolTip.qml
-        src/qml/components/ThemedContextMenu.qml
-        src/qml/components/ThemedMenuItem.qml
-        src/qml/components/ThemedMenuSeparator.qml
-        src/qml/components/LabelledProgressRing.qml
+        src/qml/components/shell/GlobalSearchPopup.qml
+        src/qml/components/shell/GlobalSearchControls.qml
+        src/qml/components/shell/ToastHost.qml
+        src/qml/components/shell/NotificationList.qml
+        src/qml/components/shell/NotificationsPopup.qml
+        src/qml/components/shell/EmptyState.qml
+        src/qml/components/shell/TouchLiftArea.qml
+        src/qml/components/shell/TouchDragGhost.qml
+        src/qml/components/shell/SkeletonBox.qml
+        src/qml/components/controls/ThemedSwitch.qml
+        src/qml/components/controls/ThemedCheckBox.qml
+        src/qml/components/controls/ThemedToggleButton.qml
+        src/qml/components/controls/ThemedToolTip.qml
+        src/qml/components/controls/ThemedContextMenu.qml
+        src/qml/components/controls/ThemedMenuItem.qml
+        src/qml/components/controls/ThemedMenuSeparator.qml
+        src/qml/components/controls/ThemedSliderHandle.qml
+        src/qml/components/controls/ThemedComboBoxDelegate.qml
+        src/qml/components/controls/ThemedColorDialogThumb.qml
+        src/qml/components/shell/LabelledProgressRing.qml
+        src/qml/components/shell/StartScreenTitle.qml
+        src/qml/components/shell/StartScreenRecents.qml
+        src/qml/components/shell/StartScreenProjectRow.qml
+        src/qml/components/shell/StartScreenActions.qml
+        src/qml/components/shell/SettingsSectionCard.qml
+        src/qml/components/shell/SettingsAppearanceSection.qml
+        src/qml/components/shell/SettingsThemeList.qml
+        src/qml/components/shell/SettingsThemeEntry.qml
+        src/qml/components/shell/SettingsAppearanceActions.qml
+        src/qml/components/shell/SettingsAppearanceTranslucency.qml
+        src/qml/components/shell/SettingsPreviewSection.qml
+        src/qml/components/shell/SettingsPlaybackSection.qml
+        src/qml/components/shell/SettingsMarketplaceSection.qml
+        src/qml/components/shell/SettingsInterfaceSection.qml
+        src/qml/components/shell/SettingsCloudProvidersSection.qml
+        src/qml/components/shell/SettingsAppSection.qml
+        src/qml/components/shell/SegmentationFrameColumn.qml
+        src/qml/components/shell/SegmentationControlColumn.qml
+        src/qml/components/shell/RestoreUpscalerPicker.qml
+        src/qml/components/shell/RestoreControlColumn.qml
+        src/qml/components/shell/RestoreCompareView.qml
+        src/qml/components/shell/RecentProjectsProjectRow.qml
+        src/qml/components/shell/RecentProjectsActionRow.qml
+        src/qml/components/shell/NotificationUpdateRow.qml
+        src/qml/components/shell/NotificationHistoryRow.qml
+        src/qml/components/shell/MainOverlayInputGuard.qml
+        src/qml/components/shell/MainMacMenuBar.qml
+        src/qml/components/shell/MainAndroidMediaPreviewOverlay.qml
+        src/qml/components/shell/GlobalSearchResultRow.qml
+        src/qml/components/shell/EditorWorkspace.qml
+        src/qml/components/shell/EditorHeaderSettingsButton.qml
+        src/qml/components/shell/EditorHeaderSeparator.qml
+        src/qml/components/shell/EditorHeaderSearchField.qml
+        src/qml/components/shell/EditorHeaderProjectsButton.qml
+        src/qml/components/shell/EditorHeaderNotificationsButton.qml
+        src/qml/components/shell/EditorHeaderHairline.qml
+        src/qml/components/shell/EditorHeaderExtrasWave.qml
+        src/qml/components/shell/EditorHeaderExtrasButton.qml
+        src/qml/components/shell/EditorHeaderExportButton.qml
+        src/qml/components/shell/EditorHeaderExportBadge.qml
+        src/qml/components/shell/EditorHeaderDownloadsButton.qml
+        src/qml/components/shell/DenoiseWaveformLane.qml
     RESOURCES
         # UI chrome: interface font and Lucide SVG icons (always needed, including before addons).
         # Static instances rather than the variable Inter: on Windows Qt registers application
@@ -1534,7 +2064,13 @@ target_link_libraries(drift PRIVATE
     driftcore
     driftengine
 )
-target_include_directories(drift PRIVATE src src/preview)
+target_include_directories(drift PRIVATE src src/theme src/preview)
+if(DRIFT_BACKDROP_PLATFORM_LIBS)
+    target_link_libraries(drift PRIVATE ${DRIFT_BACKDROP_PLATFORM_LIBS})
+endif()
+if(DRIFT_BACKDROP_PLATFORM_DEFS)
+    target_compile_definitions(drift PRIVATE ${DRIFT_BACKDROP_PLATFORM_DEFS})
+endif()
 
 if(ANDROID)
     # FileDialogs registers a QtAndroidPrivate::NewIntentListener so a second ACTION_VIEW reaches a

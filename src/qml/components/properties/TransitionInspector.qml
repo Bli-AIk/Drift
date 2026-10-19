@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Window
 import Drift
-import ".."
-
 Item {
     id: root
 
@@ -138,7 +136,7 @@ Item {
             text: root.clipKind === "video" || root.clipKind === "shape" || root.clipKind === "text"
                   ? qsTr("Select where two clips overlap (shown in purple), or drag a clip so it overlaps the next one.")
                   : qsTr("Transitions work between two clips on a video, shape, or text track.")
-            color: Theme.mutedForeground
+            color: Theme.c.transitionInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
         }
@@ -152,7 +150,7 @@ Item {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: qsTr("No transition after this clip. Add one at the cut to the next clip.")
-                color: Theme.mutedForeground
+                color: Theme.c.transitionInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
             }
@@ -184,7 +182,7 @@ Item {
                         line += " " + qsTr("One side has no media past the cut, so its sound fades through silence instead of crossfading.")
                     return line
                 }
-                color: Theme.mutedForeground
+                color: Theme.c.transitionInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -194,7 +192,7 @@ Item {
                 spacing: 4
                 Text {
                     text: qsTr("Type")
-                    color: Theme.mutedForeground
+                    color: Theme.c.transitionInspector.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }
@@ -227,7 +225,7 @@ Item {
                 spacing: 4
                 Text {
                     text: qsTr("Duration")
-                    color: Theme.mutedForeground
+                    color: Theme.c.transitionInspector.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }
@@ -255,7 +253,7 @@ Item {
                 spacing: 4
                 Text {
                     text: qsTr("Curve")
-                    color: Theme.mutedForeground
+                    color: Theme.c.transitionInspector.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }
@@ -301,7 +299,7 @@ Item {
                             width: parent.width - 48
                             elide: Text.ElideRight
                             text: trParamRow.paramData.label
-                            color: Theme.mutedForeground
+                            color: Theme.c.transitionInspector.foregroundMuted
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSizeXs
                             anchors.verticalCenter: parent.verticalCenter
@@ -313,7 +311,7 @@ Item {
                                   ? (trParamRow.paramData.value ? qsTr("On") : qsTr("Off"))
                                   : Number(trParamSlider.value).toFixed(
                                         Math.abs(trParamRow.paramData.max - trParamRow.paramData.min) >= 10 ? 1 : 2)
-                            color: Theme.panelForeground
+                            color: Theme.c.transitionInspector.foreground
                             font.family: Theme.monoFontFamily
                             font.pixelSize: Theme.fontSizeXs
                             anchors.verticalCenter: parent.verticalCenter

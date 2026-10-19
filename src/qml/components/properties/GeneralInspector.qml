@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 Item {
     id: root
 
@@ -213,7 +211,7 @@ Item {
             spacing: 4
             Text {
                 text: qsTr("Clip name")
-                color: Theme.mutedForeground
+                color: Theme.c.generalInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -224,7 +222,7 @@ Item {
                     width: parent.width - renameButton.width - parent.spacing
                     anchors.verticalCenter: parent.verticalCenter
                     text: (root.hasSelection && root.clipData.name) || qsTr("Untitled clip")
-                    color: root.hasSelection && root.clipData.name ? Theme.panelForeground : Theme.mutedForeground
+                    color: root.hasSelection && root.clipData.name ? Theme.c.generalInspector.foreground : Theme.c.generalInspector.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeBase
                     font.weight: Font.Medium
@@ -246,7 +244,7 @@ Item {
             spacing: 4
             Text {
                 text: qsTr("Type")
-                color: Theme.mutedForeground
+                color: Theme.c.generalInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -254,7 +252,7 @@ Item {
                 // Human label rather than the raw internal id.
                 text: root.clipKind === "adjustment" && root.clipData.adjustmentKind === "transform"
                       ? qsTr("Transform layer") : root.clipKindLabel(root.clipKind)
-                color: Theme.panelForeground
+                color: Theme.c.generalInspector.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
                 elide: Text.ElideRight
@@ -281,7 +279,7 @@ Item {
 
                     Text {
                         text: qsTr("Crop")
-                        color: Theme.mutedForeground
+                        color: Theme.c.generalInspector.foregroundMuted
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontSizeXs
                         font.weight: Font.Medium
@@ -319,7 +317,7 @@ Item {
                         spacing: 4
                         Text {
                             text: "X"
-                            color: Theme.mutedForeground
+                            color: Theme.c.generalInspector.foregroundMuted
                             font.pixelSize: Theme.fontSizeXs
                             font.family: Theme.fontFamily
                         }
@@ -343,7 +341,7 @@ Item {
                         spacing: 4
                         Text {
                             text: "Y"
-                            color: Theme.mutedForeground
+                            color: Theme.c.generalInspector.foregroundMuted
                             font.pixelSize: Theme.fontSizeXs
                             font.family: Theme.fontFamily
                         }
@@ -372,7 +370,7 @@ Item {
                         spacing: 4
                         Text {
                             text: qsTr("Width")
-                            color: Theme.mutedForeground
+                            color: Theme.c.generalInspector.foregroundMuted
                             font.pixelSize: Theme.fontSizeXs
                             font.family: Theme.fontFamily
                         }
@@ -393,7 +391,7 @@ Item {
                         spacing: 4
                         Text {
                             text: qsTr("Height")
-                            color: Theme.mutedForeground
+                            color: Theme.c.generalInspector.foregroundMuted
                             font.pixelSize: Theme.fontSizeXs
                             font.family: Theme.fontFamily
                         }
@@ -426,7 +424,7 @@ Item {
                 spacing: 4
                 Text {
                     text: qsTr("Starts at")
-                    color: Theme.mutedForeground
+                    color: Theme.c.generalInspector.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -448,7 +446,7 @@ Item {
                 spacing: 4
                 Text {
                     text: qsTr("Duration")
-                    color: Theme.mutedForeground
+                    color: Theme.c.generalInspector.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -482,7 +480,7 @@ Item {
                     onPressedChanged: if (!pressed) tip1217.held = false
                 }
                 ThemedToolTip { id: tip1217; property bool held: false; text: qsTr("Which part of the original file this clip plays"); visible: tipHover1217.hovered || held }
-                color: Theme.mutedForeground
+                color: Theme.c.generalInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -504,7 +502,7 @@ Item {
                             onPressedChanged: if (!pressed) tip1231.held = false
                         }
                         ThemedToolTip { id: tip1231; property bool held: false; text: qsTr("Seconds into the file where this clip starts"); visible: tipHover1231.hovered || held }
-                        color: Theme.mutedForeground
+                        color: Theme.c.generalInspector.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -533,7 +531,7 @@ Item {
                             onPressedChanged: if (!pressed) tip1252.held = false
                         }
                         ThemedToolTip { id: tip1252; property bool held: false; text: qsTr("Seconds into the file where this clip ends"); visible: tipHover1252.hovered || held }
-                        color: Theme.mutedForeground
+                        color: Theme.c.generalInspector.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -558,7 +556,7 @@ Item {
 
             Text {
                 text: qsTr("File")
-                color: Theme.mutedForeground
+                color: Theme.c.generalInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -566,7 +564,7 @@ Item {
             Text {
                 id: clipPathLabel
                 text: root.clipData.path || "—"
-                color: Theme.panelForeground
+                color: Theme.c.generalInspector.foreground
                 font.family: Theme.monoFontFamily
                 font.pixelSize: Theme.fontSizeSm
                 width: parent.width

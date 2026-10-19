@@ -1,8 +1,5 @@
 import QtQuick
 import Drift
-import "../.."
-import ".."
-
 // Navigating the 3D scene: middle- or right-drag orbits, with Shift it pans, and the wheel dollies.
 // A click on the camera's drawn body selects it, and the corner widget shows which way the world's
 // axes point. The pad under it steps the view. Sits under the tools, so a clip's box still wins
@@ -297,39 +294,16 @@ Item {
         }
 
         // The still zone, so there is something to aim the pointer at.
-        Rectangle {
-            x: parent.width / 2 - width / 2
-            y: parent.height / 2 - height / 2
-            width: fly.deadZone * parent.width
-            height: fly.deadZone * parent.height
-            radius: Math.min(width, height) / 2
-            color: "transparent"
-            border.width: Theme.borderWidth
-            border.color: fly.steering ? Theme.accent : Theme.mutedForeground
+        Preview3DFlyDeadZone {
+            steering: fly.steering
+            fraction: fly.deadZone
         }
 
-        Rectangle {
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: Theme.spacingLg
-            width: hint.implicitWidth + Theme.spacingLg * 2
-            height: hint.implicitHeight + Theme.spacingSm * 2
-            radius: Theme.radiusMd
-            color: Theme.panelBackground
-            border.width: Theme.borderWidth
-            border.color: Theme.panelBorder
-
-            Text {
-                id: hint
-                anchors.centerIn: parent
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSizeSm
-                color: Theme.foreground
-                text: fly.steering
-                      ? qsTr("W/A/S/D move · Q/E down/up · Shift faster · Wheel speed (%1×) · Esc or click to finish")
-                            .arg(fly.speed.toFixed(2))
-                      : qsTr("Move the pointer to the centre ring to start steering")
-            }
+        Preview3DFlyHint {
+            message: fly.steering
+                     ? qsTr("W/A/S/D move · Q/E down/up · Shift faster · Wheel speed (%1×) · Esc or click to finish")
+                           .arg(fly.speed.toFixed(2))
+                     : qsTr("Move the pointer to the centre ring to start steering")
         }
     }
 

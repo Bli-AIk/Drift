@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 Item {
     id: root
 
@@ -46,7 +44,7 @@ Item {
             visible: maskShapeBox.visible
             width: parent.width
             text: qsTr("Shape")
-            color: Theme.mutedForeground
+            color: Theme.c.masksInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -88,7 +86,7 @@ Item {
             Text {
                 width: parent.width
                 text: qsTr("Combine")
-                color: Theme.mutedForeground
+                color: Theme.c.masksInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -177,7 +175,7 @@ Item {
             visible: root.maskShape !== "none"
             Text {
                 text: qsTr("Invert")
-                color: Theme.mutedForeground
+                color: Theme.c.masksInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 anchors.verticalCenter: parent.verticalCenter

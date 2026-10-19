@@ -121,6 +121,9 @@
 #include <QElapsedTimer>
 #include <QSettings>
 #include <QStorageInfo>
+#ifdef Q_OS_MACOS
+#include <sys/mount.h>
+#endif
 #include <QByteArray>
 #include <QSet>
 #include <QStandardPaths>
@@ -271,6 +274,59 @@ bool writeTargetIsDisposable(const QUrl &url)
     return false;
 }
 
+namespace {
+
+#ifdef Q_OS_MACOS
+// Path-based statfs attributes a firmlinked directory to the sealed system volume.
+// The open file's descriptor is the volume that accepted the write.
+qint64 bytesAvailableOnOpenFile(int fd)
+{
+    if (fd < 0)
+        return -1;
+    struct statfs fs {};
+    if (::fstatfs(fd, &fs) != 0 || (fs.f_flags & MNT_RDONLY) != 0 || fs.f_bsize == 0)
+        return -1;
+    if (quint64(fs.f_bavail) > std::numeric_limits<quint64>::max() / quint64(fs.f_bsize))
+        return std::numeric_limits<qint64>::max();
+    const quint64 bytes = quint64(fs.f_bavail) * quint64(fs.f_bsize);
+    const quint64 cap = quint64(std::numeric_limits<qint64>::max());
+    return bytes > cap ? std::numeric_limits<qint64>::max() : qint64(bytes);
+}
+#endif
+
+// Mount matching in QStorageInfo is by path prefix. On macOS, /private, /var, /tmp and /Users are
+// firmlinks onto the Data volume, but those paths are not under /System/Volumes/Data, so they match
+// "/" — the sealed read-only system volume — and the free-space figure is not the space a write
+// there will use. A volume mounted somewhere else (a disk image under /Volumes) already has its
+// own prefix and is left alone.
+QStorageInfo storageForExportDirectory(const QString &dirPath)
+{
+    QStorageInfo storage(dirPath);
+#ifdef Q_OS_MACOS
+    const QString root = QDir::cleanPath(storage.rootPath());
+    if (!storage.isValid() || !storage.isReadOnly() || root != QLatin1String("/"))
+        return storage;
+
+    const QString canonical = QFileInfo(dirPath).canonicalFilePath();
+    const QString dataRoot = QStringLiteral("/System/Volumes/Data");
+    if (canonical.isEmpty() || canonical == dataRoot
+        || canonical.startsWith(dataRoot + QLatin1Char('/')))
+        return storage;
+
+    const QString onData = dataRoot + canonical;
+    if (!QFileInfo(onData).isDir())
+        return storage;
+
+    QStorageInfo data(onData);
+    if (data.isValid() && data.isReady() && !data.isReadOnly()
+        && QDir::cleanPath(data.rootPath()) != root)
+        return data;
+#endif
+    return storage;
+}
+
+} // namespace
+
 // Checked before an export starts, so a location that can't take the file fails in a second with
 // the reason instead of minutes into the render with a generic encoder error. Returns an empty
 // string when the location looks writable. Android SAF documents are written through the resolver
@@ -310,38 +366,29 @@ QString exportTargetProblem(const QUrl &url, const QString &path)
             .arg(dirName);
     }
 
-    QStorageInfo storage(dirPath);
+    const QStorageInfo storage = storageForExportDirectory(dirPath);
     const QByteArray fsType = storage.isValid() ? storage.fileSystemType().toLower() : QByteArray();
     const bool network = path.startsWith(QLatin1String("//")) || path.startsWith(QLatin1String("\\\\"))
                          || fsType.startsWith("cifs") || fsType.startsWith("smb")
                          || fsType.startsWith("nfs") || fsType == "fuse.sshfs"
                          || fsType == "9p" || fsType.contains("webdav");
-
-    if (storage.isValid() && storage.isReady() && storage.isReadOnly()) {
-        return QCoreApplication::translate("AppController",
-                                           "%1 is on a read-only drive. Choose another folder.")
-            .arg(dirName);
-    }
-
-    // Replacing a file: opening it without truncating catches read-only files and, on Windows,
-    // one that another app (a media player, a sync client) still has open.
-    if (target.exists()) {
-        QFile existing(path);
-        if (!existing.open(QIODevice::ReadWrite)) {
-            return QCoreApplication::translate(
-                       "AppController",
-                       "Can’t replace %1. It may be read-only or open in another app.")
-                .arg(QDir::toNativeSeparators(path));
-        }
-    }
+    // Hint only. On macOS this is still true when statfs never left the sealed system volume, so
+    // a directory QTemporaryDir just created would be refused. The probe is what decides.
+    const bool reportedReadOnly = storage.isValid() && storage.isReady() && storage.isReadOnly();
 
     // A real write is the only reliable answer: ACLs, network shares, sync folders and
-    // controlled-folder access all say yes to isWritable() and then refuse the file.
+    // controlled-folder access all say yes to isWritable() and then refuse the file. The same
+    // probe catches a volume flag that says read-only when the directory is writable.
     QTemporaryFile probe(QDir(dirPath).filePath(QStringLiteral(".drift-write-test-XXXXXX")));
     const QByteArray block(64 * 1024, '\0');
     const bool writable = probe.open() && probe.write(block) == block.size() && probe.seek(0)
                           && probe.write(block.left(16)) == 16 && probe.flush();
     if (!writable) {
+        if (reportedReadOnly) {
+            return QCoreApplication::translate("AppController",
+                                               "%1 is on a read-only drive. Choose another folder.")
+                .arg(dirName);
+        }
         if (network) {
             return QCoreApplication::translate(
                        "AppController",
@@ -359,9 +406,31 @@ QString exportTargetProblem(const QUrl &url, const QString &path)
             .arg(dirName, probe.errorString());
     }
 
+    // Replacing a file: opening it without truncating catches read-only files and, on Windows,
+    // one that another app (a media player, a sync client) still has open. Skipped when the
+    // directory itself could not be written — that failure already has its own reason.
+    if (target.exists()) {
+        QFile existing(path);
+        if (!existing.open(QIODevice::ReadWrite)) {
+            return QCoreApplication::translate(
+                       "AppController",
+                       "Can’t replace %1. It may be read-only or open in another app.")
+                .arg(QDir::toNativeSeparators(path));
+        }
+    }
+
+    qint64 bytesAvailable = -1;
+    if (storage.isValid() && storage.isReady())
+        bytesAvailable = storage.bytesAvailable();
+#ifdef Q_OS_MACOS
+    // A flag that survived storageForExportDirectory still describes the sealed volume, so its
+    // free-space figure is not the one the probe file was written against.
+    if (reportedReadOnly)
+        bytesAvailable = bytesAvailableOnOpenFile(probe.handle());
+#endif
+
     constexpr qint64 kMinFreeBytes = 64ll * 1024 * 1024;
-    if (storage.isValid() && storage.isReady() && storage.bytesAvailable() >= 0
-        && storage.bytesAvailable() < kMinFreeBytes) {
+    if (bytesAvailable >= 0 && bytesAvailable < kMinFreeBytes) {
         return QCoreApplication::translate("AppController",
                                            "There isn’t enough free space in %1.")
             .arg(dirName);
@@ -620,6 +689,11 @@ AppController::~AppController()
     waitForMulticamRefresh();
     if (hadMulticamSession)
         m_playback.setProject(&m_project);
+    // The export worker captures `this` too; cancel it and let it unwind before teardown.
+    if (m_exportFuture.isRunning()) {
+        m_exportCancel.storeRelaxed(1);
+        m_exportFuture.waitForFinished();
+    }
 
     // Stop the agent server before the undo stack is cut loose below. McpController is
     // a child, so without this it would only be destroyed after the members a late
@@ -4480,6 +4554,8 @@ QHash<QString, QString> defaultShortcuts()
         // Timeline zoom is QML state too, so these take the same route as the tool modes.
         {QStringLiteral("zoomIn"), QStringLiteral("Ctrl+=")},
         {QStringLiteral("zoomOut"), QStringLiteral("Ctrl+-")},
+        // The global search field lives in EditorHeader, so this is QML-only as well.
+        {QStringLiteral("search"), QStringLiteral("Ctrl+K")},
         // QML owns the window, so triggerAction only raises the request — same shape as the
         // file actions above.
         {QStringLiteral("multicam"), QStringLiteral("Ctrl+Shift+C")},
@@ -5298,6 +5374,7 @@ QVariantList AppController::actions() const
         action(QStringLiteral("zoomIn"), tr("Zoom in")),
         action(QStringLiteral("zoomOut"), tr("Zoom out")),
         action(QStringLiteral("multicam"), tr("Multicam window")),
+        action(QStringLiteral("search"), tr("Search…")),
     };
 }
 
@@ -15291,6 +15368,14 @@ QVariantMap AppController::transitionBetweenClips(int trackIndex, int clipIndex)
     return {};
 }
 
+bool AppController::hasTransitionPartner(int trackIndex, int clipIndex) const
+{
+    if (trackIndex < 0 || trackIndex >= m_project.tracks().size())
+        return false;
+    const drift::Track &track = m_project.tracks().at(trackIndex);
+    return trackAllowsTransitions(track.type) && findTransitionPartnerIndex(track, clipIndex) >= 0;
+}
+
 QVariantList AppController::transitionKindsForTrack(int trackIndex) const
 {
     const QVariantList all = transitionKinds();
@@ -20974,7 +21059,7 @@ void AppController::exportWithSettings(const QUrl &outputUrl, const QVariantMap 
 
     const bool disposable = writeTargetIsDisposable(outputUrl);
 
-    (void)QtConcurrent::run([this, snapshot, exportSettings, outputPath, outputUrl, disposable]() {
+    m_exportFuture = QtConcurrent::run([this, snapshot, exportSettings, outputPath, outputUrl, disposable]() {
         // Spans the encode *and* the copy into the user's document. Exporter::run takes its own
         // hold, but that one ends when run() returns — and the commit below is the phase that
         // would otherwise lose a multi-minute render to a screen that idled out mid-copy. The

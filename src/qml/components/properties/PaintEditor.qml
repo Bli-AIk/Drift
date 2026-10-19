@@ -1,7 +1,5 @@
 import QtQuick
 import Drift
-import ".."
-
 // Paint editor for a fill or stroke layer of a text or shape clip: solid colour, gradient, image
 // texture or a shader effect. Every write goes through setStyleLayer with a partial paint patch.
 Column {
@@ -71,7 +69,7 @@ Column {
             spacing: 4
             Text {
                 text: qsTr("Paint")
-                color: Theme.mutedForeground
+                color: Theme.c.paintEditor.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -90,7 +88,7 @@ Column {
             visible: root.kind === "solid"
             Text {
                 text: qsTr("Colour")
-                color: Theme.mutedForeground
+                color: Theme.c.paintEditor.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -129,7 +127,7 @@ Column {
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.texture.path ? String(root.texture.path).split("/").pop() : qsTr("No image")
                 elide: Text.ElideMiddle
-                color: Theme.mutedForeground
+                color: Theme.c.paintEditor.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -144,7 +142,7 @@ Column {
                 spacing: 4
                 Text {
                     text: qsTr("Fit")
-                    color: Theme.mutedForeground
+                    color: Theme.c.paintEditor.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -170,7 +168,7 @@ Column {
                 spacing: 4
                 Text {
                     text: qsTr("Scale")
-                    color: Theme.mutedForeground
+                    color: Theme.c.paintEditor.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -196,7 +194,7 @@ Column {
             spacing: 4
             Text {
                 text: qsTr("Angle")
-                color: Theme.mutedForeground
+                color: Theme.c.paintEditor.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -227,7 +225,7 @@ Column {
             spacing: 4
             Text {
                 text: qsTr("Effect")
-                color: Theme.mutedForeground
+                color: Theme.c.paintEditor.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }

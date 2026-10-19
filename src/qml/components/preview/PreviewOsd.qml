@@ -1,6 +1,5 @@
 import QtQuick
 import Drift
-import ".."
 
 // The preview's on-screen controls, kept off the picture until they are wanted: they fade in when
 // the pointer moves over the preview and out again after a couple of idle seconds. They hold
@@ -15,8 +14,8 @@ Item {
     property bool held: false
 
     readonly property bool mode3d: EditorState.preview.mode === "3d"
-    readonly property bool pinned: interacting || held || guidesPopover.opened || optionsMenu.busy
-                                   || topHover.hovered || rightHover.hovered || toolsHover.hovered
+    readonly property bool pinned: interacting || held || cluster.menuOpen || cluster.menuBusy
+                                   || topHover.hovered || cluster.hovered || toolsHover.hovered
     property bool awake: false
     readonly property bool shown: awake || pinned
 
@@ -60,94 +59,12 @@ Item {
             HoverHandler { id: topHover }
         }
 
-        Rectangle {
+        PreviewOsdCluster {
+            id: cluster
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.margins: Theme.spacingLg
-            width: rightRow.implicitWidth + Theme.spacingXs * 2
-            height: rightRow.implicitHeight + Theme.spacingXs * 2
-            radius: Theme.radiusMd
-            color: Theme.panelBackground
-            border.width: Theme.borderWidth
-            border.color: Theme.panelBorder
-
-            HoverHandler { id: rightHover }
-
-            Row {
-                id: rightRow
-                anchors.centerIn: parent
-                spacing: 0
-
-                // Only once the view has moved, and the way back to 100%.
-                Item {
-                    visible: !!osd.viewport && osd.viewport.viewMoved
-                    width: visible ? zoomText.implicitWidth + Theme.spacingMd * 2 : 0
-                    height: Theme.iconButtonSize
-
-                    Text {
-                        id: zoomText
-                        anchors.centerIn: parent
-                        text: osd.viewport ? Math.round(osd.viewport.userZoom * 100) + "%" : ""
-                        color: zoomMouse.containsMouse ? Theme.panelForeground : Theme.mutedForeground
-                        font.family: Theme.monoFontFamily
-                        font.pixelSize: Theme.fontSizeXs
-                    }
-
-                    MouseArea {
-                        id: zoomMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: osd.viewport.resetView()
-                    }
-
-                    ThemedToolTip {
-                        text: Theme.platformShortcutText(
-                                  qsTr("Preview zoom — Ctrl+scroll over the preview to zoom, "
-                                     + "middle-drag to pan. Click to reset to 100%."))
-                        visible: zoomMouse.containsMouse
-                    }
-                }
-
-                IconButton {
-                    glyph: Theme.icons.grid
-                    variant: "text"
-                    tooltip: qsTr("Toggle guides")
-                    active: EditorState.preview.guidesEnabled
-                    onClicked: EditorState.preview.guidesEnabled = !EditorState.preview.guidesEnabled
-                }
-
-                IconButton {
-                    anchors.verticalCenter: parent.verticalCenter
-                    glyph: Theme.icons.chevronDown
-                    variant: "text"
-                    tooltip: qsTr("Guide sets")
-                    buttonSize: Theme.iconButtonSize * 0.6
-                    iconSize: Theme.iconSizeBase * 0.75
-                    active: guidesPopover.visible
-                    onClicked: guidesPopover.opened ? guidesPopover.close() : guidesPopover.open()
-
-                    GuidesPopover {
-                        id: guidesPopover
-                        x: parent.width - width
-                        y: parent.height + Theme.spacingMd
-                    }
-                }
-
-                IconButton {
-                    glyph: Theme.icons.ellipsis
-                    variant: "text"
-                    tooltip: qsTr("Preview options")
-                    active: optionsMenu.visible
-                    onClicked: optionsMenu.opened ? optionsMenu.close() : optionsMenu.open()
-
-                    PreviewOptionsMenu {
-                        id: optionsMenu
-                        x: parent.width - width
-                        y: parent.height + Theme.spacingMd
-                    }
-                }
-            }
+            viewport: osd.viewport
         }
 
         Preview3DTools {

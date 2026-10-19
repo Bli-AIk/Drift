@@ -256,6 +256,27 @@ add_test(NAME Mcp COMMAND tst_mcp)
 drift_copy_effects(tst_mcp)
 drift_copy_transitions(tst_mcp)
 
+qt_add_executable(tst_thememanager
+    tst_thememanager.cpp
+    ../src/theme/ThemeManager.cpp
+    ../src/core/ZipArchive.cpp
+    ../src/engine/AndroidUri.cpp)
+target_include_directories(tst_thememanager PRIVATE ../src)
+target_compile_definitions(tst_thememanager PRIVATE
+    "DRIFT_MAIN_CPP=\"${CMAKE_SOURCE_DIR}/src/main.cpp\""
+)
+target_link_libraries(tst_thememanager PRIVATE Qt6::Test Qt6::Qml Qt6::Quick ZLIB::ZLIB)
+qt_add_resources(tst_thememanager "drift_themes"
+    PREFIX "/themes"
+    BASE "${CMAKE_SOURCE_DIR}/resources/themes"
+    FILES
+        "${CMAKE_SOURCE_DIR}/resources/themes/dark.json"
+        "${CMAKE_SOURCE_DIR}/resources/themes/light.json"
+        "${CMAKE_SOURCE_DIR}/resources/themes/theme.schema.json"
+)
+add_test(NAME ThemeManager COMMAND tst_thememanager)
+set_tests_properties(ThemeManager PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
 # Runs lupdate and fails if i18n/*.ts would change — i.e. someone added qsTr/tr and
 # did not run `cmake --build build --target update_translations`. Skipped where lupdate cannot
 # parse QML: there the test would rewrite the checkout's catalogs without their QML strings
@@ -271,3 +292,32 @@ if(DRIFT_LUPDATE_HAS_QML)
 else()
     message(STATUS "lupdate has no QML support; skipping the Translations test.")
 endif()
+
+set(_drift_windowbackdrop_platform)
+foreach(_src ${DRIFT_BACKDROP_PLATFORM_SOURCES})
+    list(APPEND _drift_windowbackdrop_platform "${CMAKE_SOURCE_DIR}/${_src}")
+endforeach()
+qt_add_executable(tst_windowbackdrop
+    tst_windowbackdrop.cpp
+    ../src/theme/WindowBackdrop.cpp
+    ../src/theme/ThemeManager.cpp
+    ../src/core/ZipArchive.cpp
+    ../src/engine/AndroidUri.cpp
+    ${_drift_windowbackdrop_platform}
+)
+target_include_directories(tst_windowbackdrop PRIVATE ../src)
+target_compile_definitions(tst_windowbackdrop PRIVATE
+    "DRIFT_MAIN_CPP=\"${CMAKE_SOURCE_DIR}/src/main.cpp\""
+    ${DRIFT_BACKDROP_PLATFORM_DEFS}
+)
+target_link_libraries(tst_windowbackdrop PRIVATE Qt6::Test Qt6::Qml Qt6::Quick ZLIB::ZLIB ${DRIFT_BACKDROP_PLATFORM_LIBS})
+qt_add_resources(tst_windowbackdrop "drift_themes"
+    PREFIX "/themes"
+    BASE "${CMAKE_SOURCE_DIR}/resources/themes"
+    FILES
+        "${CMAKE_SOURCE_DIR}/resources/themes/dark.json"
+        "${CMAKE_SOURCE_DIR}/resources/themes/light.json"
+        "${CMAKE_SOURCE_DIR}/resources/themes/theme.schema.json"
+)
+add_test(NAME WindowBackdrop COMMAND tst_windowbackdrop)
+set_tests_properties(WindowBackdrop PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
