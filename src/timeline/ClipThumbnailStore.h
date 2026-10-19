@@ -28,6 +28,9 @@ public:
     // The decoded image if it is ready. Otherwise queues it and returns a null image;
     // imageReady(path) follows. `maxHeight` bounds the decode, in device pixels.
     QImage image(const QString &path, int maxHeight);
+    // Drops the images and failures whose path starts with `prefix`, for files regenerated under
+    // the same name.
+    void forgetPrefix(const QString &prefix);
 
 signals:
     void imageReady(const QString &path);

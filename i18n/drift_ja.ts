@@ -9946,6 +9946,10 @@
         <translation>ライブラリを更新できませんでした</translation>
     </message>
     <message>
+        <source>Could not refresh “%1”: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>That media is no longer in this project.</source>
         <translation>そのメディアはこのプロジェクトに存在しません。</translation>
     </message>
@@ -9960,6 +9964,10 @@
     <message>
         <source>Media replaced</source>
         <translation>メディアを置き換えました</translation>
+    </message>
+    <message>
+        <source>Media refreshed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

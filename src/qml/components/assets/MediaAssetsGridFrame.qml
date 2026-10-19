@@ -16,6 +16,7 @@ Rectangle {
     required property string thumbnailPath
     required property int assetIndex
     required property string liveThumbnailPath
+    required property int thumbnailRevision
     required property real cardSize
     required property bool selected
     required property bool hovered
@@ -73,7 +74,7 @@ Rectangle {
         anchors.fill: parent
         visible: !root.isFolder && root.liveThumbnailPath.length > 0 && status === Image.Ready
         source: !root.isFolder && root.liveThumbnailPath.length > 0
-                ? EditorState.imageUrl(root.liveThumbnailPath) : ""
+                ? EditorState.imageUrl(root.liveThumbnailPath) + "?rev=" + root.thumbnailRevision : ""
         fillMode: Image.PreserveAspectFit
         asynchronous: true
         sourceSize: Qt.size(Math.ceil(cardSize * Screen.devicePixelRatio),

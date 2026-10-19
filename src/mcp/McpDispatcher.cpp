@@ -7,6 +7,7 @@
 #include "core/Time.h"
 #include "models/AppController.h"
 #include "models/AssetLibrary.h"
+#include "models/MediaBinController.h"
 
 #include <QDir>
 #include <QEventLoop>
@@ -692,7 +693,9 @@ QJsonObject McpDispatcher::apply(const QJsonObject &args)
                     {QStringLiteral("done"), results}};
         }
         results.append(QJsonObject{{QStringLiteral("tool"), tool}, {QStringLiteral("result"), one}});
-        if (isUndoable(tool))
+        // A re-read lands its "Media refreshed" edit inside this batch, where undo is suspended.
+        const bool refreshed = tool == QLatin1String("import_media") && one.contains(QStringLiteral("reprobed"));
+        if (isUndoable(tool) || refreshed)
             hadUndoable = true;
     }
     m_controller->mcp()->endBatch(batchLabel(ops.size()), hadUndoable);
@@ -918,6 +921,11 @@ QJsonObject McpDispatcher::waitImport(const QStringList &ids)
     timeout.start(15000);
     QObject::connect(&timeout, &QTimer::timeout, &loop, &QEventLoop::quit);
     QObject::connect(lib, &AssetLibrary::assetMetadataChanged, &loop, &QEventLoop::quit);
+    // Outcomes that change no metadata still clear the pending flag: a re-probe the bin refused
+    // (unreadable, or now another kind of media) and a new import that could not be read. Without
+    // these the loop would sleep out the whole cap before rechecking.
+    QObject::connect(lib, &AssetLibrary::assetSourceProbed, &loop, &QEventLoop::quit);
+    QObject::connect(lib, &AssetLibrary::assetImportFailed, &loop, &QEventLoop::quit);
 
     while (timeout.isActive()) {
         bool pending = false;
@@ -977,12 +985,48 @@ QJsonObject McpDispatcher::opImportMedia(const QJsonObject &args)
     const QStringList ids = lib->importLocalPaths(paths);
     if (ids.isEmpty() && !missing.isEmpty())
         return err("import_failed", QStringLiteral("No readable files"));
+    // Rows already in the bin whose file changed in place are re-probed by the import.
+    const QStringList refreshing = refreshingIds(ids);
     QJsonObject result = waitImport(ids);
     if (!missing.isEmpty())
         result.insert(QStringLiteral("missing"), QJsonArray::fromStringList(missing));
     if (!existing.isEmpty())
         result.insert(QStringLiteral("refreshed"), QJsonArray::fromStringList(existing));
+    addRefreshOutcome(result, refreshing);
     return result;
+}
+
+QStringList McpDispatcher::refreshingIds(const QStringList &ids) const
+{
+    QStringList out;
+    if (AssetLibrary *lib = m_controller->assetLibrary()) {
+        for (const QString &id : ids) {
+            if (lib->isRefreshPending(id))
+                out.append(id);
+        }
+    }
+    return out;
+}
+
+void McpDispatcher::addRefreshOutcome(QJsonObject &result, const QStringList &refreshed)
+{
+    AssetLibrary *lib = m_controller->assetLibrary();
+    QJsonArray reprobed;
+    QJsonArray stale;
+    for (const QString &id : refreshed) {
+        // From the refresh's own outcome, not the fingerprint: a refused re-probe leaves the
+        // fingerprint as it was, and an asset from an older project never had one to compare.
+        const bool refused = m_controller->bin()->takeRefreshFailure(id);
+        const bool unfinished = lib && lib->isRefreshPending(id);
+        if (refused || unfinished)
+            stale.append(id);
+        else
+            reprobed.append(id);
+    }
+    if (!reprobed.isEmpty())
+        result.insert(QStringLiteral("reprobed"), reprobed);
+    if (!stale.isEmpty())
+        result.insert(QStringLiteral("stale"), stale);
 }
 
 QJsonObject McpDispatcher::opListAssets() const

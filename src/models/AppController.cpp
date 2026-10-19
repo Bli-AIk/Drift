@@ -82,6 +82,7 @@
 #include "engine/StickerCatalog.h"
 #include "engine/StillImage.h"
 #include "MulticamImageStore.h"
+#include "timeline/ClipThumbnailStore.h"
 #include "engine/TextLayout.h"
 #ifdef DRIFT_WITH_SKIA
 #include "engine/SkiaTextPainter.h"
@@ -800,6 +801,12 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
 
     connect(&m_filmstripTiles, &FilmstripTileCache::tileReady, this,
             &AppController::filmstripTileReady);
+    if (m_assetLibrary) {
+        // Direct: it has to run before the probe it announces starts reading the file.
+        connect(m_assetLibrary, &AssetLibrary::sourceContentChanging, this,
+                [this](const QString &path) { forgetChangedMediaSource(path, true); },
+                Qt::DirectConnection);
+    }
     connect(&m_waveformBlocks, &WaveformBlockCache::rangeReady, this,
             &AppController::waveformRangeReady);
 
@@ -20073,8 +20080,11 @@ const MediaWaveform::Dense *AppController::densePeaksFor(const QString &path) co
             QMetaObject::invokeMethod(
                 self,
                 [self, path, dense] {
-                    self->m_waveformCache.insert(path, dense);
                     self->m_waveformPending.remove(path);
+                    // Decoded from the file this path held before it changed; the next ask
+                    // decodes it again.
+                    if (!self->m_waveformDiscard.remove(path))
+                        self->m_waveformCache.insert(path, dense);
                     emit self->waveformReady(path);
                 },
                 Qt::QueuedConnection);
@@ -20082,6 +20092,29 @@ const MediaWaveform::Dense *AppController::densePeaksFor(const QString &path) co
     }
 
     return nullptr;
+}
+
+void AppController::forgetChangedMediaSource(const QString &path, bool beforeReprobe)
+{
+    if (path.isEmpty())
+        return;
+    // Skips a decoder that is mid-read; the second call, after the re-probe, catches it.
+    ClipReaderPool::instance().releasePath(path);
+    m_waveformBlocks.forgetSource(path);
+    m_filmstripTiles.forgetSource(path);
+    m_waveformCache.remove(path);
+    if (m_waveformPending.contains(path))
+        m_waveformDiscard.insert(path);
+    // Cached files are named by path, so the regenerated ones keep their names.
+    ClipThumbnailStore::instance().forgetPrefix(MediaThumbnail::cachePrefixFor(path));
+    if (!beforeReprobe)
+        return;
+    // These would hand the re-probe the old pictures back, so they go before it runs.
+    MediaThumbnail::forgetSource(path);
+    drift::ReverseProxyCache::instance().removePreview(path);
+    // Keyed by the content hash recorded at the last probe, which a clip still carries; all or
+    // nothing, and cheap to rebuild — parsed documents only.
+    drift::vec::clearVectorDocumentCache();
 }
 
 QVariantList AppController::waveformPeaks(const QString &path) const
@@ -20715,7 +20748,7 @@ void AppController::applyParsedProject(ParsedProject parsed)
     m_stabilize->migrateLegacyClips();
 
     if (m_assetLibrary)
-        m_assetLibrary->setProject(&m_project);
+        m_assetLibrary->setProject(&m_project, true);
     m_bin->folderModel()->setProject(&m_project);
     m_bin->setCurrentFolderId(QString());
 
@@ -21975,5 +22008,4 @@ bool AppController::exportUserTextAnimationPreset(const QString &presetId, const
     file.write(QJsonDocument(json).toJson(QJsonDocument::Indented));
     return true;
 }
-
 

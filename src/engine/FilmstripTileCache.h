@@ -45,6 +45,11 @@ public:
     // of the session.
     void clear();
 
+    // Forgets one source whose file changed in place: its memoized tiles, failure strikes and
+    // queued requests, the decoder held open on it, and its tile files on disk. A batch already
+    // decoding it is discarded when it lands rather than memoizing pictures of the old file.
+    void forgetSource(const QString &sourcePath);
+
     // While suspended, requests still queue but nothing decodes, and a batch already running
     // stops at its next tile and requeues the rest; resuming starts the newest batch. Playback holds this so tile and peak decoding do not compete with the preview's
     // own decoders for the CPU — the frames it would have produced scroll past unseen anyway.
@@ -78,6 +83,10 @@ private:
     QList<Request> m_queue;
     bool m_busy = false;
     bool m_batchScheduled = false;
+    // The source the running batch decodes, and whether forgetSource()/clear() has since
+    // disowned it.
+    QString m_busySource;
+    bool m_discardBatch = false;
     bool m_suspended = false;
     // Raised by setSuspended(true) so a batch already decoding stops early; read by the worker
     // after its decode to tell a cut-short batch from a finished one.

@@ -9987,6 +9987,10 @@
         <translation>Impossible de mettre à jour la bibliothèque</translation>
     </message>
     <message>
+        <source>Could not refresh “%1”: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>That media is no longer in this project.</source>
         <translation>Ce média ne fait plus partie du projet.</translation>
     </message>
@@ -10001,6 +10005,10 @@
     <message>
         <source>Media replaced</source>
         <translation>Média remplacé</translation>
+    </message>
+    <message>
+        <source>Media refreshed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

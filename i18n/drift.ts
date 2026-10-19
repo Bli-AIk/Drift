@@ -9984,6 +9984,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Could not refresh “%1”: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>That media is no longer in this project.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9997,6 +10001,10 @@
     </message>
     <message>
         <source>Media replaced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media refreshed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

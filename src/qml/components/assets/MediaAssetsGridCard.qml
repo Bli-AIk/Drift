@@ -37,12 +37,17 @@ Column {
     // The Connections below replaces the binding, so a recycled card has to get it back.
     GridView.onReused: root.liveThumbnailPath = Qt.binding(() => root.thumbnailPath)
     GridView.onPooled: frame.closeMenus()
+    // The thumbnail file keeps its name when its media is re-read, so the image URL carries this
+    // to make the Image fetch the new pixels.
+    property int thumbnailRevision: 0
 
     Connections {
         target: AssetLibrary
         function onAssetMetadataChanged(assetId) {
-            if (!root.isFolder && assetId === root.assetId)
+            if (!root.isFolder && assetId === root.assetId) {
                 root.liveThumbnailPath = AssetLibrary.thumbnailAt(root.assetIndex)
+                root.thumbnailRevision++
+            }
         }
     }
 
@@ -101,6 +106,7 @@ Column {
         thumbnailPath: root.thumbnailPath
         assetIndex: root.assetIndex
         liveThumbnailPath: root.liveThumbnailPath
+        thumbnailRevision: root.thumbnailRevision
         cardSize: root.cardSize
         selected: root.selected
         hovered: cardHover.hovered

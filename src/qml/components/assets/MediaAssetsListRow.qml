@@ -65,11 +65,16 @@ Rectangle {
         rowMenu.close()
         folderRowMenu.close()
     }
+    // See MediaAssetsGridCard: the thumbnail's name is unchanged across a re-read.
+    property int thumbnailRevision: 0
+
     Connections {
         target: AssetLibrary
         function onAssetMetadataChanged(assetId) {
-            if (!root.isFolder && assetId === root.assetId)
+            if (!root.isFolder && assetId === root.assetId) {
                 root.liveThumbnailPath = AssetLibrary.thumbnailAt(root.assetIndex)
+                root.thumbnailRevision++
+            }
         }
     }
 
@@ -98,6 +103,7 @@ Rectangle {
             id: listThumbFrame
             folder: root.isFolder
             liveThumbnailPath: root.liveThumbnailPath
+            thumbnailRevision: root.thumbnailRevision
             kind: root.kind
             replaceBusy: root.replaceBusy
             showVfr: !root.isFolder && root.kind === "video" && host.vfrWarningOf(root.assetId)

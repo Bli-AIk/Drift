@@ -10136,6 +10136,10 @@
         <translation>تعذر تحديث المكتبة</translation>
     </message>
     <message>
+        <source>Could not refresh “%1”: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>That media is no longer in this project.</source>
         <translation>تلك الوسائط لم تعد موجودة في هذا المشروع.</translation>
     </message>
@@ -10150,6 +10154,10 @@
     <message>
         <source>Media replaced</source>
         <translation>تم استبدال الوسائط</translation>
+    </message>
+    <message>
+        <source>Media refreshed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
