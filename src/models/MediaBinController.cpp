@@ -931,6 +931,10 @@ void MediaBinController::finalizeReplace(const QString &assetId, const drift::Me
     // Captured before applyProbedSource overwrites `current` in place — rebindClipsToAsset needs
     // to know what the bin's correction *was* to rebase each clip's own by how much it changed.
     const int oldBinCorrection = drift::rotationCorrectionOf(*current);
+    // A refresh of unchanged media keeps the landmarks and depth maps, which were baked from it.
+    const bool mediaChanged = !refresh || current->durationUs != replacement.durationUs
+        || current->width != replacement.width || current->height != replacement.height
+        || current->sourceSize != replacement.sourceSize;
     if (!m_app->m_assetLibrary->applyProbedSource(assetId, replacement)) {
         refuse(tr("That media is no longer in this project."));
         return;
@@ -941,7 +945,7 @@ void MediaBinController::finalizeReplace(const QString &assetId, const drift::Me
     if (replacement.path == path)
         m_app->forgetChangedMediaSource(path, /*beforeReprobe=*/false);
 
-    const int adjusted = rebindClipsToAsset(assetId, replacement, oldBinCorrection);
+    const int adjusted = rebindClipsToAsset(assetId, replacement, oldBinCorrection, mediaChanged);
     const QString label = fromEdit ? tr("Media edited")
                                    : (refresh ? tr("Media refreshed") : tr("Media replaced"));
     m_app->pushProjectEdit(before, label);
@@ -952,7 +956,7 @@ void MediaBinController::finalizeReplace(const QString &assetId, const drift::Me
 }
 
 int MediaBinController::rebindClipsToAsset(const QString &assetId, const drift::MediaAsset &asset,
-                                      int oldBinCorrection)
+                                      int oldBinCorrection, bool mediaChanged)
 {
     const int newBinCorrection = drift::rotationCorrectionOf(asset);
     int adjusted = 0;
@@ -976,9 +980,11 @@ int MediaBinController::rebindClipsToAsset(const QString &assetId, const drift::
                 ((clip.rotationCorrection - oldBinCorrection + newBinCorrection) % 360 + 360) % 360;
             // Landmarks are baked against the old pixels. Left in place they would keep the face
             // warps tracking a face the new footage never had, and render without erroring.
-            clip.faceTrackPath.clear();
-            clip.faceTrackSrcOffsetUs = 0;
-            clip.depthPath.clear();
+            if (mediaChanged) {
+                clip.faceTrackPath.clear();
+                clip.faceTrackSrcOffsetUs = 0;
+                clip.depthPath.clear();
+            }
 
             // Stills have no source range to fit.
             if (asset.durationUs <= 0 || clip.srcOut <= asset.durationUs)

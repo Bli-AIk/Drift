@@ -143,7 +143,8 @@ private:
     void finalizeReplace(const QString &assetId, const drift::MediaAsset &filled, bool ok);
     // Moves every clip bound to `assetId` onto the replacement media. Returns how many had a
     // source range that no longer fitted and had to be pulled back to it.
-    int rebindClipsToAsset(const QString &assetId, const drift::MediaAsset &asset, int oldBinCorrection);
+    int rebindClipsToAsset(const QString &assetId, const drift::MediaAsset &asset, int oldBinCorrection,
+                           bool mediaChanged);
     // Runs spec off-thread and swaps its output in for the asset at assetIndex, reporting through
     // editChanged/editFinished. The caller has checked no edit is running.
     void startEditJob(const QString &assetId, const QString &name,
