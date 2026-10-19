@@ -1106,11 +1106,17 @@ void AssetLibrary::startImportJob(const QString &assetId, const QString &absolut
     m_importPending.insert(assetId);
 
     (void)QtConcurrent::run(&m_jobs, [this, assetId, absolutePath, imageOnly]() {
+        // Taken before the probe: a file still being written must not get its final size and
+        // mtime recorded against a duration read from its partial contents.
+        drift::MediaAsset fingerprint;
+        fingerprint.path = absolutePath;
+        drift::stampSourceFingerprint(fingerprint);
         MediaInfo info;
         const std::optional<drift::MediaAsset> probed = probeAsset(absolutePath, imageOnly, &info);
         drift::MediaAsset filled = probed.value_or(drift::MediaAsset{});
         filled.path = absolutePath;
-        drift::stampSourceFingerprint(filled);
+        filled.sourceSize = fingerprint.sourceSize;
+        filled.sourceModifiedMs = fingerprint.sourceModifiedMs;
         const bool ok = probed.has_value();
         const bool video = ok && filled.kind == drift::MediaKind::Video;
         const bool suggestProxy = video && wantsPreviewProxy(info);
@@ -1144,10 +1150,14 @@ bool AssetLibrary::startReplaceProbe(int index, const QString &absolutePath)
     const quint64 token = ++m_lastProbeToken;
     m_probeToken.insert(assetId, token);
     (void)QtConcurrent::run(&m_jobs, [this, assetId, absolutePath, imageOnly, token]() {
+        drift::MediaAsset fingerprint;
+        fingerprint.path = absolutePath;
+        drift::stampSourceFingerprint(fingerprint);
         const std::optional<drift::MediaAsset> probed = probeAsset(absolutePath, imageOnly);
         drift::MediaAsset filled = probed.value_or(drift::MediaAsset{});
         filled.path = absolutePath;
-        drift::stampSourceFingerprint(filled);
+        filled.sourceSize = fingerprint.sourceSize;
+        filled.sourceModifiedMs = fingerprint.sourceModifiedMs;
         const bool ok = probed.has_value();
 
         QMetaObject::invokeMethod(
