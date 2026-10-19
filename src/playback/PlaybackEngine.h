@@ -280,7 +280,8 @@ private:
     bool m_loopWorkArea = false;
     bool m_voiceoverRecording = false;
     // processedUSecs() is cumulative from QAudioSink::start(), not from the last clock reset.
-    // Subtracting this (captured whenever the clock is re-anchored) keeps a seek from landing
-    // at seekTarget + time-since-play instead of seekTarget.
+    // This is where the current stream's first sample sits in the sink's output, captured on the
+    // first fill of each stream generation. Audio thread only.
     qint64 m_sinkPlayedUsOffset = 0;
+    quint64 m_anchoredGeneration = 0;
 };

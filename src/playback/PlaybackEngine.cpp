@@ -303,7 +303,6 @@ void PlaybackEngine::onAudioSampleRateChanged()
     m_audioStreamGeneration.fetch_add(1, std::memory_order_release);
     m_clock.reset(m_playheadUs, m_sampleRate);
     if (m_playing) {
-        m_sinkPlayedUsOffset = m_audio.processedUSecs();
         m_clock.start();
     }
 }
@@ -398,7 +397,6 @@ void PlaybackEngine::resyncAudioAt(drift::TimeUs us)
     // reset() clears the running flag; resume the clock if we are still in play
     // so edits/seeks during playback don't freeze audio at one timeline spot.
     if (m_playing) {
-        m_sinkPlayedUsOffset = m_audio.processedUSecs();
         m_clock.start();
     }
 }
@@ -702,7 +700,6 @@ void PlaybackEngine::play()
 
     requestAudioFocus();
     ensureAudioSink();
-    m_sinkPlayedUsOffset = m_audio.processedUSecs();
     m_clock.start();
 
     pushAudioSnapshot();
@@ -1041,6 +1038,16 @@ int PlaybackEngine::fillAudio(float *buffer, int sampleCount)
     if (!m_playing || !m_project) {
         std::memset(buffer, 0, static_cast<size_t>(sampleCount) * 2 * sizeof(float));
         return sampleCount;
+    }
+
+    // The first fill after a play, seek or rate change is the first sample of the new stream, but
+    // the sink still has whatever it pulled before — silence while paused, the old position after a
+    // seek — queued ahead of it. Anchoring to processedUSecs() at play time instead put the picture
+    // that whole queue ahead of the sound.
+    const quint64 generation = m_audioStreamGeneration.load(std::memory_order_acquire);
+    if (generation != m_anchoredGeneration) {
+        m_anchoredGeneration = generation;
+        m_sinkPlayedUsOffset = m_audio.deliveredUSecs();
     }
 
     // Mix at the produce position (audio we are generating into the buffer),
