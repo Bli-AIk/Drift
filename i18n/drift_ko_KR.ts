@@ -1518,6 +1518,10 @@
         <translation type="unfinished">1/4</translation>
     </message>
     <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Auto</source>
         <translation type="unfinished">자동</translation>
     </message>
@@ -11221,12 +11225,17 @@
         <translation type="unfinished">1/4</translation>
     </message>
     <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Auto</source>
         <translation type="unfinished">자동</translation>
     </message>
     <message>
         <source>Preview quality — lower is smoother while editing.
-Full, Half and Quarter are fixed fractions of the project resolution: Full composites exactly what an export would.
+Full, Half, Quarter and 1/8 are fixed fractions of the project resolution: Full composites exactly what an export would.
+1/8 (Eco) is for older laptops with integrated graphics.
 Auto renders only as many pixels as the preview actually shows, and lowers that further while playback cannot keep up.</source>
         <translation type="unfinished">미리보기 화질 — 낮을수록 편집 중 더 부드럽습니다.\n전체, 절반 및 1/4은 프로젝트 해상도의 고정 비율입니다. 전체는 내보내기와 동일한 픽셀을 정확히 합성합니다.\n자동은 미리보기에 실제로 표시되는 픽셀 수만큼만 렌더링하며, 재생이 따라가지 못하면 더 낮춥니다.</translation>
     </message>

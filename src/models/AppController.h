@@ -1693,6 +1693,7 @@ protected:
     // clip dependency, so an edit to the timeline does not invalidate it.
     const QList<drift::TimeUs> &extraSnapTargetsCached() const;
     void invalidateExtraSnapTargets() { m_extraSnapTargetsValid = false; }
+    void updateFrameCacheSuspension();
     // Snaps against the vector pinned for the current trim gesture, falling back to a one-shot
     // build when called outside one.
     drift::TimeUs snapTimeForGesture(drift::TimeUs rawUs) const;

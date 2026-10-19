@@ -1518,6 +1518,10 @@
         <translation type="unfinished">এক-চতুর্থাংশ</translation>
     </message>
     <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Auto</source>
         <translation type="unfinished">স্বয়ংক্রিয়</translation>
     </message>
@@ -11269,14 +11273,19 @@
         <translation>এক-চতুর্থাংশ</translation>
     </message>
     <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Auto</source>
         <translation>স্বয়ংক্রিয়</translation>
     </message>
     <message>
         <source>Preview quality — lower is smoother while editing.
-Full, Half and Quarter are fixed fractions of the project resolution: Full composites exactly what an export would.
+Full, Half, Quarter and 1/8 are fixed fractions of the project resolution: Full composites exactly what an export would.
+1/8 (Eco) is for older laptops with integrated graphics.
 Auto renders only as many pixels as the preview actually shows, and lowers that further while playback cannot keep up.</source>
-        <translation>প্রিভিউর মান — মান কমালে সম্পাদনার সময় আরও মসৃণভাবে চলে।
+        <translation type="unfinished">প্রিভিউর মান — মান কমালে সম্পাদনার সময় আরও মসৃণভাবে চলে।
 পূর্ণ, অর্ধেক ও এক-চতুর্থাংশ হলো প্রকল্পের রেজোলিউশনের নির্দিষ্ট অংশ: পূর্ণ মোড এক্সপোর্টের মতোই কম্পোজিট করে।
 স্বয়ংক্রিয় মোড শুধু প্রিভিউতে দেখা যায় এমন পিক্সেল রেন্ডার করে এবং প্লেব্যাক তাল রাখতে না পারলে রেজোলিউশন আরও কমায়.</translation>
     </message>
