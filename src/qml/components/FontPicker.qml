@@ -37,7 +37,7 @@ Item {
     }
 
     function rebuild() {
-        familyModel.clear()
+        const rows = []
         const needle = root.filter
         const matches = (name) => needle === "" || name.toLowerCase().indexOf(needle) >= 0
 
@@ -46,7 +46,7 @@ Item {
         for (let i = 0; i < catalog.length; ++i) {
             if (!matches(catalog[i].family))
                 continue
-            familyModel.append({
+            rows.push({
                 "name": catalog[i].family,
                 "previewFamily": catalog[i].qtFamily,
                 "group": catalog[i].categoryLabel,
@@ -57,16 +57,27 @@ Item {
         const user = EditorState.userFonts()
         for (let i = 0; i < user.length; ++i) {
             if (matches(user[i]))
-                familyModel.append({ "name": user[i], "previewFamily": user[i], "group": qsTr("My fonts"), "removable": true })
+                rows.push({ "name": user[i], "previewFamily": user[i], "group": qsTr("My fonts"), "removable": true })
         }
 
+        // Rendering each system family in its own face stalls scrolling on Windows (#345): every row
+        // makes Qt resolve and load an installed font on the GUI thread. They use the UI font instead.
         // Fonts are an addon, so an empty catalog is the normal starting state; the system list
         // is always offered and the header suggests the pack.
         const system = EditorState.systemFontFamilies()
         for (let i = 0; i < system.length; ++i) {
             if (matches(system[i]))
-                familyModel.append({ "name": system[i], "previewFamily": system[i], "group": qsTr("System fonts"), "removable": false })
+                rows.push({ "name": system[i], "previewFamily": "", "group": qsTr("System fonts"), "removable": false })
         }
+
+        familyModel.clear()
+        familyModel.append(rows)
+    }
+
+    Timer {
+        id: filterDebounce
+        interval: 150
+        onTriggered: root.rebuild()
     }
 
     Component.onCompleted: root.rebuild()
@@ -187,7 +198,7 @@ Item {
                 font.family: Theme.fontFamily
                 onTextChanged: {
                     root.filter = text.trim().toLowerCase()
-                    root.rebuild()
+                    filterDebounce.restart()
                 }
             }
 

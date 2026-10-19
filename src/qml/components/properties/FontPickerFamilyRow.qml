@@ -28,7 +28,7 @@ Rectangle {
         anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         text: row.name
-        font.family: row.previewFamily
+        font.family: row.previewFamily === "" ? Theme.fontFamily : row.previewFamily
         font.pixelSize: 18
         color: Theme.c.fontPickerFamilyRow.foreground
         elide: Text.ElideRight
