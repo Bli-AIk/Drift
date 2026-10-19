@@ -1,11 +1,11 @@
 #pragma once
 
-#include "AudioOutputChannel.h"
-#include "CompositorService.h"
-#include "PlaybackClock.h"
-#include "PlaybackStats.h"
-#include "core/Project.h"
-#include "core/Time.h"
+#include "playback/AudioOutputChannel.h"
+#include "playback/CompositorService.h"
+#include "playback/PlaybackClock.h"
+#include "playback/PlaybackStats.h"
+#include "core/project/Project.h"
+#include "core/base/Time.h"
 #include "engine/AudioMixer.h"
 #include "engine/audio/ClipAudioRetimer.h"
 

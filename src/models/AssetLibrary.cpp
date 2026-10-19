@@ -1,7 +1,7 @@
-#include "AssetLibrary.h"
+#include "models/AssetLibrary.h"
 
-#include "core/ImageSequence.h"
-#include "core/Project.h"
+#include "core/project/media/ImageSequence.h"
+#include "core/project/Project.h"
 
 #include "engine/MediaProbe.h"
 #include "engine/MediaThumbnail.h"
@@ -14,7 +14,7 @@
 #include "engine/ProxyNaming.h"
 #include "engine/ReverseProxyCache.h"
 #include "engine/VectorInspect.h"
-#include "core/DotLottie.h"
+#include "core/project/sources/DotLottie.h"
 
 #ifdef Q_OS_ANDROID
 #include <QCryptographicHash>

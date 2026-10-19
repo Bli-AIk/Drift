@@ -1,4 +1,4 @@
-#include "FileDialogs.h"
+#include "models/FileDialogs.h"
 
 #include <QDir>
 #include <QFileDialog>

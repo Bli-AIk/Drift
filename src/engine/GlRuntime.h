@@ -8,11 +8,11 @@
 // GpuCompositor (whole-frame compositing that never leaves the GPU). Not a
 // public API — do not include from outside src/engine.
 
-#include "GpuEffectDefinition.h"
-#include "GpuStatus.h"
-#include "ModelAsset.h"
-#include "PreviewVideoFrame.h"
-#include "core/Time.h"
+#include "engine/GpuEffectDefinition.h"
+#include "engine/GpuStatus.h"
+#include "engine/ModelAsset.h"
+#include "engine/PreviewVideoFrame.h"
+#include "core/base/Time.h"
 
 #include <QVector4D>
 #include <QByteArray>

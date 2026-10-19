@@ -1,9 +1,9 @@
 #pragma once
 
-#include "TextLayout.h"
-#include "VectorPainter.h"
-#include "core/Clip.h"
-#include "core/TextAnimator.h"
+#include "engine/TextLayout.h"
+#include "engine/VectorPainter.h"
+#include "core/project/clip/Clip.h"
+#include "core/text/animation/TextAnimator.h"
 
 #include <QColor>
 #include <QList>

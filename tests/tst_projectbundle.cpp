@@ -1,4 +1,4 @@
-#include "core/ImageSequence.h"
+#include "core/project/media/ImageSequence.h"
 #include "engine/ProjectBundle.h"
 #include "engine/ProjectDependencies.h"
 

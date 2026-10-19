@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/FadeShape.h"
+#include "core/animation/FadeShape.h"
 
 #include <QObject>
 #include <QString>

@@ -1,10 +1,10 @@
-#include "LocalTranscription.h"
+#include "engine/LocalTranscription.h"
 
-#include "CtcAligner.h"
-#include "SileroVad.h"
-#include "SpeakerDiarizer.h"
-#include "SpeechAudio.h"
-#include "WhisperTranscriber.h"
+#include "engine/CtcAligner.h"
+#include "engine/SileroVad.h"
+#include "engine/SpeakerDiarizer.h"
+#include "engine/SpeechAudio.h"
+#include "engine/WhisperTranscriber.h"
 
 #include <QDebug>
 #include <QFile>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Transcript.h"
+#include "core/project/Transcript.h"
 
 #include <QString>
 

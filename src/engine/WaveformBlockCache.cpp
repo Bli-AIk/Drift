@@ -1,6 +1,6 @@
-#include "WaveformBlockCache.h"
+#include "engine/WaveformBlockCache.h"
 
-#include "MediaWaveform.h"
+#include "engine/MediaWaveform.h"
 
 #include <QThreadPool>
 #include <QTimer>

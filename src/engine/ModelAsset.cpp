@@ -1,9 +1,9 @@
 #define CGLTF_IMPLEMENTATION
 #include "cgltf.h"
 
-#include "ModelAsset.h"
+#include "engine/ModelAsset.h"
 
-#include "ModelAnimation.h"
+#include "engine/ModelAnimation.h"
 
 #include <QByteArray>
 #include <QDateTime>

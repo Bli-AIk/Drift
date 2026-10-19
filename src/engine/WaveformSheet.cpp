@@ -1,4 +1,4 @@
-#include "WaveformSheet.h"
+#include "engine/WaveformSheet.h"
 
 #include <QFont>
 #include <QFontMetrics>

@@ -5,7 +5,7 @@
 
 #include "engine/MediaProbe.h"
 #include "engine/SceneDetect.h"
-#include "core/Time.h"
+#include "core/base/Time.h"
 
 // isatty: POSIX spells it in <unistd.h>, MSVC in <io.h> with a leading underscore.
 #if defined(_WIN32)

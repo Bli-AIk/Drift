@@ -1,8 +1,8 @@
-#include "HwAccel.h"
+#include "engine/HwAccel.h"
 
-#include "GpuCompositor.h"
-#include "GpuDevice.h"
-#include "GpuPreference.h"
+#include "engine/GpuCompositor.h"
+#include "engine/GpuDevice.h"
+#include "engine/GpuPreference.h"
 
 #include <QByteArray>
 #include <QHash>

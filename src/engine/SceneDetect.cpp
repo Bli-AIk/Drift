@@ -1,8 +1,8 @@
-#include "SceneDetect.h"
+#include "engine/SceneDetect.h"
 
-#include "ClipReaderPool.h"
-#include "ObjectDetector.h"
-#include "MediaProbe.h"
+#include "engine/ClipReaderPool.h"
+#include "engine/ObjectDetector.h"
+#include "engine/MediaProbe.h"
 
 #include <QCryptographicHash>
 #include <QDir>

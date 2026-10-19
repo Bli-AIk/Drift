@@ -1,4 +1,4 @@
-#include "ModelClipRenderer.h"
+#include "engine/ModelClipRenderer.h"
 
 #include "engine/ModelAnimation.h"
 #include "engine/ModelAsset.h"

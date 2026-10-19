@@ -1,6 +1,6 @@
-#include "StickerCatalog.h"
+#include "engine/StickerCatalog.h"
 
-#include "GpuPackageParse.h"
+#include "engine/GpuPackageParse.h"
 
 #include <QDir>
 #include <QFile>

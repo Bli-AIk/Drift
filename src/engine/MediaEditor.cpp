@@ -1,14 +1,14 @@
-#include "MediaEditor.h"
+#include "engine/MediaEditor.h"
 
-#include "AudioFileWriter.h"
-#include "MediaProbe.h"
-#include "core/Time.h"
+#include "engine/AudioFileWriter.h"
+#include "engine/MediaProbe.h"
+#include "core/base/Time.h"
 
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QImage>
-#include "StillImage.h"
+#include "engine/StillImage.h"
 
 #include <QStandardPaths>
 #include <QStringList>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/Clip.h"
-#include "core/Time.h"
+#include "core/project/clip/Clip.h"
+#include "core/base/Time.h"
 
 #include <QHash>
 #include <QList>

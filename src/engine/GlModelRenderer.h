@@ -1,8 +1,8 @@
 #pragma once
 
-#include "FaceLandmarker.h"
-#include "FaceModelTransform.h"
-#include "GlRuntime.h"
+#include "engine/FaceLandmarker.h"
+#include "engine/FaceModelTransform.h"
+#include "engine/GlRuntime.h"
 
 #include <QMatrix4x4>
 #include <QOpenGLExtraFunctions>

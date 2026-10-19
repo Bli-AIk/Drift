@@ -40,10 +40,10 @@
 #include <utility>
 #include <random>
 
-#include "core/Clip.h"
-#include "core/Project.h"
-#include "core/Stabilize.h"
-#include "core/TimelineOps.h"
+#include "core/project/clip/Clip.h"
+#include "core/project/Project.h"
+#include "core/project/clip/Stabilize.h"
+#include "core/edit/TimelineOps.h"
 #include "engine/AudioMixer.h"
 #include "engine/ClipReader.h"
 #include "engine/LoudnessMeter.h"
@@ -105,7 +105,7 @@
 #include "engine/FontCatalog.h"
 #include "engine/FrameCompositor.h"
 #include "engine/GpuCompositor.h"
-#include "core/TextAnimationPreset.h"
+#include "core/text/animation/TextAnimationPreset.h"
 #include "engine/TextLayout.h"
 #ifdef DRIFT_WITH_SKIA
 #include "engine/SkiaRuntime.h"
@@ -123,7 +123,7 @@
 #include "engine/ClipReaderPool.h"
 #include "engine/MediaProbe.h"
 #include "engine/TransitionCatalog.h"
-#include "core/Transition.h"
+#include "core/project/Transition.h"
 #include "TestZip.h"
 
 extern "C" {

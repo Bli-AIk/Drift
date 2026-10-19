@@ -1,6 +1,6 @@
-#include "SplatAsset.h"
+#include "engine/SplatAsset.h"
 
-#include "core/ZipArchive.h"
+#include "core/base/ZipArchive.h"
 
 #include <QBuffer>
 #include <QDir>

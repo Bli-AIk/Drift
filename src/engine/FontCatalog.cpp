@@ -1,9 +1,9 @@
-#include "FontCatalog.h"
+#include "engine/FontCatalog.h"
 
-#include "GpuPackageParse.h"
+#include "engine/GpuPackageParse.h"
 #ifdef DRIFT_WITH_SKIA
-#include "SkiaFontCollection.h"
-#include "SkiaFonts.h"
+#include "engine/SkiaFontCollection.h"
+#include "engine/SkiaFonts.h"
 #endif
 
 #include <QCoreApplication>

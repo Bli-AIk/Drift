@@ -1,4 +1,4 @@
-#include "TimelineViewState.h"
+#include "timeline/TimelineViewState.h"
 
 TimelineViewState::TimelineViewState(QObject *parent)
     : QObject(parent)

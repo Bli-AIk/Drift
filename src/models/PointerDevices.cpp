@@ -1,4 +1,4 @@
-#include "PointerDevices.h"
+#include "models/PointerDevices.h"
 
 #ifdef Q_OS_ANDROID
 #include <QJniEnvironment>

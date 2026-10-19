@@ -1,11 +1,11 @@
-#include "SkiaTextPainter.h"
+#include "engine/SkiaTextPainter.h"
 
-#include "SkiaPath.h"
-#include "SkiaShading.h"
-#include "SkiaTextGeometry.h"
-#include "SkiaTextEffects.h"
-#include "SkiaVectorResources.h"
-#include "core/TextAnimationPreset.h"
+#include "engine/SkiaPath.h"
+#include "engine/SkiaShading.h"
+#include "engine/SkiaTextGeometry.h"
+#include "engine/SkiaTextEffects.h"
+#include "engine/SkiaVectorResources.h"
+#include "core/text/animation/TextAnimationPreset.h"
 
 #include <QCache>
 #include <QHash>

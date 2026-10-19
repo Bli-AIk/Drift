@@ -1,4 +1,4 @@
-#include "core/Project.h"
+#include "core/project/Project.h"
 #include "engine/FontCatalog.h"
 #include "engine/FrameCompositor.h"
 

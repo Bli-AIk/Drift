@@ -1,7 +1,7 @@
 #pragma once
 
-#include "VectorPainter.h"
-#include "core/ShapeStyle.h"
+#include "engine/VectorPainter.h"
+#include "core/shapes/ShapeStyle.h"
 
 #include <QRectF>
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "FaceLandmarker.h"
-#include "FaceMesh.h"
-#include "GlRuntime.h"
+#include "engine/FaceLandmarker.h"
+#include "engine/FaceMesh.h"
+#include "engine/GlRuntime.h"
 
 #include <QMap>
 #include <QOpenGLExtraFunctions>

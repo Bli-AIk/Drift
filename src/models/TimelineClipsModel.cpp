@@ -1,4 +1,4 @@
-#include "TimelineClipsModel.h"
+#include "models/TimelineClipsModel.h"
 
 #include <QSet>
 #include <QStringList>

@@ -1,11 +1,11 @@
-#include "TextLayout.h"
+#include "engine/TextLayout.h"
 
-#include "EmojiCatalog.h"
-#include "FontCatalog.h"
+#include "engine/EmojiCatalog.h"
+#include "engine/FontCatalog.h"
 #ifdef DRIFT_WITH_SKIA
-#include "SkiaFontCollection.h"
-#include "SkiaFonts.h"
-#include "SkiaTextGeometry.h"
+#include "engine/SkiaFontCollection.h"
+#include "engine/SkiaFonts.h"
+#include "engine/SkiaTextGeometry.h"
 
 #include "include/core/SkFontMetrics.h"
 #include "include/core/SkFontMgr.h"

@@ -1,6 +1,6 @@
-#include "BinFolderListModel.h"
+#include "models/BinFolderListModel.h"
 
-#include "core/Project.h"
+#include "core/project/Project.h"
 
 #include <QSet>
 #include <QUuid>

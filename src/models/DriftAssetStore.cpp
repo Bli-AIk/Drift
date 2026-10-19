@@ -1,8 +1,8 @@
-#include "DriftAssetStore.h"
+#include "models/DriftAssetStore.h"
 
-#include "AppController.h"
-#include "AssetLibrary.h"
-#include "MarketClient.h"
+#include "models/AppController.h"
+#include "models/AssetLibrary.h"
+#include "models/MarketClient.h"
 #include "engine/FacePropCatalog.h"
 
 #include <QCryptographicHash>

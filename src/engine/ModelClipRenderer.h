@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Model3dSource.h"
+#include "core/project/sources/Model3dSource.h"
 #include "engine/ModelClipTransform.h"
 
 #include <QRectF>

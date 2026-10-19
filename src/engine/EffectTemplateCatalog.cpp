@@ -1,7 +1,7 @@
-#include "EffectTemplateCatalog.h"
+#include "engine/EffectTemplateCatalog.h"
 
-#include "EffectCatalog.h"
-#include "GpuPackageParse.h"
+#include "engine/EffectCatalog.h"
+#include "engine/GpuPackageParse.h"
 
 #include <QCoreApplication>
 #include <QDir>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Clip.h"
+#include "core/project/clip/Clip.h"
 #include "engine/SceneDetect.h"
 
 #include <QAtomicInt>

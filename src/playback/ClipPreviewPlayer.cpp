@@ -1,4 +1,4 @@
-#include "ClipPreviewPlayer.h"
+#include "playback/ClipPreviewPlayer.h"
 
 #include "ClipPreviewImageStore.h"
 #include "engine/AudioMixer.h"

@@ -52,16 +52,16 @@
 #include "MulticamImageProvider.h"
 #include "MulticamImageStore.h"
 
-#include "core/Clip.h"
-#include "core/EffectStackStore.h"
-#include "core/MogrtReader.h"
-#include "core/KdenliveReader.h"
-#include "core/ResolveReader.h"
-#include "core/EdlReader.h"
-#include "core/OtioReader.h"
-#include "core/Project.h"
-#include "core/TimelineOps.h"
-#include "core/Track.h"
+#include "core/project/clip/Clip.h"
+#include "core/effects/EffectStackStore.h"
+#include "core/interchange/premiere/MogrtReader.h"
+#include "core/interchange/KdenliveReader.h"
+#include "core/interchange/ResolveReader.h"
+#include "core/interchange/EdlReader.h"
+#include "core/interchange/OtioReader.h"
+#include "core/project/Project.h"
+#include "core/edit/TimelineOps.h"
+#include "core/project/Track.h"
 
 namespace {
 

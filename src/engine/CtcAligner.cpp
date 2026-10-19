@@ -1,8 +1,8 @@
-#include "CtcAligner.h"
+#include "engine/CtcAligner.h"
 
-#include "GpuPackageParse.h"
-#include "OrtSupport.h"
-#include "SpeechAudio.h"
+#include "engine/GpuPackageParse.h"
+#include "engine/OrtSupport.h"
+#include "engine/SpeechAudio.h"
 
 #include <QDebug>
 #include <QDir>

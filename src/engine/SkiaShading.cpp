@@ -1,7 +1,7 @@
-#include "SkiaShading.h"
+#include "engine/SkiaShading.h"
 
-#include "SkiaPath.h"
-#include "SkiaTextEffects.h"
+#include "engine/SkiaPath.h"
+#include "engine/SkiaTextEffects.h"
 
 #include <QtMath>
 

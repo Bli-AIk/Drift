@@ -3,8 +3,8 @@
 #include "mcp/McpJson.h"
 #include "mcp/McpValidate.h"
 
-#include "core/TextStyle.h"
-#include "core/Time.h"
+#include "core/text/TextStyle.h"
+#include "core/base/Time.h"
 #include "models/AppController.h"
 #include "models/AssetLibrary.h"
 #include "models/MediaBinController.h"

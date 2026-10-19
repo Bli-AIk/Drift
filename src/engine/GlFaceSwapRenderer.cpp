@@ -1,8 +1,8 @@
-#include "GlFaceSwapRenderer.h"
+#include "engine/GlFaceSwapRenderer.h"
 
-#include "FaceSwapSource.h"
-#include "FaceTrack.h"
-#include "GlModelRenderer.h"
+#include "engine/FaceSwapSource.h"
+#include "engine/FaceTrack.h"
+#include "engine/GlModelRenderer.h"
 
 #include <QDateTime>
 #include <QDir>

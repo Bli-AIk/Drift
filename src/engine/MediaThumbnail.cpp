@@ -1,13 +1,13 @@
-#include "MediaThumbnail.h"
+#include "engine/MediaThumbnail.h"
 
-#include "PdfClipRenderer.h"
-#include "VectorClipRenderer.h"
-#include "VectorInspect.h"
+#include "engine/PdfClipRenderer.h"
+#include "engine/VectorClipRenderer.h"
+#include "engine/VectorInspect.h"
 
-#include "StillImage.h"
+#include "engine/StillImage.h"
 
-#include "MediaProbe.h"
-#include "SwsColorRange.h"
+#include "engine/MediaProbe.h"
+#include "engine/SwsColorRange.h"
 
 #include <QDir>
 #include <QFile>

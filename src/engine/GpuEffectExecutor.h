@@ -1,10 +1,10 @@
 #pragma once
 
-#include "DepthSidecar.h"
-#include "EffectCatalog.h"
-#include "FaceLandmarker.h"
-#include "GpuEffectDefinition.h"
-#include "core/Time.h"
+#include "engine/DepthSidecar.h"
+#include "engine/EffectCatalog.h"
+#include "engine/FaceLandmarker.h"
+#include "engine/GpuEffectDefinition.h"
+#include "core/base/Time.h"
 
 #include <QImage>
 #include <QList>

@@ -13,7 +13,7 @@
 #include <cmath>
 #include <memory>
 
-#include "core/Project.h"
+#include "core/project/Project.h"
 #include "engine/AudioMixer.h"
 #include "engine/AudioOnsets.h"
 #include "engine/SceneDetect.h"

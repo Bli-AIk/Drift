@@ -1,10 +1,10 @@
-#include "ClipReader.h"
+#include "engine/ClipReader.h"
 
-#include "GlRuntime.h"
-#include "GpuCompositor.h"
-#include "HwAccel.h"
-#include "MediaProbe.h"
-#include "SwsColorRange.h"
+#include "engine/GlRuntime.h"
+#include "engine/GpuCompositor.h"
+#include "engine/HwAccel.h"
+#include "engine/MediaProbe.h"
+#include "engine/SwsColorRange.h"
 
 #include <QTransform>
 #include <QtMath>

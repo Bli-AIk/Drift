@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MediaWaveform.h"
+#include "engine/MediaWaveform.h"
 
 #include <QHash>
 #include <QList>

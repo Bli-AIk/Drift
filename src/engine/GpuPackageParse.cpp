@@ -1,6 +1,6 @@
-#include "GpuPackageParse.h"
+#include "engine/GpuPackageParse.h"
 
-#include "AddonRegistry.h"
+#include "engine/AddonRegistry.h"
 
 #include <QColor>
 #include <QCoreApplication>

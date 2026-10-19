@@ -1,7 +1,7 @@
-#include "CurveEditorController.h"
+#include "models/CurveEditorController.h"
 
-#include "AppController.h"
-#include "AppControllerDetail.h"
+#include "models/AppController.h"
+#include "models/AppControllerDetail.h"
 #include "engine/TransitionCatalog.h"
 
 CurveEditorController::CurveEditorController(AppController *app, QObject *parent)

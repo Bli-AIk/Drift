@@ -1,7 +1,7 @@
-#include "PreviewProxyRenderer.h"
+#include "engine/PreviewProxyRenderer.h"
 
-#include "MediaProbe.h"
-#include "ProxyEncoder.h"
+#include "engine/MediaProbe.h"
+#include "engine/ProxyEncoder.h"
 
 #include <QCoreApplication>
 #include <QSize>

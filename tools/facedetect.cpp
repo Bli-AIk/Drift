@@ -13,7 +13,7 @@
 #include "engine/EffectProcessor.h"
 #include "engine/FaceLandmarker.h"
 #include "engine/FaceTrack.h"
-#include "core/Effect.h"
+#include "core/effects/Effect.h"
 
 #include <QCoreApplication>
 #include <QFileInfo>

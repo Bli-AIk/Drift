@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/Keyframe.h"
-#include "core/Time.h"
+#include "core/animation/Keyframe.h"
+#include "core/base/Time.h"
 #include "engine/audio/AudioGraph.h"
 
 #include <QMap>

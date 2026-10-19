@@ -1,4 +1,4 @@
-#include "PlaybackStats.h"
+#include "playback/PlaybackStats.h"
 
 #include <QCoreApplication>
 

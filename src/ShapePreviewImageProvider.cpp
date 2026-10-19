@@ -1,6 +1,6 @@
 #include "ShapePreviewImageProvider.h"
 
-#include "core/ShapeStyle.h"
+#include "core/shapes/ShapeStyle.h"
 #ifdef DRIFT_WITH_SKIA
 #include "engine/SkiaRuntime.h"
 #include "engine/SkiaShapePainter.h"

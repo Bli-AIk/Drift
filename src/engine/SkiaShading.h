@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/BlendMode.h"
-#include "core/TextShading.h"
+#include "core/effects/BlendMode.h"
+#include "core/text/TextShading.h"
 
 #include <QRectF>
 

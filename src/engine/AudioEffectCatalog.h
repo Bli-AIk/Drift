@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/Effect.h"
-#include "core/EffectPreset.h"
+#include "core/effects/Effect.h"
+#include "core/effects/EffectPreset.h"
 #include "engine/audio/AudioEffectRack.h"
 #include "engine/audio/AudioGraph.h"
 

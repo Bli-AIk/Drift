@@ -1,7 +1,7 @@
-#include "ProxyEncoder.h"
-#include "MediaProbe.h"
+#include "engine/ProxyEncoder.h"
+#include "engine/MediaProbe.h"
 
-#include "SwsColorRange.h"
+#include "engine/SwsColorRange.h"
 
 #include <QCoreApplication>
 #include <QFile>

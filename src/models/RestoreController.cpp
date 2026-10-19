@@ -1,6 +1,6 @@
-#include "RestoreController.h"
+#include "models/RestoreController.h"
 
-#include "AppController.h"
+#include "models/AppController.h"
 #include "SegmentImageStore.h"
 #include "engine/ClipReaderPool.h"
 #include "engine/MediaEditor.h"

@@ -1,6 +1,6 @@
-#include "SegmentationController.h"
+#include "models/SegmentationController.h"
 
-#include "AppController.h"
+#include "models/AppController.h"
 #include "SegmentImageStore.h"
 #include "engine/EffectTemplateCatalog.h"
 #include "engine/MatteWriter.h"

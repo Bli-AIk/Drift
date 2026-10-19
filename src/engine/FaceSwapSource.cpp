@@ -4,7 +4,7 @@
 #include "engine/FaceTrack.h"
 
 #include <QFile>
-#include "StillImage.h"
+#include "engine/StillImage.h"
 
 
 #include <algorithm>

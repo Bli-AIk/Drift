@@ -1,7 +1,7 @@
-#include "SkiaTextEffects.h"
+#include "engine/SkiaTextEffects.h"
 
-#include "SkiaPath.h"
-#include "SkiaVectorResources.h"
+#include "engine/SkiaPath.h"
+#include "engine/SkiaVectorResources.h"
 
 #include <QCache>
 #include <QFileInfo>

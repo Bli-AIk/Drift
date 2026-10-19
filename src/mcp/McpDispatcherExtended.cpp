@@ -3,11 +3,11 @@
 
 #include <QColor>
 
-#include "core/ShapeStyle.h"
-#include "core/TextAnimationPreset.h"
-#include "core/TextPresetStore.h"
-#include "core/TextStyle.h"
-#include "core/TextLook.h"
+#include "core/shapes/ShapeStyle.h"
+#include "core/text/animation/TextAnimationPreset.h"
+#include "core/text/TextPresetStore.h"
+#include "core/text/TextStyle.h"
+#include "core/text/TextLook.h"
 #include "mcp/McpEffectAuthoring.h"
 #include "mcp/McpJson.h"
 #include "mcp/McpMarket.h"

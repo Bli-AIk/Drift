@@ -1,4 +1,4 @@
-#include "AudioOutputChannel.h"
+#include "playback/AudioOutputChannel.h"
 
 #include <QAudioSink>
 #include <QDebug>

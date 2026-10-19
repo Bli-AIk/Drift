@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ClipReader.h"
-#include "core/Time.h"
+#include "engine/ClipReader.h"
+#include "core/base/Time.h"
 
 #include <QElapsedTimer>
 #include <QHash>

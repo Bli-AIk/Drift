@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Model3dSource.h"
+#include "core/project/sources/Model3dSource.h"
 #include "engine/ClipTransform3d.h"
 
 #include <QMatrix3x3>

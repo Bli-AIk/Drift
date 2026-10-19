@@ -1,4 +1,4 @@
-#include "CloudProviders.h"
+#include "models/CloudProviders.h"
 
 #include <QEventLoop>
 #include <QFile>

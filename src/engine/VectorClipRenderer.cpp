@@ -1,11 +1,11 @@
-#include "VectorClipRenderer.h"
+#include "engine/VectorClipRenderer.h"
 
-#include "VectorInspect.h"
+#include "engine/VectorInspect.h"
 
 #ifdef DRIFT_WITH_SKIA
-#include "SkiaFonts.h"
-#include "SkiaRuntime.h"
-#include "SkiaVectorResources.h"
+#include "engine/SkiaFonts.h"
+#include "engine/SkiaRuntime.h"
+#include "engine/SkiaVectorResources.h"
 
 #include <QFileInfo>
 #include <QHash>

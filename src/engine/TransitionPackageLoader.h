@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TransitionCatalog.h"
+#include "engine/TransitionCatalog.h"
 
 #include <QList>
 #include <QString>

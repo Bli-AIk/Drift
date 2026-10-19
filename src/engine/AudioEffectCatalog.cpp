@@ -1,6 +1,6 @@
-#include "AudioEffectCatalog.h"
+#include "engine/AudioEffectCatalog.h"
 
-#include "GpuPackageParse.h"
+#include "engine/GpuPackageParse.h"
 #include "engine/audio/AudioEffectFactory.h"
 #include "engine/audio/WavReader.h"
 

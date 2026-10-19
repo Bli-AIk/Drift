@@ -1,7 +1,7 @@
 #include "mcp/McpCatalog.h"
 #include "mcp/McpJson.h"
 
-#include "core/ShapeStyle.h"
+#include "core/shapes/ShapeStyle.h"
 
 #include <QHash>
 

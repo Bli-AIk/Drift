@@ -1,18 +1,18 @@
-#include "GlRuntime.h"
+#include "engine/GlRuntime.h"
 
-#include "ClipReader.h"
-#include "Face111.h"
-#include "DepthSidecar.h"
-#include "GlModelRenderer.h"
-#include "GlSplatRenderer.h"
-#include "GpuDevice.h"
-#include "SwsColorRange.h"
-#include "VaapiZeroCopy.h"
+#include "engine/ClipReader.h"
+#include "engine/Face111.h"
+#include "engine/DepthSidecar.h"
+#include "engine/GlModelRenderer.h"
+#include "engine/GlSplatRenderer.h"
+#include "engine/GpuDevice.h"
+#include "engine/SwsColorRange.h"
+#include "engine/VaapiZeroCopy.h"
 #if defined(Q_OS_WIN)
-#include "D3d11GlInterop.h"
+#include "engine/D3d11GlInterop.h"
 #endif
 #ifdef DRIFT_WITH_SKIA
-#include "SkiaRuntime.h"
+#include "engine/SkiaRuntime.h"
 #endif
 
 #include <QColor>
@@ -60,7 +60,7 @@ extern "C" {
 #if defined(Q_OS_ANDROID)
 #define DRIFT_ANDROID_AHB_IMPORT 1
 #include <android/hardware_buffer.h>
-#include "MediaCodecImagePool.h"
+#include "engine/MediaCodecImagePool.h"
 #endif
 
 // GL_TEXTURE_EXTERNAL_OES and the EGL enums the AHardwareBuffer import needs. Qt for Android

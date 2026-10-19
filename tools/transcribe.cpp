@@ -9,7 +9,7 @@
 #include "engine/LocalTranscription.h"
 #include "engine/MediaProbe.h"
 #include "engine/WhisperTranscriber.h"
-#include "core/Time.h"
+#include "core/base/Time.h"
 
 #include <QCoreApplication>
 #include <QTextStream>

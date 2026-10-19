@@ -10,8 +10,8 @@
 #include <QSortFilterProxyModel>
 #include <QTimer>
 
-#include "TimelineLayout.h"
-#include "TimelineViewState.h"
+#include "timeline/TimelineLayout.h"
+#include "timeline/TimelineViewState.h"
 
 class AppController;
 class AssetLibrary;

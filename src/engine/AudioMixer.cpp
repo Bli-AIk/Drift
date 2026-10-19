@@ -1,11 +1,11 @@
-#include "AudioMixer.h"
+#include "engine/AudioMixer.h"
 
-#include "AudioEffectCatalog.h"
-#include "ClipReaderPool.h"
-#include "TransitionCatalog.h"
-#include "core/Clip.h"
-#include "core/TimelineOps.h"
-#include "core/Transition.h"
+#include "engine/AudioEffectCatalog.h"
+#include "engine/ClipReaderPool.h"
+#include "engine/TransitionCatalog.h"
+#include "core/project/clip/Clip.h"
+#include "core/edit/TimelineOps.h"
+#include "core/project/Transition.h"
 
 #include <QtMath>
 #include <cmath>

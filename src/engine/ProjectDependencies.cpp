@@ -1,14 +1,14 @@
-#include "ProjectDependencies.h"
+#include "engine/ProjectDependencies.h"
 
-#include "AddonRegistry.h"
-#include "AudioEffectCatalog.h"
-#include "AudioFileWriter.h"
-#include "EffectCatalog.h"
-#include "FontCatalog.h"
-#include "MediaEditor.h"
-#include "TransitionCatalog.h"
-#include "core/ImageSequence.h"
-#include "core/Project.h"
+#include "engine/AddonRegistry.h"
+#include "engine/AudioEffectCatalog.h"
+#include "engine/AudioFileWriter.h"
+#include "engine/EffectCatalog.h"
+#include "engine/FontCatalog.h"
+#include "engine/MediaEditor.h"
+#include "engine/TransitionCatalog.h"
+#include "core/project/media/ImageSequence.h"
+#include "core/project/Project.h"
 
 #include <algorithm>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/SubtitleCue.h"
+#include "core/project/SubtitleCue.h"
 
 #include <QList>
 #include <QString>

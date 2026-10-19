@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/BinFolder.h"
+#include "core/project/BinFolder.h"
 
 #include <QAbstractListModel>
 #include <QList>

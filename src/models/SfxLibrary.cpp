@@ -1,7 +1,7 @@
-#include "SfxLibrary.h"
+#include "models/SfxLibrary.h"
 
-#include "AssetLibrary.h"
-#include "MarketClient.h"
+#include "models/AssetLibrary.h"
+#include "models/MarketClient.h"
 
 #include <QCryptographicHash>
 #include <QDir>

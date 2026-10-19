@@ -1,9 +1,9 @@
-#include "SpeedCurveController.h"
+#include "models/SpeedCurveController.h"
 
-#include "AppController.h"
-#include "AppControllerDetail.h"
-#include "core/Time.h"
-#include "core/TimelineOps.h"
+#include "models/AppController.h"
+#include "models/AppControllerDetail.h"
+#include "core/base/Time.h"
+#include "core/edit/TimelineOps.h"
 
 #include <QSet>
 #include <QUuid>

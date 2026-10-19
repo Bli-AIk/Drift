@@ -1,6 +1,6 @@
-#include "SkiaVectorResources.h"
+#include "engine/SkiaVectorResources.h"
 
-#include "SkiaFonts.h"
+#include "engine/SkiaFonts.h"
 
 #include <QByteArray>
 #include <QDir>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MediaThumbnail.h"
+#include "engine/MediaThumbnail.h"
 
 #include <QHash>
 #include <QList>

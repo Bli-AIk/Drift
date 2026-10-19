@@ -1,4 +1,4 @@
-#include "ClipThumbnailStore.h"
+#include "timeline/ClipThumbnailStore.h"
 
 #include <QImageReader>
 #include <QPointer>

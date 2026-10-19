@@ -1,9 +1,9 @@
 #pragma once
 
-#include "HwAccel.h"
-#include "MediaCodecImagePool.h"
-#include "PreviewVideoFrame.h"
-#include "core/Time.h"
+#include "engine/HwAccel.h"
+#include "engine/MediaCodecImagePool.h"
+#include "engine/PreviewVideoFrame.h"
+#include "core/base/Time.h"
 
 #include <QImage>
 #include <QList>

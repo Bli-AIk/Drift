@@ -5,7 +5,7 @@
 #include <QString>
 #include <QVariantList>
 
-#include "core/FadeShape.h"
+#include "core/animation/FadeShape.h"
 
 // One track's clips, exposed as roles.
 //

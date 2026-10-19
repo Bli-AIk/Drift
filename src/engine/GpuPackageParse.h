@@ -1,7 +1,7 @@
 #pragma once
 
-#include "GpuEffectDefinition.h"
-#include "core/EffectPreset.h"
+#include "engine/GpuEffectDefinition.h"
+#include "core/effects/EffectPreset.h"
 
 #include <QJsonArray>
 #include <QJsonObject>

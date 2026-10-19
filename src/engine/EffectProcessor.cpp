@@ -1,8 +1,8 @@
-#include "EffectProcessor.h"
+#include "engine/EffectProcessor.h"
 
-#include "EffectCatalog.h"
-#include "FaceTrack.h"
-#include "GpuEffectExecutor.h"
+#include "engine/EffectCatalog.h"
+#include "engine/FaceTrack.h"
+#include "engine/GpuEffectExecutor.h"
 
 #include <cstring>
 

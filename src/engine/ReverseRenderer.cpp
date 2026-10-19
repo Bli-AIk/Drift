@@ -1,7 +1,7 @@
-#include "ReverseRenderer.h"
+#include "engine/ReverseRenderer.h"
 
-#include "MediaProbe.h"
-#include "ProxyEncoder.h"
+#include "engine/MediaProbe.h"
+#include "engine/ProxyEncoder.h"
 
 #include <QCoreApplication>
 #include <QFile>

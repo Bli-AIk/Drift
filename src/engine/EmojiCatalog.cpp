@@ -1,9 +1,9 @@
-#include "EmojiCatalog.h"
+#include "engine/EmojiCatalog.h"
 
-#include "EmojiTable.h"
-#include "GpuPackageParse.h"
+#include "engine/EmojiTable.h"
+#include "engine/GpuPackageParse.h"
 #ifdef DRIFT_WITH_SKIA
-#include "SkiaFontCollection.h"
+#include "engine/SkiaFontCollection.h"
 #endif
 
 #include <QDir>

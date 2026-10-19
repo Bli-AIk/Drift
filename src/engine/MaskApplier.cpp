@@ -1,6 +1,6 @@
-#include "MaskApplier.h"
+#include "engine/MaskApplier.h"
 
-#include "core/ShapePath.h"
+#include "core/shapes/ShapePath.h"
 
 #include <QPainter>
 #include <QPainterPath>

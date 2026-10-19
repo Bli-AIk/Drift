@@ -1,9 +1,9 @@
 #include "engine/TransformLayer.h"
 
-#include "core/Clip.h"
-#include "core/ClipAnimation.h"
-#include "core/Project.h"
-#include "core/TimelineOps.h"
+#include "core/project/clip/Clip.h"
+#include "core/animation/ClipAnimation.h"
+#include "core/project/Project.h"
+#include "core/edit/TimelineOps.h"
 #include "engine/ClipTransform3d.h"
 
 #include <QVector4D>

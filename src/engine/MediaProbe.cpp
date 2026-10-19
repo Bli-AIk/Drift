@@ -1,6 +1,6 @@
-#include "MediaProbe.h"
+#include "engine/MediaProbe.h"
 
-#include "core/ImageSequence.h"
+#include "core/project/media/ImageSequence.h"
 
 #include <algorithm>
 #include <cmath>

@@ -1,6 +1,6 @@
-#include "TransitionCatalog.h"
+#include "engine/TransitionCatalog.h"
 
-#include "TransitionPackageLoader.h"
+#include "engine/TransitionPackageLoader.h"
 
 #include <QCoreApplication>
 #include <QHash>

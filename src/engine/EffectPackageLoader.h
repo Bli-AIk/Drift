@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EffectCatalog.h"
+#include "engine/EffectCatalog.h"
 
 #include <QList>
 #include <QString>

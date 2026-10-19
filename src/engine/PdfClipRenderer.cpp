@@ -1,6 +1,6 @@
-#include "PdfClipRenderer.h"
+#include "engine/PdfClipRenderer.h"
 
-#include "PdfiumRuntime.h"
+#include "engine/PdfiumRuntime.h"
 
 #include <QCoreApplication>
 #include <QFileInfo>

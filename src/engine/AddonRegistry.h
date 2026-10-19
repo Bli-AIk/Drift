@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AddonPackage.h"
+#include "engine/AddonPackage.h"
 
 #include <QDateTime>
 #include <QList>

@@ -1,6 +1,6 @@
 #include "engine/SceneCamera3d.h"
 
-#include "core/Clip.h"
+#include "core/project/clip/Clip.h"
 #include "engine/TransformLayer.h"
 
 #include <QVector4D>

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "AudioOutputChannel.h"
-#include "PlaybackClock.h"
-#include "core/Clip.h"
-#include "core/SpeedCurve.h"
-#include "core/Time.h"
+#include "playback/AudioOutputChannel.h"
+#include "playback/PlaybackClock.h"
+#include "core/project/clip/Clip.h"
+#include "core/animation/SpeedCurve.h"
+#include "core/base/Time.h"
 #include "engine/audio/ClipAudioRetimer.h"
 
 #include <QImage>

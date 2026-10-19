@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Project.h"
+#include "core/project/Project.h"
 
 #include <QHash>
 #include <QJsonArray>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/Time.h"
-#include "core/Transcript.h"
+#include "core/base/Time.h"
+#include "core/project/Transcript.h"
 
 #include <QList>
 #include <QString>

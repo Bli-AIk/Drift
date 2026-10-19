@@ -1,7 +1,7 @@
-#include "StillImage.h"
+#include "engine/StillImage.h"
 
-#include "ClipReader.h"
-#include "MediaProbe.h"
+#include "engine/ClipReader.h"
+#include "engine/MediaProbe.h"
 
 #include <QFileInfo>
 #include <QImageReader>

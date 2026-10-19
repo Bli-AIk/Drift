@@ -1,7 +1,7 @@
-#include "AddonManager.h"
+#include "models/AddonManager.h"
 
-#include "AddonEndpoint.h"
-#include "VersionCompare.h"
+#include "models/AddonEndpoint.h"
+#include "core/base/VersionCompare.h"
 #include "engine/AddonPackage.h"
 #include "engine/AddonRegistry.h"
 #include "engine/AndroidUri.h"
@@ -16,7 +16,7 @@
 #include "engine/PdfiumRuntime.h"
 #include "engine/StickerCatalog.h"
 #include "engine/TransitionCatalog.h"
-#include "core/ZipArchive.h"
+#include "core/base/ZipArchive.h"
 
 #include <QDateTime>
 #include <QDir>

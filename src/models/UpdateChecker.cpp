@@ -1,7 +1,7 @@
-#include "UpdateChecker.h"
+#include "models/UpdateChecker.h"
 
-#include "UpdateAsset.h"
-#include "VersionCompare.h"
+#include "models/UpdateAsset.h"
+#include "core/base/VersionCompare.h"
 
 #include <QCoreApplication>
 #include <QCryptographicHash>

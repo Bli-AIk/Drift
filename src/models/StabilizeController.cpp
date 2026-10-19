@@ -1,8 +1,8 @@
-#include "StabilizeController.h"
+#include "models/StabilizeController.h"
 
-#include "AppController.h"
-#include "McpDetail.h"
-#include "core/Stabilize.h"
+#include "models/AppController.h"
+#include "models/McpDetail.h"
+#include "core/project/clip/Stabilize.h"
 #include "engine/MediaEditor.h"
 #include "engine/MediaProbe.h"
 

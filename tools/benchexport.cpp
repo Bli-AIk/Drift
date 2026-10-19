@@ -1,9 +1,9 @@
 // Side-by-side export timing: GPU NV12 pipeline vs serial RGBA + sws_scale.
 //
 //   benchexport <video> [out_dir]
-#include "core/Clip.h"
-#include "core/Project.h"
-#include "core/Track.h"
+#include "core/project/clip/Clip.h"
+#include "core/project/Project.h"
+#include "core/project/Track.h"
 #include "engine/ClipReaderPool.h"
 #include "engine/EffectCatalog.h"
 #include "engine/Exporter.h"

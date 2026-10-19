@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/PdfSource.h"
+#include "core/project/sources/PdfSource.h"
 
 #include <QImage>
 #include <QSize>

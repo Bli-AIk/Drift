@@ -1,8 +1,8 @@
-#include "CompositorService.h"
+#include "playback/CompositorService.h"
 
-#include "PerfLog.h"
-#include "PlaybackClock.h"
-#include "PlaybackStats.h"
+#include "playback/PerfLog.h"
+#include "playback/PlaybackClock.h"
+#include "playback/PlaybackStats.h"
 #include "engine/ClipReaderPool.h"
 
 #include <QElapsedTimer>

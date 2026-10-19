@@ -7,7 +7,7 @@
 #include <QTemporaryDir>
 #include <QOpenGLExtraFunctions>
 
-#include "core/Project.h"
+#include "core/project/Project.h"
 #include "engine/FrameCompositor.h"
 #include "engine/GlRuntime.h"
 #include "engine/GpuCompositor.h"
@@ -23,8 +23,8 @@
 #include "engine/SkiaTextPainter.h"
 #include "engine/SkiaTextEffects.h"
 #include "engine/TextLayout.h"
-#include "core/TextAnimationPreset.h"
-#include "core/TextLook.h"
+#include "core/text/animation/TextAnimationPreset.h"
+#include "core/text/TextLook.h"
 #include "engine/VectorPainter.h"
 
 #include "include/core/SkBlurTypes.h"

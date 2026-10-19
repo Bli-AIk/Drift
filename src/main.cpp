@@ -79,7 +79,7 @@
 #endif
 
 #ifdef Q_OS_ANDROID
-#include "core/Project.h"
+#include "core/project/Project.h"
 #include "engine/FrameCompositor.h"
 
 #include <QDir>

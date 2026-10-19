@@ -1,4 +1,4 @@
-#include "VectorInspect.h"
+#include "engine/VectorInspect.h"
 
 #include <QFile>
 #include <QJsonArray>
@@ -11,9 +11,9 @@
 #include <algorithm>
 
 #ifdef DRIFT_WITH_SKIA
-#include "SkiaFonts.h"
-#include "SkiaVectorObservers.h"
-#include "SkiaVectorResources.h"
+#include "engine/SkiaFonts.h"
+#include "engine/SkiaVectorObservers.h"
+#include "engine/SkiaVectorResources.h"
 
 #include <QFileInfo>
 

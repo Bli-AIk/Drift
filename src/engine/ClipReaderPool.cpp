@@ -1,6 +1,6 @@
-#include "ClipReaderPool.h"
+#include "engine/ClipReaderPool.h"
 
-#include "ClipReaderWorker.h"
+#include "engine/ClipReaderWorker.h"
 
 #include <QMetaObject>
 #include <QMetaType>

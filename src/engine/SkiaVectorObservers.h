@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VectorInspect.h"
+#include "engine/VectorInspect.h"
 
 #include <QList>
 #include <QStringList>

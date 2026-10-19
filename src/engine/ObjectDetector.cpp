@@ -1,8 +1,8 @@
-#include "ObjectDetector.h"
+#include "engine/ObjectDetector.h"
 
-#include "GpuPackageParse.h"
-#include "OrtRuntime.h"
-#include "OrtSupport.h"
+#include "engine/GpuPackageParse.h"
+#include "engine/OrtRuntime.h"
+#include "engine/OrtSupport.h"
 
 #include <QDir>
 #include <QFile>

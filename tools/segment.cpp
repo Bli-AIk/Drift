@@ -6,7 +6,7 @@
 #include "engine/ClipReaderPool.h"
 #include "engine/MediaProbe.h"
 #include "engine/Sam2Segmenter.h"
-#include "core/Time.h"
+#include "core/base/Time.h"
 
 #include <QCoreApplication>
 #include <QElapsedTimer>

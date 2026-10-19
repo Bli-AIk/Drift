@@ -1,8 +1,8 @@
-#include "SpeechAudio.h"
+#include "engine/SpeechAudio.h"
 
-#include "AudioFileWriter.h"
-#include "ClipReaderPool.h"
-#include "MediaProbe.h"
+#include "engine/AudioFileWriter.h"
+#include "engine/ClipReaderPool.h"
+#include "engine/MediaProbe.h"
 
 #include <QDir>
 #include <QUuid>

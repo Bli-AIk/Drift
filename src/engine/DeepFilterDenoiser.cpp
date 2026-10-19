@@ -1,7 +1,7 @@
-#include "DeepFilterDenoiser.h"
+#include "engine/DeepFilterDenoiser.h"
 
-#include "GpuPackageParse.h"
-#include "OrtSupport.h"
+#include "engine/GpuPackageParse.h"
+#include "engine/OrtSupport.h"
 
 #include <QDebug>
 #include <QDir>

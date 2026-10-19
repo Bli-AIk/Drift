@@ -1,8 +1,8 @@
-#include "DepthController.h"
+#include "models/DepthController.h"
 
-#include "AppController.h"
-#include "McpDetail.h"
-#include "JobRegistry.h"
+#include "models/AppController.h"
+#include "models/McpDetail.h"
+#include "models/JobRegistry.h"
 #include "engine/ClipReaderPool.h"
 #include "engine/DepthSidecar.h"
 #include "engine/StillImage.h"

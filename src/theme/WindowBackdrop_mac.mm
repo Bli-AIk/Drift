@@ -1,4 +1,4 @@
-#include "WindowBackdrop.h"
+#include "theme/WindowBackdrop.h"
 
 #include <QHash>
 #include <QWindow>

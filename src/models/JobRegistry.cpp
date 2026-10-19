@@ -1,4 +1,4 @@
-#include "JobRegistry.h"
+#include "models/JobRegistry.h"
 
 #include <QDateTime>
 #include <QMetaObject>

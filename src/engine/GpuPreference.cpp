@@ -1,4 +1,4 @@
-#include "GpuPreference.h"
+#include "engine/GpuPreference.h"
 
 #include <QSettings>
 

@@ -1,7 +1,7 @@
-#include "FacePropCatalog.h"
+#include "engine/FacePropCatalog.h"
 
-#include "FacePropImport.h"
-#include "GpuPackageParse.h"
+#include "engine/FacePropImport.h"
+#include "engine/GpuPackageParse.h"
 
 #include <QDir>
 #include <QFile>

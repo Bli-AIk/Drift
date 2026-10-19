@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/VectorSource.h"
+#include "core/project/sources/VectorSource.h"
 
 #include <QByteArray>
 #include <QJsonObject>

@@ -1,6 +1,6 @@
-#include "WindowBackdrop.h"
+#include "theme/WindowBackdrop.h"
 
-#include "ThemeManager.h"
+#include "theme/ThemeManager.h"
 
 #include <QCoreApplication>
 #include <QOperatingSystemVersion>

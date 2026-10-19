@@ -1,4 +1,4 @@
-#include "Haptics.h"
+#include "models/Haptics.h"
 
 #include <QSettings>
 

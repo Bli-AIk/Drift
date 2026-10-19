@@ -1,6 +1,6 @@
-#include "TransitionPackageLoader.h"
+#include "engine/TransitionPackageLoader.h"
 
-#include "GpuPackageParse.h"
+#include "engine/GpuPackageParse.h"
 
 #include <QDir>
 #include <QFileInfo>

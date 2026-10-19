@@ -1,9 +1,9 @@
-#include "WhisperTranscriber.h"
+#include "engine/WhisperTranscriber.h"
 
-#include "WhisperTokenizer.h"
-#include "GpuPackageParse.h"
-#include "OrtRuntime.h"
-#include "core/Time.h"
+#include "engine/WhisperTokenizer.h"
+#include "engine/GpuPackageParse.h"
+#include "engine/OrtRuntime.h"
+#include "core/base/Time.h"
 
 #include <QByteArray>
 #include <QDebug>

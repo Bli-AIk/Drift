@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/Clip.h"
-#include "core/SpeedCurve.h"
+#include "core/project/clip/Clip.h"
+#include "core/animation/SpeedCurve.h"
 #include "playback/ClipPreviewPlayer.h"
 
 #include <QObject>

@@ -1,6 +1,6 @@
-#include "FilmstripTileCache.h"
+#include "engine/FilmstripTileCache.h"
 
-#include "MediaThumbnail.h"
+#include "engine/MediaThumbnail.h"
 
 #include <QFileInfo>
 #include <QTimer>

@@ -1,7 +1,7 @@
-#include "GpuDevice.h"
+#include "engine/GpuDevice.h"
 
-#include "GpuPreference.h"
-#include "HwAccel.h"
+#include "engine/GpuPreference.h"
+#include "engine/HwAccel.h"
 
 #include <QDir>
 #include <QFile>

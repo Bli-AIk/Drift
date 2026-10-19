@@ -1,4 +1,4 @@
-#include "McpController.h"
+#include "models/McpController.h"
 
 #include "mcp/McpCatalog.h"
 #ifndef Q_OS_WASM
@@ -6,8 +6,8 @@
 #endif
 #include "models/AppController.h"
 #include "preview/PreviewController.h"
-#include "McpDetail.h"
-#include "MarketClient.h"
+#include "models/McpDetail.h"
+#include "models/MarketClient.h"
 #include "models/JobRegistry.h"
 #include "models/TtsController.h"
 #include "models/VoiceLibrary.h"
@@ -16,11 +16,11 @@
 #include "engine/FrameCompositor.h"
 #include "engine/FrameSheet.h"
 #include "engine/SceneDetect.h"
-#include "AddonManager.h"
-#include "AssetLibrary.h"
+#include "models/AddonManager.h"
+#include "models/AssetLibrary.h"
 #include "models/CloudProviders.h"
-#include "core/CutOps.h"
-#include "core/TimelineOps.h"
+#include "core/edit/CutOps.h"
+#include "core/edit/TimelineOps.h"
 #include "engine/AddonRegistry.h"
 #include "engine/AudioFileWriter.h"
 #include "engine/AudioOnsets.h"

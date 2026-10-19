@@ -2,7 +2,7 @@
 
 #include "include/core/SkRefCnt.h"
 #include "include/core/SkTypeface.h"
-#include "TextLayout.h"
+#include "engine/TextLayout.h"
 #include "modules/skparagraph/include/FontCollection.h"
 #include "modules/skparagraph/include/Paragraph.h"
 

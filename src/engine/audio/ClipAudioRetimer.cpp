@@ -1,6 +1,6 @@
 #include "engine/audio/ClipAudioRetimer.h"
 
-#include "core/SpeedCurve.h"
+#include "core/animation/SpeedCurve.h"
 
 #include <soundtouch/SoundTouch.h>
 

@@ -1,10 +1,10 @@
-#include "AssetPreviewController.h"
+#include "models/AssetPreviewController.h"
 
-#include "AppController.h"
-#include "AssetLibrary.h"
-#include "core/Clip.h"
-#include "core/MediaAsset.h"
-#include "core/Time.h"
+#include "models/AppController.h"
+#include "models/AssetLibrary.h"
+#include "core/project/clip/Clip.h"
+#include "core/project/media/MediaAsset.h"
+#include "core/base/Time.h"
 
 #include <algorithm>
 

@@ -1,6 +1,6 @@
-#include "PlaybackDiagnostics.h"
+#include "playback/PlaybackDiagnostics.h"
 
-#include "PlaybackStats.h"
+#include "playback/PlaybackStats.h"
 #include "engine/ClipReader.h"
 #include "engine/DiagnosticsProbe.h"
 #include "engine/FrameCompositor.h"

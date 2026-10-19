@@ -1,6 +1,6 @@
-#include "MarketIdentity.h"
+#include "models/MarketIdentity.h"
 
-#include "MarketEndpoint.h"
+#include "models/MarketEndpoint.h"
 
 #include <QCryptographicHash>
 #include <QFile>

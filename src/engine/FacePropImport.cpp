@@ -1,6 +1,6 @@
-#include "FacePropImport.h"
+#include "engine/FacePropImport.h"
 
-#include "core/ZipArchive.h"
+#include "core/base/ZipArchive.h"
 
 #include <QCoreApplication>
 #include <QDir>

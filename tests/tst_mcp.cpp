@@ -1,5 +1,5 @@
 #include <QtTest>
-#include "core/Transcript.h"
+#include "core/project/Transcript.h"
 #include "models/CloudProviders.h"
 
 #include <QAbstractSocket>
@@ -40,7 +40,7 @@
 #include "engine/GpuCompositor.h"
 #include "engine/ObjectDetector.h"
 #include "engine/PdfiumRuntime.h"
-#include "core/EffectStackStore.h"
+#include "core/effects/EffectStackStore.h"
 #include "models/AddonManager.h"
 #include "models/AppController.h"
 #include "preview/PreviewController.h"

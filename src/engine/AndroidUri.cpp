@@ -1,4 +1,4 @@
-#include "AndroidUri.h"
+#include "engine/AndroidUri.h"
 
 #include <QFileInfo>
 

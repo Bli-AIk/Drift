@@ -1,6 +1,6 @@
-#include "SkiaFontCollection.h"
+#include "engine/SkiaFontCollection.h"
 
-#include "SkiaFonts.h"
+#include "engine/SkiaFonts.h"
 
 #include <QList>
 #include <QString>

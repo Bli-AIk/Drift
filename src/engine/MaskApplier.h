@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Mask.h"
+#include "core/effects/Mask.h"
 
 #include <QImage>
 #include <QPainterPath>

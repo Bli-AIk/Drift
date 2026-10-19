@@ -1,6 +1,6 @@
-#include "EffectCatalog.h"
+#include "engine/EffectCatalog.h"
 
-#include "EffectPackageLoader.h"
+#include "engine/EffectPackageLoader.h"
 
 #include <QCoreApplication>
 #include <QHash>

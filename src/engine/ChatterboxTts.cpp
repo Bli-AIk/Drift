@@ -1,8 +1,8 @@
-#include "ChatterboxTts.h"
+#include "engine/ChatterboxTts.h"
 
-#include "ChatterboxTokenizer.h"
-#include "GpuPackageParse.h"
-#include "OrtSupport.h"
+#include "engine/ChatterboxTokenizer.h"
+#include "engine/GpuPackageParse.h"
+#include "engine/OrtSupport.h"
 
 #include <QDataStream>
 #include <QDir>

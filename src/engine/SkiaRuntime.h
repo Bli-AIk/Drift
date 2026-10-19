@@ -1,7 +1,7 @@
 #pragma once
 
-#include "GlRuntime.h"
-#include "VectorPainter.h"
+#include "engine/GlRuntime.h"
+#include "engine/VectorPainter.h"
 
 #include <QImage>
 

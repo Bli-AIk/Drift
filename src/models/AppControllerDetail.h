@@ -1,9 +1,9 @@
 #pragma once
 
-#include "core/Clip.h"
-#include "core/Mask.h"
-#include "core/Project.h"
-#include "core/Transition.h"
+#include "core/project/clip/Clip.h"
+#include "core/effects/Mask.h"
+#include "core/project/Project.h"
+#include "core/project/Transition.h"
 
 #include <QSet>
 #include <QString>

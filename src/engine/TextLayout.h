@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/TextAnimator.h"
-#include "core/TextStyle.h"
+#include "core/text/animation/TextAnimator.h"
+#include "core/text/TextStyle.h"
 
 #include <QColor>
 #include <QList>

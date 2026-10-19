@@ -1,4 +1,4 @@
-#include "AddonRegistry.h"
+#include "engine/AddonRegistry.h"
 
 #include <QDebug>
 #include <QDir>

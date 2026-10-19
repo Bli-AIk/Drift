@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/TextStyle.h"
+#include "core/text/TextStyle.h"
 
 #include <QFont>
 #include <QList>

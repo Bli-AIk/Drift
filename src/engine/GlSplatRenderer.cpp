@@ -1,9 +1,9 @@
-#include "GlSplatRenderer.h"
+#include "engine/GlSplatRenderer.h"
 
-#include "GlModelRenderer.h"
-#include "ModelClipRenderer.h"
-#include "ModelClipTransform.h"
-#include "SplatAsset.h"
+#include "engine/GlModelRenderer.h"
+#include "engine/ModelClipRenderer.h"
+#include "engine/ModelClipTransform.h"
+#include "engine/SplatAsset.h"
 
 #include <QDebug>
 #include <QOpenGLShaderProgram>

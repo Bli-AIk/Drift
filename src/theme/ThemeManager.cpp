@@ -1,6 +1,6 @@
-#include "ThemeManager.h"
+#include "theme/ThemeManager.h"
 
-#include "core/ZipArchive.h"
+#include "core/base/ZipArchive.h"
 #include "engine/AndroidUri.h"
 
 #include <memory>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GpuDevice.h"
+#include "engine/GpuDevice.h"
 
 #include <QList>
 #include <QString>

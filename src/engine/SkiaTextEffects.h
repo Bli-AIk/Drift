@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/TextShading.h"
+#include "core/text/TextShading.h"
 
 #include <QRectF>
 

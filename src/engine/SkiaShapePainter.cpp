@@ -1,8 +1,8 @@
-#include "SkiaShapePainter.h"
+#include "engine/SkiaShapePainter.h"
 
-#include "SkiaPath.h"
-#include "SkiaShading.h"
-#include "core/ShapePath.h"
+#include "engine/SkiaPath.h"
+#include "engine/SkiaShading.h"
+#include "core/shapes/ShapePath.h"
 
 #include <QtMath>
 

@@ -1,7 +1,7 @@
-#include "DiagnosticsProbe.h"
+#include "engine/DiagnosticsProbe.h"
 
-#include "ClipReader.h"
-#include "GlRuntime.h"
+#include "engine/ClipReader.h"
+#include "engine/GlRuntime.h"
 
 namespace drift::diag {
 

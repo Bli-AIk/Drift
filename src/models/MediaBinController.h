@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/MediaAsset.h"
+#include "core/project/media/MediaAsset.h"
 #include "models/BinFolderListModel.h"
 
 #include <QAtomicInt>

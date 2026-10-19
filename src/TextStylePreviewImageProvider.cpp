@@ -1,9 +1,9 @@
 #include "TextStylePreviewImageProvider.h"
 
-#include "core/Clip.h"
-#include "core/TextAnimationPreset.h"
-#include "core/TextLook.h"
-#include "core/TextStyle.h"
+#include "core/project/clip/Clip.h"
+#include "core/text/animation/TextAnimationPreset.h"
+#include "core/text/TextLook.h"
+#include "core/text/TextStyle.h"
 #ifdef DRIFT_WITH_SKIA
 #include "engine/SkiaRuntime.h"
 #include "engine/SkiaTextPainter.h"

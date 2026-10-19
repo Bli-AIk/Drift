@@ -65,7 +65,7 @@ public:
 struct AVStream;
 struct AVFormatContext;
 
-// avformat_open_input for a media path. Image-sequence paths (core/ImageSequence.h) open through
+// avformat_open_input for a media path. Image-sequence paths (core/project/media/ImageSequence.h) open through
 // the image2 demuxer with their start number and frame rate; everything else opens as given.
 // Returns the avformat_open_input result.
 int openMediaInput(AVFormatContext **fmt, const QString &path);

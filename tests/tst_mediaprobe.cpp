@@ -6,7 +6,7 @@
 #include <QStandardPaths>
 #include <QTemporaryDir>
 
-#include "core/ImageSequence.h"
+#include "core/project/media/ImageSequence.h"
 #include "engine/ClipReader.h"
 #include "engine/MediaProbe.h"
 

@@ -1,11 +1,11 @@
-#include "GlModelRenderer.h"
+#include "engine/GlModelRenderer.h"
 
-#include "ModelAnimation.h"
-#include "ModelClipRenderer.h"
-#include "ModelClipTransform.h"
+#include "engine/ModelAnimation.h"
+#include "engine/ModelClipRenderer.h"
+#include "engine/ModelClipTransform.h"
 
-#include "FaceMesh.h"
-#include "ModelAsset.h"
+#include "engine/FaceMesh.h"
+#include "engine/ModelAsset.h"
 
 #include <QFileInfo>
 #include <QMatrix4x4>

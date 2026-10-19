@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AppController.h"
+#include "models/AppController.h"
 
 // Backward-compatible alias used by existing QML.
 class EditorState : public AppController

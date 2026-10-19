@@ -1,6 +1,6 @@
-#include "CompositorFrameHistory.h"
+#include "engine/CompositorFrameHistory.h"
 
-#include "GpuEffectExecutor.h"
+#include "engine/GpuEffectExecutor.h"
 
 #include <QPainter>
 #include <QtMath>

@@ -1,10 +1,10 @@
-#include "GpuEffectExecutor.h"
+#include "engine/GpuEffectExecutor.h"
 
-#include "FaceModelTransform.h"
-#include "GlFaceSwapRenderer.h"
-#include "GlModelRenderer.h"
-#include "GlRuntime.h"
-#include "GpuEffectDefinition.h"
+#include "engine/FaceModelTransform.h"
+#include "engine/GlFaceSwapRenderer.h"
+#include "engine/GlModelRenderer.h"
+#include "engine/GlRuntime.h"
+#include "engine/GpuEffectDefinition.h"
 
 #include <QMutexLocker>
 #include <QOpenGLShaderProgram>

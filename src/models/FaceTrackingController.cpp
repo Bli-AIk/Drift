@@ -1,6 +1,6 @@
-#include "FaceTrackingController.h"
+#include "models/FaceTrackingController.h"
 
-#include "AppController.h"
+#include "models/AppController.h"
 #include "engine/ClipReaderPool.h"
 #include "engine/EffectCatalog.h"
 #include "engine/FaceLandmarker.h"

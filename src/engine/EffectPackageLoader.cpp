@@ -1,7 +1,7 @@
-#include "EffectPackageLoader.h"
+#include "engine/EffectPackageLoader.h"
 
-#include "GpuEffectDefinition.h"
-#include "GpuPackageParse.h"
+#include "engine/GpuEffectDefinition.h"
+#include "engine/GpuPackageParse.h"
 
 #include <QDir>
 #include <QFileInfo>

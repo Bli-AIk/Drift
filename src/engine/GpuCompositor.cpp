@@ -1,21 +1,21 @@
-#include "GpuCompositor.h"
+#include "engine/GpuCompositor.h"
 #ifdef DRIFT_WITH_SKIA
-#include "SkiaRuntime.h"
+#include "engine/SkiaRuntime.h"
 #endif
 
-#include "EffectCatalog.h"
-#include "FaceModelTransform.h"
-#include "FaceTrack.h"
-#include "GlFaceSwapRenderer.h"
-#include "GlEditorOverlay.h"
-#include "GlModelRenderer.h"
-#include "GlRuntime.h"
-#include "GlSplatRenderer.h"
-#include "GpuDevice.h"
-#include "GpuEffectDefinition.h"
-#include "MaskApplier.h"
-#include "ModelClipRenderer.h"
-#include "TransformLayer.h"
+#include "engine/EffectCatalog.h"
+#include "engine/FaceModelTransform.h"
+#include "engine/FaceTrack.h"
+#include "engine/GlFaceSwapRenderer.h"
+#include "engine/GlEditorOverlay.h"
+#include "engine/GlModelRenderer.h"
+#include "engine/GlRuntime.h"
+#include "engine/GlSplatRenderer.h"
+#include "engine/GpuDevice.h"
+#include "engine/GpuEffectDefinition.h"
+#include "engine/MaskApplier.h"
+#include "engine/ModelClipRenderer.h"
+#include "engine/TransformLayer.h"
 
 #include <QLineF>
 #include <QMatrix4x4>

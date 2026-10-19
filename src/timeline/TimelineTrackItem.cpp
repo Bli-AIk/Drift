@@ -1,7 +1,7 @@
-#include "TimelineTrackItem.h"
+#include "timeline/TimelineTrackItem.h"
 
-#include "ClipThumbnailStore.h"
-#include "TimelineViewState.h"
+#include "timeline/ClipThumbnailStore.h"
+#include "timeline/TimelineViewState.h"
 #include "models/AppController.h"
 #include "models/AssetLibrary.h"
 #include "models/TimelineClipsModel.h"

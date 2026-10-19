@@ -1,13 +1,13 @@
-#include "Exporter.h"
+#include "engine/Exporter.h"
 
-#include "AudioMixer.h"
-#include "ClipReaderPool.h"
-#include "FrameCompositor.h"
-#include "GpuCompositor.h"
-#include "GpuPreference.h"
-#include "HwAccel.h"
-#include "core/Project.h"
-#include "core/Time.h"
+#include "engine/AudioMixer.h"
+#include "engine/ClipReaderPool.h"
+#include "engine/FrameCompositor.h"
+#include "engine/GpuCompositor.h"
+#include "engine/GpuPreference.h"
+#include "engine/HwAccel.h"
+#include "core/project/Project.h"
+#include "core/base/Time.h"
 
 #include <QFile>
 #include <QHash>
@@ -16,7 +16,7 @@
 #include <QtGlobal>
 
 #ifdef Q_OS_ANDROID
-#include "AndroidUri.h"
+#include "engine/AndroidUri.h"
 
 #include <QDir>
 #include <QFileInfo>

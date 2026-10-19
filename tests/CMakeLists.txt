@@ -260,7 +260,7 @@ drift_copy_transitions(tst_mcp)
 qt_add_executable(tst_thememanager
     tst_thememanager.cpp
     ../src/theme/ThemeManager.cpp
-    ../src/core/ZipArchive.cpp
+    ../src/core/base/ZipArchive.cpp
     ../src/engine/AndroidUri.cpp)
 target_include_directories(tst_thememanager PRIVATE ../src)
 target_compile_definitions(tst_thememanager PRIVATE
@@ -302,7 +302,7 @@ qt_add_executable(tst_windowbackdrop
     tst_windowbackdrop.cpp
     ../src/theme/WindowBackdrop.cpp
     ../src/theme/ThemeManager.cpp
-    ../src/core/ZipArchive.cpp
+    ../src/core/base/ZipArchive.cpp
     ../src/engine/AndroidUri.cpp
     ${_drift_windowbackdrop_platform}
 )

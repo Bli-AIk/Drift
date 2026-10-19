@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/Project.h"
-#include "core/Time.h"
+#include "core/project/Project.h"
+#include "core/base/Time.h"
 #include "engine/audio/AudioEffectRack.h"
 #include "engine/audio/ClipAudioRetimer.h"
 

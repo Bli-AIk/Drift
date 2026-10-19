@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Effect.h"
+#include "core/effects/Effect.h"
 #include "engine/EditorOverlay.h"
 
 #include <QColor>

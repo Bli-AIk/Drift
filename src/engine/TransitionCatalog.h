@@ -1,8 +1,8 @@
 #pragma once
 
-#include "GpuEffectDefinition.h"
-#include "core/EffectPreset.h"
-#include "core/Transition.h"
+#include "engine/GpuEffectDefinition.h"
+#include "core/effects/EffectPreset.h"
+#include "core/project/Transition.h"
 
 #include <QList>
 #include <QMap>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Time.h"
+#include "core/base/Time.h"
 #include "engine/Sam2Segmenter.h"
 
 #include <QAtomicInt>

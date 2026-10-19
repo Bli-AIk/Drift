@@ -1,4 +1,4 @@
-#include "PreferencesController.h"
+#include "models/PreferencesController.h"
 #include "engine/ProxyNaming.h"
 
 #include "engine/GpuPreference.h"

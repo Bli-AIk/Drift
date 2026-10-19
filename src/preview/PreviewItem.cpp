@@ -1,4 +1,4 @@
-#include "PreviewItem.h"
+#include "preview/PreviewItem.h"
 
 #include "playback/PlaybackEngine.h"
 

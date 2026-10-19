@@ -4,7 +4,7 @@
 
 #include <optional>
 
-#include "HwAccel.h"
+#include "engine/HwAccel.h"
 
 namespace drift::diag {
 

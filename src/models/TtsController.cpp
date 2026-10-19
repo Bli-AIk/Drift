@@ -1,8 +1,8 @@
-#include "TtsController.h"
+#include "models/TtsController.h"
 
-#include "AppController.h"
-#include "JobRegistry.h"
-#include "VoiceLibrary.h"
+#include "models/AppController.h"
+#include "models/JobRegistry.h"
+#include "models/VoiceLibrary.h"
 #include "engine/AddonRegistry.h"
 #include "engine/AudioFileWriter.h"
 #include "engine/OrtRuntime.h"

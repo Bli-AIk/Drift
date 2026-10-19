@@ -1,7 +1,7 @@
-#include "SceneDetectController.h"
+#include "models/SceneDetectController.h"
 
-#include "AppController.h"
-#include "McpDetail.h"
+#include "models/AppController.h"
+#include "models/McpDetail.h"
 
 #include <QSettings>
 

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "engine/EditorOverlay.h"
-#include "core/Clip.h"
-#include "core/Effect.h"
-#include "core/Mask.h"
-#include "core/Time.h"
+#include "core/project/clip/Clip.h"
+#include "core/effects/Effect.h"
+#include "core/effects/Mask.h"
+#include "core/base/Time.h"
 #include "engine/ClipTransform3d.h"
 #include "engine/SceneCamera3d.h"
 #include "engine/DepthSidecar.h"

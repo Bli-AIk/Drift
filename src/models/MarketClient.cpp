@@ -1,8 +1,8 @@
-#include "MarketClient.h"
+#include "models/MarketClient.h"
 
-#include "AssetLibrary.h"
-#include "MarketEndpoint.h"
-#include "MarketIdentity.h"
+#include "models/AssetLibrary.h"
+#include "models/MarketEndpoint.h"
+#include "models/MarketIdentity.h"
 
 #include <QCryptographicHash>
 #include <QDateTime>

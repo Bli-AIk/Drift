@@ -12,8 +12,8 @@
 #include <memory>
 #include <vector>
 
-#include "AudioFileWriter.h"
-#include "core/Time.h"
+#include "engine/AudioFileWriter.h"
+#include "core/base/Time.h"
 
 namespace drift {
 

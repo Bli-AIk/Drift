@@ -1,7 +1,7 @@
-#include "AddonPackage.h"
+#include "engine/AddonPackage.h"
 
-#include "AddonSigningKey.h"
-#include "models/VersionCompare.h"
+#include "engine/AddonSigningKey.h"
+#include "core/base/VersionCompare.h"
 
 #include <QCryptographicHash>
 #include <QDir>

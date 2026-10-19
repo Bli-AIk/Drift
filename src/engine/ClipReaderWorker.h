@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ClipReader.h"
+#include "engine/ClipReader.h"
 
-#include "core/Time.h"
+#include "core/base/Time.h"
 
 #include <QAtomicInt>
 #include <QElapsedTimer>

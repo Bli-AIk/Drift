@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/Effect.h"
-#include "core/Time.h"
+#include "core/effects/Effect.h"
+#include "core/base/Time.h"
 #include "engine/DepthSidecar.h"
 #include "engine/FaceLandmarker.h"
 

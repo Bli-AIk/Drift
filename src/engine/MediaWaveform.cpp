@@ -1,5 +1,5 @@
-#include "MediaWaveform.h"
-#include "MediaProbe.h"
+#include "engine/MediaWaveform.h"
+#include "engine/MediaProbe.h"
 
 #include <QFileInfo>
 #include <QVector>

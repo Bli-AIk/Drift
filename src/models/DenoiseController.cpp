@@ -1,6 +1,6 @@
-#include "DenoiseController.h"
+#include "models/DenoiseController.h"
 
-#include "AppController.h"
+#include "models/AppController.h"
 #include "engine/AudioFileWriter.h"
 #include "engine/ClipReaderPool.h"
 #include "engine/DeepFilterDenoiser.h"

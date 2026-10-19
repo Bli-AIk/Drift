@@ -1,6 +1,6 @@
-#include "PreviewController.h"
+#include "preview/PreviewController.h"
 
-#include "core/TimelineOps.h"
+#include "core/edit/TimelineOps.h"
 #include "engine/ClipGizmo.h"
 #include "engine/ClipTransform3d.h"
 #include "engine/DepthRelief.h"

@@ -1,14 +1,14 @@
-#include "DebugReport.h"
+#include "engine/DebugReport.h"
 
-#include "ClipReader.h"
-#include "Exporter.h"
-#include "GlRuntime.h"
-#include "GpuCompositor.h"
-#include "GpuDevice.h"
-#include "GpuPreference.h"
-#include "HwAccel.h"
-#include "OrtRuntime.h"
-#include "VaapiZeroCopy.h"
+#include "engine/ClipReader.h"
+#include "engine/Exporter.h"
+#include "engine/GlRuntime.h"
+#include "engine/GpuCompositor.h"
+#include "engine/GpuDevice.h"
+#include "engine/GpuPreference.h"
+#include "engine/HwAccel.h"
+#include "engine/OrtRuntime.h"
+#include "engine/VaapiZeroCopy.h"
 
 #include <QCoreApplication>
 #include <QDir>

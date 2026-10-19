@@ -4,7 +4,7 @@
 #include <QThread>
 #include <QVector>
 
-#include "core/Project.h"
+#include "core/project/Project.h"
 #include "engine/FrameCompositor.h"
 #include "engine/GpuCompositor.h"
 #include "engine/VectorClipRenderer.h"

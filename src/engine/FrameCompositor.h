@@ -1,10 +1,10 @@
 #pragma once
 
-#include "GpuCompositor.h"
-#include "EditorView3d.h"
-#include "core/Project.h"
-#include "core/Time.h"
-#include "TextLayout.h"
+#include "engine/GpuCompositor.h"
+#include "engine/EditorView3d.h"
+#include "core/project/Project.h"
+#include "core/base/Time.h"
+#include "engine/TextLayout.h"
 
 #include <QColor>
 #include <QHash>

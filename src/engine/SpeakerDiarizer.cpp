@@ -1,9 +1,9 @@
-#include "SpeakerDiarizer.h"
+#include "engine/SpeakerDiarizer.h"
 
-#include "GpuPackageParse.h"
-#include "KaldiFbank.h"
-#include "OrtSupport.h"
-#include "SpeechAudio.h"
+#include "engine/GpuPackageParse.h"
+#include "engine/KaldiFbank.h"
+#include "engine/OrtSupport.h"
+#include "engine/SpeechAudio.h"
 
 #include <QDebug>
 #include <QDir>
