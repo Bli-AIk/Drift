@@ -714,6 +714,14 @@ AppController::~AppController()
     m_trimCursorCache.clear();
 }
 
+void AppController::updateFrameCacheSuspension()
+{
+    const bool suspended =
+        m_playback.isPlaying() || m_assetPreview->playing() || m_speedCurve->playing();
+    m_filmstripTiles.setSuspended(suspended);
+    m_waveformBlocks.setSuspended(suspended);
+}
+
 void AppController::setAddonManager(AddonManager *manager)
 {
     m_addonManager = manager;
@@ -963,11 +971,9 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
             emit inspectorPlayheadChanged();
     });
     connect(&m_playback, &PlaybackEngine::playingChanged, this, [this] {
-        // Every play and pause passes through here — UI, shortcuts and MCP alike — so this is
-        // the one place background thumbnail and waveform decoding steps aside for playback.
+        // Every play and pause passes through here — UI, shortcuts and MCP alike.
+        updateFrameCacheSuspension();
         const bool enginePlaying = m_playback.isPlaying();
-        m_filmstripTiles.setSuspended(enginePlaying);
-        m_waveformBlocks.setSuspended(enginePlaying);
         if (!enginePlaying && m_playing) {
             m_playing = false;
             m_playheadUs = m_playback.playheadUs();
@@ -975,6 +981,11 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
             emit playheadSecondsChanged();
         }
     });
+    // Modal previews play through their own players, which the engine never sees.
+    connect(m_assetPreview, &AssetPreviewController::playingChanged, this,
+            &AppController::updateFrameCacheSuspension);
+    connect(m_speedCurve, &SpeedCurveController::playingChanged, this,
+            &AppController::updateFrameCacheSuspension);
     // The extra snap targets are the beat grid, the bookmarks and the work area — none of which
     // a timeline edit can move. Driven off the signals rather than the two dozen call sites that
     // emit them, so a new one cannot forget.
