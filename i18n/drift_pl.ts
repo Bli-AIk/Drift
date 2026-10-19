@@ -302,7 +302,7 @@
     </message>
     <message>
         <source>Delete this pack&apos;s downloaded data</source>
-        <translation type="unfinished">Usuń pobrane dane z tego pakietu</translation>
+        <translation>Usuń pobrane dane z tego pakietu</translation>
     </message>
 </context>
 <context>
@@ -372,11 +372,11 @@
     <name>AddonStartupPackRow</name>
     <message>
         <source>%1… %2%</source>
-        <translation type="unfinished">%1… %2%</translation>
+        <translation>%1… %2%</translation>
     </message>
     <message>
         <source>%1 → %2</source>
-        <translation type="unfinished">%1 → %2</translation>
+        <translation>%1 → %2</translation>
     </message>
 </context>
 <context>
@@ -541,7 +541,7 @@
     </message>
     <message>
         <source>Speech</source>
-        <translation type="unfinished"></translation>
+        <translation>Mowa</translation>
     </message>
     <message>
         <source>Turn a script into a voiceover</source>
