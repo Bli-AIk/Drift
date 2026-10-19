@@ -1,7 +1,5 @@
 import QtQuick
 import Drift
-import ".."
-
 // The Market: one search field, then text tabs, Drift Assets and sound effects first and the
 // stock types from the marketplace catalog after them. Drift Assets and sound effects are
 // CutWire's own and free, so they need no opt-in; the consent gate stands in front of the stock
@@ -142,36 +140,9 @@ Item {
                     model: [{ id: "assets", label: qsTr("Assets") }]
                            .concat(Sfx.available ? [{ id: "sfx", label: qsTr("SFX") }] : [])
                            .concat(root.stockTabs)
-                    delegate: Item {
-                        required property var modelData
-                        readonly property bool active: root.section === modelData.id
-                        width: tabLabel.implicitWidth
-                        height: tabLabel.implicitHeight + Theme.spacingLg + 2
-                        Accessible.role: Accessible.PageTab
-                        Accessible.name: tabLabel.text
-                        Accessible.checked: active
-
-                        Text {
-                            id: tabLabel
-                            anchors.top: parent.top
-                            anchors.topMargin: Theme.spacingSm
-                            text: modelData.label || modelData.id
-                            color: parent.active || tabHover.hovered ? Theme.panelForeground : Theme.mutedForeground
-                            font.family: Theme.fontFamily
-                            font.pixelSize: Theme.fontSizeSm
-                            font.weight: parent.active ? Font.DemiBold : Font.Medium
-                        }
-                        Rectangle {
-                            anchors.bottom: parent.bottom
-                            width: parent.width
-                            height: 2
-                            radius: 1
-                            color: Theme.primary
-                            opacity: parent.active ? 1 : 0
-                            Behavior on opacity { NumberAnimation { duration: Theme.durationBase; easing.type: Theme.easing } }
-                        }
-                        HoverHandler { id: tabHover; cursorShape: Qt.PointingHandCursor }
-                        TapHandler { onTapped: root.showSection(modelData.id) }
+                    delegate: MarketSectionTab {
+                        section: root.section
+                        onSectionSelected: (id) => root.showSection(id)
                     }
                 }
             }
@@ -179,8 +150,8 @@ Item {
 
         Rectangle {
             width: parent.width
-            height: Theme.borderWidth
-            color: Theme.panelBorder
+            height: Theme.c.marketTab.borderWidth
+            color: Theme.c.marketTab.border
         }
     }
 

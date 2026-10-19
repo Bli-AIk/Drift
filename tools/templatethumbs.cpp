@@ -1,7 +1,7 @@
-#include "engine/EffectCatalog.h"
-#include "engine/EffectProcessor.h"
-#include "engine/EffectTemplateCatalog.h"
-#include "engine/GpuEffectExecutor.h"
+#include "engine/packages/effects/EffectCatalog.h"
+#include "engine/compositor/effects/EffectProcessor.h"
+#include "engine/packages/effects/EffectTemplateCatalog.h"
+#include "engine/gpu/effects/GpuEffectExecutor.h"
 
 #include <QCoreApplication>
 #include <QGuiApplication>

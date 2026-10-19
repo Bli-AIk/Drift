@@ -1,4 +1,4 @@
-#include "engine/MediaProbe.h"
+#include "engine/decode/probe/MediaProbe.h"
 
 #include <QCoreApplication>
 #include <QTextStream>

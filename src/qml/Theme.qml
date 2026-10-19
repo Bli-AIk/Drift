@@ -2,14 +2,15 @@ pragma Singleton
 import QtQuick
 import Drift
 
-// Design tokens for the app shell and panel surfaces (dark + light), plus
-// shared layout/typography/iconography constants used across the UI.
+// Design tokens for the app shell and panel surfaces, plus shared layout,
+// typography and iconography constants. Color, metric, type and motion values
+// are loaded from JSON by ThemeManager; the property names below are the ones
+// the rest of the app already binds to.
 //
 // Control chrome (buttons, inputs, chips, dialogs) lives in
 // src/qml/components/Themed*.qml — use those; do not re-skin Qt controls inline.
 QtObject {
     id: theme
-
 
     // --- Platform keyboard shortcuts -----------------------------------------
     // Shortcut strings stored by EditorState use a portable/canonical notation:
@@ -131,221 +132,200 @@ QtObject {
     property FontLoader _interItalic: FontLoader { source: "qrc:/qt/qml/Drift/resources/fonts/InterUI-Italic.ttf" }
 
     readonly property string fontFamily: _interRegular.name || "sans-serif"
-    readonly property string monoFontFamily: "monospace"
+    readonly property string monoFontFamily: ThemeManager.typography.monoFontFamily
 
     // --- Light/dark mode: follows the OS until the user picks a side -----------
     // Qt.styleHints.colorScheme is live-updated by the platform theme (Qt 6.5+).
     // Once toggled, the choice lives in QSettings via EditorState.preferences and survives
     // restarts; it is app-wide, not stored per project.
+    //
+    // A single-variant user theme reports its own variant here. That binding reads
+    // ThemeManager.effectiveVariant and must not be written back by setVariant, or the
+    // two sides chase each other. The toggle records the requested side and selects
+    // the system theme, which is what actually loads a built-in.
     readonly property bool systemPrefersDark: Qt.styleHints.colorScheme !== Qt.Light
-    readonly property bool darkMode: EditorState.preferences.darkModeOverridden ? EditorState.preferences.darkModePreferred
-                                                                    : systemPrefersDark
+    // Single-variant user themes report their own side. A pinned built-in does
+    // too: setVariant will not unpin it, and the header checkmarks read darkMode.
+    // Selection "system" follows the appearance preference, otherwise the OS.
+    // setVariant at startup must not be what loads a built-in over DRIFT_THEME;
+    // ThemeManager keeps that override until select().
+    readonly property bool darkMode: {
+        if (ThemeManager.appearanceFollowsTheme)
+            return ThemeManager.effectiveVariant === "dark"
+        if (ThemeManager.selection === "dark" || ThemeManager.selection === "light")
+            return ThemeManager.selection === "dark"
+        return EditorState.preferences.darkModeOverridden
+               ? EditorState.preferences.darkModePreferred
+               : systemPrefersDark
+    }
 
     function toggleDarkMode() {
-        EditorState.preferences.setDarkModePreference(!darkMode);
+        setDarkMode(!darkMode)
     }
 
     function setDarkMode(enabled) {
-        EditorState.preferences.setDarkModePreference(enabled);
+        const side = enabled ? "dark" : "light"
+        EditorState.preferences.setDarkModePreference(enabled)
+        if (ThemeManager.appearanceFollowsTheme) {
+            // setVariant only stores the side while a single-variant theme is up.
+            ThemeManager.setVariant(side)
+            ThemeManager.select("system")
+            return
+        }
+        if (ThemeManager.selection === "dark" || ThemeManager.selection === "light")
+            ThemeManager.select(side)
     }
 
-    // --- Color palettes: app shell vs. panel surfaces, light and dark ------------
+    function syncVariant() {
+        ThemeManager.setVariant(darkMode ? "dark" : "light")
+    }
+
+    // Startup stays synchronous so the matching built-in is on screen before the
+    // first frame. A deferred swap would paint the constructor's dark theme and
+    // flash light sessions. Later changes wait until darkMode has finished
+    // evaluating: setVariant loads a theme, and doing that mid-evaluation is a
+    // binding loop.
+    Component.onCompleted: syncVariant()
+    onDarkModeChanged: Qt.callLater(syncVariant)
+
+    // Per-component tokens. Each group is lowerCamel of the QML type name.
+    readonly property var c: ThemeManager.components
+    readonly property var tokens: ThemeManager
+
+    // Shell palettes for both variants, not just the one currently applied.
     readonly property var _dark: ({
-        appBackground: "#0d0d0d",
-        foreground: "#dedede",
-        border: "#292929",
-        accent: "#242424",
-        accentForeground: "#f2f2f2",
-        mutedForeground: "#808080",
-        popoverHover: "#212121",
-        panelBackground: "#1a1a1a",
-        panelForeground: "#d9d9d9",
-        panelBorder: "#2e2e2e",
-        panelAccent: "#262626",
-        panelAccentForeground: "#ededed",
-        panelMuted: "#383838",
-        panelSecondaryBg: "#26200a",
-        panelSecondaryBorder: "#4a3d00",
-        panelSecondaryForeground: "#ffcf4a"
+        appBackground: ThemeManager.builtinToken("dark", "semantic.surface.app"),
+        foreground: ThemeManager.builtinToken("dark", "semantic.foreground"),
+        border: ThemeManager.builtinToken("dark", "semantic.border"),
+        accent: ThemeManager.builtinToken("dark", "semantic.accent"),
+        accentForeground: ThemeManager.builtinToken("dark", "semantic.accentForeground"),
+        mutedForeground: ThemeManager.builtinToken("dark", "semantic.mutedForeground"),
+        popoverHover: ThemeManager.builtinToken("dark", "semantic.popoverHover"),
+        panelBackground: ThemeManager.builtinToken("dark", "semantic.surface.panel"),
+        panelForeground: ThemeManager.builtinToken("dark", "semantic.panel.foreground"),
+        panelBorder: ThemeManager.builtinToken("dark", "semantic.panel.border"),
+        panelAccent: ThemeManager.builtinToken("dark", "semantic.panel.accent"),
+        panelAccentForeground: ThemeManager.builtinToken("dark", "semantic.panel.accentForeground"),
+        panelMuted: ThemeManager.builtinToken("dark", "semantic.panel.muted"),
+        panelSecondaryBg: ThemeManager.builtinToken("dark", "semantic.panel.secondary.background"),
+        panelSecondaryBorder: ThemeManager.builtinToken("dark", "semantic.panel.secondary.border"),
+        panelSecondaryForeground: ThemeManager.builtinToken("dark", "semantic.panel.secondary.foreground")
     })
     readonly property var _light: ({
-        appBackground: "#ffffff",
-        foreground: "#1c1c1c",
-        border: "#e8e8e8",
-        accent: "#f5f5f5",
-        accentForeground: "#050505",
-        mutedForeground: "#7a7a7a",
-        popoverHover: "#f5f5f5",
-        panelBackground: "#f9fafb",
-        panelForeground: "#212121",
-        panelBorder: "#dedede",
-        panelAccent: "#ededed",
-        panelAccentForeground: "#0d0d0d",
-        panelMuted: "#d4d4d4",
-        panelSecondaryBg: "#fff6da",
-        panelSecondaryBorder: "#ffe7a3",
-        panelSecondaryForeground: "#9a6f00"
+        appBackground: ThemeManager.builtinToken("light", "semantic.surface.app"),
+        foreground: ThemeManager.builtinToken("light", "semantic.foreground"),
+        border: ThemeManager.builtinToken("light", "semantic.border"),
+        accent: ThemeManager.builtinToken("light", "semantic.accent"),
+        accentForeground: ThemeManager.builtinToken("light", "semantic.accentForeground"),
+        mutedForeground: ThemeManager.builtinToken("light", "semantic.mutedForeground"),
+        popoverHover: ThemeManager.builtinToken("light", "semantic.popoverHover"),
+        panelBackground: ThemeManager.builtinToken("light", "semantic.surface.panel"),
+        panelForeground: ThemeManager.builtinToken("light", "semantic.panel.foreground"),
+        panelBorder: ThemeManager.builtinToken("light", "semantic.panel.border"),
+        panelAccent: ThemeManager.builtinToken("light", "semantic.panel.accent"),
+        panelAccentForeground: ThemeManager.builtinToken("light", "semantic.panel.accentForeground"),
+        panelMuted: ThemeManager.builtinToken("light", "semantic.panel.muted"),
+        panelSecondaryBg: ThemeManager.builtinToken("light", "semantic.panel.secondary.background"),
+        panelSecondaryBorder: ThemeManager.builtinToken("light", "semantic.panel.secondary.border"),
+        panelSecondaryForeground: ThemeManager.builtinToken("light", "semantic.panel.secondary.foreground")
     })
     readonly property var _palette: darkMode ? _dark : _light
 
     // --- Colors: app shell ---------------------------------------------------
-    readonly property color appBackground: _palette.appBackground
-    readonly property color foreground: _palette.foreground
-    readonly property color border: _palette.border
-    readonly property color accent: _palette.accent
-    readonly property color accentForeground: _palette.accentForeground
-    readonly property color mutedForeground: _palette.mutedForeground
-    readonly property color popoverHover: _palette.popoverHover
+    readonly property color appBackground: ThemeManager.semantic.surface.app
+    readonly property color foreground: ThemeManager.semantic.foreground
+    readonly property color border: ThemeManager.semantic.border
+    readonly property color accent: ThemeManager.semantic.accent
+    readonly property color accentForeground: ThemeManager.semantic.accentForeground
+    readonly property color mutedForeground: ThemeManager.semantic.mutedForeground
+    readonly property color popoverHover: ThemeManager.semantic.popoverHover
 
     // --- Colors: panel surfaces ------------------------------------------------
-    readonly property color panelBackground: _palette.panelBackground
-    readonly property color panelForeground: _palette.panelForeground
-    readonly property color panelBorder: _palette.panelBorder
-    readonly property color panelAccent: _palette.panelAccent
-    readonly property color panelAccentForeground: _palette.panelAccentForeground
-    readonly property color panelMuted: _palette.panelMuted
+    readonly property color panelBackground: ThemeManager.semantic.surface.panel
+    readonly property color panelForeground: ThemeManager.semantic.panel.foreground
+    readonly property color panelBorder: ThemeManager.semantic.panel.border
+    readonly property color panelAccent: ThemeManager.semantic.panel.accent
+    readonly property color panelAccentForeground: ThemeManager.semantic.panel.accentForeground
+    readonly property color panelMuted: ThemeManager.semantic.panel.muted
     // Slider groove — lighter than panelMuted in dark mode so the track reads at rest.
-    readonly property color sliderTrack: darkMode ? "#505050" : panelMuted
+    readonly property color sliderTrack: ThemeManager.semantic.panel.sliderTrack
     // Scrollbar track + handle (timeline horizontal bar, panel flickables).
-    readonly property color scrollbarTrack: darkMode ? "#2a2a2a" : panelBorder
-    readonly property color scrollbarHandle: darkMode ? "#6a6a6a" : panelMuted
-    readonly property color scrollbarHandleHover: darkMode ? "#888888" : mutedForeground
-    readonly property color scrollbarHandlePressed: darkMode ? "#b8b8b8" : foreground
-    // Bottom-sheet drag pill. panelBorder put it at 1.28:1 against the sheet in both
-    // themes, so the one affordance saying "this sheet moves" was invisible; these
-    // clear the 3:1 non-text floor (3.1:1 dark, 3.0:1 light).
-    readonly property color sheetHandle: darkMode ? "#6a6a6a" : "#919191"
-    readonly property color panelSecondaryBg: _palette.panelSecondaryBg
-    readonly property color panelSecondaryBorder: _palette.panelSecondaryBorder
-    readonly property color panelSecondaryForeground: _palette.panelSecondaryForeground
+    readonly property color scrollbarTrack: ThemeManager.semantic.panel.scrollbar.track
+    readonly property color scrollbarHandle: ThemeManager.semantic.panel.scrollbar.handle
+    readonly property color scrollbarHandleHover: ThemeManager.semantic.panel.scrollbar.handleHover
+    readonly property color scrollbarHandlePressed: ThemeManager.semantic.panel.scrollbar.handlePressed
+    // Bottom-sheet drag pill. panelBorder sat under the 3:1 non-text floor in both themes.
+    readonly property color sheetHandle: ThemeManager.semantic.panel.sheetHandle
+    readonly property color panelSecondaryBg: ThemeManager.semantic.panel.secondary.background
+    readonly property color panelSecondaryBorder: ThemeManager.semantic.panel.secondary.border
+    readonly property color panelSecondaryForeground: ThemeManager.semantic.panel.secondary.foreground
 
-    // --- Colors: shared semantic (identical in both themes) -----------------------
-    readonly property color primary: "#F8B81C"
-    readonly property color primaryForeground: "#221900"
-    // `primary` as a *foreground* on a panel surface. The brand amber is a fill
-    // colour: on the light panel it lands at 1.69:1, so a selected tab tinted with
-    // it was effectively invisible. Dark mode keeps the amber (9.8:1); light mode
-    // uses the darkened brand tone (5.2:1). Only for text/glyphs on panels —
-    // fills, rings and progress arcs still use `primary` in both themes.
-    readonly property color accentOnPanel: darkMode ? primary : "#8a6300"
-    readonly property color destructive: "#e91616"
-    readonly property color constructive: "#23d160"
-    readonly property color warning: "#f97316"
+    // --- Colors: shared semantic ------------------------------------------------
+    readonly property color primary: ThemeManager.semantic.primary
+    readonly property color primaryForeground: ThemeManager.semantic.primaryForeground
+    // `primary` as a foreground on a panel. The brand amber fails contrast on the
+    // light panel; dark mode keeps the amber. Fills still use `primary`.
+    readonly property color accentOnPanel: ThemeManager.semantic.accentOnPanel
+    readonly property color destructive: ThemeManager.semantic.destructive
+    readonly property color constructive: ThemeManager.semantic.constructive
+    readonly property color warning: ThemeManager.semantic.warning
+    readonly property color focusRing: ThemeManager.semantic.focusRing
 
-    // Keyboard focus indicator. Shared by every focusable control so a Tab pass
-    // reads as one system regardless of which control has focus.
-    readonly property color focusRing: primary
+    readonly property color exportGradientTop: ThemeManager.semantic.export.gradientTop
+    readonly property color exportGradientBottom: ThemeManager.semantic.export.gradientBottom
+    readonly property color exportGlow: ThemeManager.semantic.export.glow
 
-    // Export CTA gradient stops (the documented inline-color exception, sourced
-    // from here so the button still tracks the token system).
-    readonly property color exportGradientTop: "#ffcf4a"
-    readonly property color exportGradientBottom: "#f59e0b"
-    readonly property color exportGlow: "#fbbf24"
+    // Scrims sit on photographic content, so they do not follow the app theme.
+    readonly property color scrimColor: ThemeManager.semantic.scrim
+    readonly property color scrimStrong: ThemeManager.semantic.scrimStrong
+    readonly property color overlayColor: ThemeManager.semantic.overlay
+    readonly property color guideStrong: ThemeManager.semantic.guide.strong
+    readonly property color guideMedium: ThemeManager.semantic.guide.medium
+    readonly property color guideWeak: ThemeManager.semantic.guide.weak
+    readonly property color onMedia: ThemeManager.semantic.onMedia
+    readonly property color snapGuide: ThemeManager.semantic.timeline.snapGuide
+    readonly property color skeletonColor: ThemeManager.semantic.skeleton
+    readonly property color skeletonHighlight: ThemeManager.semantic.skeletonHighlight
 
-    // Scrims/overlays drawn over media (clip name bands, preview letterbox,
-    // thumbnail duration badges). Fixed regardless of app theme because they sit
-    // on photographic content, not on panel surfaces.
-    readonly property color scrimColor: "#00000066"
-    readonly property color scrimStrong: "#000000b3"
-    readonly property color overlayColor: "#000000"
-    // Guides and handles drawn on top of preview media.
-    readonly property color guideStrong: "#99ffffff"
-    readonly property color guideMedium: "#80ffffff"
-    readonly property color guideWeak: "#66ffffff"
-    readonly property color onMedia: "#ffffff"
-    // Timeline snap indicator.
-    readonly property color snapGuide: "#f5c542"
-    // Async placeholder fill for thumbnails, filmstrips and waveforms.
-    readonly property color skeletonColor: darkMode ? "#242424" : "#e8e8e8"
-    readonly property color skeletonHighlight: darkMode ? "#333333" : "#f5f5f5"
+    // --- Colors: timeline clip types -------------------------------------------
+    readonly property color clipText: ThemeManager.semantic.clip.text
+    readonly property color clipSubtitle: ThemeManager.semantic.clip.subtitle
+    readonly property color clipAudio: ThemeManager.semantic.clip.audio
+    readonly property color clipGraphic: ThemeManager.semantic.clip.graphic
+    readonly property color clipEffect: ThemeManager.semantic.clip.effect
+    readonly property color clipComposite: ThemeManager.semantic.clip.composite
+    readonly property color clipProxy: ThemeManager.semantic.clip.proxy
+    readonly property color clipProxyForeground: ThemeManager.semantic.clip.proxyForeground
+    readonly property color clipProxyBand: ThemeManager.semantic.clip.proxyBand
+    readonly property color clipEditFriendly: ThemeManager.semantic.clip.editFriendly
+    readonly property color clipEditFriendlyForeground: ThemeManager.semantic.clip.editFriendlyForeground
+    readonly property color clipAdjustmentVideo: ThemeManager.semantic.clip.adjustment.video
+    readonly property color clipAdjustmentAudio: ThemeManager.semantic.clip.adjustment.audio
+    readonly property color clipAdjustmentMask: ThemeManager.semantic.clip.adjustment.mask
+    readonly property color clipTransform: ThemeManager.semantic.clip.transform
+    readonly property color clipVideoOverview: ThemeManager.semantic.clip.videoOverview
+    readonly property color transitionOverlap: ThemeManager.semantic.clip.transitionOverlap
+    readonly property color waveformColor: ThemeManager.semantic.clip.waveform
+    readonly property color panelWaveformColor: ThemeManager.semantic.clip.panelWaveform
+    readonly property color beatBarColor: ThemeManager.semantic.clip.beat.bar
+    readonly property color beatGridColor: ThemeManager.semantic.clip.beat.grid
+    readonly property color beatOnsetColor: ThemeManager.semantic.clip.beat.onset
+    readonly property color clipVideoPlaceholder: ThemeManager.semantic.clip.videoPlaceholder
+    // Fixed dark in both themes: a white surround in light mode left the video floating.
+    readonly property color previewLetterbox: ThemeManager.semantic.preview.letterbox
+    readonly property color textStylePreviewBg: ThemeManager.semantic.preview.textStyleBackground
+    readonly property color textStylePreviewBorder: ThemeManager.semantic.preview.textStyleBorder
 
-    // --- Colors: timeline clip types (fixed regardless of app theme) ---------------
-    readonly property color clipText: "#5DBAA0"
-    readonly property color clipSubtitle: "#4A9FD4"
-    readonly property color clipAudio: "#8F5DBA"
-    readonly property color clipGraphic: "#BA5D7A"
-    readonly property color clipEffect: "#5d93ba"
-    readonly property color clipComposite: "#BA8F5D"
-    // Clips previewing from a low-res proxy: the name band and the "Proxy" pill. Green, so it
-    // stays apart from the yellow selection ring and every clip-type colour above.
-    readonly property color clipProxy: "#3DBE8B"
-    readonly property color clipProxyForeground: "#06261A"
-    readonly property color clipProxyBand: "#D9174A36"
-    // Media converted to an edit-friendly format ("Convert to edit-friendly format").
-    readonly property color clipEditFriendly: "#5AA9E6"
-    readonly property color clipEditFriendlyForeground: "#06203A"
-    // Adjustment layers, tinted by what they act on so a glance at the lane says which it is.
-    // The video one is clipEffect itself, which is the colour adjustments have always had.
-    readonly property color clipAdjustmentVideo: clipEffect
-    readonly property color clipAdjustmentAudio: "#9B6BC9"
-    readonly property color clipAdjustmentMask: "#BA9B5D"
-    // Transform layers: their clips, the span bracket, the coverage tint and the parent frame.
-    readonly property color clipTransform: "#8FBA5D"
-    // Video in the overview strip only. On the timeline a video clip shows its thumbnails over
-    // clipVideoPlaceholder, which at three pixels tall reads as a hole in the strip — so the
-    // minimap gives footage a neutral slate that stays distinct from the coloured clip types.
-    readonly property color clipVideoOverview: "#6E7A85"
-    readonly property color transitionOverlap: "#9B5DE5"
-    readonly property color waveformColor: "#ffffffb3" // rgba(255,255,255,0.7) — on dark clip chrome
-    // Waveform drawn on panel surfaces (subtitle cue lane, etc.): follows light/dark FG.
-    readonly property color panelWaveformColor: darkMode ? "#ffffffb3" : "#212121b3"
-    // Detected beat grid in the keyframe strip. Bar lines get the stronger alpha; the
-    // beats between them the weaker one, so the metre reads at a glance without the grid
-    // competing with the keyframe curves drawn on top of it.
-    readonly property color beatBarColor: darkMode ? "#7ac8ff8c" : "#1f6fb24d"
-    readonly property color beatGridColor: darkMode ? "#7ac8ff47" : "#1f6fb230"
-    // Transients that do not land on the grid — drawn as short vertically-centered bars.
-    readonly property color beatOnsetColor: darkMode ? "#ffffff8c" : "#2121218c"
-    // Video clips normally show real thumbnails (always photographic/dark-ish); until
-    // thumbnail generation exists, use a fixed dark placeholder so the white filename
-    // scrim stays legible in light mode too instead of following panelAccent.
-    readonly property color clipVideoPlaceholder: "#2b2b2b"
-    // The band around a letterboxed preview canvas. Fixed dark in both themes: it frames
-    // photographic content, and following appBackground made it a white surround in light
-    // mode with the video floating in the middle of it.
-    //
-    // Mid-grey rather than the near-black it was: an empty canvas, a letterboxed clip and a
-    // dark frame all render close to black, so at #101010 there was nothing on screen saying
-    // where the canvas ended and the surround began. Still dark enough to frame video without
-    // competing with it.
-    readonly property color previewLetterbox: "#333333"
-    // Style-pack thumbnails: most packs use white/light glyphs (and sit on video), so the
-    // card canvas stays dark in both themes — panelSecondaryBg washes them out in light mode.
-    readonly property color textStylePreviewBg: "#1c1c1c"
-    readonly property color textStylePreviewBorder: darkMode ? "#3a3a3a" : "#2a2a2a"
+    // --- Colors: 3D transform gizmo --------------------------------------------
+    readonly property color gizmoX: ThemeManager.semantic.gizmo.x
+    readonly property color gizmoY: ThemeManager.semantic.gizmo.y
+    readonly property color gizmoZ: ThemeManager.semantic.gizmo.z
+    readonly property color gizmoUniform: ThemeManager.semantic.gizmo.uniform
+    readonly property color gizmoHot: ThemeManager.semantic.gizmo.hot
 
-    // --- Colors: 3D transform gizmo (fixed; drawn over footage) --------------
-    // The usual X/Y/Z = red/green/blue, bright enough to hold up on any frame.
-    readonly property color gizmoX: "#f0475a"
-    readonly property color gizmoY: "#5ccf5a"
-    readonly property color gizmoZ: "#4f8ff7"
-    readonly property color gizmoUniform: "#f2f2f2"
-    readonly property color gizmoHot: "#ffd43b"
-
-    // --- Colors: keyframe curves (fixed regardless of app theme) -------------
-    // One hue per animatable property so overlaid curves, their key diamonds and
-    // their gutter chips all read as the same series. Chosen for separation at
-    // 1.5px stroke width on both panel backgrounds.
-    readonly property var keyframeCurveColors: ({
-        "x": "#16a9f3",
-        "y": "#f59e0b",
-        "width": "#23d160",
-        "height": "#e879f9",
-        "rotation": "#f43f5e",
-        "rotationX": "#fb923c",
-        "rotationY": "#facc15",
-        "z": "#60a5fa",
-        "perspective": "#94a3b8",
-        "opacity": "#a78bfa",
-        "volume": "#2dd4bf"
-    })
-    // Effect parameters are open-ended ("fx.<index>.<key>"), so they can't have named entries
-    // above. Hashing the prop into this ramp keeps each one a stable, distinct color across
-    // sessions instead of drawing every effect curve in the same accent.
-    readonly property var keyframeCurveRamp: [
-        "#38bdf8", "#fb923c", "#4ade80", "#c084fc",
-        "#fb7185", "#facc15", "#2dd4bf", "#818cf8"
-    ]
+    // --- Colors: keyframe curves ------------------------------------------------
+    readonly property var keyframeCurveColors: ThemeManager.semantic.keyframe.curves
+    readonly property var keyframeCurveRamp: ThemeManager.semantic.keyframe.ramp
     function keyframeCurveColor(prop) {
         if (keyframeCurveColors[prop])
             return keyframeCurveColors[prop]
@@ -356,40 +336,32 @@ QtObject {
     }
 
     // --- Radius --------------------------------------------------------------
-    readonly property real radiusSm: 5.6
-    readonly property real radiusMd: 10.4
-    readonly property real radiusLg: 13.12
-    readonly property real radiusXs: 3    // badges, tick marks, hairline chrome
-    readonly property real radiusPill: 999
+    readonly property real radiusSm: ThemeManager.metrics.radius.sm
+    readonly property real radiusMd: ThemeManager.metrics.radius.md
+    readonly property real radiusLg: ThemeManager.metrics.radius.lg
+    readonly property real radiusXs: ThemeManager.metrics.radius.xs
+    readonly property real radiusPill: ThemeManager.metrics.radius.pill
 
     // --- Spacing scale ---------------------------------------------------------
-    // Every gap/margin/padding in the app should come from here. Values are the
-    // ones already in de-facto use, deduplicated into a scale.
-    readonly property real spacingXs: 2
-    readonly property real spacingSm: 4
-    readonly property real spacingMd: 6
-    readonly property real spacingLg: 8
-    readonly property real spacingXl: 12
-    readonly property real spacing2xl: 16
-    readonly property real spacing3xl: 24
+    readonly property real spacingXs: ThemeManager.metrics.spacing.xs
+    readonly property real spacingSm: ThemeManager.metrics.spacing.sm
+    readonly property real spacingMd: ThemeManager.metrics.spacing.md
+    readonly property real spacingLg: ThemeManager.metrics.spacing.lg
+    readonly property real spacingXl: ThemeManager.metrics.spacing.xl
+    readonly property real spacing2xl: ThemeManager.metrics.spacing.xxl
+    readonly property real spacing3xl: ThemeManager.metrics.spacing.xxxl
 
     // --- Control metrics -------------------------------------------------------
     // controlHeight is the alignment baseline: text fields, combo boxes and text
     // buttons all share it so adjacent controls in a Row line up.
     //
-    // The panels, inspectors and browsers are shared with the desktop build, and every
-    // one of them sizes its controls from these three tokens. Rather than fork each
-    // component for touch, the tokens themselves grow on Android: a 28px icon button
-    // sized for a mouse cursor is roughly a third of a fingertip, which made destructive
-    // controls (Remove sitting beside Disable in the effects list) genuinely risky.
-    // 44/36/40 are Android's minimum comfortable targets, not arbitrary bumps.
     // Two independent axes, deliberately not one boolean.
     //
     //   sizeClass  — how much room there is. Drives which shell runs and whether a layout
     //                collapses to a single pane. A narrow window on a desktop is "compact".
     //   touchInput — what is pointing at it. Drives hit-target growth. A touchscreen laptop
     //                at 1400dp is touch but not compact; a 500dp mouse-driven window is the
-    //                reverse. Conflating them is why touchUi ended up meaning three things.
+    //                reverse.
     //
     // liftDragRequired is derived rather than a third axis: a platform DragHandler cannot
     // leave a bottom sheet, and the sheet is a consequence of being compact, not of being
@@ -412,72 +384,84 @@ QtObject {
     readonly property bool touchInput: !pointerPrimary
     readonly property bool liftDragRequired: touchInput || compact
 
-    // Retained as an alias so the ~25 existing call sites keep compiling while they are
-    // migrated to touchInput / compact / liftDragRequired one surface at a time.
+    // Retained as an alias so existing call sites keep compiling.
     readonly property bool touchUi: touchInput
-    readonly property real controlHeight: touchUi ? 44 : 30
-    readonly property real controlHeightSm: touchUi ? 36 : 26   // chips, segmented toggles
-    readonly property real iconButtonSize: touchUi ? 40 : 28
-    readonly property real borderWidth: 1
-    readonly property real borderWidthFocus: 2
+
+    // Reads touchUi, so the binding follows both the theme document and the input mode.
+    function inputMetric(metric) {
+        return touchUi ? metric.touch : metric.pointer
+    }
+
+    readonly property real controlHeight: inputMetric(ThemeManager.metrics.controlHeight)
+    readonly property real controlHeightSm: inputMetric(ThemeManager.metrics.controlHeightSm)
+    readonly property real iconButtonSize: inputMetric(ThemeManager.metrics.iconButtonSize)
+    readonly property real borderWidth: ThemeManager.metrics.borderWidth
+    readonly property real borderWidthFocus: ThemeManager.metrics.borderWidthFocus
 
     // --- Icon sizes ------------------------------------------------------------
-    readonly property real iconSizeSm: 12
-    readonly property real iconSizeMd: 14
-    readonly property real iconSizeBase: 16
-    readonly property real iconSizeLg: 18
-    readonly property real iconSizeXl: 22
+    readonly property real iconSizeSm: ThemeManager.metrics.iconSize.sm
+    readonly property real iconSizeMd: ThemeManager.metrics.iconSize.md
+    readonly property real iconSizeBase: ThemeManager.metrics.iconSize.base
+    readonly property real iconSizeLg: ThemeManager.metrics.iconSize.lg
+    readonly property real iconSizeXl: ThemeManager.metrics.iconSize.xl
 
     // --- Motion ----------------------------------------------------------------
-    // durationFast: hover/press tints. durationBase: dialogs, tab crossfades.
-    // durationSlow: layout-affecting reveals. durationPress: press feedback.
-    readonly property int durationFast: 90
-    readonly property int durationBase: 140
-    readonly property int durationSlow: 220
-    readonly property int durationPress: 120
-    // Strong ease-out (~cubic-bezier(0.22, 1, 0.36, 1)) for anything entering or
-    // leaving: it starts fast, so the interface answers in the frame the user is
-    // watching. OutCubic was too weak to read as deliberate.
-    readonly property int easing: Easing.OutQuint
-    // Strong ease-in-out (~cubic-bezier(0.76, 0, 0.24, 1)) for things already on
-    // screen that move or morph, where a fast start reads as a jerk.
-    readonly property int easingInOut: Easing.InOutQuart
-    // Press feedback: pressable chrome dips to this scale while held.
-    readonly property real pressScale: 0.97
-    readonly property int tooltipDelay: 400
+    function easingNamed(name) {
+        switch (name) {
+        case "Linear": return Easing.Linear
+        case "InQuad": return Easing.InQuad
+        case "OutQuad": return Easing.OutQuad
+        case "InOutQuad": return Easing.InOutQuad
+        case "InCubic": return Easing.InCubic
+        case "OutCubic": return Easing.OutCubic
+        case "InOutCubic": return Easing.InOutCubic
+        case "InQuart": return Easing.InQuart
+        case "OutQuart": return Easing.OutQuart
+        case "InOutQuart": return Easing.InOutQuart
+        case "InQuint": return Easing.InQuint
+        case "OutQuint": return Easing.OutQuint
+        case "InOutQuint": return Easing.InOutQuint
+        case "OutExpo": return Easing.OutExpo
+        case "InOutExpo": return Easing.InOutExpo
+        default: return Easing.OutQuint
+        }
+    }
+
+    readonly property int durationFast: ThemeManager.motion.durationFast
+    readonly property int durationBase: ThemeManager.motion.durationBase
+    readonly property int durationSlow: ThemeManager.motion.durationSlow
+    readonly property int durationPress: ThemeManager.motion.durationPress
+    readonly property int easing: easingNamed(ThemeManager.motion.easing)
+    readonly property int easingInOut: easingNamed(ThemeManager.motion.easingInOut)
+    readonly property real pressScale: ThemeManager.motion.pressScale
+    readonly property int tooltipDelay: ThemeManager.motion.tooltipDelay
 
     // --- Dialog widths ---------------------------------------------------------
-    readonly property real dialogWidthSm: 340
-    readonly property real dialogWidthMd: 420
-    readonly property real dialogWidthLg: 660
-    // Minimum breathing room between a dialog and the window edge.
-    readonly property real dialogMargin: 32
+    readonly property real dialogWidthSm: ThemeManager.metrics.dialog.widthSm
+    readonly property real dialogWidthMd: ThemeManager.metrics.dialog.widthMd
+    readonly property real dialogWidthLg: ThemeManager.metrics.dialog.widthLg
+    readonly property real dialogMargin: ThemeManager.metrics.dialog.margin
 
     // --- Typography ------------------------------------------------------------
-    readonly property real fontSizeXs: 11.52
-    readonly property real fontSizeSm: 12.64
-    readonly property real fontSizeBase: 14.72
-    readonly property real fontSizeTiny: 9.6   // 0.6rem clip captions
-    readonly property real fontSizeTick: 10    // literal 10px ruler tick labels
-    readonly property real fontSizeCard: 11.2  // 0.7rem asset card filenames
+    readonly property real fontSizeXs: ThemeManager.typography.fontSize.xs
+    readonly property real fontSizeSm: ThemeManager.typography.fontSize.sm
+    readonly property real fontSizeBase: ThemeManager.typography.fontSize.base
+    readonly property real fontSizeTiny: ThemeManager.typography.fontSize.tiny
+    readonly property real fontSizeTick: ThemeManager.typography.fontSize.tick
+    readonly property real fontSizeCard: ThemeManager.typography.fontSize.card
 
     // --- Layout: chrome ------------------------------------------------------
-    readonly property real headerHeight: 54.4
-    readonly property real panelGap: 3
-    readonly property real pagePadding: 12
+    readonly property real headerHeight: ThemeManager.metrics.headerHeight
+    readonly property real panelGap: ThemeManager.metrics.panelGap
+    readonly property real pagePadding: ThemeManager.metrics.pagePadding
 
     // --- Layout: assets panel -----------------------------------------------
-    readonly property real panelHeaderHeight: touchUi ? 52 : 44
-    readonly property real tabRailWidth: touchUi ? 52 : 40
-    readonly property real assetCardWidth: 112
-    readonly property real assetCardGap: 16
+    readonly property real panelHeaderHeight: inputMetric(ThemeManager.metrics.panelHeaderHeight)
+    readonly property real tabRailWidth: inputMetric(ThemeManager.metrics.tabRailWidth)
+    readonly property real assetCardWidth: ThemeManager.metrics.assetCardWidth
+    readonly property real assetCardGap: ThemeManager.metrics.assetCardGap
 
-    // Tint for category chips in asset browser tabs.
-    readonly property var categoryColors: [
-        "#f59e0b", "#ef4444", "#8b5cf6", "#3b82f6", "#10b981",
-        "#ec4899", "#06b6d4", "#84cc16", "#f97316", "#6366f1"
-    ]
-
+    readonly property var categoryColors: ThemeManager.semantic.category
     function categoryColor(index) {
         const colors = categoryColors
         if (!colors || colors.length === 0)
@@ -486,126 +470,71 @@ QtObject {
     }
 
     // --- Layout: preview panel -----------------------------------------------
-    // Above and below the transport bar's buttons.
-    readonly property real previewTransportPadding: 6
+    readonly property real previewTransportPadding: ThemeManager.metrics.previewTransportPadding
 
     // --- Layout: timeline ------------------------------------------------------
-    readonly property real timelineToolbarHeight: 40
-    // Resolve-style full-project overview strip above the ruler; short enough
-    // to stay out of the way but tall enough to be an easy click target.
-    readonly property real timelineOverviewHeight: 34
-    // Tall enough to be an easy seek/scrub hit target (CapCut/Premiere-style).
-    readonly property real timelineRulerHeight: 28
-    readonly property real timelineBookmarkRowHeight: 18
-    readonly property real trackHeightVideo: 65
-    readonly property real trackHeightAudio: 50
-    readonly property real trackHeightText: touchUi ? 44 : 25
-    readonly property real trackHeightSubtitle: touchUi ? 44 : 25
-    readonly property real trackHeightShape: 50
-    // An adjustment carries no picture and no waveform — just the list of effects in it — so it
-    // needs a label's worth of room, not a video track's.
-    readonly property real trackHeightAdjustment: touchUi ? 40 : 28
-    // One nested adjustment lane, drawn as a strip across the top of its parent's row. Roughly
-    // 30% of a video track, which is where a track with a single lane lands — a percentage per
-    // lane instead would make a track with three of them nearly twice its natural height.
-    // 20px lanes came out at 12-14dp of usable strip on a phone once the row borders were
-    // taken off — under half the touch floor for the toggles that live in them.
-    readonly property real adjustmentLaneHeight: touchUi ? 24 : 20
-    readonly property real trackGap: 6
-    // Invisible hit area above tracks (no visible UI) for new-track drops when timeline has clips.
-    readonly property real newTrackHitSlop: 24
-    readonly property real trackLabelsWidth: 130
-    readonly property real pixelsPerSecondBase: 50
-    // Empty runway after the last clip: fixed in pixels at every zoom (not a
-    // fixed number of seconds). Sized as a fraction of the timeline viewport.
-    readonly property real timelineEndPadFraction: 0.25
-    readonly property real timelineEndPadMinPx: 120
-    readonly property real playheadLineWidth: 2
-    // Top scrubber head — sized to sit in the seek strip and stay easy to grab.
-    readonly property real playheadHandleSize: 16
-    readonly property real playheadSeekGrabWidth: 18
-    readonly property real clipSelectionRingWidth: 1.5
-    // Name band across the top of a clip. Clamped against track height at the use
-    // site so it never swallows a short (25px text/subtitle) row.
-    readonly property real clipHeaderBandHeight: 20
-    readonly property real clipTrimHandleWidth: 12
-    // Floor for a selected clip's on-timeline width so it never shrinks to a
-    // sliver. Sized for two trim handles plus a move strip between them.
-    readonly property real clipMinInteractiveWidth: 28
+    readonly property real timelineToolbarHeight: ThemeManager.metrics.timeline.toolbarHeight
+    readonly property real timelineOverviewHeight: ThemeManager.metrics.timeline.overviewHeight
+    readonly property real timelineRulerHeight: ThemeManager.metrics.timeline.rulerHeight
+    readonly property real timelineBookmarkRowHeight: ThemeManager.metrics.timeline.bookmarkRowHeight
+    readonly property real trackHeightVideo: ThemeManager.metrics.timeline.trackHeightVideo
+    readonly property real trackHeightAudio: ThemeManager.metrics.timeline.trackHeightAudio
+    readonly property real trackHeightText: inputMetric(ThemeManager.metrics.timeline.trackHeightText)
+    readonly property real trackHeightSubtitle: inputMetric(ThemeManager.metrics.timeline.trackHeightSubtitle)
+    readonly property real trackHeightShape: ThemeManager.metrics.timeline.trackHeightShape
+    readonly property real trackHeightAdjustment: inputMetric(ThemeManager.metrics.timeline.trackHeightAdjustment)
+    readonly property real adjustmentLaneHeight: inputMetric(ThemeManager.metrics.timeline.adjustmentLaneHeight)
+    readonly property real trackGap: ThemeManager.metrics.timeline.trackGap
+    readonly property real newTrackHitSlop: ThemeManager.metrics.timeline.newTrackHitSlop
+    readonly property real trackLabelsWidth: ThemeManager.metrics.timeline.trackLabelsWidth
+    readonly property real pixelsPerSecondBase: ThemeManager.metrics.timeline.pixelsPerSecondBase
+    readonly property real timelineEndPadFraction: ThemeManager.metrics.timeline.endPadFraction
+    readonly property real timelineEndPadMinPx: ThemeManager.metrics.timeline.endPadMinPx
+    readonly property real playheadLineWidth: ThemeManager.metrics.timeline.playheadLineWidth
+    readonly property real playheadHandleSize: ThemeManager.metrics.timeline.playheadHandleSize
+    readonly property real playheadSeekGrabWidth: ThemeManager.metrics.timeline.playheadSeekGrabWidth
+    readonly property real clipSelectionRingWidth: ThemeManager.metrics.timeline.clipSelectionRingWidth
+    readonly property real clipHeaderBandHeight: ThemeManager.metrics.timeline.clipHeaderBandHeight
+    readonly property real clipTrimHandleWidth: ThemeManager.metrics.timeline.clipTrimHandleWidth
+    readonly property real clipMinInteractiveWidth: ThemeManager.metrics.timeline.clipMinInteractiveWidth
     readonly property real clipMinWidth: clipMinInteractiveWidth * 2
-    // Matches drift::kMinClipDurationUs (0.1s). Effective min duration is the
-    // larger of this and clipMinWidth / pxPerSecond at the current zoom.
-    readonly property real clipMinDurationSeconds: 0.1
+    readonly property real clipMinDurationSeconds: ThemeManager.metrics.timeline.clipMinDurationSeconds
 
     // --- Layout: Android / touch -----------------------------------------------
-    // Used by AndroidMain / AndroidTimeline / AndroidPreview and the CapCut shell.
-    // Desktop chrome keeps the metrics above.
-    readonly property real androidIconButtonSize: 48
-    readonly property real androidTimelineToolbarHeight: 56
-    readonly property real androidPreviewTransportHeight: 56
-    readonly property real androidTopBarHeight: 56
-    // Four destinations plus the centred Add button. Taller than the old scrolling
-    // strip because the Add button is a 48dp target that has to sit inside it.
-    readonly property real androidBottomRailHeight: 64
-    // Contextual clip toolbar. Taller than the 56dp strip it replaces because its slots
-    // are glyph-over-caption, like the rail below it.
-    readonly property real androidClipToolbarHeight: 64
-    readonly property real androidSplitterHeight: 32
-    readonly property real androidSheetHeightFraction: 0.50
-    readonly property real androidSheetExpandedFraction: 0.92
-    readonly property real androidSheetHeaderHeight: 56
-    readonly property real androidSheetDismissFraction: 0.38
-    // Hold before an asset card lifts out of the sheet for a drag. Shorter than the
-    // 800ms platform long-press: the tap it competes with only opens a menu, and a
-    // gesture that has to be held for most of a second reads as an unresponsive app.
-    readonly property int touchLiftInterval: 320
-    // Upward travel after a lift that counts as heading for a drop target: past this the
-    // asset sheet slides aside even while the finger is still over it.
-    readonly property real touchLiftStepAsideDistance: 56
-    // The rail's five slots divide its width, so destinations have no fixed width.
-    // The Add button is the one that does: a docked-FAB-sized target in the centre.
-    readonly property real androidRailFabSize: 48
-    // Add-menu row. A token rather than a literal because the sheet computes its own
-    // height from the row count, and the two must not drift apart.
-    readonly property real androidAddRowHeight: 64
-    // Mute/hide icons only — track type labels do not fit a phone. Wide enough for the
-    // two toggles to sit a dead band apart without their hit areas reaching the type
-    // caption on the left or the corner filmstrip toggle below it.
-    readonly property real androidTrackLabelsWidth: 88
-    // The fixed centre line. Thinner than the desktop playhead: it is always on screen and
-    // always over content, so it marks the frame rather than announcing itself.
-    readonly property real androidPlayheadCentreWidth: 2
-    readonly property real androidClipTrimHandleWidth: 20
-    readonly property real androidClipEdgeMargin: 22
-    // Outside the clip, so with the 20px bar a trim edge offers a 40px+ grab — a fingertip.
-    readonly property real androidTrimHotspotExtra: 20
-    // Preview region held between a floor and a ceiling. The pane is sized from the project
-    // aspect, but only within this band: below the floor the canvas letterboxes inside the
-    // pane instead of the pane shrinking, so the transport row's y stays put between the
-    // editor, crop mode and a sheet being open.
-    readonly property real androidPreviewMaxScreenFraction: 0.50
-    readonly property real androidPreviewMinFraction: 0.34
-    // Compact-width layout margin. Deliberately NOT the shared pagePadding (12): raising that
-    // would move every desktop panel, and 16 is the Material compact figure.
-    readonly property real androidPagePadding: 16
-    // The 48dp floor and the 8dp separation rule, named so call sites state the intent rather
-    // than reaching for whichever spacing token happens to be the right number today.
-    readonly property real androidMinTouchTarget: 48
-    readonly property real androidTouchGap: 8
-    // Template card in the canvas sheet. A portrait card so a 9:16 swatch — what most phone
-    // projects are — fills it rather than sitting as a sliver in a landscape box.
-    readonly property real androidLayoutCardWidth: 88
-    readonly property real androidLayoutCardHeight: 112
-    readonly property real androidHomeTileHeight: 96
-    readonly property real androidHomeRecentCardWidth: 140
-    readonly property real androidHomeRecentCardHeight: 96
-
+    readonly property real androidIconButtonSize: ThemeManager.metrics.android.iconButtonSize
+    readonly property real androidTimelineToolbarHeight: ThemeManager.metrics.android.timelineToolbarHeight
+    readonly property real androidPreviewTransportHeight: ThemeManager.metrics.android.previewTransportHeight
+    readonly property real androidTopBarHeight: ThemeManager.metrics.android.topBarHeight
+    readonly property real androidBottomRailHeight: ThemeManager.metrics.android.bottomRailHeight
+    readonly property real androidClipToolbarHeight: ThemeManager.metrics.android.clipToolbarHeight
+    readonly property real androidSplitterHeight: ThemeManager.metrics.android.splitterHeight
+    readonly property real androidSheetHeightFraction: ThemeManager.metrics.android.sheetHeightFraction
+    readonly property real androidSheetExpandedFraction: ThemeManager.metrics.android.sheetExpandedFraction
+    readonly property real androidSheetHeaderHeight: ThemeManager.metrics.android.sheetHeaderHeight
+    readonly property real androidSheetDismissFraction: ThemeManager.metrics.android.sheetDismissFraction
+    readonly property int touchLiftInterval: ThemeManager.motion.touchLiftInterval
+    readonly property real touchLiftStepAsideDistance: ThemeManager.metrics.android.liftStepAsideDistance
+    readonly property real androidRailFabSize: ThemeManager.metrics.android.railFabSize
+    readonly property real androidAddRowHeight: ThemeManager.metrics.android.addRowHeight
+    readonly property real androidTrackLabelsWidth: ThemeManager.metrics.android.trackLabelsWidth
+    readonly property real androidPlayheadCentreWidth: ThemeManager.metrics.android.playheadCentreWidth
+    readonly property real androidClipTrimHandleWidth: ThemeManager.metrics.android.clipTrimHandleWidth
+    readonly property real androidClipEdgeMargin: ThemeManager.metrics.android.clipEdgeMargin
+    readonly property real androidTrimHotspotExtra: ThemeManager.metrics.android.trimHotspotExtra
+    readonly property real androidPreviewMaxScreenFraction: ThemeManager.metrics.android.previewMaxScreenFraction
+    readonly property real androidPreviewMinFraction: ThemeManager.metrics.android.previewMinFraction
+    readonly property real androidPagePadding: ThemeManager.metrics.android.pagePadding
+    readonly property real androidMinTouchTarget: ThemeManager.metrics.android.minTouchTarget
+    readonly property real androidTouchGap: ThemeManager.metrics.android.touchGap
+    readonly property real androidLayoutCardWidth: ThemeManager.metrics.android.layoutCardWidth
+    readonly property real androidLayoutCardHeight: ThemeManager.metrics.android.layoutCardHeight
+    readonly property real androidHomeTileHeight: ThemeManager.metrics.android.homeTileHeight
+    readonly property real androidHomeRecentCardWidth: ThemeManager.metrics.android.homeRecentCardWidth
+    readonly property real androidHomeRecentCardHeight: ThemeManager.metrics.android.homeRecentCardHeight
 
     // --- Layout: window --------------------------------------------------------
-    // Floor for ApplicationWindow. Below this the split minimums cannot all be
-    // satisfied and panels start overlapping.
-    readonly property real windowMinimumWidth: 900
-    readonly property real windowMinimumHeight: 560
+    readonly property real windowMinimumWidth: ThemeManager.metrics.windowMinimumWidth
+    readonly property real windowMinimumHeight: ThemeManager.metrics.windowMinimumHeight
 
     // --- Iconography (Lucide SVGs in resources/icons/; ISC-licensed, see
     // resources/licenses/LICENSE-lucide.txt) ------------------------------------
@@ -725,6 +654,7 @@ QtObject {
         spinner: "loader-circle",
         refresh: "refresh-cw",
         download: "download",
+        bell: "bell",
 
         // Affordances
         reset: "rotate-ccw",
@@ -740,6 +670,7 @@ QtObject {
         move3d: "move-3d",
         rotate3d: "rotate-3d",
         scale3d: "scale-3d",
+        fly: "helicopter",
         // CapCut-style select/pointer tool (exit cut modes)
         mousePointer: "mouse-pointer",
 

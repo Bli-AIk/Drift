@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Window
 import Drift 1.0
-import "components"
 
 // Multicam punching surface: every camera at the current time, side by side. Clicks and number
 // keys recut a staged copy of the selected clips; the live timeline is untouched until Save.
@@ -16,7 +15,7 @@ ToolWindow {
     minimumWidth: 720
     minimumHeight: 520
     title: qsTr("Multicam")
-    color: Theme.appBackground
+    color: Theme.c.multicamWindow.background
 
     readonly property var angles: EditorState.multicamAngles
     readonly property real currentSeconds: EditorState.playheadSeconds
@@ -144,100 +143,9 @@ ToolWindow {
                     Repeater {
                         model: root.angles
 
-                        Rectangle {
-                            id: tile
-                            required property int index
-                            required property var modelData
-
-                            width: angleGrid.cellWidth
-                            height: angleGrid.cellHeight
-                            // Same ground as the program monitor: a tile is mostly video, and
-                            // PreserveAspectFit letterboxes every camera whose aspect is not the
-                            // cell's. Bars have to read as bars, which a light panel colour does
-                            // not — and the overlaid badge and filename are drawn white.
-                            color: Theme.overlayColor
-                            radius: Theme.radiusMd
-                            border.width: modelData.active ? 2 : Theme.borderWidth
-                            border.color: modelData.active ? Theme.primary
-                                                           : (tileMouse.containsMouse ? Theme.panelForeground
-                                                                                      : Theme.panelBorder)
-                            clip: true
-
-                            Behavior on border.color {
-                                ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                            }
-
-                            Image {
-                                anchors.fill: parent
-                                anchors.margins: Theme.spacingXs
-                                fillMode: Image.PreserveAspectFit
-                                // The pixels behind this URL change on every refresh, so the
-                                // revision is what makes QML fetch them again.
-                                cache: false
-                                asynchronous: true
-                                source: modelData.hasClip && EditorState.multicamRevision > 0
-                                        ? "image://multicam/" + tile.index + "?rev=" + EditorState.multicamRevision
-                                        : ""
-                            }
-
-                            ThemedLabel {
-                                anchors.centerIn: parent
-                                visible: !tile.modelData.hasClip
-                                horizontalAlignment: Text.AlignHCenter
-                                // Sits on the tile's video ground, not on a panel, so it takes
-                                // the same treatment as the badge and filename above it.
-                                color: "#ffffff"
-                                text: qsTr("Nothing here")
-                            }
-
-                            // Number badge — the key that switches to this angle.
-                            Rectangle {
-                                x: Theme.spacingSm
-                                y: Theme.spacingSm
-                                width: badge.width + Theme.spacingMd
-                                height: badge.height + Theme.spacingXs
-                                radius: Theme.radiusSm
-                                color: tile.modelData.active ? Theme.primary : Theme.scrimStrong
-
-                                Text {
-                                    id: badge
-                                    anchors.centerIn: parent
-                                    text: tile.index + 1
-                                    color: tile.modelData.active ? Theme.primaryForeground : "#ffffff"
-                                    font.family: Theme.monoFontFamily
-                                    font.pixelSize: Theme.fontSizeXs
-                                    font.weight: Font.Medium
-                                }
-                            }
-
-                            Text {
-                                anchors.left: parent.left
-                                anchors.right: parent.right
-                                anchors.bottom: parent.bottom
-                                anchors.margins: Theme.spacingSm
-                                text: tile.modelData.clipName.length > 0 ? tile.modelData.clipName
-                                                                         : tile.modelData.label
-                                elide: Text.ElideMiddle
-                                color: "#ffffff"
-                                font.family: Theme.fontFamily
-                                font.pixelSize: Theme.fontSizeXs
-                                style: Text.Outline
-                                styleColor: Theme.overlayColor
-                            }
-
-                            MouseArea {
-                                id: tileMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: EditorState.switchMulticamAngle(tile.index)
-                            }
-
-                            ThemedToolTip {
-                                visible: tileMouse.containsMouse
-                                text: qsTr("Switch the program to %1 (key %2)")
-                                      .arg(tile.modelData.label).arg(tile.index + 1)
-                            }
+                        MulticamAngleTile {
+                            cellWidth: angleGrid.cellWidth
+                            cellHeight: angleGrid.cellHeight
                         }
                     }
                 }
@@ -249,10 +157,10 @@ ToolWindow {
                 id: programPane
                 width: body.width - gridPane.width - Theme.spacingLg
                 height: parent.height
-                color: Theme.overlayColor
-                radius: Theme.radiusMd
-                border.width: Theme.borderWidth
-                border.color: Theme.border
+                color: Theme.c.multicamWindow.programBackground
+                radius: Theme.c.multicamWindow.programRadius
+                border.width: Theme.c.multicamWindow.programBorderWidth
+                border.color: Theme.c.multicamWindow.programBorder
                 clip: true
 
                 PreviewItem {
@@ -292,17 +200,7 @@ ToolWindow {
                     text: qsTr("GPU preview unavailable — see Help → Debug info")
                 }
 
-                Text {
-                    anchors.left: parent.left
-                    anchors.top: parent.top
-                    anchors.margins: Theme.spacingSm
-                    text: qsTr("Program")
-                    color: "#ffffff"
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeXs
-                    style: Text.Outline
-                    styleColor: Theme.overlayColor
-                }
+                MulticamProgramBadge { }
             }
         }
 
@@ -340,13 +238,9 @@ ToolWindow {
                     onClicked: EditorState.stepFrames(1)
                 }
 
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: root.formatTimecode(root.currentSeconds) + "  /  "
-                          + root.formatTimecode(root.durationSeconds)
-                    color: Theme.panelForeground
-                    font.family: Theme.monoFontFamily
-                    font.pixelSize: Theme.fontSizeSm
+                MulticamTimecodeLabel {
+                    textValue: root.formatTimecode(root.currentSeconds) + "  /  "
+                               + root.formatTimecode(root.durationSeconds)
                 }
 
                 ThemedSlider {
@@ -382,46 +276,21 @@ ToolWindow {
                 readonly property var programClips: EditorState.multicamProgramClips
                 readonly property real span: Math.max(0.001, root.durationSeconds)
 
-                Rectangle {
-                    anchors.fill: parent
-                    radius: Theme.radiusSm
-                    color: Theme.panelMuted
-                }
+                MulticamLaneTrack { }
 
                 Repeater {
                     model: laneStrip.programClips
 
-                    Rectangle {
-                        required property var modelData
-
-                        x: laneStrip.width * (modelData.start / laneStrip.span)
-                        width: Math.max(1, laneStrip.width * (modelData.duration / laneStrip.span))
-                        height: laneStrip.height
-                        radius: Theme.radiusSm
-                        color: Theme.panelSecondaryBg
-                        border.width: Theme.borderWidth
-                        border.color: Theme.panelBorder
-
-                        Text {
-                            anchors.left: parent.left
-                            anchors.leftMargin: Theme.spacingXs
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: parent.width - Theme.spacingSm
-                            text: modelData.name
-                            elide: Text.ElideRight
-                            color: Theme.panelForeground
-                            font.family: Theme.fontFamily
-                            font.pixelSize: Theme.fontSizeXs
-                        }
+                    MulticamProgramSegment {
+                        laneWidth: laneStrip.width
+                        laneHeight: laneStrip.height
+                        span: laneStrip.span
                     }
                 }
 
                 // Playhead.
-                Rectangle {
-                    width: 2
-                    height: parent.height
-                    x: Math.round(laneStrip.width * (root.currentSeconds / laneStrip.span)) - 1
-                    color: Theme.primary
+                MulticamLanePlayhead {
+                    fraction: root.currentSeconds / laneStrip.span
                 }
             }
         }

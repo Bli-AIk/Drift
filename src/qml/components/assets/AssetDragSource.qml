@@ -1,10 +1,10 @@
 import QtQuick
 import Drift
-import ".."
-
-// Makes whatever it covers draggable as an asset: a platform drag on the desktop (the mime type
-// comes from AssetDrag), a press-and-hold lift into TouchDrag on the phone, and a plain tap on
-// either — which the card uses for its add-at-playhead action.
+// Makes whatever it covers draggable as an asset. The gesture follows the device of each press, not
+// the form factor: a mouse/touchpad/stylus clicks for the card's primary action (tapped), drags as a
+// platform drag (the mime type comes from AssetDrag) and right-clicks for contextMenuRequested; a
+// finger presses-and-holds to lift into TouchDrag and taps for contextMenuRequested when the card
+// has a menu (hasContextMenu), else for tapped.
 //
 // The Drag attached properties sit on this item and the handlers on a child: a handler on the item
 // that owns Drag.Automatic re-enters QDrag::exec through its own active binding.
@@ -22,7 +22,11 @@ Item {
     readonly property bool pressed: tap.pressed || lift.pressed
     readonly property bool hovered: hover.hovered
 
+    // Whether a finger's tap should open the card's menu instead of running its primary action.
+    property bool hasContextMenu: false
+
     signal tapped()
+    signal contextMenuRequested()
 
     Drag.active: mouseDrag.active
     Drag.dragType: Drag.Automatic
@@ -38,20 +42,24 @@ Item {
 
         HoverHandler {
             id: hover
-            enabled: !Theme.touchUi
             cursorShape: mouseDrag.active ? Qt.ClosedHandCursor : Qt.PointingHandCursor
         }
 
         TapHandler {
             id: tap
-            enabled: !Theme.touchUi
+            acceptedButtons: Qt.LeftButton
+            acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad | PointerDevice.Stylus
             onTapped: root.tapped()
+        }
+
+        TapHandler {
+            acceptedButtons: Qt.RightButton
+            onTapped: root.contextMenuRequested()
         }
 
         DragHandler {
             id: mouseDrag
             target: null
-            enabled: !Theme.touchUi
             acceptedButtons: Qt.LeftButton
             // Not the touchscreen: a finger on a desktop touchscreen scrolls the grid.
             acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad | PointerDevice.Stylus
@@ -70,7 +78,7 @@ Item {
             label: root.label
             thumbnail: root.thumbnail
             glyph: root.glyph
-            onLiftTapped: root.tapped()
+            onLiftTapped: root.hasContextMenu ? root.contextMenuRequested() : root.tapped()
         }
     }
 }

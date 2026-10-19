@@ -22,6 +22,11 @@ QtObject {
     // Invoked with the number of assets actually added, once the import settles.
     property var _onFinished: null
 
+    // Set by the host window: function(found, done) shows the image-sequence sheet and later
+    // calls done(choice, fps) with choice "sequence", "stills" or "cancel". Left null on shells
+    // with no sheet, where numbered images simply import as stills.
+    property var sequencePrompt: null
+
     // Asset ids still being probed, and what to run once every one of them is done.
     property var _awaitIds: []
     property var _awaitCallback: null
@@ -40,16 +45,47 @@ QtObject {
         if (media.length === 0)
             return false
         urls = media
+        if (mediaImport.sequencePrompt && !AssetLibrary.importing) {
+            const found = AssetLibrary.detectImageSequences(urls)
+            if (found.length > 0) {
+                mediaImport.sequencePrompt(found, function (choice, fps) {
+                    if (choice === "cancel") {
+                        if (onFinished)
+                            onFinished(0)
+                        return
+                    }
+                    let rest = urls
+                    let sequencePaths = []
+                    if (choice === "sequence") {
+                        let consumed = {}
+                        for (let i = 0; i < found.length; ++i) {
+                            for (let j = 0; j < found[i].consumedUrls.length; ++j)
+                                consumed[found[i].consumedUrls[j].toString()] = true
+                            sequencePaths.push(AssetLibrary.imageSequenceImportPath(
+                                found[i].pattern, found[i].start, fps))
+                        }
+                        rest = urls.filter(function (u) { return !consumed[u.toString()] })
+                    }
+                    if (!mediaImport._start(rest, sequencePaths, fromDrop, onFinished) && onFinished)
+                        onFinished(0)
+                })
+                return true
+            }
+        }
+        return mediaImport._start(urls, [], fromDrop, onFinished)
+    }
+
+    function _start(urls, sequencePaths, fromDrop, onFinished) {
         // Async, because on Android reading a picked file means copying it out of the SAF
         // stream first. Run inline, that copy blocked the GUI thread for the whole transfer —
         // which also meant the "Importing…" overlay was set and cleared inside one JS turn and
         // never painted at all.
         const before = AssetLibrary.count
-        if (!AssetLibrary.importUrlsAsync(urls)) {
+        if (!AssetLibrary.importUrlsAsync(urls, sequencePaths)) {
             Toasts.warning(qsTr("An import is already running."))
             return false
         }
-        mediaImport._requested = urls.length
+        mediaImport._requested = urls.length + sequencePaths.length
         mediaImport._countBefore = before
         mediaImport._fromDrop = !!fromDrop
         mediaImport._onFinished = onFinished || null

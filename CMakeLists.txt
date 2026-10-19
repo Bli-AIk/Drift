@@ -23,7 +23,7 @@ option(DRIFT_WITH_SKIA "Draw vector content (text, shapes, Lottie, SVG) with Ski
 set(DRIFT_SKIA_DIR "" CACHE PATH "Directory containing SkiaConfig.cmake (default: third_party/prebuilt/skia/<target>)")
 
 # Defaults off under CI so the Translations test still compares the committed catalogs.
-if(DEFINED ENV{CI})
+if(DEFINED ENV{CI} OR EMSCRIPTEN)
     set(_drift_auto_ts OFF)
 else()
     set(_drift_auto_ts ON)
@@ -33,7 +33,7 @@ option(DRIFT_AUTO_UPDATE_TRANSLATIONS "Run lupdate as part of the default build"
 # Fonts, stickers and the Whisper model used to be fetched or extracted here and shipped inside
 # the build tree — roughly 800 MB of assets every user paid for whether or not they used them.
 # They are now addons: signed .driftpkg archives downloaded at runtime into <AppDataLocation>/
-# addons/ (src/engine/AddonPackage, src/models/AddonManager). Nothing asset-shaped is bundled,
+# addons/ (src/engine/addons/AddonPackage, src/app/online/addons/AddonManager). Nothing asset-shaped is bundled,
 # so a fresh build starts with system fonts, an empty sticker tab and no transcriber, and the
 # user installs what they want from the Addon Manager. The packaging and publishing tooling
 # lives in the drift-addons repo.
@@ -50,7 +50,7 @@ option(DRIFT_AUTO_UPDATE_TRANSLATIONS "Run lupdate as part of the default build"
 
 # --- Addon service ----------------------------------------------------------
 # Where the Addon Manager fetches from. These are the only place either value is defined —
-# src/models/AddonEndpoint.h just reads them — so a fork can point at its own Worker with:
+# src/app/online/addons/AddonEndpoint.h just reads them — so a fork can point at its own Worker with:
 #
 #   cmake -B build -DDRIFT_ADDON_INDEX_URL=https://addons.example.com/v1/index \
 #                  -DDRIFT_ADDON_CLIENT_TOKEN=...
@@ -134,6 +134,21 @@ message(STATUS "Drift distribution: ${DRIFT_DISTRIBUTION}")
 # Google Play updates this build itself, and scripts/build.sh has no way to pass an empty feed.
 if(DRIFT_DISTRIBUTION STREQUAL "android-play")
     set(DRIFT_UPDATE_FEED_URL "")
+endif()
+# A browser tab is always the latest deployment; there is no installer to point at.
+if(EMSCRIPTEN)
+    set(DRIFT_UPDATE_FEED_URL "")
+endif()
+
+# Qt for wasm is built with one exception model and every object linked into it must agree, so this
+# has to match how Qt itself was configured. The official Qt 6.11 wasm builds use JS exceptions
+# (config_qtbase.summary: "WebAssembly Exceptions ... no"), hence -fexceptions.
+# Global rather than per target: the prebuilt archives and JUCE are compiled the same way.
+if(EMSCRIPTEN)
+    set(DRIFT_WASM_EH_FLAGS "-fexceptions" CACHE STRING
+        "Exception-handling flag for wasm; must match the Qt for wasm build")
+    add_compile_options(${DRIFT_WASM_EH_FLAGS})
+    add_link_options(${DRIFT_WASM_EH_FLAGS})
 endif()
 
 find_package(Qt6 6.10 REQUIRED COMPONENTS Quick QuickControls2 Multimedia Test Concurrent Widgets OpenGL Network QuickEffects Svg Xml)
@@ -239,20 +254,73 @@ if(ANDROID)
     set(DRIFT_SOUNDTOUCH_TARGET drift_soundtouch)
 endif()
 
-if(NOT ANDROID)
+# --- WebAssembly prebuilt dependencies ---------------------------------------
+# Same shape as the Android block above: no pkg-config and no system prefix, so the static archives
+# built by third_party/build-wasm.sh stand in for the host lookups. Compiled with the same -pthread
+# and exception flags as Qt for wasm, or the link fails on mismatched atomics/EH features.
+if(EMSCRIPTEN)
+    set(DRIFT_PREBUILT "${CMAKE_SOURCE_DIR}/third_party/prebuilt/wasm")
+    if(NOT EXISTS "${DRIFT_PREBUILT}/lib/libavcodec.a")
+        message(FATAL_ERROR
+            "No prebuilt dependencies for wasm. Run:\n"
+            "    third_party/build-wasm.sh")
+    endif()
+
+    # zlib is an emscripten port, not an archive: the flag has to reach both compile and link.
+    add_library(ZLIB::ZLIB INTERFACE IMPORTED)
+    target_compile_options(ZLIB::ZLIB INTERFACE -sUSE_ZLIB=1)
+    target_link_options(ZLIB::ZLIB INTERFACE -sUSE_ZLIB=1)
+    set(ZLIB_FOUND TRUE)
+
+    add_library(FFmpeg::FFmpeg INTERFACE IMPORTED)
+    target_include_directories(FFmpeg::FFmpeg INTERFACE "${DRIFT_PREBUILT}/include")
+    target_link_libraries(FFmpeg::FFmpeg INTERFACE
+        "${DRIFT_PREBUILT}/lib/libavfilter.a"
+        "${DRIFT_PREBUILT}/lib/libavformat.a"
+        "${DRIFT_PREBUILT}/lib/libavcodec.a"
+        "${DRIFT_PREBUILT}/lib/libswscale.a"
+        "${DRIFT_PREBUILT}/lib/libswresample.a"
+        "${DRIFT_PREBUILT}/lib/libavutil.a"
+        "${DRIFT_PREBUILT}/lib/libx264.a"
+        "${DRIFT_PREBUILT}/lib/libdav1d.a"
+        "${DRIFT_PREBUILT}/lib/libvidstab.a"
+        m ZLIB::ZLIB)
+
+    add_library(drift_zstd INTERFACE IMPORTED)
+    target_include_directories(drift_zstd INTERFACE "${DRIFT_PREBUILT}/include")
+    target_link_libraries(drift_zstd INTERFACE "${DRIFT_PREBUILT}/lib/libzstd.a")
+    set(DRIFT_ZSTD_TARGET drift_zstd)
+
+    add_library(OpenSSL::Crypto INTERFACE IMPORTED)
+    target_include_directories(OpenSSL::Crypto INTERFACE "${DRIFT_PREBUILT}/include")
+    target_link_libraries(OpenSSL::Crypto INTERFACE "${DRIFT_PREBUILT}/lib/libcrypto.a")
+
+    add_library(drift_soundtouch INTERFACE IMPORTED)
+    target_include_directories(drift_soundtouch INTERFACE "${DRIFT_PREBUILT}/include")
+    target_link_libraries(drift_soundtouch INTERFACE "${DRIFT_PREBUILT}/lib/libSoundTouch.a")
+    set(DRIFT_SOUNDTOUCH_TARGET drift_soundtouch)
+endif()
+
+if(NOT ANDROID AND NOT EMSCRIPTEN)
     find_package(FFmpeg REQUIRED)
 endif()
 
 # ONNX Runtime powers auto subtitles, object segmentation, face tracking and noise removal. The
 # app links none of it: it compiles against the headers and dlopens a runtime at startup
-# (src/engine/OrtRuntime.cpp), so the CPU / CUDA / WebGPU decision belongs to the user and is made
+# (src/engine/ml/runtime/OrtRuntime.cpp), so the CPU / CUDA / WebGPU decision belongs to the user and is made
 # by installing an addon, not by whoever configured this build. Only the headers are needed here.
 option(DRIFT_FETCH_ONNXRUNTIME
     "Download prebuilt ONNX Runtime headers when they are not installed (cmake/FetchOnnxRuntime.cmake)" ON)
 # Stage a CPU runtime into <appDir>/onnxruntime so the build tree can transcribe without going
 # through the addon service. Packaged builds turn this off — they ship no runtime at all.
+# Not on wasm: only the headers are fetched, and there is no runtime to dlopen in a browser.
+if(EMSCRIPTEN)
+    set(_drift_bundle_ort OFF)
+else()
+    set(_drift_bundle_ort ON)
+endif()
 option(DRIFT_BUNDLE_ONNXRUNTIME
-    "Stage a CPU ONNX Runtime into the build tree for development" ON)
+    "Stage a CPU ONNX Runtime into the build tree for development" ${_drift_bundle_ort})
 find_package(OnnxRuntime QUIET)
 if(DRIFT_BUNDLE_ONNXRUNTIME AND OnnxRuntime_FOUND AND NOT ONNXRUNTIME_RUNTIME_LIBS
    AND DRIFT_FETCH_ONNXRUNTIME)
@@ -287,7 +355,7 @@ endif()
 # Addon packages (.driftpkg) are solid-zstd compressed and Ed25519 signed. zstd upstream only
 # ships a CMake config in recent releases, so fall back to pkg-config.
 find_package(PkgConfig QUIET)
-if(NOT ANDROID)
+if(NOT ANDROID AND NOT EMSCRIPTEN)
     find_package(zstd CONFIG QUIET)
     if(TARGET zstd::libzstd_shared)
         set(DRIFT_ZSTD_TARGET zstd::libzstd_shared)
@@ -301,7 +369,9 @@ if(NOT ANDROID)
     endif()
     find_package(OpenSSL REQUIRED COMPONENTS Crypto)
 endif()
-find_package(ZLIB REQUIRED)
+if(NOT EMSCRIPTEN)
+    find_package(ZLIB REQUIRED)
+endif()
 
 # SoundTouch does the pitch shifting behind the voice effects. juce_dsp has no pitch shifter, and a
 # hand-rolled granular one cancels the signal outright wherever the tap spacing lands on an odd
@@ -311,7 +381,7 @@ find_package(ZLIB REQUIRED)
 # exist, and a non-existent INTERFACE_INCLUDE_DIRECTORIES entry on an imported target is a hard
 # generate-time error rather than something we can fall back from. Where there is no pkg-config at
 # all (MSVC), the CMake config below is the only path, so it gets repaired instead.
-if(NOT ANDROID)
+if(NOT ANDROID AND NOT EMSCRIPTEN)
     if(PkgConfig_FOUND)
         pkg_check_modules(SOUNDTOUCH QUIET IMPORTED_TARGET soundtouch)
     endif()
@@ -404,15 +474,40 @@ if(DRIFT_JUCE_DIR)
             "(looked in ${_drift_juce_dir}).")
     endif()
     message(STATUS "JUCE: using ${_drift_juce_dir}")
+    if(EMSCRIPTEN)
+        # The wasm fix-up edits a JUCE header, which is not something to do to a user's checkout,
+        # so build from a copy in the build tree (rerun when the source path changes).
+        include(PatchJuceWasm)
+        set(_drift_juce_copied "")
+        if(EXISTS "${CMAKE_BINARY_DIR}/juce-wasm-src/.src")
+            file(READ "${CMAKE_BINARY_DIR}/juce-wasm-src/.src" _drift_juce_copied)
+        endif()
+        if(NOT "${_drift_juce_copied}" STREQUAL "${_drift_juce_dir}")
+            file(REMOVE_RECURSE "${CMAKE_BINARY_DIR}/juce-wasm-src")
+            file(COPY "${_drift_juce_dir}/" DESTINATION "${CMAKE_BINARY_DIR}/juce-wasm-src"
+                 PATTERN ".git" EXCLUDE)
+            file(WRITE "${CMAKE_BINARY_DIR}/juce-wasm-src/.src" "${_drift_juce_dir}")
+        endif()
+        drift_patch_juce_wasm("${CMAKE_BINARY_DIR}/juce-wasm-src/modules")
+        set(_drift_juce_dir "${CMAKE_BINARY_DIR}/juce-wasm-src")
+    endif()
     add_subdirectory("${_drift_juce_dir}" "${CMAKE_BINARY_DIR}/juce-build")
 elseif(DRIFT_FETCH_JUCE)
     message(STATUS "JUCE: fetching ${DRIFT_JUCE_TAG}")
     include(FetchContent)
+    set(_drift_juce_patch "")
+    if(EMSCRIPTEN)
+        # The download is ours alone, so patch it in place between populate and add_subdirectory.
+        set(_drift_juce_patch PATCH_COMMAND ${CMAKE_COMMAND}
+            -DDRIFT_JUCE_MODULES_DIR=<SOURCE_DIR>/modules
+            -P "${CMAKE_SOURCE_DIR}/cmake/PatchJuceWasm.cmake")
+    endif()
     FetchContent_Declare(JUCE
         GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
         GIT_TAG ${DRIFT_JUCE_TAG}
         GIT_SHALLOW TRUE
-        GIT_PROGRESS TRUE)
+        GIT_PROGRESS TRUE
+        ${_drift_juce_patch})
     FetchContent_MakeAvailable(JUCE)
 else()
     message(FATAL_ERROR
@@ -425,90 +520,92 @@ qt_policy(SET QTP0004 NEW)
 
 # --- core: domain model, no GUI ---------------------------------------------
 add_library(driftcore STATIC
-    src/core/Effect.h
-    src/core/Effect.cpp
-    src/core/EffectPreset.h
-    src/core/BinFolder.h
-    src/core/MediaAsset.h
-    src/core/MediaAsset.cpp
-    src/core/BlendMode.h
-    src/core/Clip.h
-    src/core/Clip.cpp
-    src/core/Stabilize.h
-    src/core/Stabilize.cpp
-    src/core/Bezier.h
-    src/core/SpeedCurve.h
-    src/core/SpeedCurve.cpp
-    src/core/FadeShape.h
-    src/core/FadeShape.cpp
-    src/core/ClipAnimation.h
-    src/core/ClipAnimation.cpp
-    src/core/SubtitleCue.h
-    src/core/SubtitleCue.cpp
-    src/core/Transcript.h
-    src/core/Transcript.cpp
-    src/core/GuideSet.h
-    src/core/GuideSet.cpp
-    src/core/SrtIO.h
-    src/core/SrtIO.cpp
-    src/core/Mask.h
-    src/core/Mask.cpp
-    src/core/Transition.h
-    src/core/Transition.cpp
-    src/core/TextParamSpec.h
-    src/core/TextParamSpec.cpp
-    src/core/LottieTextImport.h
-    src/core/LottieTextImport.cpp
-    src/core/TextLook.h
-    src/core/TextLook.cpp
-    src/core/TextShading.h
-    src/core/TextShading.cpp
-    src/core/TextAnimationPreset.h
-    src/core/TextAnimationPreset.cpp
-    src/core/TextAnimator.h
-    src/core/TextAnimator.cpp
-    src/core/TextStyle.h
-    src/core/TextStyle.cpp
-    src/core/TextPresetStore.h
-    src/core/TextPresetStore.cpp
-    src/core/EffectStackStore.h
-    src/core/EffectStackStore.cpp
-    src/core/ShapeStyle.h
-    src/core/ShapeStyle.cpp
-    src/core/ShapePath.h
-    src/core/ShapePath.cpp
-    src/core/VectorSource.h
-    src/core/VectorSource.cpp
-    src/core/Model3dSource.h
-    src/core/Model3dSource.cpp
-    src/core/PdfSource.h
-    src/core/PdfSource.cpp
-    src/core/ZipArchive.h
-    src/core/ZipArchive.cpp
-    src/core/DotLottie.h
-    src/core/DotLottie.cpp
-    src/core/Track.h
-    src/core/Track.cpp
-    src/core/Project.h
-    src/core/Project.cpp
-    src/core/PrprojReader.h
-    src/core/PrprojReader.cpp
-    src/core/MogrtReader.h
-    src/core/MogrtReader.cpp
-    src/core/KdenliveReader.h
-    src/core/KdenliveReader.cpp
-    src/core/ResolveReader.h
-    src/core/ResolveReader.cpp
-    src/core/EdlReader.h
-    src/core/EdlReader.cpp
-    src/core/OtioReader.h
-    src/core/OtioReader.cpp
-    src/core/TimelineOps.h
-    src/core/TimelineOps.cpp
-    src/core/CutOps.h
-    src/core/CutOps.cpp
-    src/core/commands/ProjectCommands.h
-    src/core/commands/ProjectCommands.cpp
+    src/core/effects/Effect.h
+    src/core/effects/Effect.cpp
+    src/core/effects/EffectPreset.h
+    src/core/project/BinFolder.h
+    src/core/project/media/MediaAsset.h
+    src/core/project/media/MediaAsset.cpp
+    src/core/project/media/ImageSequence.h
+    src/core/project/media/ImageSequence.cpp
+    src/core/effects/BlendMode.h
+    src/core/project/clip/Clip.h
+    src/core/project/clip/Clip.cpp
+    src/core/project/clip/Stabilize.h
+    src/core/project/clip/Stabilize.cpp
+    src/core/base/Bezier.h
+    src/core/animation/SpeedCurve.h
+    src/core/animation/SpeedCurve.cpp
+    src/core/animation/FadeShape.h
+    src/core/animation/FadeShape.cpp
+    src/core/animation/ClipAnimation.h
+    src/core/animation/ClipAnimation.cpp
+    src/core/project/SubtitleCue.h
+    src/core/project/SubtitleCue.cpp
+    src/core/project/Transcript.h
+    src/core/project/Transcript.cpp
+    src/core/project/GuideSet.h
+    src/core/project/GuideSet.cpp
+    src/core/interchange/subtitles/SrtIO.h
+    src/core/interchange/subtitles/SrtIO.cpp
+    src/core/effects/Mask.h
+    src/core/effects/Mask.cpp
+    src/core/project/Transition.h
+    src/core/project/Transition.cpp
+    src/core/text/animation/TextParamSpec.h
+    src/core/text/animation/TextParamSpec.cpp
+    src/core/text/animation/LottieTextImport.h
+    src/core/text/animation/LottieTextImport.cpp
+    src/core/text/TextLook.h
+    src/core/text/TextLook.cpp
+    src/core/text/TextShading.h
+    src/core/text/TextShading.cpp
+    src/core/text/animation/TextAnimationPreset.h
+    src/core/text/animation/TextAnimationPreset.cpp
+    src/core/text/animation/TextAnimator.h
+    src/core/text/animation/TextAnimator.cpp
+    src/core/text/TextStyle.h
+    src/core/text/TextStyle.cpp
+    src/core/text/TextPresetStore.h
+    src/core/text/TextPresetStore.cpp
+    src/core/effects/EffectStackStore.h
+    src/core/effects/EffectStackStore.cpp
+    src/core/shapes/ShapeStyle.h
+    src/core/shapes/ShapeStyle.cpp
+    src/core/shapes/ShapePath.h
+    src/core/shapes/ShapePath.cpp
+    src/core/project/sources/VectorSource.h
+    src/core/project/sources/VectorSource.cpp
+    src/core/project/sources/Model3dSource.h
+    src/core/project/sources/Model3dSource.cpp
+    src/core/project/sources/PdfSource.h
+    src/core/project/sources/PdfSource.cpp
+    src/core/base/ZipArchive.h
+    src/core/base/ZipArchive.cpp
+    src/core/project/sources/DotLottie.h
+    src/core/project/sources/DotLottie.cpp
+    src/core/project/Track.h
+    src/core/project/Track.cpp
+    src/core/project/Project.h
+    src/core/project/Project.cpp
+    src/core/interchange/premiere/PrprojReader.h
+    src/core/interchange/premiere/PrprojReader.cpp
+    src/core/interchange/premiere/MogrtReader.h
+    src/core/interchange/premiere/MogrtReader.cpp
+    src/core/interchange/KdenliveReader.h
+    src/core/interchange/KdenliveReader.cpp
+    src/core/interchange/ResolveReader.h
+    src/core/interchange/ResolveReader.cpp
+    src/core/interchange/EdlReader.h
+    src/core/interchange/EdlReader.cpp
+    src/core/interchange/OtioReader.h
+    src/core/interchange/OtioReader.cpp
+    src/core/edit/TimelineOps.h
+    src/core/edit/TimelineOps.cpp
+    src/core/edit/CutOps.h
+    src/core/edit/CutOps.cpp
+    src/core/edit/commands/ProjectCommands.h
+    src/core/edit/commands/ProjectCommands.cpp
 )
 target_include_directories(driftcore PUBLIC src)
 target_link_libraries(driftcore PUBLIC Qt6::Core Qt6::Gui Qt6::Xml ZLIB::ZLIB)
@@ -525,35 +622,35 @@ qt_add_resources(driftcore "drift_text_animations"
 # from spreading across driftengine. AudioEffectRack.h is the only header that leaves here and it
 # mentions no JUCE type, so driftengine stays JUCE-free at the source level.
 add_library(driftaudiodsp STATIC
-    src/engine/audio/AudioStage.h
-    src/engine/audio/AudioEffectProcessor.h
-    src/engine/audio/AudioEffectProcessor.cpp
-    src/engine/audio/FilterProcessors.h
-    src/engine/audio/FilterProcessors.cpp
-    src/engine/audio/DynamicsProcessors.h
-    src/engine/audio/DynamicsProcessors.cpp
-    src/engine/audio/ModulationProcessors.h
-    src/engine/audio/ModulationProcessors.cpp
-    src/engine/audio/SoundTouchPitchProcessor.h
-    src/engine/audio/SoundTouchPitchProcessor.cpp
-    src/engine/audio/AudioEffectFactory.h
-    src/engine/audio/AudioEffectFactory.cpp
-    src/engine/audio/PedalCatalog.h
-    src/engine/audio/PedalCatalog.cpp
-    src/engine/audio/WavReader.h
-    src/engine/audio/WavReader.cpp
-    src/engine/audio/AudioGraph.h
-    src/engine/audio/AudioGraph.cpp
-    src/engine/audio/GraphPedals.h
-    src/engine/audio/GraphPedals.cpp
-    src/engine/audio/GraphProcessor.h
-    src/engine/audio/GraphProcessor.cpp
-    src/engine/audio/DriftGraphApi.h
-    src/engine/audio/DriftGraphApi.cpp
-    src/engine/audio/AudioEffectRack.h
-    src/engine/audio/AudioEffectRack.cpp
-    src/engine/audio/ClipAudioRetimer.h
-    src/engine/audio/ClipAudioRetimer.cpp
+    src/engine/audio/dsp/AudioStage.h
+    src/engine/audio/dsp/AudioEffectProcessor.h
+    src/engine/audio/dsp/AudioEffectProcessor.cpp
+    src/engine/audio/dsp/processors/FilterProcessors.h
+    src/engine/audio/dsp/processors/FilterProcessors.cpp
+    src/engine/audio/dsp/processors/DynamicsProcessors.h
+    src/engine/audio/dsp/processors/DynamicsProcessors.cpp
+    src/engine/audio/dsp/processors/ModulationProcessors.h
+    src/engine/audio/dsp/processors/ModulationProcessors.cpp
+    src/engine/audio/dsp/processors/SoundTouchPitchProcessor.h
+    src/engine/audio/dsp/processors/SoundTouchPitchProcessor.cpp
+    src/engine/audio/dsp/AudioEffectFactory.h
+    src/engine/audio/dsp/AudioEffectFactory.cpp
+    src/engine/audio/dsp/graph/PedalCatalog.h
+    src/engine/audio/dsp/graph/PedalCatalog.cpp
+    src/engine/audio/dsp/WavReader.h
+    src/engine/audio/dsp/WavReader.cpp
+    src/engine/audio/dsp/graph/AudioGraph.h
+    src/engine/audio/dsp/graph/AudioGraph.cpp
+    src/engine/audio/dsp/graph/GraphPedals.h
+    src/engine/audio/dsp/graph/GraphPedals.cpp
+    src/engine/audio/dsp/graph/GraphProcessor.h
+    src/engine/audio/dsp/graph/GraphProcessor.cpp
+    src/engine/audio/dsp/graph/DriftGraphApi.h
+    src/engine/audio/dsp/graph/DriftGraphApi.cpp
+    src/engine/audio/dsp/AudioEffectRack.h
+    src/engine/audio/dsp/AudioEffectRack.cpp
+    src/engine/audio/dsp/ClipAudioRetimer.h
+    src/engine/audio/dsp/ClipAudioRetimer.cpp
 )
 # Nothing here is a QObject, and AUTOMOC would otherwise scan JUCE's amalgamated sources.
 set_target_properties(driftaudiodsp PROPERTIES AUTOMOC OFF)
@@ -572,6 +669,13 @@ target_compile_definitions(driftaudiodsp PRIVATE
     # Otherwise every binary that links this, tools and tests included, opens with "JUCE v8.0.15".
     JUCE_DISABLE_JUCE_VERSION_PRINTING=1
 )
+if(EMSCRIPTEN)
+    # juce_SystemStats_wasm.cpp calls emscripten_get_now() without including its header. JUCE's
+    # sources reach this target as interface sources, so a per-file property would be keyed on a
+    # path this file does not own; the flag is harmless for the rest of the target.
+    target_compile_options(driftaudiodsp PRIVATE "SHELL:-include emscripten/emscripten.h")
+    target_sources(driftaudiodsp PRIVATE wasm/juce_wasm_shim.cpp)
+endif()
 # The same sources are built to WebAssembly for Drift Forge's preview (wasm/). Fused multiply-adds
 # would round differently from the wasm build, and on ARM the compiler contracts by default.
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
@@ -580,210 +684,220 @@ endif()
 
 # --- engine: FFmpeg-facing code, no QML deps -------------------------------
 add_library(driftengine STATIC
-    src/engine/AddonPackage.h
-    src/engine/AddonPackage.cpp
-    src/engine/AddonRegistry.h
-    src/engine/AddonRegistry.cpp
-    src/engine/AddonSigningKey.h
-    src/engine/AndroidUri.h
-    src/engine/AndroidUri.cpp
-    src/engine/HwAccel.h
-    src/engine/HwAccel.cpp
-    src/engine/SwsColorRange.h
-    src/engine/MediaProbe.h
-    src/engine/MediaProbe.cpp
-    src/engine/MediaThumbnail.h
-    src/engine/MediaThumbnail.cpp
-    src/engine/StillImage.h
-    src/engine/StillImage.cpp
-    src/engine/MediaCodecImagePool.h
-    src/engine/MediaCodecImagePool.cpp
-    src/engine/FilmstripTileCache.h
-    src/engine/FilmstripTileCache.cpp
-    src/engine/MediaWaveform.h
-    src/engine/MediaWaveform.cpp
-    src/engine/LoudnessMeter.h
-    src/engine/LoudnessMeter.cpp
-    src/engine/WaveformBlockCache.h
-    src/engine/WaveformBlockCache.cpp
-    src/engine/AudioOnsets.h
-    src/engine/AudioOnsets.cpp
-    src/engine/SceneDetect.h
-    src/engine/SceneDetect.cpp
-    src/engine/FrameSheet.h
-    src/engine/FrameSheet.cpp
-    src/engine/WaveformSheet.h
-    src/engine/WaveformSheet.cpp
-    src/engine/ObjectDetector.h
-    src/engine/ObjectDetector.cpp
-    src/engine/Exporter.h
-    src/engine/Exporter.cpp
-    src/engine/PreviewVideoFrame.h
-    src/engine/ClipReader.h
-    src/engine/ClipReader.cpp
-    src/engine/DebugReport.h
-    src/engine/DebugReport.cpp
-    src/engine/DiagnosticsProbe.h
-    src/engine/DiagnosticsProbe.cpp
-    src/engine/ClipReaderWorker.h
-    src/engine/ClipReaderWorker.cpp
-    src/engine/ClipReaderPool.h
-    src/engine/ClipReaderPool.cpp
-    src/engine/EffectProcessor.h
-    src/engine/EffectProcessor.cpp
-    src/engine/EffectCatalog.h
-    src/engine/EffectCatalog.cpp
-    src/engine/FontCatalog.h
-    src/engine/FontCatalog.cpp
-    src/engine/StickerCatalog.h
-    src/engine/StickerCatalog.cpp
-    src/engine/EmojiCatalog.h
-    src/engine/EmojiCatalog.cpp
-    src/engine/EmojiTable.h
-    src/engine/EmojiTable.cpp
-    src/engine/TextLayout.h
-    src/engine/TextLayout.cpp
-    src/engine/VectorClipRenderer.h
-    src/engine/VectorClipRenderer.cpp
-    src/engine/VectorInspect.h
-    src/engine/VectorInspect.cpp
-    src/engine/EffectPackageLoader.h
-    src/engine/EffectPackageLoader.cpp
-    src/engine/TransitionCatalog.h
-    src/engine/TransitionCatalog.cpp
-    src/engine/TransitionPackageLoader.h
-    src/engine/TransitionPackageLoader.cpp
-    src/engine/GpuPackageParse.h
-    src/engine/GpuPackageParse.cpp
-    src/engine/GpuEffectDefinition.h
-    src/engine/GpuCompositor.h
-    src/engine/GpuCompositor.cpp
-    src/engine/GlRuntime.h
-    src/engine/GlRuntime.cpp
-    src/engine/GpuStatus.h
-    src/engine/GpuStatus.cpp
-    src/engine/VaapiZeroCopy.h
-    src/engine/GpuEffectExecutor.h
-    src/engine/GpuEffectExecutor.cpp
-    src/engine/CompositorFrameHistory.h
-    src/engine/CompositorFrameHistory.cpp
-    src/engine/FrameCompositor.h
-    src/engine/FrameCompositor.cpp
-    src/engine/MaskApplier.h
-    src/engine/MaskApplier.cpp
-    src/engine/AudioEffectCatalog.h
-    src/engine/AudioEffectCatalog.cpp
-    src/engine/EffectTemplateCatalog.h
-    src/engine/EffectTemplateCatalog.cpp
-    src/engine/AudioMixer.h
-    src/engine/AudioMixer.cpp
-    src/engine/WhisperTokenizer.h
-    src/engine/WhisperTokenizer.cpp
-    src/engine/WhisperTranscriber.h
-    src/engine/WhisperTranscriber.cpp
-    src/engine/ChatterboxTokenizer.h
-    src/engine/ChatterboxTokenizer.cpp
-    src/engine/ChatterboxTts.h
-    src/engine/ChatterboxTts.cpp
-    src/engine/OrtSupport.h
-    src/engine/OrtRuntime.h
-    src/engine/OrtRuntime.cpp
-    src/engine/PdfClipRenderer.h
-    src/engine/PdfClipRenderer.cpp
-    src/engine/PdfiumRuntime.h
-    src/engine/PdfiumRuntime.cpp
-    src/engine/Sam2Segmenter.h
-    src/engine/Sam2Segmenter.cpp
-    src/engine/RvmMatter.h
-    src/engine/RvmMatter.cpp
-    src/engine/VdaDepth.h
-    src/engine/VdaDepth.cpp
-    src/engine/Restorer.h
-    src/engine/Restorer.cpp
-    src/engine/DepthSidecar.h
-    src/engine/DepthSidecar.cpp
-    src/engine/FaceLandmarker.h
-    src/engine/FaceLandmarker.cpp
-    src/engine/FaceTrack.h
-    src/engine/FaceTrack.cpp
-    src/engine/FaceModelTransform.h
-    src/engine/FaceModelTransform.cpp
-    src/engine/ModelAnimation.h
-    src/engine/ModelAnimation.cpp
-    src/engine/ClipTransform3d.h
-    src/engine/ClipTransform3d.cpp
-    src/engine/SceneCamera3d.h
-    src/engine/SceneCamera3d.cpp
-    src/engine/PreviewSnap.h
-    src/engine/EditorView3d.h
-    src/engine/EditorView3d.cpp
-    src/engine/EditorOverlay.h
-    src/engine/EditorOverlay.cpp
-    src/engine/GlEditorOverlay.h
-    src/engine/GlEditorOverlay.cpp
-    src/engine/PreviewSnap.cpp
-    src/engine/TransformLayer.h
-    src/engine/TransformLayer.cpp
-    src/engine/ClipGizmo.h
-    src/engine/ClipGizmo.cpp
-    src/engine/ModelClipTransform.h
-    src/engine/ModelClipTransform.cpp
-    src/engine/ModelClipRenderer.h
-    src/engine/ModelClipRenderer.cpp
-    src/engine/FaceMesh.h
-    src/engine/FaceMesh.cpp
-    src/engine/Face111.h
-    src/engine/Face111.cpp
-    src/engine/ModelAsset.h
-    src/engine/ModelAsset.cpp
-    src/engine/GlFaceSwapRenderer.h
-    src/engine/GlFaceSwapRenderer.cpp
-    src/engine/GlModelRenderer.h
-    src/engine/GlModelRenderer.cpp
-    src/engine/FaceSwapSource.h
-    src/engine/FaceSwapSource.cpp
-    src/engine/FacePropCatalog.h
-    src/engine/FacePropCatalog.cpp
-    src/engine/FacePropImport.h
-    src/engine/FacePropImport.cpp
-    src/engine/DeepFilterDenoiser.h
-    src/engine/DeepFilterDenoiser.cpp
-    src/engine/MatteWriter.h
-    src/engine/MatteWriter.cpp
-    src/engine/ReverseProxyCache.h
-    src/engine/ReverseProxyCache.cpp
-    src/engine/ReverseRenderer.h
-    src/engine/ReverseRenderer.cpp
-    src/engine/ProxyEncoder.h
-    src/engine/ProxyEncoder.cpp
-    src/engine/PreviewProxyRenderer.h
-    src/engine/PreviewProxyRenderer.cpp
-    src/engine/MediaEditor.h
-    src/engine/MediaEditor.cpp
-    src/engine/AudioFileWriter.h
-    src/engine/AudioFileWriter.cpp
-    src/engine/AudioRecorder.h
-    src/engine/AudioRecorder.cpp
-    src/engine/SpeechAudio.h
-    src/engine/SpeechAudio.cpp
-    src/engine/SileroVad.h
-    src/engine/SileroVad.cpp
-    src/engine/CtcAligner.h
-    src/engine/CtcAligner.cpp
-    src/engine/LocalTranscription.h
-    src/engine/LocalTranscription.cpp
-    src/engine/KaldiFbank.h
-    src/engine/KaldiFbank.cpp
-    src/engine/SpeakerDiarizer.h
-    src/engine/SpeakerDiarizer.cpp
-    src/engine/ProjectBundle.h
-    src/engine/ProjectBundle.cpp
-    src/engine/ProjectDependencies.h
-    src/engine/ProjectDependencies.cpp
-    src/engine/GpuPreference.h
-    src/engine/GpuPreference.cpp
-    src/engine/GpuDevice.h
-    src/engine/GpuDevice.cpp
+    src/engine/addons/AddonPackage.h
+    src/engine/addons/AddonPackage.cpp
+    src/engine/addons/AddonRegistry.h
+    src/engine/addons/AddonRegistry.cpp
+    src/engine/addons/AddonSigningKey.h
+    src/engine/addons/PackageSearchPaths.h
+    src/engine/addons/PackageSearchPaths.cpp
+    src/engine/platform/AndroidUri.h
+    src/engine/platform/AndroidUri.cpp
+    src/engine/decode/hw/HwAccel.h
+    src/engine/decode/hw/HwAccel.cpp
+    src/engine/decode/SwsColorRange.h
+    src/engine/decode/probe/MediaProbe.h
+    src/engine/decode/probe/MediaProbe.cpp
+    src/engine/media/thumbnails/MediaThumbnail.h
+    src/engine/media/thumbnails/MediaThumbnail.cpp
+    src/engine/decode/probe/StillImage.h
+    src/engine/decode/probe/StillImage.cpp
+    src/engine/decode/hw/MediaCodecImagePool.h
+    src/engine/decode/hw/MediaCodecImagePool.cpp
+    src/engine/media/thumbnails/FilmstripTileCache.h
+    src/engine/media/thumbnails/FilmstripTileCache.cpp
+    src/engine/media/waveforms/MediaWaveform.h
+    src/engine/media/waveforms/MediaWaveform.cpp
+    src/engine/audio/analysis/LoudnessMeter.h
+    src/engine/audio/analysis/LoudnessMeter.cpp
+    src/engine/media/waveforms/WaveformBlockCache.h
+    src/engine/media/waveforms/WaveformBlockCache.cpp
+    src/engine/audio/analysis/AudioOnsets.h
+    src/engine/audio/analysis/AudioOnsets.cpp
+    src/engine/ml/vision/detection/SceneDetect.h
+    src/engine/ml/vision/detection/SceneDetect.cpp
+    src/engine/diagnostics/sheets/FrameSheet.h
+    src/engine/diagnostics/sheets/FrameSheet.cpp
+    src/engine/diagnostics/sheets/WaveformSheet.h
+    src/engine/diagnostics/sheets/WaveformSheet.cpp
+    src/engine/ml/vision/detection/ObjectDetector.h
+    src/engine/ml/vision/detection/ObjectDetector.cpp
+    src/engine/encode/export/Exporter.h
+    src/engine/encode/export/Exporter.cpp
+    src/engine/decode/readers/PreviewVideoFrame.h
+    src/engine/decode/readers/ClipReader.h
+    src/engine/decode/readers/ClipReader.cpp
+    src/engine/diagnostics/DebugReport.h
+    src/engine/diagnostics/DebugReport.cpp
+    src/engine/diagnostics/DiagnosticsProbe.h
+    src/engine/diagnostics/DiagnosticsProbe.cpp
+    src/engine/decode/readers/ClipReaderWorker.h
+    src/engine/decode/readers/ClipReaderWorker.cpp
+    src/engine/decode/readers/ClipReaderPool.h
+    src/engine/decode/readers/ClipReaderPool.cpp
+    src/engine/compositor/effects/EffectProcessor.h
+    src/engine/compositor/effects/EffectProcessor.cpp
+    src/engine/packages/effects/EffectCatalog.h
+    src/engine/packages/effects/EffectCatalog.cpp
+    src/engine/packages/assets/FontCatalog.h
+    src/engine/packages/assets/FontCatalog.cpp
+    src/engine/packages/assets/StickerCatalog.h
+    src/engine/packages/assets/StickerCatalog.cpp
+    src/engine/packages/assets/EmojiCatalog.h
+    src/engine/packages/assets/EmojiCatalog.cpp
+    src/engine/packages/assets/EmojiTable.h
+    src/engine/packages/assets/EmojiTable.cpp
+    src/engine/render2d/text/TextLayout.h
+    src/engine/render2d/text/TextLayout.cpp
+    src/engine/render2d/vector/VectorClipRenderer.h
+    src/engine/render2d/vector/VectorClipRenderer.cpp
+    src/engine/render2d/vector/VectorInspect.h
+    src/engine/render2d/vector/VectorInspect.cpp
+    src/engine/packages/effects/EffectPackageLoader.h
+    src/engine/packages/effects/EffectPackageLoader.cpp
+    src/engine/packages/transitions/TransitionCatalog.h
+    src/engine/packages/transitions/TransitionCatalog.cpp
+    src/engine/packages/transitions/TransitionPackageLoader.h
+    src/engine/packages/transitions/TransitionPackageLoader.cpp
+    src/engine/packages/GpuPackageParse.h
+    src/engine/packages/GpuPackageParse.cpp
+    src/engine/gpu/effects/GpuEffectDefinition.h
+    src/engine/compositor/GpuCompositor.h
+    src/engine/compositor/GpuCompositor.cpp
+    src/engine/gpu/GlRuntime.h
+    src/engine/gpu/GlRuntime.cpp
+    src/engine/gpu/device/GpuStatus.h
+    src/engine/gpu/device/GpuStatus.cpp
+    src/engine/decode/hw/VaapiZeroCopy.h
+    src/engine/gpu/effects/GpuEffectExecutor.h
+    src/engine/gpu/effects/GpuEffectExecutor.cpp
+    src/engine/compositor/effects/CompositorFrameHistory.h
+    src/engine/compositor/effects/CompositorFrameHistory.cpp
+    src/engine/compositor/FrameCompositor.h
+    src/engine/compositor/FrameCompositor.cpp
+    src/engine/compositor/layers/MaskApplier.h
+    src/engine/compositor/layers/MaskApplier.cpp
+    src/engine/packages/audio/AudioEffectCatalog.h
+    src/engine/packages/audio/AudioEffectCatalog.cpp
+    src/engine/packages/effects/EffectTemplateCatalog.h
+    src/engine/packages/effects/EffectTemplateCatalog.cpp
+    src/engine/audio/AudioMixer.h
+    src/engine/audio/AudioMixer.cpp
+    src/engine/ml/speech/transcription/WhisperTokenizer.h
+    src/engine/ml/speech/transcription/WhisperTokenizer.cpp
+    src/engine/ml/speech/transcription/WhisperTranscriber.h
+    src/engine/ml/speech/transcription/WhisperTranscriber.cpp
+    src/engine/ml/speech/tts/ChatterboxTokenizer.h
+    src/engine/ml/speech/tts/ChatterboxTokenizer.cpp
+    src/engine/ml/speech/tts/ChatterboxTts.h
+    src/engine/ml/speech/tts/ChatterboxTts.cpp
+    src/engine/ml/runtime/OrtSupport.h
+    src/engine/ml/runtime/OrtRuntime.h
+    src/engine/ml/runtime/OrtRuntime.cpp
+    src/engine/render2d/pdf/PdfClipRenderer.h
+    src/engine/render2d/pdf/PdfClipRenderer.cpp
+    src/engine/render2d/pdf/PdfiumRuntime.h
+    src/engine/render2d/pdf/PdfiumRuntime.cpp
+    src/engine/ml/vision/segmentation/Sam2Segmenter.h
+    src/engine/ml/vision/segmentation/Sam2Segmenter.cpp
+    src/engine/ml/vision/segmentation/RvmMatter.h
+    src/engine/ml/vision/segmentation/RvmMatter.cpp
+    src/engine/ml/vision/depth/VdaDepth.h
+    src/engine/ml/vision/depth/VdaDepth.cpp
+    src/engine/ml/vision/Restorer.h
+    src/engine/ml/vision/Restorer.cpp
+    src/engine/ml/vision/depth/DepthSidecar.h
+    src/engine/ml/vision/depth/DepthSidecar.cpp
+    src/engine/face/tracking/FaceLandmarker.h
+    src/engine/face/tracking/FaceLandmarker.cpp
+    src/engine/face/tracking/FaceTrack.h
+    src/engine/face/tracking/FaceTrack.cpp
+    src/engine/face/props/FaceModelTransform.h
+    src/engine/face/props/FaceModelTransform.cpp
+    src/engine/render3d/models/ModelAnimation.h
+    src/engine/render3d/models/ModelAnimation.cpp
+    src/engine/render3d/scene/ClipTransform3d.h
+    src/engine/render3d/scene/ClipTransform3d.cpp
+    src/engine/render3d/scene/SceneCamera3d.h
+    src/engine/render3d/scene/SceneCamera3d.cpp
+    src/engine/compositor/PreviewSnap.h
+    src/engine/render3d/scene/EditorView3d.h
+    src/engine/render3d/scene/EditorView3d.cpp
+    src/engine/render3d/editor/EditorOverlay.h
+    src/engine/render3d/editor/EditorOverlay.cpp
+    src/engine/render3d/DepthRelief.h
+    src/engine/render3d/DepthRelief.cpp
+    src/engine/render3d/editor/GlEditorOverlay.h
+    src/engine/render3d/editor/GlEditorOverlay.cpp
+    src/engine/compositor/PreviewSnap.cpp
+    src/engine/compositor/layers/TransformLayer.h
+    src/engine/compositor/layers/TransformLayer.cpp
+    src/engine/render3d/editor/ClipGizmo.h
+    src/engine/render3d/editor/ClipGizmo.cpp
+    src/engine/render3d/models/ModelClipTransform.h
+    src/engine/render3d/models/ModelClipTransform.cpp
+    src/engine/render3d/models/ModelClipRenderer.h
+    src/engine/render3d/models/ModelClipRenderer.cpp
+    src/engine/face/tracking/FaceMesh.h
+    src/engine/face/tracking/FaceMesh.cpp
+    src/engine/face/tracking/Face111.h
+    src/engine/face/tracking/Face111.cpp
+    src/engine/render3d/models/ModelAsset.h
+    src/engine/render3d/models/ModelAsset.cpp
+    src/engine/render3d/splats/SplatAsset.h
+    src/engine/render3d/splats/SplatAsset.cpp
+    src/engine/face/swap/GlFaceSwapRenderer.h
+    src/engine/face/swap/GlFaceSwapRenderer.cpp
+    src/engine/render3d/models/GlModelRenderer.h
+    src/engine/render3d/models/GlModelRenderer.cpp
+    src/engine/render3d/splats/GlSplatRenderer.h
+    src/engine/render3d/splats/GlSplatRenderer.cpp
+    src/engine/face/swap/FaceSwapSource.h
+    src/engine/face/swap/FaceSwapSource.cpp
+    src/engine/face/props/FacePropCatalog.h
+    src/engine/face/props/FacePropCatalog.cpp
+    src/engine/face/props/FacePropImport.h
+    src/engine/face/props/FacePropImport.cpp
+    src/engine/ml/speech/DeepFilterDenoiser.h
+    src/engine/ml/speech/DeepFilterDenoiser.cpp
+    src/engine/encode/writers/MatteWriter.h
+    src/engine/encode/writers/MatteWriter.cpp
+    src/engine/encode/proxies/ProxyNaming.h
+    src/engine/encode/proxies/ProxyNaming.cpp
+    src/engine/encode/proxies/ReverseProxyCache.h
+    src/engine/encode/proxies/ReverseProxyCache.cpp
+    src/engine/encode/proxies/ReverseRenderer.h
+    src/engine/encode/proxies/ReverseRenderer.cpp
+    src/engine/encode/proxies/ProxyEncoder.h
+    src/engine/encode/proxies/ProxyEncoder.cpp
+    src/engine/encode/proxies/PreviewProxyRenderer.h
+    src/engine/encode/proxies/PreviewProxyRenderer.cpp
+    src/engine/encode/MediaEditor.h
+    src/engine/encode/MediaEditor.cpp
+    src/engine/encode/writers/AudioFileWriter.h
+    src/engine/encode/writers/AudioFileWriter.cpp
+    src/engine/audio/AudioRecorder.h
+    src/engine/audio/AudioRecorder.cpp
+    src/engine/ml/speech/SpeechAudio.h
+    src/engine/ml/speech/SpeechAudio.cpp
+    src/engine/ml/speech/transcription/SileroVad.h
+    src/engine/ml/speech/transcription/SileroVad.cpp
+    src/engine/ml/speech/transcription/CtcAligner.h
+    src/engine/ml/speech/transcription/CtcAligner.cpp
+    src/engine/ml/speech/transcription/LocalTranscription.h
+    src/engine/ml/speech/transcription/LocalTranscription.cpp
+    src/engine/ml/speech/diarization/KaldiFbank.h
+    src/engine/ml/speech/diarization/KaldiFbank.cpp
+    src/engine/ml/speech/diarization/SpeakerDiarizer.h
+    src/engine/ml/speech/diarization/SpeakerDiarizer.cpp
+    src/engine/project/ProjectBundle.h
+    src/engine/project/ProjectBundle.cpp
+    src/engine/project/ProjectDependencies.h
+    src/engine/project/ProjectDependencies.cpp
+    src/engine/gpu/device/GpuPreference.h
+    src/engine/gpu/device/GpuPreference.cpp
+    src/engine/gpu/device/GpuDevice.h
+    src/engine/gpu/device/GpuDevice.cpp
 )
 target_include_directories(driftengine PUBLIC src)
 # cgltf is PRIVATE: ModelAsset.h exposes no cgltf type, so nothing outside ModelAsset.cpp includes it.
@@ -795,8 +909,8 @@ if(WIN32)
     # Hybrid-graphics laptops: D3D11VA -> OpenGL preview interop, and DXGI adapter enumeration for
     # the GPU preference and for opening D3D11VA on the GPU that renders.
     target_sources(driftengine PRIVATE
-        src/engine/D3d11GlInterop.h
-        src/engine/D3d11GlInterop.cpp
+        src/engine/decode/hw/D3d11GlInterop.h
+        src/engine/decode/hw/D3d11GlInterop.cpp
     )
     target_link_libraries(driftengine PRIVATE d3d11 dxgi d3dcompiler opengl32)
 endif()
@@ -811,32 +925,32 @@ endif()
 if(DRIFT_WITH_SKIA)
     find_package(Skia REQUIRED)
     target_sources(driftengine PRIVATE
-        src/engine/SkiaRuntime.h
-        src/engine/SkiaRuntime.cpp
-        src/engine/SkiaPath.h
-        src/engine/SkiaPath.cpp
-        src/engine/SkiaShading.h
-        src/engine/SkiaShading.cpp
-        src/engine/SkiaShapePainter.h
-        src/engine/SkiaShapePainter.cpp
-        src/engine/SkiaFonts.h
-        src/engine/SkiaFonts.cpp
-        src/engine/SkiaFontCollection.h
-        src/engine/SkiaFontCollection.cpp
-        src/engine/SkiaVectorResources.h
-        src/engine/SkiaVectorResources.cpp
-        src/engine/SkiaVectorObservers.h
-        src/engine/SkiaVectorObservers.cpp
-        src/engine/SkiaTextPainter.h
-        src/engine/SkiaTextPainter.cpp
-        src/engine/SkiaTextEffects.h
-        src/engine/SkiaTextEffects.cpp
+        src/engine/render2d/skia/SkiaRuntime.h
+        src/engine/render2d/skia/SkiaRuntime.cpp
+        src/engine/render2d/skia/SkiaPath.h
+        src/engine/render2d/skia/SkiaPath.cpp
+        src/engine/render2d/skia/SkiaShading.h
+        src/engine/render2d/skia/SkiaShading.cpp
+        src/engine/render2d/shapes/SkiaShapePainter.h
+        src/engine/render2d/shapes/SkiaShapePainter.cpp
+        src/engine/render2d/text/fonts/SkiaFonts.h
+        src/engine/render2d/text/fonts/SkiaFonts.cpp
+        src/engine/render2d/text/fonts/SkiaFontCollection.h
+        src/engine/render2d/text/fonts/SkiaFontCollection.cpp
+        src/engine/render2d/vector/SkiaVectorResources.h
+        src/engine/render2d/vector/SkiaVectorResources.cpp
+        src/engine/render2d/vector/SkiaVectorObservers.h
+        src/engine/render2d/vector/SkiaVectorObservers.cpp
+        src/engine/render2d/text/SkiaTextPainter.h
+        src/engine/render2d/text/SkiaTextPainter.cpp
+        src/engine/render2d/text/SkiaTextEffects.h
+        src/engine/render2d/text/SkiaTextEffects.cpp
     )
     # build-skia.sh compiles Skia with RTTI (see the extra_cflags_cc note there), so Drift classes
     # may subclass Skia interfaces from any translation unit. vcpkg's port on Windows keeps /GR-,
     # which is harmless: MSVC emits type descriptors as COMDAT wherever they are needed, so a
     # derived class never depends on its base's archive carrying one.
-    # PRIVATE: no header outside src/engine/Skia*.h includes Skia (Vector*.cpp do, under
+    # PRIVATE: no header outside src/engine/render2d/**/Skia*.h includes Skia (Vector*.cpp do, under
     # DRIFT_WITH_SKIA), so the defines and the include root stay out of the rest of the build.
     target_link_libraries(driftengine PRIVATE Skia::Skia)
     target_compile_definitions(driftengine PUBLIC DRIFT_WITH_SKIA)
@@ -847,162 +961,169 @@ endif()
 
 # --- application ------------------------------------------------------------
 qt_add_executable(drift
-    src/main.cpp
-    src/DriftImageProvider.h
-    src/DriftImageProvider.cpp
-    src/SegmentImageProvider.h
-    src/SegmentImageProvider.cpp
-    src/SegmentImageStore.h
-    src/SegmentImageStore.cpp
-    src/ClipPreviewImageProvider.h
-    src/ClipPreviewImageProvider.cpp
-    src/ClipPreviewImageStore.h
-    src/ClipPreviewImageStore.cpp
-    src/MulticamImageProvider.h
-    src/MulticamImageProvider.cpp
-    src/MulticamImageStore.h
-    src/MulticamImageStore.cpp
-    src/TextStylePreviewImageProvider.h
-    src/TextStylePreviewImageProvider.cpp
-    src/ShapePreviewImageProvider.h
-    src/ShapePreviewImageProvider.cpp
-    src/models/AddonEndpoint.h
-    src/models/AddonManager.h
-    src/models/AddonManager.cpp
-    src/models/JobRegistry.h
-    src/models/JobRegistry.cpp
-    src/models/CloudProviders.h
-    src/models/CloudProviders.cpp
-    src/models/MarketEndpoint.h
-    src/models/MarketIdentity.h
-    src/models/MarketIdentity.cpp
-    src/models/MarketClient.h
-    src/models/MarketClient.cpp
-    src/models/DriftAssetStore.h
-    src/models/DriftAssetStore.cpp
-    src/models/SfxLibrary.h
-    src/models/SfxLibrary.cpp
-    src/models/VersionCompare.h
-    src/models/UpdateChecker.h
-    src/models/UpdateChecker.cpp
-    src/models/UpdateAsset.h
-    src/models/UpdateAsset.cpp
-    src/models/AppController.h
-    src/models/AppController.cpp
-    src/models/McpController.h
-    src/models/McpController.cpp
-    src/models/PreferencesController.h
-    src/models/PreferencesController.cpp
-    src/models/ProjectFileController.h
-    src/models/ProjectFileController.cpp
-    src/models/AssetPreviewController.h
-    src/models/AssetPreviewController.cpp
-    src/models/SpeedCurveController.h
-    src/models/SpeedCurveController.cpp
-    src/models/CurveEditorController.h
-    src/models/CurveEditorController.cpp
-    src/models/SegmentationController.h
-    src/models/SegmentationController.cpp
-    src/models/SceneDetectController.h
-    src/models/SceneDetectController.cpp
-    src/models/DepthController.h
-    src/models/DepthController.cpp
-    src/models/DenoiseController.h
-    src/models/DenoiseController.cpp
-    src/models/RestoreController.h
-    src/models/RestoreController.cpp
-    src/models/FaceTrackingController.h
-    src/models/FaceTrackingController.cpp
-    src/models/StabilizeController.h
-    src/models/StabilizeController.cpp
-    src/models/MediaBinController.h
-    src/models/MediaBinController.cpp
-    src/models/TtsController.h
-    src/models/TtsController.cpp
-    src/models/VoiceLibrary.h
-    src/models/VoiceLibrary.cpp
-    src/models/McpDetail.h
-    src/models/AppControllerDetail.h
-    src/models/EditorState.h
-    src/models/LayoutStore.h
-    src/models/LayoutStore.cpp
-    src/models/FileDialogs.h
-    src/models/FileDialogs.cpp
-    src/models/Haptics.h
-    src/models/Haptics.cpp
-    src/models/PointerDevices.h
-    src/models/PointerDevices.cpp
-    src/models/AssetLibrary.h
-    src/models/AssetLibrary.cpp
-    src/models/BinFolderListModel.h
-    src/models/BinFolderListModel.cpp
-    src/models/TimelineClipsModel.h
-    src/models/TimelineClipsModel.cpp
+    src/app/main.cpp
+    src/ui/imageproviders/DriftImageProvider.h
+    src/ui/imageproviders/DriftImageProvider.cpp
+    src/ui/imageproviders/segment/SegmentImageProvider.h
+    src/ui/imageproviders/segment/SegmentImageProvider.cpp
+    src/ui/imageproviders/segment/SegmentImageStore.h
+    src/ui/imageproviders/segment/SegmentImageStore.cpp
+    src/ui/imageproviders/clippreview/ClipPreviewImageProvider.h
+    src/ui/imageproviders/clippreview/ClipPreviewImageProvider.cpp
+    src/playback/preview/ClipPreviewImageStore.h
+    src/playback/preview/ClipPreviewImageStore.cpp
+    src/ui/imageproviders/multicam/MulticamImageProvider.h
+    src/ui/imageproviders/multicam/MulticamImageProvider.cpp
+    src/ui/imageproviders/multicam/MulticamImageStore.h
+    src/ui/imageproviders/multicam/MulticamImageStore.cpp
+    src/ui/imageproviders/TextStylePreviewImageProvider.h
+    src/ui/imageproviders/TextStylePreviewImageProvider.cpp
+    src/ui/imageproviders/ShapePreviewImageProvider.h
+    src/ui/imageproviders/ShapePreviewImageProvider.cpp
+    src/app/online/addons/AddonEndpoint.h
+    src/app/online/addons/AddonManager.h
+    src/app/online/addons/AddonManager.cpp
+    src/app/jobs/JobRegistry.h
+    src/app/jobs/JobRegistry.cpp
+    src/app/online/CloudProviders.h
+    src/app/online/CloudProviders.cpp
+    src/app/online/market/MarketEndpoint.h
+    src/app/online/market/MarketIdentity.h
+    src/app/online/market/MarketIdentity.cpp
+    src/app/online/market/MarketClient.h
+    src/app/online/market/MarketClient.cpp
+    src/app/online/assets/DriftAssetStore.h
+    src/app/online/assets/DriftAssetStore.cpp
+    src/app/online/assets/SfxLibrary.h
+    src/app/online/assets/SfxLibrary.cpp
+    src/core/base/VersionCompare.h
+    src/app/online/updates/UpdateChecker.h
+    src/app/online/updates/UpdateChecker.cpp
+    src/app/online/updates/UpdateAsset.h
+    src/app/online/updates/UpdateAsset.cpp
+    src/app/editor/AppController.h
+    src/app/editor/AppController.cpp
+    src/app/mcp/McpController.h
+    src/app/mcp/McpController.cpp
+    src/app/editor/PreferencesController.h
+    src/app/editor/PreferencesController.cpp
+    src/app/editor/ProjectFileController.h
+    src/app/editor/ProjectFileController.cpp
+    src/app/bin/AssetPreviewController.h
+    src/app/bin/AssetPreviewController.cpp
+    src/app/editor/sessions/SpeedCurveController.h
+    src/app/editor/sessions/SpeedCurveController.cpp
+    src/app/editor/sessions/CurveEditorController.h
+    src/app/editor/sessions/CurveEditorController.cpp
+    src/app/jobs/vision/SegmentationController.h
+    src/app/jobs/vision/SegmentationController.cpp
+    src/app/jobs/vision/SceneDetectController.h
+    src/app/jobs/vision/SceneDetectController.cpp
+    src/app/jobs/vision/DepthController.h
+    src/app/jobs/vision/DepthController.cpp
+    src/app/jobs/audio/DenoiseController.h
+    src/app/jobs/audio/DenoiseController.cpp
+    src/app/jobs/vision/RestoreController.h
+    src/app/jobs/vision/RestoreController.cpp
+    src/app/jobs/vision/FaceTrackingController.h
+    src/app/jobs/vision/FaceTrackingController.cpp
+    src/app/jobs/vision/StabilizeController.h
+    src/app/jobs/vision/StabilizeController.cpp
+    src/app/bin/MediaBinController.h
+    src/app/bin/MediaBinController.cpp
+    src/app/jobs/audio/TtsController.h
+    src/app/jobs/audio/TtsController.cpp
+    src/app/jobs/audio/VoiceLibrary.h
+    src/app/jobs/audio/VoiceLibrary.cpp
+    src/app/mcp/McpDetail.h
+    src/app/editor/AppControllerDetail.h
+    src/app/editor/EditorState.h
+    src/app/editor/LayoutStore.h
+    src/app/editor/LayoutStore.cpp
+    src/app/platform/FileDialogs.h
+    src/app/platform/FileDialogs.cpp
+    src/app/platform/Haptics.h
+    src/app/platform/Haptics.cpp
+    src/app/platform/PointerDevices.h
+    src/app/platform/PointerDevices.cpp
+    src/app/bin/AssetLibrary.h
+    src/app/bin/AssetLibrary.cpp
+    src/app/bin/BinFolderListModel.h
+    src/app/bin/BinFolderListModel.cpp
+    src/app/editor/TimelineClipsModel.h
+    src/app/editor/TimelineClipsModel.cpp
     src/playback/PlaybackEngine.h
     src/playback/PlaybackEngine.cpp
     src/playback/PlaybackClock.h
     src/playback/PlaybackClock.cpp
     src/playback/AudioOutputChannel.h
     src/playback/AudioOutputChannel.cpp
-    src/playback/ClipPreviewPlayer.h
-    src/playback/ClipPreviewPlayer.cpp
-    src/playback/CompositorService.h
-    src/playback/CompositorService.cpp
-    src/playback/PlaybackStats.h
-    src/playback/PlaybackStats.cpp
-    src/playback/PlaybackDiagnostics.h
-    src/playback/PlaybackDiagnostics.cpp
-    src/playback/PerfLog.h
-    src/playback/PerfLog.cpp
-    src/preview/PreviewItem.h
-    src/preview/PreviewItem.cpp
-    src/preview/PreviewController.h
-    src/preview/PreviewController.cpp
-    src/timeline/ClipThumbnailStore.h
-    src/timeline/ClipThumbnailStore.cpp
-    src/timeline/TimelineLayout.h
-    src/timeline/TimelineLayout.cpp
-    src/timeline/TimelineTrackItem.h
-    src/timeline/TimelineTrackItem.cpp
-    src/timeline/TimelineViewState.h
-    src/timeline/TimelineViewState.cpp
+    src/playback/preview/ClipPreviewPlayer.h
+    src/playback/preview/ClipPreviewPlayer.cpp
+    src/playback/preview/CompositorService.h
+    src/playback/preview/CompositorService.cpp
+    src/playback/stats/PlaybackStats.h
+    src/playback/stats/PlaybackStats.cpp
+    src/playback/stats/PlaybackDiagnostics.h
+    src/playback/stats/PlaybackDiagnostics.cpp
+    src/playback/stats/PerfLog.h
+    src/playback/stats/PerfLog.cpp
+    src/ui/preview/PreviewItem.h
+    src/ui/preview/PreviewItem.cpp
+    src/ui/preview/PreviewController.h
+    src/ui/preview/PreviewController.cpp
+    src/ui/timeline/ClipThumbnailStore.h
+    src/ui/timeline/ClipThumbnailStore.cpp
+    src/ui/timeline/TimelineLayout.h
+    src/ui/timeline/TimelineLayout.cpp
+    src/ui/timeline/TimelineTrackItem.h
+    src/ui/timeline/TimelineTrackItem.cpp
+    src/ui/timeline/TimelineViewState.h
+    src/ui/timeline/TimelineViewState.cpp
 )
 
 # The MCP server itself ships everywhere. On Android it listens on loopback like it does on
 # desktop, and an agent reaches it through `adb forward` — which is what makes the phone build
 # drivable by tooling instead of by blind coordinate taps.
 target_sources(drift PRIVATE
-    src/mcp/McpSession.h
-    src/mcp/McpSession.cpp
-    src/mcp/McpCatalog.h
-    src/mcp/McpCatalog.cpp
-    src/mcp/McpProtocol.h
-    src/mcp/McpProtocol.cpp
-    src/mcp/McpHttp.h
-    src/mcp/McpHttp.cpp
-    src/mcp/McpDispatcher.h
-    src/mcp/McpDispatcher.cpp
-    src/mcp/McpDispatcherExtended.cpp
-    src/mcp/McpEffectAuthoring.h
-    src/mcp/McpEffectAuthoring.cpp
-    src/mcp/McpValidate.h
-    src/mcp/McpValidate.cpp
-    src/mcp/McpMarket.cpp
-    src/mcp/McpServer.h
-    src/mcp/McpServer.cpp
-    src/mcp/McpJson.h
+    src/app/mcp/protocol/McpSession.h
+    src/app/mcp/protocol/McpSession.cpp
+    src/app/mcp/tools/McpCatalog.h
+    src/app/mcp/tools/McpCatalog.cpp
+    src/app/mcp/protocol/McpProtocol.h
+    src/app/mcp/protocol/McpProtocol.cpp
+    src/app/mcp/tools/McpDispatcher.h
+    src/app/mcp/tools/McpDispatcher.cpp
+    src/app/mcp/tools/McpDispatcherExtended.cpp
+    src/app/mcp/tools/McpEffectAuthoring.h
+    src/app/mcp/tools/McpEffectAuthoring.cpp
+    src/app/mcp/protocol/McpValidate.h
+    src/app/mcp/protocol/McpValidate.cpp
+    src/app/mcp/tools/McpMarket.cpp
+    src/app/mcp/protocol/McpJson.h
 )
+
+# The HTTP listener needs QTcpServer, which a browser has no sockets for; McpController does not
+# construct a McpServer under Q_OS_WASM.
+if(NOT EMSCRIPTEN)
+    target_sources(drift PRIVATE
+        src/app/mcp/transport/McpHttp.h
+        src/app/mcp/transport/McpHttp.cpp
+        src/app/mcp/transport/McpServer.h
+        src/app/mcp/transport/McpServer.cpp
+    )
+endif()
 
 # The stdio transport and the headless entry point stay desktop-only: both are process entry
 # points driven from a terminal, which an APK has no equivalent of.
-if(NOT ANDROID)
+if(NOT ANDROID AND NOT EMSCRIPTEN)
     target_sources(drift PRIVATE
-        src/mcp/McpStdio.h
-        src/mcp/McpStdio.cpp
-        src/mcp/McpStdioServer.h
-        src/mcp/McpStdioServer.cpp
-        src/HeadlessApp.h
-        src/HeadlessApp.cpp
+        src/app/mcp/transport/McpStdio.h
+        src/app/mcp/transport/McpStdio.cpp
+        src/app/mcp/transport/McpStdioServer.h
+        src/app/mcp/transport/McpStdioServer.cpp
+        src/app/HeadlessApp.h
+        src/app/HeadlessApp.cpp
     )
 endif()
 
@@ -1136,6 +1257,17 @@ qt_add_resources(drift "drift_diagnostics"
     FILES resources/diagnostics/bench1080p60.mp4
 )
 
+# Built-in theme documents. ThemeManager reads these; Theme.qml is a facade over the
+# resolved tokens, so the rest of the QML keeps using the same property names.
+qt_add_resources(drift "drift_themes"
+    PREFIX "/themes"
+    BASE resources/themes
+    FILES
+        resources/themes/dark.json
+        resources/themes/light.json
+        resources/themes/theme.schema.json
+)
+
 set_source_files_properties(src/qml/Theme.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
 # Canvas preset catalog + the (template, quality) -> pixels arithmetic, shared by the desktop
 # layout dialog and the phone layout sheet so the two cannot drift apart again.
@@ -1145,7 +1277,7 @@ set_source_files_properties(src/qml/LayoutPresets.qml PROPERTIES QT_QML_SINGLETO
 set_source_files_properties(src/qml/DownloadFormat.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
 # Import + reporting policy, needed by surfaces that have no AssetsPanel to borrow it from.
 set_source_files_properties(src/qml/MediaImport.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
-# App-wide notification queue; the visual host is components/ToastHost.qml.
+# App-wide notification queue; the visual host is components/shell/ToastHost.qml.
 set_source_files_properties(src/qml/Toasts.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
 # In-flight lift-and-drop state for the phone asset sheet; the ghost is drawn by
 # AndroidBottomSheet and the drop is performed by AndroidTimeline.
@@ -1156,9 +1288,51 @@ set_source_files_properties(src/qml/AssetDrag.qml PROPERTIES QT_QML_SINGLETON_TY
 file(GLOB DRIFT_LUCIDE_ICONS RELATIVE "${CMAKE_SOURCE_DIR}" CONFIGURE_DEPENDS
      "resources/icons/*.svg")
 
+# Native window backdrops. Linux blur is optional: KF6WindowSystem when the
+# package is present, otherwise the X11 _KDE_NET_WM_BLUR_BEHIND_REGION atom.
+set(DRIFT_BACKDROP_PLATFORM_SOURCES)
+set(DRIFT_BACKDROP_PLATFORM_LIBS)
+set(DRIFT_BACKDROP_PLATFORM_DEFS)
+if(WIN32)
+    list(APPEND DRIFT_BACKDROP_PLATFORM_SOURCES src/ui/theme/backdrop/WindowBackdrop_win.cpp)
+    list(APPEND DRIFT_BACKDROP_PLATFORM_LIBS dwmapi)
+elseif(APPLE AND CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    # .mm sources are Objective-C++. The project() languages are CXX and C so
+    # Linux configure does not ask for a language this host does not have.
+    set(CMAKE_OBJCXX_STANDARD 20)
+    set(CMAKE_OBJCXX_STANDARD_REQUIRED ON)
+    enable_language(OBJCXX)
+    list(APPEND DRIFT_BACKDROP_PLATFORM_SOURCES src/ui/theme/backdrop/WindowBackdrop_mac.mm)
+    list(APPEND DRIFT_BACKDROP_PLATFORM_LIBS "-framework Cocoa")
+elseif(UNIX AND NOT ANDROID AND NOT EMSCRIPTEN AND NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+    list(APPEND DRIFT_BACKDROP_PLATFORM_SOURCES src/ui/theme/backdrop/WindowBackdrop_linux.cpp)
+    find_package(KF6WindowSystem QUIET)
+    if(KF6WindowSystem_FOUND)
+        list(APPEND DRIFT_BACKDROP_PLATFORM_LIBS KF6::WindowSystem)
+        list(APPEND DRIFT_BACKDROP_PLATFORM_DEFS DRIFT_HAS_KF6_WINDOW_SYSTEM)
+        message(STATUS "Window backdrop: KF6WindowSystem blur")
+    else()
+        message(STATUS "Window backdrop: KF6WindowSystem not found; KDE blur disabled")
+    endif()
+    if(PkgConfig_FOUND)
+        pkg_check_modules(XCB QUIET IMPORTED_TARGET xcb)
+        if(XCB_FOUND)
+            list(APPEND DRIFT_BACKDROP_PLATFORM_LIBS PkgConfig::XCB)
+            list(APPEND DRIFT_BACKDROP_PLATFORM_DEFS DRIFT_HAS_XCB)
+            message(STATUS "Window backdrop: X11 blur atom via xcb")
+        endif()
+    endif()
+endif()
+
 qt_add_qml_module(drift
     URI Drift
     VERSION 1.0
+    SOURCES
+        src/ui/theme/ThemeManager.h
+        src/ui/theme/ThemeManager.cpp
+        src/ui/theme/backdrop/WindowBackdrop.h
+        src/ui/theme/backdrop/WindowBackdrop.cpp
+        ${DRIFT_BACKDROP_PLATFORM_SOURCES}
     QML_FILES
         src/qml/Shell.qml
         src/qml/LayoutPresets.qml
@@ -1169,8 +1343,9 @@ qt_add_qml_module(drift
         src/qml/AndroidLinkImport.qml
         src/qml/DownloadFormat.qml
         src/qml/AndroidDownloadsSheet.qml
-        src/qml/components/NavRailButton.qml
-        # Touch entry point, loaded instead of Main.qml on Android (see src/main.cpp).
+        src/qml/AndroidNotificationsSheet.qml
+        src/qml/components/shell/NavRailButton.qml
+        # Touch entry point, loaded instead of Main.qml on Android (see src/app/main.cpp).
         src/qml/AndroidLayoutSheet.qml
         src/qml/AndroidMain.qml
         src/qml/AndroidMoreToolsSheet.qml
@@ -1207,6 +1382,10 @@ qt_add_qml_module(drift
         src/qml/components/preview/PreviewTransportBar.qml
         src/qml/components/preview/modes/Preview2DMode.qml
         src/qml/components/preview/modes/Preview3DMode.qml
+        src/qml/components/preview/modes/PreviewModeSwitchSegment.qml
+        src/qml/components/preview/modes/PreviewModeSwitchPill.qml
+        src/qml/components/preview/modes/Preview3DFlyHint.qml
+        src/qml/components/preview/modes/Preview3DFlyDeadZone.qml
         src/qml/components/preview/TransformGizmo.qml
         src/qml/components/preview/TransformOverlay.qml
         src/qml/components/preview/PreviewDropOverlay.qml
@@ -1216,9 +1395,10 @@ qt_add_qml_module(drift
         src/qml/components/preview/GuideEditOverlay.qml
         src/qml/components/preview/MaskOverlay.qml
         src/qml/components/preview/DepthEffectOverlay.qml
+        src/qml/components/preview/DepthLight3dOverlay.qml
         src/qml/components/preview/Checkerboard.qml
-        src/qml/components/preview/AndroidTransformOverlay.qml
-        src/qml/components/preview/AndroidCropOverlay.qml
+        src/qml/components/android/AndroidTransformOverlay.qml
+        src/qml/components/android/AndroidCropOverlay.qml
         src/qml/SegmentationWindow.qml
         src/qml/MulticamWindow.qml
         src/qml/DenoiseWindow.qml
@@ -1254,12 +1434,100 @@ qt_add_qml_module(drift
         src/qml/components/properties/MasksInspector.qml
         src/qml/components/properties/EffectsInspector.qml
         src/qml/components/properties/FacePropPicker.qml
+        src/qml/components/properties/VectorSvgColorRow.qml
+        src/qml/components/properties/Vec2ParamPad.qml
+        src/qml/components/properties/TextLookTile.qml
+        src/qml/components/properties/TextInspectorTextPage.qml
+        src/qml/components/properties/TextInspectorTabBar.qml
+        src/qml/components/properties/TextInspectorStylePage.qml
+        src/qml/components/properties/TextInspectorSpacingSection.qml
+        src/qml/components/properties/TextInspectorPresetSection.qml
+        src/qml/components/properties/TextInspectorLookSection.qml
+        src/qml/components/properties/TextInspectorFontSection.qml
+        src/qml/components/properties/TextInspectorDecorations.qml
+        src/qml/components/properties/TextInspectorContentSection.qml
+        src/qml/components/properties/TextInspectorAnimatePage.qml
+        src/qml/components/properties/TextInspectorAnimateHint.qml
+        src/qml/components/properties/TextInspectorAnimSlotBar.qml
+        src/qml/components/properties/TextInspectorAnimPresetGrid.qml
+        src/qml/components/properties/TextInspectorAnimControls.qml
+        src/qml/components/properties/TextInspectorAnimCategoryStrip.qml
+        src/qml/components/properties/TextInspectorAnimAdvanced.qml
+        src/qml/components/properties/TextInspectorAccentSection.qml
+        src/qml/components/properties/TextContentResizeGrip.qml
+        src/qml/components/properties/TextAnimPresetFrame.qml
+        src/qml/components/properties/TextAlignDivider.qml
+        src/qml/components/properties/SubtitleEditorPanel.qml
+        src/qml/components/properties/SubtitleEditorHeader.qml
+        src/qml/components/properties/SubtitleCueEmptyState.qml
+        src/qml/components/properties/SubtitleCueCard.qml
+        src/qml/components/properties/SpeedCurveTangentHandle.qml
+        src/qml/components/properties/SpeedCurvePreviewStage.qml
+        src/qml/components/properties/SpeedCurveKnob.qml
+        src/qml/components/properties/SpeedCurveGridLine.qml
+        src/qml/components/properties/SpeedCurveGraphPlayhead.qml
+        src/qml/components/properties/SpeedCurveFilmstrip.qml
+        src/qml/components/properties/SpeedCurveCanvas.qml
+        src/qml/components/properties/ShadingLayerHeader.qml
+        src/qml/components/properties/PropertiesTabRailSeparator.qml
+        src/qml/components/properties/PropertiesSheetTabChip.qml
+        src/qml/components/properties/PropertiesInspectorHeading.qml
+        src/qml/components/properties/PropertiesEmptyState.qml
+        src/qml/components/properties/KeyframeGraphValueAxis.qml
+        src/qml/components/properties/KeyframeGraphTangentHandle.qml
+        src/qml/components/properties/KeyframeGraphResizeGrip.qml
+        src/qml/components/properties/KeyframeGraphPlayhead.qml
+        src/qml/components/properties/KeyframeGraphLaneStatus.qml
+        src/qml/components/properties/KeyframeGraphKeyDot.qml
+        src/qml/components/properties/KeyframeGraphHeaderBar.qml
+        src/qml/components/properties/KeyframeGraphGutterRule.qml
+        src/qml/components/properties/KeyframeGraphFrame.qml
+        src/qml/components/properties/KeyframeGraphCurveCanvas.qml
+        src/qml/components/properties/KeyframeGraphClipSpan.qml
+        src/qml/components/properties/KeyframeGraphBeatCanvas.qml
+        src/qml/components/properties/GradientStopChip.qml
+        src/qml/components/properties/GradientPreviewBar.qml
+        src/qml/components/properties/GradientPresetSwatch.qml
+        src/qml/components/properties/FontPickerTrigger.qml
+        src/qml/components/properties/FontPickerSectionHeader.qml
+        src/qml/components/properties/FontPickerPopupSurface.qml
+        src/qml/components/properties/FontPickerPackBanner.qml
+        src/qml/components/properties/FontPickerFamilyRow.qml
+        src/qml/components/properties/FontPickerAddRow.qml
+        src/qml/components/properties/FadeCurveToolbarRule.qml
+        src/qml/components/properties/FadeCurvePlotFrame.qml
+        src/qml/components/properties/FadeCurveCanvas.qml
+        src/qml/components/properties/FacePropTile.qml
+        src/qml/components/properties/EmojiPickerSurface.qml
+        src/qml/components/properties/EmojiPickerEmptyLabel.qml
+        src/qml/components/properties/EmojiGridCell.qml
+        src/qml/components/properties/EffectsStackActions.qml
+        src/qml/components/properties/EffectsParamGroupHeader.qml
+        src/qml/components/properties/EffectsOccludeSection.qml
+        src/qml/components/properties/EffectsHueParam.qml
+        src/qml/components/properties/EffectsFileParam.qml
+        src/qml/components/properties/EffectsFaceSection.qml
+        src/qml/components/properties/EffectsFaceIndexParam.qml
+        src/qml/components/properties/EffectsEnumParam.qml
+        src/qml/components/properties/EffectsEffectHeader.qml
+        src/qml/components/properties/EffectsDepthSection.qml
+        src/qml/components/properties/EffectsDepthPanel.qml
+        src/qml/components/properties/EffectsColorSwatchChip.qml
+        src/qml/components/properties/EffectsColorParam.qml
+        src/qml/components/properties/EffectsClipParam.qml
+        src/qml/components/properties/EffectsBoolParam.qml
+        src/qml/components/properties/EffectsAutoKeyHint.qml
+        src/qml/components/properties/ColorSwatchButton.qml
+        src/qml/components/properties/CollapsibleSectionRule.qml
+        src/qml/components/properties/CollapsibleSectionHeader.qml
+        src/qml/components/properties/AudioEffectHeader.qml
         src/qml/components/assets/TextAssetsTab.qml
         src/qml/components/assets/ScenesTab.qml
         src/qml/components/assets/SubtitlesTab.qml
         src/qml/components/assets/SpeechTab.qml
         src/qml/components/assets/StickersTab.qml
         src/qml/components/assets/ShapesTab.qml
+        src/qml/components/assets/AssetSearchBar.qml
         src/qml/components/assets/AssetDragSource.qml
         src/qml/components/assets/MasksTab.qml
         src/qml/components/assets/SoundsTab.qml
@@ -1280,6 +1548,44 @@ qt_add_qml_module(drift
         src/qml/components/assets/AssetCategoryChips.qml
         src/qml/components/assets/EffectStacksSection.qml
         src/qml/components/assets/AssetFavoriteButton.qml
+        src/qml/components/assets/TransitionPresetCard.qml
+        src/qml/components/assets/TextStyleUserCard.qml
+        src/qml/components/assets/TextStylePackCard.qml
+        src/qml/components/assets/StockAudioRow.qml
+        src/qml/components/assets/StickerPresetCard.qml
+        src/qml/components/assets/ShortcutsBindingRow.qml
+        src/qml/components/assets/ShapePresetCard.qml
+        src/qml/components/assets/SfxSoundRow.qml
+        src/qml/components/assets/ScenesShotRow.qml
+        src/qml/components/assets/MediaAssetsViewToolbar.qml
+        src/qml/components/assets/MediaAssetsSelectionRing.qml
+        src/qml/components/assets/MediaAssetsListThumb.qml
+        src/qml/components/assets/MediaAssetsListRow.qml
+        src/qml/components/assets/MediaAssetsListLabels.qml
+        src/qml/components/assets/MediaAssetsJobStatus.qml
+        src/qml/components/assets/MediaAssetsItemMenu.qml
+        src/qml/components/assets/MediaAssetsGridNameRow.qml
+        src/qml/components/assets/MediaAssetsGridFrame.qml
+        src/qml/components/assets/MediaAssetsGridCard.qml
+        src/qml/components/assets/MediaAssetsGridBusyOverlay.qml
+        src/qml/components/assets/MediaAssetsFormatRow.qml
+        src/qml/components/assets/MediaAssetsFolderMenu.qml
+        src/qml/components/assets/MediaAssetsEmptyState.qml
+        src/qml/components/assets/MediaAssetsDurationBadge.qml
+        src/qml/components/assets/MaskPresetCard.qml
+        src/qml/components/assets/MarketSectionTab.qml
+        src/qml/components/assets/EffectTemplateCard.qml
+        src/qml/components/assets/EffectStackCard.qml
+        src/qml/components/assets/EffectPresetCard.qml
+        src/qml/components/assets/DownloadsJobRow.qml
+        src/qml/components/assets/AudioEffectPresetCard.qml
+        src/qml/components/assets/AssetsPanelTabRail.qml
+        src/qml/components/assets/AssetsPanelTabButton.qml
+        src/qml/components/assets/AssetsPanelImportSplit.qml
+        src/qml/components/assets/AssetsPanelImportOverlay.qml
+        src/qml/components/assets/AssetsPanelImportMenu.qml
+        src/qml/components/assets/AssetsPanelHeader.qml
+        src/qml/components/assets/AssetsPanelDropOverlay.qml
         src/qml/TimelinePanel.qml
         src/qml/components/timeline/TimelineToolbar.qml
         src/qml/components/timeline/TimelineToolbarCustomizeDialog.qml
@@ -1293,93 +1599,447 @@ qt_add_qml_module(drift
         src/qml/components/timeline/PlayheadInterpolator.qml
         src/qml/components/timeline/TimelineTrackArea.qml
         src/qml/components/timeline/TimelineDropRouter.qml
-        src/qml/components/IconGlyph.qml
-        src/qml/components/IconButton.qml
-        src/qml/components/PanelFrame.qml
-        src/qml/components/PanelSplitHandle.qml
+        src/qml/components/timeline/VoiceoverTransportButton.qml
+        src/qml/components/timeline/VoiceoverTransport.qml
+        src/qml/components/timeline/VoiceoverTimerReadout.qml
+        src/qml/components/timeline/VoiceoverStatus.qml
+        src/qml/components/timeline/VoiceoverRecLabel.qml
+        src/qml/components/timeline/VoiceoverRecDot.qml
+        src/qml/components/timeline/VoiceoverMicPicker.qml
+        src/qml/components/timeline/VoiceoverMicMenuItem.qml
+        src/qml/components/timeline/VoiceoverLevelMeter.qml
+        src/qml/components/timeline/VoiceoverGlow.qml
+        src/qml/components/timeline/VoiceoverGainControl.qml
+        src/qml/components/timeline/VoiceoverBarDivider.qml
+        src/qml/components/timeline/TransformCoverageTint.qml
+        src/qml/components/timeline/TrackHeaderWash.qml
+        src/qml/components/timeline/TrackHeaderRow.qml
+        src/qml/components/timeline/TrackHeaderResizeHandle.qml
+        src/qml/components/timeline/TrackHeaderRenameDialog.qml
+        src/qml/components/timeline/TrackHeaderMuteButton.qml
+        src/qml/components/timeline/TrackHeaderMicButton.qml
+        src/qml/components/timeline/TrackHeaderLaneEye.qml
+        src/qml/components/timeline/TrackHeaderInsertLine.qml
+        src/qml/components/timeline/TrackHeaderInlineName.qml
+        src/qml/components/timeline/TrackHeaderHideButton.qml
+        src/qml/components/timeline/TrackHeaderGrip.qml
+        src/qml/components/timeline/TrackHeaderEdge.qml
+        src/qml/components/timeline/TrackHeaderDeleteDialog.qml
+        src/qml/components/timeline/TrackHeaderCoversMenu.qml
+        src/qml/components/timeline/TrackHeaderContextMenu.qml
+        src/qml/components/timeline/TrackHeaderCompactName.qml
+        src/qml/components/timeline/TrackHeaderClipDisplayButton.qml
+        src/qml/components/timeline/TrackHeaderChannelLanesButton.qml
+        src/qml/components/timeline/TrackHeaderBandName.qml
+        src/qml/components/timeline/TimelineWorkAreaShade.qml
+        src/qml/components/timeline/TimelineWorkAreaOverlay.qml
+        src/qml/components/timeline/TimelineWorkAreaEdge.qml
+        src/qml/components/timeline/TimelineTrimHandle.qml
+        src/qml/components/timeline/TimelineTrimGrip.qml
+        src/qml/components/timeline/TimelineTransitionRegion.qml
+        src/qml/components/timeline/TimelineTransitionLabel.qml
+        src/qml/components/timeline/TimelineTransitionHatch.qml
+        src/qml/components/timeline/TimelineTransitionDropOutline.qml
+        src/qml/components/timeline/TimelineTrackTransformWash.qml
+        src/qml/components/timeline/TimelineToolbarZoomSlider.qml
+        src/qml/components/timeline/TimelineToolbarZoomReadout.qml
+        src/qml/components/timeline/TimelineToolbarZoomControl.qml
+        src/qml/components/timeline/TimelineToolbarToolButton.qml
+        src/qml/components/timeline/TimelineToolbarTimecode.qml
+        src/qml/components/timeline/TimelineToolbarSeparator.qml
+        src/qml/components/timeline/TimelineToolbarSceneMenuItem.qml
+        src/qml/components/timeline/TimelineToolbarSceneEmptyItem.qml
+        src/qml/components/timeline/TimelineToolbarSceneBadge.qml
+        src/qml/components/timeline/TimelineToolbarOverflowMenuItem.qml
+        src/qml/components/timeline/TimelineToolbarOverflowButton.qml
+        src/qml/components/timeline/TimelineToolbarHairline.qml
+        src/qml/components/timeline/TimelineToolbarCustomizeRow.qml
+        src/qml/components/timeline/TimelineToolbarCustomizeGrip.qml
+        src/qml/components/timeline/TimelineToolbarCustomizeDivider.qml
+        src/qml/components/timeline/TimelineToolbarActionSlot.qml
+        src/qml/components/timeline/TimelineSpanBracketTick.qml
+        src/qml/components/timeline/TimelineSpanBracketLine.qml
+        src/qml/components/timeline/TimelineSpanBracketFoot.qml
+        src/qml/components/timeline/TimelineSpanBracketDash.qml
+        src/qml/components/timeline/TimelineSpanBracketChip.qml
+        src/qml/components/timeline/TimelineSnapGuideLabel.qml
+        src/qml/components/timeline/TimelineSnapGuide.qml
+        src/qml/components/timeline/TimelineSeekStripFill.qml
+        src/qml/components/timeline/TimelineSeekStripEdge.qml
+        src/qml/components/timeline/TimelineSeekStrip.qml
+        src/qml/components/timeline/TimelineRulerTick.qml
+        src/qml/components/timeline/TimelineRuler.qml
+        src/qml/components/timeline/TimelinePlayheadTip.qml
+        src/qml/components/timeline/TimelinePlayheadLine.qml
+        src/qml/components/timeline/TimelinePlayheadHead.qml
+        src/qml/components/timeline/TimelinePlayhead.qml
+        src/qml/components/timeline/TimelineOverviewShade.qml
+        src/qml/components/timeline/TimelineOverviewPlayhead.qml
+        src/qml/components/timeline/TimelineOverviewMap.qml
+        src/qml/components/timeline/TimelineOverviewFrame.qml
+        src/qml/components/timeline/TimelineOverviewEdge.qml
+        src/qml/components/timeline/TimelineOverviewBackground.qml
+        src/qml/components/timeline/TimelineNewTrackGhostLane.qml
+        src/qml/components/timeline/TimelineNewTrackGhostClip.qml
+        src/qml/components/timeline/TimelineNewTrackGhostBoundary.qml
+        src/qml/components/timeline/TimelineNewTrackGhost.qml
+        src/qml/components/timeline/TimelineMarqueeRect.qml
+        src/qml/components/timeline/TimelineLiveRecordingBlock.qml
+        src/qml/components/timeline/TimelineLandingOutline.qml
+        src/qml/components/timeline/TimelineGapHover.qml
+        src/qml/components/timeline/TimelineFadeHandle.qml
+        src/qml/components/timeline/TimelineEmptyState.qml
+        src/qml/components/timeline/TimelineCutOverlay.qml
+        src/qml/components/timeline/TimelineCutDoomGradient.qml
+        src/qml/components/timeline/TimelineCutDash.qml
+        src/qml/components/timeline/TimelineClipContextMenu.qml
+        src/qml/components/timeline/TimelineBookmarkMarker.qml
+        src/qml/components/timeline/TimelineBookmarkLaneHighlight.qml
+        src/qml/components/timeline/TimelineBookmarkContextMenu.qml
+        src/qml/components/timeline/TimelineAdjustmentLaneStrip.qml
+        src/qml/components/timeline/TimelineAdjustmentLaneChrome.qml
+        src/qml/components/timeline/SubtitleCueWaveform.qml
+        src/qml/components/timeline/SubtitleCueSpan.qml
+        src/qml/components/timeline/SubtitleCuePlayhead.qml
+        src/qml/components/timeline/SubtitleCueGutter.qml
+        src/qml/components/timeline/SubtitleCueEdgeGrip.qml
+        src/qml/components/timeline/SubtitleCueBlock.qml
+        src/qml/components/timeline/NewTrackMenuEntry.qml
+        src/qml/components/timeline/MixerZoneGradient.qml
+        src/qml/components/timeline/MixerStripToggle.qml
+        src/qml/components/timeline/MixerPanControl.qml
+        src/qml/components/timeline/MixerMeterTick.qml
+        src/qml/components/timeline/MixerMeterChannel.qml
+        src/qml/components/timeline/MixerLevelReadout.qml
+        src/qml/components/timeline/MixerLevelMeter.qml
+        src/qml/components/timeline/MixerFader.qml
+        src/qml/components/timeline/MixerDbScale.qml
+        src/qml/components/timeline/MixerChannelStrip.qml
+        src/qml/components/timeline/MixerChannelName.qml
+        src/qml/components/timeline/MixerChannelDivider.qml
+        src/qml/components/timeline/MixerChannelArmTint.qml
+        src/qml/components/timeline/ClipFilmstripTile.qml
+        src/qml/components/controls/IconGlyph.qml
+        src/qml/components/controls/ThemeSlot.qml
+        src/qml/components/controls/IconButton.qml
+        src/qml/components/shell/PanelFrame.qml
+        src/qml/components/shell/PanelSplitHandle.qml
         src/qml/components/ClipFilmstrip.qml
-        src/qml/components/AppScrollBar.qml
+        src/qml/components/controls/AppScrollBar.qml
         src/qml/components/KeyframeDiamond.qml
         src/qml/components/ChannelKeyButton.qml
         src/qml/components/Vec2Param.qml
         src/qml/components/PropertyKeyframeRow.qml
         src/qml/components/KeyframeGraph.qml
         src/qml/components/SubtitleCueLane.qml
-        src/qml/components/ShortcutCaptureField.qml
+        src/qml/components/shell/ShortcutCaptureField.qml
         src/qml/components/ColorSwatchField.qml
-        src/qml/components/ThemedColorDialog.qml
+        src/qml/components/controls/ThemedColorDialog.qml
         src/qml/components/ColorEyedropper.qml
         src/qml/components/EffectBrowser.qml
         src/qml/components/AudioEffectBrowser.qml
         src/qml/components/EffectTemplateBrowser.qml
-        src/qml/components/ThemedSlider.qml
-        src/qml/components/ThemedTextField.qml
-        src/qml/components/ThemedNumberField.qml
-        src/qml/components/ThemedTextArea.qml
+        src/qml/components/controls/ThemedSlider.qml
+        src/qml/components/controls/ThemedTextField.qml
+        src/qml/components/controls/ThemedNumberField.qml
+        src/qml/components/controls/ThemedTextArea.qml
         src/qml/components/SubtitleEditor.qml
-        src/qml/components/ThemedComboBox.qml
+        src/qml/components/controls/ThemedComboBox.qml
         src/qml/components/FontPicker.qml
         src/qml/components/CollapsibleSection.qml
         src/qml/components/TextStylePackThumb.qml
         src/qml/components/TextStylePackPicker.qml
-        src/qml/components/NameDialog.qml
+        src/qml/components/dialogs/NameDialog.qml
         src/qml/components/EmojiPicker.qml
-        src/qml/components/ThemedButton.qml
-        src/qml/components/ThemedChip.qml
-        src/qml/components/ThemedProgressBar.qml
+        src/qml/components/controls/ThemedButton.qml
+        src/qml/components/controls/ThemedChip.qml
+        src/qml/components/controls/ThemedProgressBar.qml
         src/qml/components/MediaPill.qml
-        src/qml/components/VfrWarning.qml
-        src/qml/components/ThemedLabel.qml
-        src/qml/components/ThemedDialog.qml
-        src/qml/components/ToolWindow.qml
-        src/qml/components/LazyLoader.qml
-        src/qml/components/AndroidLifecycle.qml
-        src/qml/components/AddonManagerDialog.qml
-        src/qml/components/AddonStartupDialog.qml
-        src/qml/components/MissingAddonsDialog.qml
-        src/qml/components/AboutDialog.qml
-        src/qml/components/UpdateDialog.qml
-        src/qml/components/DebugInfoDialog.qml
+        src/qml/components/shell/VfrWarning.qml
+        src/qml/components/controls/ThemedLabel.qml
+        src/qml/components/controls/ThemedDialog.qml
+        src/qml/components/shell/ToolWindow.qml
+        src/qml/components/shell/LazyLoader.qml
+        src/qml/components/android/AndroidLifecycle.qml
+        src/qml/components/dialogs/AddonManagerDialog.qml
+        src/qml/components/dialogs/AddonStartupDialog.qml
+        src/qml/components/dialogs/MissingAddonsDialog.qml
+        src/qml/components/dialogs/AboutDialog.qml
+        src/qml/components/dialogs/UpdateDialog.qml
+        src/qml/components/dialogs/DebugInfoDialog.qml
+        src/qml/components/dialogs/ThemeTrustDialog.qml
         src/qml/components/preview/PlaybackStatsOverlay.qml
-        src/qml/components/ProjectSetupDialog.qml
-        src/qml/components/LayoutChooserDialog.qml
-        src/qml/components/LanguageChooserDialog.qml
-        src/qml/components/AgentAccessControls.qml
-        src/qml/components/AgentAccessDialog.qml
-        src/qml/components/VideoSizeDialog.qml
-        src/qml/components/VideoSizeControls.qml
-        src/qml/components/ProjectPropertiesDialog.qml
-        src/qml/components/SettingsPane.qml
-        src/qml/components/SheetActionRow.qml
-        src/qml/components/SheetActionTile.qml
-        src/qml/components/SettingsDialog.qml
-        src/qml/components/ShellSwitchDialog.qml
-        src/qml/components/PasteAttributesDialog.qml
-        src/qml/components/PackageProgressDialog.qml
-        src/qml/components/ExportDialog.qml
-        src/qml/components/ExportProgressDialog.qml
-        src/qml/components/CollectMediaDialog.qml
-        src/qml/components/ReverseProgressDialog.qml
-        src/qml/components/SubtitleProgressDialog.qml
-        src/qml/components/CircularProgress.qml
-        src/qml/components/RecoveryDialog.qml
-        src/qml/components/UnsavedChangesDialog.qml
+        src/qml/components/preview/transport/PreviewTransportTimecode.qml
+        src/qml/components/preview/transport/PreviewTransportStepForwardButton.qml
+        src/qml/components/preview/transport/PreviewTransportStepBackButton.qml
+        src/qml/components/preview/transport/PreviewTransportRewindButton.qml
+        src/qml/components/preview/transport/PreviewTransportPlayButton.qml
+        src/qml/components/preview/transport/PreviewTransportLoopButton.qml
+        src/qml/components/preview/transport/PreviewTransportFullscreenButton.qml
+        src/qml/components/preview/transport/PreviewTransportFastForwardButton.qml
+        src/qml/components/preview/transform/TransformOverlaySnapGuide.qml
+        src/qml/components/preview/transform/TransformOverlaySizeReadout.qml
+        src/qml/components/preview/transform/TransformOverlayRotateHandle.qml
+        src/qml/components/preview/transform/TransformOverlayResizeGrip.qml
+        src/qml/components/preview/transform/TransformOverlayParentOutline.qml
+        src/qml/components/preview/transform/TransformOverlayParentChip.qml
+        src/qml/components/preview/transform/TransformOverlayLayerChip.qml
+        src/qml/components/preview/transform/TransformOverlayBoxBorder.qml
+        src/qml/components/preview/text/InlineTextSelectionHandle.qml
+        src/qml/components/preview/status/PreviewVoiceoverBadge.qml
+        src/qml/components/preview/status/PreviewGapCaption.qml
+        src/qml/components/preview/status/PreviewCompactGpuCaption.qml
+        src/qml/components/preview/stats/PlaybackStatsLine.qml
+        src/qml/components/preview/osd/PreviewOsdZoomChip.qml
+        src/qml/components/preview/osd/PreviewOsdOptionsButton.qml
+        src/qml/components/preview/osd/PreviewOsdGuidesButton.qml
+        src/qml/components/preview/osd/PreviewOsdGuideMenuButton.qml
+        src/qml/components/preview/osd/PreviewOsdCluster.qml
+        src/qml/components/preview/options/PreviewOptionsRowLabel.qml
+        src/qml/components/preview/options/PreviewOptionsDecodeWarning.qml
+        src/qml/components/preview/options/PreviewOptionsDecodeDialog.qml
+        src/qml/components/preview/multicam/MulticamTimecodeLabel.qml
+        src/qml/components/preview/multicam/MulticamProgramSegment.qml
+        src/qml/components/preview/multicam/MulticamProgramBadge.qml
+        src/qml/components/preview/multicam/MulticamLaneTrack.qml
+        src/qml/components/preview/multicam/MulticamLanePlayhead.qml
+        src/qml/components/preview/multicam/MulticamAngleTile.qml
+        src/qml/components/preview/multicam/MulticamAngleCaption.qml
+        src/qml/components/preview/multicam/MulticamAngleBadge.qml
+        src/qml/components/preview/media/MediaPreviewTrimSpan.qml
+        src/qml/components/preview/media/MediaPreviewTrimShade.qml
+        src/qml/components/preview/media/MediaPreviewTrimHandle.qml
+        src/qml/components/preview/media/MediaPreviewSavingScrim.qml
+        src/qml/components/preview/media/MediaPreviewRulerTick.qml
+        src/qml/components/preview/media/MediaPreviewResolutionPill.qml
+        src/qml/components/preview/media/MediaPreviewPlayheadLine.qml
+        src/qml/components/preview/media/MediaPreviewPlayheadCap.qml
+        src/qml/components/preview/media/MediaPreviewGradeChip.qml
+        src/qml/components/preview/media/MediaPreviewCropScrim.qml
+        src/qml/components/preview/media/MediaPreviewCropGrip.qml
+        src/qml/components/preview/media/MediaPreviewCropFrame.qml
+        src/qml/components/preview/media/MediaPreviewAudioPlaceholder.qml
+        src/qml/components/preview/mask/MaskOverlayVertexHandle.qml
+        src/qml/components/preview/mask/MaskOverlayRotateHandle.qml
+        src/qml/components/preview/mask/MaskOverlayResizeGrip.qml
+        src/qml/components/preview/mask/MaskOverlayOutline.qml
+        src/qml/components/preview/mask/MaskOverlayFeatherRing.qml
+        src/qml/components/preview/mask/MaskOverlayEmptyHint.qml
+        src/qml/components/preview/mask/MaskOverlayEdgeMidpoint.qml
+        src/qml/components/preview/mask/MaskOverlayClipBounds.qml
+        src/qml/components/preview/mask/MaskOverlayBarEdge.qml
+        src/qml/components/preview/mask/MaskOverlayBarBand.qml
+        src/qml/components/preview/guides/GuidesPopoverSetRow.qml
+        src/qml/components/preview/guides/GuidesPopoverSectionLabel.qml
+        src/qml/components/preview/guides/GuidesPopoverReadOnlyNote.qml
+        src/qml/components/preview/guides/GuidesPopoverPercentField.qml
+        src/qml/components/preview/guides/GuidesPopoverMarginFields.qml
+        src/qml/components/preview/guides/GuidesPopoverLinePosition.qml
+        src/qml/components/preview/guides/GuidesPopoverItemRow.qml
+        src/qml/components/preview/guides/GuidesPopoverItemHeader.qml
+        src/qml/components/preview/guides/GuidesPopoverDivider.qml
+        src/qml/components/preview/guides/GuidesPopoverColorRow.qml
+        src/qml/components/preview/guides/GuidesPopoverAspectFields.qml
+        src/qml/components/preview/guides/GuideEditReadout.qml
+        src/qml/components/preview/guides/GuideEditHighlight.qml
+        src/qml/components/preview/guides/GuideEditBar.qml
+        src/qml/components/preview/guides/GuideEditAddStrip.qml
+        src/qml/components/preview/gizmo/TransformGizmoStroke.qml
+        src/qml/components/preview/gizmo/TransformGizmoPivot.qml
+        src/qml/components/preview/gizmo/TransformGizmoHead.qml
+        src/qml/components/preview/gizmo/TransformGizmoHandle.qml
+        src/qml/components/preview/depth/DepthLight3dKnob.qml
+        src/qml/components/preview/depth/DepthLight3dAimRing.qml
+        src/qml/components/preview/depth/DepthEffectLightKnob.qml
+        src/qml/components/preview/depth/DepthEffectFocusReticle.qml
+        src/qml/components/preview/depth/DepthEffectAimRing.qml
+        src/qml/components/preview/depth/DepthEffectAimLine.qml
+        src/qml/components/preview/crop/CropOverlayThirdGuides.qml
+        src/qml/components/preview/crop/CropOverlaySizeBadge.qml
+        src/qml/components/preview/crop/CropOverlayScrim.qml
+        src/qml/components/preview/crop/CropOverlayHint.qml
+        src/qml/components/preview/crop/CropOverlayGrip.qml
+        src/qml/components/preview/crop/CropOverlayFrame.qml
+        src/qml/components/preview/axis/ViewAxisShaft.qml
+        src/qml/components/preview/axis/ViewAxisKnob.qml
+        src/qml/components/preview/axis/ViewAxisDisc.qml
+        src/qml/components/preview/PreviewFullscreenTransportScrim.qml
+        src/qml/components/preview/PreviewDropClipFrame.qml
+        src/qml/components/preview/PreviewDropCanvasFrame.qml
+        src/qml/components/preview/Preview3DToolsDivider.qml
+        src/qml/components/preview/GuideLayerMark.qml
+        src/qml/components/dialogs/ProjectSetupDialog.qml
+        src/qml/components/dialogs/LayoutChooserDialog.qml
+        src/qml/components/dialogs/LanguageChooserDialog.qml
+        src/qml/components/shell/AgentAccessControls.qml
+        src/qml/components/dialogs/AgentAccessDialog.qml
+        src/qml/components/dialogs/VideoSizeDialog.qml
+        src/qml/components/shell/VideoSizeControls.qml
+        src/qml/components/dialogs/ProjectPropertiesDialog.qml
+        src/qml/components/shell/SettingsPane.qml
+        src/qml/components/android/SheetActionRow.qml
+        src/qml/components/android/SheetActionTile.qml
+        src/qml/components/android/AndroidTransformSnapLine.qml
+        src/qml/components/android/AndroidTransformSizeReadout.qml
+        src/qml/components/android/AndroidTransformRotateHandle.qml
+        src/qml/components/android/AndroidTransformResizeGrip.qml
+        src/qml/components/android/AndroidTransformParentFrame.qml
+        src/qml/components/android/AndroidTransformLayerChip.qml
+        src/qml/components/android/AndroidTransformClipOutline.qml
+        src/qml/components/android/AndroidTopBarTitleButton.qml
+        src/qml/components/android/AndroidTopBarExportButton.qml
+        src/qml/components/android/AndroidTopBarCountBadge.qml
+        src/qml/components/android/AndroidTimelineWorkArea.qml
+        src/qml/components/android/AndroidTimelineTransitionMark.qml
+        src/qml/components/android/AndroidTimelineTrackWash.qml
+        src/qml/components/android/AndroidTimelineSnapGuide.qml
+        src/qml/components/android/AndroidTimelineRulerTick.qml
+        src/qml/components/android/AndroidTimelineRuler.qml
+        src/qml/components/android/AndroidTimelinePlayhead.qml
+        src/qml/components/android/AndroidTimelineNewTrackGhost.qml
+        src/qml/components/android/AndroidTimelineLiveRecording.qml
+        src/qml/components/android/AndroidTimelineLaneBar.qml
+        src/qml/components/android/AndroidTimelineGapPress.qml
+        src/qml/components/android/AndroidTimelineDropGhost.qml
+        src/qml/components/android/AndroidTimelineBookmarkFlag.qml
+        src/qml/components/android/AndroidTimelineAdjustmentStrip.qml
+        src/qml/components/android/AndroidTextEditBar.qml
+        src/qml/components/android/AndroidSheetScrim.qml
+        src/qml/components/android/AndroidSheetHeader.qml
+        src/qml/components/android/AndroidSheetHandle.qml
+        src/qml/components/android/AndroidSheetDragArea.qml
+        src/qml/components/android/AndroidSheetActionTileFace.qml
+        src/qml/components/android/AndroidSheetActionSwitch.qml
+        src/qml/components/android/AndroidSheetActionMark.qml
+        src/qml/components/android/AndroidSheetActionIconTile.qml
+        src/qml/components/android/AndroidRailButton.qml
+        src/qml/components/android/AndroidRailAddButton.qml
+        src/qml/components/android/AndroidPreviewTransport.qml
+        src/qml/components/android/AndroidPreviewOptionsStrip.qml
+        src/qml/components/android/AndroidPreviewLetterbox.qml
+        src/qml/components/android/AndroidOnMediaReadout.qml
+        src/qml/components/android/AndroidMoreToolsHeading.qml
+        src/qml/components/android/AndroidMediaTrimHandle.qml
+        src/qml/components/android/AndroidMediaSavingScrim.qml
+        src/qml/components/android/AndroidMediaPreviewHeader.qml
+        src/qml/components/android/AndroidMediaPlayBadge.qml
+        src/qml/components/android/AndroidMediaCropShade.qml
+        src/qml/components/android/AndroidMediaCropOverlay.qml
+        src/qml/components/android/AndroidMediaCropGrip.qml
+        src/qml/components/android/AndroidLinkBusyStatus.qml
+        src/qml/components/android/AndroidLayoutTemplateCard.qml
+        src/qml/components/android/AndroidLayoutSummarySwatch.qml
+        src/qml/components/android/AndroidLayoutSectionLabel.qml
+        src/qml/components/android/AndroidHomeWordmark.qml
+        src/qml/components/android/AndroidHomeStartTile.qml
+        src/qml/components/android/AndroidHomeRecentCard.qml
+        src/qml/components/android/AndroidFadeSliderRow.qml
+        src/qml/components/android/AndroidDownloadJobRow.qml
+        src/qml/components/android/AndroidCropHint.qml
+        src/qml/components/android/AndroidCropGrip.qml
+        src/qml/components/android/AndroidCropFrame.qml
+        src/qml/components/android/AndroidCropDimMask.qml
+        src/qml/components/android/AndroidComposerTimingEdge.qml
+        src/qml/components/android/AndroidClipToolbarSlot.qml
+        src/qml/components/android/AndroidClipToolbarHint.qml
+        src/qml/components/android/AndroidAttentionDot.qml
+        src/qml/components/dialogs/SettingsDialog.qml
+        src/qml/components/dialogs/ShellSwitchDialog.qml
+        src/qml/components/dialogs/PasteAttributesDialog.qml
+        src/qml/components/dialogs/PackageProgressDialog.qml
+        src/qml/components/dialogs/ProjectLoadDialog.qml
+        src/qml/components/dialogs/ExportDialog.qml
+        src/qml/components/dialogs/ExportProgressDialog.qml
+        src/qml/components/dialogs/CollectMediaDialog.qml
+        src/qml/components/dialogs/ImageSequenceDialog.qml
+        src/qml/components/dialogs/ReverseProgressDialog.qml
+        src/qml/components/dialogs/SubtitleProgressDialog.qml
+        src/qml/components/shell/CircularProgress.qml
+        src/qml/components/dialogs/RecoveryDialog.qml
+        src/qml/components/dialogs/UnsavedChangesDialog.qml
+        src/qml/components/dialogs/PasteAttributesVideoSection.qml
+        src/qml/components/dialogs/PasteAttributesTransitionsSection.qml
+        src/qml/components/dialogs/PasteAttributesAudioSection.qml
+        src/qml/components/dialogs/MissingAddonsRow.qml
+        src/qml/components/dialogs/LayoutChooserTemplateRow.qml
+        src/qml/components/dialogs/LayoutChooserCategoryButton.qml
+        src/qml/components/dialogs/ExportDialogWorkAreaCheck.qml
+        src/qml/components/dialogs/ExportDialogVideoSection.qml
+        src/qml/components/dialogs/ExportDialogModeBar.qml
+        src/qml/components/dialogs/ExportDialogGifSection.qml
+        src/qml/components/dialogs/ExportDialogAudioSection.qml
+        src/qml/components/dialogs/DebugInfoSystemTab.qml
+        src/qml/components/dialogs/DebugInfoPlaybackTab.qml
+        src/qml/components/dialogs/DebugInfoBenchRow.qml
+        src/qml/components/dialogs/AddonStartupPackRow.qml
+        src/qml/components/dialogs/AddonManagerRow.qml
         src/qml/components/UpscaleModelCard.qml
-        src/qml/components/RecentProjectsPopup.qml
-        src/qml/components/StartScreen.qml
+        src/qml/components/shell/RecentProjectsPopup.qml
+        src/qml/components/shell/StartScreen.qml
         src/qml/components/NewTrackMenu.qml
-        src/qml/components/ToastHost.qml
-        src/qml/components/EmptyState.qml
-        src/qml/components/TouchLiftArea.qml
-        src/qml/components/SkeletonBox.qml
-        src/qml/components/ThemedSwitch.qml
-        src/qml/components/ThemedCheckBox.qml
-        src/qml/components/ThemedToggleButton.qml
-        src/qml/components/ThemedToolTip.qml
-        src/qml/components/ThemedContextMenu.qml
-        src/qml/components/ThemedMenuItem.qml
-        src/qml/components/ThemedMenuSeparator.qml
-        src/qml/components/LabelledProgressRing.qml
+        src/qml/components/shell/GlobalSearchPopup.qml
+        src/qml/components/shell/GlobalSearchControls.qml
+        src/qml/components/shell/ToastHost.qml
+        src/qml/components/shell/NotificationList.qml
+        src/qml/components/shell/NotificationsPopup.qml
+        src/qml/components/shell/EmptyState.qml
+        src/qml/components/shell/TouchLiftArea.qml
+        src/qml/components/shell/TouchDragGhost.qml
+        src/qml/components/shell/SkeletonBox.qml
+        src/qml/components/controls/ThemedSwitch.qml
+        src/qml/components/controls/ThemedCheckBox.qml
+        src/qml/components/controls/ThemedToggleButton.qml
+        src/qml/components/controls/ThemedToolTip.qml
+        src/qml/components/controls/ThemedContextMenu.qml
+        src/qml/components/controls/ThemedMenuItem.qml
+        src/qml/components/controls/ThemedMenuSeparator.qml
+        src/qml/components/controls/ThemedSliderHandle.qml
+        src/qml/components/controls/ThemedComboBoxDelegate.qml
+        src/qml/components/controls/ThemedColorDialogThumb.qml
+        src/qml/components/shell/LabelledProgressRing.qml
+        src/qml/components/shell/StartScreenTitle.qml
+        src/qml/components/shell/StartScreenRecents.qml
+        src/qml/components/shell/StartScreenProjectRow.qml
+        src/qml/components/shell/StartScreenActions.qml
+        src/qml/components/shell/SettingsSectionCard.qml
+        src/qml/components/shell/SettingsAppearanceSection.qml
+        src/qml/components/shell/SettingsThemeList.qml
+        src/qml/components/shell/SettingsThemeEntry.qml
+        src/qml/components/shell/SettingsAppearanceActions.qml
+        src/qml/components/shell/SettingsAppearanceTranslucency.qml
+        src/qml/components/shell/SettingsPreviewSection.qml
+        src/qml/components/shell/SettingsPlaybackSection.qml
+        src/qml/components/shell/SettingsMarketplaceSection.qml
+        src/qml/components/shell/SettingsInterfaceSection.qml
+        src/qml/components/shell/SettingsCloudProvidersSection.qml
+        src/qml/components/shell/SettingsAppSection.qml
+        src/qml/components/shell/SegmentationFrameColumn.qml
+        src/qml/components/shell/SegmentationControlColumn.qml
+        src/qml/components/shell/RestoreUpscalerPicker.qml
+        src/qml/components/shell/RestoreControlColumn.qml
+        src/qml/components/shell/RestoreCompareView.qml
+        src/qml/components/shell/RecentProjectsProjectRow.qml
+        src/qml/components/shell/RecentProjectsActionRow.qml
+        src/qml/components/shell/NotificationUpdateRow.qml
+        src/qml/components/shell/NotificationHistoryRow.qml
+        src/qml/components/shell/MainOverlayInputGuard.qml
+        src/qml/components/shell/MainMacMenuBar.qml
+        src/qml/components/shell/MainAndroidMediaPreviewOverlay.qml
+        src/qml/components/shell/GlobalSearchResultRow.qml
+        src/qml/components/shell/EditorWorkspace.qml
+        src/qml/components/shell/EditorHeaderSettingsButton.qml
+        src/qml/components/shell/AppSettingsMenu.qml
+        src/qml/components/shell/EditorHeaderSeparator.qml
+        src/qml/components/shell/EditorHeaderSearchField.qml
+        src/qml/components/shell/EditorHeaderProjectsButton.qml
+        src/qml/components/shell/EditorHeaderNotificationsButton.qml
+        src/qml/components/shell/EditorHeaderHairline.qml
+        src/qml/components/shell/EditorHeaderExtrasWave.qml
+        src/qml/components/shell/EditorHeaderExtrasButton.qml
+        src/qml/components/shell/EditorHeaderExportButton.qml
+        src/qml/components/shell/EditorHeaderExportBadge.qml
+        src/qml/components/shell/EditorHeaderDownloadsButton.qml
+        src/qml/components/shell/DenoiseWaveformLane.qml
     RESOURCES
         # UI chrome: interface font and Lucide SVG icons (always needed, including before addons).
         # Static instances rather than the variable Inter: on Windows Qt registers application
@@ -1407,7 +2067,15 @@ target_link_libraries(drift PRIVATE
     driftcore
     driftengine
 )
-target_include_directories(drift PRIVATE src src/preview)
+target_include_directories(drift PRIVATE src)
+# qmltyperegistrar emits bare-basename includes (<ThemeManager.h>) for the qml module's headers.
+target_include_directories(drift PRIVATE src/ui/theme src/ui/theme/backdrop)
+if(DRIFT_BACKDROP_PLATFORM_LIBS)
+    target_link_libraries(drift PRIVATE ${DRIFT_BACKDROP_PLATFORM_LIBS})
+endif()
+if(DRIFT_BACKDROP_PLATFORM_DEFS)
+    target_compile_definitions(drift PRIVATE ${DRIFT_BACKDROP_PLATFORM_DEFS})
+endif()
 
 if(ANDROID)
     # FileDialogs registers a QtAndroidPrivate::NewIntentListener so a second ACTION_VIEW reaches a
@@ -1415,31 +2083,6 @@ if(ANDROID)
     # CorePrivate is not pulled in by the plain Qt6 Core package, hence the extra find_package.
     find_package(Qt6 REQUIRED COMPONENTS CorePrivate)
     target_link_libraries(drift PRIVATE Qt6::CorePrivate)
-
-    # applicationDirPath() on Android is the APK's lib directory and contains nothing but .so
-    # files, so the file-based package roots the desktop build stages next to the binary have
-    # nowhere to live. The packages ride inside the binary as Qt resources instead;
-    # GpuPackageParse::defaultSearchPaths adds ":/packages/<subdir>" as the bundled root.
-    file(GLOB_RECURSE DRIFT_PACKAGE_FILES RELATIVE "${CMAKE_SOURCE_DIR}" CONFIGURE_DEPENDS
-         "effects/*/effect.json"
-         "effects/*/*.frag"
-         "effects/*/*.png"
-         "effects/*/*.bin"
-         "effects/*/NOTICE"
-         "effects/*/LICENSE*"
-         "transitions/*/*.json"
-         "transitions/*/*.frag"
-         "transitions/*/*.png"
-         "audio-effects/*/audio-effect.json"
-         "audio-effects/*/thumbnail.png"
-         "effect-templates/*/template.json"
-         "effect-templates/*/thumbnail.png")
-    list(REMOVE_DUPLICATES DRIFT_PACKAGE_FILES)
-    qt_add_resources(drift "drift_packages"
-        PREFIX "/packages"
-        BASE "${CMAKE_SOURCE_DIR}"
-        FILES ${DRIFT_PACKAGE_FILES}
-    )
 
     # Qt Network's OpenSSL TLS plugin dlopens libcrypto_3.so / libssl_3.so at runtime.
     # androiddeployqt files each extra .so under lib/<abi>/ from its ELF architecture, so a
@@ -1495,12 +2138,42 @@ if(ANDROID)
     )
 endif()
 
+# applicationDirPath() has nothing to stage into on Android (the APK's lib directory) or wasm (a
+# virtual filesystem with no files beside the binary), so the file-based package roots the desktop
+# build stages next to the binary ride inside it as Qt resources instead.
+if(ANDROID OR EMSCRIPTEN)
+    # PackageSearchPaths::defaultSearchPaths adds ":/packages/<subdir>" as the bundled root.
+    file(GLOB_RECURSE DRIFT_PACKAGE_FILES RELATIVE "${CMAKE_SOURCE_DIR}" CONFIGURE_DEPENDS
+         "effects/*/effect.json"
+         "effects/*/*.frag"
+         "effects/*/*.png"
+         "effects/*/*.bin"
+         "effects/*/NOTICE"
+         "effects/*/LICENSE*"
+         "transitions/*/*.json"
+         "transitions/*/*.frag"
+         "transitions/*/*.png"
+         "audio-effects/*/audio-effect.json"
+         "audio-effects/*/thumbnail.png"
+         "effect-templates/*/template.json"
+         "effect-templates/*/thumbnail.png")
+    list(REMOVE_DUPLICATES DRIFT_PACKAGE_FILES)
+    qt_add_resources(drift "drift_packages"
+        PREFIX "/packages"
+        BASE "${CMAKE_SOURCE_DIR}"
+        FILES ${DRIFT_PACKAGE_FILES}
+    )
+endif()
+
 # MCP tool names, JSON schemas, agent errors and copied configs are a machine protocol and must
-# stay English. QT_EXCLUDE_FROM_TRANSLATION is a no-op until src/mcp/ exists (the mcp branch);
-# lupdate also ignores QStringLiteral, so those files only leak if someone later adds tr().
+# stay English. lupdate also ignores QStringLiteral, so those files only leak if someone later adds tr().
 file(GLOB DRIFT_MCP_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_SOURCE_DIR}/src/mcp/*.cpp"
-    "${CMAKE_SOURCE_DIR}/src/mcp/*.h")
+    "${CMAKE_SOURCE_DIR}/src/app/mcp/protocol/*.cpp"
+    "${CMAKE_SOURCE_DIR}/src/app/mcp/protocol/*.h"
+    "${CMAKE_SOURCE_DIR}/src/app/mcp/transport/*.cpp"
+    "${CMAKE_SOURCE_DIR}/src/app/mcp/transport/*.h"
+    "${CMAKE_SOURCE_DIR}/src/app/mcp/tools/*.cpp"
+    "${CMAKE_SOURCE_DIR}/src/app/mcp/tools/*.h")
 if(DRIFT_MCP_SOURCES)
     set_source_files_properties(${DRIFT_MCP_SOURCES} PROPERTIES QT_EXCLUDE_FROM_TRANSLATION ON)
 endif()
@@ -1515,24 +2188,24 @@ if(Qt6LinguistTools_FOUND)
             ${DRIFT_TS_FILES}
         RESOURCE_PREFIX "/i18n"
         SOURCES
-            src/engine/EffectCatalog.cpp
-            src/engine/EffectTemplateCatalog.cpp
-            src/engine/AudioEffectCatalog.cpp
-            src/engine/TransitionCatalog.cpp
-            src/engine/FontCatalog.cpp
-            src/engine/ReverseRenderer.cpp
-            src/engine/ProxyEncoder.cpp
-            src/engine/PreviewProxyRenderer.cpp
-            src/engine/MediaEditor.cpp
-            src/engine/ProjectBundle.cpp
-            src/engine/FacePropImport.cpp
-            src/core/Project.cpp
-            src/core/Transcript.cpp
-            src/core/GuideSet.cpp
-            src/core/SrtIO.cpp
-            src/core/ShapeStyle.cpp
-            src/core/TextStyle.cpp
-            src/core/SubtitleCue.cpp
+            src/engine/packages/effects/EffectCatalog.cpp
+            src/engine/packages/effects/EffectTemplateCatalog.cpp
+            src/engine/packages/audio/AudioEffectCatalog.cpp
+            src/engine/packages/transitions/TransitionCatalog.cpp
+            src/engine/packages/assets/FontCatalog.cpp
+            src/engine/encode/proxies/ReverseRenderer.cpp
+            src/engine/encode/proxies/ProxyEncoder.cpp
+            src/engine/encode/proxies/PreviewProxyRenderer.cpp
+            src/engine/encode/MediaEditor.cpp
+            src/engine/project/ProjectBundle.cpp
+            src/engine/face/props/FacePropImport.cpp
+            src/core/project/Project.cpp
+            src/core/project/Transcript.cpp
+            src/core/project/GuideSet.cpp
+            src/core/interchange/subtitles/SrtIO.cpp
+            src/core/shapes/ShapeStyle.cpp
+            src/core/text/TextStyle.cpp
+            src/core/project/SubtitleCue.cpp
         # -locations none: source line numbers in .ts files churn on every edit
         # and make i18n/*.ts conflict across PRs. Translators still see context
         # and source text; they lose jump-to-source in Qt Linguist.
@@ -1600,6 +2273,18 @@ if(Qt6LinguistTools_FOUND)
     endif()
 else()
     message(STATUS "Qt6 LinguistTools not found; translations will not be built.")
+endif()
+
+if(EMSCRIPTEN)
+    # Threads come from Qt's multithread toolchain (-pthread). The pool is pre-spawned because a
+    # worker can only be created from the main thread's event loop, which blocks on thread joins.
+    # FULL_ES3 emulates glMapBufferRange, which GlRuntime's PBO readback needs.
+    set_target_properties(drift PROPERTIES QT_WASM_INITIAL_MEMORY 128MB)
+    target_link_options(drift PRIVATE
+        -sALLOW_MEMORY_GROWTH=1
+        -sMAXIMUM_MEMORY=4GB
+        -sPTHREAD_POOL_SIZE=8
+        -sFULL_ES3=1)
 endif()
 
 # Defined here rather than in the header so there is exactly one place to change them.
@@ -1695,8 +2380,8 @@ function(drift_copy_effect_templates target)
     drift_stage_packages(${target} effect-templates)
 endfunction()
 
-# Android gets these through qt_add_resources above; there is no <appDir> to stage into.
-if(NOT ANDROID)
+# Android and wasm get these through qt_add_resources above; there is no <appDir> to stage into.
+if(NOT ANDROID AND NOT EMSCRIPTEN)
     drift_copy_effects(drift)
     drift_copy_effect_templates(drift)
     drift_copy_transitions(drift)
@@ -1705,8 +2390,8 @@ if(NOT ANDROID)
 endif()
 
 # Desktop packaging, the headless CLI tools and the QTest binaries. None of it applies to an
-# APK, so the Android configure skips it wholesale.
-if(NOT ANDROID)
+# APK or a browser tab, so the Android and wasm configures skip it wholesale.
+if(NOT ANDROID AND NOT EMSCRIPTEN)
 # --- install (used by packaging, e.g. Flatpak; the dev workflow runs in-place) ---
 include(GNUInstallDirs)
 
@@ -1740,7 +2425,7 @@ else()
     install(TARGETS drift RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT drift)
 
     # File-based effect/transition/template/audio-effect packages ship next to the binary;
-    # the app searches <appDir>/<subdir> (GpuPackageParse::defaultSearchPaths). Installing
+    # the app searches <appDir>/<subdir> (PackageSearchPaths::defaultSearchPaths). Installing
     # them here (rather than via the DRIFT_*_DIR env vars) keeps installed addons able to
     # supersede the bundled copies.
     foreach(_assetdir effects transitions effect-templates audio-effects)
@@ -1774,4 +2459,4 @@ add_subdirectory(tools)
 # --- tests -------------------------------------------------------------------
 enable_testing()
 add_subdirectory(tests)
-endif() # NOT ANDROID
+endif() # NOT ANDROID AND NOT EMSCRIPTEN

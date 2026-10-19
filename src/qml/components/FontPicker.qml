@@ -37,7 +37,7 @@ Item {
     }
 
     function rebuild() {
-        familyModel.clear()
+        const rows = []
         const needle = root.filter
         const matches = (name) => needle === "" || name.toLowerCase().indexOf(needle) >= 0
 
@@ -46,7 +46,7 @@ Item {
         for (let i = 0; i < catalog.length; ++i) {
             if (!matches(catalog[i].family))
                 continue
-            familyModel.append({
+            rows.push({
                 "name": catalog[i].family,
                 "previewFamily": catalog[i].qtFamily,
                 "group": catalog[i].categoryLabel,
@@ -57,16 +57,27 @@ Item {
         const user = EditorState.userFonts()
         for (let i = 0; i < user.length; ++i) {
             if (matches(user[i]))
-                familyModel.append({ "name": user[i], "previewFamily": user[i], "group": qsTr("My fonts"), "removable": true })
+                rows.push({ "name": user[i], "previewFamily": user[i], "group": qsTr("My fonts"), "removable": true })
         }
 
+        // Rendering each system family in its own face stalls scrolling on Windows (#345): every row
+        // makes Qt resolve and load an installed font on the GUI thread. They use the UI font instead.
         // Fonts are an addon, so an empty catalog is the normal starting state; the system list
         // is always offered and the header suggests the pack.
         const system = EditorState.systemFontFamilies()
         for (let i = 0; i < system.length; ++i) {
             if (matches(system[i]))
-                familyModel.append({ "name": system[i], "previewFamily": system[i], "group": qsTr("System fonts"), "removable": false })
+                rows.push({ "name": system[i], "previewFamily": "", "group": qsTr("System fonts"), "removable": false })
         }
+
+        familyModel.clear()
+        familyModel.append(rows)
+    }
+
+    Timer {
+        id: filterDebounce
+        interval: 150
+        onTriggered: root.rebuild()
     }
 
     Component.onCompleted: root.rebuild()
@@ -139,49 +150,17 @@ Item {
         }
     }
 
-    Rectangle {
-        id: trigger
-        anchors.fill: parent
-        radius: Theme.radiusSm
-        color: Theme.panelAccent
-        border.width: (popup.visible || root.activeFocus) ? 1 : 0
-        border.color: root.activeFocus ? Theme.primary : Theme.panelSecondaryBorder
-
-        Text {
-            anchors.left: parent.left
-            anchors.leftMargin: 8
-            anchors.right: chevron.left
-            anchors.rightMargin: 4
-            anchors.verticalCenter: parent.verticalCenter
-            text: root.displayFamily
-            // Preview the current selection in the face it actually is.
-            font.family: root.family === "" ? Theme.fontFamily : root.family
-            font.pixelSize: Theme.fontSizeSm
-            color: Theme.panelForeground
-            elide: Text.ElideRight
-        }
-
-        IconGlyph {
-            id: chevron
-            anchors.right: parent.right
-            anchors.rightMargin: 8
-            anchors.verticalCenter: parent.verticalCenter
-            glyph: Theme.icons.chevronDown
-            iconSize: 12
-            iconColor: Theme.mutedForeground
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                root.forceActiveFocus()
-                if (popup.visible) {
-                    popup.close()
-                } else {
-                    popup.open()
-                }
-            }
+    FontPickerTrigger {
+        displayFamily: root.displayFamily
+        previewFamily: root.family
+        fieldFocused: root.activeFocus
+        popupOpen: popup.visible
+        onToggled: {
+            root.forceActiveFocus()
+            if (popup.visible)
+                popup.close()
+            else
+                popup.open()
         }
     }
 
@@ -219,35 +198,12 @@ Item {
                 font.family: Theme.fontFamily
                 onTextChanged: {
                     root.filter = text.trim().toLowerCase()
-                    root.rebuild()
+                    filterDebounce.restart()
                 }
             }
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 34
-                color: addMouse.containsMouse ? Theme.panelAccent : "transparent"
-
-                Text {
-                    anchors.left: parent.left
-                    anchors.leftMargin: 8
-                    anchors.right: parent.right
-                    anchors.rightMargin: 8
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Add font file…")
-                    color: Theme.primary
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeSm
-                    elide: Text.ElideRight
-                }
-
-                MouseArea {
-                    id: addMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.addFont()
-                }
+            FontPickerAddRow {
+                onAddRequested: root.addFont()
             }
 
             ListView {
@@ -258,123 +214,40 @@ Item {
                 reuseItems: true
                 model: familyModel
 
-                header: Rectangle {
-                    width: list.width
-                    height: root.usingSystemFonts ? 40 : 0
-                    visible: root.usingSystemFonts
-                    color: Theme.panelSecondaryBg
-
-                    Text {
-                        anchors.left: parent.left
-                        anchors.leftMargin: 8
-                        anchors.right: parent.right
-                        anchors.rightMargin: 8
-                        anchors.verticalCenter: parent.verticalCenter
-                        // The count was baked into the translated string, so it could
-                        // not be updated or pluralised.
-                        text: qsTr("Install the font pack for curated families →")
-                        color: Theme.primary
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeSm
-                        elide: Text.ElideRight
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            popup.close()
-                            root.Window.window.openAddonManager("fonts")
-                        }
+                header: FontPickerPackBanner {
+                    rowWidth: list.width
+                    shown: root.usingSystemFonts
+                    onPackRequested: {
+                        popup.close()
+                        root.Window.window.openAddonManager("fonts")
                     }
                 }
                 currentIndex: -1
                 ScrollBar.vertical: AppScrollBar {}
 
                 section.property: "group"
-                section.delegate: Rectangle {
-                    required property string section
-                    width: list.width
-                    height: 24
-                    color: Theme.panelSecondaryBg
-
-                    Text {
-                        anchors.left: parent.left
-                        anchors.leftMargin: 8
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: parent.section
-                        color: Theme.mutedForeground
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeXs
-                    }
+                section.delegate: FontPickerSectionHeader {
+                    rowWidth: list.width
                 }
 
                 // Roles come in as required properties. Declaring any required property puts the
                 // delegate in required-properties mode, where the `model` context object is not
                 // injected — so every role the delegate reads has to be declared here.
-                delegate: Rectangle {
-                    id: row
-                    required property string name
-                    required property string previewFamily
-                    required property bool removable
-
-                    width: list.width
-                    height: 34
-                    color: rowMouse.containsMouse ? Theme.panelAccent
-                                                  : (row.name === root.family ? Theme.panelSecondaryBg
-                                                                              : "transparent")
-
-                    Behavior on color {
-                        ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                delegate: FontPickerFamilyRow {
+                    rowWidth: list.width
+                    selectedFamily: root.family
+                    onFamilyChosen: function(familyName) {
+                        root.forceActiveFocus()
+                        root.familyPicked(familyName)
+                        popup.close()
                     }
-
-                    Text {
-                        anchors.left: parent.left
-                        anchors.leftMargin: 8
-                        anchors.right: removeButton.visible ? removeButton.left : parent.right
-                        anchors.rightMargin: 8
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: row.name
-                        font.family: row.previewFamily
-                        font.pixelSize: 18
-                        color: Theme.panelForeground
-                        elide: Text.ElideRight
-                    }
-
-                    MouseArea {
-                        id: rowMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            root.forceActiveFocus()
-                            root.familyPicked(row.name)
-                            popup.close()
-                        }
-                    }
-
-                    IconButton {
-                        id: removeButton
-                        visible: row.removable
-                        anchors.right: parent.right
-                        anchors.rightMargin: 4
-                        anchors.verticalCenter: parent.verticalCenter
-                        glyph: Theme.icons.x
-                        variant: "ghost"
-                        buttonSize: 24
-                        iconSize: 12
-                        tooltip: qsTr("Remove font")
-                        onClicked: EditorState.removeUserFont(row.name)
+                    onRemoveRequested: function(familyName) {
+                        EditorState.removeUserFont(familyName)
                     }
                 }
             }
         }
 
-        background: Rectangle {
-            radius: Theme.radiusSm
-            color: Theme.panelBackground
-            border.width: 1
-            border.color: Theme.panelBorder
-        }
+        background: FontPickerPopupSurface { }
     }
 }

@@ -28,18 +28,18 @@ AbstractButton {
     focusPolicy: Qt.StrongFocus
     padding: Theme.spacingSm
     implicitHeight: body.implicitHeight + topPadding + bottomPadding
-    opacity: enabled ? 1 : 0.5
+    opacity: enabled ? 1 : Theme.c.upscaleModelCard.disabledOpacity
 
     Accessible.role: Accessible.RadioButton
     Accessible.name: model.name || ""
     Accessible.checked: root.selected
 
     background: Rectangle {
-        radius: Theme.radiusMd
-        color: root.selected ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.10)
-                             : root.hovered ? Theme.panelSecondaryBg : Theme.panelBackground
-        border.width: root.selected || root.visualFocus ? 2 : 1
-        border.color: root.selected || root.visualFocus ? Theme.primary : Theme.panelBorder
+        radius: Theme.c.upscaleModelCard.radius
+        color: root.selected ? Qt.rgba(Theme.c.upscaleModelCard.accent.r, Theme.c.upscaleModelCard.accent.g, Theme.c.upscaleModelCard.accent.b, 0.10)
+                             : root.hovered ? Theme.c.upscaleModelCard.backgroundHover : Theme.c.upscaleModelCard.background
+        border.width: root.selected || root.visualFocus ? Theme.c.upscaleModelCard.borderWidthFocus : Theme.c.upscaleModelCard.borderWidth
+        border.color: root.selected || root.visualFocus ? Theme.c.upscaleModelCard.borderFocus : Theme.c.upscaleModelCard.border
     }
 
     contentItem: Column {
@@ -50,8 +50,8 @@ AbstractButton {
             id: frame
             width: parent.width
             height: Math.round(width * 9 / 16)
-            radius: Theme.radiusSm
-            color: Theme.panelMuted
+            radius: Theme.c.upscaleModelCard.frameRadius
+            color: Theme.c.upscaleModelCard.frameBackground
             clip: true
 
             Image {
@@ -68,7 +68,7 @@ AbstractButton {
                 visible: !root.model.thumbnail
                 glyph: root.isNone ? Theme.icons.x : Theme.icons.image
                 iconSize: 22
-                iconColor: Theme.mutedForeground
+                iconColor: Theme.c.upscaleModelCard.icon
             }
 
             // The thumbnails are split down the middle: bicubic on the left, the model on the right.
@@ -81,14 +81,14 @@ AbstractButton {
                     y: frame.height - height - 4
                     width: tag.implicitWidth + 8
                     height: tag.implicitHeight + 2
-                    radius: Theme.radiusXs
-                    color: Theme.scrimStrong
+                    radius: Theme.c.upscaleModelCard.badgeRadius
+                    color: Theme.c.upscaleModelCard.badgeBackground
 
                     Text {
                         id: tag
                         anchors.centerIn: parent
                         text: parent.modelData
-                        color: "#ffffff"
+                        color: Theme.c.upscaleModelCard.badgeForeground
                         font.pixelSize: Theme.fontSizeTiny
                     }
                 }
@@ -116,10 +116,10 @@ AbstractButton {
                 visible: !root.isNone
                 width: visible ? scaleText.implicitWidth + 10 : 0
                 height: scaleText.implicitHeight + 2
-                radius: height / 2
-                color: Theme.panelSecondaryBg
-                border.width: 1
-                border.color: Theme.panelBorder
+                radius: Theme.c.upscaleModelCard.scaleRadius
+                color: Theme.c.upscaleModelCard.scaleBackground
+                border.width: Theme.c.upscaleModelCard.scaleBorderWidth
+                border.color: Theme.c.upscaleModelCard.scaleBorder
 
                 Text {
                     id: scaleText
@@ -128,7 +128,7 @@ AbstractButton {
                     font.family: Theme.monoFontFamily
                     font.pixelSize: Theme.fontSizeXs
                     font.weight: Font.Medium
-                    color: Theme.panelForeground
+                    color: Theme.c.upscaleModelCard.foreground
                 }
             }
 
@@ -179,8 +179,8 @@ AbstractButton {
                         required property int index
                         width: 10
                         height: 4
-                        radius: 2
-                        color: index < root.speedLevel ? Theme.constructive : Theme.panelBorder
+                        radius: Theme.c.upscaleModelCard.meterRadius
+                        color: index < root.speedLevel ? Theme.c.upscaleModelCard.meterOn : Theme.c.upscaleModelCard.meterOff
                     }
                 }
             }

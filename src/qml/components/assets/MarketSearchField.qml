@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // The Market's one entry point: a pill-shaped field with no buttons. Enter submits, the
 // trailing × clears the text or, while a request is out, cancels it. The pill is the only
 // fully rounded control on the page, which is what marks it as the place to start.
@@ -19,10 +17,10 @@ Rectangle {
     function focusField() { input.forceActiveFocus() }
 
     implicitHeight: Theme.touchUi ? Theme.controlHeight + Theme.spacingLg : Theme.controlHeight + Theme.spacingSm
-    radius: height / 2
-    color: Theme.panelAccent
-    border.width: input.activeFocus ? Theme.borderWidthFocus : 0
-    border.color: Theme.focusRing
+    radius: Theme.c.marketSearchField.radius
+    color: Theme.c.marketSearchField.background
+    border.width: input.activeFocus ? Theme.c.marketSearchField.borderWidth : 0
+    border.color: Theme.c.marketSearchField.borderFocus
 
     IconGlyph {
         id: lens
@@ -31,7 +29,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         glyph: root.busy ? Theme.icons.spinner : Theme.icons.search
         iconSize: Theme.iconSizeMd
-        iconColor: Theme.mutedForeground
+        iconColor: Theme.c.marketSearchField.icon
 
         RotationAnimator on rotation {
             running: root.busy
@@ -53,13 +51,13 @@ Rectangle {
         background: null
         leftPadding: 0
         rightPadding: 0
-        color: Theme.panelForeground
-        placeholderTextColor: Theme.mutedForeground
+        color: Theme.c.marketSearchField.foreground
+        placeholderTextColor: Theme.c.marketSearchField.foregroundMuted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeSm
         selectByMouse: true
-        selectedTextColor: Theme.primaryForeground
-        selectionColor: Theme.primary
+        selectedTextColor: Theme.c.marketSearchField.selectionForeground
+        selectionColor: Theme.c.marketSearchField.selection
         Keys.onReturnPressed: root.submitted()
         Keys.onEnterPressed: root.submitted()
         Keys.onEscapePressed: (event) => {

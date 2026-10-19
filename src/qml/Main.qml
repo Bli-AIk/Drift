@@ -1,12 +1,19 @@
-import Qt.labs.platform as Platform
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Window
 import Drift
-import "components"
 
 ApplicationWindow {
     id: window
+    property alias editorHeader: workspace.editorHeader
+    property alias rootSplit: workspace.rootSplit
+    property alias outerSplit: workspace.outerSplit
+    property alias innerSplit: workspace.innerSplit
+    property alias assetsPanel: workspace.assetsPanel
+    property alias previewPanel: workspace.previewPanel
+    property alias propertiesPanel: workspace.propertiesPanel
+    property alias timelinePanel: workspace.timelinePanel
+    property alias androidMediaPreviewLoader: mediaPreviewHost.loader
 
     // Qt creates some chrome itself — most visibly the Undo/Cut/Copy/Paste menu on every
     // TextField and TextArea (Basic/TextField.qml declares ContextMenu.menu). Drift styles
@@ -15,26 +22,26 @@ ApplicationWindow {
     // rendered in that scheme's colours next to Drift's own. Palette propagates down the item
     // hierarchy, popups included, so setting the roles the Basic style reads brings Qt's own
     // chrome under Theme — and binding them keeps it following the light/dark toggle.
-    palette.window: Theme.panelBackground
-    palette.windowText: Theme.panelForeground
-    palette.base: Theme.panelAccent
-    palette.text: Theme.panelForeground
-    palette.button: Theme.panelAccent
-    palette.buttonText: Theme.panelForeground
-    palette.placeholderText: Theme.mutedForeground
+    palette.window: Theme.c.appWindow.paletteWindow
+    palette.windowText: Theme.c.appWindow.paletteWindowText
+    palette.base: Theme.c.appWindow.paletteBase
+    palette.text: Theme.c.appWindow.paletteText
+    palette.button: Theme.c.appWindow.paletteButton
+    palette.buttonText: Theme.c.appWindow.paletteButtonText
+    palette.placeholderText: Theme.c.appWindow.palettePlaceholder
     // Menu border and item states: dark draws the frame, light the hovered row,
     // midlight the pressed one.
-    palette.dark: Theme.panelBorder
-    palette.mid: Theme.panelMuted
-    palette.midlight: Theme.panelAccent
-    palette.light: Theme.popoverHover
+    palette.dark: Theme.c.appWindow.paletteDark
+    palette.mid: Theme.c.appWindow.paletteMid
+    palette.midlight: Theme.c.appWindow.paletteMidlight
+    palette.light: Theme.c.appWindow.paletteLight
     // Drawn at 12% and 50% alpha for the menu's drop shadow; appBackground would
     // make that a white glow in light mode.
-    palette.shadow: "#000000"
-    palette.highlight: Theme.primary
-    palette.highlightedText: Theme.primaryForeground
-    palette.toolTipBase: Theme.panelBackground
-    palette.toolTipText: Theme.panelForeground
+    palette.shadow: Theme.c.appWindow.paletteShadow
+    palette.highlight: Theme.c.appWindow.paletteHighlight
+    palette.highlightedText: Theme.c.appWindow.paletteHighlightedText
+    palette.toolTipBase: Theme.c.appWindow.paletteToolTipBase
+    palette.toolTipText: Theme.c.appWindow.paletteToolTipText
 
     width: 1280
     height: 800
@@ -52,7 +59,13 @@ ApplicationWindow {
     // "Conflicting properties 'visible' and 'visibility'" (Maximized + hidden).
     visibility: Window.Hidden
     title: "CutWire Drift"
-    color: Theme.appBackground
+    // Alpha stays 1 unless this process was started with a translucent surface.
+    // backgroundOpacity is read here so the binding follows theme reloads.
+    color: {
+        const opacity = ThemeManager.window.backgroundOpacity
+        const multiplier = (opacity === undefined || opacity === null) ? 1 : opacity
+        return WindowBackdrop.windowBackground(Theme.c.appWindow.background, multiplier)
+    }
 
     LayoutMirroring.enabled: Qt.application.layoutDirection === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
@@ -95,310 +108,12 @@ ApplicationWindow {
     Loader {
         active: Theme.isMacOS
         sourceComponent: Component {
-        Platform.MenuBar {
-            window: window
-
-            Platform.Menu {
-                title: qsTr("&File")
-
-                Platform.MenuItem {
-                    text: qsTr("&New Project")
-                    shortcut: StandardKey.New
-                    onTriggered: window.requestNewProject()
-                }
-                Platform.MenuItem {
-                    text: qsTr("&Open Project…")
-                    shortcut: StandardKey.Open
-                    onTriggered: window.requestOpenProjectDialog()
-                }
-                Platform.MenuSeparator {}
-                Platform.MenuItem {
-                    text: qsTr("&Save Project")
-                    shortcut: StandardKey.Save
-                    enabled: !window.showStartScreen
-                    onTriggered: editorHeader.saveProject()
-                }
-                Platform.MenuItem {
-                    text: qsTr("Save Project &As…")
-                    shortcut: StandardKey.SaveAs
-                    enabled: !window.showStartScreen
-                    onTriggered: editorHeader.saveProjectAs()
-                }
-                Platform.MenuItem {
-                    text: qsTr("Save Project &JSON…")
-                    enabled: !window.showStartScreen
-                    onTriggered: editorHeader.saveProjectJson()
-                }
-                Platform.MenuItem {
-                    text: qsTr("Open Project JSON…")
-                    onTriggered: editorHeader.openProjectJson()
-                }
-                Platform.MenuSeparator {}
-                Platform.MenuItem {
-                    text: qsTr("&Export Video…")
-                    enabled: !window.showStartScreen && !EditorState.exportInProgress
-                    onTriggered: editorHeader.exportVideo()
-                }
-                Platform.MenuItem {
-                    text: qsTr("&Package Project…")
-                    enabled: !window.showStartScreen
-                    onTriggered: editorHeader.packageProject()
-                }
-                Platform.MenuSeparator {}
-                Platform.MenuItem {
-                    text: qsTr("&Close Project")
-                    shortcut: StandardKey.Close
-                    enabled: !window.showStartScreen
-                    onTriggered: window.requestCloseProject()
-                }
+            MainMacMenuBar {
+                appWindow: window
+                header: editorHeader
+                assets: assetsPanel
+                downloadsLoader: downloadsWindowLoader
             }
-
-            Platform.Menu {
-                title: qsTr("&Edit")
-
-                Platform.MenuItem {
-                    text: qsTr("&Undo")
-                    shortcut: StandardKey.Undo
-                    enabled: !window.showStartScreen && EditorState.canUndo
-                    onTriggered: window.dispatchAction("undo")
-                }
-                Platform.MenuItem {
-                    text: qsTr("&Redo")
-                    shortcut: StandardKey.Redo
-                    enabled: !window.showStartScreen && EditorState.canRedo
-                    onTriggered: window.dispatchAction("redo")
-                }
-                Platform.MenuSeparator {}
-                Platform.MenuItem {
-                    text: qsTr("Cu&t")
-                    shortcut: StandardKey.Cut
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("cut")
-                }
-                Platform.MenuItem {
-                    text: qsTr("&Copy")
-                    shortcut: StandardKey.Copy
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("copy")
-                }
-                Platform.MenuItem {
-                    text: qsTr("&Paste")
-                    shortcut: StandardKey.Paste
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("paste")
-                }
-                Platform.MenuItem {
-                    text: qsTr("&Delete")
-                    shortcut: StandardKey.Delete
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("delete")
-                }
-                Platform.MenuItem {
-                    text: qsTr("Select &All")
-                    shortcut: StandardKey.SelectAll
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("selectAll")
-                }
-                Platform.MenuItem {
-                    text: qsTr("Clear Selection")
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("clearSelection")
-                }
-                Platform.MenuSeparator {}
-                Platform.MenuItem {
-                    text: qsTr("Split Clip")
-                    shortcut: "S"
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("split")
-                }
-                Platform.MenuItem {
-                    text: qsTr("Duplicate Clip")
-                    shortcut: "Ctrl+D"
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("duplicate")
-                }
-                Platform.MenuItem {
-                    text: qsTr("Copy Effects")
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("copyEffects")
-                }
-                Platform.MenuItem {
-                    text: qsTr("Paste Effects")
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("pasteEffects")
-                }
-                Platform.MenuItem {
-                    text: qsTr("Paste Attributes…")
-                    shortcut: "Ctrl+Alt+V"
-                    enabled: !window.showStartScreen
-                    onTriggered: window.openPasteAttributes()
-                }
-                Platform.MenuSeparator {}
-                Platform.MenuItem {
-                    text: qsTr("About Drift")
-                    role: Platform.MenuItem.AboutRole
-                    onTriggered: window.openAboutDialog()
-                }
-                Platform.MenuItem {
-                    text: qsTr("Settings…")
-                    shortcut: StandardKey.Preferences
-                    role: Platform.MenuItem.ApplicationSpecificRole
-                    onTriggered: window.openSettings()
-                }
-                Platform.MenuItem {
-                    text: qsTr("Check for Updates…")
-                    role: Platform.MenuItem.ApplicationSpecificRole
-                    onTriggered: window.checkForUpdates()
-                }
-            }
-
-            Platform.Menu {
-                title: qsTr("&Playback")
-
-                Platform.MenuItem {
-                    text: qsTr("Play / Pause")
-                    shortcut: "Space"
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("playPause")
-                }
-                Platform.MenuSeparator {}
-                Platform.MenuItem {
-                    text: qsTr("Step Back One Frame")
-                    shortcut: "Left"
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("stepBack")
-                }
-                Platform.MenuItem {
-                    text: qsTr("Step Forward One Frame")
-                    shortcut: "Right"
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("stepForward")
-                }
-                Platform.MenuItem {
-                    text: qsTr("Previous Cut Point")
-                    shortcut: "Up"
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("previousEdit")
-                }
-                Platform.MenuItem {
-                    text: qsTr("Next Cut Point")
-                    shortcut: "Down"
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("nextEdit")
-                }
-                Platform.MenuItem {
-                    text: qsTr("Go to Start of Timeline")
-                    shortcut: "Home"
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("goToStart")
-                }
-                Platform.MenuSeparator {}
-                Platform.MenuItem {
-                    text: qsTr("Toggle Bookmark")
-                    shortcut: "M"
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("toggleBookmark")
-                }
-                Platform.MenuItem {
-                    text: qsTr("Next Bookmark")
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("nextBookmark")
-                }
-                Platform.MenuItem {
-                    text: qsTr("Previous Bookmark")
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("previousBookmark")
-                }
-            }
-
-            Platform.Menu {
-                title: qsTr("&View")
-
-                Platform.MenuItem {
-                    text: qsTr("Zoom &In")
-                    shortcut: StandardKey.ZoomIn
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("zoomIn")
-                }
-                Platform.MenuItem {
-                    text: qsTr("Zoom &Out")
-                    shortcut: StandardKey.ZoomOut
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("zoomOut")
-                }
-                Platform.MenuSeparator {}
-                Platform.MenuItem {
-                    text: qsTr("Toggle Fullscreen Preview")
-                    enabled: !window.showStartScreen
-                    onTriggered: window.togglePreviewFullscreen()
-                }
-                Platform.MenuItem {
-                    text: qsTr("Toggle Guides")
-                    enabled: !window.showStartScreen
-                    onTriggered: window.dispatchAction("toggleGuides")
-                }
-                Platform.MenuSeparator {}
-                Platform.MenuItem {
-                    text: qsTr("Switch to Mobile Layout…")
-                    onTriggered: window.switchShell("mobile")
-                }
-            }
-
-            Platform.Menu {
-                title: qsTr("&Window")
-
-                Platform.MenuItem {
-                    text: qsTr("Landscape Workspace")
-                    checkable: true
-                    checked: !EditorState.preferences.workspaceLayoutOverridden || EditorState.preferences.workspaceLayoutPreferred === "landscape"
-                    onTriggered: EditorState.preferences.setWorkspaceLayoutPreference("landscape")
-                }
-                Platform.MenuItem {
-                    text: qsTr("Portrait Workspace")
-                    checkable: true
-                    checked: EditorState.preferences.workspaceLayoutOverridden && EditorState.preferences.workspaceLayoutPreferred === "portrait"
-                    onTriggered: EditorState.preferences.setWorkspaceLayoutPreference("portrait")
-                }
-                Platform.MenuItem {
-                    text: qsTr("Auto Workspace (Follow Canvas)")
-                    checkable: true
-                    checked: !EditorState.preferences.workspaceLayoutOverridden
-                    onTriggered: EditorState.preferences.clearWorkspaceLayoutPreference()
-                }
-                Platform.MenuSeparator {}
-                Platform.MenuItem {
-                    text: qsTr("Downloads")
-                    onTriggered: downloadsWindowLoader.ensure().show()
-                }
-                Platform.MenuItem {
-                    text: qsTr("Multicam")
-                    onTriggered: window.openMulticam()
-                }
-            }
-
-            Platform.Menu {
-                title: qsTr("&Help")
-
-                Platform.MenuItem {
-                    text: qsTr("Keyboard Shortcuts")
-                    shortcut: "F1"
-                    onTriggered: {
-                        if (window.previewFullscreen)
-                            window.togglePreviewFullscreen()
-                        assetsPanel.showTab("shortcuts")
-                    }
-                }
-                Platform.MenuItem {
-                    text: qsTr("Extras…")
-                    onTriggered: window.openExtras()
-                }
-                Platform.MenuSeparator {}
-                Platform.MenuItem {
-                    text: qsTr("Debug Info…")
-                    onTriggered: window.openDebugInfo()
-                }
-            }
-        }
         }
     }
 
@@ -406,7 +121,7 @@ ApplicationWindow {
     onClosing: function (close) {
         // Before any of the branches below, so a quit that is cancelled at the
         // unsaved prompt still records where the window was.
-        window.persistLayout()
+        window.persistWindowState()
         if (window.forceClose || !EditorState.projectFile.hasUnsavedChanges)
             return
         close.accepted = false
@@ -539,96 +254,62 @@ ApplicationWindow {
         LayoutMemory.saveWindowState(window.windowedGeometry, maximized === 1)
     }
 
-    function persistLayout() {
-        window.persistWindowState()
-        window.capturePanelFractions()
-        for (const key in window.panelFractions)
-            LayoutMemory.setPanelFraction(key, window.panelFractions[key])
-    }
-
     // Panel sizes are kept as a fraction of the split they sit in rather than a pixel
     // width, so a layout dragged out on a 4K display still reads on a laptop screen.
     // Keyed by workspace, because portrait and landscape are different arrangements
     // and each deserves to remember its own.
-    property var panelFractions: ({})
-    // Nothing is captured until the stored layout has been applied, or the defaults
-    // from the first layout pass would immediately overwrite it.
-    property bool panelLayoutRestored: false
-
-    Timer {
-        id: panelSettleTimer
-        interval: 250
-        onTriggered: {
-            window.capturePanelFractions()
-            for (const key in window.panelFractions)
-                LayoutMemory.setPanelFraction(key, window.panelFractions[key])
-        }
-    }
-
-    function schedulePanelCapture() {
-        if (!window.panelLayoutRestored || workspaceApplyTimer.running)
-            return
-        panelSettleTimer.restart()
-    }
-
-    function capturePanelFractions() {
-        // Fullscreen collapses every panel around the preview; those sizes are a mode,
-        // not a layout, and must not be written over the user's arrangement.
-        if (window.previewFullscreen)
-            return
-        const prefix = window.workspaceLayout + "/"
-        if (outerSplit.height > 0 && innerSplit.height > 0)
-            window.panelFractions[prefix + "editorRow"] = innerSplit.height / outerSplit.height
-        if (innerSplit.width > 0) {
-            window.panelFractions[prefix + "assets"] = assetsPanel.width / innerSplit.width
-            window.panelFractions[prefix + "properties"] = propertiesPanel.width / innerSplit.width
-        }
-        // Landscape hands the preview the slack in its row (fillWidth), so it has no
-        // width of its own to remember there.
-        if (window.portraitWorkspace && rootSplit.width > 0)
-            window.panelFractions[prefix + "preview"] = previewPanel.width / rootSplit.width
-    }
+    //
+    // Fractions are written only when the user finishes dragging a handle, and
+    // reapplied whenever the split they are a fraction of changes size. Sampling them
+    // at any other time is what made them shrink every launch (#326): the window first
+    // lays out at its windowed size and is maximized after, so pixel sizes restored on
+    // that first pass were then read back against the larger window.
 
     // Writing an attached SplitView size drops the default binding behind it — which
     // is the point: from here on the panel keeps the size the user chose, exactly as
-    // it does after a handle drag.
-    function applySavedPanelSizes() {
-        const prefix = window.workspaceLayout + "/"
-        const editorRow = LayoutMemory.panelFraction(prefix + "editorRow", 0)
-        if (editorRow > 0 && outerSplit.height > 0)
+    // it does after a handle drag. Fullscreen collapses every panel around the
+    // preview; those sizes are a mode, not a layout, and are left alone.
+    function applyEditorRowFraction() {
+        if (window.previewFullscreen || outerSplit.height <= 0)
+            return
+        const editorRow = LayoutMemory.panelFraction(window.workspaceLayout + "/editorRow", 0)
+        if (editorRow > 0)
             innerSplit.SplitView.preferredHeight = outerSplit.height * editorRow
-        const assets = LayoutMemory.panelFraction(prefix + "assets", 0)
-        if (assets > 0 && innerSplit.width > 0)
-            assetsPanel.SplitView.preferredWidth = innerSplit.width * assets
-        const properties = LayoutMemory.panelFraction(prefix + "properties", 0)
-        if (properties > 0 && innerSplit.width > 0)
-            propertiesPanel.SplitView.preferredWidth = innerSplit.width * properties
-        if (window.portraitWorkspace) {
-            const preview = LayoutMemory.panelFraction(prefix + "preview", 0)
-            if (preview > 0 && rootSplit.width > 0)
-                previewPanel.SplitView.preferredWidth = rootSplit.width * preview
-        }
     }
 
-    // Every extent is 0 on the first layout pass, and a fraction of 0 is 0 — so the
-    // restore waits for real sizes rather than running at Component.onCompleted.
-    function restorePanelSizesWhenReady() {
-        if (window.panelLayoutRestored)
+    function applySidePanelFractions() {
+        if (window.previewFullscreen || innerSplit.width <= 0)
             return
-        if (rootSplit.width <= 0 || outerSplit.height <= 0 || innerSplit.width <= 0)
+        const prefix = window.workspaceLayout + "/"
+        const assets = LayoutMemory.panelFraction(prefix + "assets", 0)
+        if (assets > 0)
+            assetsPanel.SplitView.preferredWidth = innerSplit.width * assets
+        const properties = LayoutMemory.panelFraction(prefix + "properties", 0)
+        if (properties > 0)
+            propertiesPanel.SplitView.preferredWidth = innerSplit.width * properties
+    }
+
+    // Landscape hands the preview the slack in its row (fillWidth), so it has no
+    // width of its own there.
+    function applyPreviewFraction() {
+        if (window.previewFullscreen || !window.portraitWorkspace || rootSplit.width <= 0)
             return
-        window.applySavedPanelSizes()
-        window.panelLayoutRestored = true
+        const preview = LayoutMemory.panelFraction(window.workspaceLayout + "/preview", 0)
+        if (preview > 0)
+            previewPanel.SplitView.preferredWidth = rootSplit.width * preview
     }
 
     // A workspace flip moves the preview between splits, so the panels around it are
     // still resizing on the frame the flip lands. Reapplying immediately would divide
-    // by stale extents; waiting lets the new arrangement settle first, and capture is
-    // suppressed until it has (schedulePanelCapture checks this timer).
+    // by stale extents; waiting lets the new arrangement settle first.
     Timer {
         id: workspaceApplyTimer
         interval: 100
-        onTriggered: window.applySavedPanelSizes()
+        onTriggered: {
+            window.applyEditorRowFraction()
+            window.applySidePanelFractions()
+            window.applyPreviewFraction()
+        }
     }
 
     // Fullscreen preview: the window goes fullscreen *and* every panel around the
@@ -720,11 +401,8 @@ ApplicationWindow {
     onPortraitWorkspaceChanged: {
         rootSplit.relocatePreview()
         // The two workspaces remember their own proportions, so the flip pulls in the
-        // other one's — and any capture already in flight belongs to the old layout.
-        if (window.panelLayoutRestored) {
-            panelSettleTimer.stop()
-            workspaceApplyTimer.restart()
-        }
+        // other one's.
+        workspaceApplyTimer.restart()
     }
 
     function configureAndAddAsset(assetIndex, runner) {
@@ -743,8 +421,9 @@ ApplicationWindow {
     property bool layoutPromptDismissed: false
 
     // True only during the startup window where continueStartupAfterLanguage() has
-    // decided to ask which project to open, rather than settle on one itself.
-    // Cleared for good once that choice is made.
+    // decided to ask which project to open, rather than settle on one itself — and on
+    // first launch, behind the language chooser that runs before it. Cleared for good
+    // once that choice is made.
     property bool showStartScreen: false
 
     // Header Extras icon pulses while true; never auto-opens a dialog.
@@ -786,6 +465,13 @@ ApplicationWindow {
     }
 
     LazyLoader {
+        id: imageSequenceDialogLoader
+        sourceComponent: Component {
+            ImageSequenceDialog { }
+        }
+    }
+
+    LazyLoader {
         id: projectSetupDialogLoader
         sourceComponent: Component {
             ProjectSetupDialog { }
@@ -813,6 +499,8 @@ ApplicationWindow {
             }
         }
     }
+
+    ProjectLoadDialog { }
 
     LazyLoader {
         id: recoveryDialogLoader
@@ -860,9 +548,6 @@ ApplicationWindow {
 
     Connections {
         target: Updates
-        function onUpdateReady() {
-            window.openUpdateDialog()
-        }
         function onInstallReady() {
             window.openUpdateDialog()
         }
@@ -1256,6 +941,21 @@ ApplicationWindow {
         debugInfoDialogLoader.ensure().open()
     }
 
+    // Global search opens assets tabs and labels them; the panel itself is out of the header's reach.
+    function showAssetsTab(tabId) {
+        if (window.previewFullscreen)
+            window.togglePreviewFullscreen()
+        assetsPanel.showTab(tabId)
+    }
+
+    function assetsTabLabel(tabId) {
+        return assetsPanel.tabLabel(tabId)
+    }
+
+    function focusEditor() {
+        editorScope.forceActiveFocus()
+    }
+
     function openPasteAttributes() {
         pasteAttributesDialogLoader.ensure().openDialog()
     }
@@ -1300,7 +1000,11 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
+        WindowBackdrop.attach(window)
         Theme.windowWidth = window.width
+        MediaImport.sequencePrompt = function (found, done) {
+            imageSequenceDialogLoader.ensure().ask(found, done)
+        }
         window.restoreWindowGeometry()
         window.beginStartupProject()
         // Independent of the project-restore sequence above — it neither gates nor is
@@ -1312,6 +1016,12 @@ ApplicationWindow {
     }
 
     function beginStartupProject() {
+        // First launch: the language chooser runs before anything decides which project to
+        // open, and the empty editor behind it is a project nobody asked for. Raise the start
+        // screen first, so the chooser sits on the page the rest of first launch lands on;
+        // continueStartupAfterLanguage() lowers it again for the paths that open a project.
+        if (EditorState.preferences.needsUiLanguagePrompt)
+            window.showStartScreen = true
         if (window.promptLanguageChooserIfNeeded())
             return
         window.continueStartupAfterLanguage()
@@ -1364,6 +1074,10 @@ ApplicationWindow {
     function openPendingLaunch() {
         if (window._pendingLaunchUrl === "")
             return
+        // A recovery restore is still landing; onProjectLoadFinished comes back here so the
+        // unsaved prompt sees the recovered work.
+        if (EditorState.projectFile.projectLoadPending)
+            return
         const url = window._pendingLaunchUrl
         window._pendingLaunchUrl = ""
         window.openLaunchedProject(url)
@@ -1389,6 +1103,11 @@ ApplicationWindow {
             window.showStartScreen = true
             return
         }
+        // Reopen is on but there was nothing to reopen: a fresh project, set up through the
+        // layout chooser — which defers to the start screen, so drop the one raised for the
+        // language chooser first. (The paths above that open a document drop it themselves,
+        // in onProjectLoadFinished, once the document is in.)
+        window.showStartScreen = false
         layoutChooserOpenTimer.start()
     }
 
@@ -1458,17 +1177,11 @@ ApplicationWindow {
         // --- Error and status surfacing -------------------------------------
         // These signals previously had no handler anywhere in QML, so a failed
         // export or transcription was reported only to the console.
+        // Failures and cancellation surface through lastMessage, which carries the
+        // actual reason; a generic toast here used to blame disk space for everything.
         function onExportFinished(success) {
-            if (success) {
+            if (success)
                 Toasts.success(qsTr("Export finished."))
-                return
-            }
-            // Exporter reports cancellation as a failed run with this message —
-            // surface it as a neutral note, not a disk/location error.
-            if (EditorState.lastMessage === "Export cancelled")
-                Toasts.info(qsTr("Export cancelled."))
-            else
-                Toasts.error(qsTr("Export failed. Check the save location and free space on your disk."))
         }
 
         function onSubtitleGenerationFinished(ok, message) {
@@ -1531,6 +1244,16 @@ ApplicationWindow {
         function onProjectLoadFinished(ok) {
             if (ok)
                 window.showStartScreen = false
+            window.openPendingLaunch()
+        }
+
+        // An agent's close_project (true) / new_project or load_project (false). The agent already discarded
+        // the document without asking, so there is no unsaved prompt here — only the screen
+        // change and the same "Project closed" note requestCloseProject() posts.
+        function onStartScreenRequested(visible) {
+            window.showStartScreen = visible
+            if (visible)
+                EditorState.setLastMessage(qsTr("Project closed"))
         }
 
         function onMissingAddons(addons) {
@@ -1631,6 +1354,11 @@ ApplicationWindow {
                 timelinePanel.setZoom(timelinePanel.zoom / 1.5)
             return
         }
+        if (id === "search") {
+            if (editorHeader.visible)
+                editorHeader.focusSearch()
+            return
+        }
         EditorState.triggerAction(id)
     }
 
@@ -1701,201 +1429,10 @@ ApplicationWindow {
             event.accepted = true
         }
 
-    Column {
-        anchors.fill: parent
-        spacing: 0
-        // The start screen sits on top of this document rather than replacing it (see
-        // the StartScreen instance below), so without this the editor underneath was
-        // still fully live — clickable through any gap and, worse, still reachable by
-        // keyboard even though nothing of it is visible. Disabling blocks mouse input
-        // and keyboard focus for the whole subtree, not just the pointer.
-        enabled: !window.showStartScreen
-
-        EditorHeader {
-            id: editorHeader
-            width: parent.width
-            visible: !window.previewFullscreen
+        EditorWorkspace {
+            id: workspace
             onDownloadsRequested: downloadsWindowLoader.ensure().show()
         }
-
-        Item {
-            width: parent.width
-            // Clamped so the editor body never takes a negative height while the
-            // window is being resized toward its minimum.
-            height: Math.max(0, parent.height
-                                - (window.previewFullscreen ? 0 : Theme.headerHeight))
-
-            // Two workspaces (issue #46). Landscape is the classic three-pane row
-            // above the timeline. Portrait lifts the preview out into a full-height
-            // column on the right, so a 9:16 frame is bounded by the window height
-            // instead of by the height of the top row — where it renders
-            // postage-stamp small. Only the preview moves between the two; assets,
-            // properties and the timeline keep their slots either way.
-            SplitView {
-                id: rootSplit
-                anchors.fill: parent
-                // Edge-to-edge in fullscreen; the usual page padding otherwise.
-                anchors.margins: window.previewFullscreen ? 0 : Theme.pagePadding
-                anchors.topMargin: 0
-                orientation: Qt.Horizontal
-                spacing: Theme.panelGap
-
-                handle: PanelSplitHandle { view: rootSplit }
-
-                // Container.removeItem() *destroys* what it removes — takeItem() is
-                // the one that hands the item back. That distinction matters here:
-                // the preview owns the video sink and the GL runtime, so rebuilding
-                // it (via removeItem, or a Loader) would tear down the renderer and
-                // drop playback state on every workspace switch. Moving the one live
-                // instance keeps the switch free.
-                function relocatePreview() {
-                    const wantRoot = window.portraitWorkspace
-                    if (wantRoot === (previewPanel.SplitView.view === rootSplit))
-                        return
-                    const from = wantRoot ? innerSplit : rootSplit
-                    for (let i = 0; i < from.count; ++i) {
-                        if (from.itemAt(i) === previewPanel) {
-                            from.takeItem(i)
-                            break
-                        }
-                    }
-                    // Index 1 either way: after the assets panel in the landscape
-                    // row, after the editing stack in the portrait column.
-                    if (wantRoot)
-                        rootSplit.insertItem(1, previewPanel)
-                    else
-                        innerSplit.insertItem(1, previewPanel)
-                }
-
-                // The preview is declared in its landscape slot below, so a session
-                // that starts portrait needs one move once the tree exists. Also
-                // covers a layout flip that lands before this point during startup —
-                // relocatePreview() is a no-op when nothing has to move.
-                Component.onCompleted: relocatePreview()
-
-                // The stored panel sizes need real extents to be fractions of, and
-                // these are 0 until the first layout pass lands.
-                onWidthChanged: window.restorePanelSizesWhenReady()
-                onHeightChanged: window.restorePanelSizesWhenReady()
-
-                SplitView {
-                    id: outerSplit
-                    SplitView.fillWidth: true
-                    orientation: Qt.Vertical
-                    spacing: Theme.panelGap
-
-                    handle: PanelSplitHandle { view: outerSplit }
-
-                    // In the portrait workspace the preview is a sibling of this
-                    // whole stack, so fullscreen has to collapse the stack itself —
-                    // hiding only the panels inside it would leave the preview
-                    // confined to its column. SplitView drops hidden items from the
-                    // layout, so this hands the window to the preview.
-                    visible: !(window.previewFullscreen && window.portraitWorkspace)
-
-                    onHeightChanged: window.restorePanelSizesWhenReady()
-
-                    SplitView {
-                        id: innerSplit
-                        // Sized against the enclosing SplitView by id. `parent` here
-                        // is the SplitView's own content item, which makes these
-                        // percentage constraints self-referential during a resize.
-                        // In fullscreen the timeline is hidden, so the normal 30–85%
-                        // band would leave a dead strip below the preview.
-                        //
-                        // Never set a fixed minimum larger than the current parent
-                        // size: on the first layout pass width/height are 0, and
-                        // Qt SplitView asserts when maximum < minimum (qBound).
-                        SplitView.preferredHeight: window.previewFullscreen
-                                                   ? outerSplit.height : outerSplit.height * 0.5
-                        SplitView.minimumHeight: window.previewFullscreen
-                                                 ? outerSplit.height
-                                                 : Math.min(outerSplit.height, outerSplit.height * 0.3)
-                        SplitView.maximumHeight: window.previewFullscreen
-                                                 ? outerSplit.height
-                                                 : Math.max(SplitView.minimumHeight, outerSplit.height * 0.85)
-                        orientation: Qt.Horizontal
-                        spacing: Theme.panelGap
-
-                        handle: PanelSplitHandle { view: innerSplit }
-
-                        onWidthChanged: window.restorePanelSizesWhenReady()
-                        // This split's share of the vertical one is the timeline's
-                        // height, seen from the other side.
-                        onHeightChanged: {
-                            window.restorePanelSizesWhenReady()
-                            window.schedulePanelCapture()
-                        }
-
-                        AssetsPanel {
-                            id: assetsPanel
-                            visible: !window.previewFullscreen
-                            // A quarter of the row alongside the preview. In portrait
-                            // the preview is gone from this row and the properties
-                            // panel — last, and the only one without a fill — soaks up
-                            // everything left over, so an unchanged quarter here left
-                            // the library at a third of the inspector's width. Half
-                            // splits the row evenly between the two instead.
-                            SplitView.preferredWidth: Math.max(0, innerSplit.width
-                                                               * (window.portraitWorkspace ? 0.5 : 0.25))
-                            // Cap mins to available width so 200+320+240 never exceeds a
-                            // zero/partial first layout pass (Qt asserts max < min).
-                            SplitView.minimumWidth: Math.min(200, Math.max(0, innerSplit.width * 0.2))
-                            onWidthChanged: window.schedulePanelCapture()
-                        }
-
-                        // Declared in its landscape slot; rootSplit.relocatePreview()
-                        // moves this same instance out to the portrait column.
-                        PreviewPanel {
-                            id: previewPanel
-                            previewFullscreen: window.previewFullscreen
-                            onFullscreenRequested: window.togglePreviewFullscreen()
-                            // Landscape: the pane that absorbs the slack in the top
-                            // row. Portrait: a sized column, with the editing stack
-                            // taking the slack instead — except in fullscreen, where
-                            // the stack is hidden and the preview is all there is.
-                            SplitView.fillWidth: !window.portraitWorkspace || window.previewFullscreen
-                            // Portrait default: wide enough for the tall frame once
-                            // the panel's transport row and gutters are discounted,
-                            // capped so the libraries and timeline keep a usable
-                            // share. Ignored while fillWidth is set, and replaced
-                            // outright once the user drags the handle — SplitView
-                            // writes this attached property, which drops the binding.
-                            SplitView.preferredWidth: Math.max(0, Math.min(rootSplit.width * 0.4,
-                                                                           (rootSplit.height - 72) * 9 / 16))
-                            SplitView.minimumWidth: window.portraitWorkspace
-                                                    ? Math.min(260, Math.max(0, rootSplit.width * 0.2))
-                                                    : Math.min(320, Math.max(0, innerSplit.width * 0.3))
-                            onWidthChanged: window.schedulePanelCapture()
-                        }
-
-                        PropertiesPanel {
-                            id: propertiesPanel
-                            visible: !window.previewFullscreen
-                            SplitView.preferredWidth: Math.max(0, innerSplit.width * 0.25)
-                            SplitView.minimumWidth: Math.min(240, Math.max(0, innerSplit.width * 0.2))
-                            // Empty-state browse CTAs jump the assets panel to the
-                            // matching library tab.
-                            onWidthChanged: window.schedulePanelCapture()
-                            onBrowseEffectsRequested: assetsPanel.showTab("effects")
-                            onBrowseAudioEffectsRequested: assetsPanel.showTab("sounds")
-                        }
-                    }
-
-                    TimelinePanel {
-                        id: timelinePanel
-                        visible: !window.previewFullscreen
-                        propertiesTab: propertiesPanel.currentTabId
-                        SplitView.preferredHeight: Math.max(0, outerSplit.height * 0.5)
-                        SplitView.minimumHeight: Math.min(140, Math.max(0, outerSplit.height * 0.2))
-                    }
-                }
-
-                // The preview is inserted here, after the editing stack, while the
-                // portrait workspace is active.
-            }
-        }
-    }
     }
 
     // Startup only: replaces a fresh empty project when "Reopen last project on
@@ -1917,67 +1454,37 @@ ApplicationWindow {
                 onNewProjectRequested: window.requestNewProject()
                 onOpenProjectRequested: window.requestOpenProjectDialog()
                 onOpenRecentRequested: (path) => window.requestOpenRecentProject(path)
+                onLanguageRequested: editorHeader.openLanguageChooser()
+                onMobileLayoutRequested: window.switchShell("mobile")
+                onMoreSettingsRequested: window.openSettings()
+                onDebugInfoRequested: window.openDebugInfo()
+                onAgentAccessRequested: editorHeader.openAgentAccess()
             }
         }
     }
 
-    // Android's stand-in for MediaPreviewWindow: filling the window, over the editor.
-    Item {
-        anchors.fill: parent
-        z: 10
-        visible: window.mediaPreviewPage !== null
+    MainAndroidMediaPreviewOverlay {
+        id: mediaPreviewHost
+    }
 
-        MouseArea {
-            anchors.fill: parent
-            hoverEnabled: true
-        }
+    MainOverlayInputGuard { }
 
-        Loader {
-            id: androidMediaPreviewLoader
-            anchors.fill: parent
-            active: false
-            sourceComponent: Component {
-                AndroidMediaPreview {
-                    onClosed: {
-                        window.mediaPreviewPage = null
-                        Qt.callLater(function () { androidMediaPreviewLoader.active = false })
-                    }
-                }
-            }
+    // Desktop has no sheet to step aside, so the drop target is live from the lift.
+    Connections {
+        target: TouchDrag
+        function onActiveChanged() {
+            if (TouchDrag.active)
+                TouchDrag.clearOfSource = true
         }
     }
 
-    // Under the Overlay, over the page. Overlay popups stay interactive; the editor cannot.
-    MouseArea {
-        id: overlayInputGuard
-        anchors.fill: parent
-        z: 11
-        visible: Theme.touchInput && window.overlayModalCount > 0
-        acceptedButtons: Qt.AllButtons
-        hoverEnabled: true
-        preventStealing: true
-        onPressed: (mouse) => { mouse.accepted = true }
-        onWheel: (wheel) => { wheel.accepted = true }
-
-        readonly property int _stealHandlers: PointerHandler.CanTakeOverFromHandlersOfSameType
-                                            | PointerHandler.CanTakeOverFromHandlersOfDifferentType
-
-        TapHandler {
-            acceptedButtons: Qt.AllButtons
-            grabPermissions: overlayInputGuard._stealHandlers
-        }
-
-        PinchHandler {
-            target: null
-            grabPermissions: overlayInputGuard._stealHandlers
-        }
-
-        DragHandler {
-            target: null
-            grabPermissions: overlayInputGuard._stealHandlers
-        }
+    TouchDragGhost {
+        visible: TouchDrag.active
+        z: 10000
     }
 
     // Notification host — above all panels, so any message lands in one place.
-    ToastHost { }
+    ToastHost {
+        topMargin: editorHeader.visible ? editorHeader.height : 0
+    }
 }

@@ -13,7 +13,7 @@ agent over MCP (see [MCP.md](MCP.md#custom-effects)).
 | Audio effect | `audio-effect.json` | none: a built-in processor, or a graph of built-in pedals | below |
 
 The MCP op `effect_authoring_guide` returns the same material, written for agents. Keep the two in
-step: its text lives in `src/mcp/McpEffectAuthoring.cpp`.
+step: its text lives in `src/app/mcp/tools/McpEffectAuthoring.cpp`.
 
 ## Parameters → inspector controls
 
@@ -83,7 +83,7 @@ effect's.
 }
 ```
 
-The processors are in `src/engine/audio/AudioEffectFactory.cpp`. To find the right identifiers,
+The processors are in `src/engine/audio/dsp/AudioEffectFactory.cpp`. To find the right identifiers,
 copy them from a bundled effect that uses the same processor. The `processors` table in
 `effect_authoring_guide` lists those effects. Then change `displayName`, the ranges and the
 defaults to suit.
@@ -121,7 +121,7 @@ With `"processor": "graph"`, a `graph` object describes a pedalboard:
 ```
 
 - **chain** runs in order. Each node has an `id` and a `type`: a pedal from
-  `src/engine/audio/PedalCatalog.cpp` (`effect_authoring_guide` returns the same catalog as
+  `src/engine/audio/dsp/graph/PedalCatalog.cpp` (`effect_authoring_guide` returns the same catalog as
   `pedals`), or `split`. `classic.<processor>` pedals are the processors above, so a legacy effect is
   a one-pedal graph.
 - **knobs** map a knob id to a number, or to `{ "param": "<identifier>" }`, which makes it one of
@@ -154,5 +154,5 @@ to WebAssembly (`wasm/`).
 ## Sharing
 
 A `.driftfx` file is the folder packed with zstd. It has a SHA-256 digest but no signature (see
-`src/engine/AddonPackage.h`). Users import one through the Import button in the effect browsers.
+`src/engine/addons/AddonPackage.h`). Users import one through the Import button in the effect browsers.
 `export_effect` writes one for any My Effects package.

@@ -1,11 +1,14 @@
 #include <QtTest>
 
 #include <QFileInfo>
+#include <QImage>
 #include <QProcess>
 #include <QStandardPaths>
 #include <QTemporaryDir>
 
-#include "engine/MediaProbe.h"
+#include "core/project/media/ImageSequence.h"
+#include "engine/decode/readers/ClipReader.h"
+#include "engine/decode/probe/MediaProbe.h"
 
 class TestMediaProbe : public QObject
 {
@@ -15,6 +18,7 @@ private slots:
     void missingFileFails();
     void readsDisplayMatrixRotation();
     void multiTrackAudioProbing();
+    void probesImageSequence();
 };
 
 void TestMediaProbe::missingFileFails()
@@ -114,6 +118,46 @@ void TestMediaProbe::multiTrackAudioProbing()
     QCOMPARE(audio[0].title, QStringLiteral("Game Audio"));
     QCOMPARE(audio[1].audioStreamOrdinal, 1);
     QCOMPARE(audio[1].title, QStringLiteral("Microphone"));
+}
+
+void TestMediaProbe::probesImageSequence()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QColor colors[] = {Qt::red, Qt::green, Qt::blue, Qt::yellow, Qt::white};
+    for (int i = 0; i < 5; ++i) {
+        QImage img(64, 48, QImage::Format_RGB32);
+        img.fill(colors[i]);
+        QVERIFY(img.save(dir.filePath(QStringLiteral("f_%1.png").arg(i + 1, 4, 10, QLatin1Char('0')))));
+    }
+
+    drift::ImageSequence seq;
+    seq.pattern = dir.filePath(QStringLiteral("f_%04d.png"));
+    seq.start = 1;
+    drift::setImageSequenceFps(seq, 10.0);
+    const QString path = drift::imageSequencePath(seq);
+
+    const MediaInfo info = MediaProbe::probe(path);
+    QVERIFY2(info.ok, qPrintable(info.errorString));
+    int videoStreams = 0;
+    for (const StreamInfo &s : info.streams) {
+        if (s.type != StreamInfo::Type::Video)
+            continue;
+        ++videoStreams;
+        QCOMPARE(s.width, 64);
+        QCOMPARE(s.height, 48);
+        QVERIFY(qAbs(s.fps - 10.0) < 0.01);
+    }
+    QCOMPARE(videoStreams, 1);
+    QVERIFY(qAbs(info.durationUs - 500000) < 20000);
+
+    ClipReader reader;
+    QVERIFY(reader.open(path));
+    QImage frame;
+    QVERIFY(reader.readVideoFrameAt(200000, frame, 64, 48));
+    QVERIFY(!frame.isNull());
+    const QColor c = frame.pixelColor(32, 24);
+    QVERIFY2(c.blue() > 200 && c.red() < 50 && c.green() < 50, qPrintable(c.name()));
 }
 
 QTEST_MAIN(TestMediaProbe)

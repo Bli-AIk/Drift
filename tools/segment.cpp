@@ -3,10 +3,10 @@
 // Usage: segment [--time SECONDS] [--point X,Y] [--frames N] [--fps F] [--out PREFIX] <media-file>
 //        X,Y are normalized 0..1 frame coordinates. Defaults: --time 0 --point 0.5,0.5 --frames 1
 
-#include "engine/ClipReaderPool.h"
-#include "engine/MediaProbe.h"
-#include "engine/Sam2Segmenter.h"
-#include "core/Time.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/decode/probe/MediaProbe.h"
+#include "engine/ml/vision/segmentation/Sam2Segmenter.h"
+#include "core/base/Time.h"
 
 #include <QCoreApplication>
 #include <QElapsedTimer>
@@ -17,7 +17,7 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-    // Must match src/main.cpp, or AppDataLocation points somewhere else and the tool cannot see
+    // Must match src/app/main.cpp, or AppDataLocation points somewhere else and the tool cannot see
     // models installed as addons.
     QCoreApplication::setApplicationName("CutWire Drift");
     QCoreApplication::setOrganizationName("CutWire Drift");

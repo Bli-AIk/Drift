@@ -1,4 +1,4 @@
-#include "AudioOutputChannel.h"
+#include "playback/AudioOutputChannel.h"
 
 #include <QAudioSink>
 #include <QDebug>
@@ -125,12 +125,14 @@ qint64 AudioPullDevice::readData(char *data, qint64 maxlen)
 
     if (m_channel->m_direct) {
         const int filled = m_channel->m_fill(reinterpret_cast<float *>(data), frames);
+        m_channel->m_deliveredFrames += filled;
         return static_cast<qint64>(filled) * bytesPerFrame;
     }
 
     m_channel->m_scratch.resize(frames * 2);
     const int filled = m_channel->m_fill(m_channel->m_scratch.data(), frames);
     drift::writeInterleaved(m_channel->m_scratch.constData(), filled, m_channel->m_format, data);
+    m_channel->m_deliveredFrames += filled;
     return static_cast<qint64>(filled) * bytesPerFrame;
 }
 
@@ -223,8 +225,10 @@ void AudioOutputChannel::start()
                 return;
             if (m_sink->state() == QAudio::SuspendedState)
                 m_sink->resume();
-            else if (m_sink->state() == QAudio::StoppedState)
+            else if (m_sink->state() == QAudio::StoppedState) {
+                m_deliveredFrames = 0;
                 m_sink->start(m_pull);
+            }
         },
         Qt::QueuedConnection);
 }
@@ -246,6 +250,12 @@ void AudioOutputChannel::stop()
 qint64 AudioOutputChannel::processedUSecs() const
 {
     return m_sink ? m_sink->processedUSecs() : 0;
+}
+
+qint64 AudioOutputChannel::deliveredUSecs() const
+{
+    const int rate = m_format.sampleRate();
+    return rate > 0 ? m_deliveredFrames * 1'000'000 / rate : 0;
 }
 
 QAudioDevice AudioOutputChannel::resolveDevice() const
@@ -283,9 +293,9 @@ void AudioOutputChannel::rebuild()
     m_activeId = device.id();
     m_haveSink = true;
     // Before the sink is built, so the caller has re-anchored its clock and mixer by the time the
-    // first buffer is pulled at the new rate.
-    if (m_sampleRate.exchange(format.sampleRate(), std::memory_order_acq_rel) != format.sampleRate())
-        emit sampleRateChanged();
+    // first buffer is pulled from it.
+    m_sampleRate.store(format.sampleRate(), std::memory_order_release);
+    emit sinkRebuilt();
 
     QMetaObject::invokeMethod(
         m_pull, [this, device, format] { buildSink(device, format); }, Qt::QueuedConnection);
@@ -313,6 +323,7 @@ void AudioOutputChannel::buildSink(const QAudioDevice &device, const QAudioForma
             this, [this, message] { handleSinkError(message); }, Qt::QueuedConnection);
     });
 
+    m_deliveredFrames = 0;
     if (m_running.load(std::memory_order_acquire))
         m_sink->start(m_pull);
 }

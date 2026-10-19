@@ -3,7 +3,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
-#include "models/UpdateAsset.h"
+#include "app/online/updates/UpdateAsset.h"
 
 class UpdateAssetTest : public QObject
 {

@@ -1,6 +1,6 @@
 #include <QtTest>
 
-#include "core/PdfSource.h"
+#include "core/project/sources/PdfSource.h"
 
 using namespace drift;
 

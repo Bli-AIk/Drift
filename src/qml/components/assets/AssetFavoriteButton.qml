@@ -1,7 +1,5 @@
 import QtQuick
 import Drift
-import ".."
-
 // Star toggle for marking an asset-browser item as a favorite.
 IconButton {
     id: root

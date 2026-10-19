@@ -1,7 +1,5 @@
 import QtQuick
 import Drift
-import ".."
-
 // The interactive chrome of one timeline clip: trim handles, fade dots and the context menu.
 // The clip itself — body, filmstrip, waveform, labels — is drawn by TimelineTrackClips, which
 // also owns the body gestures (select, move). This overlay only exists for the clips that need
@@ -140,10 +138,10 @@ Item {
     // tooltip keeps its own visible binding inside, so the reveal delay and the conditions are
     // exactly what they were.
     readonly property bool tooltipsActive:
-        leftTrimMouse.containsMouse || leftTrimMouse.pressed || leftTrimHover.hovered
-        || rightTrimMouse.containsMouse || rightTrimMouse.pressed || rightTrimHover.hovered
-        || fadeInMouse.containsMouse || fadeInMouse.pressed
-        || fadeOutMouse.containsMouse || fadeOutMouse.pressed
+        leftTrimHandle.areaContainsMouse || leftTrimHandle.areaPressed || leftTrimHandle.areaHovered
+        || rightTrimHandle.areaContainsMouse || rightTrimHandle.areaPressed || rightTrimHandle.areaHovered
+        || fadeInHandle.areaContainsMouse || fadeInHandle.areaPressed
+        || fadeOutHandle.areaContainsMouse || fadeOutHandle.areaPressed
 
     // Arms the Loader holding the context menu and pops it. Re-pops an already-loaded menu
     // rather than reloading it, for the second right-click that lands while the first is still
@@ -158,7 +156,7 @@ Item {
 
     // A finger leaves no cursor position behind, so the menu opens where the press landed.
     function popupContextMenu(menu) {
-        if (Theme.touchInput && !touchMode && trackClips)
+        if (trackClips && trackClips.lastPressTouch && !touchMode)
             menu.popup(trackClips, trackClips.dragPointer.x, trackClips.dragPointer.y)
         else
             menu.popup()
@@ -170,10 +168,10 @@ Item {
     // pointer leaves the strip, and during a trim the handle geometry trails the pointer by a
     // frame — so it flapped, and every flap was a restoreOverrideCursor()/setOverrideCursor()
     // pair with a freshly rasterised pixmap behind it.
-    readonly property int trimCursorSide: leftTrimMouse.pressed ? -1
-                                          : rightTrimMouse.pressed ? 1
-                                          : leftTrimMouse.containsMouse ? -1
-                                          : rightTrimMouse.containsMouse ? 1 : 0
+    readonly property int trimCursorSide: leftTrimHandle.areaPressed ? -1
+                                          : rightTrimHandle.areaPressed ? 1
+                                          : leftTrimHandle.areaContainsMouse ? -1
+                                          : rightTrimHandle.areaContainsMouse ? 1 : 0
     readonly property int trimCursorHeight: Math.round(height)
     // Identifies this clip to the shared override cursor. Not derived from trackIndex/clipIndex:
     // those shift when a clip is inserted or removed, which would orphan a held cursor.
@@ -241,9 +239,9 @@ Item {
 
     function beginEdgeGesture(area, mouse) {
         const p = area.mapToItem(null, mouse.x, mouse.y)
-        // Desktop has a pointer and a scroll wheel and never needed this; starting it already
-        // decided keeps every branch below dead there.
-        edgeAxis = touchMode ? 0 : 1
+        // A pointer has a scroll wheel and never needed this; starting it already decided keeps
+        // every branch below dead for it. A finger on the desktop timeline arbitrates too.
+        edgeAxis = (touchMode || mouse.source !== Qt.MouseEventNotSynthesized) ? 0 : 1
         edgePressSceneX = p.x
         edgePressSceneY = p.y
         edgeLastSceneY = p.y
@@ -303,6 +301,17 @@ Item {
                 effectiveStart * panel.pxPerSecond + Theme.clipSelectionRingWidth + followOffsetX)
     y: Theme.clipSelectionRingWidth + followOffsetY
 
+    // Override point for the clip body. The default body is painted by
+    // TimelineTrackClips; this slot draws nothing unless a theme supplies one.
+    ThemeSlot {
+        slot: "TimelineClipBody"
+        control: clipItem
+        anchors.fill: parent
+        fallback: Component {
+            Item { }
+        }
+    }
+
     // Stands in for the rect the Menu used to be parented to, so it resolves the same parent item
     // and clamps against the same bounds.
     Loader {
@@ -310,724 +319,44 @@ Item {
         anchors.fill: parent
         active: false
         asynchronous: false
-        sourceComponent: clipContextMenuComponent
-        onLoaded: clipItem.popupContextMenu(item)
-    }
-
-    Component {
-        id: clipContextMenuComponent
-
-        ThemedContextMenu {
-            id: clipContextMenu
-
-            property bool canPasteEffects: false
-            property bool canPasteAttributes: false
-            property bool canMergeTrackSubtitles: false
-            onAboutToShow: {
-                canPasteEffects = EditorState.clipboardHasEffects()
-                canPasteAttributes = EditorState.canPasteAttributes()
-                canMergeTrackSubtitles = clipItem.trackType === "subtitle"
-                        && EditorState.canMergeAllSubtitlesOnTrack(clipItem.trackIndex)
-            }
-            // Deferred: onClosed runs inside the Popup's own close path, and dropping the
-            // Loader's item there would destroy an object still unwinding.
-            onClosed: Qt.callLater(function() { clipContextMenuLoader.active = false })
-
-            ThemedMenuItem {
-                text: qsTr("Properties")
-                icon.name: Theme.icons.sliders
-                onTriggered: {
-                    if (!clipItem.selected)
-                        EditorState.selectClip(clipItem.trackIndex, clipItem.clipIndex)
-                    if (typeof panel.openClipProperties === "function")
-                        panel.openClipProperties()
-                }
-            }
-            ThemedMenuItem {
-                // Touch route into multi-clip selection; the panel owns the mode and
-                // the desktop panel does not declare the property at all.
-                text: qsTr("Select multiple")
-                icon.name: Theme.icons.check
-                visible: panel.multiSelectActive === false
-                onTriggered: panel.multiSelectActive = true
-            }
-            ThemedMenuItem {
-                text: qsTr("Open composite")
-                icon.name: Theme.icons.layers
-                visible: clipItem.clipData.kind === "composite"
-                onTriggered: EditorState.openCompositeClip(clipItem.trackIndex, clipItem.clipIndex)
-            }
-            ThemedMenuItem {
-                text: qsTr("Flatten composite")
-                icon.name: Theme.icons.film
-                visible: clipItem.clipData.kind === "composite"
-                enabled: !EditorState.exportInProgress
-                onTriggered: EditorState.flattenComposite(clipItem.trackIndex, clipItem.clipIndex)
-            }
-            ThemedMenuItem {
-                text: qsTr("Make composite")
-                icon.name: Theme.icons.layers
-                visible: EditorState.makeCompositeAvailable
-                onTriggered: EditorState.makeCompositeFromSelection()
-            }
-            ThemedMenuItem {
-                text: EditorState.selection.length > 1 ? qsTr("Transform together")
-                                                       : qsTr("Add transform layer")
-                icon.name: Theme.icons.group
-                visible: EditorState.transformTogetherAvailable && !clipItem.isTransformClip
-                onTriggered: EditorState.makeTransformLayerFromSelection()
-            }
-            ThemedMenuItem {
-                text: qsTr("Select transform layer")
-                icon.name: Theme.icons.maximize
-                visible: clipItem.hasTransformParent && !clipItem.isTransformClip
-                onTriggered: {
-                    EditorState.selectClip(clipItem.trackIndex, clipItem.clipIndex)
-                    EditorState.selectTransformParent()
-                }
-            }
-            ThemedMenuItem {
-                text: qsTr("Covers…")
-                icon.name: Theme.icons.layers
-                visible: clipItem.isTransformClip
-                onTriggered: {
-                    if (!clipItem.selected)
-                        EditorState.selectClip(clipItem.trackIndex, clipItem.clipIndex)
-                    if (typeof panel.openClipProperties === "function")
-                        panel.openClipProperties()
-                }
-            }
-            ThemedMenuItem {
-                text: qsTr("Select covered clips")
-                icon.name: Theme.icons.maximize
-                visible: clipItem.isTransformClip
-                onTriggered: EditorState.selectTransformChildren(clipItem.trackIndex, clipItem.clipIndex)
-            }
-            ThemedMenuSeparator { }
-            ThemedMenuItem {
-                text: qsTr("Split at current time")
-                icon.name: Theme.icons.scissors
-                onTriggered: EditorState.splitAtPlayhead()
-            }
-            ThemedMenuItem {
-                text: qsTr("Split item at current time")
-                icon.name: Theme.icons.scissors
-                // Scoped to just this clip (and its linked partner, e.g. companion
-                // audio) — splitAtPlayhead() above cuts every clip under the playhead
-                // across every track, which is surprising when picked from one clip's menu.
-                visible: EditorState.playheadSeconds > clipItem.clipData.start
-                        && EditorState.playheadSeconds < clipItem.clipData.start + clipItem.clipData.duration
-                onTriggered: EditorState.splitClipAt(clipItem.trackIndex, clipItem.clipIndex,
-                                                     EditorState.playheadSeconds)
-            }
-            ThemedMenuItem {
-                text: qsTr("Separate audio")
-                icon.name: Theme.icons.audioLines
-                // CapCut: only offer extract when the clip still has embedded audio.
-                visible: clipItem.trackType === "video" && EditorState.separateAudioAvailable
-                onTriggered: EditorState.separateAudioFromSelection()
-            }
-            ThemedMenuItem {
-                text: qsTr("Separate all audio tracks")
-                icon.name: Theme.icons.audioLines
-                visible: clipItem.trackType === "video" && EditorState.separateAudioAvailable
-                         && EditorState.clipAudioStreamCount(clipItem.trackIndex, clipItem.clipIndex) > 1
-                onTriggered: EditorState.separateAllAudioTracks(clipItem.trackIndex, clipItem.clipIndex)
-            }
-            ThemedMenuItem {
-                text: qsTr("Convert to edit-friendly format")
-                icon.name: Theme.icons.rabbit
-                // Converts the bin media, so every clip using it follows along.
-                visible: clipItem.mediaAssetId.length > 0 && !clipItem.mediaEditFriendly
-                onTriggered: EditorState.bin.convertToConstantFrameRate([clipItem.mediaAssetId])
-            }
-            ThemedMenuItem {
-                text: qsTr("Crop…")
-                icon.name: Theme.icons.crop
-                // Desktop only: AndroidMain has no crop window for timeline clips.
-                visible: (clipItem.clipData.kind === "video" || clipItem.clipData.kind === "image")
-                         && typeof clipItem.Window.window.openCrop === "function"
-                onTriggered: clipItem.Window.window.openCrop(clipItem.trackIndex, clipItem.clipIndex)
-            }
-            ThemedMenuItem {
-                text: qsTr("Enhance video…")
-                icon.name: Theme.icons.sparkles
-                // Desktop only: AndroidMain has no restore window.
-                visible: clipItem.clipData.kind === "video"
-                         && typeof clipItem.Window.window.openRestore === "function"
-                onTriggered: clipItem.Window.window.openRestore(clipItem.trackIndex, clipItem.clipIndex)
-            }
-            ThemedMenuItem {
-                text: qsTr("Unlink")
-                icon.name: Theme.icons.unlink
-                visible: !!clipItem.clipData.linked && EditorState.unlinkAvailable
-                onTriggered: EditorState.unlinkSelectedClips()
-            }
-            ThemedMenuItem {
-                text: qsTr("Link")
-                icon.name: Theme.icons.link
-                // Needs two or more unlinked clips selected (Shift+click to add).
-                visible: EditorState.linkAvailable
-                onTriggered: EditorState.linkSelectedClips()
-            }
-            ThemedMenuItem {
-                text: qsTr("Merge subtitle clips")
-                icon.name: Theme.icons.linkTwo
-                visible: clipItem.trackType === "subtitle"
-                enabled: EditorState.mergeAvailable
-                onTriggered: EditorState.mergeSelectedClips()
-            }
-            ThemedMenuItem {
-                text: qsTr("Merge all subtitles on this track")
-                icon.name: Theme.icons.linkTwo
-                visible: clipItem.trackType === "subtitle"
-                enabled: clipContextMenu.canMergeTrackSubtitles
-                onTriggered: EditorState.mergeAllSubtitlesOnTrack(clipItem.trackIndex)
-            }
-            ThemedMenuItem {
-                text: qsTr("Convert to text clips")
-                icon.name: Theme.icons.type
-                visible: clipItem.trackType === "subtitle"
-                onTriggered: EditorState.convertSubtitleToTextClips(clipItem.trackIndex, clipItem.clipIndex)
-            }
-            ThemedMenuItem {
-                text: qsTr("Convert to subtitle")
-                icon.name: Theme.icons.captions
-                visible: clipItem.trackType === "text" && EditorState.textToSubtitleAvailable
-                onTriggered: clipItem.panel.requestConvertTextToSubtitle()
-            }
-            ThemedMenuSeparator { }
-            ThemedMenuItem {
-                text: qsTr("Cut")
-                icon.name: Theme.icons.scissors
-                onTriggered: EditorState.cutSelection()
-            }
-            ThemedMenuItem {
-                text: qsTr("Copy")
-                icon.name: Theme.icons.copy
-                onTriggered: EditorState.copySelection()
-            }
-            ThemedMenuItem {
-                text: qsTr("Paste attributes…")
-                icon.name: Theme.icons.clipboardPaste
-                enabled: clipContextMenu.canPasteAttributes
-                onTriggered: EditorState.requestPasteAttributes()
-            }
-            ThemedMenuItem {
-                text: qsTr("Duplicate")
-                icon.name: Theme.icons.copyPlus
-                onTriggered: EditorState.duplicateSelectedClip()
-            }
-            ThemedMenuItem {
-                text: qsTr("Rename…")
-                icon.name: Theme.icons.pencil
-                onTriggered: clipItem.panel.requestRenameClip(clipItem.trackIndex, clipItem.clipIndex)
-            }
-            ThemedMenuSeparator { visible: !clipItem.isTransformClip }
-            ThemedMenuItem {
-                text: qsTr("Copy effects")
-                icon.name: Theme.icons.wand
-                visible: clipItem.hasAnyEffects
-                onTriggered: EditorState.copyClipEffectsToClipboard(clipItem.trackIndex,
-                                                                    clipItem.clipIndex)
-            }
-            ThemedMenuItem {
-                text: qsTr("Paste effects")
-                icon.name: Theme.icons.clipboardPaste
-                visible: !clipItem.isTransformClip
-                enabled: clipContextMenu.canPasteEffects
-                onTriggered: EditorState.pasteEffectsFromClipboard(clipItem.trackIndex,
-                                                                   clipItem.clipIndex)
-            }
-            ThemedMenuItem {
-                text: qsTr("Save effects as preset…")
-                icon.name: Theme.icons.save
-                visible: clipItem.hasAnyEffects
-                onTriggered: clipItem.panel.requestSaveEffectPreset(clipItem.trackIndex,
-                                                                     clipItem.clipIndex)
-            }
-            ThemedMenuSeparator { visible: clipItem.clipData.kind === "adjustment" && !clipItem.isTransformClip }
-            ThemedMenuItem {
-                text: qsTr("Unlink from clip")
-                icon.name: Theme.icons.unlink
-                visible: clipItem.pinnedToClip
-                onTriggered: EditorState.unlinkAdjustment(clipItem.trackIndex, clipItem.clipIndex)
-            }
-            ThemedMenuItem {
-                text: qsTr("Move to its own track")
-                icon.name: Theme.icons.layers
-                // Only meaningful for a nested one: a standalone adjustment already has one.
-                visible: clipItem.clipData.kind === "adjustment"
-                         && clipItem.panel.tracks[clipItem.trackIndex].isAdjustmentLane === true
-                onTriggered: EditorState.moveAdjustmentToOwnTrack(clipItem.trackIndex,
-                                                                  clipItem.clipIndex)
-            }
-            ThemedMenuSeparator { }
-            ThemedMenuItem {
-                text: qsTr("Delete")
-                icon.name: Theme.icons.trash
-                onTriggered: EditorState.deleteSelectedClip()
+        sourceComponent: Component {
+            TimelineClipContextMenu {
+                owner: clipItem
+                // Deferred: onClosed runs inside the Popup's own close path, and dropping the
+                // Loader's item there would destroy an object still unwinding.
+                onUnloadRequested: Qt.callLater(function() { clipContextMenuLoader.active = false })
             }
         }
+        onLoaded: clipItem.popupContextMenu(item)
     }
-
 
     // Fade dots sit above trim handles so they stay
     // grabable at the corners (zero fade). Trim the
     // edge below the dots; grab the dots to fade.
-    Rectangle {
+    TimelineFadeHandle {
         id: fadeInHandle
-        width: clipItem.fadeHandleSize
-        height: clipItem.fadeHandleSize
-        radius: clipItem.fadeHandleSize / 2
-        y: 2
-        z: 40
-        visible: clipItem.timelineFadeHandles && clipItem.selected
-                 && clipItem.width > clipItem.fadeHandleMinWidth
-        color: Theme.primary
-        border.color: Theme.onMedia
-        border.width: 2
-
-        Binding {
-            target: fadeInHandle
-            property: "x"
-            when: !fadeInMouse.pressed
-            value: Math.max(clipItem.fadeHandleInset,
-                            Math.min(clipItem.width - clipItem.fadeHandleInset - fadeInHandle.width,
-                                     (clipItem.clipData.fadeIn || 0) * panel.pxPerSecond - fadeInHandle.width / 2))
-        }
-
-        MouseArea {
-            id: fadeInMouse
-            anchors.fill: parent
-            anchors.leftMargin: -6
-            anchors.rightMargin: -6
-            anchors.topMargin: -6
-            anchors.bottomMargin: clipItem.height < 35 ? 4 : -6
-            z: 1
-            preventStealing: true
-            hoverEnabled: true
-            cursorShape: Qt.SizeHorCursor
-            onPressed: (mouse) => {
-                Qt.callLater(function() { clipItem.forceActiveFocus() })
-                mouse.accepted = true
-                EditorState.beginPreviewDrag(qsTr("Adjust fade"))
-            }
-            onPositionChanged: (mouse) => {
-                if (!pressed)
-                    return
-                const px = Math.max(0, Math.min(clipItem.width,
-                                                mapToItem(clipItem, mouse.x, mouse.y).x))
-                fadeInHandle.x = Math.max(clipItem.fadeHandleInset,
-                                          Math.min(clipItem.width - clipItem.fadeHandleInset
-                                                   - fadeInHandle.width,
-                                                   px - fadeInHandle.width / 2))
-                EditorState.previewSetClipFade(clipItem.trackIndex, clipItem.clipIndex,
-                                               px / panel.pxPerSecond,
-                                               clipItem.clipData.fadeOut || 0)
-            }
-            onReleased: EditorState.commitPreviewDrag()
-            onCanceled: EditorState.cancelPreviewDrag()
-
-            HoverHandler { cursorShape: Qt.SizeHorCursor }
-
-            Loader {
-                anchors.fill: parent
-                active: clipItem.tooltipsActive
-                sourceComponent: Component {
-                    ThemedToolTip {
-                        visible: fadeInMouse.pressed || fadeInMouse.containsMouse
-                        text: qsTr("Fade in %1s").arg((clipItem.clipData.fadeIn || 0).toFixed(2))
-                    }
-                }
-            }
-        }
+        owner: clipItem
     }
-
-    Rectangle {
+    TimelineFadeHandle {
         id: fadeOutHandle
-        width: clipItem.fadeHandleSize
-        height: clipItem.fadeHandleSize
-        radius: clipItem.fadeHandleSize / 2
-        y: 2
-        z: 40
-        visible: clipItem.timelineFadeHandles && clipItem.selected
-                 && clipItem.width > clipItem.fadeHandleMinWidth
-        color: Theme.primary
-        border.color: Theme.onMedia
-        border.width: 2
-
-        Binding {
-            target: fadeOutHandle
-            property: "x"
-            when: !fadeOutMouse.pressed
-            value: Math.max(clipItem.fadeHandleInset,
-                            Math.min(clipItem.width - clipItem.fadeHandleInset - fadeOutHandle.width,
-                                     clipItem.width - (clipItem.clipData.fadeOut || 0) * panel.pxPerSecond - fadeOutHandle.width / 2))
-        }
-
-        MouseArea {
-            id: fadeOutMouse
-            anchors.fill: parent
-            anchors.leftMargin: -6
-            anchors.rightMargin: -6
-            anchors.topMargin: -6
-            anchors.bottomMargin: clipItem.height < 35 ? 4 : -6
-            z: 1
-            preventStealing: true
-            hoverEnabled: true
-            cursorShape: Qt.SizeHorCursor
-            onPressed: (mouse) => {
-                Qt.callLater(function() { clipItem.forceActiveFocus() })
-                mouse.accepted = true
-                EditorState.beginPreviewDrag(qsTr("Adjust fade"))
-            }
-            onPositionChanged: (mouse) => {
-                if (!pressed)
-                    return
-                const px = Math.max(0, Math.min(clipItem.width,
-                                                mapToItem(clipItem, mouse.x, mouse.y).x))
-                fadeOutHandle.x = Math.max(clipItem.fadeHandleInset,
-                                           Math.min(clipItem.width - clipItem.fadeHandleInset
-                                                    - fadeOutHandle.width,
-                                                    px - fadeOutHandle.width / 2))
-                EditorState.previewSetClipFade(clipItem.trackIndex, clipItem.clipIndex,
-                                               clipItem.clipData.fadeIn || 0,
-                                               Math.max(0, (clipItem.width - px) / panel.pxPerSecond))
-            }
-            onReleased: EditorState.commitPreviewDrag()
-            onCanceled: EditorState.cancelPreviewDrag()
-
-            HoverHandler { cursorShape: Qt.SizeHorCursor }
-
-            Loader {
-                anchors.fill: parent
-                active: clipItem.tooltipsActive
-                sourceComponent: Component {
-                    ThemedToolTip {
-                        visible: fadeOutMouse.pressed || fadeOutMouse.containsMouse
-                        text: qsTr("Fade out %1s").arg((clipItem.clipData.fadeOut || 0).toFixed(2))
-                    }
-                }
-            }
-        }
+        owner: clipItem
+        outgoing: true
     }
 
-    Rectangle {
+    TimelineTrimHandle {
         id: leftTrimHandle
-        // Thin edge bar; hotspots still use the wide Theme width when idle.
-        // The pointer gets a hairline to trim to; a finger covers the bar anyway, so on touch it
-        // stays full width and keeps its grip.
-        width: !clipItem.touchMode
-               && (leftTrimMouse.containsMouse || leftTrimHover.hovered || leftTrimMouse.pressed)
-               ? Math.max(2, clipItem.trimHandleWidth * 0.35)
-               : clipItem.trimHandleWidth
-        radius: clipItem.touchMode ? Theme.radiusXs : 0
-
-        // Grip notch: says "this edge moves" without a tooltip, which touch cannot show.
-        Rectangle {
-            anchors.centerIn: parent
-            visible: clipItem.touchMode && clipItem.showTrimHandles
-            width: 3
-            height: Math.min(16, parent.height * 0.4)
-            radius: 1.5
-            color: Theme.onMedia
-            opacity: 0.9
-        }
+        owner: clipItem
+        edge: -1
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        color: clipItem.showTrimHandles ? Theme.primary : "transparent"
-        opacity: !clipItem.showTrimHandles ? 0
-                 : (leftTrimMouse.containsMouse || leftTrimHover.hovered || leftTrimMouse.pressed)
-                   ? 1.0 : 0.85
-
-        Behavior on opacity {
-            enabled: clipItem.showTrimHandles
-            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
-        Behavior on width {
-            enabled: clipItem.showTrimHandles
-            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
-
-        Loader {
-            anchors.fill: parent
-            active: clipItem.tooltipsActive
-            sourceComponent: Component {
-                ThemedToolTip {
-                    text: qsTr("Drag to trim the start")
-                    visible: clipItem.showTrimHandles
-                             && (leftTrimMouse.containsMouse || leftTrimHover.hovered)
-                             && !leftTrimMouse.pressed
-                }
-            }
-        }
-        z: 30
-
-        MouseArea {
-            id: leftTrimMouse
-            anchors.fill: parent
-            anchors.leftMargin: -clipItem.trimHotspotExtra
-            anchors.rightMargin: -4
-            // Leave the top corner for the fade-in dot.
-            anchors.topMargin: clipItem.timelineFadeHandles && clipItem.showTrimHandles
-                               && !clipItem.touchMode ? (clipItem.height < 35 ? 10 : 16) : -6
-            anchors.bottomMargin: -6
-            // Same reason as the move drag: these are ~38px strips at both edges of
-            // every clip and they hold the grab, so on touch they turned each clip
-            // boundary into another place the timeline could not be panned. Only the
-            // selected clip — the one actually showing trim handles — arms them.
-            enabled: !clipItem.touchMode || clipItem.showTrimHandles
-            preventStealing: true
-            hoverEnabled: true
-            cursorShape: Qt.BlankCursor
-
-            HoverHandler {
-                id: leftTrimHover
-                cursorShape: Qt.BlankCursor
-            }
-
-            // Last position this edge was actually committed at, in whole pixels. A high-polling
-            // mouse delivers several positionChanged per frame, and each one used to mutate the
-            // project and rebuild the whole timeline model. Same idiom the move drag uses above.
-            property int lastTrimPx: -2147483647
-            // Where the edge was last asked to go. Negative means the gesture never moved it,
-            // so there is nothing to commit.
-            property real lastTrimSeconds: -1
-            // Set while this handle owns an open preview drag, so the drag is closed exactly
-            // once however the gesture ends.
-            property bool trimming: false
-
-            onPressed: (mouse) => {
-                Qt.callLater(function() { clipItem.forceActiveFocus() })
-                const wasSelected = clipItem.selected
-                Haptics.reset()
-                clipItem.beginEdgeGesture(leftTrimMouse, mouse)
-                if (!clipItem.selected)
-                    EditorState.selectClip(clipItem.trackIndex, clipItem.clipIndex)
-                if (!wasSelected)
-                    Haptics.select()
-                // One undo entry and one dirty mark for the whole drag. Without this a trim was
-                // invisible to both: it never moved the undo stack index, and the dirty flag is
-                // only ever set from that index changing — so trimming, closing, and being asked
-                // nothing about saving lost the work outright.
-                EditorState.beginPreviewDrag(qsTr("Trim clip"))
-                EditorState.beginTrimGesture(clipItem.trackIndex, clipItem.clipIndex, -1)
-                lastTrimPx = -2147483647
-                lastTrimSeconds = -1
-                trimming = true
-            }
-            onPositionChanged: (mouse) => {
-                if (!pressed)
-                    return
-                // A vertical drag on this strip is someone reaching for another layer, not for
-                // this clip's in point.
-                if (clipItem.edgeGestureScrolled(leftTrimMouse, mouse))
-                    return
-                const end = (clipItem.clipData.start || 0)
-                            + (clipItem.clipData.duration || 0)
-                const raw = mapToItem(trackRow, mouse.x, mouse.y).x / panel.pxPerSecond
-                // Floor duration so the clip stays at least
-                // clipMinWidth; handles remain draggable to extend.
-                const newStart = Math.max(0, Math.min(raw, end - clipItem.minDurationSeconds))
-                const px = Math.round(newStart * panel.pxPerSecond)
-                if (px === lastTrimPx)
-                    return
-                lastTrimPx = px
-                lastTrimSeconds = newStart
-                // Previewed, not applied. The reply reports what the trim would do -- snapping
-                // and every limit that can stop this edge live inside it, and the one the user
-                // needs told, the source running out, has no cue on screen at all.
-                const p = EditorState.previewTrimLeft(clipItem.trackIndex, clipItem.clipIndex,
-                                                      newStart)
-                if (p.ok && p.changed) {
-                    clipItem.trimPreviewStart = p.start
-                    clipItem.trimPreviewDuration = p.duration
-                    clipItem.trimPreviewIn = p.inPoint
-                    clipItem.trimPreviewOut = p.outPoint
-                    clipItem.trimPreviewActive = true
-                    panel.setTrimFollow(clipItem.clipData.linkId, clipItem.clipData.id,
-                                        p.start, p.duration, p.inPoint, p.outPoint,
-                                        p.rippleIds, p.rippleDelta)
-                }
-                Haptics.trimStep(p.ok ? p.outcome : 0)
-            }
-            onReleased: {
-                Haptics.reset()
-                if (trimming) {
-                    trimming = false
-                    // The one and only edit of the gesture. Dropping the preview first so the
-                    // geometry bindings are reading the project again by the time it lands.
-                    clipItem.trimPreviewActive = false
-                    panel.clearTrimFollow()
-                    // One call, so the edit, the undo push and finishEdit announce the timeline
-                    // once between them rather than three times.
-                    EditorState.commitTrim(clipItem.trackIndex, clipItem.clipIndex,
-                                           -1, lastTrimSeconds)
-                }
-            }
-            onCanceled: {
-                Haptics.reset()
-                if (trimming) {
-                    trimming = false
-                    clipItem.trimPreviewActive = false
-                    panel.clearTrimFollow()
-                    EditorState.endTrimGesture()
-                    EditorState.cancelPreviewDrag()
-                }
-            }
-        }
     }
-
-    Rectangle {
+    TimelineTrimHandle {
         id: rightTrimHandle
-        // The pointer gets a hairline to trim to; a finger covers the bar anyway, so on touch it
-        // stays full width and keeps its grip.
-        width: !clipItem.touchMode
-               && (rightTrimMouse.containsMouse || rightTrimHover.hovered || rightTrimMouse.pressed)
-               ? Math.max(2, clipItem.trimHandleWidth * 0.35)
-               : clipItem.trimHandleWidth
-        radius: clipItem.touchMode ? Theme.radiusXs : 0
-
-        // Grip notch: says "this edge moves" without a tooltip, which touch cannot show.
-        Rectangle {
-            anchors.centerIn: parent
-            visible: clipItem.touchMode && clipItem.showTrimHandles
-            width: 3
-            height: Math.min(16, parent.height * 0.4)
-            radius: 1.5
-            color: Theme.onMedia
-            opacity: 0.9
-        }
+        owner: clipItem
+        edge: 1
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        color: clipItem.showTrimHandles ? Theme.primary : "transparent"
-        opacity: !clipItem.showTrimHandles ? 0
-                 : (rightTrimMouse.containsMouse || rightTrimHover.hovered || rightTrimMouse.pressed)
-                   ? 1.0 : 0.85
-
-        Behavior on opacity {
-            enabled: clipItem.showTrimHandles
-            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
-        Behavior on width {
-            enabled: clipItem.showTrimHandles
-            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
-
-        Loader {
-            anchors.fill: parent
-            active: clipItem.tooltipsActive
-            sourceComponent: Component {
-                ThemedToolTip {
-                    text: qsTr("Drag to trim the end")
-                    visible: clipItem.showTrimHandles
-                             && (rightTrimMouse.containsMouse || rightTrimHover.hovered)
-                             && !rightTrimMouse.pressed
-                }
-            }
-        }
-        z: 30
-
-        MouseArea {
-            id: rightTrimMouse
-            anchors.fill: parent
-            anchors.leftMargin: -4
-            anchors.rightMargin: -clipItem.trimHotspotExtra
-            // Leave the top corner for the fade-out dot.
-            anchors.topMargin: clipItem.timelineFadeHandles && clipItem.showTrimHandles
-                               && !clipItem.touchMode ? (clipItem.height < 35 ? 10 : 16) : -6
-            anchors.bottomMargin: -6
-            // Same reason as the move drag: these are ~38px strips at both edges of
-            // every clip and they hold the grab, so on touch they turned each clip
-            // boundary into another place the timeline could not be panned. Only the
-            // selected clip — the one actually showing trim handles — arms them.
-            enabled: !clipItem.touchMode || clipItem.showTrimHandles
-            preventStealing: true
-            hoverEnabled: true
-            cursorShape: Qt.BlankCursor
-
-            HoverHandler {
-                id: rightTrimHover
-                cursorShape: Qt.BlankCursor
-            }
-
-            // See the matching properties on the left handle.
-            property int lastTrimPx: -2147483647
-            // Where the edge was last asked to go. Negative means the gesture never moved it,
-            // so there is nothing to commit.
-            property real lastTrimSeconds: -1
-            property bool trimming: false
-
-            onPressed: (mouse) => {
-                Qt.callLater(function() { clipItem.forceActiveFocus() })
-                const wasSelected = clipItem.selected
-                Haptics.reset()
-                clipItem.beginEdgeGesture(rightTrimMouse, mouse)
-                if (!clipItem.selected)
-                    EditorState.selectClip(clipItem.trackIndex, clipItem.clipIndex)
-                if (!wasSelected)
-                    Haptics.select()
-                EditorState.beginPreviewDrag(qsTr("Trim clip"))
-                EditorState.beginTrimGesture(clipItem.trackIndex, clipItem.clipIndex, 1)
-                lastTrimPx = -2147483647
-                lastTrimSeconds = -1
-                trimming = true
-            }
-            onPositionChanged: (mouse) => {
-                if (!pressed)
-                    return
-                if (clipItem.edgeGestureScrolled(rightTrimMouse, mouse))
-                    return
-                const start = clipItem.clipData.start || 0
-                const raw = mapToItem(trackRow, mouse.x, mouse.y).x / panel.pxPerSecond
-                const newEnd = Math.max(raw, start + clipItem.minDurationSeconds)
-                const px = Math.round(newEnd * panel.pxPerSecond)
-                if (px === lastTrimPx)
-                    return
-                lastTrimPx = px
-                lastTrimSeconds = newEnd
-                // See the left handle: previewed here, committed once on release.
-                const p = EditorState.previewTrimRight(clipItem.trackIndex, clipItem.clipIndex,
-                                                       newEnd)
-                if (p.ok && p.changed) {
-                    clipItem.trimPreviewStart = p.start
-                    clipItem.trimPreviewDuration = p.duration
-                    clipItem.trimPreviewIn = p.inPoint
-                    clipItem.trimPreviewOut = p.outPoint
-                    clipItem.trimPreviewActive = true
-                    panel.setTrimFollow(clipItem.clipData.linkId, clipItem.clipData.id,
-                                        p.start, p.duration, p.inPoint, p.outPoint,
-                                        p.rippleIds, p.rippleDelta)
-                }
-                Haptics.trimStep(p.ok ? p.outcome : 0)
-            }
-            onReleased: {
-                Haptics.reset()
-                if (trimming) {
-                    trimming = false
-                    // The one and only edit of the gesture. Dropping the preview first so the
-                    // geometry bindings are reading the project again by the time it lands.
-                    clipItem.trimPreviewActive = false
-                    panel.clearTrimFollow()
-                    // One call, so the edit, the undo push and finishEdit announce the timeline
-                    // once between them rather than three times.
-                    EditorState.commitTrim(clipItem.trackIndex, clipItem.clipIndex,
-                                           1, lastTrimSeconds)
-                }
-            }
-            onCanceled: {
-                Haptics.reset()
-                if (trimming) {
-                    trimming = false
-                    clipItem.trimPreviewActive = false
-                    panel.clearTrimFollow()
-                    EditorState.endTrimGesture()
-                    EditorState.cancelPreviewDrag()
-                }
-            }
-        }
     }
 }

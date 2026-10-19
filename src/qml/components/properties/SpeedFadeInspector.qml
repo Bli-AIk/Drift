@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 Item {
     id: root
 
@@ -13,7 +11,6 @@ Item {
     }
     readonly property bool hasSelection: !!clipData && Object.keys(clipData).length > 0
     readonly property string clipKind: hasSelection ? (clipData.kind || "") : ""
-    readonly property bool speedKind: clipKind === "video" || clipKind === "audio" || clipKind === "composite"
     // Composites (and audio separated from one) read a nested timeline, which the Custom speed
     // preview and the reverse render cannot decode.
     readonly property bool nestedSource: hasSelection && !!clipData.sequenceId
@@ -35,19 +32,9 @@ Item {
         width: root.width
         spacing: Theme.spacingXl
 
-        EmptyState {
-            visible: !root.speedKind
-            width: parent.width
-            compact: true
-            glyph: Theme.icons.gauge
-            title: qsTr("Not available")
-            hint: qsTr("Speed applies to video, audio and composite clips.")
-        }
-
         Text {
-            visible: root.speedKind
             text: qsTr("Playback speed")
-            color: Theme.mutedForeground
+            color: Theme.c.speedFadeInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -62,7 +49,6 @@ Item {
         Row {
             width: parent.width
             spacing: 6
-            visible: root.speedKind
 
             ThemedButton {
                 visible: !root.nestedSource
@@ -85,7 +71,6 @@ Item {
             Row {
                 width: parent.width
                 spacing: 6
-                visible: root.speedKind
                 Repeater {
                     model: [
                         { label: "0.25×", value: 0.25 },
@@ -110,7 +95,6 @@ Item {
         ThemedSlider {
             id: speedSlider
             label: qsTr("Speed")
-            visible: root.speedKind
             enabled: !speedColumn.hasSpeedCurve && !EditorState.playing
             width: parent.width
             from: 0.25
@@ -131,18 +115,17 @@ Item {
         }
 
         Text {
-            visible: root.speedKind
             text: (speedColumn.hasSpeedCurve
                    ? qsTr("Custom speed")
                    : (root.clipData.speed || 1).toFixed(2) + "×")
                     + (root.clipData.reverse ? qsTr(" (reversed)") : "")
-            color: Theme.mutedForeground
+            color: Theme.c.speedFadeInspector.foregroundMuted
             font.family: Theme.monoFontFamily
             font.pixelSize: Theme.fontSizeSm
         }
 
         ThemedChip {
-            visible: root.speedKind && !root.nestedSource
+            visible: !root.nestedSource
             text: qsTr("Reverse")
             selected: {
                 void root.clipDataRevision

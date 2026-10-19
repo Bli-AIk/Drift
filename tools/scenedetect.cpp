@@ -3,9 +3,9 @@
 // Usage: scenedetect [--threshold T] [--min-scene S] [--no-adaptive] [--start SEC]
 //                    [--duration SEC] [--csv] <media-file>
 
-#include "engine/MediaProbe.h"
-#include "engine/SceneDetect.h"
-#include "core/Time.h"
+#include "engine/decode/probe/MediaProbe.h"
+#include "engine/ml/vision/detection/SceneDetect.h"
+#include "core/base/Time.h"
 
 // isatty: POSIX spells it in <unistd.h>, MSVC in <io.h> with a leading underscore.
 #if defined(_WIN32)
@@ -41,7 +41,7 @@ QString timecode(drift::TimeUs us)
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-    // Must match src/main.cpp, or AppDataLocation points somewhere else and the tool cannot
+    // Must match src/app/main.cpp, or AppDataLocation points somewhere else and the tool cannot
     // see models installed as addons.
     QCoreApplication::setApplicationName("CutWire Drift");
     QCoreApplication::setOrganizationName("CutWire Drift");

@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 Item {
     id: root
 
@@ -12,7 +10,6 @@ Item {
         return EditorState.selectedClipData
     }
     readonly property bool hasSelection: !!clipData && Object.keys(clipData).length > 0
-    readonly property string clipKind: hasSelection ? (clipData.kind || "") : ""
 
     height: contentCol.height
     implicitHeight: contentCol.height
@@ -31,30 +28,19 @@ Item {
         width: root.width
         spacing: Theme.spacingXl
 
-        EmptyState {
-            visible: root.clipKind === "audio"
-            width: parent.width
-            compact: true
-            glyph: Theme.icons.film
-            title: qsTr("Video only")
-            hint: qsTr("This tab does not apply to audio clips.")
-        }
-
         Text {
-            visible: root.clipKind !== "audio"
             text: qsTr("Blend mode")
-            color: Theme.mutedForeground
+            color: Theme.c.blendingInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
 
         // The tab was a label plus one combo with no description.
         Text {
-            visible: root.clipKind !== "audio"
             width: parent.width
             wrapMode: Text.WordWrap
             text: qsTr("How this clip's colours combine with the tracks beneath it.")
-            color: Theme.mutedForeground
+            color: Theme.c.blendingInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             opacity: 0.8
@@ -62,7 +48,6 @@ Item {
 
         ThemedComboBox {
             id: blendModeBox
-            visible: root.clipKind !== "audio"
             width: parent.width
             model: ["normal", "multiply", "screen", "overlay", "add", "darken", "lighten"]
             // Human labels — raw ids were shown to the user.
@@ -83,7 +68,7 @@ Item {
         }
 
         ThemedButton {
-            visible: root.clipKind !== "audio" && (root.clipData.blendMode || "normal") !== "normal"
+            visible: (root.clipData.blendMode || "normal") !== "normal"
             text: qsTr("Reset to Normal")
             variant: "ghost"
             glyph: Theme.icons.reset

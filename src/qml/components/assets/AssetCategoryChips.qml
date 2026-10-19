@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // Category filter row: favorites star, then horizontal category chips.
 // ⭐ | [Color] [Glitch] …
 Item {
@@ -22,7 +20,7 @@ Item {
 
     width: parent ? parent.width : 0
     height: visible ? Theme.controlHeightSm : 0
-    visible: !searching && categories.length > 0
+    visible: !searching && (categories.length > 0 || showMine)
 
     Row {
         id: row
@@ -56,9 +54,9 @@ Item {
         Rectangle {
             id: divider
             anchors.verticalCenter: parent.verticalCenter
-            width: Theme.borderWidth
+            width: Theme.c.assetCategoryChips.dividerWidth
             height: Theme.controlHeightSm - 6
-            color: Theme.panelBorder
+            color: Theme.c.assetCategoryChips.divider
         }
 
         Flickable {

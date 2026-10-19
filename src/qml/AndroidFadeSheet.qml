@@ -1,7 +1,5 @@
 import QtQuick
 import Drift
-import "components"
-
 // The phone's home for a clip's edge fades. On the desktop they are dots on the clip; on touch
 // those dots sat a finger's width from the trim handles and one kept being grabbed for the other,
 // so here they are sliders instead, the way phone editors do it. Same values, same undo: a drag is
@@ -67,58 +65,20 @@ AndroidBottomSheet {
                 { which: "out", label: qsTr("Fade out") }
             ]
 
-            delegate: Column {
+            delegate: AndroidFadeSliderRow {
                 id: fadeRow
-                required property var modelData
                 readonly property bool isIn: modelData.which === "in"
-                readonly property real current: isIn ? root.fadeIn : root.fadeOut
                 width: parent.width
-                spacing: Theme.spacingSm
-
-                Item {
-                    width: parent.width
-                    height: Math.max(fadeLabel.implicitHeight, fadeValue.implicitHeight)
-
-                    ThemedLabel {
-                        id: fadeLabel
-                        anchors.left: parent.left
-                        text: fadeRow.modelData.label
-                        size: "sm"
-                    }
-                    Text {
-                        id: fadeValue
-                        anchors.right: parent.right
-                        text: root.formatSeconds(fadeSlider.pressed ? fadeSlider.value : fadeRow.current)
-                        color: Theme.mutedForeground
-                        font.family: Theme.monoFontFamily
-                        font.pixelSize: Theme.fontSizeSm
-                    }
-                }
-
-                ThemedSlider {
-                    id: fadeSlider
-                    width: parent.width
-                    from: 0
-                    to: root.maxFade
-                    stepSize: 0.1
-                    label: fadeRow.modelData.label
-                    valueFormatter: root.formatSeconds
-                    Binding on value {
-                        when: !fadeSlider.pressed
-                        value: fadeRow.current
-                    }
-                    onPressedChanged: {
-                        if (pressed)
-                            EditorState.beginPreviewDrag(fadeRow.isIn ? qsTr("Fade in") : qsTr("Fade out"))
-                        else
-                            EditorState.commitPreviewDrag()
-                    }
-                    onMoved: {
-                        if (fadeRow.isIn)
-                            root.setFades(value, root.fadeOut)
-                        else
-                            root.setFades(root.fadeIn, value)
-                    }
+                current: isIn ? root.fadeIn : root.fadeOut
+                maxFade: root.maxFade
+                formatSeconds: function(v) { return root.formatSeconds(v) }
+                onPreviewBegan: EditorState.beginPreviewDrag(fadeRow.isIn ? qsTr("Fade in") : qsTr("Fade out"))
+                onPreviewEnded: EditorState.commitPreviewDrag()
+                onMoved: (value) => {
+                    if (fadeRow.isIn)
+                        root.setFades(value, root.fadeOut)
+                    else
+                        root.setFades(root.fadeIn, value)
                 }
             }
         }

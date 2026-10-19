@@ -1,7 +1,5 @@
 import QtQuick
-import QtQuick.Controls.Basic
 import Drift
-import ".."
 
 // Drags the guides of the set being edited. Lines and margin edges move; a line
 // dragged off the canvas is removed; dragging from the top or left strip adds a
@@ -132,55 +130,32 @@ Item {
 
     readonly property var shown: drag || hover
 
-    Rectangle {
+    GuideEditAddStrip {
         x: root.cx
         y: root.cy
         width: root.cw
         height: root.stripPx
-        color: Theme.panelBackground
-        opacity: 0.6
     }
 
-    Rectangle {
+    GuideEditAddStrip {
         x: root.cx
         y: root.cy + root.stripPx
         width: root.stripPx
         height: root.ch - root.stripPx
-        color: Theme.panelBackground
-        opacity: 0.6
     }
 
-    Rectangle {
-        visible: root.shown !== null
-        readonly property bool vertical: root.shown ? root.shown.axis === "x" : false
-        x: !root.shown ? 0 : vertical ? root.edgeAt(root.shown) - 1 : root.shown.from
-        y: !root.shown ? 0 : vertical ? root.shown.from : root.edgeAt(root.shown) - 1
-        width: !root.shown ? 0 : vertical ? 3 : root.shown.to - root.shown.from
-        height: !root.shown ? 0 : vertical ? root.shown.to - root.shown.from : 3
-        color: root.dragRemoves ? Theme.destructive : Theme.primary
+    GuideEditHighlight {
+        edge: root.shown
+        at: root.shown ? root.edgeAt(root.shown) : 0
+        removing: root.dragRemoves
     }
 
-    Rectangle {
-        id: readout
+    GuideEditReadout {
         visible: root.drag !== null
-        x: Math.min(root.width - width, mouseArea.mouseX + Theme.spacingLg)
-        y: Math.min(root.height - height, mouseArea.mouseY + Theme.spacingLg)
-        width: readoutText.implicitWidth + Theme.spacingMd * 2
-        height: readoutText.implicitHeight + Theme.spacingSm * 2
-        radius: Theme.radiusSm
-        color: Theme.panelBackground
-        border.width: Theme.borderWidth
-        border.color: Theme.panelBorder
-
-        Text {
-            id: readoutText
-            anchors.centerIn: parent
-            text: root.dragRemoves ? qsTr("Release to remove")
-                                   : (root.dragValue * 100).toFixed(1) + "%"
-            color: Theme.foreground
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSizeXs
-        }
+        pointerX: mouseArea.mouseX
+        pointerY: mouseArea.mouseY
+        label: root.dragRemoves ? qsTr("Release to remove")
+                                : (root.dragValue * 100).toFixed(1) + "%"
     }
 
     MouseArea {
@@ -228,48 +203,9 @@ Item {
         onExited: if (!root.drag) root.hover = null
     }
 
-    Rectangle {
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: Theme.spacingLg
-        width: barRow.implicitWidth + Theme.spacingLg * 2
-        height: barRow.implicitHeight + Theme.spacingMd * 2
-        radius: Theme.radiusMd
-        color: Theme.panelBackground
-        border.width: Theme.borderWidth
-        border.color: Theme.panelBorder
-
-        Row {
-            id: barRow
-            anchors.centerIn: parent
-            spacing: Theme.spacingLg
-
-            Column {
-                anchors.verticalCenter: parent.verticalCenter
-
-                Text {
-                    text: qsTr("Editing %1").arg(root.editedSet ? root.editedSet.name : "")
-                    color: Theme.foreground
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeSm
-                    font.weight: Font.Medium
-                }
-                Text {
-                    width: Math.min(implicitWidth, root.width * 0.6)
-                    wrapMode: Text.WordWrap
-                    text: qsTr("Drag from the top or left edge to add a guide, off the canvas to remove one. Shift steps by 1%.")
-                    color: Theme.mutedForeground
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeXs
-                }
-            }
-
-            ThemedButton {
-                anchors.verticalCenter: parent.verticalCenter
-                variant: "primary"
-                text: qsTr("Done")
-                onClicked: EditorState.preview.guideEditSetId = ""
-            }
-        }
+    GuideEditBar {
+        setName: root.editedSet ? root.editedSet.name : ""
+        maxHintWidth: root.width * 0.6
+        onDone: EditorState.preview.guideEditSetId = ""
     }
 }

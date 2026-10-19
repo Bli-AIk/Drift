@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <QtTest>
 
 #include <QAccessible>
@@ -29,33 +30,38 @@
 #include <QAbstractItemModel>
 #include <zlib.h>
 
-#include "playback/CompositorService.h"
-#include "engine/HwAccel.h"
-#include "engine/MediaEditor.h"
-#include "engine/MediaProbe.h"
-#include "engine/FrameCompositor.h"
-#include "engine/GpuCompositor.h"
-#include "engine/ClipReaderPool.h"
-#include "models/AppController.h"
-#include "models/TimelineClipsModel.h"
-#include "timeline/TimelineLayout.h"
-#include "timeline/TimelineTrackItem.h"
-#include "timeline/TimelineViewState.h"
-#include "models/AssetLibrary.h"
-#include "models/DriftAssetStore.h"
-#include "MulticamImageProvider.h"
-#include "MulticamImageStore.h"
+#include <filesystem>
 
-#include "core/Clip.h"
-#include "core/EffectStackStore.h"
-#include "core/MogrtReader.h"
-#include "core/KdenliveReader.h"
-#include "core/ResolveReader.h"
-#include "core/EdlReader.h"
-#include "core/OtioReader.h"
-#include "core/Project.h"
-#include "core/TimelineOps.h"
-#include "core/Track.h"
+#include "playback/preview/CompositorService.h"
+#include "engine/decode/hw/HwAccel.h"
+#include "engine/encode/MediaEditor.h"
+#include "engine/decode/probe/MediaProbe.h"
+#include "engine/encode/proxies/ProxyNaming.h"
+#include "engine/encode/proxies/ReverseProxyCache.h"
+#include "app/editor/PreferencesController.h"
+#include "engine/compositor/FrameCompositor.h"
+#include "engine/compositor/GpuCompositor.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "app/editor/AppController.h"
+#include "app/editor/TimelineClipsModel.h"
+#include "ui/timeline/TimelineLayout.h"
+#include "ui/timeline/TimelineTrackItem.h"
+#include "ui/timeline/TimelineViewState.h"
+#include "app/bin/AssetLibrary.h"
+#include "app/online/assets/DriftAssetStore.h"
+#include "ui/imageproviders/multicam/MulticamImageProvider.h"
+#include "ui/imageproviders/multicam/MulticamImageStore.h"
+
+#include "core/project/clip/Clip.h"
+#include "core/effects/EffectStackStore.h"
+#include "core/interchange/premiere/MogrtReader.h"
+#include "core/interchange/KdenliveReader.h"
+#include "core/interchange/ResolveReader.h"
+#include "core/interchange/EdlReader.h"
+#include "core/interchange/OtioReader.h"
+#include "core/project/Project.h"
+#include "core/edit/TimelineOps.h"
+#include "core/project/Track.h"
 
 namespace {
 
@@ -66,6 +72,8 @@ class TestController : public AppController
 public:
     using AppController::AppController;
     using AppController::notifyTracksChanged;
+    using AppController::m_filmstripTiles;
+    using AppController::m_waveformBlocks;
 };
 
 QByteArray readFile(const QString &path)
@@ -87,6 +95,8 @@ private slots:
     void compositeClipGetsAPreviewBox();
     void cameraMovesThePreviewOverlayWithThePicture();
     void cameraGizmoMovesAndTurnsTheEye();
+    void flyMovesTheCameraWhenLookingThrough();
+    void undoRestoresEditsMadeThroughEarlierPointers();
     void compositeClipSpeedRetimesToFit();
     void importedMediaIsCentredAndResetsToItsFit();
     void transformTogetherWrapsTheSelection();
@@ -147,6 +157,8 @@ private slots:
     void videoTransitionMirrorsToLinkedAudio();
     void deleteLeftRightActionsCutAtThePlayhead();
     void playbackRateStepsThroughTheOfferedRates();
+    void previewQualityEighthRendersAtOneEighth();
+    void playbackSuspendsThumbnailAndWaveformDecoding();
     void displayRefreshRateIgnoresDriverPlaceholders();
     void workAreaMarkClearAndUndo();
     void bookmarkSnapTarget();
@@ -155,6 +167,7 @@ private slots:
     void undoingBinFolderRenameEmitsDataChanged();
     void importIntoDeletedFolderFallsBackToRoot();
     void importUnreadableUrlReportsFailed();
+    void importImageSequenceAsVideoAsset();
     void importFolderMirrorsDirectoryTree();
     void importFolderMovesAlreadyImportedMediaIntoMirroredFolder();
     void importFolderSkipsSymlinkCycles();
@@ -247,6 +260,11 @@ private slots:
     void shapeStylePartialUpdateAndUndo();
     void shapeLayersAndKeyframes();
     void replaceSourceRebindsClipsAndClampsTrim();
+    void linkProxyValidatesAndCountsMatches();
+    void proxyGenerationWritesBesideSource();
+    void proxyGenerationFallsBackToCacheWhenFolderIsReadOnly();
+    void reverseRenderWritesBesideSource();
+    void reverseRenderFallsBackToCacheWhenFolderIsReadOnly();
     void replaceSourceRefusesADifferentKind();
     void exportImageWritesPngAndJpeg();
     void startupProjectUrlFromArguments();
@@ -290,6 +308,7 @@ private slots:
     void clipsModelNotifiesOnlyTheClipThatChanged();
     void clipsModelInsertsAndRemovesWithoutReset();
     void clipsModelDerivesGapsAndOverlaps();
+    void closeGapBeforeFirstClipMovesTrackToStart();
     void timelineLayoutCullsTilesAndHits();
     void trackItemOverlaysFollowSelection();
     void trackItemExposesDrawnClipsToAccessibility();
@@ -297,6 +316,7 @@ private slots:
     void trackFitAnswersForAKindMatchTheAssetForms();
     void provisionalKindReadsTheExtensionAlone();
     void importFileNameStaysStorable();
+    void splatInputsAreModelPaths();
 };
 
 // A file dragged in from the file manager has no bin row yet, so the timeline's drop preview
@@ -923,6 +943,47 @@ void EditorStateTest::cameraMovesThePreviewOverlayWithThePicture()
     QVERIFY(state.preview()->clipAtCanvasPoint(restRendered.x(), restRendered.y()).isEmpty());
 }
 
+void EditorStateTest::flyMovesTheCameraWhenLookingThrough()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.project()->setResolution(1000, 1000);
+    state.addCameraTrack();
+    state.setPlayheadSeconds(0.0);
+    state.preview()->setMode(QStringLiteral("3d"));
+    const QVariantMap rest = state.preview()->cameraBox();
+    const int track = rest.value(QStringLiteral("track")).toInt();
+    const int clip = rest.value(QStringLiteral("clip")).toInt();
+    const auto eyeOf = [&] {
+        return drift::sceneCameraEye(drift::sceneCameraFromClip(
+            state.project()->tracks().at(track).clips.at(clip), 0, 1.0));
+    };
+
+    // From the free view, flying moves the view and leaves the camera alone.
+    state.preview()->setFlying(true);
+    QVERIFY(state.preview()->flying());
+    const QVector3D viewEye = drift::editorViewEye(state.preview()->currentView());
+    state.preview()->fly(0.0, 0.0, 0.1, 0.0, 0.0);
+    QVERIFY((drift::editorViewEye(state.preview()->currentView()) - viewEye).length() > 1.f);
+    QVERIFY((eyeOf() - QVector3D(0, 0, 2000)).length() < 0.01f);
+    state.preview()->setFlying(false);
+
+    // Through the camera, the camera flies: W moves the eye along its view, by lens multiples.
+    state.preview()->toggleLookThrough();
+    state.preview()->setFlying(true);
+    state.preview()->fly(0.0, 0.0, 0.1, 0.0, 0.0);
+    QVERIFY(state.preview()->lookThrough());
+    QVERIFY2((eyeOf() - QVector3D(0, 0, 1800)).length() < 0.5f, qPrintable(QString::number(eyeOf().z())));
+    // Turning keeps the eye in place and yaws the camera.
+    state.preview()->fly(30.0, 0.0, 0.0, 0.0, 0.0);
+    QVERIFY((eyeOf() - QVector3D(0, 0, 1800)).length() < 0.5f);
+    QVERIFY(std::abs(state.project()->tracks().at(track).clips.at(clip).rotationY.evaluateAt(0)) > 1.0);
+    // Landing makes the whole flight one undo step.
+    state.preview()->setFlying(false);
+    state.undo();
+    QVERIFY((eyeOf() - QVector3D(0, 0, 2000)).length() < 0.5f);
+}
+
 void EditorStateTest::cameraGizmoMovesAndTurnsTheEye()
 {
     AssetLibrary library;
@@ -1040,6 +1101,32 @@ void EditorStateTest::compositeClipGetsAPreviewBox()
             found = true;
     }
     QVERIFY(found);
+}
+
+void EditorStateTest::undoRestoresEditsMadeThroughEarlierPointers()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Hold me"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString prop = QStringLiteral("opacity");
+    state.setClipKeyframe(track, clip, prop, 0.0, 0.0);
+    state.setClipKeyframe(track, clip, prop, 2.0, 1.0);
+
+    // setKeyframeHold resolves its key pointer before taking the undo snapshot. TrackList keeps
+    // clip buffers private to each copy, but a clip's keyframe map is still shared between them.
+    state.setKeyframeHold(track, clip, prop, 0.0, true);
+    QVERIFY(state.clipKeyframes(track, clip, prop).first().toMap().value(QStringLiteral("hold")).toBool());
+    state.undo();
+    QVERIFY(!state.clipKeyframes(track, clip, prop).first().toMap().value(QStringLiteral("hold")).toBool());
+
+    // Bookmarks are a plain QList, so they have the same hazard one level higher.
+    state.addBookmark(1.0, QStringLiteral("A"));
+    state.updateBookmark(0, 2.0, QStringLiteral("B"));
+    QCOMPARE(state.project()->bookmarks().at(0).label, QStringLiteral("B"));
+    state.undo();
+    QCOMPARE(state.project()->bookmarks().at(0).label, QStringLiteral("A"));
 }
 
 void EditorStateTest::compositeClipSpeedRetimesToFit()
@@ -1582,6 +1669,11 @@ void EditorStateTest::arrowKeysJogAndJumpThePlayhead()
     QCOMPARE(state.shortcutFor(QStringLiteral("jumpForward")), QStringLiteral("Shift+Right"));
     QCOMPARE(state.shortcutFor(QStringLiteral("jumpBackFar")), QStringLiteral("Ctrl+Left"));
     QCOMPARE(state.shortcutFor(QStringLiteral("jumpForwardFar")), QStringLiteral("Ctrl+Right"));
+    QCOMPARE(state.shortcutFor(QStringLiteral("search")), QStringLiteral("Ctrl+K"));
+    const QVariantList actions = state.actions();
+    QVERIFY(std::any_of(actions.cbegin(), actions.cend(), [](const QVariant &action) {
+        return action.toMap().value(QStringLiteral("id")).toString() == QLatin1String("search");
+    }));
 
     // What Main.qml's editor FocusScope does with an unaccepted arrow.
     const auto jog = [&state](int key, Qt::KeyboardModifiers mods) {
@@ -1995,6 +2087,45 @@ void EditorStateTest::importIntoDeletedFolderFallsBackToRoot()
     QTRY_VERIFY_WITH_TIMEOUT(!library.isImportPending(ids.first()), 5000);
 }
 
+void EditorStateTest::importImageSequenceAsVideoAsset()
+{
+    AssetLibrary library;
+    AppController state(&library);
+
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QList<QUrl> urls;
+    for (int i = 1; i <= 5; ++i) {
+        QImage image(16, 16, QImage::Format_RGB32);
+        image.fill(Qt::black);
+        const QString file = tempDir.path() + QStringLiteral("/f_") + QString::number(i).rightJustified(4, '0')
+                             + QStringLiteral(".png");
+        QVERIFY(image.save(file));
+        urls.append(QUrl::fromLocalFile(file));
+    }
+
+    const QVariantList found = library.detectImageSequences(urls);
+    QCOMPARE(found.size(), 1);
+    const QVariantMap seq = found.first().toMap();
+    QCOMPARE(seq.value(QStringLiteral("consumedUrls")).value<QList<QUrl>>(), urls);
+
+    const QString path = library.imageSequenceImportPath(seq.value(QStringLiteral("pattern")).toString(),
+                                                         seq.value(QStringLiteral("start")).toInt(), 10.0);
+    QSignalSpy finished(&library, &AssetLibrary::importFinished);
+    QVERIFY(library.importUrlsAsync({}, {path}));
+    QVERIFY(finished.wait(5000));
+    QCOMPARE(finished.first().at(0).toInt(), 1);
+    QCOMPARE(library.count(), 1);
+
+    const QString id = library.assetIdAt(0);
+    QTRY_VERIFY_WITH_TIMEOUT(!library.isImportPending(id), 10000);
+    QCOMPARE(library.count(), 1);
+    const QVariantMap asset = library.assetAt(0);
+    QCOMPARE(asset.value(QStringLiteral("name")).toString(), QStringLiteral("f_[0001-0005].png"));
+    QCOMPARE(asset.value(QStringLiteral("kind")).toString(), QStringLiteral("video"));
+    QCOMPARE(asset.value(QStringLiteral("durationSeconds")).toDouble(), 0.5);
+}
+
 void EditorStateTest::importUnreadableUrlReportsFailed()
 {
     AssetLibrary library;
@@ -2154,9 +2285,6 @@ void EditorStateTest::importFolderMovesAlreadyImportedMediaIntoMirroredFolder()
 
 void EditorStateTest::importFolderSkipsSymlinkCycles()
 {
-#ifdef Q_OS_WIN
-    QSKIP("Symlink creation needs elevated privileges on Windows");
-#endif
     AssetLibrary library;
     AppController state(&library);
 
@@ -2168,8 +2296,13 @@ void EditorStateTest::importFolderSkipsSymlinkCycles()
     // SubA/loop -> the temp dir itself, so recursing into it would walk back into root forever
     // without a visited-set guard.
     const QString linkPath = root.filePath(QStringLiteral("SubA/loop"));
-    if (!QFile::link(tempDir.path(), linkPath))
-        QSKIP("This filesystem does not support symlinks");
+    // QFile::link makes a .lnk shortcut on Windows, which the importer does not follow.
+    std::error_code ec;
+    std::filesystem::create_directory_symlink(std::filesystem::path(tempDir.path().toStdWString()),
+                                              std::filesystem::path(linkPath.toStdWString()), ec);
+    if (ec)
+        QSKIP(qPrintable(QStringLiteral("Cannot create a directory symlink here: %1")
+                             .arg(QString::fromStdString(ec.message()))));
 
     // Hangs (or stack-overflows) here if the visited-set guard regresses — there is no bound on
     // the recursion otherwise, since the symlink always resolves back to an already-mirrored
@@ -2700,6 +2833,7 @@ void EditorStateTest::projectPersistenceRoundTrip()
 
     state.projectFile()->saveProject(QUrl::fromLocalFile(tempFile.fileName()));
     state.projectFile()->loadProject(QUrl::fromLocalFile(tempFile.fileName()));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
 
     QVERIFY(state.durationSeconds() > 0.0);
     QCOMPARE(state.tracks().size(), 2);
@@ -2757,11 +2891,13 @@ void EditorStateTest::saveProjectAsDuplicatesProject()
 
     // And the original still opens as it was, under its own id and name.
     state.projectFile()->loadProject(QUrl::fromLocalFile(originalPath));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
     QCOMPARE(state.project()->id(), originalId);
     QCOMPARE(state.projectFile()->projectName(), QStringLiteral("Wedding"));
     QCOMPARE(clipCount(), 1); // without the clip that was only ever added to the copy
 
     state.projectFile()->loadProject(QUrl::fromLocalFile(copyPath));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
     QCOMPARE(state.projectFile()->projectName(), QStringLiteral("wedding-short"));
     QCOMPARE(clipCount(), 2);
 }
@@ -2796,6 +2932,7 @@ void EditorStateTest::projectJsonExportImportRoundTrip()
     QVERIFY(state.projectFile()->currentProjectPath().isEmpty());
 
     state.projectFile()->loadProjectJson(QUrl::fromLocalFile(jsonPath));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
     QCOMPARE(state.lastMessage(), QStringLiteral("Project JSON loaded"));
     QCOMPARE(state.projectFile()->projectMetadata().value(QStringLiteral("title")).toString(),
              QStringLiteral("FromJson"));
@@ -2812,6 +2949,7 @@ void EditorStateTest::projectJsonExportImportRoundTrip()
     // loadProject sniffs JSON so a dropped file, CLI arg or MCP load_project works.
     state.projectFile()->newProject();
     state.projectFile()->loadProject(QUrl::fromLocalFile(jsonPath));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
     QCOMPARE(state.lastMessage(), QStringLiteral("Project JSON loaded"));
     QCOMPARE(state.projectFile()->projectMetadata().value(QStringLiteral("title")).toString(),
              QStringLiteral("FromJson"));
@@ -2877,6 +3015,7 @@ void EditorStateTest::guidesTravelWithProject()
 
     state.preview()->setGuidesEnabled(false);
     state.projectFile()->loadProjectJson(QUrl::fromLocalFile(jsonPath));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
     QVERIFY(state.preview()->guidesEnabled());
     const QVariantList items = state.guideItems();
     QCOMPARE(items.size(), 1);
@@ -3005,6 +3144,7 @@ void EditorStateTest::projectJsonImportRejectsGarbageAndLeavesTimeline()
     }
 
     state.projectFile()->loadProjectJson(QUrl::fromLocalFile(path));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
     QCOMPARE(state.lastMessageSeverity(), QStringLiteral("error"));
     QCOMPARE(state.lastMessage(), QStringLiteral("This file isn’t a Drift project."));
     QCOMPARE(state.tracks().size(), 2);
@@ -3073,6 +3213,7 @@ void EditorStateTest::legacyStabilizedRenderBecomesBinAsset()
     AssetLibrary library;
     AppController state(&library);
     state.projectFile()->loadProjectJson(QUrl::fromLocalFile(jsonPath));
+    QTRY_VERIFY(!state.projectFile()->projectLoadPending());
     const drift::Project &loaded = *state.project();
     QCOMPARE(loaded.assetOrder().size(), 2);
 
@@ -3112,6 +3253,9 @@ void EditorStateTest::stabilizeRendersRangeIntoBinAndSwapsClip()
     const QString ffmpeg = QStandardPaths::findExecutable(QStringLiteral("ffmpeg"));
     if (ffmpeg.isEmpty())
         QSKIP("ffmpeg not on PATH");
+    // Without it the playback engine's "preview needs OpenGL 3.3" error overwrites lastMessage.
+    if (!GpuCompositor::isAvailable())
+        QSKIP("OpenGL offscreen context unavailable");
     QStandardPaths::setTestModeEnabled(true);
     const auto restore = qScopeGuard([] { QStandardPaths::setTestModeEnabled(false); });
 
@@ -3383,6 +3527,44 @@ bool writeSimpleZipForTest(const QString &outPath, const QList<QPair<QString, QB
     return true;
 }
 } // namespace
+
+// A .sog is a model by name; .ply, .zip and meta.json only when their content says Gaussian splat,
+// so a plain zip or a mesh PLY stays out of the model kind.
+void EditorStateTest::splatInputsAreModelPaths()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    auto write = [&](const char *name, const QByteArray &bytes) {
+        const QString path = dir.filePath(QLatin1String(name));
+        QFile f(path);
+        if (f.open(QIODevice::WriteOnly))
+            f.write(bytes);
+        return path;
+    };
+
+    QVERIFY(AssetLibrary::isModelPath(QStringLiteral("scene.glb")));
+    QVERIFY(AssetLibrary::isModelPath(QStringLiteral("scene.SOG")));
+    QVERIFY(AssetLibrary::isMediaPath(QStringLiteral("scene.sog")));
+    QVERIFY(AssetLibrary::isModelPath(write("splat.ply",
+        "ply\nformat binary_little_endian 1.0\nelement vertex 1\nproperty float x\nproperty float y\n"
+        "property float z\nproperty float f_dc_0\nproperty float f_dc_1\nproperty float f_dc_2\n"
+        "property float opacity\nproperty float scale_0\nproperty float scale_1\nproperty float scale_2\n"
+        "property float rot_0\nproperty float rot_1\nproperty float rot_2\nproperty float rot_3\n"
+        "end_header\n")));
+    QVERIFY(!AssetLibrary::isModelPath(write("mesh.ply",
+        "ply\nformat ascii 1.0\nelement vertex 1\nproperty float x\nproperty float y\n"
+        "property float z\nelement face 0\nproperty list uchar int vertex_indices\nend_header\n")));
+
+    const QString bundle = dir.filePath(QStringLiteral("bundle.zip"));
+    QVERIFY(writeSimpleZipForTest(bundle, {{QStringLiteral("meta.json"), "{}"}}));
+    QVERIFY(AssetLibrary::isModelPath(bundle));
+    QVERIFY(AssetLibrary::isMediaPath(bundle));
+    const QString plain = dir.filePath(QStringLiteral("plain.zip"));
+    QVERIFY(writeSimpleZipForTest(plain, {{QStringLiteral("readme.txt"), "hi"}}));
+    QVERIFY(!AssetLibrary::isModelPath(plain));
+    QVERIFY(!AssetLibrary::isMediaPath(plain));
+    QVERIFY(!AssetLibrary::isModelPath(QStringLiteral("missing.zip")));
+}
 
 void EditorStateTest::mogrtImportIntoExistingProject()
 {
@@ -6935,6 +7117,282 @@ void EditorStateTest::replaceSourceRebindsClipsAndClampsTrim()
     QCOMPARE(undone.depthPath, beforeSwap.depthPath);
 }
 
+namespace {
+
+// Proxy sidecar state is process-wide, so each test starts and ends with none and with the
+// pattern list the user would have had.
+struct ProxyTestScope
+{
+    explicit ProxyTestScope(AppController &state) : m_state(state)
+    {
+        QStandardPaths::setTestModeEnabled(true);
+        m_org = QCoreApplication::organizationName();
+        m_app = QCoreApplication::applicationName();
+        QCoreApplication::setOrganizationName(QStringLiteral("DriftTest"));
+        QCoreApplication::setApplicationName(QStringLiteral("DriftTestProxy"));
+        QSettings().remove(QStringLiteral("proxy"));
+        drift::ReverseProxyCache::instance().clearSidecars();
+        m_side = drift::ReverseProxyCache::previewProxyShortSide.exchange(360);
+        m_state.preferences()->setProxyNamePatterns({});
+    }
+    ~ProxyTestScope()
+    {
+        m_state.preferences()->resetProxyNamePatterns();
+        drift::ReverseProxyCache::previewProxyShortSide.store(m_side);
+        drift::ReverseProxyCache::instance().clearSidecars();
+        QSettings().remove(QStringLiteral("proxy"));
+        QCoreApplication::setOrganizationName(m_org);
+        QCoreApplication::setApplicationName(m_app);
+        QStandardPaths::setTestModeEnabled(false);
+    }
+    AppController &m_state;
+    QString m_org;
+    QString m_app;
+    int m_side = 0;
+};
+
+} // namespace
+
+void EditorStateTest::linkProxyValidatesAndCountsMatches()
+{
+    const QString ffmpeg = QStandardPaths::findExecutable(QStringLiteral("ffmpeg"));
+    if (ffmpeg.isEmpty())
+        QSKIP("ffmpeg not available to generate a test clip");
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString a = dir.filePath(QStringLiteral("a.mp4"));
+    const QString b = dir.filePath(QStringLiteral("b.mp4"));
+    const QString c = dir.filePath(QStringLiteral("c.mp4"));
+    const QString aProxy = dir.filePath(QStringLiteral("a_proxy.mp4"));
+    const QString aLong = dir.filePath(QStringLiteral("a_long.mp4"));
+    const QString aText = dir.filePath(QStringLiteral("a_text.mp4"));
+    QVERIFY(renderTestVideo(ffmpeg, a, 2));
+    QVERIFY(QFile::copy(a, b));
+    QVERIFY(QFile::copy(a, c));
+    QVERIFY(QFile::copy(a, aProxy));
+    QVERIFY(QFile::copy(a, dir.filePath(QStringLiteral("b_proxy.mp4"))));
+    QVERIFY(renderTestVideo(ffmpeg, aLong, 5));
+    {
+        QFile text(aText);
+        QVERIFY(text.open(QIODevice::WriteOnly));
+        text.write("not a video");
+    }
+
+    AssetLibrary library;
+    AppController state(&library);
+    ProxyTestScope scope(state);
+    QVERIFY(importAndAwait(library, a));
+    QVERIFY(importAndAwait(library, b));
+    QVERIFY(importAndAwait(library, c));
+    const QString idA = library.assetIdAt(0);
+    const QString idB = library.assetIdAt(1);
+    const QString idC = library.assetIdAt(2);
+    QCOMPARE(library.proxyState(idA), QStringLiteral("none"));
+
+    QSignalSpy probed(&library, &AssetLibrary::proxyLinkProbed);
+    library.linkProxy(idA, QUrl::fromLocalFile(aLong));
+    QVERIFY(probed.wait(60000));
+    QVERIFY(!probed.last().at(3).toString().isEmpty());
+    QVERIFY(probed.last().at(1).toString().isEmpty());
+
+    probed.clear();
+    library.linkProxy(idA, QUrl::fromLocalFile(aText));
+    QVERIFY(probed.wait(60000));
+    QVERIFY(!probed.last().at(3).toString().isEmpty());
+
+    probed.clear();
+    library.linkProxy(idA, QUrl::fromLocalFile(aProxy));
+    QVERIFY(probed.wait(60000));
+    QCOMPARE(probed.last().at(3).toString(), QString());
+    QCOMPARE(probed.last().at(1).toString(), QStringLiteral("*_proxy"));
+    QCOMPARE(probed.last().at(2).toInt(), 1);
+    QCOMPARE(library.proxyState(idA), QStringLiteral("none"));
+
+    library.commitProxyRule(QStringLiteral("*_proxy"));
+    QCOMPARE(state.preferences()->proxyNamePatterns(), QStringList{QStringLiteral("*_proxy")});
+    QTRY_COMPARE_WITH_TIMEOUT(library.proxyState(idA), QStringLiteral("linked"), 30000);
+    QTRY_COMPARE_WITH_TIMEOUT(library.proxyState(idB), QStringLiteral("linked"), 30000);
+    QCOMPARE(library.proxyState(idC), QStringLiteral("none"));
+}
+
+void EditorStateTest::proxyGenerationWritesBesideSource()
+{
+    const QString ffmpeg = QStandardPaths::findExecutable(QStringLiteral("ffmpeg"));
+    if (ffmpeg.isEmpty())
+        QSKIP("ffmpeg not available to generate a test clip");
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("clip.mp4"));
+    QVERIFY(renderTestVideo(ffmpeg, source, 2));
+
+    AssetLibrary library;
+    AppController state(&library);
+    ProxyTestScope scope(state);
+    QVERIFY(importAndAwait(library, source));
+    const QString id = library.assetIdAt(0);
+
+    QSignalSpy fallback(&library, &AssetLibrary::proxyLocationFallback);
+    library.createProxies({id});
+    QTRY_COMPARE_WITH_TIMEOUT(library.proxyState(id), QStringLiteral("ready"), 120000);
+    QVERIFY(QFileInfo::exists(dir.filePath(QStringLiteral("clip_proxy_360.mp4"))));
+    QVERIFY(!QFileInfo::exists(dir.filePath(QStringLiteral("clip_proxy_360.mp4.part"))));
+    QCOMPARE(fallback.count(), 0);
+
+    library.removeProxies({id});
+    QCOMPARE(library.proxyState(id), QStringLiteral("none"));
+    QVERIFY(!QFileInfo::exists(dir.filePath(QStringLiteral("clip_proxy_360.mp4"))));
+    QVERIFY(QFileInfo::exists(source));
+}
+
+void EditorStateTest::proxyGenerationFallsBackToCacheWhenFolderIsReadOnly()
+{
+    const QString ffmpeg = QStandardPaths::findExecutable(QStringLiteral("ffmpeg"));
+    if (ffmpeg.isEmpty())
+        QSKIP("ffmpeg not available to generate a test clip");
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("clip.mp4"));
+    QVERIFY(renderTestVideo(ffmpeg, source, 2));
+
+    AssetLibrary library;
+    AppController state(&library);
+    ProxyTestScope scope(state);
+    QVERIFY(importAndAwait(library, source));
+    const QString id = library.assetIdAt(0);
+
+    const QFileDevice::Permissions original = QFileInfo(dir.path()).permissions();
+    const auto restorePermissions =
+        qScopeGuard([&] { QFile::setPermissions(dir.path(), original); });
+    QVERIFY(QFile::setPermissions(dir.path(), QFileDevice::ReadOwner | QFileDevice::ExeOwner));
+#ifdef Q_OS_WIN
+    // A read-only attribute does not stop new files in a directory on Windows; a deny ACE does,
+    // for administrators too.
+    const QString aclTarget = QDir::toNativeSeparators(dir.path());
+    QCOMPARE(QProcess::execute(QStringLiteral("icacls"),
+                               {aclTarget, QStringLiteral("/deny"), QStringLiteral("*S-1-1-0:(W)")}),
+             0);
+    const auto restoreAcl = qScopeGuard([&] {
+        QProcess::execute(QStringLiteral("icacls"),
+                          {aclTarget, QStringLiteral("/remove:d"), QStringLiteral("*S-1-1-0")});
+    });
+#endif
+    {
+        QFile probe(dir.filePath(QStringLiteral("probe")));
+        if (probe.open(QIODevice::WriteOnly))
+            QSKIP("folder stays writable (running as root?)");
+    }
+
+    QSignalSpy fallback(&library, &AssetLibrary::proxyLocationFallback);
+    library.createProxies({id});
+    QVERIFY(fallback.wait(120000));
+    QCOMPARE(fallback.count(), 1);
+    QCOMPARE(fallback.at(0).at(0).toStringList(),
+             QStringList{QDir::toNativeSeparators(QFileInfo(dir.path()).absoluteFilePath())});
+    QTRY_COMPARE_WITH_TIMEOUT(library.proxyState(id), QStringLiteral("ready"), 30000);
+    QVERIFY(!QFileInfo::exists(dir.filePath(QStringLiteral("clip_proxy_360.mp4"))));
+
+    library.removeProxies({id});
+}
+
+void EditorStateTest::reverseRenderWritesBesideSource()
+{
+    const QString ffmpeg = QStandardPaths::findExecutable(QStringLiteral("ffmpeg"));
+    if (ffmpeg.isEmpty())
+        QSKIP("ffmpeg not available to generate a test clip");
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("clip.mp4"));
+    QVERIFY(renderTestVideo(ffmpeg, source, 2));
+
+    AssetLibrary library;
+    AppController state(&library);
+    ProxyTestScope scope(state);
+    QVERIFY(importAndAwait(library, source));
+    state.addClipFromAsset(0);
+    const int track = state.selectedTrack();
+    QVERIFY(track >= 0);
+
+    QSignalSpy fallback(&library, &AssetLibrary::proxyLocationFallback);
+    QSignalSpy finished(&state, &AppController::reverseRenderFinished);
+    state.applyClipReverse(track, 0);
+    QVERIFY(finished.wait(120000));
+    QVERIFY(finished.at(0).at(0).toBool());
+
+    const QStringList written =
+        QDir(dir.path()).entryList({QStringLiteral("clip_reversed_*.mp4")}, QDir::Files);
+    QCOMPARE(written.size(), 1);
+    QVERIFY(drift::parseReversedSidecarName(source, written.first()));
+    QVERIFY(QDir(dir.path()).entryList({QStringLiteral("*.part")}, QDir::Files).isEmpty());
+    QVERIFY(state.clipHasReverseProxy(track, 0));
+    QCOMPARE(fallback.count(), 0);
+}
+
+void EditorStateTest::reverseRenderFallsBackToCacheWhenFolderIsReadOnly()
+{
+    const QString ffmpeg = QStandardPaths::findExecutable(QStringLiteral("ffmpeg"));
+    if (ffmpeg.isEmpty())
+        QSKIP("ffmpeg not available to generate a test clip");
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("clip.mp4"));
+    QVERIFY(renderTestVideo(ffmpeg, source, 2));
+
+    AssetLibrary library;
+    AppController state(&library);
+    ProxyTestScope scope(state);
+    QVERIFY(importAndAwait(library, source));
+    state.addClipFromAsset(0);
+    const int track = state.selectedTrack();
+    QVERIFY(track >= 0);
+
+    const QFileDevice::Permissions original = QFileInfo(dir.path()).permissions();
+    const auto restorePermissions =
+        qScopeGuard([&] { QFile::setPermissions(dir.path(), original); });
+    QVERIFY(QFile::setPermissions(dir.path(), QFileDevice::ReadOwner | QFileDevice::ExeOwner));
+#ifdef Q_OS_WIN
+    // A read-only attribute does not stop new files in a directory on Windows; a deny ACE does,
+    // for administrators too.
+    const QString aclTarget = QDir::toNativeSeparators(dir.path());
+    QCOMPARE(QProcess::execute(QStringLiteral("icacls"),
+                               {aclTarget, QStringLiteral("/deny"), QStringLiteral("*S-1-1-0:(W)")}),
+             0);
+    const auto restoreAcl = qScopeGuard([&] {
+        QProcess::execute(QStringLiteral("icacls"),
+                          {aclTarget, QStringLiteral("/remove:d"), QStringLiteral("*S-1-1-0")});
+    });
+#endif
+    {
+        QFile probe(dir.filePath(QStringLiteral("probe")));
+        if (probe.open(QIODevice::WriteOnly))
+            QSKIP("folder stays writable (running as root?)");
+    }
+
+    QSignalSpy fallback(&library, &AssetLibrary::proxyLocationFallback);
+    QSignalSpy finished(&state, &AppController::reverseRenderFinished);
+    state.applyClipReverse(track, 0);
+    QVERIFY(finished.wait(120000));
+    QVERIFY(finished.at(0).at(0).toBool());
+
+    QCOMPARE(fallback.count(), 1);
+    QCOMPARE(fallback.at(0).at(0).toStringList(),
+             QStringList{QDir::toNativeSeparators(QFileInfo(dir.path()).absoluteFilePath())});
+    QVERIFY(QDir(dir.path()).entryList({QStringLiteral("clip_reversed_*")}, QDir::Files).isEmpty());
+    QVERIFY(state.clipHasReverseProxy(track, 0));
+
+    // The cache entry is the only thing keeping the lookup alive; drop it so later tests start clean.
+    const auto &clip = state.project()->tracks().at(track).clips.at(0);
+    drift::TimeUs coverEnd = 0;
+    const QString cached =
+        drift::ReverseProxyCache::instance().lookup(source, clip.srcIn, clip.srcOut, &coverEnd);
+    QVERIFY(!cached.isEmpty());
+    QFile::remove(cached);
+}
+
 // A clip's type is fixed at creation and decides which track it may sit on, so audio cannot slot
 // into a video row. The refusal has to leave the project exactly as it was.
 void EditorStateTest::replaceSourceRefusesADifferentKind()
@@ -9690,6 +10148,84 @@ void EditorStateTest::clipsModelInsertsAndRemovesWithoutReset()
     clips.swapItemsAt(0, 1);
     state.notifyTracksChanged();
     QCOMPARE(resetSpy.count(), 1);
+}
+
+// The fixed qualities are fractions of the project resolution once the panel fits it 1:1;
+// "eighth" is the low-spec step below Quarter, and an unknown value leaves the setting alone.
+void EditorStateTest::previewQualityEighthRendersAtOneEighth()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    PlaybackEngine *playback = state.playback();
+    playback->setPreviewRenderSize(state.project()->width(), state.project()->height());
+
+    const QList<QPair<QString, double>> expected{
+        {QStringLiteral("full"), 1.0},
+        {QStringLiteral("half"), 0.5},
+        {QStringLiteral("quarter"), 0.25},
+        {QStringLiteral("eighth"), 0.125},
+    };
+    for (const auto &[quality, scale] : expected) {
+        playback->setPreviewQuality(quality);
+        QCOMPARE(playback->previewQuality(), quality);
+        QCOMPARE(playback->previewRenderScale(), scale);
+    }
+
+    playback->setPreviewQuality(QStringLiteral("sixteenth"));
+    QCOMPARE(playback->previewQuality(), QStringLiteral("eighth"));
+}
+
+// Tile and peak decoding would compete with the preview's decoders for the CPU, so playback
+// holds both caches and pausing lets them catch up.
+void EditorStateTest::playbackSuspendsThumbnailAndWaveformDecoding()
+{
+    AssetLibrary library;
+    TestController state(&library);
+    appendTwoVideoClips(*state.project());
+    state.notifyTracksChanged();
+    QVERIFY(!state.m_filmstripTiles.isSuspended());
+    QVERIFY(!state.m_waveformBlocks.isSuspended());
+
+    state.setPlaying(true);
+    if (!state.playback()->isPlaying())
+        QSKIP("Playback did not start in this environment");
+    QVERIFY(state.m_filmstripTiles.isSuspended());
+    QVERIFY(state.m_waveformBlocks.isSuspended());
+
+    state.setPlaying(false);
+    QVERIFY(!state.m_filmstripTiles.isSuspended());
+    QVERIFY(!state.m_waveformBlocks.isSuspended());
+}
+
+// A track whose first clip starts late has a gap from 0, and closing it moves the whole track to
+// the start of the timeline, keeping the spacing between its clips.
+void EditorStateTest::closeGapBeforeFirstClipMovesTrackToStart()
+{
+    AssetLibrary library;
+    TestController state(&library);
+    appendTwoVideoClips(*state.project());
+    auto &clips = state.project()->tracks()[0].clips;
+    clips[0].timelineStart = drift::secondsToUs(1.5);
+    clips[1].timelineStart = drift::secondsToUs(5.0);
+    state.notifyTracksChanged();
+
+    auto *model = qobject_cast<TimelineClipsModel *>(state.clipsModel(0));
+    QVERIFY(model);
+    QCOMPARE(model->decorations().gaps.size(), 2);
+    QCOMPARE(model->decorations().gaps.at(0).start, 0.0);
+    QCOMPARE(model->decorations().gaps.at(0).end, 1.5);
+    QCOMPARE(model->decorations().gaps.at(1).start, 3.5);
+    QCOMPARE(model->decorations().gaps.at(1).end, 5.0);
+
+    state.closeGap(0, 0.0);
+    QCOMPARE(state.project()->tracks().at(0).clips.at(0).timelineStart, drift::TimeUs(0));
+    QCOMPARE(state.project()->tracks().at(0).clips.at(1).timelineStart, drift::secondsToUs(3.5));
+    QCOMPARE(model->decorations().gaps.size(), 1);
+    QCOMPARE(model->decorations().gaps.at(0).start, 2.0);
+
+    state.undo();
+    QCOMPARE(state.project()->tracks().at(0).clips.at(0).timelineStart, drift::secondsToUs(1.5));
+    QCOMPARE(state.project()->tracks().at(0).clips.at(1).timelineStart, drift::secondsToUs(5.0));
 }
 
 void EditorStateTest::clipsModelDerivesGapsAndOverlaps()

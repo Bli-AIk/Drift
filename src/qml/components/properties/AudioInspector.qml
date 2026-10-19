@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Window
 import Drift
-import ".."
-
 Item {
     id: root
 
@@ -14,7 +12,6 @@ Item {
     }
     readonly property bool hasSelection: !!clipData && Object.keys(clipData).length > 0
     readonly property string clipKind: hasSelection ? (clipData.kind || "") : ""
-    readonly property bool audible: clipKind === "audio" || clipKind === "video" || clipKind === "composite"
     // Read straight from a media file: stream choice, denoise and transcription need one.
     readonly property bool fileAudio: (clipKind === "audio" || clipKind === "video") && !clipData.sequenceId
     readonly property var propVolume: { "key": "volume", "label": qsTr("Volume"), "def": 1.0, "decimals": 2 }
@@ -46,18 +43,8 @@ Item {
         width: root.width
         spacing: Theme.spacingXl
 
-        EmptyState {
-            visible: root.clipKind !== "audio" && root.clipKind !== "video"
-            width: parent.width
-            compact: true
-            glyph: Theme.icons.volumeOff
-            title: qsTr("No audio")
-            hint: qsTr("This clip has no audio track.")
-        }
-
         PropertyKeyframeRow {
             width: root.width
-            visible: root.audible
             propDef: root.propVolume
             keyframeList: (root.clipData.keyframes && root.clipData.keyframes.volume && root.clipData.keyframes.volume.points) || []
             useSlider: true
@@ -72,7 +59,6 @@ Item {
             id: panSection
             width: parent.width
             spacing: Theme.spacingSm
-            visible: root.audible
 
             readonly property real panValue: {
                 void root.clipDataRevision
@@ -86,7 +72,7 @@ Item {
                 Text {
                     width: parent.width / 2
                     text: qsTr("Pan")
-                    color: Theme.mutedForeground
+                    color: Theme.c.audioInspector.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }
@@ -103,7 +89,7 @@ Item {
                         return (v < 0 ? qsTr("L %1") : qsTr("R %1"))
                                    .arg(Math.round(Math.abs(v) * 100))
                     }
-                    color: Theme.panelForeground
+                    color: Theme.c.audioInspector.foreground
                     font.family: Theme.monoFontFamily
                     font.pixelSize: Theme.fontSizeSm
                 }
@@ -155,7 +141,7 @@ Item {
             Text {
                 width: parent.width
                 text: qsTr("Audio track")
-                color: Theme.mutedForeground
+                color: Theme.c.audioInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -195,9 +181,9 @@ Item {
         Rectangle {
             visible: root.fileAudio
             width: parent.width
-            height: 1
-            color: Theme.panelBorder
-            opacity: 0.5
+            height: Theme.c.audioInspector.ruleWidth
+            color: Theme.c.audioInspector.rule
+            opacity: Theme.c.audioInspector.ruleOpacity
         }
 
         // ----- Noise removal ---------------------------------------------
@@ -226,7 +212,7 @@ Item {
             Text {
                 width: parent.width
                 text: qsTr("Noise")
-                color: Theme.mutedForeground
+                color: Theme.c.audioInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -259,15 +245,15 @@ Item {
         Rectangle {
             visible: root.fileAudio
             width: parent.width
-            height: 1
-            color: Theme.panelBorder
-            opacity: 0.5
+            height: Theme.c.audioInspector.ruleWidth
+            color: Theme.c.audioInspector.rule
+            opacity: Theme.c.audioInspector.ruleOpacity
         }
 
         Text {
             visible: root.fileAudio
             text: qsTr("Auto subtitles")
-            color: Theme.mutedForeground
+            color: Theme.c.audioInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -320,7 +306,7 @@ Item {
             width: parent.width
             wrapMode: Text.WordWrap
             text: qsTr("Shorter captions are timed by splitting each phrase evenly, so they can drift slightly out of sync with the speech.")
-            color: Theme.mutedForeground
+            color: Theme.c.audioInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }

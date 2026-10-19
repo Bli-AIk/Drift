@@ -2,12 +2,12 @@
 // clips and times FrameCompositor::compositeAt across a playback-like sweep.
 //
 //   benchcomposite <a.mp4> <b.mp4> [previewScale]
-#include "core/Clip.h"
-#include "core/Project.h"
-#include "core/Track.h"
-#include "core/Transition.h"
-#include "engine/FontCatalog.h"
-#include "engine/FrameCompositor.h"
+#include "core/project/clip/Clip.h"
+#include "core/project/Project.h"
+#include "core/project/Track.h"
+#include "core/project/Transition.h"
+#include "engine/packages/assets/FontCatalog.h"
+#include "engine/compositor/FrameCompositor.h"
 
 #include <QElapsedTimer>
 #include <QFile>

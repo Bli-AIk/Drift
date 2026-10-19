@@ -6,11 +6,11 @@
 // Per frame it prints the mean depth and the mean change from the frame before. Flicker or a jump
 // at a window seam (frames 24..31, 46..53, ...) shows up as a spike in the change column.
 
-#include "core/Time.h"
-#include "engine/ClipReaderPool.h"
-#include "engine/DepthSidecar.h"
-#include "engine/MediaProbe.h"
-#include "engine/VdaDepth.h"
+#include "core/base/Time.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/ml/vision/depth/DepthSidecar.h"
+#include "engine/decode/probe/MediaProbe.h"
+#include "engine/ml/vision/depth/VdaDepth.h"
 
 #include <QCoreApplication>
 #include <QElapsedTimer>
@@ -23,7 +23,7 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-    // Must match src/main.cpp, or AppDataLocation points somewhere else and the tool cannot see
+    // Must match src/app/main.cpp, or AppDataLocation points somewhere else and the tool cannot see
     // models installed as addons.
     QCoreApplication::setApplicationName("CutWire Drift");
     QCoreApplication::setOrganizationName("CutWire Drift");

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "AudioOutputChannel.h"
-#include "CompositorService.h"
-#include "PlaybackClock.h"
-#include "PlaybackStats.h"
-#include "core/Project.h"
-#include "core/Time.h"
-#include "engine/AudioMixer.h"
-#include "engine/audio/ClipAudioRetimer.h"
+#include "playback/AudioOutputChannel.h"
+#include "playback/preview/CompositorService.h"
+#include "playback/PlaybackClock.h"
+#include "playback/stats/PlaybackStats.h"
+#include "core/project/Project.h"
+#include "core/base/Time.h"
+#include "engine/audio/AudioMixer.h"
+#include "engine/audio/dsp/ClipAudioRetimer.h"
 
 #include <memory>
 #include <QImage>
@@ -187,7 +187,7 @@ signals:
 private:
     int fillAudio(float *buffer, int sampleCount);
     void ensureAudioSink();
-    void onAudioSampleRateChanged();
+    void onAudioSinkRebuilt();
     // Reads the clock and publishes the playhead when it has crossed into a new project frame.
     void advancePlayhead();
     void emitPlayhead();
@@ -280,7 +280,8 @@ private:
     bool m_loopWorkArea = false;
     bool m_voiceoverRecording = false;
     // processedUSecs() is cumulative from QAudioSink::start(), not from the last clock reset.
-    // Subtracting this (captured whenever the clock is re-anchored) keeps a seek from landing
-    // at seekTarget + time-since-play instead of seekTarget.
+    // This is where the current stream's first sample sits in the sink's output, captured on the
+    // first fill of each stream generation. Audio thread only.
     qint64 m_sinkPlayedUsOffset = 0;
+    quint64 m_anchoredGeneration = 0;
 };

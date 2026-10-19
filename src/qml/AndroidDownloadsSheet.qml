@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import "components"
-
 // Every download at once, on the phone.
 //
 // Deliberately not auto-raised. The per-tile ring in MarketTab is the primary surface and the
@@ -48,94 +46,10 @@ AndroidBottomSheet {
             boundsBehavior: Flickable.StopAtBounds
             ScrollBar.vertical: AppScrollBar { }
 
-            delegate: Item {
-                id: row
-                required property var modelData
+            delegate: AndroidDownloadJobRow {
                 width: list.width
-                height: Theme.androidAddRowHeight
-
-                readonly property bool busy: modelData.running === true
-
-                IconGlyph {
-                    id: kindIcon
-                    anchors.left: parent.left
-                    anchors.leftMargin: Theme.androidPagePadding + root.safeLeft
-                    anchors.verticalCenter: parent.verticalCenter
-                    glyph: DownloadFormat.kindGlyph(row.modelData)
-                    iconSize: Theme.iconSizeLg
-                    iconColor: DownloadFormat.statusColor(row.modelData)
-                }
-
-                Column {
-                    anchors.left: kindIcon.right
-                    anchors.leftMargin: Theme.spacingLg
-                    anchors.right: rowAction.left
-                    anchors.rightMargin: Theme.spacingLg
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 2
-
-                    Text {
-                        width: parent.width
-                        text: row.modelData.title || ""
-                        color: Theme.panelForeground
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeSm
-                        font.weight: Font.Medium
-                        elide: Text.ElideRight
-                    }
-
-                    Text {
-                        width: parent.width
-                        text: DownloadFormat.detailLine(row.modelData)
-                        color: row.modelData.status === "failed" ? Theme.destructive
-                                                                 : Theme.mutedForeground
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeXs
-                        elide: Text.ElideRight
-                    }
-                }
-
-                // One trailing control, and which one follows the job: cancel what is running,
-                // retry what failed and can be, nothing for what is already done.
-                Item {
-                    id: rowAction
-                    anchors.right: parent.right
-                    anchors.rightMargin: Theme.androidPagePadding + root.safeRight
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: Theme.androidMinTouchTarget
-                    height: Theme.androidMinTouchTarget
-
-                    CircularProgress {
-                        anchors.centerIn: parent
-                        visible: row.busy
-                        value: Number(row.modelData.progress || 0)
-                        indeterminate: Number(row.modelData.progress || 0) <= 0
-                        size: Theme.iconSizeXl
-                        strokeWidth: 2
-                    }
-
-                    IconButton {
-                        anchors.fill: parent
-                        visible: row.busy
-                        buttonSize: Theme.androidMinTouchTarget
-                        iconSize: Theme.iconSizeMd
-                        glyph: Theme.icons.x
-                        variant: "text"
-                        tooltip: qsTr("Cancel download")
-                        onClicked: Market.cancelDownload(row.modelData.itemId)
-                    }
-
-                    IconButton {
-                        anchors.fill: parent
-                        visible: !row.busy && row.modelData.retryable === true
-                        buttonSize: Theme.androidMinTouchTarget
-                        iconSize: Theme.iconSizeMd
-                        glyph: Theme.icons.refresh
-                        variant: "text"
-                        tooltip: qsTr("Try again")
-                        onClicked: Market.retryDownload(row.modelData.itemId)
-                    }
-                }
+                sideInset: root.safeLeft
+                sideInsetRight: root.safeRight
             }
         }
 

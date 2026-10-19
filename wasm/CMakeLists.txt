@@ -3,7 +3,7 @@
 #   emcmake cmake -S wasm -B build-wasm && cmake --build build-wasm
 #
 # It compiles the same sources as driftaudiodsp — the stages, the pedal catalog, the graph and its
-# C API (src/engine/audio/DriftGraphApi.h) — plus juce_dsp and SoundTouch, so a preview in the
+# C API (src/engine/audio/dsp/graph/DriftGraphApi.h) — plus juce_dsp and SoundTouch, so a preview in the
 # browser runs the code Drift runs. Forge's scripts/build-audio-wasm.sh drives this and copies the
 # result into Forge.
 cmake_minimum_required(VERSION 3.24)
@@ -21,6 +21,8 @@ endif()
 
 set(DRIFT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/..")
 include(FetchContent)
+list(APPEND CMAKE_MODULE_PATH "${DRIFT_ROOT}/cmake")
+include(PatchJuceWasm)
 
 # Same pins as the app (CMakeLists.txt, third_party/build-android.sh). A local checkout can stand
 # in for either download.
@@ -56,14 +58,7 @@ if(NOT EXISTS "${_juce}/.patched")
     foreach(module juce_core juce_audio_basics juce_audio_formats juce_dsp)
         file(COPY "${DRIFT_JUCE_DIR}/modules/${module}" DESTINATION "${_juce}/modules")
     endforeach()
-    set(_priorities "${_juce}/modules/juce_core/native/juce_ThreadPriorities_native.h")
-    file(READ "${_priorities}" _text)
-    string(FIND "${_text}" "#if JUCE_LINUX || JUCE_BSD" _at)
-    if(_at EQUAL -1)
-        message(FATAL_ERROR "JUCE ${DRIFT_JUCE_TAG}: thread priority table changed; revisit the wasm fix-up")
-    endif()
-    string(REPLACE "#if JUCE_LINUX || JUCE_BSD" "#if JUCE_LINUX || JUCE_BSD || JUCE_WASM" _text "${_text}")
-    file(WRITE "${_priorities}" "${_text}")
+    drift_patch_juce_wasm("${_juce}/modules")
     file(TOUCH "${_juce}/.patched")
 endif()
 

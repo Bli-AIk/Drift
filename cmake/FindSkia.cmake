@@ -19,6 +19,8 @@ endif()
 
 if(ANDROID)
     set(_skia_target "android-${ANDROID_ABI}")
+elseif(EMSCRIPTEN)
+    set(_skia_target "wasm")
 elseif(WIN32)
     set(_skia_target "win-x64")
 elseif(APPLE)

@@ -1,16 +1,16 @@
 // Side-by-side export timing: GPU NV12 pipeline vs serial RGBA + sws_scale.
 //
 //   benchexport <video> [out_dir]
-#include "core/Clip.h"
-#include "core/Project.h"
-#include "core/Track.h"
-#include "engine/ClipReaderPool.h"
-#include "engine/EffectCatalog.h"
-#include "engine/Exporter.h"
-#include "engine/FontCatalog.h"
-#include "engine/FrameCompositor.h"
-#include "engine/GpuCompositor.h"
-#include "engine/MediaProbe.h"
+#include "core/project/clip/Clip.h"
+#include "core/project/Project.h"
+#include "core/project/Track.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/packages/effects/EffectCatalog.h"
+#include "engine/encode/export/Exporter.h"
+#include "engine/packages/assets/FontCatalog.h"
+#include "engine/compositor/FrameCompositor.h"
+#include "engine/compositor/GpuCompositor.h"
+#include "engine/decode/probe/MediaProbe.h"
 
 #include <QElapsedTimer>
 #include <QFileInfo>

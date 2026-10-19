@@ -124,10 +124,10 @@ Popup {
     ]
 
     background: Rectangle {
-        color: Theme.panelBackground
-        border.width: 1
-        border.color: Theme.panelBorder
-        radius: Theme.radiusMd
+        color: Theme.c.newTrackMenu.background
+        border.width: Theme.c.newTrackMenu.borderWidth
+        border.color: Theme.c.newTrackMenu.border
+        radius: Theme.c.newTrackMenu.radius
     }
 
     contentItem: Column {
@@ -159,7 +159,7 @@ Popup {
             topPadding: 4
             bottomPadding: 6
             text: qsTr("New track")
-            color: Theme.mutedForeground
+            color: Theme.c.newTrackMenu.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             font.weight: Font.Medium
@@ -168,62 +168,15 @@ Popup {
         Rectangle {
             width: parent.width
             height: 1
-            color: Theme.panelBorder
+            color: Theme.c.newTrackMenu.separator
             opacity: 0.5
         }
 
         Repeater {
             model: root.trackTypes
 
-            delegate: Rectangle {
-                id: trackTypeRow
-                required property var modelData
-                required property int index
-
-                width: parent.width
-                height: Theme.controlHeight + Theme.spacingXs
-                radius: Theme.radiusSm
-                color: itemMouse.containsMouse || root.highlightIndex === index
-                       ? Theme.popoverHover : "transparent"
-
-                Behavior on color {
-                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                }
-
-                Row {
-                    anchors.fill: parent
-                    anchors.leftMargin: Theme.spacingLg
-                    anchors.rightMargin: Theme.spacingLg
-                    spacing: Theme.spacingLg + Theme.spacingXs
-
-                    IconGlyph {
-                        anchors.verticalCenter: parent.verticalCenter
-                        glyph: trackTypeRow.modelData.icon
-                        iconSize: Theme.iconSizeMd
-                        iconColor: Theme.mutedForeground
-                    }
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: trackTypeRow.modelData.label
-                        color: Theme.panelForeground
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeSm
-                    }
-                }
-
-                MouseArea {
-                    id: itemMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onEntered: root.highlightIndex = trackTypeRow.index
-                    onClicked: {
-                        Haptics.confirm()
-                        root.addTrackOfType(trackTypeRow.modelData.type)
-                        root.close()
-                    }
-                }
+            delegate: NewTrackMenuEntry {
+                menu: root
             }
         }
     }

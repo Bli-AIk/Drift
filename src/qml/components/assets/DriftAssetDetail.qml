@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Window
 import Drift
-import ".."
-
 // Everything about one Drift Asset, and the place to set its colours before adding it, so a
 // brand colour is picked once rather than fixed clip by clip afterwards.
 Rectangle {
@@ -46,7 +44,7 @@ Rectangle {
     readonly property real aspect: kind === "lottie" && Number(design.preview_height) > 0
                                    ? Number(design.preview_width) / Number(design.preview_height) : 1
 
-    color: Theme.panelBackground
+    color: Theme.c.driftAssetDetail.background
 
     // A Rectangle takes no input, and TapHandlers only grab passively, so without this a tap
     // on the panel (a colour swatch, a button) also reached the card lying underneath it.
@@ -91,7 +89,7 @@ Rectangle {
         Text {
             anchors.verticalCenter: parent.verticalCenter
             text: root.categoryLabel
-            color: Theme.mutedForeground
+            color: Theme.c.driftAssetDetail.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
         }
@@ -118,8 +116,8 @@ Rectangle {
             Rectangle {
                 width: parent.width
                 height: root.kind === "lottie" ? Math.min(220, width / root.aspect) : Math.min(240, width)
-                radius: Theme.radiusMd
-                color: Theme.panelAccent
+                radius: Theme.c.driftAssetDetail.previewRadius
+                color: Theme.c.driftAssetDetail.previewBackground
                 clip: true
 
                 AnimatedImage {
@@ -138,7 +136,7 @@ Rectangle {
                 Text {
                     width: parent.width
                     text: root.asset.name || ""
-                    color: Theme.panelForeground
+                    color: Theme.c.driftAssetDetail.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeBase * 1.2
                     font.weight: Font.DemiBold
@@ -148,7 +146,7 @@ Rectangle {
                     width: parent.width
                     text: root.design.description || ""
                     visible: text.length > 0
-                    color: Theme.mutedForeground
+                    color: Theme.c.driftAssetDetail.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeSm
                     lineHeight: 1.3
@@ -163,7 +161,7 @@ Rectangle {
 
                 Text {
                     text: qsTr("Style")
-                    color: Theme.panelForeground
+                    color: Theme.c.driftAssetDetail.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeSm
                     font.weight: Font.Medium
@@ -186,10 +184,10 @@ Rectangle {
                                 id: styleSwatch
                                 width: Theme.spacing3xl * 2
                                 height: width
-                                radius: root.kind === "face-prop" ? height / 2 : Theme.radiusSm
-                                color: Theme.panelAccent
-                                border.width: styleChoice.chosen || styleHover.hovered ? Theme.borderWidthFocus : Theme.borderWidth
-                                border.color: styleChoice.chosen ? Theme.primary : Theme.panelBorder
+                                radius: root.kind === "face-prop" ? Theme.c.driftAssetDetail.styleRadiusPill : Theme.c.driftAssetDetail.styleRadius
+                                color: Theme.c.driftAssetDetail.styleBackground
+                                border.width: styleChoice.chosen || styleHover.hovered ? Theme.c.driftAssetDetail.styleBorderWidthFocus : Theme.c.driftAssetDetail.styleBorderWidth
+                                border.color: styleChoice.chosen ? Theme.c.driftAssetDetail.styleBorderSelected : Theme.c.driftAssetDetail.styleBorder
                                 clip: true
 
                                 Image {
@@ -219,7 +217,7 @@ Rectangle {
                             Text {
                                 width: styleSwatch.width
                                 text: modelData.name || ""
-                                color: Theme.mutedForeground
+                                color: Theme.c.driftAssetDetail.foregroundMuted
                                 font.family: Theme.fontFamily
                                 font.pixelSize: Theme.fontSizeXs
                                 elide: Text.ElideRight
@@ -241,7 +239,7 @@ Rectangle {
                     Text {
                         id: coloursLabel
                         text: qsTr("Colours")
-                        color: Theme.panelForeground
+                        color: Theme.c.driftAssetDetail.foreground
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontSizeSm
                         font.weight: Font.Medium
@@ -252,7 +250,7 @@ Rectangle {
                         anchors.verticalCenter: coloursLabel.verticalCenter
                         text: qsTr("Reset")
                         visible: Object.keys(root.slotValues).length > 0
-                        color: resetHover.hovered ? Theme.panelForeground : Theme.mutedForeground
+                        color: resetHover.hovered ? Theme.c.driftAssetDetail.foregroundHover : Theme.c.driftAssetDetail.foregroundMuted
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontSizeXs
                         HoverHandler { id: resetHover; cursorShape: Qt.PointingHandCursor }
@@ -275,10 +273,10 @@ Rectangle {
                                 id: swatch
                                 width: Theme.spacing3xl + Theme.spacingSm
                                 height: width
-                                radius: Theme.radiusSm
+                                radius: Theme.c.driftAssetDetail.swatchRadius
                                 color: root.slotValues[modelData] || root.design.slots[modelData]
-                                border.width: swatchHover.hovered ? Theme.borderWidthFocus : Theme.borderWidth
-                                border.color: swatchHover.hovered ? Theme.primary : Theme.panelBorder
+                                border.width: swatchHover.hovered ? Theme.c.driftAssetDetail.swatchBorderWidthFocus : Theme.c.driftAssetDetail.swatchBorderWidth
+                                border.color: swatchHover.hovered ? Theme.c.driftAssetDetail.swatchBorderHover : Theme.c.driftAssetDetail.swatchBorder
 
                                 HoverHandler { id: swatchHover; cursorShape: Qt.PointingHandCursor }
                                 TapHandler {
@@ -293,7 +291,7 @@ Rectangle {
                             Text {
                                 anchors.horizontalCenter: swatch.horizontalCenter
                                 text: modelData
-                                color: Theme.mutedForeground
+                                color: Theme.c.driftAssetDetail.foregroundMuted
                                 font.family: Theme.fontFamily
                                 font.pixelSize: Theme.fontSizeXs
                             }
@@ -325,7 +323,7 @@ Rectangle {
                             return qsTr("3D model, loops every %1 s").arg(Math.round(Number((root.design.animation || {}).duration || 0) * 10) / 10)
                         return qsTr("Tracks a face in the clip it is applied to")
                     }
-                    color: Theme.panelForeground
+                    color: Theme.c.driftAssetDetail.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                     wrapMode: Text.WordWrap
@@ -337,8 +335,8 @@ Rectangle {
                           ? qsTr("Licence <a href=\"%1\">CC BY-NC-SA 4.0</a>").arg(root.licenseUrl())
                           : qsTr("Licence %1").arg(root.asset.license || "")
                     textFormat: Text.StyledText
-                    linkColor: Theme.accentOnPanel
-                    color: Theme.mutedForeground
+                    linkColor: Theme.c.driftAssetDetail.accent
+                    color: Theme.c.driftAssetDetail.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                     wrapMode: Text.WordWrap
@@ -372,7 +370,7 @@ Rectangle {
                 width: parent.width
                 visible: root.kind === "face-prop" && !root.clipSelected
                 text: qsTr("Select a clip with a face on the timeline to apply this prop.")
-                color: Theme.mutedForeground
+                color: Theme.c.driftAssetDetail.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 wrapMode: Text.WordWrap

@@ -32,10 +32,10 @@ Item {
         width: 9
         height: 9
         rotation: 45
-        radius: 2
-        color: root.keyHere ? Theme.primary : "transparent"
-        border.width: 1.5
-        border.color: root.animated ? Theme.primary : Theme.mutedForeground
+        radius: Theme.c.channelKeyButton.radius
+        color: root.keyHere ? Theme.c.channelKeyButton.backgroundSelected : "transparent"
+        border.width: Theme.c.channelKeyButton.borderWidth
+        border.color: root.animated ? Theme.c.channelKeyButton.border : Theme.c.channelKeyButton.borderMuted
         opacity: root.animated && !root.keyHere ? 0.6 : 1
     }
 

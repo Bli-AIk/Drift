@@ -1,14 +1,14 @@
-#include "PlaybackEngine.h"
+#include "playback/PlaybackEngine.h"
 
-#include "PerfLog.h"
+#include "playback/stats/PerfLog.h"
 
 #include <cstdio>
 
-#include "engine/AndroidUri.h"
-#include "engine/ClipReaderPool.h"
-#include "engine/GpuCompositor.h"
-#include "engine/HwAccel.h"
-#include "engine/ReverseProxyCache.h"
+#include "engine/platform/AndroidUri.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/compositor/GpuCompositor.h"
+#include "engine/decode/hw/HwAccel.h"
+#include "engine/encode/proxies/ReverseProxyCache.h"
 
 #include <QSettings>
 #include <QVariantMap>
@@ -99,14 +99,15 @@ constexpr drift::TimeUs kReadAheadUs = 2 * drift::kUsPerSecond;
 // (kMinCurveSpeed..kMaxCurveSpeed), and nothing outside this list is accepted.
 constexpr std::array<double, 6> kPlaybackRates{0.25, 0.5, 1.0, 1.5, 2.0, 4.0};
 
-// "full", "half" and "quarter" are fractions of the preview panel (device pixels),
-// never of the project: Full matches the panel, Half/Quarter are 1/2 and 1/4 of
+// "full", "half", "quarter" and "eighth" are fractions of the preview panel (device pixels),
+// never of the project: Full matches the panel, Half/Quarter/Eighth are 1/2, 1/4 and 1/8 of
 // that, all capped at project resolution. "auto" is Full plus a compositor ratchet
 // that trades remaining resolution for cadence when playback cannot keep up.
 bool isKnownPreviewQuality(const QString &quality)
 {
     return quality == QStringLiteral("full") || quality == QStringLiteral("half")
-        || quality == QStringLiteral("quarter") || quality == QStringLiteral("auto");
+        || quality == QStringLiteral("quarter") || quality == QStringLiteral("eighth")
+        || quality == QStringLiteral("auto");
 }
 
 constexpr QLatin1String kHwPrefix("hw:");
@@ -219,8 +220,7 @@ PlaybackEngine::PlaybackEngine(QObject *parent)
     m_compositor.setStats(&m_stats);
 
     m_audio.setFillCallback([this](float *stereo, int frames) { return fillAudio(stereo, frames); });
-    connect(&m_audio, &AudioOutputChannel::sampleRateChanged, this,
-            &PlaybackEngine::onAudioSampleRateChanged);
+    connect(&m_audio, &AudioOutputChannel::sinkRebuilt, this, &PlaybackEngine::onAudioSinkRebuilt);
     connect(&m_audio, &AudioOutputChannel::errorOccurred, this, &PlaybackEngine::audioError);
     m_sampleRate = m_audio.sampleRate();
 
@@ -293,16 +293,18 @@ void PlaybackEngine::ensureAudioSink()
     m_sampleRate = m_audio.sampleRate();
 }
 
-// The device would not take the project's rate, or the sink moved to a device that runs at a
-// different one. Everything downstream of the sink counts in output samples, so re-anchor it.
-void PlaybackEngine::onAudioSampleRateChanged()
+// The sink was reopened, possibly at a rate other than the project's. Its played position restarts
+// and its queue was dropped unheard, so carry on from what was actually heard, and re-anchor
+// everything downstream of the sink, which counts in output samples.
+void PlaybackEngine::onAudioSinkRebuilt()
 {
+    if (m_playing)
+        m_playheadUs = m_clock.currentTimeUs();
     m_sampleRate = m_audio.sampleRate();
     m_mixer.resetClipAudioState();
     m_audioStreamGeneration.fetch_add(1, std::memory_order_release);
     m_clock.reset(m_playheadUs, m_sampleRate);
     if (m_playing) {
-        m_sinkPlayedUsOffset = m_audio.processedUSecs();
         m_clock.start();
     }
 }
@@ -397,7 +399,6 @@ void PlaybackEngine::resyncAudioAt(drift::TimeUs us)
     // reset() clears the running flag; resume the clock if we are still in play
     // so edits/seeks during playback don't freeze audio at one timeline spot.
     if (m_playing) {
-        m_sinkPlayedUsOffset = m_audio.processedUSecs();
         m_clock.start();
     }
 }
@@ -701,13 +702,12 @@ void PlaybackEngine::play()
 
     requestAudioFocus();
     ensureAudioSink();
-    m_sinkPlayedUsOffset = m_audio.processedUSecs();
     m_clock.start();
 
     pushAudioSnapshot();
 
     // Opening the device may settle on a rate the project did not ask for, which comes back as
-    // sampleRateChanged and re-anchors the clock — so this has to follow m_playing being set.
+    // sinkRebuilt and re-anchors the clock — so this has to follow m_playing being set.
     m_audio.start();
 
     emit playingChanged();
@@ -955,7 +955,11 @@ FrameCompositor::RenderOptions PlaybackEngine::playbackRenderOptions() const
 {
     FrameCompositor::RenderOptions options;
     double qualityFraction = 1.0;
-    if (m_previewQuality == QStringLiteral("quarter"))
+    // Eighth is for machines that cannot keep up even at Quarter — dual-core laptops on
+    // integrated graphics — where a soft preview beats a stuttering one.
+    if (m_previewQuality == QStringLiteral("eighth"))
+        qualityFraction = 0.125;
+    else if (m_previewQuality == QStringLiteral("quarter"))
         qualityFraction = 0.25;
     else if (m_previewQuality == QStringLiteral("half"))
         qualityFraction = 0.5;
@@ -1036,6 +1040,16 @@ int PlaybackEngine::fillAudio(float *buffer, int sampleCount)
     if (!m_playing || !m_project) {
         std::memset(buffer, 0, static_cast<size_t>(sampleCount) * 2 * sizeof(float));
         return sampleCount;
+    }
+
+    // The first fill after a play, seek or rate change is the first sample of the new stream, but
+    // the sink still has whatever it pulled before — silence while paused, the old position after a
+    // seek — queued ahead of it. Anchoring to processedUSecs() at play time instead put the picture
+    // that whole queue ahead of the sound.
+    const quint64 generation = m_audioStreamGeneration.load(std::memory_order_acquire);
+    if (generation != m_anchoredGeneration) {
+        m_anchoredGeneration = generation;
+        m_sinkPlayedUsOffset = m_audio.deliveredUSecs();
     }
 
     // Mix at the produce position (audio we are generating into the buffer),

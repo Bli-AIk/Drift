@@ -5,7 +5,7 @@
 # compiles against, and — when DRIFT_BUNDLE_ONNXRUNTIME is on — a runtime for the build tree to
 # load so a dev build works before any addon is installed. The library is never linked; which
 # runtime the shipped app uses is the user's runtime choice, not a configure-time one
-# (src/engine/OrtRuntime.cpp).
+# (src/engine/ml/runtime/OrtRuntime.cpp).
 
 if(DRIFT_ONNXRUNTIME_FETCHED)
     return()
@@ -13,14 +13,15 @@ endif()
 
 set(_onnxruntime_version "1.27.0")
 
-if(ANDROID)
+if(ANDROID OR EMSCRIPTEN)
     # Only the headers are ever used here — the app links no ONNX Runtime at all and dlopens one at
-    # startup (src/engine/OrtRuntime.cpp), which on Android arrives as an Acceleration addon. The
+    # startup (src/engine/ml/runtime/OrtRuntime.cpp), which on Android arrives as an Acceleration addon. The
     # C and C++ API headers are identical across platforms and architectures, so the linux-x64
     # tarball is a valid source for them; nothing from its lib/ directory is linked or staged
     # (drift_bundle_onnxruntime is skipped on Android, and scripts/build.sh passes
     # DRIFT_BUNDLE_ONNXRUNTIME=OFF). Using the official android AAR instead would mean unzipping a
-    # second archive format to obtain byte-identical headers.
+    # second archive format to obtain byte-identical headers. The wasm build likewise has no
+    # runtime to load and needs only the headers.
     set(_onnxruntime_archive "onnxruntime-linux-x64-${_onnxruntime_version}.tgz")
     set(_onnxruntime_sha256 "547e40a48f1fe73e3f812d7c88a948612c23f896b91e4e2ee1e232d7b468246f")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")

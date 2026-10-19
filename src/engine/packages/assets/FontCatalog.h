@@ -1,0 +1,76 @@
+#pragma once
+
+#include "core/text/TextStyle.h"
+
+#include <QFont>
+#include <QList>
+#include <QPair>
+#include <QString>
+#include <QStringList>
+
+// File-based font packages: fonts/<id>/{family.json, *.ttf, OFL.txt}, discovered the same way as
+// effect and transition packages. The bundle is fetched by scripts/fetch-fonts.py rather than
+// committed, so an empty catalog is a normal state — callers fall back to system fonts.
+
+struct FontFace
+{
+    int weight = 400; // 100..900, as requested from Google Fonts
+    bool italic = false;
+    QString styleName; // e.g. "Black", "Bold Italic" — how the face is actually selected
+    QString file;      // absolute path
+};
+
+struct FontFamilyEntry
+{
+    QString id;
+    QString family;   // display name, e.g. "Plus Jakarta Sans"
+    QString qtFamily; // family name Qt registered the faces under
+    QString category; // impact | clean | editorial | playful
+    QString license;
+    QString packageDir;
+    int order = 0;
+    QList<FontFace> faces; // sorted by weight, upright before italic
+
+    QList<int> weights() const; // distinct upright weights, ascending
+    bool hasItalic() const;
+};
+
+const QList<FontFamilyEntry> &fontCatalog();
+const FontFamilyEntry *fontFamilyForName(const QString &family);
+QList<QPair<QString, QString>> fontCategories(); // id + label, display order
+
+// Register the packages with QFontDatabase. Needs a QGuiApplication, so call it explicitly from
+// main()/tools/tests rather than relying on the lazy path.
+void reloadFontCatalog(const QStringList &packageRoots = {});
+
+// Fonts the user brought in (.ttf/.otf/.ttc/.otc), kept under <AppDataLocation>/fonts/user. They
+// are registered with Qt and with Skia (by family name, so every face of a family is matched on
+// weight and italic) and shadow the system fonts. Call from the GUI thread.
+void reloadUserFonts();
+// Copies `path` into the store and registers it. Returns the families it provides; empty with
+// `error` set when the file is not a usable font.
+QStringList importUserFontFile(const QString &path, QString *error = nullptr);
+// Unregisters the family and deletes the files that provide it.
+bool removeUserFont(const QString &family);
+QStringList userFontFamilies(); // sorted
+QString userFontDir();
+
+// Families the platform font manager enumerates (the Skia manager's list when built with Skia,
+// else Qt's), sorted. Computed once.
+QStringList systemFontFamilies();
+
+// Resolve a style to a concrete face at pixelSizePx. Falls through to the system font database for
+// families that are not in the catalog, so projects written before the bundle still render.
+QFont fontForStyle(const drift::TextStyle &style, int pixelSizePx);
+
+// What the Skia layout asks its font collection for. `family` is the face's file path when the
+// style resolved to a bundled face (registered under that name), else the requested family for
+// the system manager to match.
+struct ResolvedFont
+{
+    QString family;
+    int weight = 400;
+    bool italic = false;
+    bool bundled = false;
+};
+ResolvedFont resolveFont(const drift::TextStyle &style);

@@ -92,7 +92,7 @@ when the clip has no mesh, the output is the plain copy. Rules, all enforced at 
 - `templateBounds` needs four numbers with a positive width and height.
 
 See `effects/face_retouch` for lipstick and blush templates drawn this way, and
-`src/engine/Face111.h` for the point order.
+`src/engine/face/tracking/Face111.h` for the point order.
 
 ## GLSL
 
@@ -129,7 +129,7 @@ Two coordinate conventions are in play, and mixing them up produces elliptical w
 | `u_facePoseOriginX/Y/Z`, `u_facePoseScale` | `float` | Eye midpoint and interocular distance |
 | `u_faceYaw`, `u_facePitch`, `u_faceRoll` | `float` | Radians, derived from the basis for shaders that only want an angle |
 | `u_faceHasMesh` | `float` | 0 for a sidecar baked before the mesh existed |
-| `u_faceLandmarks111[111]` | `vec2[]` | Width-normalized. The 468-point mesh reduced to GPUPixel's 111-point layout (`src/engine/Face111.h`). Only set when `u_faceHasMesh` is 1 |
+| `u_faceLandmarks111[111]` | `vec2[]` | Width-normalized. The 468-point mesh reduced to GPUPixel's 111-point layout (`src/engine/face/tracking/Face111.h`). Only set when `u_faceHasMesh` is 1 |
 
 Both `u_faceValid` and `u_faceHasContours` must be checked by anything using the loops:
 

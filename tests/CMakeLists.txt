@@ -15,64 +15,64 @@ add_test(NAME PdfSource COMMAND tst_pdfsource)
 
 qt_add_executable(tst_editorstate
     tst_editorstate.cpp
-    ../src/SegmentImageStore.cpp
-    ../src/ClipPreviewImageStore.cpp
-    ../src/MulticamImageStore.cpp
+    ../src/ui/imageproviders/segment/SegmentImageStore.cpp
+    ../src/playback/preview/ClipPreviewImageStore.cpp
+    ../src/ui/imageproviders/multicam/MulticamImageStore.cpp
     # The provider, not just the store: the id QML addresses a tile by is parsed here, and a
     # store test cannot see that half. Costs a Qt6::Quick link, but needs no QML engine —
     # requestImage is called directly.
-    ../src/MulticamImageProvider.cpp
-    ../src/models/AppController.cpp
-    ../src/models/McpController.cpp
-    ../src/models/PreferencesController.cpp
-    ../src/models/ProjectFileController.cpp
-    ../src/models/AssetPreviewController.cpp
-    ../src/models/SpeedCurveController.cpp
-    ../src/models/CurveEditorController.cpp
-    ../src/models/SegmentationController.cpp
-    ../src/models/SceneDetectController.cpp
-    ../src/models/DepthController.cpp
-    ../src/models/DenoiseController.cpp
-    ../src/models/RestoreController.cpp
-    ../src/models/FaceTrackingController.cpp
-    ../src/models/StabilizeController.cpp
-    ../src/models/MediaBinController.cpp
-    ../src/models/TtsController.cpp
-    ../src/models/VoiceLibrary.cpp
-    ../src/preview/PreviewController.cpp
-    ../src/models/AddonManager.cpp
-    ../src/models/JobRegistry.cpp
-    ../src/models/CloudProviders.cpp
-    ../src/models/AssetLibrary.cpp
-    ../src/models/BinFolderListModel.cpp
-    ../src/models/TimelineClipsModel.cpp
-    ../src/timeline/TimelineLayout.cpp
-    ../src/timeline/TimelineTrackItem.cpp
-    ../src/timeline/TimelineViewState.cpp
-    ../src/timeline/ClipThumbnailStore.cpp
+    ../src/ui/imageproviders/multicam/MulticamImageProvider.cpp
+    ../src/app/editor/AppController.cpp
+    ../src/app/mcp/McpController.cpp
+    ../src/app/editor/PreferencesController.cpp
+    ../src/app/editor/ProjectFileController.cpp
+    ../src/app/bin/AssetPreviewController.cpp
+    ../src/app/editor/sessions/SpeedCurveController.cpp
+    ../src/app/editor/sessions/CurveEditorController.cpp
+    ../src/app/jobs/vision/SegmentationController.cpp
+    ../src/app/jobs/vision/SceneDetectController.cpp
+    ../src/app/jobs/vision/DepthController.cpp
+    ../src/app/jobs/audio/DenoiseController.cpp
+    ../src/app/jobs/vision/RestoreController.cpp
+    ../src/app/jobs/vision/FaceTrackingController.cpp
+    ../src/app/jobs/vision/StabilizeController.cpp
+    ../src/app/bin/MediaBinController.cpp
+    ../src/app/jobs/audio/TtsController.cpp
+    ../src/app/jobs/audio/VoiceLibrary.cpp
+    ../src/ui/preview/PreviewController.cpp
+    ../src/app/online/addons/AddonManager.cpp
+    ../src/app/jobs/JobRegistry.cpp
+    ../src/app/online/CloudProviders.cpp
+    ../src/app/bin/AssetLibrary.cpp
+    ../src/app/bin/BinFolderListModel.cpp
+    ../src/app/editor/TimelineClipsModel.cpp
+    ../src/ui/timeline/TimelineLayout.cpp
+    ../src/ui/timeline/TimelineTrackItem.cpp
+    ../src/ui/timeline/TimelineViewState.cpp
+    ../src/ui/timeline/ClipThumbnailStore.cpp
     ../src/playback/PlaybackEngine.cpp
     ../src/playback/PlaybackClock.cpp
     ../src/playback/AudioOutputChannel.cpp
-    ../src/playback/CompositorService.cpp
-    ../src/playback/PerfLog.cpp
-    ../src/playback/PlaybackStats.cpp
-    ../src/playback/PlaybackDiagnostics.cpp
-    ../src/playback/ClipPreviewPlayer.cpp
-    ../src/mcp/McpSession.cpp
-    ../src/mcp/McpCatalog.cpp
-    ../src/mcp/McpProtocol.cpp
-    ../src/mcp/McpHttp.cpp
-    ../src/mcp/McpDispatcher.cpp
-    ../src/mcp/McpDispatcherExtended.cpp
-    ../src/mcp/McpEffectAuthoring.cpp
-    ../src/mcp/McpValidate.cpp
-    ../src/mcp/McpMarket.cpp
-    ../src/models/MarketClient.cpp
-    ../src/models/DriftAssetStore.cpp
-    ../src/models/MarketIdentity.cpp
-    ../src/mcp/McpServer.cpp
-    ../src/mcp/McpStdio.cpp
-    ../src/mcp/McpStdioServer.cpp
+    ../src/playback/preview/CompositorService.cpp
+    ../src/playback/stats/PerfLog.cpp
+    ../src/playback/stats/PlaybackStats.cpp
+    ../src/playback/stats/PlaybackDiagnostics.cpp
+    ../src/playback/preview/ClipPreviewPlayer.cpp
+    ../src/app/mcp/protocol/McpSession.cpp
+    ../src/app/mcp/tools/McpCatalog.cpp
+    ../src/app/mcp/protocol/McpProtocol.cpp
+    ../src/app/mcp/transport/McpHttp.cpp
+    ../src/app/mcp/tools/McpDispatcher.cpp
+    ../src/app/mcp/tools/McpDispatcherExtended.cpp
+    ../src/app/mcp/tools/McpEffectAuthoring.cpp
+    ../src/app/mcp/protocol/McpValidate.cpp
+    ../src/app/mcp/tools/McpMarket.cpp
+    ../src/app/online/market/MarketClient.cpp
+    ../src/app/online/assets/DriftAssetStore.cpp
+    ../src/app/online/market/MarketIdentity.cpp
+    ../src/app/mcp/transport/McpServer.cpp
+    ../src/app/mcp/transport/McpStdio.cpp
+    ../src/app/mcp/transport/McpStdioServer.cpp
 )
 target_include_directories(tst_editorstate PRIVATE ../src)
 target_link_libraries(tst_editorstate PRIVATE Qt6::Test Qt6::Gui Qt6::Quick Qt6::Multimedia Qt6::Concurrent Qt6::Network driftcore driftengine)
@@ -96,7 +96,7 @@ target_include_directories(tst_playback PRIVATE ../src)
 target_link_libraries(tst_playback PRIVATE Qt6::Test Qt6::Multimedia driftcore)
 add_test(NAME Playback COMMAND tst_playback)
 
-qt_add_executable(tst_layoutstore tst_layoutstore.cpp ../src/models/LayoutStore.cpp)
+qt_add_executable(tst_layoutstore tst_layoutstore.cpp ../src/app/editor/LayoutStore.cpp)
 target_include_directories(tst_layoutstore PRIVATE ../src)
 # Qt6::Gui for QScreen: restoring a window means checking it against the displays
 # that are actually attached now.
@@ -107,7 +107,7 @@ add_test(NAME LayoutStore COMMAND tst_layoutstore)
 # test means the same thing on a dev machine as it does headless in CI.
 set_tests_properties(LayoutStore PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
 
-qt_add_executable(tst_updateasset tst_updateasset.cpp ../src/models/UpdateAsset.cpp)
+qt_add_executable(tst_updateasset tst_updateasset.cpp ../src/app/online/updates/UpdateAsset.cpp)
 target_include_directories(tst_updateasset PRIVATE ../src)
 target_link_libraries(tst_updateasset PRIVATE Qt6::Test)
 add_test(NAME UpdateAsset COMMAND tst_updateasset)
@@ -129,7 +129,7 @@ add_test(NAME AddonPackage COMMAND tst_addonpackage)
 
 qt_add_executable(tst_marketidentity
     tst_marketidentity.cpp
-    ../src/models/MarketIdentity.cpp
+    ../src/app/online/market/MarketIdentity.cpp
 )
 target_include_directories(tst_marketidentity PRIVATE ../src)
 target_link_libraries(tst_marketidentity PRIVATE Qt6::Test Qt6::Core)
@@ -150,8 +150,8 @@ qt_add_executable(tst_engine
     tst_engine.cpp
     # Diagnostics live in the playback layer but are engine-shaped: a collector plus a
     # plain-text rendering, exactly like DebugReport, and tested alongside it.
-    ../src/playback/PlaybackStats.cpp
-    ../src/playback/PlaybackDiagnostics.cpp
+    ../src/playback/stats/PlaybackStats.cpp
+    ../src/playback/stats/PlaybackDiagnostics.cpp
 )
 target_include_directories(tst_engine PRIVATE ../src)
 target_link_libraries(tst_engine PRIVATE Qt6::Test Qt6::Gui Qt6::OpenGL driftengine driftcore)
@@ -197,56 +197,57 @@ endif()
 
 qt_add_executable(tst_mcp
     tst_mcp.cpp
-    ../src/mcp/McpSession.cpp
-    ../src/mcp/McpCatalog.cpp
-    ../src/mcp/McpProtocol.cpp
-    ../src/mcp/McpHttp.cpp
-    ../src/SegmentImageStore.cpp
-    ../src/ClipPreviewImageStore.cpp
-    ../src/MulticamImageStore.cpp
-    ../src/models/AppController.cpp
-    ../src/models/McpController.cpp
-    ../src/models/PreferencesController.cpp
-    ../src/models/ProjectFileController.cpp
-    ../src/models/AssetPreviewController.cpp
-    ../src/models/SpeedCurveController.cpp
-    ../src/models/CurveEditorController.cpp
-    ../src/models/SegmentationController.cpp
-    ../src/models/SceneDetectController.cpp
-    ../src/models/DepthController.cpp
-    ../src/models/DenoiseController.cpp
-    ../src/models/RestoreController.cpp
-    ../src/models/FaceTrackingController.cpp
-    ../src/models/StabilizeController.cpp
-    ../src/models/MediaBinController.cpp
-    ../src/models/TtsController.cpp
-    ../src/models/VoiceLibrary.cpp
-    ../src/preview/PreviewController.cpp
-    ../src/models/AddonManager.cpp
-    ../src/models/JobRegistry.cpp
-    ../src/models/CloudProviders.cpp
-    ../src/models/AssetLibrary.cpp
-    ../src/models/BinFolderListModel.cpp
-    ../src/models/TimelineClipsModel.cpp
+    ../src/app/mcp/protocol/McpSession.cpp
+    ../src/app/mcp/tools/McpCatalog.cpp
+    ../src/app/mcp/protocol/McpProtocol.cpp
+    ../src/app/mcp/transport/McpHttp.cpp
+    ../src/ui/imageproviders/segment/SegmentImageStore.cpp
+    ../src/playback/preview/ClipPreviewImageStore.cpp
+    ../src/ui/imageproviders/multicam/MulticamImageStore.cpp
+    ../src/app/editor/AppController.cpp
+    ../src/app/mcp/McpController.cpp
+    ../src/app/editor/PreferencesController.cpp
+    ../src/app/editor/ProjectFileController.cpp
+    ../src/app/bin/AssetPreviewController.cpp
+    ../src/app/editor/sessions/SpeedCurveController.cpp
+    ../src/app/editor/sessions/CurveEditorController.cpp
+    ../src/app/jobs/vision/SegmentationController.cpp
+    ../src/app/jobs/vision/SceneDetectController.cpp
+    ../src/app/jobs/vision/DepthController.cpp
+    ../src/app/jobs/audio/DenoiseController.cpp
+    ../src/app/jobs/vision/RestoreController.cpp
+    ../src/app/jobs/vision/FaceTrackingController.cpp
+    ../src/app/jobs/vision/StabilizeController.cpp
+    ../src/app/bin/MediaBinController.cpp
+    ../src/app/jobs/audio/TtsController.cpp
+    ../src/app/jobs/audio/VoiceLibrary.cpp
+    ../src/ui/preview/PreviewController.cpp
+    ../src/app/online/addons/AddonManager.cpp
+    ../src/app/jobs/JobRegistry.cpp
+    ../src/app/online/CloudProviders.cpp
+    ../src/app/bin/AssetLibrary.cpp
+    ../src/app/bin/BinFolderListModel.cpp
+    ../src/app/editor/TimelineClipsModel.cpp
+    ../src/ui/timeline/ClipThumbnailStore.cpp
     ../src/playback/PlaybackEngine.cpp
     ../src/playback/PlaybackClock.cpp
     ../src/playback/AudioOutputChannel.cpp
-    ../src/playback/CompositorService.cpp
-    ../src/playback/PerfLog.cpp
-    ../src/playback/PlaybackStats.cpp
-    ../src/playback/PlaybackDiagnostics.cpp
-    ../src/playback/ClipPreviewPlayer.cpp
-    ../src/mcp/McpDispatcher.cpp
-    ../src/mcp/McpDispatcherExtended.cpp
-    ../src/mcp/McpEffectAuthoring.cpp
-    ../src/mcp/McpValidate.cpp
-    ../src/mcp/McpMarket.cpp
-    ../src/models/MarketClient.cpp
-    ../src/models/DriftAssetStore.cpp
-    ../src/models/MarketIdentity.cpp
-    ../src/mcp/McpServer.cpp
-    ../src/mcp/McpStdio.cpp
-    ../src/mcp/McpStdioServer.cpp
+    ../src/playback/preview/CompositorService.cpp
+    ../src/playback/stats/PerfLog.cpp
+    ../src/playback/stats/PlaybackStats.cpp
+    ../src/playback/stats/PlaybackDiagnostics.cpp
+    ../src/playback/preview/ClipPreviewPlayer.cpp
+    ../src/app/mcp/tools/McpDispatcher.cpp
+    ../src/app/mcp/tools/McpDispatcherExtended.cpp
+    ../src/app/mcp/tools/McpEffectAuthoring.cpp
+    ../src/app/mcp/protocol/McpValidate.cpp
+    ../src/app/mcp/tools/McpMarket.cpp
+    ../src/app/online/market/MarketClient.cpp
+    ../src/app/online/assets/DriftAssetStore.cpp
+    ../src/app/online/market/MarketIdentity.cpp
+    ../src/app/mcp/transport/McpServer.cpp
+    ../src/app/mcp/transport/McpStdio.cpp
+    ../src/app/mcp/transport/McpStdioServer.cpp
 )
 target_include_directories(tst_mcp PRIVATE ../src)
 target_link_libraries(tst_mcp PRIVATE Qt6::Test Qt6::Gui Qt6::Network Qt6::Multimedia Qt6::Concurrent driftcore driftengine)
@@ -255,6 +256,27 @@ target_compile_definitions(tst_mcp PRIVATE DRIFT_VERSION="${PROJECT_VERSION}"
 add_test(NAME Mcp COMMAND tst_mcp)
 drift_copy_effects(tst_mcp)
 drift_copy_transitions(tst_mcp)
+
+qt_add_executable(tst_thememanager
+    tst_thememanager.cpp
+    ../src/ui/theme/ThemeManager.cpp
+    ../src/core/base/ZipArchive.cpp
+    ../src/engine/platform/AndroidUri.cpp)
+target_include_directories(tst_thememanager PRIVATE ../src)
+target_compile_definitions(tst_thememanager PRIVATE
+    "DRIFT_MAIN_CPP=\"${CMAKE_SOURCE_DIR}/src/app/main.cpp\""
+)
+target_link_libraries(tst_thememanager PRIVATE Qt6::Test Qt6::Qml Qt6::Quick ZLIB::ZLIB)
+qt_add_resources(tst_thememanager "drift_themes"
+    PREFIX "/themes"
+    BASE "${CMAKE_SOURCE_DIR}/resources/themes"
+    FILES
+        "${CMAKE_SOURCE_DIR}/resources/themes/dark.json"
+        "${CMAKE_SOURCE_DIR}/resources/themes/light.json"
+        "${CMAKE_SOURCE_DIR}/resources/themes/theme.schema.json"
+)
+add_test(NAME ThemeManager COMMAND tst_thememanager)
+set_tests_properties(ThemeManager PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
 
 # Runs lupdate and fails if i18n/*.ts would change — i.e. someone added qsTr/tr and
 # did not run `cmake --build build --target update_translations`. Skipped where lupdate cannot
@@ -271,3 +293,32 @@ if(DRIFT_LUPDATE_HAS_QML)
 else()
     message(STATUS "lupdate has no QML support; skipping the Translations test.")
 endif()
+
+set(_drift_windowbackdrop_platform)
+foreach(_src ${DRIFT_BACKDROP_PLATFORM_SOURCES})
+    list(APPEND _drift_windowbackdrop_platform "${CMAKE_SOURCE_DIR}/${_src}")
+endforeach()
+qt_add_executable(tst_windowbackdrop
+    tst_windowbackdrop.cpp
+    ../src/ui/theme/backdrop/WindowBackdrop.cpp
+    ../src/ui/theme/ThemeManager.cpp
+    ../src/core/base/ZipArchive.cpp
+    ../src/engine/platform/AndroidUri.cpp
+    ${_drift_windowbackdrop_platform}
+)
+target_include_directories(tst_windowbackdrop PRIVATE ../src)
+target_compile_definitions(tst_windowbackdrop PRIVATE
+    "DRIFT_MAIN_CPP=\"${CMAKE_SOURCE_DIR}/src/app/main.cpp\""
+    ${DRIFT_BACKDROP_PLATFORM_DEFS}
+)
+target_link_libraries(tst_windowbackdrop PRIVATE Qt6::Test Qt6::Qml Qt6::Quick ZLIB::ZLIB ${DRIFT_BACKDROP_PLATFORM_LIBS})
+qt_add_resources(tst_windowbackdrop "drift_themes"
+    PREFIX "/themes"
+    BASE "${CMAKE_SOURCE_DIR}/resources/themes"
+    FILES
+        "${CMAKE_SOURCE_DIR}/resources/themes/dark.json"
+        "${CMAKE_SOURCE_DIR}/resources/themes/light.json"
+        "${CMAKE_SOURCE_DIR}/resources/themes/theme.schema.json"
+)
+add_test(NAME WindowBackdrop COMMAND tst_windowbackdrop)
+set_tests_properties(WindowBackdrop PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")

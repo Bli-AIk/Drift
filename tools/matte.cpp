@@ -3,10 +3,10 @@
 // Usage: matte [--time SECONDS] [--frames N] [--fps F] [--variant NAME] [--out PREFIX] <media-file>
 //        Defaults: --time 0 --frames 1 --fps 30
 
-#include "core/Time.h"
-#include "engine/ClipReaderPool.h"
-#include "engine/MediaProbe.h"
-#include "engine/RvmMatter.h"
+#include "core/base/Time.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/decode/probe/MediaProbe.h"
+#include "engine/ml/vision/segmentation/RvmMatter.h"
 
 #include <QCoreApplication>
 #include <QElapsedTimer>
@@ -16,7 +16,7 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-    // Must match src/main.cpp, or AppDataLocation points somewhere else and the tool cannot see
+    // Must match src/app/main.cpp, or AppDataLocation points somewhere else and the tool cannot see
     // models installed as addons.
     QCoreApplication::setApplicationName("CutWire Drift");
     QCoreApplication::setOrganizationName("CutWire Drift");

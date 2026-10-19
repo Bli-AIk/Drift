@@ -3,37 +3,39 @@
 #include <QColor>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QPointF>
 #include <QSet>
 #include <QStandardPaths>
 
-#include "core/ClipAnimation.h"
-#include "core/Keyframe.h"
-#include "core/Project.h"
-#include "core/Stabilize.h"
-#include "core/ShapePath.h"
-#include "core/SrtIO.h"
-#include "core/SubtitleCue.h"
-#include "core/Transcript.h"
-#include "core/commands/ProjectCommands.h"
-#include "core/LottieTextImport.h"
-#include "core/TextAnimationPreset.h"
-#include "core/TextAnimator.h"
-#include "core/TextLook.h"
-#include "core/TextShading.h"
-#include "core/EffectStackStore.h"
-#include "core/TextPresetStore.h"
-#include "core/Model3dSource.h"
-#include "core/VectorSource.h"
-#include "core/DotLottie.h"
+#include "core/animation/ClipAnimation.h"
+#include "core/project/media/ImageSequence.h"
+#include "core/animation/Keyframe.h"
+#include "core/project/Project.h"
+#include "core/project/clip/Stabilize.h"
+#include "core/shapes/ShapePath.h"
+#include "core/interchange/subtitles/SrtIO.h"
+#include "core/project/SubtitleCue.h"
+#include "core/project/Transcript.h"
+#include "core/edit/commands/ProjectCommands.h"
+#include "core/text/animation/LottieTextImport.h"
+#include "core/text/animation/TextAnimationPreset.h"
+#include "core/text/animation/TextAnimator.h"
+#include "core/text/TextLook.h"
+#include "core/text/TextShading.h"
+#include "core/effects/EffectStackStore.h"
+#include "core/text/TextPresetStore.h"
+#include "core/project/sources/Model3dSource.h"
+#include "core/project/sources/VectorSource.h"
+#include "core/project/sources/DotLottie.h"
 #include "TestZip.h"
 
 #include <QTemporaryDir>
-#include "core/TimelineOps.h"
-#include "core/CutOps.h"
-#include "core/Transition.h"
+#include "core/edit/TimelineOps.h"
+#include "core/edit/CutOps.h"
+#include "core/project/Transition.h"
 
 #include <cmath>
 
@@ -42,6 +44,10 @@ class CoreTest : public QObject
     Q_OBJECT
 
 private slots:
+    void imageSequencePathRoundTrip();
+    void imageSequenceFpsRationals();
+    void imageSequenceDisplayName();
+    void imageSequenceDetection();
     void timeConversion();
     void transcriptJsonRoundTrip();
     void transcriptWordsInRange();
@@ -77,6 +83,7 @@ private slots:
     void activateSequenceSwapsTracks();
     void binFolderDeletionMovesChildrenToParent();
     void assetFrameRateMarksRoundTrip();
+    void assetSourceFingerprintRoundTripsAndDetectsChange();
     void projectMetadataRoundTrip();
     void effectColorParamSurvivesRoundTrip();
     void clipTransformSerialization();
@@ -124,6 +131,7 @@ private slots:
     void model3dSourceSerialization();
     void model3dScalarClampsAndResolves();
     void model3dPoseMigratesToTransform();
+    void model3dKeyLightKeysMigrate();
     void foldVectorTimeTable_data();
     void foldVectorTimeTable();
     void effectCatalogIdSerialization();
@@ -147,6 +155,7 @@ private slots:
     void clipReverseAndFlipSerialization();
     void clipSplitMergeRoundTrip();
     void subtitleClipsMergeWithGaps();
+    void subtitlesFollowRetimedClip();
     void splitCarriesTheAnimationOntoBothHalves();
     void clipLinkFieldsSerialization();
     void maskAndTransitionSerialization();
@@ -704,6 +713,52 @@ void CoreTest::assetFrameRateMarksRoundTrip()
     QVERIFY(!loaded.asset(uncheckedId)->frameRateKnown);
 }
 
+// The size and modification time recorded at probe time save with the project, and are what
+// tells a file rewritten in place from the one the asset was read from. Without a record (an
+// older project) there is nothing to compare, which must not read as "changed".
+void CoreTest::assetSourceFingerprintRoundTripsAndDetectsChange()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString path = dir.filePath(QStringLiteral("vo.wav"));
+    {
+        QFile file(path);
+        QVERIFY(file.open(QIODevice::WriteOnly));
+        file.write(QByteArray(1000, 'a'));
+    }
+
+    drift::Project project;
+    drift::MediaAsset stamped;
+    stamped.kind = drift::MediaKind::Audio;
+    stamped.path = path;
+    drift::stampSourceFingerprint(stamped);
+    QCOMPARE(stamped.sourceSize, qint64(1000));
+    const QString stampedId = project.addAsset(stamped);
+
+    drift::MediaAsset unstamped;
+    unstamped.kind = drift::MediaKind::Audio;
+    unstamped.path = path;
+    const QString unstampedId = project.addAsset(unstamped);
+
+    QString error;
+    const drift::Project loaded = drift::Project::fromJson(project.toJson(), &error);
+    QVERIFY(error.isEmpty());
+    const drift::MediaAsset *back = loaded.asset(stampedId);
+    QCOMPARE(back->sourceSize, stamped.sourceSize);
+    QCOMPARE(back->sourceModifiedMs, stamped.sourceModifiedMs);
+    QVERIFY(!drift::sourceChangedOnDisk(*back));
+    QVERIFY(!drift::sourceFingerprintKnown(*loaded.asset(unstampedId)));
+
+    // Rewritten at the same path with other content.
+    {
+        QFile file(path);
+        QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
+        file.write(QByteArray(400, 'b'));
+    }
+    QVERIFY(drift::sourceChangedOnDisk(*back));
+    QVERIFY(!drift::sourceChangedOnDisk(*loaded.asset(unstampedId)));
+}
+
 void CoreTest::binFolderDeletionMovesChildrenToParent()
 {
     drift::Project project;
@@ -1017,7 +1072,7 @@ void CoreTest::subtitleCueSerialization()
     clip.timelineDuration = drift::secondsToUs(30.0);
     clip.subtitleCues = {
         {drift::secondsToUs(1.0), drift::secondsToUs(4.0), QStringLiteral("Hello")},
-        {drift::secondsToUs(5.0), drift::secondsToUs(8.0), QStringLiteral("World")},
+        {drift::secondsToUs(5.0), drift::secondsToUs(8.0), QStringLiteral("World"), QStringLiteral("asset-1")},
     };
     project.tracks()[0].clips.append(clip);
 
@@ -1031,6 +1086,8 @@ void CoreTest::subtitleCueSerialization()
     QCOMPARE(loadedClip.subtitleCues.size(), 2);
     QCOMPARE(loadedClip.subtitleCues[0].text, QStringLiteral("Hello"));
     QCOMPARE(loadedClip.subtitleCues[1].startUs, drift::secondsToUs(5.0));
+    QVERIFY(loadedClip.subtitleCues[0].source.isEmpty());
+    QCOMPARE(loadedClip.subtitleCues[1].source, QStringLiteral("asset-1"));
 }
 
 void CoreTest::subtitleCueLookup()
@@ -1884,12 +1941,21 @@ void CoreTest::model3dSourceSerialization()
     clip.model3d.animation = 1;
     clip.model3d.loop = drift::VectorLoop::PingPong;
     clip.model3d.startOffsetUs = drift::secondsToUs(0.25);
-    clip.model3d.lightYaw = 60.0;
-    clip.model3d.lightPitch = -10.0;
-    clip.model3d.lightIntensity = 1.5;
+    drift::ModelLight &spot = clip.model3d.lights[1];
+    spot.enabled = true;
+    spot.x = 0.2;
+    spot.y = 0.7;
+    spot.z = 1.0;
+    spot.color = QColor(QStringLiteral("#123456"));
+    spot.intensity = 2.0;
+    spot.radius = 1.5;
+    spot.cone = 40.0;
+    spot.aimX = 0.3;
+    spot.aimY = 0.6;
+    clip.model3d.lights[0].enabled = false;
     clip.model3d.ambient = 0.1;
-    clip.model3d.keyframes[QStringLiteral("lightYaw")].setKeyframe(0, 0.0);
-    clip.model3d.keyframes[QStringLiteral("lightYaw")].setKeyframe(drift::secondsToUs(2.0), 360.0);
+    clip.model3d.keyframes[QStringLiteral("light2_intensity")].setKeyframe(0, 0.0);
+    clip.model3d.keyframes[QStringLiteral("light2_intensity")].setKeyframe(drift::secondsToUs(2.0), 2.0);
     project.tracks()[0].clips.append(clip);
 
     // Non-model clips must not grow a model3d key.
@@ -1923,12 +1989,21 @@ void CoreTest::model3dSourceSerialization()
     QCOMPARE(c.model3d.animationDurationUs(), drift::secondsToUs(0.5));
     QCOMPARE(c.model3d.loop, drift::VectorLoop::PingPong);
     QCOMPARE(c.model3d.startOffsetUs, drift::secondsToUs(0.25));
-    QCOMPARE(c.model3d.lightYaw, 60.0);
-    QCOMPARE(c.model3d.lightPitch, -10.0);
-    QCOMPARE(c.model3d.lightIntensity, 1.5);
+    QVERIFY(!c.model3d.lights[0].enabled);
+    const drift::ModelLight &loadedSpot = c.model3d.lights[1];
+    QVERIFY(loadedSpot.enabled);
+    QCOMPARE(loadedSpot.x, 0.2);
+    QCOMPARE(loadedSpot.y, 0.7);
+    QCOMPARE(loadedSpot.z, 1.0);
+    QCOMPARE(loadedSpot.color, QColor(QStringLiteral("#123456")));
+    QCOMPARE(loadedSpot.intensity, 2.0);
+    QCOMPARE(loadedSpot.radius, 1.5);
+    QCOMPARE(loadedSpot.cone, 40.0);
+    QCOMPARE(loadedSpot.aimX, 0.3);
+    QCOMPARE(loadedSpot.aimY, 0.6);
     QCOMPARE(c.model3d.ambient, 0.1);
     QCOMPARE(c.model3d.keyframes.size(), 1);
-    QCOMPARE(c.model3d.keyframes.value(QStringLiteral("lightYaw")).evaluateAt(drift::secondsToUs(1.0)), 180.0);
+    QCOMPARE(c.model3d.keyframes.value(QStringLiteral("light2_intensity")).evaluateAt(drift::secondsToUs(1.0)), 1.0);
     // A current file carries no legacy pose, so nothing is migrated on the way back in.
     QVERIFY(!c.model3d.legacyPose.present);
     QVERIFY(c.model3d.isAnimated());
@@ -1958,7 +2033,8 @@ void CoreTest::model3dSourceSerialization()
 void CoreTest::model3dScalarClampsAndResolves()
 {
     drift::Model3dSource m;
-    QCOMPARE(drift::model3dKeyframeProperties().size(), 4);
+    // Ambient, then eight numbers for each of the four lights.
+    QCOMPARE(drift::model3dKeyframeProperties().size(), 1 + 4 * 8);
     for (const QString &key : drift::model3dKeyframeProperties()) {
         double v = -1.0;
         QVERIFY2(drift::model3dScalar(m, key, &v), qPrintable(key));
@@ -1971,25 +2047,42 @@ void CoreTest::model3dScalarClampsAndResolves()
 
     QVERIFY(drift::setModel3dScalar(m, QStringLiteral("ambient"), -1.0));
     QCOMPARE(m.ambient, 0.0);
-    QVERIFY(drift::setModel3dScalar(m, QStringLiteral("lightIntensity"), -1.0));
-    QCOMPARE(m.lightIntensity, 0.0);
-    QVERIFY(drift::setModel3dScalar(m, QStringLiteral("lightYaw"), 720.0));
-    QCOMPARE(m.lightYaw, 720.0);
+    QVERIFY(drift::setModel3dScalar(m, QStringLiteral("light1_intensity"), -1.0));
+    QCOMPARE(m.lights[0].intensity, 0.0);
+    QVERIFY(drift::setModel3dScalar(m, QStringLiteral("light2_z"), 9.0));
+    QCOMPARE(m.lights[1].z, 3.0);
+    QVERIFY(drift::setModel3dScalar(m, QStringLiteral("light3_cone"), 1.0));
+    QCOMPARE(m.lights[2].cone, 10.0);
+    QVERIFY(drift::setModel3dScalar(m, QStringLiteral("light4_aimX"), 0.25));
+    QCOMPARE(m.lights[3].aimX, 0.25);
+    QVERIFY(!drift::setModel3dScalar(m, QStringLiteral("light5_x"), 0.5));
+    QVERIFY(!drift::setModel3dScalar(m, QStringLiteral("light1_enabled"), 1.0));
+    // The old key light is gone.
+    QVERIFY(!drift::setModel3dScalar(m, QStringLiteral("lightYaw"), 1.0));
+
+    // The switch and the colour are plain options, not numbers.
+    QVERIFY(drift::setModel3dLightOption(m, QStringLiteral("light3_enabled"), true));
+    QVERIFY(m.lights[2].enabled);
+    QVERIFY(drift::setModel3dLightOption(m, QStringLiteral("light3_color"), QStringLiteral("#ff0000")));
+    QCOMPARE(m.lights[2].color, QColor(Qt::red));
+    QVERIFY(!drift::setModel3dLightOption(m, QStringLiteral("light3_color"), QStringLiteral("nope")));
+    QVERIFY(!drift::setModel3dLightOption(m, QStringLiteral("light3_x"), 0.5));
 
     QVERIFY(!m.isAnimated());
-    m.keyframes[QStringLiteral("lightPitch")].setKeyframe(0, 20.0);
-    m.keyframes[QStringLiteral("lightPitch")].setKeyframe(drift::secondsToUs(1.0), 60.0);
+    m.keyframes[QStringLiteral("light1_y")].setKeyframe(0, 0.2);
+    m.keyframes[QStringLiteral("light1_y")].setKeyframe(drift::secondsToUs(1.0), 0.6);
     QVERIFY(m.isAnimated());
     const drift::Model3dSource baked = m.resolvedAt(drift::secondsToUs(0.5));
-    QCOMPARE(baked.lightPitch, 40.0);
+    QCOMPARE(baked.lights[0].y, 0.4);
     QVERIFY(baked.keyframes.isEmpty());
     QVERIFY(!baked.isAnimated());
-    QCOMPARE(baked.lightYaw, 720.0);
+    QCOMPARE(baked.lights[3].aimX, 0.25);
 
     // A disabled track leaves the static value alone.
-    m.keyframes[QStringLiteral("lightPitch")].setEnabled(false);
+    const double staticY = m.lights[0].y;
+    m.keyframes[QStringLiteral("light1_y")].setEnabled(false);
     QVERIFY(!m.isAnimated());
-    QCOMPARE(m.resolvedAt(drift::secondsToUs(0.5)).lightPitch, 20.0);
+    QCOMPARE(m.resolvedAt(drift::secondsToUs(0.5)).lights[0].y, staticY);
 
     m.animations = {{QStringLiteral("a"), drift::secondsToUs(1.0)}};
     m.animation = 5;
@@ -2060,9 +2153,59 @@ void CoreTest::model3dPoseMigratesToTransform()
     // The old lens put the eye height / (2 * depth) from the model.
     QCOMPARE(c.perspective.evaluateAt(0), 1080.0 / 0.5);
     QVERIFY(c.layer3d);
-    QCOMPARE(c.model3d.lightYaw, 45.0);
+    // The old key light (yaw 45, the default pitch 20) stands 2.5 clip heights out along its
+    // direction as light 1, in a frame twice as wide as it is tall.
+    const drift::ModelLight &key = c.model3d.lights[0];
+    QVERIFY(key.enabled);
+    const double yaw = 45.0 * M_PI / 180.0;
+    const double pitch = 20.0 * M_PI / 180.0;
+    QVERIFY(std::abs(key.x - (0.5 + 2.5 * std::sin(yaw) * std::cos(pitch) / 2.0)) < 1e-6);
+    QVERIFY(std::abs(key.y - (0.5 - 2.5 * std::sin(pitch))) < 1e-6);
+    QVERIFY(std::abs(key.z - (-2.5 * std::cos(yaw) * std::cos(pitch))) < 1e-6);
+    QCOMPARE(key.radius, 5.0);
+    QCOMPARE(key.intensity, 1.25);
+    QVERIFY(!c.model3d.lights[1].enabled);
     QVERIFY(c.model3d.keyframes.isEmpty());
     QVERIFY(!c.model3d.legacyPose.present);
+}
+
+void CoreTest::model3dKeyLightKeysMigrate()
+{
+    // Before format 15: one key light, its yaw swept a quarter turn.
+    drift::KeyframeTrack<double> sweep;
+    sweep.setKeyframe(0, 0.0);
+    sweep.setKeyframe(drift::secondsToUs(1.0), 90.0);
+    drift::KeyframeTrack<double> fade;
+    fade.setKeyframe(0, 1.0);
+    fade.setKeyframe(drift::secondsToUs(1.0), 0.0);
+    const drift::Model3dSource m = drift::Model3dSource::fromJson(QJsonObject{
+        {QStringLiteral("path"), QStringLiteral("/media/robot.glb")},
+        {QStringLiteral("lightYaw"), 0.0},
+        {QStringLiteral("lightPitch"), 0.0},
+        {QStringLiteral("lightIntensity"), 1.0},
+        {QStringLiteral("keyframes"), QJsonObject{{QStringLiteral("lightYaw"), drift::keyframesToJson(sweep)},
+                                                  {QStringLiteral("lightIntensity"), drift::keyframesToJson(fade)}}},
+    });
+    QVERIFY(m.lights[0].enabled);
+    QVERIFY(!m.keyframes.contains(QStringLiteral("lightYaw")));
+    QVERIFY(!m.keyframes.contains(QStringLiteral("lightIntensity")));
+    // Straight at the viewer at the start, off to the right (and clamped there) at the end.
+    const drift::KeyframeTrack<double> x = m.keyframes.value(QStringLiteral("light1_x"));
+    const drift::KeyframeTrack<double> z = m.keyframes.value(QStringLiteral("light1_z"));
+    QCOMPARE(x.keyframes().size(), 2);
+    QCOMPARE(x.evaluateAt(0), 0.5);
+    QCOMPARE(z.evaluateAt(0), -2.5);
+    QCOMPARE(x.evaluateAt(drift::secondsToUs(1.0)), 2.0);
+    QVERIFY(std::abs(z.evaluateAt(drift::secondsToUs(1.0))) < 1e-6);
+    const drift::KeyframeTrack<double> brightness = m.keyframes.value(QStringLiteral("light1_intensity"));
+    QCOMPARE(brightness.evaluateAt(0), 1.25);
+    QCOMPARE(brightness.evaluateAt(drift::secondsToUs(1.0)), 0.0);
+
+    // A current file is read as written, old key or not.
+    QJsonObject current = m.toJson();
+    QVERIFY(current.contains(QStringLiteral("light1_enabled")));
+    current.insert(QStringLiteral("lightYaw"), 90.0);
+    QCOMPARE(drift::Model3dSource::fromJson(current).lights[0].x, m.lights[0].x);
 }
 
 void CoreTest::foldVectorTimeTable_data()
@@ -2997,6 +3140,77 @@ void CoreTest::subtitleClipsMergeWithGaps()
         QCOMPARE(rejoined.subtitleCues.at(i).endUs, merged.subtitleCues.at(i).endUs);
         QCOMPARE(rejoined.subtitleCues.at(i).text, merged.subtitleCues.at(i).text);
     }
+}
+
+void CoreTest::subtitlesFollowRetimedClip()
+{
+    auto cue = [](double s, double e, const QString &text, const QString &source) {
+        return drift::SubtitleCue{drift::secondsToUs(s), drift::secondsToUs(e), text, source};
+    };
+
+    drift::Project project;
+    project.tracks().clear();
+    project.tracks().append(drift::Track{.type = drift::TrackType::Subtitle});
+    project.tracks().append(drift::Track{.type = drift::TrackType::Video});
+
+    // A 10 s clip at 2 s, with captions generated across all of it.
+    drift::Clip video;
+    video.id = QStringLiteral("v");
+    video.type = drift::ClipType::Video;
+    video.assetId = QStringLiteral("asset");
+    video.timelineStart = drift::secondsToUs(2.0);
+    video.timelineDuration = drift::secondsToUs(10.0);
+    video.srcIn = 0;
+    video.srcOut = drift::secondsToUs(10.0);
+    project.tracks()[1].clips.append(video);
+
+    drift::Clip subs;
+    subs.id = QStringLiteral("s");
+    subs.type = drift::ClipType::Subtitle;
+    subs.timelineStart = video.timelineStart;
+    subs.timelineDuration = video.timelineDuration;
+    subs.srcOut = subs.timelineDuration;
+    subs.subtitleCues = {
+        cue(1.0, 2.0, QStringLiteral("one"), QStringLiteral("asset")),
+        cue(6.0, 8.0, QStringLiteral("two"), QStringLiteral("asset")),
+        cue(9.0, 9.5, QStringLiteral("typed"), QString()),
+    };
+    project.tracks()[0].clips.append(subs);
+
+    // Double speed: the clip plays in 5 s and every linked cue lands at half its offset.
+    const drift::Project before = project;
+    drift::Clip &fast = project.tracks()[1].clips[0];
+    fast.speed = 2.0;
+    fast.timelineDuration = drift::secondsToUs(5.0);
+    drift::retimeLinkedSubtitles(before, project);
+
+    const drift::Clip &out = project.tracks().at(0).clips.at(0);
+    QCOMPARE(out.timelineStart, drift::secondsToUs(2.0));
+    QCOMPARE(out.timelineDuration, drift::secondsToUs(5.0));
+    QCOMPARE(out.srcOut, out.timelineDuration);
+    QCOMPARE(out.subtitleCues.size(), 3);
+    QCOMPARE(out.subtitleCues.at(0).startUs, drift::secondsToUs(0.5));
+    QCOMPARE(out.subtitleCues.at(0).endUs, drift::secondsToUs(1.0));
+    QCOMPARE(out.subtitleCues.at(1).startUs, drift::secondsToUs(3.0));
+    QCOMPARE(out.subtitleCues.at(1).endUs, drift::secondsToUs(4.0));
+    // A hand-written cue isn't tied to the media and stays where it was put.
+    QCOMPARE(out.subtitleCues.at(2).text, QStringLiteral("typed"));
+    QCOMPARE(out.subtitleCues.at(2).startUs, drift::secondsToUs(9.0));
+
+    // Reversed, the words play back to front: "two" now comes first.
+    const drift::Project forward = project;
+    project.tracks()[1].clips[0].reverse = true;
+    drift::retimeLinkedSubtitles(forward, project);
+    const drift::Clip &rev = project.tracks().at(0).clips.at(0);
+    QCOMPARE(rev.timelineDuration, drift::secondsToUs(5.0));
+    QCOMPARE(rev.subtitleCues.at(0).text, QStringLiteral("two"));
+    QCOMPARE(rev.subtitleCues.at(0).startUs, drift::secondsToUs(1.0));
+    QCOMPARE(rev.subtitleCues.at(0).endUs, drift::secondsToUs(2.0));
+
+    // Nothing retimed: nothing moves.
+    const drift::Project same = project;
+    drift::retimeLinkedSubtitles(same, project);
+    QCOMPARE(project.tracks().at(0).clips.at(0).subtitleCues.at(0).startUs, drift::secondsToUs(1.0));
 }
 
 void CoreTest::clipLinkFieldsSerialization()
@@ -6186,6 +6400,124 @@ void CoreTest::transcriptWordsFollowClipsOnTimeline()
     QCOMPARE(all[4].word.text, QStringLiteral("world."));
     QCOMPARE(all[4].word.startUs, drift::secondsToUs(20.0));
     QCOMPARE(drift::transcriptWordsOnTimeline(project, 0, drift::secondsToUs(100), QStringLiteral("rev")).size(), 3);
+}
+
+void CoreTest::imageSequencePathRoundTrip()
+{
+    const QString raw = QStringLiteral("/home/u/a#b/100%/render_%04d.png#start=1&fps=24:1");
+    QVERIFY(!drift::isImageSequencePath(raw)); // unescaped '%' in the directory is not a pattern
+    const QString path = QStringLiteral("/home/u/a#b/100%%/render_%04d.png#start=1&fps=24:1");
+    const auto seq = drift::parseImageSequencePath(path);
+    QVERIFY(seq.has_value());
+    QCOMPARE(seq->pattern, QStringLiteral("/home/u/a#b/100%%/render_%04d.png"));
+    QCOMPARE(seq->start, 1);
+    QCOMPARE(seq->fpsNum, 24);
+    QCOMPARE(seq->fpsDen, 1);
+    QCOMPARE(drift::imageSequencePath(*seq), path);
+    QCOMPARE(drift::imageSequenceFramePath(*seq, 7), QStringLiteral("/home/u/a#b/100%/render_0007.png"));
+    QCOMPARE(QFileInfo(path).suffix().contains(QLatin1Char('#')), true);
+
+    QVERIFY(drift::parseImageSequencePath(QStringLiteral("/x/shot.%d.exr#start=1001&fps=24000:1001")).has_value());
+    QVERIFY(!drift::parseImageSequencePath(QStringLiteral("/x/shot.exr#start=1&fps=24:1")).has_value());
+    QVERIFY(!drift::parseImageSequencePath(QStringLiteral("/x/%d_%d.png#start=1&fps=24:1")).has_value());
+    QVERIFY(!drift::parseImageSequencePath(QStringLiteral("/x/%s.png#start=1&fps=24:1")).has_value());
+    QVERIFY(!drift::parseImageSequencePath(QStringLiteral("/x/a_%d.png#start=1&fps=0:1")).has_value());
+    QVERIFY(!drift::parseImageSequencePath(QStringLiteral("/x/a_%d.png#start=1&fps=24:0")).has_value());
+    QVERIFY(!drift::parseImageSequencePath(QStringLiteral("/x/a_%d.png#start=-1&fps=24:1")).has_value());
+    QVERIFY(!drift::parseImageSequencePath(QStringLiteral("/x/a_%d.png")).has_value());
+    QCOMPARE(drift::imageSequenceFramePath(*drift::parseImageSequencePath(QStringLiteral("/x/shot.%d.exr#start=1001&fps=24:1")), 1001),
+             QStringLiteral("/x/shot.1001.exr"));
+}
+
+void CoreTest::imageSequenceFpsRationals()
+{
+    struct Case { double fps; int num; int den; };
+    const Case cases[] = {{23.976, 24000, 1001}, {29.97, 30000, 1001}, {59.94, 60000, 1001},
+                          {47.952, 48000, 1001}, {119.88, 120000, 1001}, {24.0, 24, 1},
+                          {25.0, 25, 1}, {12.5, 25, 2}, {7.123, 7123, 1000}};
+    for (const Case &c : cases) {
+        drift::ImageSequence seq;
+        drift::setImageSequenceFps(seq, c.fps);
+        QCOMPARE(seq.fpsNum, c.num);
+        QCOMPARE(seq.fpsDen, c.den);
+    }
+}
+
+void CoreTest::imageSequenceDisplayName()
+{
+    drift::ImageSequence seq;
+    seq.pattern = QStringLiteral("/a/b/render_%04d.png");
+    seq.start = 1;
+    QCOMPARE(drift::imageSequenceDisplayName(seq, 240), QStringLiteral("render_[0001-0240].png"));
+    seq.pattern = QStringLiteral("/a/b/shot.%d.exr");
+    seq.start = 1001;
+    QCOMPARE(drift::imageSequenceDisplayName(seq, 10), QStringLiteral("shot.[1001-1010].exr"));
+}
+
+void CoreTest::imageSequenceDetection()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    auto touch = [&](const QString &name) -> QString {
+        QFile f(dir.filePath(name));
+        f.open(QIODevice::WriteOnly);
+        return dir.filePath(name);
+    };
+    auto fileList = [&](const QString &fmt, int from, int to) {
+        QStringList out;
+        for (int i = from; i <= to; ++i)
+            out << touch(fmt.arg(i, 4, 10, QLatin1Char('0')));
+        return out;
+    };
+
+    // Padded run with a gap at 0006; 0007 and 0008 are selected but past it.
+    QStringList padded = fileList(QStringLiteral("r_%1.png"), 1, 5);
+    padded << touch(QStringLiteral("r_0007.png")) << touch(QStringLiteral("r_0008.png"));
+    auto found = drift::detectImageSequences(padded);
+    QCOMPARE(found.size(), 1);
+    QCOMPARE(found[0].frameCount, 5);
+    QCOMPARE(found[0].skippedAfterGap, 2);
+    QCOMPARE(found[0].consumedPaths.size(), 7);
+    QCOMPARE(found[0].sequence.start, 1);
+    QCOMPARE(found[0].sequence.pattern, dir.filePath(QStringLiteral("r_%04d.png")));
+    QCOMPARE(found[0].displayName, QStringLiteral("r_[0001-0005].png"));
+
+    // One frame picked from a longer run on disk.
+    found = drift::detectImageSequences({dir.filePath(QStringLiteral("r_0003.png"))});
+    QCOMPARE(found.size(), 1);
+    QCOMPARE(found[0].sequence.start, 3);
+    QCOMPARE(found[0].frameCount, 3);
+    QCOMPARE(found[0].skippedAfterGap, 0);
+
+    // Unpadded, mixed widths (9, 10, 11).
+    QStringList plain;
+    for (int i = 9; i <= 11; ++i) {
+        QFile f(dir.filePath(QStringLiteral("u%1.jpg").arg(i)));
+        QVERIFY(f.open(QIODevice::WriteOnly));
+        plain << f.fileName();
+    }
+    found = drift::detectImageSequences(plain);
+    QCOMPARE(found.size(), 1);
+    QCOMPARE(found[0].sequence.pattern, dir.filePath(QStringLiteral("u%d.jpg")));
+    QCOMPARE(found[0].sequence.start, 9);
+    QCOMPARE(found[0].frameCount, 3);
+
+    // Numbered stills below the minimum, a non-image and an unnumbered image stay untouched.
+    const QStringList few = {touch(QStringLiteral("p1.png")), touch(QStringLiteral("p2.png")),
+                             touch(QStringLiteral("notes7.txt")), touch(QStringLiteral("cover.png"))};
+    QVERIFY(drift::detectImageSequences(few).isEmpty());
+    QCOMPARE(drift::detectImageSequences(few, 2).size(), 1);
+
+    // Zero-padded runs of different widths are separate sequences, in input order.
+    QStringList mixed;
+    for (int i = 1; i <= 3; ++i)
+        mixed << touch(QStringLiteral("m_%1.png").arg(i, 3, 10, QLatin1Char('0')));
+    for (int i = 1; i <= 3; ++i)
+        mixed << touch(QStringLiteral("m_%1.png").arg(i, 5, 10, QLatin1Char('0')));
+    found = drift::detectImageSequences(mixed);
+    QCOMPARE(found.size(), 2);
+    QCOMPARE(found[0].sequence.pattern, dir.filePath(QStringLiteral("m_%03d.png")));
+    QCOMPARE(found[1].sequence.pattern, dir.filePath(QStringLiteral("m_%05d.png")));
 }
 
 QTEST_MAIN(CoreTest)

@@ -2,9 +2,9 @@
 // Usage: tts [--lang CODE] [--voice ref.wav|.flac] [--exaggeration 0.5] "text" out.flac
 //        Without --voice the model's bundled default voice is used.
 
-#include "engine/AudioFileWriter.h"
-#include "engine/ChatterboxTts.h"
-#include "engine/SpeechAudio.h"
+#include "engine/encode/writers/AudioFileWriter.h"
+#include "engine/ml/speech/tts/ChatterboxTts.h"
+#include "engine/ml/speech/SpeechAudio.h"
 
 #include <QCoreApplication>
 #include <QDir>

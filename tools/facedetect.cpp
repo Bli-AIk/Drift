@@ -8,12 +8,12 @@
 //   facedetect <image-or-video> [--time <seconds>] [--out overlay.png]
 //              [--effect <id>] [--param k=v] [--effect-out warped.png]
 
-#include "engine/ClipReaderPool.h"
-#include "engine/EffectCatalog.h"
-#include "engine/EffectProcessor.h"
-#include "engine/FaceLandmarker.h"
-#include "engine/FaceTrack.h"
-#include "core/Effect.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/packages/effects/EffectCatalog.h"
+#include "engine/compositor/effects/EffectProcessor.h"
+#include "engine/face/tracking/FaceLandmarker.h"
+#include "engine/face/tracking/FaceTrack.h"
+#include "core/effects/Effect.h"
 
 #include <QCoreApplication>
 #include <QFileInfo>

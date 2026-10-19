@@ -47,8 +47,11 @@ if [[ ! -f "$OUT/stamp" || "$(cat "$OUT/stamp")" != "$STAMP" ]]; then
 
   # The same arguments the formula uses, except FFmpeg. FFMPEG_DIR makes FFmpeg required, so a
   # failure to find it stops here instead of silently configuring without the backend again.
+  # The deployment target otherwise defaults to the host OS, and from macOS 15 the SDK marks
+  # CGWindowListCreateImage (used by the plugin's window capture) unavailable, not deprecated.
   cmake -S "$SRC" -B "$WORK/build" -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 \
     -DCMAKE_FIND_FRAMEWORK=FIRST \
     -DCMAKE_PREFIX_PATH="$BREW_PREFIX" \
     -DCMAKE_INSTALL_PREFIX="$BREW_PREFIX" \

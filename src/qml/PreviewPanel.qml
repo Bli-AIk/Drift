@@ -1,9 +1,5 @@
 import QtQuick
 import Drift
-import "components"
-import "components/preview"
-import "components/preview/modes"
-
 // The desktop preview: the shared viewport and tools, the on-screen controls that fade over it,
 // and the transport bar underneath.
 PanelFrame {
@@ -14,9 +10,9 @@ PanelFrame {
 
     readonly property real currentSeconds: EditorState.playheadSeconds
     readonly property real durationSeconds: EditorState.durationSeconds
-    // 3D mode is a desktop tool: phones keep the camera's picture and its 2D grips.
-    readonly property bool mobile: Qt.platform.os === "android" || Qt.platform.os === "ios"
-    readonly property bool mode3d: EditorState.preview.mode === "3d" && !mobile
+    // Only the desktop shell hosts this panel (phones use AndroidPreview), so 3D mode is always
+    // available here, including Android tablets and DeX.
+    readonly property bool mode3d: EditorState.preview.mode === "3d"
 
     // Driven by Main, which owns the window and the panels that hide around it.
     property bool previewFullscreen: false
@@ -43,9 +39,9 @@ PanelFrame {
 
     // Fullscreen gives the whole screen to the picture: no gutter, and the transport joins the OSD
     // over it instead of taking a strip of its own.
-    color: previewFullscreen ? Theme.overlayColor : Theme.panelBackground
-    border.width: previewFullscreen ? 0 : 1
-    radius: previewFullscreen ? 0 : Theme.radiusSm
+    color: previewFullscreen ? Theme.c.previewPanel.backgroundFullscreen : Theme.c.previewPanel.background
+    border.width: previewFullscreen ? Theme.c.previewPanel.borderWidthFullscreen : Theme.c.previewPanel.borderWidth
+    radius: previewFullscreen ? Theme.c.previewPanel.radiusFullscreen : Theme.c.previewPanel.radius
 
     Item {
         id: viewportOuter
@@ -100,12 +96,11 @@ PanelFrame {
     }
 
     // In fullscreen the bar sits over the picture, so it needs a surface of its own.
-    Rectangle {
+    PreviewFullscreenTransportScrim {
         anchors.fill: bottomBar
         z: 1
-        visible: root.previewFullscreen && bottomBar.visible
-        opacity: bottomBar.opacity
-        color: Qt.rgba(Theme.panelBackground.r, Theme.panelBackground.g, Theme.panelBackground.b, 0.9)
+        shown: root.previewFullscreen && bottomBar.visible
+        plateOpacity: bottomBar.opacity
     }
 
     // In fullscreen this is part of the OSD: it fades with it, and holds it up while in use.
@@ -226,6 +221,15 @@ PanelFrame {
                 width: panelViewport.canvas.width
                 height: panelViewport.canvas.height
                 visible: EditorState.preview.handlesVisible && !root.mode3d
+            }
+
+            // The same lights in the 3D view, standing over the clip's relief.
+            DepthLight3dOverlay {
+                x: panelViewport.canvas.x
+                y: panelViewport.canvas.y
+                width: panelViewport.canvas.width
+                height: panelViewport.canvas.height
+                visible: EditorState.preview.handlesVisible && root.mode3d
             }
 
             // Assets dragged from the browsers land here as overlays at the playhead, or onto the

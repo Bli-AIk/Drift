@@ -1,8 +1,8 @@
-#include "engine/AddonPackage.h"
-#include "engine/AddonRegistry.h"
-#include "engine/AudioEffectCatalog.h"
-#include "engine/GpuPackageParse.h"
-#include "engine/audio/AudioEffectRack.h"
+#include "engine/addons/AddonPackage.h"
+#include "engine/addons/AddonRegistry.h"
+#include "engine/packages/audio/AudioEffectCatalog.h"
+#include "engine/addons/PackageSearchPaths.h"
+#include "engine/audio/dsp/AudioEffectRack.h"
 
 #include <QCoreApplication>
 #include <QDir>
@@ -360,7 +360,7 @@ void TestAddonPackage::installedAddonOutranksBundledContent()
     QVERIFY2(recordInstalledAddon(info, &error), qPrintable(error));
     reloadAddonRegistry();
 
-    const QStringList roots = GpuPackageParse::defaultSearchPaths(
+    const QStringList roots = PackageSearchPaths::defaultSearchPaths(
         QStringLiteral("DRIFT_UNSET_FOR_TEST"), QStringLiteral("fonts"), QStringLiteral("fonts"));
 
     const QString addonRoot = QDir(installDir).filePath(QStringLiteral("fonts"));

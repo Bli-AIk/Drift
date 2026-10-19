@@ -1,11 +1,14 @@
 #include <QtTest>
-#include "engine/SileroVad.h"
-#include "engine/ChatterboxTokenizer.h"
-#include "engine/ChatterboxTts.h"
-#include "engine/SpeechAudio.h"
-#include "engine/CtcAligner.h"
-#include "engine/KaldiFbank.h"
-#include "engine/SpeakerDiarizer.h"
+#include <QBuffer>
+#include <QMap>
+#include <array>
+#include "engine/ml/speech/transcription/SileroVad.h"
+#include "engine/ml/speech/tts/ChatterboxTokenizer.h"
+#include "engine/ml/speech/tts/ChatterboxTts.h"
+#include "engine/ml/speech/SpeechAudio.h"
+#include "engine/ml/speech/transcription/CtcAligner.h"
+#include "engine/ml/speech/diarization/KaldiFbank.h"
+#include "engine/ml/speech/diarization/SpeakerDiarizer.h"
 #include <set>
 
 #include <QColor>
@@ -37,87 +40,90 @@
 #include <utility>
 #include <random>
 
-#include "core/Clip.h"
-#include "core/Project.h"
-#include "core/Stabilize.h"
-#include "core/TimelineOps.h"
-#include "engine/AudioMixer.h"
-#include "engine/ClipReader.h"
-#include "engine/LoudnessMeter.h"
-#include "engine/StillImage.h"
-#include "engine/DebugReport.h"
-#include "engine/DepthSidecar.h"
-#include "engine/VdaDepth.h"
-#include "engine/Exporter.h"
-#include "engine/PreviewProxyRenderer.h"
-#include "engine/ClipGizmo.h"
-#include "engine/SceneCamera3d.h"
-#include "engine/PreviewSnap.h"
-#include "engine/EditorView3d.h"
-#include "engine/EditorOverlay.h"
-#include "engine/TransformLayer.h"
-#include "engine/GpuCompositor.h"
-#include "engine/MediaWaveform.h"
-#include "playback/PlaybackDiagnostics.h"
-#include "playback/PlaybackStats.h"
-#include "engine/GpuStatus.h"
-#include "engine/GpuDevice.h"
-#include "engine/HwAccel.h"
-#include "engine/OrtRuntime.h"
-#include "engine/CompositorFrameHistory.h"
-#include "engine/AudioEffectCatalog.h"
-#include "engine/audio/AudioEffectFactory.h"
-#include "engine/audio/AudioGraph.h"
-#include "engine/audio/DriftGraphApi.h"
-#include "engine/audio/PedalCatalog.h"
-#include "engine/audio/AudioEffectRack.h"
-#include "engine/audio/ClipAudioRetimer.h"
-#include "engine/AudioFileWriter.h"
-#include "engine/AudioOnsets.h"
-#include "engine/ObjectDetector.h"
-#include "engine/SceneDetect.h"
-#include "engine/FrameSheet.h"
-#include "engine/WaveformSheet.h"
-#include "engine/DeepFilterDenoiser.h"
-#include "engine/EffectCatalog.h"
-#include "engine/EffectPackageLoader.h"
-#include "engine/EffectProcessor.h"
-#include "engine/FaceTrack.h"
-#include "engine/FaceMesh.h"
-#include "engine/Face111.h"
-#include "engine/FacePropCatalog.h"
-#include "engine/FacePropImport.h"
-#include "engine/FaceModelTransform.h"
-#include "engine/ModelAsset.h"
-#include "engine/ModelAnimation.h"
-#include "engine/ModelClipRenderer.h"
-#include "engine/ModelClipTransform.h"
-#include "engine/GlFaceSwapRenderer.h"
-#include "engine/FaceSwapSource.h"
-#include "engine/GlModelRenderer.h"
-#include "engine/GlRuntime.h"
-#include "engine/EmojiCatalog.h"
-#include "engine/FontCatalog.h"
-#include "engine/FrameCompositor.h"
-#include "engine/GpuCompositor.h"
-#include "core/TextAnimationPreset.h"
-#include "engine/TextLayout.h"
+#include "core/project/clip/Clip.h"
+#include "core/project/Project.h"
+#include "core/project/clip/Stabilize.h"
+#include "core/edit/TimelineOps.h"
+#include "engine/audio/AudioMixer.h"
+#include "engine/decode/readers/ClipReader.h"
+#include "engine/audio/analysis/LoudnessMeter.h"
+#include "engine/decode/probe/StillImage.h"
+#include "engine/diagnostics/DebugReport.h"
+#include "engine/ml/vision/depth/DepthSidecar.h"
+#include "engine/ml/vision/depth/VdaDepth.h"
+#include "engine/encode/export/Exporter.h"
+#include "engine/encode/proxies/PreviewProxyRenderer.h"
+#include "engine/render3d/editor/ClipGizmo.h"
+#include "engine/render3d/scene/SceneCamera3d.h"
+#include "engine/compositor/PreviewSnap.h"
+#include "engine/render3d/scene/EditorView3d.h"
+#include "engine/render3d/editor/EditorOverlay.h"
+#include "engine/compositor/layers/TransformLayer.h"
+#include "engine/compositor/GpuCompositor.h"
+#include "engine/media/thumbnails/MediaThumbnail.h"
+#include "engine/media/waveforms/MediaWaveform.h"
+#include "playback/stats/PlaybackDiagnostics.h"
+#include "playback/stats/PlaybackStats.h"
+#include "engine/gpu/device/GpuStatus.h"
+#include "engine/gpu/device/GpuDevice.h"
+#include "engine/decode/hw/HwAccel.h"
+#include "engine/ml/runtime/OrtRuntime.h"
+#include "engine/compositor/effects/CompositorFrameHistory.h"
+#include "engine/packages/audio/AudioEffectCatalog.h"
+#include "engine/audio/dsp/AudioEffectFactory.h"
+#include "engine/audio/dsp/graph/AudioGraph.h"
+#include "engine/audio/dsp/graph/DriftGraphApi.h"
+#include "engine/audio/dsp/graph/PedalCatalog.h"
+#include "engine/audio/dsp/AudioEffectRack.h"
+#include "engine/audio/dsp/ClipAudioRetimer.h"
+#include "engine/encode/writers/AudioFileWriter.h"
+#include "engine/audio/analysis/AudioOnsets.h"
+#include "engine/ml/vision/detection/ObjectDetector.h"
+#include "engine/ml/vision/detection/SceneDetect.h"
+#include "engine/render3d/splats/SplatAsset.h"
+#include "engine/diagnostics/sheets/FrameSheet.h"
+#include "engine/diagnostics/sheets/WaveformSheet.h"
+#include "engine/ml/speech/DeepFilterDenoiser.h"
+#include "engine/packages/effects/EffectCatalog.h"
+#include "engine/packages/effects/EffectPackageLoader.h"
+#include "engine/compositor/effects/EffectProcessor.h"
+#include "engine/face/tracking/FaceTrack.h"
+#include "engine/face/tracking/FaceMesh.h"
+#include "engine/face/tracking/Face111.h"
+#include "engine/face/props/FacePropCatalog.h"
+#include "engine/face/props/FacePropImport.h"
+#include "engine/face/props/FaceModelTransform.h"
+#include "engine/render3d/models/ModelAsset.h"
+#include "engine/render3d/models/ModelAnimation.h"
+#include "engine/render3d/models/ModelClipRenderer.h"
+#include "engine/render3d/models/ModelClipTransform.h"
+#include "engine/face/swap/GlFaceSwapRenderer.h"
+#include "engine/face/swap/FaceSwapSource.h"
+#include "engine/render3d/models/GlModelRenderer.h"
+#include "engine/gpu/GlRuntime.h"
+#include "engine/packages/assets/EmojiCatalog.h"
+#include "engine/packages/assets/FontCatalog.h"
+#include "engine/compositor/FrameCompositor.h"
+#include "engine/compositor/GpuCompositor.h"
+#include "core/text/animation/TextAnimationPreset.h"
+#include "engine/render2d/text/TextLayout.h"
 #ifdef DRIFT_WITH_SKIA
-#include "engine/SkiaRuntime.h"
-#include "engine/SkiaTextPainter.h"
+#include "engine/render2d/skia/SkiaRuntime.h"
+#include "engine/render2d/text/SkiaTextPainter.h"
 #endif
-#include "engine/GpuEffectExecutor.h"
-#include "engine/GpuPackageParse.h"
+#include "engine/gpu/effects/GpuEffectExecutor.h"
+#include "engine/packages/GpuPackageParse.h"
 
-#include "engine/MaskApplier.h"
-#include "engine/MatteWriter.h"
-#include "engine/ReverseProxyCache.h"
-#include "engine/ReverseRenderer.h"
-#include "engine/MediaEditor.h"
-#include "engine/ClipReaderPool.h"
-#include "engine/MediaProbe.h"
-#include "engine/TransitionCatalog.h"
-#include "core/Transition.h"
+#include "engine/compositor/layers/MaskApplier.h"
+#include "engine/encode/writers/MatteWriter.h"
+#include "engine/encode/proxies/ReverseProxyCache.h"
+#include "engine/encode/proxies/ProxyNaming.h"
+#include "engine/encode/proxies/ReverseRenderer.h"
+#include "engine/encode/MediaEditor.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/decode/probe/MediaProbe.h"
+#include "engine/packages/transitions/TransitionCatalog.h"
+#include "core/project/Transition.h"
 #include "TestZip.h"
 
 extern "C" {
@@ -135,6 +141,14 @@ class EngineTest : public QObject
 
 private slots:
     void initTestCase();
+    void splatPlyLoads();
+    void splatPlyRejectsBadFiles();
+    void splatSogRoundTrip();
+    void splatSogStreamedPicksLevelByBudget();
+    void splatRejectsUnrelatedPaths();
+    void splatSampleLoads();
+    void aimAtCentresTheTargetAndHoldsTheEye();
+    void rotatedKeepingEyeTurnsInPlace();
     void chatterboxTokenizerMatchesReference();
     void chatterboxSplitsSentencesForSynthesis();
     void chatterboxVoiceConditioningRoundTrips();
@@ -144,6 +158,10 @@ private slots:
     void matteWriterRoundTripsColourForeground();
     void reverseRendererPlaysSourceBackwards();
     void previewProxyKeepsSourceTiming();
+    void proxyNamingLearnsAndMatchesRules();
+    void sidecarProxiesOutrankTheCache();
+    void reversedSidecarNamesRoundTrip();
+    void reversedSidecarsOutrankTheIndex();
     void variableFrameRateIsDetected();
     void mediaEditorCropsAnImage();
     void mediaEditorConformsVariableFrameRate();
@@ -401,6 +419,7 @@ private slots:
     void retimedClipAudioIsNotSilent();
     void retimedAudioPreservesPitch();
     void perChannelPeaksFoldToTheMergedEnvelope();
+    void backgroundDecodesStopWhenAborted();
     void panLawIsUnityAtCentreAndSilencesOneSide();
     void retimedAudioLengthTracksTimeline();
     void retimedAudioSurvivesBlockSizeChanges();
@@ -1994,6 +2013,17 @@ void EngineTest::editorViewLooksAtTheWorld()
     const drift::EditorView3d framed = drift::frameEditorView(front, QVector3D(10, 20, 30), 100.0);
     QCOMPARE(framed.target, QVector3D(10, 20, 30));
 
+    // Flying turns the head in place: the eye stays put while the view swings right and up.
+    const drift::EditorView3d turned = drift::flyEditorView(front, 30.0, 20.0, 0.0, 0.0, 0.0);
+    QVERIFY((drift::editorViewEye(turned) - drift::editorViewEye(front)).length() < 0.01f);
+    QVERIFY(turned.target.x() > 0.f);
+    QVERIFY(turned.target.y() < 0.f);
+    QCOMPARE(turned.distance, front.distance);
+    // W moves along the view (toward -z from the front), D to screen right, E up (world -y).
+    const drift::EditorView3d flown = drift::flyEditorView(front, 0.0, 0.0, 100.0, 50.0, 25.0);
+    QVERIFY((drift::editorViewEye(flown) - QVector3D(50, -25, 2900)).length() < 0.01f);
+    QVERIFY((flown.target - QVector3D(50, -25, -100)).length() < 0.01f);
+
     // Looking through the camera is exactly the camera's projection.
     drift::SceneCamera3d camera;
     camera.positionX = 120.0;
@@ -3240,10 +3270,15 @@ void EngineTest::modelClipWorldFitsTheRect()
     // And the model's +x edge rides the quad's right edge.
     QVERIFY((spun.map(QVector3D(1.f, 0.25f, 0.f)) - quad.map(QVector3D(1.f, 0.f, 0.f))).length() < 1e-3f);
 
-    // Normals land in the light frame (world with y up again): at rest, model up stays up.
-    const QMatrix3x3 n = drift::modelClipNormalMatrix(world);
-    const QVector3D up = QVector3D(n(0, 1), n(1, 1), n(2, 1)).normalized();
-    QVERIFY((up - QVector3D(0.f, 1.f, 0.f)).length() < 1e-4f);
+    // The lights' frame is the rect laid flat at the model's centre, unturned by its rotations:
+    // its middle is the box centre, and z counts clip heights away from the viewer.
+    const drift::ModelLightFrame lights = drift::modelLightFrame(rect, turned, canvas);
+    QVERIFY((lights.toWorld(QVector3D(0.5f, 0.5f, 0.f)) - spun.map((aabbMin + aabbMax) * 0.5f)).length() < 1e-3f);
+    QVERIFY((lights.toWorld(QVector3D(0.5f, 0.5f, -1.f)) - lights.toWorld(QVector3D(0.5f, 0.5f, 0.f))
+             - QVector3D(0.f, 0.f, float(rect.height()))).length() < 1e-3f);
+    QVERIFY((lights.fromWorld(lights.toWorld(QVector3D(0.2f, 1.3f, -0.7f))) - QVector3D(0.2f, 1.3f, -0.7f)).length()
+            < 1e-5f);
+    QVERIFY((lights.aimWorld(1.0, 0.0) - lights.toWorld(QVector3D(1.f, 0.f, 0.f))).length() < 1e-5f);
 
     // Seen through a viewpoint, a model vertex and a quad point at the same world place share a
     // depth, which is what lets the two occlude each other in one depth buffer.
@@ -3264,12 +3299,14 @@ void EngineTest::modelClipDrawRequestFollowsLoopMode()
     request.rotation = 12.0;
     request.pose.rotationY = 45.0;
     request.source.path = path;
-    request.source.lightYaw = 75.0;
+    request.source.lights[2].enabled = true;
+    request.source.lights[2].x = 1.75;
 
     const auto draw = drift::model3d::makeDrawRequest(request);
     QVERIFY(draw);
     QVERIFY(draw->asset);
-    QCOMPARE(draw->params.lightYaw, 75.0);
+    QVERIFY(draw->params.lights[2].enabled);
+    QCOMPARE(draw->params.lights[2].x, 1.75);
     QCOMPARE(draw->rect, request.rect);
     QCOMPARE(draw->rotation, 12.0);
     QCOMPARE(draw->pose3d.rotationY, 45.0);
@@ -3282,8 +3319,7 @@ namespace {
 
 // A model centred with half the canvas across, tipped toward the viewer, seen through an eye
 // `size / (2 * depth)` px away (the old "depth" lens).
-GpuScene modelClipScene(const QString &path, int size, double rotY = 0.0, double lightPitch = 20.0,
-                        double depth = 0.5)
+GpuScene modelClipScene(const QString &path, int size, double rotY = 0.0, double depth = 0.5)
 {
     drift::model3d::RenderRequest request;
     request.path = path;
@@ -3292,7 +3328,6 @@ GpuScene modelClipScene(const QString &path, int size, double rotY = 0.0, double
     request.pose.rotationY = rotY;
     request.pose.perspective = size / (2.0 * depth);
     request.source.path = path;
-    request.source.lightPitch = lightPitch;
 
     GpuLayer layer;
     layer.model3d = drift::model3d::makeDrawRequest(request);
@@ -3331,7 +3366,7 @@ void EngineTest::modelClipRendersCube()
     // Rows land with v=0 at the image top: the tilt brings the cube's top toward the viewer, so
     // under perspective the top of the picture is the wider (nearer) end. The
     // cube's shared vertices have no per-face normals, so lighting cannot tell faces apart.
-    const QImage tipped = GpuCompositor::render(modelClipScene(path, 64, 0.0, 20.0, 1.0));
+    const QImage tipped = GpuCompositor::render(modelClipScene(path, 64, 0.0, 1.0));
     QVERIFY(!tipped.isNull());
     auto coveredWidth = [&](int y) {
         int n = 0;
@@ -5275,6 +5310,142 @@ void EngineTest::previewProxyKeepsSourceTiming()
     QVERIFY(!QFileInfo::exists(proxyPath));
 }
 
+void EngineTest::proxyNamingLearnsAndMatchesRules()
+{
+    // Expected paths go through QFileInfo because the sources resolve onto the current drive on
+    // Windows.
+    using namespace drift;
+    const QString src = QStringLiteral("/media/shoot/clip01.MP4");
+
+    const auto suffixRule = learnProxyRule(src, QStringLiteral("/media/shoot/clip01_proxy.MP4"));
+    QVERIFY(suffixRule);
+    QCOMPARE(proxyRuleToString(*suffixRule), QStringLiteral("*_proxy"));
+    QCOMPARE(proxyCandidatePath(*suffixRule, QStringLiteral("/media/shoot/other.MP4")),
+             QFileInfo(QStringLiteral("/media/shoot/other_proxy.MP4")).absoluteFilePath());
+
+    const auto prefixRule = learnProxyRule(src, QStringLiteral("/media/shoot/PRX_clip01.MP4"));
+    QVERIFY(prefixRule);
+    QCOMPARE(proxyRuleToString(*prefixRule), QStringLiteral("PRX_*"));
+
+    const auto subdirRule = learnProxyRule(src, QStringLiteral("/media/shoot/Proxy/clip01_proxy.MP4"));
+    QVERIFY(subdirRule);
+    QCOMPARE(proxyRuleToString(*subdirRule), QStringLiteral("Proxy/*_proxy"));
+    QCOMPARE(proxyCandidatePath(*subdirRule, QStringLiteral("/media/shoot/b.MP4")),
+             QFileInfo(QStringLiteral("/media/shoot/Proxy/b_proxy.MP4")).absoluteFilePath());
+
+    const auto extRule = learnProxyRule(src, QStringLiteral("/media/shoot/Proxy/clip01_proxy.mov"));
+    QVERIFY(extRule);
+    QCOMPARE(proxyRuleToString(*extRule), QStringLiteral("Proxy/*_proxy.mov"));
+    QCOMPARE(proxyCandidatePath(*extRule, QStringLiteral("/media/shoot/b.MP4")),
+             QFileInfo(QStringLiteral("/media/shoot/Proxy/b_proxy.mov")).absoluteFilePath());
+
+    // Same stem, different extension only is still a rule; the identical path is not.
+    QVERIFY(learnProxyRule(src, QStringLiteral("/media/shoot/clip01.mov")));
+    QVERIFY(!learnProxyRule(src, src));
+    QVERIFY(!learnProxyRule(src, QStringLiteral("/media/shoot/unrelated.MP4")));
+    QVERIFY(!learnProxyRule(src, QStringLiteral("/media/shoot/CLIP01_proxy.MP4")));
+    QVERIFY(!learnProxyRule(src, QStringLiteral("/media/elsewhere/clip01_proxy.MP4")));
+    QVERIFY(!learnProxyRule(src, QStringLiteral("/media/clip01_proxy.MP4")));
+
+    for (const auto &rule : {*suffixRule, *prefixRule, *subdirRule, *extRule}) {
+        const auto back = proxyRuleFromString(proxyRuleToString(rule));
+        QVERIFY(back);
+        QCOMPARE(*back, rule);
+    }
+    QVERIFY(!proxyRuleFromString(QStringLiteral("_proxy")));
+    QVERIFY(!proxyRuleFromString(QStringLiteral("*_*")));
+    QVERIFY(!proxyRuleFromString(QStringLiteral("../*_proxy")));
+
+    QCOMPARE(generatedProxyPath(src, 720),
+             QFileInfo(QStringLiteral("/media/shoot/clip01_proxy_720.mp4")).absoluteFilePath());
+    QCOMPARE(defaultProxyNamePatterns().size(), 3);
+}
+
+void EngineTest::sidecarProxiesOutrankTheCache()
+{
+    auto &cache = drift::ReverseProxyCache::instance();
+    const QString source = QStringLiteral("/nonexistent/sidecar-priority/source.mp4");
+    const auto cleanup = qScopeGuard([&] {
+        cache.setSidecars(source, {});
+        cache.removePreview(source);
+    });
+
+    cache.insertPreview(source, 720, QStringLiteral("/nonexistent/cache/720.mp4"));
+    QCOMPARE(cache.lookupPreview(source, 720), QStringLiteral("/nonexistent/cache/720.mp4"));
+
+    drift::ReverseProxyCache::Sidecars set;
+    set.external = QStringLiteral("/nonexistent/sidecar-priority/source_proxy.mp4");
+    cache.setSidecars(source, set);
+    QCOMPARE(cache.lookupPreview(source, 720), set.external);
+    QCOMPARE(cache.lookupPreview(source, 540), set.external);
+
+    set.generated.insert(720, QStringLiteral("/nonexistent/sidecar-priority/source_proxy_720.mp4"));
+    set.generated.insert(360, QStringLiteral("/nonexistent/sidecar-priority/source_proxy_360.mp4"));
+    cache.setSidecars(source, set);
+    QCOMPARE(cache.lookupPreview(source, 720), set.generated.value(720));
+    // A generated proxy at another size is ignored in favour of the external one.
+    QCOMPARE(cache.lookupPreview(source, 540), set.external);
+
+    QCOMPARE(cache.sidecars(source).generated.size(), 2);
+    cache.setSidecars(source, {});
+    QVERIFY(cache.sidecars(source).isEmpty());
+    QCOMPARE(cache.lookupPreview(source, 720), QStringLiteral("/nonexistent/cache/720.mp4"));
+}
+
+void EngineTest::reversedSidecarNamesRoundTrip()
+{
+    using namespace drift;
+    const QString src = QStringLiteral("/media/shoot/we[ir]d*.clip01.MP4");
+
+    // Rounded outward to whole milliseconds.
+    const QString path = reversedSidecarPath(src, 1'500'400, 4'000'100);
+    QCOMPARE(path, QFileInfo(QStringLiteral("/media/shoot/we[ir]d*.clip01_reversed_1500-4001.mp4")).absoluteFilePath());
+    const auto range = parseReversedSidecarName(src, QFileInfo(path).fileName());
+    QVERIFY(range);
+    QCOMPARE(range->inUs, TimeUs(1'500'000));
+    QCOMPARE(range->outUs, TimeUs(4'001'000));
+
+    const QString name = QFileInfo(path).fileName();
+    QVERIFY(!parseReversedSidecarName(QStringLiteral("/media/shoot/other.MP4"), name));
+    QVERIFY(!parseReversedSidecarName(QStringLiteral("/media/shoot/we.MP4"), name));
+    const QString head = QStringLiteral("we[ir]d*.clip01_reversed_");
+    QVERIFY(!parseReversedSidecarName(src, head + QStringLiteral("5-5.mp4")));
+    QVERIFY(!parseReversedSidecarName(src, head + QStringLiteral("9-5.mp4")));
+    QVERIFY(!parseReversedSidecarName(src, head + QStringLiteral("a-5.mp4")));
+    QVERIFY(!parseReversedSidecarName(src, head + QStringLiteral("1-2-3.mp4")));
+    QVERIFY(!parseReversedSidecarName(src, head + QStringLiteral("-5.mp4")));
+    QVERIFY(!parseReversedSidecarName(src, head + QStringLiteral("1-5.mp4.part")));
+    QVERIFY(!parseReversedSidecarName(src, head + QStringLiteral("1-5.mov")));
+    QVERIFY(!parseReversedSidecarName(src, QStringLiteral("garbage")));
+    QVERIFY(!parseReversedSidecarName(src, QString()));
+}
+
+void EngineTest::reversedSidecarsOutrankTheIndex()
+{
+    auto &cache = drift::ReverseProxyCache::instance();
+    const QString source = QStringLiteral("/nonexistent/reversed-priority/source.mp4");
+    const auto cleanup = qScopeGuard([&] { cache.setSidecars(source, {}); });
+
+    drift::ReverseProxyCache::Sidecars set;
+    set.reversed.append({2 * drift::kUsPerSecond, 8 * drift::kUsPerSecond,
+                         QStringLiteral("/nonexistent/reversed-priority/source_reversed_2000-8000.mp4")});
+    cache.setSidecars(source, set);
+
+    drift::TimeUs coverEnd = 0;
+    QCOMPARE(cache.lookup(source, 3 * drift::kUsPerSecond, 5 * drift::kUsPerSecond, &coverEnd),
+             set.reversed.first().path);
+    QCOMPARE(coverEnd, 8 * drift::kUsPerSecond);
+    QVERIFY(cache.lookup(source, drift::kUsPerSecond, 5 * drift::kUsPerSecond, &coverEnd).isEmpty());
+
+    // A wider render supersedes the narrower one, and the narrower one is dropped.
+    cache.addReversedSidecar(source, 0, 10 * drift::kUsPerSecond,
+                             QStringLiteral("/nonexistent/reversed-priority/source_reversed_0-10000.mp4"));
+    QCOMPARE(cache.sidecars(source).reversed.size(), 1);
+    QCOMPARE(cache.lookup(source, drift::kUsPerSecond, 5 * drift::kUsPerSecond, &coverEnd),
+             QStringLiteral("/nonexistent/reversed-priority/source_reversed_0-10000.mp4"));
+    QCOMPARE(coverEnd, 10 * drift::kUsPerSecond);
+}
+
 void EngineTest::variableFrameRateIsDetected()
 {
     const QString ffmpeg = QStandardPaths::findExecutable(QStringLiteral("ffmpeg"));
@@ -6321,7 +6492,16 @@ void EngineTest::clipReaderAutoKeepsCheapClipsOnSoftware()
 
     const auto previous = ClipReader::hardwareDecodeMode();
     ClipReader::setHardwareDecodeMode(ClipReader::HardwareDecodeMode::Auto);
-    const auto restore = qScopeGuard([previous] { ClipReader::setHardwareDecodeMode(previous); });
+    // Auto lets a proven zero-copy path override the cheap-clip heuristic, and that proof is
+    // process-wide: an earlier test that imported a frame would otherwise decide this one.
+    using GlRuntime = drift::gl::GlRuntime;
+    const auto previousPath = GlRuntime::lastPreviewUploadPath();
+    const QString previousDecline = GlRuntime::lastZeroCopyDeclineReason();
+    GlRuntime::restorePreviewUploadPath(GlRuntime::PreviewUploadPath::None, QString());
+    const auto restore = qScopeGuard([=] {
+        ClipReader::setHardwareDecodeMode(previous);
+        GlRuntime::restorePreviewUploadPath(previousPath, previousDecline);
+    });
 
     ClipReader reader;
     QVERIFY(reader.open(path));
@@ -12431,6 +12611,32 @@ void EngineTest::retimedAudioPreservesPitch()
     }
 }
 
+// Playback raises the caches' abort flag so a batch already decoding gives the CPU back. A raised
+// flag has to stop both decodes before they produce anything, not just keep the next batch off.
+void EngineTest::backgroundDecodesStopWhenAborted()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString audio = makeMultiChannelAudio(dir);
+    const QString video = makeHighRateVideo(dir);
+    if (audio.isEmpty() || video.isEmpty())
+        QSKIP("ffmpeg not available to generate the test clips");
+
+    const std::atomic<bool> go{false};
+    const std::atomic<bool> stop{true};
+
+    QVERIFY(!MediaWaveform::peaksForRangePerChannel(audio, 0.0, 2.0, 100, 0, &go).channels.isEmpty());
+    QVERIFY(MediaWaveform::peaksForRangePerChannel(audio, 0.0, 2.0, 100, 0, &stop).channels.isEmpty());
+
+    // Separate decoders and indices, so the aborted call cannot be answered from tiles the
+    // other one already wrote to the cache.
+    MediaThumbnail::TileDecoder stopped;
+    QVERIFY(stopped.generateTiles(video, 0, {0}, 0, &stop).isEmpty());
+    QVERIFY(!QFileInfo::exists(MediaThumbnail::tilePath(video, 0, 0, 0)));
+    MediaThumbnail::TileDecoder running;
+    QCOMPARE(running.generateTiles(video, 0, {0}, 0, &go), QList<qint64>{0});
+}
+
 // peaksForRange is implemented as a fold over peaksForRangePerChannel, on the grounds that max
 // is associative. That is the invariant the whole single-decode design rests on: if it ever
 // drifts, turning the lanes on would silently change the merged waveform every other clip draws.
@@ -15380,5 +15586,411 @@ void EngineTest::waveformSheetDrawsWordLane()
     QVERIFY(withWords.pixel(100, laneY) != withWords.pixel(390, laneY));
 }
 
+namespace {
+
+struct SogSplat
+{
+    float pos[3];
+    float quat[4]; // w x y z, unit
+    uint8_t scaleIdx[3];
+    uint8_t colorIdx[3];
+    uint8_t opacity;
+};
+
+constexpr float kSogMin[3] = {-1.f, -2.f, -3.f};
+constexpr float kSogMax[3] = {2.f, 1.f, 0.f};
+
+float sogScaleBook(int i) { return -5.f + 0.02f * float(i); }
+float sogColorBook(int i) { return -2.f + 0.02f * float(i); }
+
+QString sogMetaJson(int count)
+{
+    QJsonArray scaleBook, colorBook;
+    for (int i = 0; i < 256; ++i) {
+        scaleBook.append(double(sogScaleBook(i)));
+        colorBook.append(double(sogColorBook(i)));
+    }
+    QJsonObject means{{"mins", QJsonArray{kSogMin[0], kSogMin[1], kSogMin[2]}},
+                      {"maxs", QJsonArray{kSogMax[0], kSogMax[1], kSogMax[2]}},
+                      {"files", QJsonArray{"means_l.webp", "means_u.webp"}}};
+    QJsonObject root{{"version", 2},
+                     {"count", count},
+                     {"means", means},
+                     {"scales", QJsonObject{{"codebook", scaleBook}, {"files", QJsonArray{"scales.webp"}}}},
+                     {"quats", QJsonObject{{"files", QJsonArray{"quats.webp"}}}},
+                     {"sh0", QJsonObject{{"codebook", colorBook}, {"files", QJsonArray{"sh0.webp"}}}}};
+    return QString::fromUtf8(QJsonDocument(root).toJson());
+}
+
+// Writes the five SOG images (lossless) and meta.json into `dir`; returns file name → bytes.
+QMap<QString, QByteArray> writeSogSet(const std::vector<SogSplat> &splats, int width)
+{
+    const int n = int(splats.size());
+    // Qt's WebP plugin fails to decode some one-row images, so keep at least two rows.
+    const int height = std::max(2, (n + width - 1) / width);
+    QImage ml(width, height, QImage::Format_RGBA8888), mu = ml, qi = ml, si = ml, ci = ml;
+    for (QImage *img : {&ml, &mu, &qi, &si, &ci})
+        img->fill(QColor(0, 0, 0, 255));
+    for (int i = 0; i < n; ++i) {
+        const SogSplat &s = splats[size_t(i)];
+        const int x = i % width, y = i / width;
+        uint8_t *l = ml.scanLine(y) + x * 4, *u = mu.scanLine(y) + x * 4;
+        for (int c = 0; c < 3; ++c) {
+            const double nv = (s.pos[c] < 0 ? -1.0 : 1.0) * std::log1p(std::fabs(double(s.pos[c])));
+            const int q = int(std::lround((nv - kSogMin[c]) / (kSogMax[c] - kSogMin[c]) * 65535.0));
+            l[c] = uint8_t(q & 255);
+            u[c] = uint8_t(q >> 8);
+        }
+        int mode = 0;
+        for (int c = 1; c < 4; ++c)
+            if (std::fabs(s.quat[c]) > std::fabs(s.quat[mode]))
+                mode = c;
+        const float sign = s.quat[mode] < 0 ? -1.f : 1.f;
+        uint8_t *q = qi.scanLine(y) + x * 4;
+        int k = 0;
+        for (int c = 0; c < 4; ++c) {
+            if (c == mode)
+                continue;
+            q[k++] = uint8_t(std::lround((sign * s.quat[c] * 0.70710678f + 0.5f) * 255.f));
+        }
+        q[3] = uint8_t(252 + mode);
+        uint8_t *sc = si.scanLine(y) + x * 4, *co = ci.scanLine(y) + x * 4;
+        for (int c = 0; c < 3; ++c) {
+            sc[c] = s.scaleIdx[c];
+            co[c] = s.colorIdx[c];
+        }
+        co[3] = s.opacity;
+    }
+    QMap<QString, QByteArray> files;
+    files.insert("meta.json", sogMetaJson(n).toUtf8());
+    const std::pair<const char *, const QImage *> imgs[] = {
+        {"means_l.webp", &ml}, {"means_u.webp", &mu}, {"quats.webp", &qi}, {"scales.webp", &si}, {"sh0.webp", &ci}};
+    for (const auto &[name, img] : imgs) {
+        QByteArray bytes;
+        QBuffer buf(&bytes);
+        buf.open(QIODevice::WriteOnly);
+        img->save(&buf, "webp", 100);
+        files.insert(QLatin1String(name), bytes);
+    }
+    return files;
+}
+
+void writeFiles(const QString &dir, const QMap<QString, QByteArray> &files)
+{
+    for (auto it = files.begin(); it != files.end(); ++it) {
+        const QString path = QDir(dir).filePath(it.key());
+        QDir().mkpath(QFileInfo(path).absolutePath());
+        QFile f(path);
+        QVERIFY(f.open(QIODevice::WriteOnly));
+        f.write(it.value());
+    }
+}
+
+bool zipFiles(const QString &path, const QMap<QString, QByteArray> &files)
+{
+    QList<QPair<QString, QByteArray>> entries;
+    for (auto it = files.begin(); it != files.end(); ++it)
+        entries.append({it.key(), it.value()});
+    return writeStoredZip(path, entries);
+}
+
+std::vector<SogSplat> sogFixture()
+{
+    // Unit quaternions whose largest component is w, x, y and z in turn, one with a negative
+    // largest component; the last splat has opacity 3 so premultiplication would crush its colour.
+    auto norm = [](float w, float x, float y, float z) {
+        const float l = std::sqrt(w * w + x * x + y * y + z * z);
+        return std::array<float, 4>{w / l, x / l, y / l, z / l};
+    };
+    std::vector<SogSplat> v;
+    const auto q0 = norm(0.9f, 0.1f, -0.2f, 0.3f), q1 = norm(0.2f, -0.8f, 0.3f, 0.1f),
+               q2 = norm(0.1f, 0.2f, 0.9f, -0.3f), q3 = norm(-0.1f, 0.3f, 0.2f, -0.7f);
+    v.push_back({{0.5f, -0.25f, 0.f}, {q0[0], q0[1], q0[2], q0[3]}, {10, 20, 30}, {200, 100, 50}, 255});
+    v.push_back({{-0.5f, 0.75f, -1.f}, {q1[0], q1[1], q1[2], q1[3]}, {40, 50, 60}, {0, 255, 128}, 128});
+    v.push_back({{1.f, 0.f, -0.5f}, {q2[0], q2[1], q2[2], q2[3]}, {70, 80, 90}, {250, 250, 250}, 1});
+    v.push_back({{0.f, -0.5f, -0.1f}, {q3[0], q3[1], q3[2], q3[3]}, {100, 110, 120}, {255, 5, 190}, 3});
+    return v;
+}
+
+void verifySogFixture(const drift::SplatData &d, const std::vector<SogSplat> &exp, size_t first = 0)
+{
+    QVERIFY2(d.error.isEmpty(), qPrintable(d.error));
+    QCOMPARE(size_t(d.count), exp.size() + first);
+    for (size_t i = 0; i < exp.size(); ++i) {
+        const SogSplat &e = exp[i];
+        const size_t o = i + first;
+        for (int c = 0; c < 3; ++c) {
+            const float pos = c == 2 ? e.pos[c] : -e.pos[c]; // turned 180 degrees about z
+            QVERIFY(std::fabs(d.positions[o * 3 + size_t(c)] - pos) < 2e-3f);
+            QVERIFY(std::fabs(d.scales[o * 3 + size_t(c)] - std::exp(sogScaleBook(e.scaleIdx[c]))) < 1e-6f);
+            const float col = 0.5f + sogColorBook(e.colorIdx[c]) * 0.28209479f;
+            QVERIFY(std::abs(int(d.colors[o * 4 + size_t(c)]) - int(std::lround(std::clamp(col, 0.f, 1.f) * 255.f))) <= 1);
+        }
+        QCOMPARE(d.colors[o * 4 + 3], e.opacity);
+        // q and -q are the same rotation.
+        const float turned[4] = {-e.quat[3], -e.quat[2], e.quat[1], e.quat[0]};
+        float dot = 0.f, len = 0.f;
+        for (int c = 0; c < 4; ++c) {
+            dot += d.rotations[o * 4 + size_t(c)] * turned[c];
+            len += d.rotations[o * 4 + size_t(c)] * d.rotations[o * 4 + size_t(c)];
+        }
+        QVERIFY(std::fabs(std::fabs(dot) - 1.f) < 0.01f);
+        QVERIFY(std::fabs(len - 1.f) < 0.01f);
+    }
+}
+
+} // namespace
+
+void EngineTest::splatPlyLoads()
+{
+    QTemporaryDir tmp;
+    QVERIFY(tmp.isValid());
+    const QString path = tmp.filePath("a.ply");
+    QFile f(path);
+    QVERIFY(f.open(QIODevice::WriteOnly));
+    f.write("ply\nformat binary_little_endian 1.0\ncomment x\nelement vertex 3\n"
+            "property float x\nproperty float y\nproperty float z\n"
+            "property float nx\nproperty float ny\nproperty float nz\n"
+            "property float f_dc_0\nproperty float f_dc_1\nproperty float f_dc_2\n"
+            "property float f_rest_0\nproperty uchar pad\n"
+            "property float opacity\nproperty float scale_0\nproperty float scale_1\nproperty float scale_2\n"
+            "property float rot_0\nproperty float rot_1\nproperty float rot_2\nproperty float rot_3\n"
+            "end_header\n");
+    const float rows[3][19] = {
+        {1, 2, 3, 0, 0, 1, 0.f, 1.f, -1.f, 9, 0, 0.f, 0.f, 1.f, 2.f, 2, 0, 0, 0},
+        {-1, 0, 5, 0, 0, 1, 2.f, 0.f, 0.f, 9, 0, 10.f, -1.f, -1.f, -1.f, 0, 0, 3, 4},
+        {0, -4, 1, 0, 0, 1, 0.f, 0.f, 0.f, 9, 0, -10.f, 0.f, 0.f, 0.f, 0, 0, 0, 0},
+    };
+    for (const auto &r : rows) {
+        f.write(reinterpret_cast<const char *>(r), 10 * 4);
+        f.putChar(7);
+        f.write(reinterpret_cast<const char *>(r + 11), 8 * 4);
+    }
+    f.close();
+
+    QVERIFY(drift::isSplatPath(path));
+    const drift::SplatData d = drift::loadSplatAsset(path, 1000);
+    QVERIFY2(d.error.isEmpty(), qPrintable(d.error));
+    QCOMPARE(d.count, 3);
+    QCOMPARE(d.lodLevel, -1);
+    QCOMPARE(d.totalCount, qint64(3));
+    // Turned 180 degrees about z: x and y negate.
+    QCOMPARE(d.positions[0], -1.f);
+    QCOMPARE(d.positions[1], -2.f);
+    QCOMPARE(d.positions[8], 1.f);
+    QCOMPARE(d.colors[0], uint8_t(128));
+    QCOMPARE(d.colors[1], uint8_t(199)); // 0.5 + C0
+    QCOMPARE(d.colors[2], uint8_t(56));  // 0.5 - C0
+    QCOMPARE(d.colors[3], uint8_t(128)); // sigmoid(0) = 0.5
+    QCOMPARE(d.colors[4 + 3], uint8_t(255));
+    QCOMPARE(d.colors[8 + 3], uint8_t(0));
+    QVERIFY(std::fabs(d.scales[0] - 1.f) < 1e-6f);
+    QVERIFY(std::fabs(d.scales[2] - std::exp(2.f)) < 1e-5f);
+    // (w,x,y,z) -> (-z,-y,x,w) after the turn.
+    QVERIFY(std::fabs(d.rotations[3] - 1.f) < 1e-6f); // (2,0,0,0) normalised
+    QVERIFY(std::fabs(d.rotations[4] + 0.8f) < 1e-6f);
+    QVERIFY(std::fabs(d.rotations[4 + 1] + 0.6f) < 1e-6f);
+    QCOMPARE(d.aabbMin, QVector3D(-1.f, -2.f, 1.f));
+    QCOMPARE(d.aabbMax, QVector3D(1.f, 4.f, 5.f));
+}
+
+void EngineTest::splatPlyRejectsBadFiles()
+{
+    QTemporaryDir tmp;
+    QVERIFY(tmp.isValid());
+    auto write = [&](const char *name, const QByteArray &bytes) {
+        QFile f(tmp.filePath(name));
+        f.open(QIODevice::WriteOnly);
+        f.write(bytes);
+        return tmp.filePath(name);
+    };
+    QVERIFY(drift::loadSplatAsset(write("ascii.ply", "ply\nformat ascii 1.0\nelement vertex 1\nproperty float x\nend_header\n1\n"), 0)
+                .error.contains("binary_little_endian"));
+    QVERIFY(drift::loadSplatAsset(write("be.ply", "ply\nformat binary_big_endian 1.0\nelement vertex 1\nproperty float x\nend_header\n"), 0)
+                .error.contains("binary_little_endian"));
+    const drift::SplatData missing = drift::loadSplatAsset(
+        write("mesh.ply", "ply\nformat binary_little_endian 1.0\nelement vertex 1\nproperty float x\nend_header\n\0\0\0\0"), 0);
+    QVERIFY(missing.error.contains("missing property"));
+    QCOMPARE(missing.count, 0);
+    QVERIFY(!drift::isSplatPath(tmp.filePath("mesh.ply")));
+}
+
+void EngineTest::splatSogRoundTrip()
+{
+    QTemporaryDir tmp;
+    QVERIFY(tmp.isValid());
+    const std::vector<SogSplat> splats = sogFixture();
+    const QMap<QString, QByteArray> files = writeSogSet(splats, 2);
+
+    // Bit-exactness guard: a premultiplying decoder would crush the opacity-3 colour.
+    QImage sh0;
+    QVERIFY(sh0.loadFromData(files.value("sh0.webp"), "webp"));
+    sh0 = sh0.convertToFormat(QImage::Format_RGBA8888);
+    QCOMPARE(int(sh0.constScanLine(1)[4 + 0]), 255);
+    QCOMPARE(int(sh0.constScanLine(1)[4 + 3]), 3);
+
+    const QString dir = tmp.filePath("dir");
+    writeFiles(dir, files);
+    QVERIFY(drift::isSplatPath(dir));
+    drift::SplatData d = drift::loadSplatAsset(dir, 0);
+    verifySogFixture(d, splats);
+    QCOMPARE(d.totalCount, qint64(4));
+    QCOMPARE(d.lodLevel, -1);
+    QVERIFY(d.aabbMin.x() <= d.aabbMax.x());
+
+    d = drift::loadSplatAsset(QDir(dir).filePath("meta.json"), 0);
+    verifySogFixture(d, splats);
+
+    // Bundled, with the set in a subdirectory.
+    QMap<QString, QByteArray> nested;
+    for (auto it = files.begin(); it != files.end(); ++it)
+        nested.insert("scene/" + it.key(), it.value());
+    const QString sog = tmp.filePath("a.sog");
+    QVERIFY(zipFiles(sog, nested));
+    QVERIFY(drift::isSplatPath(sog));
+    verifySogFixture(drift::loadSplatAsset(sog, 0), splats);
+    const QString zipPath = tmp.filePath("b.zip");
+    QVERIFY(zipFiles(zipPath, files));
+    QVERIFY(drift::isSplatPath(zipPath));
+    verifySogFixture(drift::loadSplatAsset(zipPath, 0), splats);
+}
+
+void EngineTest::splatSogStreamedPicksLevelByBudget()
+{
+    QTemporaryDir tmp;
+    QVERIFY(tmp.isValid());
+    const std::vector<SogSplat> all = sogFixture();
+    const std::vector<SogSplat> a(all.begin(), all.begin() + 3), b(all.begin() + 3, all.end());
+    QMap<QString, QByteArray> files;
+    for (const auto &[name, set] : {std::pair{"0_0", a}, std::pair{"1_0", b}}) {
+        const QMap<QString, QByteArray> part = writeSogSet(set, 2);
+        for (auto it = part.begin(); it != part.end(); ++it)
+            files.insert(QLatin1String(name) + "/" + it.key(), it.value());
+    }
+    // Level 0 = every splat of both chunks, level 1 = splats 1..2 of chunk 0 and splat 0 of chunk 1.
+    QJsonObject leafA{{"bound", QJsonObject()},
+                      {"lods", QJsonObject{{"0", QJsonObject{{"file", 0}, {"offset", 0}, {"count", 3}}},
+                                           {"1", QJsonObject{{"file", 0}, {"offset", 1}, {"count", 2}}}}}};
+    QJsonObject leafB{{"bound", QJsonObject()},
+                      {"lods", QJsonObject{{"0", QJsonObject{{"file", 1}, {"offset", 0}, {"count", 1}}},
+                                           {"1", QJsonObject{{"file", 1}, {"offset", 0}, {"count", 1}}}}}};
+    QJsonObject root{{"version", 1},
+                     {"count", 7},
+                     {"counts", QJsonArray{4, 3}},
+                     {"lodLevels", 2},
+                     {"filenames", QJsonArray{"0_0/meta.json", "1_0/meta.json"}},
+                     {"tree", QJsonObject{{"bound", QJsonObject()}, {"children", QJsonArray{leafA, leafB}}}}};
+    files.insert("lod-meta.json", QJsonDocument(root).toJson());
+
+    const QString dir = tmp.filePath("dir");
+    writeFiles(dir, files);
+    const QString zipPath = tmp.filePath("s.zip");
+    QVERIFY(zipFiles(zipPath, files));
+    QVERIFY(drift::isSplatPath(dir));
+    QVERIFY(drift::isSplatPath(zipPath));
+
+    for (const QString &src : {dir, zipPath}) {
+        drift::SplatData d = drift::loadSplatAsset(src, 10);
+        QVERIFY2(d.error.isEmpty(), qPrintable(d.error));
+        QCOMPARE(d.lodLevel, 0);
+        QCOMPARE(d.lodLevels, 2);
+        QCOMPARE(d.totalCount, qint64(4));
+        verifySogFixture(d, all);
+
+        d = drift::loadSplatAsset(src, 3);
+        QCOMPARE(d.lodLevel, 1);
+        QCOMPARE(d.totalCount, qint64(3));
+        verifySogFixture(d, std::vector<SogSplat>{all[1], all[2], all[3]});
+
+        d = drift::loadSplatAsset(src, 1);
+        QCOMPARE(d.lodLevel, 1); // nothing fits: coarsest
+    }
+}
+
+void EngineTest::splatRejectsUnrelatedPaths()
+{
+    QTemporaryDir tmp;
+    QVERIFY(tmp.isValid());
+    QVERIFY(zipFiles(tmp.filePath("plain.zip"), {{"readme.txt", "hi"}, {"sub/meta.json", "{}"}}));
+    QVERIFY(!drift::isSplatPath(tmp.filePath("plain.zip")));
+    QVERIFY(!drift::isSplatPath(tmp.path()));
+    QVERIFY(!drift::isSplatPath(tmp.filePath("missing.glb")));
+    writeFiles(tmp.path(), {{"meta.json", "{\"version\":3,\"count\":1}"}});
+    QVERIFY(drift::loadSplatAsset(tmp.path(), 0).error.contains("version"));
+}
+
+void EngineTest::splatSampleLoads()
+{
+    const QString path = qEnvironmentVariable("DRIFT_SPLAT_SAMPLE");
+    if (path.isEmpty())
+        QSKIP("DRIFT_SPLAT_SAMPLE not set");
+    const drift::SplatData d = drift::loadSplatAsset(path, 1300000);
+    QVERIFY2(d.error.isEmpty(), qPrintable(d.error));
+    QCOMPARE(d.lodLevel, 3);
+    QCOMPARE(d.lodLevels, 5);
+    QCOMPARE(d.count, 1249218);
+    QCOMPARE(d.totalCount, qint64(1249218));
+    for (float v : {d.aabbMin.x(), d.aabbMin.y(), d.aabbMin.z(), d.aabbMax.x(), d.aabbMax.y(), d.aabbMax.z()})
+        QVERIFY(std::isfinite(v));
+    qInfo() << "sample aabb" << d.aabbMin << d.aabbMax;
+}
+
 QTEST_MAIN(EngineTest)
+namespace {
+
+QPointF projectedPoint(const drift::SceneCamera3d &camera, const QSizeF &canvas, const QVector3D &world)
+{
+    const QVector4D p = drift::cameraViewProjection(camera, canvas).map(QVector4D(world, 1.f));
+    return QPointF(p.x() / p.w(), p.y() / p.w());
+}
+
+} // namespace
+
+void EngineTest::aimAtCentresTheTargetAndHoldsTheEye()
+{
+    const QSizeF canvas(1920, 1080);
+    drift::SceneCamera3d camera;
+    camera.rotationZ = 10.0;
+    camera.positionX = 40.0;
+    camera.rotationY = 12.0;
+    const QVector3D eye = drift::sceneCameraEye(camera);
+    for (const QVector3D target : {QVector3D(300, -150, 0), QVector3D(-500, 200, 120), QVector3D(0, 0, 0)}) {
+        const drift::SceneCamera3d aimed = drift::aimAt(camera, target);
+        const QVector3D after = drift::sceneCameraEye(aimed);
+        QVERIFY(qAbs(after.x() - eye.x()) < 0.05f && qAbs(after.y() - eye.y()) < 0.05f && qAbs(after.z() - eye.z()) < 0.05f);
+        const QPointF px = projectedPoint(aimed, canvas, target);
+        QVERIFY2(qAbs(px.x() - 960.0) < 0.05 && qAbs(px.y() - 540.0) < 0.05, qPrintable(QStringLiteral("%1,%2").arg(px.x()).arg(px.y())));
+        QCOMPARE(aimed.rotationZ, camera.rotationZ);
+        QCOMPARE(aimed.perspective, camera.perspective);
+    }
+    // Off to the right of a default camera: it yaws that way (the eye stays at +z, so +x target needs -yaw).
+    const drift::SceneCamera3d right = drift::aimAt(drift::SceneCamera3d{}, QVector3D(400, 0, 0));
+    QVERIFY(right.rotationY < 0.0 && qFuzzyIsNull(right.rotationX));
+    const drift::SceneCamera3d up = drift::aimAt(drift::SceneCamera3d{}, QVector3D(0, -400, 0));
+    QVERIFY(up.rotationX < 0.0 && qFuzzyIsNull(up.rotationY));
+    // Standing on the target there is nothing to aim at.
+    const drift::SceneCamera3d same = drift::aimAt(camera, eye, eye);
+    QCOMPARE(same.rotationX, camera.rotationX);
+    QCOMPARE(same.rotationY, camera.rotationY);
+}
+
+void EngineTest::rotatedKeepingEyeTurnsInPlace()
+{
+    const QSizeF canvas(1000, 1000);
+    drift::SceneCamera3d camera;
+    const QVector3D eye = drift::sceneCameraEye(camera);
+    // A bare yaw swings the eye round the canvas centre; keeping the eye turns the view instead.
+    drift::SceneCamera3d swung = camera;
+    swung.rotationY = 20.0;
+    QVERIFY(qAbs(drift::sceneCameraEye(swung).x() - eye.x()) > 100.f);
+    const drift::SceneCamera3d turned = drift::rotatedKeepingEye(camera, 0.0, 20.0);
+    QVERIFY(qAbs(drift::sceneCameraEye(turned).x() - eye.x()) < 0.05f);
+    QVERIFY(qAbs(drift::sceneCameraEye(turned).z() - eye.z()) < 0.05f);
+    // +rotationY looks left, so a point ahead of the camera slides right on screen.
+    QVERIFY(projectedPoint(turned, canvas, QVector3D(0, 0, 0)).x() > 500.0);
+    // -rotationX looks up, so the scene slides down.
+    const drift::SceneCamera3d tilted = drift::rotatedKeepingEye(camera, -10.0, 0.0);
+    QVERIFY(projectedPoint(tilted, canvas, QVector3D(0, 0, 0)).y() > 500.0);
+}
+
 #include "tst_engine.moc"

@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Window
 import Drift 1.0
-import "components"
-
 // Crop is stored in the project and always previews the original source. Frames come from
 // EditorState.assetPreview's single-clip player (the timeline's own FFmpeg decode, paused
 // timeline, capped frame size) rather than a separate QtMultimedia pipeline per window.
@@ -96,7 +94,13 @@ Window {
     title: clipId.length > 0
            ? (assetName.length > 0 ? qsTr("Crop — %1").arg(assetName) : qsTr("Crop"))
            : (assetName.length > 0 ? qsTr("Preview — %1").arg(assetName) : qsTr("Preview"))
-    color: Theme.appBackground
+    color: {
+        const opacity = ThemeManager.window.backgroundOpacity
+        const multiplier = (opacity === undefined || opacity === null) ? 1 : opacity
+        return WindowBackdrop.windowBackground(Theme.c.mediaPreviewWindow.background, multiplier)
+    }
+
+    Component.onCompleted: WindowBackdrop.attach(root)
 
     function openFor(index) {
         const asset = AssetLibrary.assetAt(index)
@@ -217,7 +221,6 @@ Window {
         root.requestActivate()
         root.seekTo(root.inSeconds)
     }
-
 
     function formatTime(seconds) {
         const s = Math.max(0, seconds)
@@ -394,8 +397,8 @@ Window {
                     h -= stripBlock.height + Theme.spacingLg
                 return Math.max(80, h)
             }
-            radius: Theme.radiusMd
-            color: Theme.overlayColor
+            radius: Theme.c.mediaPreviewWindow.stageRadius
+            color: Theme.c.mediaPreviewWindow.stageBackground
             clip: true
 
             // Stills come straight from the file; video frames arrive already rotated from the
@@ -422,22 +425,10 @@ Window {
                 }
             }
 
-            Column {
+            MediaPreviewAudioPlaceholder {
                 visible: root.isAudio
                 anchors.centerIn: parent
-                spacing: Theme.spacingLg
-                IconGlyph {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    glyph: Theme.icons.music
-                    iconSize: Theme.iconSizeXl * 2
-                    iconColor: Theme.mutedForeground
-                }
-                ThemedLabel {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: root.assetName
-                    tone: "default"
-                    size: "sm"
-                }
+                assetName: root.assetName
             }
 
             // Crop frame, mapped onto the fitted picture so letterboxing is not part of the crop.
@@ -468,57 +459,14 @@ Window {
                 }
 
                 // Dim outside the keep-rect.
-                Rectangle { width: cropHost.frameX; height: parent.height; color: Theme.scrimStrong }
-                Rectangle {
-                    x: cropHost.frameX + cropHost.frameW
-                    width: Math.max(0, parent.width - x)
-                    height: parent.height
-                    color: Theme.scrimStrong
-                }
-                Rectangle {
-                    x: cropHost.frameX
-                    width: cropHost.frameW
-                    height: cropHost.frameY
-                    color: Theme.scrimStrong
-                }
-                Rectangle {
-                    x: cropHost.frameX
-                    y: cropHost.frameY + cropHost.frameH
-                    width: cropHost.frameW
-                    height: Math.max(0, parent.height - y)
-                    color: Theme.scrimStrong
+                MediaPreviewCropScrim {
+                    host: cropHost
                 }
 
-                Rectangle {
-                    x: cropHost.frameX
-                    y: cropHost.frameY
-                    width: cropHost.frameW
-                    height: cropHost.frameH
-                    color: "transparent"
-                    border.width: Theme.borderWidthFocus
-                    border.color: Theme.primary
-                }
-
-                MouseArea {
-                    x: cropHost.frameX
-                    y: cropHost.frameY
-                    width: cropHost.frameW
-                    height: cropHost.frameH
-                    enabled: !root.saving
-                    cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
-                    property real grabX: 0
-                    property real grabY: 0
-                    onPressed: (mouse) => {
-                        grabX = mouse.x
-                        grabY = mouse.y
-                    }
-                    onPositionChanged: (mouse) => {
-                        if (!pressed || cropHost.width <= 0)
-                            return
-                        const dx = (mouse.x - grabX) / cropHost.width
-                        const dy = (mouse.y - grabY) / cropHost.height
-                        cropHost.setCrop(root.cropX + dx, root.cropY + dy, root.cropW, root.cropH)
-                    }
+                MediaPreviewCropFrame {
+                    host: cropHost
+                    editor: root
+                    editing: !root.saving
                 }
 
                 Repeater {
@@ -532,85 +480,10 @@ Window {
                         { x: 0.5, y: 1, dx: 0, dy: 1 },
                         { x: 1, y: 1, dx: 1, dy: 1 }
                     ]
-                    Rectangle {
-                        required property var modelData
-                        readonly property int grip: Theme.touchUi ? 16 : 10
-                        width: grip
-                        height: grip
-                        radius: 1
-                        color: Theme.primary
-                        x: cropHost.frameX + modelData.x * cropHost.frameW - width / 2
-                        y: cropHost.frameY + modelData.y * cropHost.frameH - height / 2
-                        z: 2
-
-                        MouseArea {
-                            anchors.fill: parent
-                            anchors.margins: Theme.touchUi ? -10 : -6
-                            enabled: !root.saving
-                            cursorShape: {
-                                if (modelData.dx !== 0 && modelData.dy !== 0)
-                                    return (modelData.dx === modelData.dy)
-                                           ? Qt.SizeFDiagCursor : Qt.SizeBDiagCursor
-                                return modelData.dx !== 0 ? Qt.SizeHorCursor : Qt.SizeVerCursor
-                            }
-                            property real startX: 0
-                            property real startY: 0
-                            property real startW: 1
-                            property real startH: 1
-                            property real origX: 0
-                            property real origY: 0
-                            onPressed: {
-                                startX = root.cropX
-                                startY = root.cropY
-                                startW = root.cropW
-                                startH = root.cropH
-                                const pos = mapToItem(cropHost, mouseX, mouseY)
-                                origX = pos.x
-                                origY = pos.y
-                            }
-                            onPositionChanged: {
-                                if (!pressed || cropHost.width <= 0)
-                                    return
-                                const pos = mapToItem(cropHost, mouseX, mouseY)
-                                const dx = (pos.x - origX) / cropHost.width
-                                const dy = (pos.y - origY) / cropHost.height
-                                let nx = startX
-                                let ny = startY
-                                let nw = startW
-                                let nh = startH
-                                if (root.cropRatioLocked) {
-                                    let size
-                                    if (modelData.dx !== 0 && modelData.dy !== 0)
-                                        size = Math.abs(dx) >= Math.abs(dy)
-                                               ? startW + modelData.dx * dx
-                                               : startH + modelData.dy * dy
-                                    else if (modelData.dx !== 0)
-                                        size = startW + modelData.dx * dx
-                                    else
-                                        size = startH + modelData.dy * dy
-                                    size = Math.max(cropHost.minFrac, Math.min(1, size))
-                                    nx = modelData.dx < 0 ? startX + startW - size
-                                       : modelData.dx > 0 ? startX : startX + (startW - size) / 2
-                                    ny = modelData.dy < 0 ? startY + startH - size
-                                       : modelData.dy > 0 ? startY : startY + (startH - size) / 2
-                                    cropHost.setCrop(nx, ny, size, size)
-                                    return
-                                }
-                                if (modelData.dx < 0) {
-                                    nx = Math.max(0, Math.min(startX + startW - cropHost.minFrac, startX + dx))
-                                    nw = startX + startW - nx
-                                } else if (modelData.dx > 0) {
-                                    nw = Math.max(cropHost.minFrac, Math.min(1 - startX, startW + dx))
-                                }
-                                if (modelData.dy < 0) {
-                                    ny = Math.max(0, Math.min(startY + startH - cropHost.minFrac, startY + dy))
-                                    nh = startY + startH - ny
-                                } else if (modelData.dy > 0) {
-                                    nh = Math.max(cropHost.minFrac, Math.min(1 - startY, startH + dy))
-                                }
-                                cropHost.setCrop(nx, ny, nw, nh)
-                            }
-                        }
+                    MediaPreviewCropGrip {
+                        host: cropHost
+                        editor: root
+                        editing: !root.saving
                     }
                 }
             }
@@ -783,45 +656,18 @@ Window {
 
                 Repeater {
                     model: Math.floor(stripBlock.dur / stripBlock.tickStep) + 1
-                    Item {
-                        required property int index
-                        readonly property real tSeconds: stripBlock.rangeStart + index * stripBlock.tickStep
-                        x: (tSeconds - stripBlock.rangeStart) * stripBlock.pxPerSecond
-                        width: 1
-                        height: parent.height
-
-                        Rectangle {
-                            anchors.bottom: parent.bottom
-                            width: 1
-                            height: 6
-                            color: Theme.mutedForeground
-                            opacity: 0.35
-                        }
-                        Text {
-                            anchors.bottom: parent.bottom
-                            anchors.bottomMargin: 8
-                            anchors.left: parent.left
-                            anchors.leftMargin: 2
-                            text: stripBlock.formatTick(tSeconds)
-                            font.family: Theme.monoFontFamily
-                            font.pixelSize: Theme.fontSizeTick
-                            color: Theme.mutedForeground
-                        }
+                    MediaPreviewRulerTick {
+                        rangeStart: stripBlock.rangeStart
+                        step: stripBlock.tickStep
+                        pxPerSecond: stripBlock.pxPerSecond
+                        formatTick: (seconds) => stripBlock.formatTick(seconds)
                     }
                 }
 
                 // Playhead handle: a small flag at the top of the line that continues down
                 // through the strip below, matching the timeline's playhead silhouette.
-                Item {
-                    x: stripBlock.playX - width / 2
-                    y: 6
-                    width: 10
-                    height: 10
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: 2
-                        color: Theme.primary
-                    }
+                MediaPreviewPlayheadCap {
+                    playX: stripBlock.playX
                 }
             }
 
@@ -829,10 +675,10 @@ Window {
                 id: strip
                 width: parent.width
                 height: 64
-                radius: Theme.radiusSm
-                color: Theme.panelBackground
-                border.width: Theme.borderWidth
-                border.color: Theme.panelBorder
+                radius: Theme.c.mediaPreviewWindow.stripRadius
+                color: Theme.c.mediaPreviewWindow.stripBackground
+                border.width: Theme.c.mediaPreviewWindow.stripBorderWidth
+                border.color: Theme.c.mediaPreviewWindow.stripBorder
                 clip: true
 
                 ClipFilmstrip {
@@ -851,31 +697,22 @@ Window {
                 readonly property real inX: ((root.inSeconds - stripBlock.rangeStart) / stripBlock.dur) * width
                 readonly property real outX: ((root.outSeconds - stripBlock.rangeStart) / stripBlock.dur) * width
 
-                Rectangle {
-                    width: strip.inX
-                    height: parent.height
-                    color: Theme.scrimStrong
+                MediaPreviewTrimShade {
+                    leading: true
+                    edge: strip.inX
+                    span: strip.width
                 }
-                Rectangle {
-                    x: strip.outX
-                    width: Math.max(0, parent.width - x)
-                    height: parent.height
-                    color: Theme.scrimStrong
+                MediaPreviewTrimShade {
+                    leading: false
+                    edge: strip.outX
+                    span: strip.width
                 }
-                Rectangle {
-                    x: strip.inX
-                    width: Math.max(2, strip.outX - strip.inX)
-                    height: parent.height
-                    color: "transparent"
-                    border.width: Theme.borderWidth
-                    border.color: Theme.primary
+                MediaPreviewTrimSpan {
+                    inX: strip.inX
+                    outX: strip.outX
                 }
-                Rectangle {
-                    x: stripBlock.playX - 1
-                    width: 2
-                    height: parent.height
-                    color: Theme.primary
-                    z: 3
+                MediaPreviewPlayheadLine {
+                    playX: stripBlock.playX
                 }
 
                 MouseArea {
@@ -901,34 +738,12 @@ Window {
                     { edge: "in" },
                     { edge: "out" }
                 ]
-                Rectangle {
-                    required property var modelData
-                    visible: root.canTrim
-                    width: Theme.touchUi ? 14 : 8
-                    height: parent.height
-                    x: (modelData.edge === "in" ? strip.inX : strip.outX) - width / 2
-                    color: Theme.primary
-                    z: 3
-
-                    MouseArea {
-                        anchors.fill: parent
-                        anchors.margins: Theme.touchUi ? -8 : -4
-                        enabled: !root.saving
-                        cursorShape: Qt.SizeHorCursor
-                        preventStealing: true
-                        onPositionChanged: (mouse) => {
-                            if (!pressed)
-                                return
-                            const t = ((parent.x + width / 2 + mouse.x)
-                                       / Math.max(1, strip.width)) * root.durationSeconds
-                            if (modelData.edge === "in")
-                                root.inSeconds = t
-                            else
-                                root.outSeconds = t
-                            root.clampRange()
-                            root.seekTo(modelData.edge === "in" ? root.inSeconds : root.outSeconds)
-                        }
-                    }
+                MediaPreviewTrimHandle {
+                    editor: root
+                    strip: strip
+                    inX: strip.inX
+                    outX: strip.outX
+                    editing: !root.saving
                 }
             }
         }
@@ -959,51 +774,13 @@ Window {
             width: parent.width
             height: resolutionPill.height
 
-            Rectangle {
+            MediaPreviewResolutionPill {
                 id: resolutionPill
-                readonly property color tint: root.suggestUpscale ? Theme.warning : Theme.constructive
-                readonly property color ink: Theme.darkMode ? tint : Qt.darker(tint, 1.7)
-
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: pillRow.width + 2
-                height: 38
-                radius: height / 2
-                color: Qt.rgba(tint.r, tint.g, tint.b, 0.12)
-                border.width: 1
-                border.color: Qt.rgba(tint.r, tint.g, tint.b, 0.55)
-
-                Row {
-                    id: pillRow
-                    anchors.centerIn: parent
-
-                    Rectangle {
-                        width: gradeText.implicitWidth + 24
-                        height: resolutionPill.height - 2
-                        radius: height / 2
-                        color: resolutionPill.tint
-
-                        Text {
-                            id: gradeText
-                            anchors.centerIn: parent
-                            text: qsTr("%1p").arg(Math.min(root.outputWidth, root.outputHeight))
-                            font.family: Theme.monoFontFamily
-                            font.pixelSize: Theme.fontSizeSm
-                            font.weight: Font.Bold
-                            color: "#1a1206"
-                        }
-                    }
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        leftPadding: 14
-                        rightPadding: 18
-                        text: root.outputWidth + " × " + root.outputHeight
-                        font.family: Theme.monoFontFamily
-                        font.pixelSize: 18
-                        font.weight: Font.Medium
-                        color: resolutionPill.ink
-                    }
-                }
+                suggestUpscale: root.suggestUpscale
+                shortSide: Math.min(root.outputWidth, root.outputHeight)
+                outputWidth: root.outputWidth
+                outputHeight: root.outputHeight
             }
         }
 
@@ -1117,29 +894,10 @@ Window {
         }
     }
 
-    Rectangle {
+    MediaPreviewSavingScrim {
         visible: root.saving
-        anchors.fill: parent
-        color: Theme.scrimColor
-        z: 10
-
-        Column {
-            anchors.centerIn: parent
-            spacing: Theme.spacingLg
-            width: Math.min(parent.width - Theme.spacing3xl * 2, 320)
-
-            ThemedLabel {
-                width: parent.width
-                horizontalAlignment: Text.AlignHCenter
-                text: EditorState.bin.editStatus.length > 0
-                      ? EditorState.bin.editStatus : qsTr("Saving…")
-                tone: "default"
-                size: "sm"
-            }
-            ThemedProgressBar {
-                width: parent.width
-                value: EditorState.bin.editProgress
-            }
-        }
+        status: EditorState.bin.editStatus.length > 0
+                ? EditorState.bin.editStatus : qsTr("Saving…")
+        progress: EditorState.bin.editProgress
     }
 }

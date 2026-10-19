@@ -6,7 +6,7 @@
 #include <QSettings>
 #include <QStandardPaths>
 
-#include "models/LayoutStore.h"
+#include "app/editor/LayoutStore.h"
 
 class LayoutStoreTest : public QObject
 {
