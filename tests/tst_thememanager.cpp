@@ -7,13 +7,18 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QCoreApplication>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QQmlComponent>
 #include <QQmlEngine>
 #include <QSettings>
 #include <QSignalSpy>
 #include <QStandardPaths>
+#include <QTemporaryDir>
 #include <QUrl>
 #include <QVariantList>
+
+#include <zlib.h>
 
 #include "theme/ThemeManager.h"
 
@@ -39,6 +44,14 @@ private slots:
     void untrustedThemeHasNoOverride();
     void trustedThemeOverrideUrl();
     void missingOverrideSlotIsEmpty();
+    void selectionPersistsAndFallsBack();
+    void hotReloadPersists();
+    void dualVariantFollowsToggle();
+    void singleVariantLocksAppearance();
+    void importJsonFolderZipAndRejectsTraversal();
+    void removeAndExportRoundTrip();
+    void exampleThemesLoad();
+    void sessionOverrideIsNotPersisted();
 
 private:
     QString themesDir() const;
@@ -65,6 +78,9 @@ void ThemeManagerTest::init()
     QSettings settings;
     settings.beginGroup(QStringLiteral("Theme"));
     settings.remove(QStringLiteral("trusted"));
+    settings.remove(QStringLiteral("selection"));
+    settings.remove(QStringLiteral("hotReload"));
+    settings.sync();
 }
 
 QString ThemeManagerTest::themesDir() const
@@ -345,6 +361,12 @@ void ThemeManagerTest::mainRegistersThemeManager()
     QVERIFY2(mainFile.open(QIODevice::ReadOnly | QIODevice::Text), qPrintable(mainFile.errorString()));
     const QString source = QString::fromUtf8(mainFile.readAll());
     QVERIFY(source.contains(QStringLiteral("ThemeManager::registerSingleton()")));
+    QVERIFY(source.contains(QStringLiteral("qEnvironmentVariable(\"DRIFT_THEME\")")));
+    QVERIFY(source.contains(QStringLiteral("applySessionOverride")));
+    const int registerAt = source.indexOf(QStringLiteral("ThemeManager::registerSingleton()"));
+    const int overrideAt = source.indexOf(QStringLiteral("applySessionOverride"));
+    QVERIFY(registerAt >= 0);
+    QVERIFY(overrideAt > registerAt);
 }
 
 void ThemeManagerTest::liveBindingUpdates()
@@ -587,6 +609,469 @@ void ThemeManagerTest::missingOverrideSlotIsEmpty()
     QVERIFY(manager.isThemeTrusted(QStringLiteral("flat")));
     QVERIFY(manager.overrideUrl(QStringLiteral("ThemedButtonBackground")).isEmpty());
     QVERIFY(manager.overrideSlots(QStringLiteral("flat")).isEmpty());
+}
+
+namespace {
+
+void writeU16(QByteArray &out, quint16 value)
+{
+    out.append(char(value & 0xff));
+    out.append(char((value >> 8) & 0xff));
+}
+
+void writeU32(QByteArray &out, quint32 value)
+{
+    out.append(char(value & 0xff));
+    out.append(char((value >> 8) & 0xff));
+    out.append(char((value >> 16) & 0xff));
+    out.append(char((value >> 24) & 0xff));
+}
+
+bool writeStoredZip(const QString &path, const QList<QPair<QString, QByteArray>> &files, bool symlink)
+{
+    QByteArray local;
+    QList<quint32> offsets;
+    QList<quint32> crcs;
+    offsets.reserve(files.size());
+    crcs.reserve(files.size());
+    for (const auto &file : files) {
+        offsets.append(static_cast<quint32>(local.size()));
+        const QByteArray name = file.first.toUtf8();
+        const quint32 crc = static_cast<quint32>(crc32(
+            0, reinterpret_cast<const Bytef *>(file.second.constData()), static_cast<uInt>(file.second.size())));
+        crcs.append(crc);
+        writeU32(local, 0x04034b50);
+        writeU16(local, 20);
+        writeU16(local, 0);
+        writeU16(local, 0);
+        writeU16(local, 0);
+        writeU16(local, 0);
+        writeU32(local, crc);
+        writeU32(local, static_cast<quint32>(file.second.size()));
+        writeU32(local, static_cast<quint32>(file.second.size()));
+        writeU16(local, static_cast<quint16>(name.size()));
+        writeU16(local, 0);
+        local.append(name);
+        local.append(file.second);
+    }
+
+    QByteArray central;
+    for (int i = 0; i < files.size(); ++i) {
+        const QByteArray name = files.at(i).first.toUtf8();
+        writeU32(central, 0x02014b50);
+        writeU16(central, symlink ? 0x0314 : 20);
+        writeU16(central, 20);
+        writeU16(central, 0);
+        writeU16(central, 0);
+        writeU16(central, 0);
+        writeU16(central, 0);
+        writeU32(central, crcs.at(i));
+        writeU32(central, static_cast<quint32>(files.at(i).second.size()));
+        writeU32(central, static_cast<quint32>(files.at(i).second.size()));
+        writeU16(central, static_cast<quint16>(name.size()));
+        writeU16(central, 0);
+        writeU16(central, 0);
+        writeU16(central, 0);
+        writeU16(central, 0);
+        const quint32 mode = symlink ? (0120000u << 16) : 0u;
+        writeU32(central, mode);
+        writeU32(central, offsets.at(i));
+        central.append(name);
+    }
+    const quint32 cdSize = static_cast<quint32>(central.size());
+    const quint32 cdOffset = static_cast<quint32>(local.size());
+    writeU32(central, 0x06054b50);
+    writeU16(central, 0);
+    writeU16(central, 0);
+    writeU16(central, static_cast<quint16>(files.size()));
+    writeU16(central, static_cast<quint16>(files.size()));
+    writeU32(central, cdSize);
+    writeU32(central, cdOffset);
+    writeU16(central, 0);
+
+    QFile out(path);
+    if (!out.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        return false;
+    const QByteArray bytes = local + central;
+    return out.write(bytes) == bytes.size();
+}
+
+QString repoThemes()
+{
+    const QDir srcDir(QFileInfo(QStringLiteral(DRIFT_MAIN_CPP)).dir().absolutePath());
+    return QDir(srcDir.filePath(QStringLiteral(".."))).filePath(QStringLiteral("docs/themes"));
+}
+
+} // namespace
+
+void ThemeManagerTest::selectionPersistsAndFallsBack()
+{
+    {
+        ThemeManager first;
+        QCOMPARE(first.selection(), QStringLiteral("system"));
+        QCOMPARE(first.effectiveVariant(), QStringLiteral("dark"));
+        QVERIFY(!first.appearanceFollowsTheme());
+        QVERIFY(first.select(QStringLiteral("light")));
+        QCOMPARE(first.selection(), QStringLiteral("light"));
+        QCOMPARE(first.currentTheme(), QStringLiteral("light"));
+        QCOMPARE(first.effectiveVariant(), QStringLiteral("light"));
+    }
+    {
+        ThemeManager second;
+        QCOMPARE(second.selection(), QStringLiteral("light"));
+        QCOMPARE(second.currentTheme(), QStringLiteral("light"));
+        second.setVariant(QStringLiteral("dark"));
+        QCOMPARE(second.currentTheme(), QStringLiteral("light"));
+        QVERIFY(second.select(QStringLiteral("system")));
+        QCOMPARE(second.selection(), QStringLiteral("system"));
+        QCOMPARE(second.currentTheme(), QStringLiteral("dark"));
+    }
+    {
+        QSettings settings;
+        settings.beginGroup(QStringLiteral("Theme"));
+        settings.setValue(QStringLiteral("selection"), QStringLiteral("missing-theme"));
+        settings.sync();
+    }
+    ThemeManager fallback;
+    QCOMPARE(fallback.selection(), QStringLiteral("system"));
+    QCOMPARE(fallback.currentTheme(), QStringLiteral("dark"));
+    QCOMPARE(fallback.effectiveVariant(), QStringLiteral("dark"));
+}
+
+void ThemeManagerTest::hotReloadPersists()
+{
+    {
+        ThemeManager first;
+        QCOMPARE(first.hotReload(), false);
+        first.setHotReload(true);
+        QCOMPARE(first.hotReload(), true);
+    }
+    ThemeManager second;
+    QCOMPARE(second.hotReload(), true);
+    second.setHotReload(false);
+    ThemeManager third;
+    QCOMPARE(third.hotReload(), false);
+}
+
+void ThemeManagerTest::dualVariantFollowsToggle()
+{
+    QVERIFY(writeJson("dual.json", R"({
+        "name": "dual",
+        "extends": "dark",
+        "variants": {
+            "dark": { "palette": { "appBackground": "#111111" } },
+            "light": { "palette": { "appBackground": "#eeeeee" } }
+        }
+    })"));
+    QVERIFY(writeJson("sided/theme.json", R"({
+        "name": "sided",
+        "extends": "dark"
+    })"));
+    QVERIFY(writeJson("sided/theme.dark.json", R"({
+        "palette": { "appBackground": "#010101" }
+    })"));
+    QVERIFY(writeJson("sided/theme.light.json", R"({
+        "palette": { "appBackground": "#fefefe" }
+    })"));
+
+    ThemeManager manager;
+    QVERIFY(manager.select(QStringLiteral("dual")));
+    QCOMPARE(manager.currentTheme(), QStringLiteral("dual"));
+    QVERIFY(!manager.appearanceFollowsTheme());
+    QCOMPARE(manager.effectiveVariant(), QStringLiteral("dark"));
+    QCOMPARE(tokenColor(manager, "semantic.surface.app"), QColor(QStringLiteral("#111111")));
+    const QVariantMap themes = [&]() {
+        for (const QVariant &row : manager.themes()) {
+            const QVariantMap map = row.toMap();
+            if (map.value(QStringLiteral("id")).toString() == QLatin1String("dual"))
+                return map;
+        }
+        return QVariantMap{};
+    }();
+    QCOMPARE(themes.value(QStringLiteral("hasVariants")).toBool(), true);
+
+    manager.setVariant(QStringLiteral("light"));
+    QCOMPARE(manager.selection(), QStringLiteral("dual"));
+    QCOMPARE(manager.currentTheme(), QStringLiteral("dual"));
+    QCOMPARE(manager.effectiveVariant(), QStringLiteral("light"));
+    QCOMPARE(tokenColor(manager, "semantic.surface.app"), QColor(QStringLiteral("#eeeeee")));
+    QCOMPARE(manager.previewColors(QStringLiteral("dual")).value(QStringLiteral("surface")).value<QColor>(),
+             QColor(QStringLiteral("#eeeeee")));
+
+    manager.setVariant(QStringLiteral("dark"));
+    QCOMPARE(tokenColor(manager, "semantic.surface.app"), QColor(QStringLiteral("#111111")));
+
+    QVERIFY(manager.select(QStringLiteral("sided")));
+    QCOMPARE(manager.effectiveVariant(), QStringLiteral("dark"));
+    QCOMPARE(tokenColor(manager, "semantic.surface.app"), QColor(QStringLiteral("#010101")));
+    manager.setVariant(QStringLiteral("light"));
+    QCOMPARE(manager.currentTheme(), QStringLiteral("sided"));
+    QCOMPARE(manager.effectiveVariant(), QStringLiteral("light"));
+    QCOMPARE(tokenColor(manager, "semantic.surface.app"), QColor(QStringLiteral("#fefefe")));
+}
+
+void ThemeManagerTest::singleVariantLocksAppearance()
+{
+    QVERIFY(writeJson("only-light.json", R"({
+        "name": "only-light",
+        "extends": "light",
+        "variant": "light",
+        "palette": { "appBackground": "#f4f4f4" }
+    })"));
+    ThemeManager manager;
+    manager.setVariant(QStringLiteral("dark"));
+    QVERIFY(manager.select(QStringLiteral("only-light")));
+    QCOMPARE(manager.effectiveVariant(), QStringLiteral("light"));
+    QVERIFY(manager.appearanceFollowsTheme());
+    QCOMPARE(tokenColor(manager, "semantic.surface.app"), QColor(QStringLiteral("#f4f4f4")));
+    manager.setVariant(QStringLiteral("dark"));
+    QCOMPARE(manager.currentTheme(), QStringLiteral("only-light"));
+    QCOMPARE(manager.effectiveVariant(), QStringLiteral("light"));
+    QCOMPARE(manager.selection(), QStringLiteral("only-light"));
+}
+
+void ThemeManagerTest::importJsonFolderZipAndRejectsTraversal()
+{
+    QTemporaryDir outside;
+    QVERIFY(outside.isValid());
+    const QString jsonPath = outside.filePath(QStringLiteral("imported.json"));
+    {
+        QFile file(jsonPath);
+        QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
+        const QByteArray body = R"({
+            "name": "imported",
+            "extends": "dark",
+            "palette": { "appBackground": "#222222" }
+        })";
+        QCOMPARE(file.write(body), body.size());
+    }
+    const QString folder = outside.filePath(QStringLiteral("folder-theme"));
+    QVERIFY(QDir().mkpath(folder + QStringLiteral("/qml")));
+    {
+        QFile file(folder + QStringLiteral("/theme.json"));
+        QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
+        const QByteArray body = R"({
+            "name": "folder-theme",
+            "extends": "dark",
+            "palette": { "appBackground": "#333333" }
+        })";
+        QCOMPARE(file.write(body), body.size());
+    }
+    {
+        QFile file(folder + QStringLiteral("/qml/ThemedButtonBackground.qml"));
+        QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
+        const QByteArray body = "import QtQuick\nRectangle { property var control }\n";
+        QCOMPARE(file.write(body), body.size());
+    }
+
+    const QByteArray zipTheme = R"({
+        "name": "zipped",
+        "extends": "dark",
+        "palette": { "appBackground": "#444444" }
+    })";
+    const QString zipPath = outside.filePath(QStringLiteral("zipped.zip"));
+    QVERIFY(writeStoredZip(zipPath, {{QStringLiteral("pkg/theme.json"), zipTheme}}, false));
+
+    const QString slipPath = outside.filePath(QStringLiteral("slip.zip"));
+    QVERIFY(writeStoredZip(slipPath,
+                           {{QStringLiteral("theme.json"), zipTheme},
+                            {QStringLiteral("../evil.json"), QByteArray("{}")}},
+                           false));
+    const QString absPath = outside.filePath(QStringLiteral("abs.zip"));
+    QVERIFY(writeStoredZip(absPath, {{QStringLiteral("/tmp/abs.json"), QByteArray("{}")}}, false));
+    const QString linkPath = outside.filePath(QStringLiteral("link.zip"));
+    QVERIFY(writeStoredZip(linkPath, {{QStringLiteral("theme.json"), zipTheme}}, true));
+
+    ThemeManager manager;
+    QCOMPARE(manager.importTheme(QUrl::fromLocalFile(jsonPath)), QStringLiteral("imported"));
+    QVERIFY(manager.select(QStringLiteral("imported")));
+    QCOMPARE(tokenColor(manager, "semantic.surface.app"), QColor(QStringLiteral("#222222")));
+
+    QCOMPARE(manager.importTheme(QUrl::fromLocalFile(folder)), QStringLiteral("folder-theme"));
+    QCOMPARE(manager.overrideSlots(QStringLiteral("folder-theme")),
+             QStringList{QStringLiteral("ThemedButtonBackground")});
+    QVERIFY(!manager.isThemeTrusted(QStringLiteral("folder-theme")));
+
+    QCOMPARE(manager.importTheme(QUrl::fromLocalFile(zipPath)), QStringLiteral("zipped"));
+    QVERIFY(manager.select(QStringLiteral("zipped")));
+    QCOMPARE(tokenColor(manager, "semantic.surface.app"), QColor(QStringLiteral("#444444")));
+
+    QCOMPARE(manager.importTheme(QUrl::fromLocalFile(slipPath)), QString());
+    QVERIFY(!manager.lastError().isEmpty());
+    QVERIFY(!manager.availableThemes().contains(QStringLiteral("evil")));
+    QVERIFY(!QFile::exists(outside.filePath(QStringLiteral("evil.json"))));
+
+    QCOMPARE(manager.importTheme(QUrl::fromLocalFile(absPath)), QString());
+    QVERIFY(manager.lastError().contains(QStringLiteral("not allowed")));
+    QCOMPARE(manager.importTheme(QUrl::fromLocalFile(linkPath)), QString());
+    QVERIFY(manager.lastError().contains(QStringLiteral("symlink")));
+
+    const QString link = outside.filePath(QStringLiteral("linked.json"));
+    QVERIFY(QFile::link(jsonPath, link));
+    QCOMPARE(manager.importTheme(QUrl::fromLocalFile(link)), QString());
+    QVERIFY(manager.lastError().contains(QStringLiteral("symlink")));
+}
+
+void ThemeManagerTest::removeAndExportRoundTrip()
+{
+    QVERIFY(writeJson("round.json", R"({
+        "name": "round",
+        "extends": "dark",
+        "palette": { "primary": "#abcdef" },
+        "semantic": { "focusRing": "$palette.primary" }
+    })"));
+    ThemeManager manager;
+    QVERIFY(manager.select(QStringLiteral("round")));
+    const QColor app = tokenColor(manager, "semantic.surface.app");
+    const QColor primary = tokenColor(manager, "semantic.primary");
+    const QColor focus = tokenColor(manager, "semantic.focusRing");
+    const double radius = manager.token(QStringLiteral("metrics.radius.sm")).toDouble();
+    const QString easing = manager.token(QStringLiteral("motion.easing")).toString();
+    QCOMPARE(primary, QColor(QStringLiteral("#abcdef")));
+    QCOMPARE(focus, primary);
+
+    QTemporaryDir outside;
+    QVERIFY(outside.isValid());
+    const QString exported = outside.filePath(QStringLiteral("round-export.json"));
+    QVERIFY(manager.exportTheme(QUrl::fromLocalFile(exported)));
+    QFile exportedFile(exported);
+    QVERIFY(exportedFile.open(QIODevice::ReadOnly));
+    const QJsonObject object = QJsonDocument::fromJson(exportedFile.readAll()).object();
+    QVERIFY(!object.contains(QStringLiteral("extends")));
+    QCOMPARE(object.value(QStringLiteral("name")).toString(), QStringLiteral("round"));
+
+    QVERIFY(manager.removeTheme(QStringLiteral("round")));
+    QCOMPARE(manager.selection(), QStringLiteral("system"));
+    QVERIFY(!manager.availableThemes().contains(QStringLiteral("round")));
+    QVERIFY(!manager.removeTheme(QStringLiteral("dark")));
+
+    QCOMPARE(manager.importTheme(QUrl::fromLocalFile(exported)), QStringLiteral("round"));
+    QVERIFY(manager.select(QStringLiteral("round")));
+    QCOMPARE(tokenColor(manager, "semantic.surface.app"), app);
+    QCOMPARE(tokenColor(manager, "semantic.primary"), primary);
+    QCOMPARE(tokenColor(manager, "semantic.focusRing"), focus);
+    QCOMPARE(manager.token(QStringLiteral("metrics.radius.sm")).toDouble(), radius);
+    QCOMPARE(manager.token(QStringLiteral("motion.easing")).toString(), easing);
+    QCOMPARE(tokenColor(manager, "components.themedButton.background"), QColor(QStringLiteral("#262626")));
+}
+
+void ThemeManagerTest::exampleThemesLoad()
+{
+    const QString root = repoThemes();
+    ThemeManager manager;
+    QCOMPARE(manager.importTheme(QUrl::fromLocalFile(root + QStringLiteral("/frosted"))),
+             QStringLiteral("frosted"));
+    QVERIFY(manager.select(QStringLiteral("frosted")));
+    QCOMPARE(manager.token(QStringLiteral("window.translucent")).toBool(), true);
+    QCOMPARE(manager.token(QStringLiteral("window.backdrop")).toString(), QStringLiteral("blur"));
+    QVERIFY(tokenColor(manager, "semantic.surface.app").alpha() < 255);
+    QVERIFY(tokenColor(manager, "semantic.surface.panel").alpha() < 255);
+    QVERIFY(manager.appearanceFollowsTheme());
+    QCOMPARE(manager.effectiveVariant(), QStringLiteral("dark"));
+
+    QCOMPARE(manager.importTheme(QUrl::fromLocalFile(root + QStringLiteral("/high-contrast"))),
+             QStringLiteral("high-contrast"));
+    QVERIFY(manager.select(QStringLiteral("high-contrast")));
+    QCOMPARE(tokenColor(manager, "semantic.foreground"), QColor(QStringLiteral("#ffffff")));
+    QCOMPARE(tokenColor(manager, "semantic.primary"), QColor(QStringLiteral("#ffff00")));
+
+    QCOMPARE(manager.importTheme(QUrl::fromLocalFile(root + QStringLiteral("/override-example"))),
+             QStringLiteral("override-example"));
+    QCOMPARE(manager.overrideSlots(QStringLiteral("override-example")),
+             QStringList{QStringLiteral("ThemedButtonBackground")});
+    QVERIFY(manager.select(QStringLiteral("override-example")));
+    QCOMPARE(tokenColor(manager, "components.themedButton.background"), QColor(QStringLiteral("#ff00aa")));
+    QVERIFY(manager.overrideUrl(QStringLiteral("ThemedButtonBackground")).isEmpty());
+    manager.setThemeTrusted(QStringLiteral("override-example"), true);
+    QVERIFY(!manager.overrideUrl(QStringLiteral("ThemedButtonBackground")).isEmpty());
+}
+
+void ThemeManagerTest::sessionOverrideIsNotPersisted()
+{
+    QVERIFY(writeJson("session-only.json", R"({
+        "name": "session-only",
+        "extends": "dark",
+        "variant": "dark",
+        "palette": { "appBackground": "#123456" }
+    })"));
+    QVERIFY(writeJson("session-dual.json", R"({
+        "name": "session-dual",
+        "extends": "dark",
+        "variants": {
+            "dark": { "palette": { "appBackground": "#111111" } },
+            "light": { "palette": { "appBackground": "#eeeeee" } }
+        }
+    })"));
+
+    {
+        ThemeManager manager;
+        QCOMPARE(manager.selection(), QStringLiteral("system"));
+        QVERIFY(manager.select(QStringLiteral("light")));
+        QVERIFY(manager.applySessionOverride(QStringLiteral("session-only")));
+        QCOMPARE(manager.currentTheme(), QStringLiteral("session-only"));
+        QCOMPARE(manager.selection(), QStringLiteral("light"));
+        QCOMPARE(tokenColor(manager, "semantic.surface.app"), QColor(QStringLiteral("#123456")));
+        manager.setVariant(QStringLiteral("light"));
+        QCOMPARE(manager.currentTheme(), QStringLiteral("session-only"));
+        QCOMPARE(manager.selection(), QStringLiteral("light"));
+        QSettings settings;
+        settings.beginGroup(QStringLiteral("Theme"));
+        QCOMPARE(settings.value(QStringLiteral("selection")).toString(), QStringLiteral("light"));
+    }
+    {
+        ThemeManager again;
+        QCOMPARE(again.selection(), QStringLiteral("light"));
+        QCOMPARE(again.currentTheme(), QStringLiteral("light"));
+    }
+
+    {
+        QSettings settings;
+        settings.beginGroup(QStringLiteral("Theme"));
+        settings.setValue(QStringLiteral("selection"), QStringLiteral("system"));
+        settings.sync();
+    }
+
+    // A built-in override survives setVariant. select() ends it and persists.
+    {
+        ThemeManager pinned;
+        QCOMPARE(pinned.selection(), QStringLiteral("system"));
+        QCOMPARE(pinned.currentTheme(), QStringLiteral("dark"));
+        QVERIFY(pinned.applySessionOverride(QStringLiteral("light")));
+        QCOMPARE(pinned.selection(), QStringLiteral("system"));
+        pinned.setVariant(QStringLiteral("dark"));
+        QCOMPARE(pinned.currentTheme(), QStringLiteral("light"));
+        QVERIFY(pinned.select(QStringLiteral("system")));
+        QCOMPARE(pinned.currentTheme(), QStringLiteral("dark"));
+        pinned.setVariant(QStringLiteral("light"));
+        QCOMPARE(pinned.currentTheme(), QStringLiteral("light"));
+    }
+
+    // A failed override leaves the loaded theme, so setVariant still applies.
+    {
+        ThemeManager failed;
+        QCOMPARE(failed.currentTheme(), QStringLiteral("dark"));
+        QVERIFY(!failed.applySessionOverride(QStringLiteral("/no/such/drift-theme.json")));
+        QCOMPARE(failed.currentTheme(), QStringLiteral("dark"));
+        QVERIFY(!failed.applySessionOverride(QString()));
+        QCOMPARE(failed.currentTheme(), QStringLiteral("dark"));
+        failed.setVariant(QStringLiteral("light"));
+        QCOMPARE(failed.currentTheme(), QStringLiteral("light"));
+    }
+
+    // A dual-variant override follows the side and does not write the selection.
+    {
+        ThemeManager dual;
+        QVERIFY(dual.select(QStringLiteral("system")));
+        QVERIFY(dual.applySessionOverride(QStringLiteral("session-dual")));
+        QCOMPARE(dual.selection(), QStringLiteral("system"));
+        dual.setVariant(QStringLiteral("light"));
+        QCOMPARE(dual.currentTheme(), QStringLiteral("session-dual"));
+        QCOMPARE(dual.effectiveVariant(), QStringLiteral("light"));
+        QCOMPARE(tokenColor(dual, "semantic.surface.app"), QColor(QStringLiteral("#eeeeee")));
+        QSettings settings;
+        settings.beginGroup(QStringLiteral("Theme"));
+        QCOMPARE(settings.value(QStringLiteral("selection")).toString(), QStringLiteral("system"));
+    }
 }
 
 QTEST_MAIN(ThemeManagerTest)

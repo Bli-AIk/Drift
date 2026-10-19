@@ -694,6 +694,36 @@
       "divider": "$semantic.panel.border",
       "borderWidth": "$metrics.borderWidth"
     },
+    "settingsAppearanceSection": {
+      "foreground": "$semantic.panel.secondary.foreground"
+    },
+    "settingsThemeList": {
+      "foreground": "$semantic.panel.foreground"
+    },
+    "settingsThemeEntry": {
+      "background": "$semantic.panel.accent",
+      "backgroundSelected": "$semantic.panel.secondary.background",
+      "border": "$semantic.panel.border",
+      "borderSelected": "$semantic.primary",
+      "borderWidth": "$metrics.borderWidth",
+      "radius": "$metrics.radius.sm",
+      "foreground": "$semantic.panel.foreground",
+      "foregroundMuted": "$semantic.mutedForeground",
+      "badgeBackground": "$semantic.panel.muted",
+      "badgeForeground": "$semantic.panel.foreground",
+      "swatchRadius": "$metrics.radius.xs"
+    },
+    "settingsAppearanceActions": {
+      "foreground": "$semantic.panel.foreground"
+    },
+    "settingsAppearanceTranslucency": {
+      "foreground": "$semantic.panel.secondary.foreground",
+      "foregroundMuted": "$semantic.mutedForeground"
+    },
+    "themeTrustDialog": {
+      "foreground": "$semantic.panel.foreground",
+      "foregroundMuted": "$semantic.mutedForeground"
+    },
     "segmentationFrameColumn": {
       "background": "$semantic.surface.panel",
       "radius": "$metrics.radius.md",

@@ -138,16 +138,42 @@ QtObject {
     // Qt.styleHints.colorScheme is live-updated by the platform theme (Qt 6.5+).
     // Once toggled, the choice lives in QSettings via EditorState.preferences and survives
     // restarts; it is app-wide, not stored per project.
+    //
+    // A single-variant user theme reports its own variant here. That binding reads
+    // ThemeManager.effectiveVariant and must not be written back by setVariant, or the
+    // two sides chase each other. The toggle records the requested side and selects
+    // the system theme, which is what actually loads a built-in.
     readonly property bool systemPrefersDark: Qt.styleHints.colorScheme !== Qt.Light
-    readonly property bool darkMode: EditorState.preferences.darkModeOverridden ? EditorState.preferences.darkModePreferred
-                                                                    : systemPrefersDark
+    // Single-variant user themes report their own side. A pinned built-in does
+    // too: setVariant will not unpin it, and the header checkmarks read darkMode.
+    // Selection "system" follows the appearance preference, otherwise the OS.
+    // setVariant at startup must not be what loads a built-in over DRIFT_THEME;
+    // ThemeManager keeps that override until select().
+    readonly property bool darkMode: {
+        if (ThemeManager.appearanceFollowsTheme)
+            return ThemeManager.effectiveVariant === "dark"
+        if (ThemeManager.selection === "dark" || ThemeManager.selection === "light")
+            return ThemeManager.selection === "dark"
+        return EditorState.preferences.darkModeOverridden
+               ? EditorState.preferences.darkModePreferred
+               : systemPrefersDark
+    }
 
     function toggleDarkMode() {
-        EditorState.preferences.setDarkModePreference(!darkMode);
+        setDarkMode(!darkMode)
     }
 
     function setDarkMode(enabled) {
-        EditorState.preferences.setDarkModePreference(enabled);
+        const side = enabled ? "dark" : "light"
+        EditorState.preferences.setDarkModePreference(enabled)
+        if (ThemeManager.appearanceFollowsTheme) {
+            // setVariant only stores the side while a single-variant theme is up.
+            ThemeManager.setVariant(side)
+            ThemeManager.select("system")
+            return
+        }
+        if (ThemeManager.selection === "dark" || ThemeManager.selection === "light")
+            ThemeManager.select(side)
     }
 
     function syncVariant() {

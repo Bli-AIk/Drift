@@ -100,9 +100,14 @@ Popup {
             { label: qsTr("Extras"), keywords: "add-ons addons packs", run: () => win.openExtras() },
             { label: qsTr("Add-on manager"), keywords: "addons install packs extras", run: () => win.openAddonManager() },
             { label: qsTr("Debug info…"), keywords: "diagnostics", run: () => win.openDebugInfo() },
-            { label: qsTr("Light theme"), keywords: "appearance", run: () => Theme.setDarkMode(false) },
-            { label: qsTr("Dark theme"), keywords: "appearance", run: () => Theme.setDarkMode(true) },
-        ])
+            { label: qsTr("Light theme"), keywords: "appearance theme", run: () => Theme.setDarkMode(false) },
+            { label: qsTr("Dark theme"), keywords: "appearance theme", run: () => Theme.setDarkMode(true) },
+            { label: qsTr("System theme"), keywords: "appearance theme", run: () => ThemeManager.select("system") },
+        ].concat((ThemeManager.themes || []).filter((theme) => theme && !theme.builtIn).map((theme) => ({
+            label: qsTr("Theme: %1").arg(theme.name),
+            keywords: "appearance theme " + (theme.name || ""),
+            run: () => ThemeManager.select(theme.id)
+        }))))
         for (let i = 0; i < commands.length; ++i) {
             const cmd = commands[i]
             rows.push({ kind: "command", label: cmd.label, sub: cmd.sub || "", keywords: cmd.keywords || "",

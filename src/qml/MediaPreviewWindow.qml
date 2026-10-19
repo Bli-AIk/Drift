@@ -94,7 +94,13 @@ Window {
     title: clipId.length > 0
            ? (assetName.length > 0 ? qsTr("Crop — %1").arg(assetName) : qsTr("Crop"))
            : (assetName.length > 0 ? qsTr("Preview — %1").arg(assetName) : qsTr("Preview"))
-    color: Theme.c.mediaPreviewWindow.background
+    color: {
+        const opacity = ThemeManager.window.backgroundOpacity
+        const multiplier = (opacity === undefined || opacity === null) ? 1 : opacity
+        return WindowBackdrop.windowBackground(Theme.c.mediaPreviewWindow.background, multiplier)
+    }
+
+    Component.onCompleted: WindowBackdrop.attach(root)
 
     function openFor(index) {
         const asset = AssetLibrary.assetAt(index)

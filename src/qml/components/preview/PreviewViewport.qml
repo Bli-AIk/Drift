@@ -98,8 +98,20 @@ Item {
         y: (viewport.height - height) / 2 + viewport.panY
         // The 3D view draws the whole panel, with its own outline of the stage; this rect only
         // keeps the project frame's place for the tools.
-        color: viewport.mode3d || (EditorState.projectFile.background && EditorState.projectFile.background.kind === "transparent")
-               ? "transparent" : Theme.c.previewViewport.background
+        // Explicit backing for the composited frame. The window clear color is
+        // not a backstop once the surface has an alpha channel, and the frame
+        // itself stays opaque (the compositor clears it at alpha 1) except when
+        // the project background is transparent — that case is the checkerboard.
+        color: {
+            const projectBackground = EditorState.projectFile.background
+            const transparentProject = projectBackground && projectBackground.kind === "transparent"
+            if (viewport.mode3d || transparentProject)
+                return "transparent"
+            const token = Theme.c.previewViewport.background
+            if (WindowBackdrop.translucencyActive && token.a < 1)
+                return Qt.rgba(token.r, token.g, token.b, 1)
+            return token
+        }
         border.width: viewport.mode3d ? 0 : Theme.c.previewViewport.borderWidth
         border.color: Theme.c.previewViewport.border
         clip: !viewport.mode3d

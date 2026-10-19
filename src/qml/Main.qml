@@ -59,7 +59,13 @@ ApplicationWindow {
     // "Conflicting properties 'visible' and 'visibility'" (Maximized + hidden).
     visibility: Window.Hidden
     title: "CutWire Drift"
-    color: Theme.c.appWindow.background
+    // Alpha stays 1 unless this process was started with a translucent surface.
+    // backgroundOpacity is read here so the binding follows theme reloads.
+    color: {
+        const opacity = ThemeManager.window.backgroundOpacity
+        const multiplier = (opacity === undefined || opacity === null) ? 1 : opacity
+        return WindowBackdrop.windowBackground(Theme.c.appWindow.background, multiplier)
+    }
 
     LayoutMirroring.enabled: Qt.application.layoutDirection === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
@@ -994,6 +1000,7 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
+        WindowBackdrop.attach(window)
         Theme.windowWidth = window.width
         MediaImport.sequencePrompt = function (found, done) {
             imageSequenceDialogLoader.ensure().ask(found, done)

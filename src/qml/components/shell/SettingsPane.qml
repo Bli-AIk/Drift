@@ -35,6 +35,8 @@ Item {
             bottomPadding: Theme.spacingXl
 
 
+            SettingsAppearanceSection { }
+
             SettingsPreviewSection { }
 
             SettingsPlaybackSection { }

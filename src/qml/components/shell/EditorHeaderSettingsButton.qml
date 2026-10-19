@@ -74,6 +74,12 @@ Item {
         }
 
         ThemedMenuItem {
+            text: qsTr("System")
+            icon.name: ThemeManager.selection === "system" ? Theme.icons.check : Theme.icons.monitor
+            onTriggered: ThemeManager.select("system")
+        }
+
+        ThemedMenuItem {
             text: qsTr("Light")
             icon.name: Theme.darkMode ? Theme.icons.sun : Theme.icons.check
             onTriggered: Theme.setDarkMode(false)

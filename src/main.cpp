@@ -31,6 +31,7 @@
 #include "playback/PerfLog.h"
 #include "preview/PreviewItem.h"
 #include "theme/ThemeManager.h"
+#include "theme/WindowBackdrop.h"
 #include "timeline/TimelineTrackItem.h"
 #include "timeline/TimelineViewState.h"
 
@@ -510,6 +511,10 @@ int main(int argc, char *argv[])
     }
 #endif
 
+    // Desktop only, and only when the user has asked for it. Must be known before
+    // the default format is published: the share context QApplication creates
+    // copies that format, and GlRuntime keeps the copy rather than rebuilding it.
+    const bool translucentWindows = WindowBackdrop::startupWantsAlphaBuffer();
 #if defined(Q_OS_ANDROID) || defined(Q_OS_WASM)
     // Android and WebGL2 are GLES-only; the desktop 3.3 core profile the engine asks for cannot be created
     // here at all. Both contexts that matter — the Qt Quick scene graph's and the compositor's
@@ -531,8 +536,18 @@ int main(int argc, char *argv[])
     format.setRenderableType(QSurfaceFormat::OpenGL);
     format.setVersion(3, 3);
     format.setProfile(QSurfaceFormat::CoreProfile);
+    // OpenGL reads the alpha plane from the surface format. RHI backends
+    // (Vulkan, D3D, Metal) ignore QSurfaceFormat and look at
+    // QQuickWindow::setDefaultAlphaBuffer instead; set both so a transparent
+    // window color survives whichever graphics API is selected. The app asks
+    // for OpenGL below, so the format is the path that actually runs.
+    if (translucentWindows)
+        format.setAlphaBufferSize(8);
     QSurfaceFormat::setDefaultFormat(format);
 #endif
+    if (translucentWindows)
+        QQuickWindow::setDefaultAlphaBuffer(true);
+    WindowBackdrop::noteProcessTranslucency(translucentWindows);
 
     // Keep Qt Quick on OpenGL and create its global share context before the
     // application, enabling zero-copy texture handoff from the compositor.
@@ -706,6 +721,13 @@ int main(int argc, char *argv[])
     // callback never runs and QML reports ThemeManager as undefined. Publish
     // it here, the same way as the other singletons.
     ThemeManager::registerSingleton();
+    WindowBackdrop::registerSingleton();
+    // DRIFT_THEME is a session-only override. ThemeManager applies it after the
+    // persisted selection and does not write Theme/selection. setVariant, which
+    // Theme.qml calls at startup and when the light/dark toggle changes, leaves
+    // the override in place. select() is what ends it.
+    if (const QString themeOverride = qEnvironmentVariable("DRIFT_THEME"); !themeOverride.isEmpty())
+        ThemeManager::shared()->applySessionOverride(themeOverride);
 
     app.installEventFilter(new FileOpenFilter(&editorState, &marketClient, &app));
     {

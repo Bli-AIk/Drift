@@ -32,6 +32,16 @@ class ThemeManager : public QObject
     Q_PROPERTY(QQmlPropertyMap *window READ window CONSTANT)
     Q_PROPERTY(QString currentTheme READ currentTheme NOTIFY themeChanged)
     Q_PROPERTY(QStringList availableThemes READ availableThemes NOTIFY availableThemesChanged)
+    // "system" (follow Theme.darkMode), "dark", "light", or a user theme id.
+    // Persisted as QSettings Theme/selection. Loaded once, in the constructor.
+    Q_PROPERTY(QString selection READ selection NOTIFY selectionChanged)
+    // "dark" or "light" of the theme currently on screen.
+    Q_PROPERTY(QString effectiveVariant READ effectiveVariant NOTIFY themeChanged)
+    // True when a single-variant user theme is on screen. Theme.darkMode then
+    // follows effectiveVariant, and the light/dark toggle leaves the theme.
+    Q_PROPERTY(bool appearanceFollowsTheme READ appearanceFollowsTheme NOTIFY themeChanged)
+    Q_PROPERTY(QVariantList themes READ themes NOTIFY availableThemesChanged)
+    Q_PROPERTY(QString lastError READ lastError NOTIFY lastErrorChanged)
     Q_PROPERTY(bool hotReload READ hotReload WRITE setHotReload NOTIFY hotReloadChanged)
 
 public:
@@ -52,6 +62,11 @@ public:
 
     QString currentTheme() const { return m_currentTheme; }
     QStringList availableThemes() const;
+    QString selection() const { return m_selection; }
+    QString effectiveVariant() const { return m_effectiveVariant; }
+    bool appearanceFollowsTheme() const { return m_userTheme && !m_hasVariants; }
+    QVariantList themes() const;
+    QString lastError() const { return m_lastError; }
     bool hotReload() const { return m_hotReload; }
     void setHotReload(bool enabled);
 
@@ -62,9 +77,31 @@ public:
     Q_INVOKABLE QVariant builtinToken(const QString &variant, const QString &dottedPath) const;
     Q_INVOKABLE bool loadTheme(const QString &nameOrPath);
     Q_INVOKABLE void reload();
-    // Selects the built-in dark or light theme. A loaded user theme is left in
-    // place; Theme.qml still calls this on every darkMode change.
+    // Applies a dark/light side. Selection "system" swaps the built-in. A
+    // dual-variant user theme swaps its overlay and stays selected. A
+    // single-variant user theme records the request and stays put, so this
+    // never writes back into the value Theme.darkMode is bound to.
+    // Selection "dark" or "light" is pinned and ignores the request.
+    // A session override (applySessionOverride) is not replaced by a built-in.
     Q_INVOKABLE void setVariant(const QString &variant);
+    // "system", "dark", "light", or a user theme id. Persists the choice.
+    // Clears a session override: this is an explicit selection.
+    Q_INVOKABLE bool select(const QString &id);
+    // Loads nameOrPath for this process only. Does not write Theme/selection.
+    // setVariant will not replace it with a built-in; a dual-variant document
+    // still follows the requested side. select() ends the override.
+    bool applySessionOverride(const QString &nameOrPath);
+    // Copies a .json file, a theme folder, or a .zip into the user themes
+    // directory. Returns the new id, or empty and sets lastError.
+    Q_INVOKABLE QString importTheme(const QUrl &fileOrFolderOrZip);
+    // User themes only. The current selection falls back to system.
+    Q_INVOKABLE bool removeTheme(const QString &id);
+    // Fully resolved current theme, extends omitted, as a standalone JSON file.
+    Q_INVOKABLE bool exportTheme(const QUrl &file);
+    Q_INVOKABLE QUrl themesFolderUrl() const;
+    // surface, panel, accent, foreground, primary for the swatch. Dual-variant
+    // themes preview the side setVariant last requested.
+    Q_INVOKABLE QVariantMap previewColors(const QString &id) const;
     // File URL of qml/<slot>.qml when the current theme is a trusted folder
     // theme that contains that file. Empty for built-ins, single-file themes,
     // untrusted themes, and missing slots.
@@ -78,6 +115,8 @@ signals:
     void themeChanged();
     void hotReloadChanged();
     void availableThemesChanged();
+    void selectionChanged();
+    void lastErrorChanged();
 
 private:
     struct Loaded {
@@ -85,8 +124,19 @@ private:
         QString path;
         QString variant;
         bool user = false;
+        bool hasVariants = false;
         QVariantMap document;
     };
+
+    void setLastError(const QString &error);
+    void writeSelection() const;
+    void restorePersisted();
+    QVariantMap themeRecord(const QString &id, const QString &path, bool builtIn) const;
+    QString importLocal(const QString &path);
+    bool installDirectory(const QString &sourceDir, const QString &id, QString *error) const;
+    bool installJsonFile(const QString &sourceFile, const QString &id, QString *error) const;
+    bool extractZipTheme(const QString &zipPath, const QString &destDir, QString *error) const;
+    bool removeInstalled(const QString &path, QString *error) const;
 
     QString locate(const QString &nameOrPath, QString *error) const;
     QString pathForThemeName(const QString &name, QString *error) const;
@@ -112,13 +162,19 @@ private:
     QFileSystemWatcher m_watcher;
     QString m_currentTheme;
     QString m_sourcePath;
+    QString m_selection = QStringLiteral("system");
+    QString m_effectiveVariant = QStringLiteral("dark");
     QString m_requestedVariant = QStringLiteral("dark");
+    QString m_lastError;
     QVariantMap m_resolved;
     QVariantMap m_builtinDark;
     QVariantMap m_builtinLight;
     bool m_userTheme = false;
+    bool m_hasVariants = false;
     bool m_hotReload = false;
     bool m_inReload = false;
+    // DRIFT_THEME. The persisted selection stays as restorePersisted left it.
+    bool m_sessionOverride = false;
 
 private slots:
     void onThemeFileChanged(const QString &path);

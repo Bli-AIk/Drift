@@ -1,22 +1,34 @@
 #include "ThemeManager.h"
 
+#include "core/ZipArchive.h"
+
 #include <QColor>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
+#include <QJsonValue>
 #include <QQmlEngine>
 #include <QtQml/qqml.h>
 #include <QRegularExpression>
+#include <QSaveFile>
 #include <QSettings>
 #include <QStandardPaths>
+#include <QTemporaryDir>
 
 namespace {
 
 constexpr auto kDarkResource = ":/themes/dark.json";
 constexpr auto kLightResource = ":/themes/light.json";
+
+// A theme document is ~140 KB. These caps leave headroom and stop a zip
+// entry from expanding without a bound the importer agreed to.
+constexpr qint64 kMaxThemeFileBytes = 2 * 1024 * 1024;
+constexpr qint64 kMaxThemeTotalBytes = 8 * 1024 * 1024;
+constexpr int kMaxZipEntries = 64;
 
 const QStringList kGroups = {
     QStringLiteral("palette"),
@@ -116,6 +128,14 @@ bool isValidSlotName(const QString &slot)
 QVariantMap readObject(const QString &path, QString *error, bool warn = true)
 {
     QFile file(path);
+    if (file.exists() && file.size() > kMaxThemeFileBytes) {
+        *error = QStringLiteral("theme file is larger than %1 bytes: %2")
+                     .arg(kMaxThemeFileBytes)
+                     .arg(path);
+        if (warn)
+            qWarning("theme: %s", qPrintable(*error));
+        return {};
+    }
     if (!file.open(QIODevice::ReadOnly)) {
         *error = QStringLiteral("cannot open %1: %2").arg(path, file.errorString());
         if (warn)
@@ -150,6 +170,36 @@ QString readThemeName(const QString &path)
     return name.toString().trimmed();
 }
 
+bool validateOverlay(const QVariantMap &overlay, const QString &path, QString *error)
+{
+    auto fail = [&](const QString &message) {
+        *error = message;
+        qWarning("theme: %s (%s)", qPrintable(message), qPrintable(path));
+        return false;
+    };
+    for (auto it = overlay.cbegin(); it != overlay.cend(); ++it) {
+        if (it.key() == QLatin1String("name") || it.key() == QLatin1String("extends")
+            || it.key() == QLatin1String("variant") || it.key() == QLatin1String("variants"))
+            return fail(QStringLiteral("a variant overlay cannot contain \"%1\"").arg(it.key()));
+        if (!kGroups.contains(it.key())) {
+            qWarning("theme: unknown key \"%s\" in %s", qPrintable(it.key()), qPrintable(path));
+            continue;
+        }
+        if (it.value().typeId() != QMetaType::QVariantMap)
+            return fail(QStringLiteral("\"%1\" must be an object").arg(it.key()));
+    }
+    if (overlay.contains(QStringLiteral("window"))) {
+        const QVariantMap window = overlay.value(QStringLiteral("window")).toMap();
+        if (window.contains(QStringLiteral("translucent"))
+            && window.value(QStringLiteral("translucent")).typeId() != QMetaType::Bool)
+            return fail(QStringLiteral("window.translucent must be a boolean"));
+        if (window.contains(QStringLiteral("backdrop"))
+            && window.value(QStringLiteral("backdrop")).typeId() != QMetaType::QString)
+            return fail(QStringLiteral("window.backdrop must be a string"));
+    }
+    return true;
+}
+
 bool validateStructure(const QVariantMap &doc, const QString &path, QString *error)
 {
     auto fail = [&](const QString &message) {
@@ -176,9 +226,26 @@ bool validateStructure(const QVariantMap &doc, const QString &path, QString *err
 
     for (auto it = doc.cbegin(); it != doc.cend(); ++it) {
         if (it.key() == QLatin1String("name") || it.key() == QLatin1String("variant")
-            || it.key() == QLatin1String("extends") || kGroups.contains(it.key()))
+            || it.key() == QLatin1String("extends") || it.key() == QLatin1String("variants")
+            || kGroups.contains(it.key()))
             continue;
         qWarning("theme: unknown key \"%s\" in %s", qPrintable(it.key()), qPrintable(path));
+    }
+
+    if (doc.contains(QStringLiteral("variants"))) {
+        if (doc.value(QStringLiteral("variants")).typeId() != QMetaType::QVariantMap)
+            return fail(QStringLiteral("\"variants\" must be an object"));
+        const QVariantMap variants = doc.value(QStringLiteral("variants")).toMap();
+        for (auto it = variants.cbegin(); it != variants.cend(); ++it) {
+            if (it.key() != QLatin1String("dark") && it.key() != QLatin1String("light"))
+                return fail(QStringLiteral("variants.%1 is not \"dark\" or \"light\"").arg(it.key()));
+            if (it.value().typeId() != QMetaType::QVariantMap)
+                return fail(QStringLiteral("variants.%1 must be an object").arg(it.key()));
+            QString overlayError;
+            if (!validateOverlay(it.value().toMap(), path + QStringLiteral("#variants.") + it.key(),
+                                 &overlayError))
+                return fail(overlayError);
+        }
     }
 
     for (const QString &group : kGroups) {
@@ -355,6 +422,193 @@ void syncMap(QQmlPropertyMap *map, const QVariantMap &data)
     }
 }
 
+void stripOverlayMeta(QVariantMap *overlay)
+{
+    overlay->remove(QStringLiteral("name"));
+    overlay->remove(QStringLiteral("extends"));
+    overlay->remove(QStringLiteral("variant"));
+    overlay->remove(QStringLiteral("variants"));
+}
+
+bool isSafeThemeId(const QString &name)
+{
+    if (name.isEmpty() || name == QLatin1String("dark") || name == QLatin1String("light")
+        || name == QLatin1String("system"))
+        return false;
+    if (name.startsWith(QLatin1Char('.')))
+        return false;
+    if (name.contains(QLatin1Char('/')) || name.contains(QLatin1Char('\\'))
+        || name.contains(QLatin1String("..")))
+        return false;
+    for (const QChar ch : name) {
+        if (ch.unicode() < 32)
+            return false;
+    }
+    return true;
+}
+
+bool pathIsInside(const QString &root, const QString &candidate)
+{
+    const QString rootPath = QFileInfo(root).absoluteFilePath();
+    const QString candidatePath = QFileInfo(candidate).absoluteFilePath();
+    return candidatePath == rootPath
+           || candidatePath.startsWith(rootPath + QLatin1Char('/'));
+}
+
+QString colorToHex(const QColor &color)
+{
+    if (!color.isValid())
+        return {};
+    if (color.alpha() == 255)
+        return color.name(QColor::HexRgb);
+    return color.name(QColor::HexArgb);
+}
+
+QJsonValue variantToJson(const QVariant &value)
+{
+    if (value.typeId() == QMetaType::QColor)
+        return colorToHex(value.value<QColor>());
+    if (value.typeId() == QMetaType::QVariantMap) {
+        QJsonObject object;
+        const QVariantMap map = value.toMap();
+        for (auto it = map.cbegin(); it != map.cend(); ++it)
+            object.insert(it.key(), variantToJson(it.value()));
+        return object;
+    }
+    if (value.typeId() == QMetaType::QVariantList) {
+        QJsonArray array;
+        const QVariantList list = value.toList();
+        for (const QVariant &entry : list)
+            array.append(variantToJson(entry));
+        return array;
+    }
+    if (value.typeId() == QMetaType::QString)
+        return value.toString();
+    if (value.typeId() == QMetaType::Bool)
+        return value.toBool();
+    if (value.typeId() == QMetaType::Int || value.typeId() == QMetaType::LongLong
+        || value.typeId() == QMetaType::UInt || value.typeId() == QMetaType::ULongLong)
+        return value.toLongLong();
+    if (value.typeId() == QMetaType::Double || value.typeId() == QMetaType::Float)
+        return value.toDouble();
+    return QJsonValue::fromVariant(value);
+}
+
+bool isJunkZipPath(const QString &path)
+{
+    if (path.startsWith(QLatin1String("__MACOSX/")))
+        return true;
+    const QString base = path.section(QLatin1Char('/'), -1);
+    return base == QLatin1String(".DS_Store") || base.startsWith(QLatin1String("._"));
+}
+
+bool isAllowedThemeRelative(const QString &relative)
+{
+    if (relative == QLatin1String("theme.json") || relative == QLatin1String("theme.dark.json")
+        || relative == QLatin1String("theme.light.json"))
+        return true;
+    if (!relative.startsWith(QLatin1String("qml/")))
+        return false;
+    const QString base = relative.mid(4);
+    if (base.isEmpty() || base.contains(QLatin1Char('/')))
+        return false;
+    if (!base.endsWith(QLatin1String(".qml")))
+        return false;
+    return isValidSlotName(base.chopped(4));
+}
+
+// Walks the central directory itself so a traversal entry that ZipArchive
+// would drop still fails the import, and so unix symlink entries are rejected
+// before any byte is written.
+bool zipIsSafe(QFile &file, QString *error)
+{
+    auto fail = [&](const QString &message) {
+        *error = message;
+        return false;
+    };
+    if (file.size() > kMaxThemeTotalBytes)
+        return fail(QStringLiteral("theme archive is too large"));
+
+    const qint64 fileSize = file.size();
+    if (fileSize < 22)
+        return fail(QStringLiteral("not a valid ZIP archive"));
+    const qint64 scanLen = qMin(fileSize, static_cast<qint64>(65535 + 22));
+    if (!file.seek(fileSize - scanLen))
+        return fail(QStringLiteral("not a valid ZIP archive"));
+    const QByteArray tail = file.read(scanLen);
+    int eocd = -1;
+    for (int i = tail.size() - 22; i >= 0; --i) {
+        if (static_cast<uchar>(tail.at(i)) == 0x50 && static_cast<uchar>(tail.at(i + 1)) == 0x4b
+            && static_cast<uchar>(tail.at(i + 2)) == 0x05 && static_cast<uchar>(tail.at(i + 3)) == 0x06) {
+            eocd = i;
+            break;
+        }
+    }
+    if (eocd < 0 || eocd + 22 > tail.size())
+        return fail(QStringLiteral("not a valid ZIP archive"));
+
+    const auto readU16 = [](const char *p) {
+        const auto *b = reinterpret_cast<const uchar *>(p);
+        return static_cast<quint16>(b[0] | (b[1] << 8));
+    };
+    const auto readU32 = [](const char *p) {
+        const auto *b = reinterpret_cast<const uchar *>(p);
+        return static_cast<quint32>(b[0] | (b[1] << 8) | (b[2] << 16) | (b[3] << 24));
+    };
+
+    const char *eocdPtr = tail.constData() + eocd;
+    const quint16 totalEntries = readU16(eocdPtr + 10);
+    const quint32 cdOffset = readU32(eocdPtr + 16);
+    if (totalEntries > kMaxZipEntries)
+        return fail(QStringLiteral("theme archive has too many entries"));
+    if (!file.seek(cdOffset))
+        return fail(QStringLiteral("not a valid ZIP archive"));
+
+    qint64 uncompressedTotal = 0;
+    for (int i = 0; i < totalEntries; ++i) {
+        const QByteArray header = file.read(46);
+        if (header.size() < 46 || readU32(header.constData()) != 0x02014b50)
+            return fail(QStringLiteral("not a valid ZIP archive"));
+        const quint16 method = readU16(header.constData() + 10);
+        const quint32 compressed = readU32(header.constData() + 20);
+        const quint32 uncompressed = readU32(header.constData() + 24);
+        const quint16 nameLen = readU16(header.constData() + 28);
+        const quint16 extraLen = readU16(header.constData() + 30);
+        const quint16 commentLen = readU16(header.constData() + 32);
+        const quint16 madeBy = readU16(header.constData() + 4);
+        const quint32 externalAttrs = readU32(header.constData() + 38);
+        const QByteArray nameBytes = file.read(nameLen);
+        if (nameBytes.size() != nameLen)
+            return fail(QStringLiteral("not a valid ZIP archive"));
+        if (extraLen + commentLen > 0 && !file.seek(file.pos() + extraLen + commentLen))
+            return fail(QStringLiteral("not a valid ZIP archive"));
+
+        const QString name = QString::fromUtf8(nameBytes);
+        if (name.isEmpty())
+            return fail(QStringLiteral("theme archive contains an empty path"));
+        const bool directory = name.endsWith(QLatin1Char('/')) || name.endsWith(QLatin1Char('\\'));
+        if (name.startsWith(QLatin1Char('/')) || name.startsWith(QLatin1Char('\\'))
+            || name.contains(QLatin1String("..")) || name.contains(QLatin1Char(':'))
+            || name.contains(QLatin1Char('\\')))
+            return fail(QStringLiteral("theme archive path is not allowed: %1").arg(name));
+        if ((madeBy >> 8) == 3) {
+            const quint32 mode = externalAttrs >> 16;
+            if ((mode & 0170000) == 0120000)
+                return fail(QStringLiteral("theme archive contains a symlink: %1").arg(name));
+        }
+        if (directory || isJunkZipPath(name))
+            continue;
+        if (method != 0 && method != 8)
+            return fail(QStringLiteral("theme archive entry uses an unsupported method: %1").arg(name));
+        if (compressed > kMaxThemeFileBytes || uncompressed > kMaxThemeFileBytes)
+            return fail(QStringLiteral("theme archive entry is too large: %1").arg(name));
+        uncompressedTotal += uncompressed;
+        if (uncompressedTotal > kMaxThemeTotalBytes)
+            return fail(QStringLiteral("theme archive is too large"));
+    }
+    return true;
+}
+
 } // namespace
 
 ThemeManager *ThemeManager::shared()
@@ -388,6 +642,12 @@ ThemeManager::ThemeManager(QObject *parent)
     connect(&m_watcher, &QFileSystemWatcher::fileChanged, this, &ThemeManager::onThemeFileChanged);
     connect(&m_watcher, &QFileSystemWatcher::directoryChanged, this, &ThemeManager::onThemeFileChanged);
 
+    {
+        QSettings settings;
+        settings.beginGroup(QStringLiteral("Theme"));
+        m_hotReload = settings.value(QStringLiteral("hotReload"), false).toBool();
+    }
+
     QString error;
     if (auto dark = readTheme(QStringLiteral("dark"), &error))
         m_builtinDark = dark->document;
@@ -410,6 +670,7 @@ ThemeManager::ThemeManager(QObject *parent)
         dark.document = m_builtinDark;
         apply(dark);
     }
+    restorePersisted();
 }
 
 QStringList ThemeManager::availableThemes() const
@@ -472,10 +733,12 @@ bool ThemeManager::loadTheme(const QString &nameOrPath)
     QString error;
     const std::optional<Loaded> loaded = readTheme(nameOrPath, &error);
     if (!loaded) {
-        qWarning("theme: cannot load \"%s\": %s", qPrintable(nameOrPath), qPrintable(error));
+        setLastError(error.isEmpty() ? QStringLiteral("cannot load theme") : error);
+        qWarning("theme: cannot load \"%s\": %s", qPrintable(nameOrPath), qPrintable(m_lastError));
         return false;
     }
     apply(*loaded);
+    setLastError({});
     return true;
 }
 
@@ -506,10 +769,47 @@ void ThemeManager::setVariant(const QString &variant)
         qWarning("theme: unknown variant \"%s\"", qPrintable(variant));
         return;
     }
-    m_requestedVariant = variant;
-    if (m_userTheme || m_currentTheme == variant)
+    if (m_requestedVariant == variant && m_userTheme && !m_hasVariants)
         return;
-    loadTheme(variant);
+    if (m_requestedVariant == variant && !m_userTheme && m_currentTheme == variant)
+        return;
+    m_requestedVariant = variant;
+    if (m_userTheme) {
+        if (!m_hasVariants)
+            return;
+        QString error;
+        const std::optional<Loaded> loaded = readTheme(m_sourcePath, &error);
+        if (!loaded) {
+            qWarning("theme: cannot apply variant \"%s\": %s", qPrintable(variant), qPrintable(error));
+            return;
+        }
+        apply(*loaded);
+        return;
+    }
+    // A pinned built-in stays until select() changes it. Theme.qml still calls
+    // setVariant on every darkMode change, including while that pin is set.
+    if (m_selection == QLatin1String("dark") || m_selection == QLatin1String("light"))
+        return;
+    // Session override (DRIFT_THEME). Theme.qml calls setVariant at startup and
+    // on every darkMode change; that must not swap the override for a built-in.
+    // Dual-variant overrides already swapped their overlay above.
+    if (m_sessionOverride)
+        return;
+    if (m_currentTheme != variant)
+        loadTheme(variant);
+}
+
+bool ThemeManager::applySessionOverride(const QString &nameOrPath)
+{
+    const QString theme = nameOrPath.trimmed();
+    if (theme.isEmpty()) {
+        setLastError(QStringLiteral("empty theme override"));
+        return false;
+    }
+    if (!loadTheme(theme))
+        return false;
+    m_sessionOverride = true;
+    return true;
 }
 
 QUrl ThemeManager::overrideUrl(const QString &slot) const
@@ -546,6 +846,7 @@ void ThemeManager::setThemeTrusted(const QString &name, bool trusted)
     else
         names.removeAll(theme);
     writeTrustedThemes(names);
+    emit availableThemesChanged();
     if (theme == m_currentTheme)
         emit themeChanged();
 }
@@ -595,6 +896,10 @@ bool ThemeManager::isThemeWatchPath(const QString &path) const
     const QString themeDir = source.dir().absolutePath();
     if (absolute == themeDir)
         return true;
+    const QString darkSide = QFileInfo(source.dir().filePath(QStringLiteral("theme.dark.json"))).absoluteFilePath();
+    const QString lightSide = QFileInfo(source.dir().filePath(QStringLiteral("theme.light.json"))).absoluteFilePath();
+    if (absolute == darkSide || absolute == lightSide)
+        return true;
     const QString qmlDir = themeQmlDirectory(m_sourcePath);
     return absolute == qmlDir || absolute.startsWith(qmlDir + QLatin1Char('/'));
 }
@@ -618,8 +923,46 @@ void ThemeManager::setHotReload(bool enabled)
     if (m_hotReload == enabled)
         return;
     m_hotReload = enabled;
+    QSettings settings;
+    settings.beginGroup(QStringLiteral("Theme"));
+    settings.setValue(QStringLiteral("hotReload"), m_hotReload);
     updateWatch();
     emit hotReloadChanged();
+}
+
+void ThemeManager::setLastError(const QString &error)
+{
+    if (m_lastError == error)
+        return;
+    m_lastError = error;
+    emit lastErrorChanged();
+}
+
+void ThemeManager::writeSelection() const
+{
+    QSettings settings;
+    settings.beginGroup(QStringLiteral("Theme"));
+    settings.setValue(QStringLiteral("selection"), m_selection);
+}
+
+void ThemeManager::restorePersisted()
+{
+    QSettings settings;
+    settings.beginGroup(QStringLiteral("Theme"));
+    const QString saved = settings.value(QStringLiteral("selection"), QStringLiteral("system")).toString().trimmed();
+    if (saved.isEmpty() || saved == QLatin1String("system")) {
+        m_selection = QStringLiteral("system");
+        return;
+    }
+    if (!select(saved)) {
+        qWarning("theme: saved selection \"%s\" is unavailable (%s); using system", qPrintable(saved),
+                 qPrintable(m_lastError));
+        m_selection = QStringLiteral("system");
+        writeSelection();
+        setLastError({});
+        if (m_userTheme || m_currentTheme != QLatin1String("dark"))
+            loadTheme(QStringLiteral("dark"));
+    }
 }
 
 QString ThemeManager::locate(const QString &nameOrPath, QString *error) const
@@ -741,6 +1084,70 @@ std::optional<ThemeManager::Loaded> ThemeManager::readTheme(const QString &nameO
     if (!error->isEmpty())
         return std::nullopt;
 
+    QVariantMap darkOverlay;
+    QVariantMap lightOverlay;
+    bool hasDark = false;
+    bool hasLight = false;
+    if (merged.contains(QStringLiteral("variants"))) {
+        const QVariantMap variants = merged.take(QStringLiteral("variants")).toMap();
+        if (variants.contains(QStringLiteral("dark"))) {
+            darkOverlay = variants.value(QStringLiteral("dark")).toMap();
+            stripOverlayMeta(&darkOverlay);
+            hasDark = true;
+        }
+        if (variants.contains(QStringLiteral("light"))) {
+            lightOverlay = variants.value(QStringLiteral("light")).toMap();
+            stripOverlayMeta(&lightOverlay);
+            hasLight = true;
+        }
+    }
+    if (QFileInfo(path).fileName() == QLatin1String("theme.json") && !path.startsWith(QLatin1Char(':'))) {
+        const QDir dir = QFileInfo(path).dir();
+        const auto loadSide = [&](const char *fileName, QVariantMap *overlay, bool *present) {
+            const QString sidePath = dir.filePath(QLatin1String(fileName));
+            if (!QFile::exists(sidePath))
+                return true;
+            if (QFileInfo(sidePath).isSymLink()) {
+                *error = QStringLiteral("refusing to read variant symlink %1").arg(sidePath);
+                qWarning("theme: %s", qPrintable(*error));
+                return false;
+            }
+            QVariantMap side = readObject(sidePath, error);
+            if (!error->isEmpty())
+                return false;
+            QString overlayError;
+            if (!validateOverlay(side, sidePath, &overlayError)) {
+                *error = overlayError;
+                return false;
+            }
+            stripOverlayMeta(&side);
+            *overlay = deepMerge(*overlay, side).toMap();
+            *present = true;
+            return true;
+        };
+        if (!loadSide("theme.dark.json", &darkOverlay, &hasDark)
+            || !loadSide("theme.light.json", &lightOverlay, &hasLight))
+            return std::nullopt;
+    }
+
+    const bool hasVariants = hasDark && hasLight;
+    QString declared = merged.value(QStringLiteral("variant")).toString();
+    if (declared != QLatin1String("dark") && declared != QLatin1String("light"))
+        declared.clear();
+    if (hasVariants) {
+        const QString side = m_requestedVariant == QLatin1String("light") ? QStringLiteral("light")
+                                                                           : QStringLiteral("dark");
+        merged = deepMerge(merged, side == QLatin1String("light") ? lightOverlay : darkOverlay).toMap();
+        declared = side;
+    } else if (hasDark || hasLight) {
+        merged = deepMerge(merged, hasDark ? darkOverlay : lightOverlay).toMap();
+        if (declared.isEmpty())
+            declared = hasDark ? QStringLiteral("dark") : QStringLiteral("light");
+    } else if (declared.isEmpty()) {
+        declared = QStringLiteral("dark");
+    }
+    merged.insert(QStringLiteral("variant"), declared);
+
     QString leafName = readThemeName(path);
     if (leafName.isEmpty())
         leafName = fallbackName(path);
@@ -759,8 +1166,10 @@ std::optional<ThemeManager::Loaded> ThemeManager::readTheme(const QString &nameO
     loaded.document = coerced.toMap();
     loaded.path = isBuiltinPath(path) ? path : QFileInfo(path).absoluteFilePath();
     loaded.name = loaded.document.value(QStringLiteral("name")).toString();
-    loaded.variant = loaded.document.value(QStringLiteral("variant")).toString();
+    loaded.variant = declared;
+    loaded.hasVariants = hasVariants;
     loaded.user = !isBuiltinPath(loaded.path);
+    loaded.document.insert(QStringLiteral("variant"), declared);
     return loaded;
 }
 
@@ -769,6 +1178,8 @@ void ThemeManager::apply(const Loaded &loaded)
     m_currentTheme = loaded.name;
     m_sourcePath = loaded.path;
     m_userTheme = loaded.user;
+    m_hasVariants = loaded.hasVariants;
+    m_effectiveVariant = loaded.variant.isEmpty() ? QStringLiteral("dark") : loaded.variant;
     m_resolved = loaded.document;
     if (loaded.path == QLatin1String(kDarkResource))
         m_builtinDark = loaded.document;
@@ -803,6 +1214,12 @@ void ThemeManager::updateWatch()
     if (isFolderTheme(m_sourcePath)) {
         const QFileInfo source(m_sourcePath);
         paths.append(source.dir().absolutePath());
+        const QString darkSide = source.dir().filePath(QStringLiteral("theme.dark.json"));
+        const QString lightSide = source.dir().filePath(QStringLiteral("theme.light.json"));
+        if (QFile::exists(darkSide))
+            paths.append(darkSide);
+        if (QFile::exists(lightSide))
+            paths.append(lightSide);
         const QString qmlDirPath = themeQmlDirectory(m_sourcePath);
         if (QDir(qmlDirPath).exists()) {
             paths.append(qmlDirPath);
@@ -823,4 +1240,612 @@ void ThemeManager::onThemeFileChanged(const QString &path)
     m_inReload = true;
     reload();
     m_inReload = false;
+}
+
+QVariantList ThemeManager::themes() const
+{
+    QVariantList list;
+    list.append(themeRecord(QStringLiteral("dark"), QString::fromLatin1(kDarkResource), true));
+    list.append(themeRecord(QStringLiteral("light"), QString::fromLatin1(kLightResource), true));
+
+    const QDir dir(userThemesDirectory());
+    if (!dir.exists())
+        return list;
+
+    QStringList seen;
+    const QFileInfoList entries = dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    for (const QFileInfo &info : entries) {
+        QString path;
+        QString fallback;
+        if (info.isDir()) {
+            path = info.filePath() + QStringLiteral("/theme.json");
+            if (!QFile::exists(path))
+                continue;
+            fallback = info.fileName();
+        } else if (info.suffix().compare(QLatin1String("json"), Qt::CaseInsensitive) == 0) {
+            path = info.absoluteFilePath();
+            fallback = info.completeBaseName();
+        } else {
+            continue;
+        }
+        QString name = readThemeName(path);
+        if (name.isEmpty())
+            name = fallback;
+        if (!isSafeThemeId(name) || seen.contains(name))
+            continue;
+        seen.append(name);
+        list.append(themeRecord(name, path, false));
+    }
+    return list;
+}
+
+QVariantMap ThemeManager::themeRecord(const QString &id, const QString &path, bool builtIn) const
+{
+    QString error;
+    const QVariantMap raw = readObject(path, &error, false);
+    QString name = raw.value(QStringLiteral("name")).toString().trimmed();
+    if (name.isEmpty())
+        name = id;
+
+    bool hasDarkFile = false;
+    bool hasLightFile = false;
+    if (!builtIn && QFileInfo(path).fileName() == QLatin1String("theme.json")) {
+        const QDir dir = QFileInfo(path).dir();
+        hasDarkFile = QFile::exists(dir.filePath(QStringLiteral("theme.dark.json")));
+        hasLightFile = QFile::exists(dir.filePath(QStringLiteral("theme.light.json")));
+    }
+    const QVariantMap variants = raw.value(QStringLiteral("variants")).toMap();
+    const bool hasDark = variants.contains(QStringLiteral("dark")) || hasDarkFile;
+    const bool hasLight = variants.contains(QStringLiteral("light")) || hasLightFile;
+    QString variant = raw.value(QStringLiteral("variant")).toString();
+    if (variant != QLatin1String("dark") && variant != QLatin1String("light"))
+        variant = (hasLight && !hasDark) ? QStringLiteral("light") : QStringLiteral("dark");
+
+    bool translucent = false;
+    if (raw.contains(QStringLiteral("window")))
+        translucent = raw.value(QStringLiteral("window")).toMap().value(QStringLiteral("translucent")).toBool();
+
+    QVariantMap row;
+    row.insert(QStringLiteral("id"), id);
+    row.insert(QStringLiteral("name"), name);
+    row.insert(QStringLiteral("variant"), variant);
+    row.insert(QStringLiteral("builtIn"), builtIn);
+    row.insert(QStringLiteral("hasOverrides"), !overrideSlots(id).isEmpty());
+    row.insert(QStringLiteral("trusted"), isThemeTrusted(id));
+    row.insert(QStringLiteral("path"), builtIn ? path : QFileInfo(path).absoluteFilePath());
+    row.insert(QStringLiteral("hasVariants"), hasDark && hasLight);
+    row.insert(QStringLiteral("translucent"), translucent);
+    return row;
+}
+
+QVariantMap ThemeManager::previewColors(const QString &id) const
+{
+    const QString key = id.trimmed();
+    const QString which = (key.isEmpty() || key == QLatin1String("system"))
+                              ? (m_requestedVariant == QLatin1String("light") ? QStringLiteral("light")
+                                                                              : QStringLiteral("dark"))
+                              : key;
+    QString error;
+    const std::optional<Loaded> loaded = readTheme(which, &error);
+    if (!loaded)
+        return {};
+    QVariantMap colors;
+    colors.insert(QStringLiteral("surface"), lookupPath(loaded->document, QStringLiteral("semantic.surface.app")));
+    colors.insert(QStringLiteral("panel"), lookupPath(loaded->document, QStringLiteral("semantic.surface.panel")));
+    colors.insert(QStringLiteral("accent"), lookupPath(loaded->document, QStringLiteral("semantic.accent")));
+    colors.insert(QStringLiteral("foreground"), lookupPath(loaded->document, QStringLiteral("semantic.foreground")));
+    colors.insert(QStringLiteral("primary"), lookupPath(loaded->document, QStringLiteral("semantic.primary")));
+    return colors;
+}
+
+bool ThemeManager::select(const QString &id)
+{
+    const QString choice = id.trimmed();
+    if (choice.isEmpty()) {
+        setLastError(QStringLiteral("empty theme selection"));
+        return false;
+    }
+    if (choice == QLatin1String("system")) {
+        const QString side = m_requestedVariant == QLatin1String("light") ? QStringLiteral("light")
+                                                                           : QStringLiteral("dark");
+        m_sessionOverride = false;
+        m_selection = QStringLiteral("system");
+        writeSelection();
+        bool ok = true;
+        if (m_userTheme || m_currentTheme != side)
+            ok = loadTheme(side);
+        else
+            setLastError({});
+        emit selectionChanged();
+        return ok;
+    }
+    if (choice == QLatin1String("dark") || choice == QLatin1String("light")) {
+        m_sessionOverride = false;
+        m_requestedVariant = choice;
+        m_selection = choice;
+        writeSelection();
+        const bool ok = loadTheme(choice);
+        emit selectionChanged();
+        return ok;
+    }
+
+    QString error;
+    const std::optional<Loaded> loaded = readTheme(choice, &error);
+    if (!loaded) {
+        setLastError(error.isEmpty() ? QStringLiteral("unknown theme \"%1\"").arg(choice) : error);
+        return false;
+    }
+    if (loaded->user && !isSafeThemeId(loaded->name)) {
+        setLastError(QStringLiteral("theme name \"%1\" cannot be selected").arg(loaded->name));
+        return false;
+    }
+    m_sessionOverride = false;
+    m_selection = loaded->user ? loaded->name : choice;
+    writeSelection();
+    apply(*loaded);
+    setLastError({});
+    emit selectionChanged();
+    return true;
+}
+
+QUrl ThemeManager::themesFolderUrl() const
+{
+    const QString dir = userThemesDirectory();
+    QDir().mkpath(dir);
+    return QUrl::fromLocalFile(QDir(dir).absolutePath());
+}
+
+bool ThemeManager::exportTheme(const QUrl &file)
+{
+    QString path;
+    if (file.isLocalFile())
+        path = file.toLocalFile();
+    else if (file.scheme().isEmpty())
+        path = file.toString();
+    if (path.isEmpty()) {
+        setLastError(QStringLiteral("export path is not a local file"));
+        return false;
+    }
+    if (m_resolved.isEmpty()) {
+        setLastError(QStringLiteral("no theme is loaded"));
+        return false;
+    }
+
+    QVariantMap doc = m_resolved;
+    doc.remove(QStringLiteral("extends"));
+    doc.remove(QStringLiteral("variants"));
+    const QJsonObject object = variantToJson(doc).toObject();
+    QSaveFile out(path);
+    if (!out.open(QIODevice::WriteOnly)) {
+        setLastError(QStringLiteral("cannot write %1: %2").arg(path, out.errorString()));
+        return false;
+    }
+    const QByteArray bytes = QJsonDocument(object).toJson(QJsonDocument::Indented);
+    if (out.write(bytes) != bytes.size() || !out.commit()) {
+        setLastError(QStringLiteral("cannot write %1: %2").arg(path, out.errorString()));
+        return false;
+    }
+    setLastError({});
+    return true;
+}
+
+bool ThemeManager::removeTheme(const QString &id)
+{
+    const QString theme = id.trimmed();
+    if (theme.isEmpty() || theme == QLatin1String("dark") || theme == QLatin1String("light")
+        || theme == QLatin1String("system")) {
+        setLastError(QStringLiteral("built-in themes cannot be removed"));
+        return false;
+    }
+    QString error;
+    const QString path = pathForThemeName(theme, &error);
+    if (path.isEmpty() || isBuiltinPath(path)) {
+        setLastError(error.isEmpty() ? QStringLiteral("unknown theme \"%1\"").arg(theme) : error);
+        return false;
+    }
+    if (!removeInstalled(path, &error)) {
+        setLastError(error);
+        return false;
+    }
+    setThemeTrusted(theme, false);
+    if (m_selection == theme || m_currentTheme == theme) {
+        const QString side = m_requestedVariant == QLatin1String("light") ? QStringLiteral("light")
+                                                                           : QStringLiteral("dark");
+        m_sessionOverride = false;
+        m_selection = QStringLiteral("system");
+        writeSelection();
+        loadTheme(side);
+        emit selectionChanged();
+    }
+    emit availableThemesChanged();
+    setLastError({});
+    return true;
+}
+
+bool ThemeManager::removeInstalled(const QString &path, QString *error) const
+{
+    const QString root = QFileInfo(userThemesDirectory()).absoluteFilePath();
+    const QFileInfo info(path);
+    if (info.isSymLink()) {
+        *error = QStringLiteral("refusing to delete a symlink");
+        return false;
+    }
+    const QString canonical = info.canonicalFilePath();
+    if (canonical.isEmpty() || canonical == root || !canonical.startsWith(root + QLatin1Char('/'))) {
+        *error = QStringLiteral("theme is outside the themes directory");
+        return false;
+    }
+    if (info.fileName() == QLatin1String("theme.json")) {
+        const QString dirPath = info.dir().canonicalPath();
+        if (dirPath.isEmpty() || dirPath == root || !dirPath.startsWith(root + QLatin1Char('/'))) {
+            *error = QStringLiteral("theme is outside the themes directory");
+            return false;
+        }
+        if (!QDir(dirPath).removeRecursively()) {
+            *error = QStringLiteral("cannot remove %1").arg(dirPath);
+            return false;
+        }
+        return true;
+    }
+    if (!QFile::remove(canonical)) {
+        *error = QStringLiteral("cannot remove %1").arg(canonical);
+        return false;
+    }
+    return true;
+}
+
+QString ThemeManager::importTheme(const QUrl &url)
+{
+    QTemporaryDir scratch;
+    if (!scratch.isValid()) {
+        setLastError(QStringLiteral("cannot create a temporary directory"));
+        return {};
+    }
+
+    QString path;
+    if (url.isLocalFile())
+        path = url.toLocalFile();
+    else if (url.scheme().isEmpty())
+        path = url.toString();
+    else {
+        QFile input(url.toString());
+        if (!input.open(QIODevice::ReadOnly)) {
+            setLastError(QStringLiteral("cannot open %1").arg(url.toString()));
+            return {};
+        }
+        const QByteArray data = input.read(kMaxThemeTotalBytes + 1);
+        if (data.size() > kMaxThemeTotalBytes) {
+            setLastError(QStringLiteral("theme file is too large"));
+            return {};
+        }
+        path = scratch.filePath(QStringLiteral("upload"));
+        QFile out(path);
+        if (!out.open(QIODevice::WriteOnly) || out.write(data) != data.size()) {
+            setLastError(QStringLiteral("cannot stage the theme file"));
+            return {};
+        }
+    }
+    if (path.isEmpty()) {
+        setLastError(QStringLiteral("no theme file"));
+        return {};
+    }
+    const QString id = importLocal(path);
+    if (!id.isEmpty())
+        emit availableThemesChanged();
+    return id;
+}
+
+QString ThemeManager::importLocal(const QString &path)
+{
+    const QFileInfo info(path);
+    if (!info.exists()) {
+        setLastError(QStringLiteral("theme file not found: %1").arg(path));
+        return {};
+    }
+    if (info.isSymLink()) {
+        setLastError(QStringLiteral("refusing to import a symlink"));
+        return {};
+    }
+
+    auto acceptDirectory = [&](const QString &dir) {
+        const QString themeFile = QDir(dir).filePath(QStringLiteral("theme.json"));
+        if (!QFile::exists(themeFile)) {
+            setLastError(QStringLiteral("no theme.json in %1").arg(dir));
+            return QString();
+        }
+        if (QFileInfo(themeFile).isSymLink()) {
+            setLastError(QStringLiteral("refusing to import a symlink"));
+            return QString();
+        }
+        const QDir qmlDir(QDir(dir).filePath(QStringLiteral("qml")));
+        if (qmlDir.exists()) {
+            if (QFileInfo(qmlDir.absolutePath()).isSymLink()) {
+                setLastError(QStringLiteral("refusing to import a symlinked qml directory"));
+                return QString();
+            }
+            const QFileInfoList qmlFiles = qmlDir.entryInfoList({QStringLiteral("*.qml")}, QDir::Files);
+            for (const QFileInfo &qmlFile : qmlFiles) {
+                if (qmlFile.isSymLink() || !isValidSlotName(qmlFile.completeBaseName())) {
+                    setLastError(QStringLiteral("theme qml override is not allowed: %1").arg(qmlFile.fileName()));
+                    return QString();
+                }
+                const QString qmlRoot = QFileInfo(qmlDir.absolutePath()).canonicalFilePath();
+                const QString qmlPath = qmlFile.canonicalFilePath();
+                if (qmlRoot.isEmpty() || !qmlPath.startsWith(qmlRoot + QLatin1Char('/'))) {
+                    setLastError(QStringLiteral("theme qml override escapes the theme folder"));
+                    return QString();
+                }
+            }
+        }
+        QString error;
+        const std::optional<Loaded> loaded = readTheme(dir, &error);
+        if (!loaded) {
+            setLastError(error.isEmpty() ? QStringLiteral("invalid theme") : error);
+            return QString();
+        }
+        if (!isSafeThemeId(loaded->name)) {
+            setLastError(QStringLiteral("theme name \"%1\" cannot be installed").arg(loaded->name));
+            return QString();
+        }
+        if (!installDirectory(dir, loaded->name, &error)) {
+            setLastError(error);
+            return QString();
+        }
+        setLastError({});
+        return loaded->name;
+    };
+
+    if (info.isDir())
+        return acceptDirectory(info.absoluteFilePath());
+
+    const QString suffix = info.suffix().toLower();
+    if (suffix == QLatin1String("zip")) {
+        QTemporaryDir extracted;
+        if (!extracted.isValid()) {
+            setLastError(QStringLiteral("cannot create a temporary directory"));
+            return {};
+        }
+        QString error;
+        if (!extractZipTheme(info.absoluteFilePath(), extracted.path(), &error)) {
+            setLastError(error.isEmpty() ? QStringLiteral("cannot read the theme archive") : error);
+            return {};
+        }
+        return acceptDirectory(extracted.path());
+    }
+    if (suffix != QLatin1String("json")) {
+        setLastError(QStringLiteral("theme import must be a .json file, a folder, or a .zip"));
+        return {};
+    }
+    if (info.size() > kMaxThemeFileBytes) {
+        setLastError(QStringLiteral("theme file is too large"));
+        return {};
+    }
+
+    QString error;
+    const std::optional<Loaded> loaded = readTheme(info.absoluteFilePath(), &error);
+    if (!loaded) {
+        setLastError(error.isEmpty() ? QStringLiteral("invalid theme") : error);
+        return {};
+    }
+    if (!isSafeThemeId(loaded->name)) {
+        setLastError(QStringLiteral("theme name \"%1\" cannot be installed").arg(loaded->name));
+        return {};
+    }
+    if (!installJsonFile(info.absoluteFilePath(), loaded->name, &error)) {
+        setLastError(error);
+        return {};
+    }
+    setLastError({});
+    return loaded->name;
+}
+
+bool ThemeManager::installJsonFile(const QString &sourceFile, const QString &id, QString *error) const
+{
+    const QString root = userThemesDirectory();
+    if (!QDir().mkpath(root)) {
+        *error = QStringLiteral("cannot create the themes directory");
+        return false;
+    }
+    const QString dest = QDir(root).filePath(id + QStringLiteral(".json"));
+    const QString destDir = QDir(root).filePath(id);
+    if (QFileInfo::exists(dest) || QFileInfo(destDir).exists()) {
+        *error = QStringLiteral("theme \"%1\" is already installed").arg(id);
+        return false;
+    }
+    if (!pathIsInside(root, dest)) {
+        *error = QStringLiteral("theme id escapes the themes directory");
+        return false;
+    }
+    if (!QFile::copy(sourceFile, dest)) {
+        *error = QStringLiteral("cannot copy theme to %1").arg(dest);
+        return false;
+    }
+    return true;
+}
+
+bool ThemeManager::installDirectory(const QString &sourceDir, const QString &id, QString *error) const
+{
+    const QString root = userThemesDirectory();
+    if (!QDir().mkpath(root)) {
+        *error = QStringLiteral("cannot create the themes directory");
+        return false;
+    }
+    const QString dest = QDir(root).filePath(id);
+    const QString destFile = QDir(root).filePath(id + QStringLiteral(".json"));
+    if (QFileInfo::exists(dest) || QFileInfo::exists(destFile)) {
+        *error = QStringLiteral("theme \"%1\" is already installed").arg(id);
+        return false;
+    }
+    if (!pathIsInside(root, dest) || !QDir().mkpath(dest)) {
+        *error = QStringLiteral("cannot create %1").arg(dest);
+        return false;
+    }
+
+    const auto copyChecked = [&](const QString &from, const QString &to) {
+        const QFileInfo fromInfo(from);
+        if (fromInfo.isSymLink()) {
+            *error = QStringLiteral("refusing to copy a symlink");
+            return false;
+        }
+        if (fromInfo.size() > kMaxThemeFileBytes) {
+            *error = QStringLiteral("theme file is too large");
+            return false;
+        }
+        if (!pathIsInside(dest, to) || !QFile::copy(from, to)) {
+            *error = QStringLiteral("cannot copy %1").arg(fromInfo.fileName());
+            return false;
+        }
+        return true;
+    };
+    const auto cleanup = [&]() { QDir(dest).removeRecursively(); };
+
+    if (!copyChecked(QDir(sourceDir).filePath(QStringLiteral("theme.json")),
+                     QDir(dest).filePath(QStringLiteral("theme.json")))) {
+        cleanup();
+        return false;
+    }
+    for (const char *sideName : {"theme.dark.json", "theme.light.json"}) {
+        const QString from = QDir(sourceDir).filePath(QLatin1String(sideName));
+        if (!QFile::exists(from))
+            continue;
+        if (!copyChecked(from, QDir(dest).filePath(QLatin1String(sideName)))) {
+            cleanup();
+            return false;
+        }
+    }
+    const QDir qmlDir(QDir(sourceDir).filePath(QStringLiteral("qml")));
+    if (qmlDir.exists() && !QFileInfo(qmlDir.absolutePath()).isSymLink()) {
+        const QString qmlDest = QDir(dest).filePath(QStringLiteral("qml"));
+        if (!QDir().mkpath(qmlDest)) {
+            *error = QStringLiteral("cannot create %1").arg(qmlDest);
+            cleanup();
+            return false;
+        }
+        const QFileInfoList qmlFiles = qmlDir.entryInfoList({QStringLiteral("*.qml")}, QDir::Files, QDir::Name);
+        for (const QFileInfo &qmlFile : qmlFiles) {
+            if (!isValidSlotName(qmlFile.completeBaseName()))
+                continue;
+            if (!copyChecked(qmlFile.absoluteFilePath(), QDir(qmlDest).filePath(qmlFile.fileName()))) {
+                cleanup();
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool ThemeManager::extractZipTheme(const QString &zipPath, const QString &destDir, QString *error) const
+{
+    QFile file(zipPath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        *error = QStringLiteral("cannot open %1: %2").arg(zipPath, file.errorString());
+        return false;
+    }
+    if (!zipIsSafe(file, error))
+        return false;
+
+    QString readError;
+    const QList<drift::zip::Entry> entries = drift::zip::readEntries(file, &readError);
+    if (entries.isEmpty() && !readError.isEmpty()) {
+        *error = readError;
+        return false;
+    }
+
+    struct Item
+    {
+        QString relative;
+        drift::zip::Entry entry;
+    };
+    QList<Item> items;
+    for (const drift::zip::Entry &entry : entries) {
+        if (entry.isDir || isJunkZipPath(entry.path))
+            continue;
+        items.append({entry.path, entry});
+    }
+
+    QString prefix;
+    if (!items.isEmpty()) {
+        const int slash = items.first().relative.indexOf(QLatin1Char('/'));
+        if (slash > 0) {
+            const QString candidate = items.first().relative.left(slash + 1);
+            bool shared = true;
+            for (const Item &item : items) {
+                if (!item.relative.startsWith(candidate)) {
+                    shared = false;
+                    break;
+                }
+            }
+            if (shared)
+                prefix = candidate;
+        }
+    }
+
+    QStringList relatives;
+    relatives.reserve(items.size());
+    for (const Item &item : items)
+        relatives.append(item.relative.mid(prefix.size()));
+    bool hasThemeJson = false;
+    for (const QString &relative : relatives) {
+        if (relative == QLatin1String("theme.json"))
+            hasThemeJson = true;
+    }
+
+    if (!QDir().mkpath(destDir)) {
+        *error = QStringLiteral("cannot create a temporary directory");
+        return false;
+    }
+
+    bool wroteTheme = false;
+    bool wroteLoneJson = false;
+    qint64 total = 0;
+    for (int i = 0; i < items.size(); ++i) {
+        const QString relative = relatives.at(i);
+        if (relative.isEmpty())
+            continue;
+        const bool allowed = isAllowedThemeRelative(relative);
+        const bool loneJson = !hasThemeJson && !relative.contains(QLatin1Char('/'))
+                              && relative.endsWith(QLatin1String(".json"), Qt::CaseInsensitive);
+        if (!allowed && !loneJson)
+            continue;
+        if (loneJson && wroteLoneJson) {
+            *error = QStringLiteral("archive has more than one theme file");
+            return false;
+        }
+
+        QByteArray data;
+        if (!drift::zip::extractEntry(file, items.at(i).entry, data)) {
+            *error = QStringLiteral("cannot extract %1").arg(items.at(i).relative);
+            return false;
+        }
+        if (data.size() > kMaxThemeFileBytes || total + data.size() > kMaxThemeTotalBytes) {
+            *error = QStringLiteral("theme archive is too large");
+            return false;
+        }
+        total += data.size();
+
+        const QString outRelative = loneJson ? QStringLiteral("theme.json") : relative;
+        const QString outPath = QDir(destDir).filePath(outRelative);
+        if (!pathIsInside(destDir, outPath)) {
+            *error = QStringLiteral("theme archive path escapes the destination");
+            return false;
+        }
+        if (!QDir().mkpath(QFileInfo(outPath).path())) {
+            *error = QStringLiteral("cannot create %1").arg(QFileInfo(outPath).path());
+            return false;
+        }
+        QFile out(outPath);
+        if (!out.open(QIODevice::WriteOnly | QIODevice::Truncate) || out.write(data) != data.size()) {
+            *error = QStringLiteral("cannot write %1").arg(outRelative);
+            return false;
+        }
+        if (outRelative == QLatin1String("theme.json"))
+            wroteTheme = true;
+        if (loneJson)
+            wroteLoneJson = true;
+    }
+    if (!wroteTheme) {
+        *error = QStringLiteral("archive does not contain a theme");
+        return false;
+    }
+    return true;
 }

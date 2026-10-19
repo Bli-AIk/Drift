@@ -1286,12 +1286,51 @@ set_source_files_properties(src/qml/AssetDrag.qml PROPERTIES QT_QML_SINGLETON_TY
 file(GLOB DRIFT_LUCIDE_ICONS RELATIVE "${CMAKE_SOURCE_DIR}" CONFIGURE_DEPENDS
      "resources/icons/*.svg")
 
+# Native window backdrops. Linux blur is optional: KF6WindowSystem when the
+# package is present, otherwise the X11 _KDE_NET_WM_BLUR_BEHIND_REGION atom.
+set(DRIFT_BACKDROP_PLATFORM_SOURCES)
+set(DRIFT_BACKDROP_PLATFORM_LIBS)
+set(DRIFT_BACKDROP_PLATFORM_DEFS)
+if(WIN32)
+    list(APPEND DRIFT_BACKDROP_PLATFORM_SOURCES src/theme/WindowBackdrop_win.cpp)
+    list(APPEND DRIFT_BACKDROP_PLATFORM_LIBS dwmapi)
+elseif(APPLE AND CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    # .mm sources are Objective-C++. The project() languages are CXX and C so
+    # Linux configure does not ask for a language this host does not have.
+    set(CMAKE_OBJCXX_STANDARD 20)
+    set(CMAKE_OBJCXX_STANDARD_REQUIRED ON)
+    enable_language(OBJCXX)
+    list(APPEND DRIFT_BACKDROP_PLATFORM_SOURCES src/theme/WindowBackdrop_mac.mm)
+    list(APPEND DRIFT_BACKDROP_PLATFORM_LIBS "-framework Cocoa")
+elseif(UNIX AND NOT ANDROID AND NOT EMSCRIPTEN AND NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+    list(APPEND DRIFT_BACKDROP_PLATFORM_SOURCES src/theme/WindowBackdrop_linux.cpp)
+    find_package(KF6WindowSystem QUIET)
+    if(KF6WindowSystem_FOUND)
+        list(APPEND DRIFT_BACKDROP_PLATFORM_LIBS KF6::WindowSystem)
+        list(APPEND DRIFT_BACKDROP_PLATFORM_DEFS DRIFT_HAS_KF6_WINDOW_SYSTEM)
+        message(STATUS "Window backdrop: KF6WindowSystem blur")
+    else()
+        message(STATUS "Window backdrop: KF6WindowSystem not found; KDE blur disabled")
+    endif()
+    if(PkgConfig_FOUND)
+        pkg_check_modules(XCB QUIET IMPORTED_TARGET xcb)
+        if(XCB_FOUND)
+            list(APPEND DRIFT_BACKDROP_PLATFORM_LIBS PkgConfig::XCB)
+            list(APPEND DRIFT_BACKDROP_PLATFORM_DEFS DRIFT_HAS_XCB)
+            message(STATUS "Window backdrop: X11 blur atom via xcb")
+        endif()
+    endif()
+endif()
+
 qt_add_qml_module(drift
     URI Drift
     VERSION 1.0
     SOURCES
         src/theme/ThemeManager.h
         src/theme/ThemeManager.cpp
+        src/theme/WindowBackdrop.h
+        src/theme/WindowBackdrop.cpp
+        ${DRIFT_BACKDROP_PLATFORM_SOURCES}
     QML_FILES
         src/qml/Shell.qml
         src/qml/LayoutPresets.qml
@@ -1726,6 +1765,7 @@ qt_add_qml_module(drift
         src/qml/components/dialogs/AboutDialog.qml
         src/qml/components/dialogs/UpdateDialog.qml
         src/qml/components/dialogs/DebugInfoDialog.qml
+        src/qml/components/dialogs/ThemeTrustDialog.qml
         src/qml/components/preview/PlaybackStatsOverlay.qml
         src/qml/components/preview/transport/PreviewTransportTimecode.qml
         src/qml/components/preview/transport/PreviewTransportStepForwardButton.qml
@@ -1960,6 +2000,11 @@ qt_add_qml_module(drift
         src/qml/components/shell/StartScreenProjectRow.qml
         src/qml/components/shell/StartScreenActions.qml
         src/qml/components/shell/SettingsSectionCard.qml
+        src/qml/components/shell/SettingsAppearanceSection.qml
+        src/qml/components/shell/SettingsThemeList.qml
+        src/qml/components/shell/SettingsThemeEntry.qml
+        src/qml/components/shell/SettingsAppearanceActions.qml
+        src/qml/components/shell/SettingsAppearanceTranslucency.qml
         src/qml/components/shell/SettingsPreviewSection.qml
         src/qml/components/shell/SettingsPlaybackSection.qml
         src/qml/components/shell/SettingsMarketplaceSection.qml
@@ -2020,6 +2065,12 @@ target_link_libraries(drift PRIVATE
     driftengine
 )
 target_include_directories(drift PRIVATE src src/theme src/preview)
+if(DRIFT_BACKDROP_PLATFORM_LIBS)
+    target_link_libraries(drift PRIVATE ${DRIFT_BACKDROP_PLATFORM_LIBS})
+endif()
+if(DRIFT_BACKDROP_PLATFORM_DEFS)
+    target_compile_definitions(drift PRIVATE ${DRIFT_BACKDROP_PLATFORM_DEFS})
+endif()
 
 if(ANDROID)
     # FileDialogs registers a QtAndroidPrivate::NewIntentListener so a second ACTION_VIEW reaches a

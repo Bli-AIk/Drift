@@ -6,7 +6,13 @@ import Drift
 ApplicationWindow {
     id: window
     visible: true
-    color: Theme.c.androidMain.background
+    // Android never starts translucent; windowBackground forces alpha to 1 so a
+    // theme token with alpha cannot clear this surface to black.
+    color: {
+        const opacity = ThemeManager.window.backgroundOpacity
+        const multiplier = (opacity === undefined || opacity === null) ? 1 : opacity
+        return WindowBackdrop.windowBackground(Theme.c.androidMain.background, multiplier)
+    }
     title: "CutWire Drift"
 
     // On Android the platform sizes the window. Chosen on a desktop, this shell opens phone-shaped
@@ -831,6 +837,7 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
+        WindowBackdrop.attach(window)
         Theme.windowWidth = window.width
         // Independent of the language/recovery/launch-intent branching below — it
         // neither gates nor is gated by any of it.

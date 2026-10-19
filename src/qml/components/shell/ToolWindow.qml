@@ -17,7 +17,11 @@ Item {
     default property alias content: holder.data
 
     property string title: ""
-    property color color: Theme.c.toolWindow.background
+    property color color: {
+        const opacity = ThemeManager.window.backgroundOpacity
+        const multiplier = (opacity === undefined || opacity === null) ? 1 : opacity
+        return WindowBackdrop.windowBackground(Theme.c.toolWindow.background, multiplier)
+    }
     property real minimumWidth: 0
     property real minimumHeight: 0
 
@@ -56,6 +60,7 @@ Item {
         id: windowComponent
 
         Window {
+            id: toolHost
             title: root.title
             color: root.color
             minimumWidth: root.minimumWidth
@@ -63,6 +68,7 @@ Item {
 
             onClosing: (close) => root.closing(close)
             onVisibleChanged: if (root.visible !== visible) root.visible = visible
+            Component.onCompleted: WindowBackdrop.attach(toolHost)
         }
     }
 
