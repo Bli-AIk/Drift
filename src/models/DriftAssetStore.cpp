@@ -3,7 +3,7 @@
 #include "models/AppController.h"
 #include "models/AssetLibrary.h"
 #include "models/MarketClient.h"
-#include "engine/FacePropCatalog.h"
+#include "engine/face/props/FacePropCatalog.h"
 
 #include <QCryptographicHash>
 #include <QDir>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/project/clip/Clip.h"
-#include "engine/SceneDetect.h"
+#include "engine/ml/vision/detection/SceneDetect.h"
 
 #include <QAtomicInt>
 #include <QObject>
@@ -13,7 +13,7 @@ class AppController;
 // Shot detection for a video clip, reached from QML as EditorState.scenes.
 // Detected shots for the clip named by clipId. Analysis state, not project state:
 // it describes the source media, so it is cached on disk rather than saved (see
-// engine/SceneDetect.h) and is never pushed through the undo stack.
+// engine/ml/vision/detection/SceneDetect.h) and is never pushed through the undo stack.
 class SceneDetectController : public QObject
 {
     Q_OBJECT

@@ -7,10 +7,10 @@
 // at a window seam (frames 24..31, 46..53, ...) shows up as a spike in the change column.
 
 #include "core/base/Time.h"
-#include "engine/ClipReaderPool.h"
-#include "engine/DepthSidecar.h"
-#include "engine/MediaProbe.h"
-#include "engine/VdaDepth.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/ml/vision/depth/DepthSidecar.h"
+#include "engine/decode/probe/MediaProbe.h"
+#include "engine/ml/vision/depth/VdaDepth.h"
 
 #include <QCoreApplication>
 #include <QElapsedTimer>

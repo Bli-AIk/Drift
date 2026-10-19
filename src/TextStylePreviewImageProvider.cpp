@@ -5,8 +5,8 @@
 #include "core/text/TextLook.h"
 #include "core/text/TextStyle.h"
 #ifdef DRIFT_WITH_SKIA
-#include "engine/SkiaRuntime.h"
-#include "engine/SkiaTextPainter.h"
+#include "engine/render2d/skia/SkiaRuntime.h"
+#include "engine/render2d/text/SkiaTextPainter.h"
 #endif
 
 #include <QCache>

@@ -1,6 +1,6 @@
 #include "core/project/media/ImageSequence.h"
-#include "engine/ProjectBundle.h"
-#include "engine/ProjectDependencies.h"
+#include "engine/project/ProjectBundle.h"
+#include "engine/project/ProjectDependencies.h"
 
 #include <QCoreApplication>
 #include <QCryptographicHash>

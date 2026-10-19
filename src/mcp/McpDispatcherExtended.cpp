@@ -16,8 +16,8 @@
 #include "models/AssetLibrary.h"
 #include "models/ProjectFileController.h"
 #include "preview/PreviewController.h"
-#include "engine/EditorView3d.h"
-#include "engine/SceneCamera3d.h"
+#include "engine/render3d/scene/EditorView3d.h"
+#include "engine/render3d/scene/SceneCamera3d.h"
 
 #include <QByteArray>
 #include <QDir>

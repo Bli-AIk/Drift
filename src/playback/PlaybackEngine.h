@@ -6,8 +6,8 @@
 #include "playback/PlaybackStats.h"
 #include "core/project/Project.h"
 #include "core/base/Time.h"
-#include "engine/AudioMixer.h"
-#include "engine/audio/ClipAudioRetimer.h"
+#include "engine/audio/AudioMixer.h"
+#include "engine/audio/dsp/ClipAudioRetimer.h"
 
 #include <memory>
 #include <QImage>

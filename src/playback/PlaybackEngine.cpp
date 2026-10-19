@@ -4,11 +4,11 @@
 
 #include <cstdio>
 
-#include "engine/AndroidUri.h"
-#include "engine/ClipReaderPool.h"
-#include "engine/GpuCompositor.h"
-#include "engine/HwAccel.h"
-#include "engine/ReverseProxyCache.h"
+#include "engine/platform/AndroidUri.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/compositor/GpuCompositor.h"
+#include "engine/decode/hw/HwAccel.h"
+#include "engine/encode/proxies/ReverseProxyCache.h"
 
 #include <QSettings>
 #include <QVariantMap>

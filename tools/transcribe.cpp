@@ -5,10 +5,10 @@
 //        --words runs the full local pipeline (VAD, Whisper, CTC alignment) and prints each word.
 //        --diarize also labels speakers.
 
-#include "engine/ClipReaderPool.h"
-#include "engine/LocalTranscription.h"
-#include "engine/MediaProbe.h"
-#include "engine/WhisperTranscriber.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/ml/speech/transcription/LocalTranscription.h"
+#include "engine/decode/probe/MediaProbe.h"
+#include "engine/ml/speech/transcription/WhisperTranscriber.h"
 #include "core/base/Time.h"
 
 #include <QCoreApplication>

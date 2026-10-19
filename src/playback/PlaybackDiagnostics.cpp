@@ -1,14 +1,14 @@
 #include "playback/PlaybackDiagnostics.h"
 
 #include "playback/PlaybackStats.h"
-#include "engine/ClipReader.h"
-#include "engine/DiagnosticsProbe.h"
-#include "engine/FrameCompositor.h"
-#include "engine/GpuCompositor.h"
-#include "engine/GpuStatus.h"
-#include "engine/HwAccel.h"
-#include "engine/MediaProbe.h"
-#include "engine/PreviewVideoFrame.h"
+#include "engine/decode/readers/ClipReader.h"
+#include "engine/diagnostics/DiagnosticsProbe.h"
+#include "engine/compositor/FrameCompositor.h"
+#include "engine/compositor/GpuCompositor.h"
+#include "engine/gpu/device/GpuStatus.h"
+#include "engine/decode/hw/HwAccel.h"
+#include "engine/decode/probe/MediaProbe.h"
+#include "engine/decode/readers/PreviewVideoFrame.h"
 
 #include <QCoreApplication>
 #include <QDir>

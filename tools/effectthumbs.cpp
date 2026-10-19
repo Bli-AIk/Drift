@@ -1,11 +1,11 @@
-#include "engine/DepthSidecar.h"
-#include "engine/EffectCatalog.h"
-#include "engine/EffectPackageLoader.h"
-#include "engine/EffectProcessor.h"
-#include "engine/FaceLandmarker.h"
-#include "engine/FaceSwapSource.h"
-#include "engine/GpuEffectExecutor.h"
-#include "engine/VdaDepth.h"
+#include "engine/ml/vision/depth/DepthSidecar.h"
+#include "engine/packages/effects/EffectCatalog.h"
+#include "engine/packages/effects/EffectPackageLoader.h"
+#include "engine/compositor/effects/EffectProcessor.h"
+#include "engine/face/tracking/FaceLandmarker.h"
+#include "engine/face/swap/FaceSwapSource.h"
+#include "engine/gpu/effects/GpuEffectExecutor.h"
+#include "engine/ml/vision/depth/VdaDepth.h"
 
 #include <QGuiApplication>
 #include <QDir>

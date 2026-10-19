@@ -2,10 +2,10 @@
 
 #include "models/AppController.h"
 #include "SegmentImageStore.h"
-#include "engine/ClipReaderPool.h"
-#include "engine/MediaEditor.h"
-#include "engine/MediaProbe.h"
-#include "engine/Restorer.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/encode/MediaEditor.h"
+#include "engine/decode/probe/MediaProbe.h"
+#include "engine/ml/vision/Restorer.h"
 #include "models/JobRegistry.h"
 
 #include <QDir>

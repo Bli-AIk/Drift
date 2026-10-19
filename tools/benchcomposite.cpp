@@ -6,8 +6,8 @@
 #include "core/project/Project.h"
 #include "core/project/Track.h"
 #include "core/project/Transition.h"
-#include "engine/FontCatalog.h"
-#include "engine/FrameCompositor.h"
+#include "engine/packages/assets/FontCatalog.h"
+#include "engine/compositor/FrameCompositor.h"
 
 #include <QElapsedTimer>
 #include <QFile>

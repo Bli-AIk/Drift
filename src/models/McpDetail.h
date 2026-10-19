@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/MediaWaveform.h"
+#include "engine/media/waveforms/MediaWaveform.h"
 #include "mcp/McpJson.h"
 
 #include <QEventLoop>
@@ -14,9 +14,9 @@
 #include <memory>
 
 #include "core/project/Project.h"
-#include "engine/AudioMixer.h"
-#include "engine/AudioOnsets.h"
-#include "engine/SceneDetect.h"
+#include "engine/audio/AudioMixer.h"
+#include "engine/audio/analysis/AudioOnsets.h"
+#include "engine/ml/vision/detection/SceneDetect.h"
 
 #include <QVariant>
 #include <QVector>

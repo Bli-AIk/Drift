@@ -443,7 +443,7 @@ jobs:
           # A host with no libva at all is handled in code, not here: FFmpeg reaches VA-API
           # through implib-gen stubs whose generated dlopen failure path is assert(0), so
           # hwaccel::deviceAvailable() dlopens libva.so.2 and libva-drm.so.2 itself before
-          # letting FFmpeg near VAAPI. See vaapiLoadable() in src/engine/HwAccel.cpp.
+          # letting FFmpeg near VAAPI. See vaapiLoadable() in src/engine/decode/hw/HwAccel.cpp.
           ./linuxdeploy.AppImage --appdir AppDir --plugin qt --output appimage \
             -d "${{ steps.appimage_meta.outputs.desktop }}" \
             -i "${{ steps.appimage_meta.outputs.icon }}" \

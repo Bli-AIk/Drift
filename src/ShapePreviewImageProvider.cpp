@@ -2,8 +2,8 @@
 
 #include "core/shapes/ShapeStyle.h"
 #ifdef DRIFT_WITH_SKIA
-#include "engine/SkiaRuntime.h"
-#include "engine/SkiaShapePainter.h"
+#include "engine/render2d/skia/SkiaRuntime.h"
+#include "engine/render2d/shapes/SkiaShapePainter.h"
 #endif
 
 #include <QCache>

@@ -4,9 +4,9 @@
 #include "models/AppControllerDetail.h"
 #include "models/AssetLibrary.h"
 #include "models/ProjectFileController.h"
-#include "engine/AndroidUri.h"
-#include "engine/MediaEditor.h"
-#include "engine/MediaProbe.h"
+#include "engine/platform/AndroidUri.h"
+#include "engine/encode/MediaEditor.h"
+#include "engine/decode/probe/MediaProbe.h"
 
 #include <QDir>
 #include <QFile>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "engine/AudioRecorder.h"
-#include "engine/ChatterboxTts.h"
+#include "engine/audio/AudioRecorder.h"
+#include "engine/ml/speech/tts/ChatterboxTts.h"
 
 #include <QAbstractListModel>
 #include <QDateTime>

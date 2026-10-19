@@ -3,7 +3,7 @@
 #include "playback/PerfLog.h"
 #include "playback/PlaybackClock.h"
 #include "playback/PlaybackStats.h"
-#include "engine/ClipReaderPool.h"
+#include "engine/decode/readers/ClipReaderPool.h"
 
 #include <QElapsedTimer>
 #include <QMetaType>

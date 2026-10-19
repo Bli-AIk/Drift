@@ -5,10 +5,10 @@
 #include <QVector>
 
 #include "core/project/Project.h"
-#include "engine/FrameCompositor.h"
-#include "engine/GpuCompositor.h"
-#include "engine/VectorClipRenderer.h"
-#include "engine/VectorInspect.h"
+#include "engine/compositor/FrameCompositor.h"
+#include "engine/compositor/GpuCompositor.h"
+#include "engine/render2d/vector/VectorClipRenderer.h"
+#include "engine/render2d/vector/VectorInspect.h"
 
 using namespace drift;
 

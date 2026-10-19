@@ -3,7 +3,7 @@
 #   emcmake cmake -S wasm -B build-wasm && cmake --build build-wasm
 #
 # It compiles the same sources as driftaudiodsp — the stages, the pedal catalog, the graph and its
-# C API (src/engine/audio/DriftGraphApi.h) — plus juce_dsp and SoundTouch, so a preview in the
+# C API (src/engine/audio/dsp/graph/DriftGraphApi.h) — plus juce_dsp and SoundTouch, so a preview in the
 # browser runs the code Drift runs. Forge's scripts/build-audio-wasm.sh drives this and copies the
 # result into Forge.
 cmake_minimum_required(VERSION 3.24)

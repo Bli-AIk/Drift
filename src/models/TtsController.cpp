@@ -3,9 +3,9 @@
 #include "models/AppController.h"
 #include "models/JobRegistry.h"
 #include "models/VoiceLibrary.h"
-#include "engine/AddonRegistry.h"
-#include "engine/AudioFileWriter.h"
-#include "engine/OrtRuntime.h"
+#include "engine/addons/AddonRegistry.h"
+#include "engine/encode/writers/AudioFileWriter.h"
+#include "engine/ml/runtime/OrtRuntime.h"
 
 #include <QDir>
 #include <QFile>

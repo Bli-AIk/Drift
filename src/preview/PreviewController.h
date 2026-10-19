@@ -1,7 +1,7 @@
 #pragma once
 
-#include "engine/EditorView3d.h"
-#include "engine/SceneCamera3d.h"
+#include "engine/render3d/scene/EditorView3d.h"
+#include "engine/render3d/scene/SceneCamera3d.h"
 
 #include <QMatrix4x4>
 #include <QObject>

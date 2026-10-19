@@ -3,10 +3,10 @@
 #include "models/AppController.h"
 #include "models/McpDetail.h"
 #include "models/JobRegistry.h"
-#include "engine/ClipReaderPool.h"
-#include "engine/DepthSidecar.h"
-#include "engine/StillImage.h"
-#include "engine/VdaDepth.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/ml/vision/depth/DepthSidecar.h"
+#include "engine/decode/probe/StillImage.h"
+#include "engine/ml/vision/depth/VdaDepth.h"
 
 #include <QCryptographicHash>
 #include <QDir>

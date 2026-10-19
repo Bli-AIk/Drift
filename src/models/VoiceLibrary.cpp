@@ -3,10 +3,10 @@
 #include "models/AppController.h"
 #include "models/JobRegistry.h"
 #include "models/TtsController.h"
-#include "engine/AddonRegistry.h"
-#include "engine/AudioFileWriter.h"
-#include "engine/MediaProbe.h"
-#include "engine/SpeechAudio.h"
+#include "engine/addons/AddonRegistry.h"
+#include "engine/encode/writers/AudioFileWriter.h"
+#include "engine/decode/probe/MediaProbe.h"
+#include "engine/ml/speech/SpeechAudio.h"
 
 #include <QDir>
 #include <QFile>

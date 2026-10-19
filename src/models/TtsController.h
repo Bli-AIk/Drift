@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/ChatterboxTts.h"
+#include "engine/ml/speech/tts/ChatterboxTts.h"
 
 #include <QObject>
 #include <QString>

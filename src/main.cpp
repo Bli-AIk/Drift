@@ -1,10 +1,10 @@
-#include "engine/AudioFileWriter.h"
-#include "engine/EmojiCatalog.h"
-#include "engine/FontCatalog.h"
-#include "engine/GpuDevice.h"
-#include "engine/GpuPreference.h"
-#include "engine/HwAccel.h"
-#include "engine/ReverseProxyCache.h"
+#include "engine/encode/writers/AudioFileWriter.h"
+#include "engine/packages/assets/EmojiCatalog.h"
+#include "engine/packages/assets/FontCatalog.h"
+#include "engine/gpu/device/GpuDevice.h"
+#include "engine/gpu/device/GpuPreference.h"
+#include "engine/decode/hw/HwAccel.h"
+#include "engine/encode/proxies/ReverseProxyCache.h"
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_WASM)
 #include "HeadlessApp.h"
 #include "mcp/McpStdio.h"
@@ -21,7 +21,7 @@
 #include "models/DriftAssetStore.h"
 #include "models/SfxLibrary.h"
 #include "models/UpdateChecker.h"
-#include "engine/VaapiZeroCopy.h"
+#include "engine/decode/hw/VaapiZeroCopy.h"
 #include "ClipPreviewImageProvider.h"
 #include "DriftImageProvider.h"
 #include "MulticamImageProvider.h"
@@ -80,7 +80,7 @@
 
 #ifdef Q_OS_ANDROID
 #include "core/project/Project.h"
-#include "engine/FrameCompositor.h"
+#include "engine/compositor/FrameCompositor.h"
 
 #include <QDir>
 #include <QJsonDocument>

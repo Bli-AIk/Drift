@@ -1,7 +1,7 @@
 # Find ONNX Runtime (https://onnxruntime.ai) — headers only.
 #
 # Drift does not link ONNX Runtime. It compiles against the headers with ORT_API_MANUAL_INIT and
-# dlopens whichever runtime the user installed (src/engine/OrtRuntime.cpp), which is what lets the
+# dlopens whichever runtime the user installed (src/engine/ml/runtime/OrtRuntime.cpp), which is what lets the
 # CPU / CUDA / WebGPU choice be an addon rather than a configure-time decision. So the library
 # being absent here is not an error; only the headers have to exist.
 #

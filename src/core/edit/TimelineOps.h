@@ -190,7 +190,7 @@ Clip makeTransformClip(TimeUs startUs, TimeUs durationUs);
 void normalizeTransformLayers(QList<Track> &tracks, const QList<Track> *before = nullptr);
 
 // The scene camera. A Camera track holds Camera clips, and those clips drive the one viewpoint the
-// whole sequence is seen through (engine/SceneCamera3d.h) — it covers no span and flattens nothing,
+// whole sequence is seen through (engine/render3d/scene/SceneCamera3d.h) — it covers no span and flattens nothing,
 // so unlike a transform layer its position among the tracks does not matter.
 
 // Index of the sequence's camera track, or -1. normalizeCameraLayers keeps there being at most one.

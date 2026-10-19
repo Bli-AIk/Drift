@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/base/Time.h"
-#include "engine/Sam2Segmenter.h"
+#include "engine/ml/vision/segmentation/Sam2Segmenter.h"
 
 #include <QAtomicInt>
 #include <QImage>

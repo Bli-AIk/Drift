@@ -1,7 +1,7 @@
 #pragma once
 
-#include "engine/FrameCompositor.h"
-#include "engine/GpuCompositor.h"
+#include "engine/compositor/FrameCompositor.h"
+#include "engine/compositor/GpuCompositor.h"
 
 #include <QHash>
 #include <QObject>

@@ -5,7 +5,7 @@
 #include "core/project/clip/Clip.h"
 #include "core/animation/SpeedCurve.h"
 #include "core/base/Time.h"
-#include "engine/audio/ClipAudioRetimer.h"
+#include "engine/audio/dsp/ClipAudioRetimer.h"
 
 #include <QImage>
 #include <QMutex>

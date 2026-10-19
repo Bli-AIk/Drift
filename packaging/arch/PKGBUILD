@@ -38,7 +38,7 @@ sha256sums=('SKIP'
             '7b5158952ebc4e2ce8de19f036b7613e266705003469579d9e98070ead62fc3b')
 
 # ONNX Runtime is never linked and never shipped: Drift dlopens whichever build the user installs
-# from the Acceleration category (src/engine/OrtRuntime.cpp), so the CPU / CUDA / WebGPU choice
+# from the Acceleration category (src/engine/ml/runtime/OrtRuntime.cpp), so the CPU / CUDA / WebGPU choice
 # stays theirs. Only the headers are needed to compile, and cmake/FetchOnnxRuntime.cmake downloads
 # them during build() — there is no ONNX Runtime package in the official repos to depend on.
 # DRIFT_BUNDLE_ONNXRUNTIME=OFF keeps the staged development copy out of the package.

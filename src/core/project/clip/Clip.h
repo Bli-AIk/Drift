@@ -34,7 +34,7 @@ ClipType clipTypeFromString(const QString &type);
 // it is for, and drives the inspector tab and timeline tint. Transform is the odd one out: its
 // payload is the clip's own transform, applied as a parent to every track its Range track covers.
 // Camera is the other odd one: its payload is the clip's transform read as the sequence's shared
-// viewpoint (see engine/SceneCamera3d.h), so it has no pixels of its own and covers no range —
+// viewpoint (see engine/render3d/scene/SceneCamera3d.h), so it has no pixels of its own and covers no range —
 // one camera serves the whole sequence for as long as the clip lasts.
 enum class AdjustmentKind { VideoEffects, AudioEffects, Mask, Transform, Camera };
 
@@ -177,7 +177,7 @@ struct Clip
     KeyframeTrack<double> transformW;
     KeyframeTrack<double> transformH;
     KeyframeTrack<double> rotation;
-    // 3D pose on top of the layout (see engine/ClipTransform3d.h). layer3d is the inspector's
+    // 3D pose on top of the layout (see engine/render3d/scene/ClipTransform3d.h). layer3d is the inspector's
     // "3D layer" switch: on whenever any of the four tracks has data, and switching it off clears
     // them, so a flat clip never carries a pose. It can also be on with all four empty. Empty
     // tracks mean 0 for the tilts and depth, and kDefaultClipPerspective px for the eye distance.

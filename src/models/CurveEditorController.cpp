@@ -2,7 +2,7 @@
 
 #include "models/AppController.h"
 #include "models/AppControllerDetail.h"
-#include "engine/TransitionCatalog.h"
+#include "engine/packages/transitions/TransitionCatalog.h"
 
 CurveEditorController::CurveEditorController(AppController *app, QObject *parent)
     : QObject(parent)

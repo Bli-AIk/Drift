@@ -23,7 +23,7 @@ struct Effect
     // returns the param to a constant rather than to the catalog default.
     QMap<QString, KeyframeTrack<double>> paramKeyframes;
 
-    // Id into the effect preset catalog (src/engine/EffectCatalog.h) this effect was
+    // Id into the effect preset catalog (src/engine/packages/effects/EffectCatalog.h) this effect was
     // created from; UI-only bookkeeping so the inspector can show the right
     // label/sliders. Rendering uses catalog metadata in the engine layer.
     QString catalogId;

@@ -1,8 +1,8 @@
-#include "engine/AddonPackage.h"
-#include "engine/AddonRegistry.h"
-#include "engine/AudioEffectCatalog.h"
-#include "engine/GpuPackageParse.h"
-#include "engine/audio/AudioEffectRack.h"
+#include "engine/addons/AddonPackage.h"
+#include "engine/addons/AddonRegistry.h"
+#include "engine/packages/audio/AudioEffectCatalog.h"
+#include "engine/packages/GpuPackageParse.h"
+#include "engine/audio/dsp/AudioEffectRack.h"
 
 #include <QCoreApplication>
 #include <QDir>

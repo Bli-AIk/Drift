@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Regenerate src/engine/EmojiTable.cpp from the Unicode emoji-test.txt data file.
+# Regenerate src/engine/packages/assets/EmojiTable.cpp from the Unicode emoji-test.txt data file.
 # Skin-tone variants and the Component group are dropped; what is left is the base emoji set the
 # picker offers. Coverage is filtered again at runtime against the installed emoji font.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-DEST="$ROOT/src/engine/EmojiTable.cpp"
+DEST="$ROOT/src/engine/packages/assets/EmojiTable.cpp"
 URL="${EMOJI_TEST_URL:-https://unicode.org/Public/emoji/latest/emoji-test.txt}"
 
 if ! command -v python3 >/dev/null 2>&1; then

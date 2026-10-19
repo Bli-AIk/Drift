@@ -1,9 +1,9 @@
 #include "playback/ClipPreviewPlayer.h"
 
 #include "ClipPreviewImageStore.h"
-#include "engine/AudioMixer.h"
-#include "engine/ClipReaderPool.h"
-#include "engine/ReverseProxyCache.h"
+#include "engine/audio/AudioMixer.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/encode/proxies/ReverseProxyCache.h"
 
 #include <cstring>
 

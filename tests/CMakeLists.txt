@@ -261,7 +261,7 @@ qt_add_executable(tst_thememanager
     tst_thememanager.cpp
     ../src/theme/ThemeManager.cpp
     ../src/core/base/ZipArchive.cpp
-    ../src/engine/AndroidUri.cpp)
+    ../src/engine/platform/AndroidUri.cpp)
 target_include_directories(tst_thememanager PRIVATE ../src)
 target_compile_definitions(tst_thememanager PRIVATE
     "DRIFT_MAIN_CPP=\"${CMAKE_SOURCE_DIR}/src/main.cpp\""
@@ -303,7 +303,7 @@ qt_add_executable(tst_windowbackdrop
     ../src/theme/WindowBackdrop.cpp
     ../src/theme/ThemeManager.cpp
     ../src/core/base/ZipArchive.cpp
-    ../src/engine/AndroidUri.cpp
+    ../src/engine/platform/AndroidUri.cpp
     ${_drift_windowbackdrop_platform}
 )
 target_include_directories(tst_windowbackdrop PRIVATE ../src)

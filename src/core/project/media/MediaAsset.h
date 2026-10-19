@@ -41,7 +41,7 @@ enum class MediaKind { Video, Audio, Image, Vector, Model3d, Pdf, Composite, Oth
 // and the project importers decide clip types by it — and engine must not include models.
 //
 // HEIC/HEIF and AVIF have no Qt image plugin in any official kit; they decode through the FFmpeg
-// fallback in engine/StillImage.h. Everything else here Qt handles, given qtimageformats.
+// fallback in engine/decode/probe/StillImage.h. Everything else here Qt handles, given qtimageformats.
 const QStringList &imageExtensions();
 bool isImageSuffix(const QString &path);
 

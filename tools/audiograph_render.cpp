@@ -6,7 +6,7 @@
 //
 // Files the manifest references ("ir": "ir/plate.wav") are read relative to the manifest.
 
-#include "engine/audio/DriftGraphApi.h"
+#include "engine/audio/dsp/graph/DriftGraphApi.h"
 
 #include <QByteArray>
 #include <QDir>

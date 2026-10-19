@@ -1,7 +1,7 @@
 #include "theme/ThemeManager.h"
 
 #include "core/base/ZipArchive.h"
-#include "engine/AndroidUri.h"
+#include "engine/platform/AndroidUri.h"
 
 #include <memory>
 

@@ -1,9 +1,9 @@
 #include "models/PreferencesController.h"
-#include "engine/ProxyNaming.h"
+#include "engine/encode/proxies/ProxyNaming.h"
 
-#include "engine/GpuPreference.h"
-#include "engine/HwAccel.h"
-#include "engine/VaapiZeroCopy.h"
+#include "engine/gpu/device/GpuPreference.h"
+#include "engine/decode/hw/HwAccel.h"
+#include "engine/decode/hw/VaapiZeroCopy.h"
 
 #include <QCoreApplication>
 #include <QDir>

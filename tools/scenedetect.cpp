@@ -3,8 +3,8 @@
 // Usage: scenedetect [--threshold T] [--min-scene S] [--no-adaptive] [--start SEC]
 //                    [--duration SEC] [--csv] <media-file>
 
-#include "engine/MediaProbe.h"
-#include "engine/SceneDetect.h"
+#include "engine/decode/probe/MediaProbe.h"
+#include "engine/ml/vision/detection/SceneDetect.h"
 #include "core/base/Time.h"
 
 // isatty: POSIX spells it in <unistd.h>, MSVC in <io.h> with a leading underscore.

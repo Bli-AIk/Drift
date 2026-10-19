@@ -2,11 +2,11 @@
 
 #include "models/AppController.h"
 #include "SegmentImageStore.h"
-#include "engine/EffectTemplateCatalog.h"
-#include "engine/MatteWriter.h"
-#include "engine/RvmMatter.h"
+#include "engine/packages/effects/EffectTemplateCatalog.h"
+#include "engine/encode/writers/MatteWriter.h"
+#include "engine/ml/vision/segmentation/RvmMatter.h"
 
-#include "engine/ClipReaderPool.h"
+#include "engine/decode/readers/ClipReaderPool.h"
 
 #include <QFile>
 #include <QtConcurrent>

@@ -1,9 +1,9 @@
 #include "HeadlessApp.h"
 
-#include "engine/AudioFileWriter.h"
-#include "engine/EmojiCatalog.h"
-#include "engine/FontCatalog.h"
-#include "engine/ReverseProxyCache.h"
+#include "engine/encode/writers/AudioFileWriter.h"
+#include "engine/packages/assets/EmojiCatalog.h"
+#include "engine/packages/assets/FontCatalog.h"
+#include "engine/encode/proxies/ReverseProxyCache.h"
 #include "mcp/McpServer.h"
 #include "mcp/McpSession.h"
 #include "mcp/McpStdioServer.h"

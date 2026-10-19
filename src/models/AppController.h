@@ -5,13 +5,13 @@
 #include "core/text/animation/TextAnimationPreset.h"
 #include "core/edit/TimelineOps.h"
 #include "core/base/Time.h"
-#include "engine/AudioOnsets.h"
-#include "engine/SceneDetect.h"
-#include "engine/TransformLayer.h"
-#include "engine/FilmstripTileCache.h"
-#include "engine/MediaWaveform.h"
-#include "engine/WaveformBlockCache.h"
-#include "engine/ProjectBundle.h"
+#include "engine/audio/analysis/AudioOnsets.h"
+#include "engine/ml/vision/detection/SceneDetect.h"
+#include "engine/compositor/layers/TransformLayer.h"
+#include "engine/media/thumbnails/FilmstripTileCache.h"
+#include "engine/media/waveforms/MediaWaveform.h"
+#include "engine/media/waveforms/WaveformBlockCache.h"
+#include "engine/project/ProjectBundle.h"
 #include "models/TimelineClipsModel.h"
 #include "models/AssetLibrary.h"
 #include "models/CloudProviders.h"
@@ -58,7 +58,7 @@ namespace drift {
 struct MediaEditSpec;
 }
 
-#include "engine/AudioRecorder.h"
+#include "engine/audio/AudioRecorder.h"
 #include "playback/PlaybackEngine.h"
 #include "preview/PreviewController.h"
 #include "models/AssetPreviewController.h"
@@ -977,7 +977,7 @@ public:
     Q_INVOKABLE void addTransformLayerForSelection();
     bool canTransformSelectionTogether() const;
 
-    // The scene camera: one viewpoint the whole sequence is seen through (engine/SceneCamera3d.h).
+    // The scene camera: one viewpoint the whole sequence is seen through (engine/render3d/scene/SceneCamera3d.h).
     // Stored as Camera clips on a Camera adjustment track, so the camera animates on the timeline
     // with the ordinary keyframe machinery and two clips in a row read as a camera cut.
     //

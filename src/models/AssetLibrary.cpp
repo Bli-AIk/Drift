@@ -3,17 +3,17 @@
 #include "core/project/media/ImageSequence.h"
 #include "core/project/Project.h"
 
-#include "engine/MediaProbe.h"
-#include "engine/MediaThumbnail.h"
-#include "engine/ModelAsset.h"
-#include "engine/ModelClipRenderer.h"
-#include "engine/SplatAsset.h"
-#include "engine/PdfClipRenderer.h"
-#include "engine/PreviewProxyRenderer.h"
-#include "engine/AndroidUri.h"
-#include "engine/ProxyNaming.h"
-#include "engine/ReverseProxyCache.h"
-#include "engine/VectorInspect.h"
+#include "engine/decode/probe/MediaProbe.h"
+#include "engine/media/thumbnails/MediaThumbnail.h"
+#include "engine/render3d/models/ModelAsset.h"
+#include "engine/render3d/models/ModelClipRenderer.h"
+#include "engine/render3d/splats/SplatAsset.h"
+#include "engine/render2d/pdf/PdfClipRenderer.h"
+#include "engine/encode/proxies/PreviewProxyRenderer.h"
+#include "engine/platform/AndroidUri.h"
+#include "engine/encode/proxies/ProxyNaming.h"
+#include "engine/encode/proxies/ReverseProxyCache.h"
+#include "engine/render2d/vector/VectorInspect.h"
 #include "core/project/sources/DotLottie.h"
 
 #ifdef Q_OS_ANDROID
@@ -26,7 +26,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QImageIOHandler>
-#include "engine/StillImage.h"
+#include "engine/decode/probe/StillImage.h"
 
 #include <QImageReader>
 #include <QJsonObject>

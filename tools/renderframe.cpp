@@ -1,6 +1,6 @@
 #include "core/project/Project.h"
-#include "engine/FontCatalog.h"
-#include "engine/FrameCompositor.h"
+#include "engine/packages/assets/FontCatalog.h"
+#include "engine/compositor/FrameCompositor.h"
 
 #include <QGuiApplication>
 #include <QFile>

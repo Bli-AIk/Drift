@@ -4,9 +4,9 @@
 //        Defaults: --time 0 --frames 1 --fps 30
 
 #include "core/base/Time.h"
-#include "engine/ClipReaderPool.h"
-#include "engine/MediaProbe.h"
-#include "engine/RvmMatter.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/decode/probe/MediaProbe.h"
+#include "engine/ml/vision/segmentation/RvmMatter.h"
 
 #include <QCoreApplication>
 #include <QElapsedTimer>

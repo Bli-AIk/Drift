@@ -6,8 +6,8 @@
 // Frames go through the real GpuEffectExecutor path, so a wrong Y flip or a swapped from/to
 // shows up immediately across the sheet.
 
-#include "engine/GpuEffectExecutor.h"
-#include "engine/TransitionCatalog.h"
+#include "engine/gpu/effects/GpuEffectExecutor.h"
+#include "engine/packages/transitions/TransitionCatalog.h"
 
 #include <QColor>
 #include <QDir>

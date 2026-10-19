@@ -3,8 +3,8 @@
 #include "models/AppController.h"
 #include "models/McpDetail.h"
 #include "core/project/clip/Stabilize.h"
-#include "engine/MediaEditor.h"
-#include "engine/MediaProbe.h"
+#include "engine/encode/MediaEditor.h"
+#include "engine/decode/probe/MediaProbe.h"
 
 #include <QAtomicInt>
 #include <QDateTime>

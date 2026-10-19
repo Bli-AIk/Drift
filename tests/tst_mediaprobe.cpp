@@ -7,8 +7,8 @@
 #include <QTemporaryDir>
 
 #include "core/project/media/ImageSequence.h"
-#include "engine/ClipReader.h"
-#include "engine/MediaProbe.h"
+#include "engine/decode/readers/ClipReader.h"
+#include "engine/decode/probe/MediaProbe.h"
 
 class TestMediaProbe : public QObject
 {

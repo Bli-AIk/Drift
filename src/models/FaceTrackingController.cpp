@@ -1,12 +1,12 @@
 #include "models/FaceTrackingController.h"
 
 #include "models/AppController.h"
-#include "engine/ClipReaderPool.h"
-#include "engine/EffectCatalog.h"
-#include "engine/FaceLandmarker.h"
-#include "engine/FaceSwapSource.h"
-#include "engine/FaceTrack.h"
-#include "engine/StillImage.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/packages/effects/EffectCatalog.h"
+#include "engine/face/tracking/FaceLandmarker.h"
+#include "engine/face/swap/FaceSwapSource.h"
+#include "engine/face/tracking/FaceTrack.h"
+#include "engine/decode/probe/StillImage.h"
 
 #include <QFile>
 #include <QMetaObject>

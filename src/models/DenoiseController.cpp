@@ -1,9 +1,9 @@
 #include "models/DenoiseController.h"
 
 #include "models/AppController.h"
-#include "engine/AudioFileWriter.h"
-#include "engine/ClipReaderPool.h"
-#include "engine/DeepFilterDenoiser.h"
+#include "engine/encode/writers/AudioFileWriter.h"
+#include "engine/decode/readers/ClipReaderPool.h"
+#include "engine/ml/speech/DeepFilterDenoiser.h"
 
 #include <QFile>
 #include <QMetaObject>
