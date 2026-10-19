@@ -101,6 +101,25 @@ void ClipThumbnailStore::touch(const QString &path)
     m_lru.splice(m_lru.begin(), m_lru, it->lru);
 }
 
+void ClipThumbnailStore::forgetPrefix(const QString &prefix)
+{
+    for (auto it = m_images.begin(); it != m_images.end();) {
+        if (!it.key().startsWith(prefix)) {
+            ++it;
+            continue;
+        }
+        m_bytes -= it->image.sizeInBytes();
+        m_lru.erase(it->lru);
+        it = m_images.erase(it);
+    }
+    for (auto it = m_failed.begin(); it != m_failed.end();) {
+        if (it->startsWith(prefix))
+            it = m_failed.erase(it);
+        else
+            ++it;
+    }
+}
+
 void ClipThumbnailStore::evict()
 {
     // Never the entry just added: a single image over budget still has to be shown once.

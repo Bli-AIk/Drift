@@ -82,6 +82,7 @@
 #include "engine/StickerCatalog.h"
 #include "engine/StillImage.h"
 #include "MulticamImageStore.h"
+#include "timeline/ClipThumbnailStore.h"
 #include "engine/TextLayout.h"
 #ifdef DRIFT_WITH_SKIA
 #include "engine/SkiaTextPainter.h"
@@ -20088,6 +20089,8 @@ void AppController::forgetChangedMediaSource(const QString &path, bool beforeRep
     m_waveformCache.remove(path);
     if (m_waveformPending.contains(path))
         m_waveformDiscard.insert(path);
+    // Cached files are named by path, so the regenerated ones keep their names.
+    ClipThumbnailStore::instance().forgetPrefix(MediaThumbnail::cachePrefixFor(path));
     if (!beforeReprobe)
         return;
     // These would hand the re-probe the old pictures back, so they go before it runs.

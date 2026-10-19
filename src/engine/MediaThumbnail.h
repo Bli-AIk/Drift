@@ -45,6 +45,8 @@ public:
     // showing the old pictures. Call before regenerating, not after. `tilesOnly` leaves the
     // cover thumbnails and strips alone, for a caller racing a probe that is rewriting them.
     static void forgetSource(const QString &sourcePath, bool tilesOnly = false);
+    // The start of every cached file's name for `sourcePath`, for dropping in-memory copies by prefix.
+    static QString cachePrefixFor(const QString &sourcePath);
 
     // A decoder held open across batches of tiles.
     //

@@ -7,6 +7,7 @@ Rectangle {
 
     property bool folder: false
     property string liveThumbnailPath: ""
+    property int thumbnailRevision: 0
     property string kind: ""
     property bool replaceBusy: false
     property bool showVfr: false
@@ -29,7 +30,7 @@ Rectangle {
         anchors.fill: parent
         visible: !root.folder && root.liveThumbnailPath.length > 0 && status === Image.Ready
         source: !root.folder && root.liveThumbnailPath.length > 0
-                ? EditorState.imageUrl(root.liveThumbnailPath) : ""
+                ? EditorState.imageUrl(root.liveThumbnailPath) + "?rev=" + root.thumbnailRevision : ""
         fillMode: Image.PreserveAspectFit
         // Was missing, so list thumbnails decoded
         // on the UI thread and stalled scrolling.

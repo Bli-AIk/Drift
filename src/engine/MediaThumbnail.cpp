@@ -561,6 +561,11 @@ QList<qint64> MediaThumbnail::TileDecoder::generateTiles(const QString &sourcePa
     return produced;
 }
 
+QString MediaThumbnail::cachePrefixFor(const QString &sourcePath)
+{
+    return cacheDir() + QLatin1Char('/') + cacheKeyFor(sourcePath);
+}
+
 void MediaThumbnail::forgetSource(const QString &sourcePath, bool tilesOnly)
 {
     if (sourcePath.isEmpty())
