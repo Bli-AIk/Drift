@@ -178,15 +178,21 @@ void FilmstripTileCache::applyBatch(const QString &sourcePath, int level, int ro
     m_busy = false;
 
     for (const qint64 index : requested) {
-        // Cut short by playback: what it never reached goes back in line rather than being
-        // dropped, which would leave those tiles blank until the viewport asked again. Unless
-        // clear() ran meanwhile — then the request belongs to sources that are gone.
+        // Cut short by playback: what it never reached goes back to the front of the queue,
+        // so requests made since still decode first. Unless clear() ran meanwhile — then the
+        // request belongs to sources that are gone.
         if (aborted && !produced.contains(index)) {
+            // Requested runs newest-first, so prepending each one leaves them oldest-first.
             if (m_queued.contains(keyFor(sourcePath, level, index, rotationCorrection)))
-                m_queue.append({sourcePath, level, index, rotationCorrection});
+                m_queue.prepend({sourcePath, level, index, rotationCorrection});
             continue;
         }
         m_queued.remove(keyFor(sourcePath, level, index, rotationCorrection));
+    }
+    while (m_queue.size() > kMaxQueued) {
+        const Request &first = m_queue.first();
+        m_queued.remove(keyFor(first.sourcePath, first.level, first.index, first.rotationCorrection));
+        m_queue.removeFirst();
     }
 
     if (m_ready.size() + produced.size() > kMaxReadyEntries)
