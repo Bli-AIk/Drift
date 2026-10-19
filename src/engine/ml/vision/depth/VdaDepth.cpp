@@ -1,6 +1,6 @@
 #include "engine/ml/vision/depth/VdaDepth.h"
 
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/ml/runtime/OrtSupport.h"
 
 #include <QDir>
@@ -165,7 +165,7 @@ bool windowingMatches(const QJsonObject &obj)
 
 bool discoverRoot(ModelRoot *out, QString *why)
 {
-    const QStringList roots = GpuPackageParse::defaultSearchPaths(
+    const QStringList roots = PackageSearchPaths::defaultSearchPaths(
         QStringLiteral("DRIFT_DEPTH_MODEL_DIR"), QStringLiteral("models/depth"),
         QStringLiteral("depth-model"));
     for (const QString &root : roots) {

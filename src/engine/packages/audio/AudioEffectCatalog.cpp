@@ -1,6 +1,7 @@
 #include "engine/packages/audio/AudioEffectCatalog.h"
 
 #include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/audio/dsp/AudioEffectFactory.h"
 #include "engine/audio/dsp/WavReader.h"
 
@@ -250,9 +251,9 @@ void ensureLoaded()
 
 QStringList defaultAudioEffectSearchPaths()
 {
-    return GpuPackageParse::defaultSearchPaths(QStringLiteral("DRIFT_AUDIO_EFFECTS_DIR"),
-                                               QStringLiteral("audio-effects"),
-                                               QStringLiteral("audio-effects"));
+    return PackageSearchPaths::defaultSearchPaths(QStringLiteral("DRIFT_AUDIO_EFFECTS_DIR"),
+                                                  QStringLiteral("audio-effects"),
+                                                  QStringLiteral("audio-effects"));
 }
 
 std::optional<AudioEffectEntry> loadAudioEffectPackage(const QString &packageDir, QString *errorOut)

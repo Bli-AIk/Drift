@@ -1,6 +1,6 @@
 #include "engine/ml/speech/transcription/SileroVad.h"
 
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/ml/runtime/OrtSupport.h"
 #include "engine/ml/speech/SpeechAudio.h"
 
@@ -23,7 +23,7 @@ constexpr int kContextSamples = 64;
 
 QString resolveModelDir()
 {
-    const QStringList roots = GpuPackageParse::defaultSearchPaths(
+    const QStringList roots = PackageSearchPaths::defaultSearchPaths(
         QStringLiteral("DRIFT_VAD_MODEL_DIR"), QStringLiteral("models/silero-vad"),
         QStringLiteral("vad-model"));
     for (const QString &root : roots) {

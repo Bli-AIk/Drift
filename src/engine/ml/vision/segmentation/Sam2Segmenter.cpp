@@ -1,6 +1,6 @@
 #include "engine/ml/vision/segmentation/Sam2Segmenter.h"
 
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/ml/runtime/OrtSupport.h"
 
 #include <QByteArray>
@@ -54,7 +54,7 @@ QDir graphDir(const QString &root)
 // when every piece is present — a half-downloaded folder must not look installed.
 QString resolveSam2ModelDir()
 {
-    const QStringList roots = GpuPackageParse::defaultSearchPaths(
+    const QStringList roots = PackageSearchPaths::defaultSearchPaths(
         QStringLiteral("DRIFT_SAM2_MODEL_DIR"), QStringLiteral("models/sam2"),
         QStringLiteral("sam2-model"));
 

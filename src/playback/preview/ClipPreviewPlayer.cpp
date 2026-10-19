@@ -1,6 +1,6 @@
 #include "playback/preview/ClipPreviewPlayer.h"
 
-#include "ui/imageproviders/clippreview/ClipPreviewImageStore.h"
+#include "playback/preview/ClipPreviewImageStore.h"
 #include "engine/audio/AudioMixer.h"
 #include "engine/decode/readers/ClipReaderPool.h"
 #include "engine/encode/proxies/ReverseProxyCache.h"

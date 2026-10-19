@@ -1,4 +1,4 @@
-#include "ui/imageproviders/clippreview/ClipPreviewImageStore.h"
+#include "playback/preview/ClipPreviewImageStore.h"
 
 #include <QMutex>
 

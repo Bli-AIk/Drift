@@ -1,6 +1,6 @@
 #include "engine/packages/assets/StickerCatalog.h"
 
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 
 #include <QDir>
 #include <QFile>
@@ -78,8 +78,9 @@ void rebuildLocked(const QStringList &packageRoots)
     g_initialized = true;
 
     const QStringList roots = packageRoots.isEmpty()
-        ? GpuPackageParse::defaultSearchPaths(QStringLiteral("DRIFT_STICKERS_DIR"),
-                                              QStringLiteral("stickers"), QStringLiteral("stickers"))
+        ? PackageSearchPaths::defaultSearchPaths(QStringLiteral("DRIFT_STICKERS_DIR"),
+                                                 QStringLiteral("stickers"),
+                                                 QStringLiteral("stickers"))
         : packageRoots;
 
     for (const QString &root : roots) {

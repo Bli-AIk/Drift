@@ -1,7 +1,7 @@
 #include "engine/packages/assets/EmojiCatalog.h"
 
 #include "engine/packages/assets/EmojiTable.h"
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #ifdef DRIFT_WITH_SKIA
 #include "engine/render2d/text/fonts/SkiaFontCollection.h"
 #endif
@@ -81,9 +81,9 @@ void rebuildLocked(const QStringList &packageRoots)
 #endif
 
     const QStringList roots = packageRoots.isEmpty()
-        ? GpuPackageParse::defaultSearchPaths(QStringLiteral("DRIFT_EMOJI_FONT_DIR"),
-                                              QStringLiteral("emoji-fonts"),
-                                              QStringLiteral("emoji-font"))
+        ? PackageSearchPaths::defaultSearchPaths(QStringLiteral("DRIFT_EMOJI_FONT_DIR"),
+                                                 QStringLiteral("emoji-fonts"),
+                                                 QStringLiteral("emoji-font"))
         : packageRoots;
 
     const QString file = findFontFile(roots);

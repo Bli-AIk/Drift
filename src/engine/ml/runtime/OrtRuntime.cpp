@@ -1,6 +1,6 @@
 #include "engine/ml/runtime/OrtRuntime.h"
 
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/ml/runtime/OrtSupport.h"
 
 #include <QDebug>
@@ -125,7 +125,7 @@ std::optional<Candidate> inspect(const QString &root)
 QList<Candidate> candidates()
 {
     QList<Candidate> found;
-    const QStringList roots = GpuPackageParse::defaultSearchPaths(
+    const QStringList roots = PackageSearchPaths::defaultSearchPaths(
         QStringLiteral("DRIFT_ONNXRUNTIME_DIR"), QStringLiteral("onnxruntime"),
         QString::fromLatin1(kRuntimeKind));
     for (const QString &root : roots) {
@@ -330,7 +330,7 @@ QList<RuntimeInfo> installedRuntimes()
 QList<PluginEp> installedPluginEps()
 {
     QList<PluginEp> eps;
-    const QStringList roots = GpuPackageParse::defaultSearchPaths(
+    const QStringList roots = PackageSearchPaths::defaultSearchPaths(
         QStringLiteral("DRIFT_ONNXRUNTIME_EP_DIR"), QStringLiteral("onnxruntime-ep"),
         QString::fromLatin1(kPluginEpKind));
     for (const QString &root : roots) {

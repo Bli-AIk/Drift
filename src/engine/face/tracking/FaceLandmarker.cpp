@@ -1,6 +1,6 @@
 #include "engine/face/tracking/FaceLandmarker.h"
 
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/ml/runtime/OrtSupport.h"
 
 #include <QDir>
@@ -74,7 +74,7 @@ struct Detection
 
 QString resolveFaceModelDir()
 {
-    const QStringList roots = GpuPackageParse::defaultSearchPaths(
+    const QStringList roots = PackageSearchPaths::defaultSearchPaths(
         QStringLiteral("DRIFT_FACE_MODEL_DIR"), QStringLiteral("models/face"),
         QStringLiteral("face-model"));
 

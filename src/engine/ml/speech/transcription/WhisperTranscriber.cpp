@@ -1,7 +1,7 @@
 #include "engine/ml/speech/transcription/WhisperTranscriber.h"
 
 #include "engine/ml/speech/transcription/WhisperTokenizer.h"
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/ml/runtime/OrtRuntime.h"
 #include "core/base/Time.h"
 
@@ -138,9 +138,9 @@ QString languageDisplayName(const QString &code)
 QString resolveWhisperModelDir()
 {
     const QStringList roots =
-        GpuPackageParse::defaultSearchPaths(QStringLiteral("DRIFT_WHISPER_MODEL_DIR"),
-                                            QStringLiteral("models/whisper-small"),
-                                            QStringLiteral("whisper-model"));
+        PackageSearchPaths::defaultSearchPaths(QStringLiteral("DRIFT_WHISPER_MODEL_DIR"),
+                                               QStringLiteral("models/whisper-small"),
+                                               QStringLiteral("whisper-model"));
     for (const QString &root : roots) {
         if (QFile::exists(QDir(root).filePath(QStringLiteral("encoder_model_fp16.onnx"))))
             return root;

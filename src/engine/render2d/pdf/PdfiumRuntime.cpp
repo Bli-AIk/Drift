@@ -1,6 +1,6 @@
 #include "engine/render2d/pdf/PdfiumRuntime.h"
 
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 
 #include <QDateTime>
 #include <QDir>
@@ -109,7 +109,7 @@ QString findLibrary(const QString &dir)
 QStringList candidates()
 {
     QStringList found;
-    const QStringList roots = GpuPackageParse::defaultSearchPaths(
+    const QStringList roots = PackageSearchPaths::defaultSearchPaths(
         QStringLiteral("DRIFT_PDFIUM_DIR"), QStringLiteral("pdfium"),
         QString::fromLatin1(kPdfiumKind));
     for (const QString &root : roots) {

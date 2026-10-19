@@ -1,6 +1,6 @@
 #include "engine/packages/assets/FontCatalog.h"
 
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #ifdef DRIFT_WITH_SKIA
 #include "engine/render2d/text/fonts/SkiaFontCollection.h"
 #include "engine/render2d/text/fonts/SkiaFonts.h"
@@ -120,8 +120,8 @@ void rebuildLocked(const QStringList &packageRoots)
 #endif
 
     const QStringList roots = packageRoots.isEmpty()
-        ? GpuPackageParse::defaultSearchPaths(QStringLiteral("DRIFT_FONTS_DIR"),
-                                              QStringLiteral("fonts"), QStringLiteral("fonts"))
+        ? PackageSearchPaths::defaultSearchPaths(QStringLiteral("DRIFT_FONTS_DIR"),
+                                                 QStringLiteral("fonts"), QStringLiteral("fonts"))
         : packageRoots;
 
     for (const QString &root : roots) {

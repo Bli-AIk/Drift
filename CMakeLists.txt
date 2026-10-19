@@ -689,6 +689,8 @@ add_library(driftengine STATIC
     src/engine/addons/AddonRegistry.h
     src/engine/addons/AddonRegistry.cpp
     src/engine/addons/AddonSigningKey.h
+    src/engine/addons/PackageSearchPaths.h
+    src/engine/addons/PackageSearchPaths.cpp
     src/engine/platform/AndroidUri.h
     src/engine/platform/AndroidUri.cpp
     src/engine/decode/hw/HwAccel.h
@@ -968,8 +970,8 @@ qt_add_executable(drift
     src/ui/imageproviders/segment/SegmentImageStore.cpp
     src/ui/imageproviders/clippreview/ClipPreviewImageProvider.h
     src/ui/imageproviders/clippreview/ClipPreviewImageProvider.cpp
-    src/ui/imageproviders/clippreview/ClipPreviewImageStore.h
-    src/ui/imageproviders/clippreview/ClipPreviewImageStore.cpp
+    src/playback/preview/ClipPreviewImageStore.h
+    src/playback/preview/ClipPreviewImageStore.cpp
     src/ui/imageproviders/multicam/MulticamImageProvider.h
     src/ui/imageproviders/multicam/MulticamImageProvider.cpp
     src/ui/imageproviders/multicam/MulticamImageStore.h
@@ -2140,7 +2142,7 @@ endif()
 # virtual filesystem with no files beside the binary), so the file-based package roots the desktop
 # build stages next to the binary ride inside it as Qt resources instead.
 if(ANDROID OR EMSCRIPTEN)
-    # GpuPackageParse::defaultSearchPaths adds ":/packages/<subdir>" as the bundled root.
+    # PackageSearchPaths::defaultSearchPaths adds ":/packages/<subdir>" as the bundled root.
     file(GLOB_RECURSE DRIFT_PACKAGE_FILES RELATIVE "${CMAKE_SOURCE_DIR}" CONFIGURE_DEPENDS
          "effects/*/effect.json"
          "effects/*/*.frag"
@@ -2423,7 +2425,7 @@ else()
     install(TARGETS drift RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT drift)
 
     # File-based effect/transition/template/audio-effect packages ship next to the binary;
-    # the app searches <appDir>/<subdir> (GpuPackageParse::defaultSearchPaths). Installing
+    # the app searches <appDir>/<subdir> (PackageSearchPaths::defaultSearchPaths). Installing
     # them here (rather than via the DRIFT_*_DIR env vars) keeps installed addons able to
     # supersede the bundled copies.
     foreach(_assetdir effects transitions effect-templates audio-effects)

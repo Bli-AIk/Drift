@@ -1,6 +1,6 @@
 #include "engine/ml/vision/segmentation/RvmMatter.h"
 
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/ml/runtime/OrtSupport.h"
 
 #include <QDebug>
@@ -58,12 +58,12 @@ int variantRank(const QString &variant)
 // at the first hit: the two RVM addons install side by side and the user chooses between them.
 QList<ModelRoot> discoverRoots()
 {
-    QStringList roots = GpuPackageParse::defaultSearchPaths(QStringLiteral("DRIFT_RVM_MODEL_DIR"),
-                                                            QStringLiteral("models/rvm"),
-                                                            QStringLiteral("rvm-model"));
+    QStringList roots = PackageSearchPaths::defaultSearchPaths(
+        QStringLiteral("DRIFT_RVM_MODEL_DIR"), QStringLiteral("models/rvm"),
+        QStringLiteral("rvm-model"));
     // The addon roots above already cover both packages; this is only the bundled / hand-placed
     // convention for the second one, which cannot share a subdirectory name with the first.
-    roots += GpuPackageParse::defaultSearchPaths({}, QStringLiteral("models/rvm-resnet50"));
+    roots += PackageSearchPaths::defaultSearchPaths({}, QStringLiteral("models/rvm-resnet50"));
     roots.removeDuplicates();
 
     QList<ModelRoot> out;

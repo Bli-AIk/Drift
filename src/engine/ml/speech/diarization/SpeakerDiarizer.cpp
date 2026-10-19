@@ -1,6 +1,6 @@
 #include "engine/ml/speech/diarization/SpeakerDiarizer.h"
 
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/ml/speech/diarization/KaldiFbank.h"
 #include "engine/ml/runtime/OrtSupport.h"
 #include "engine/ml/speech/SpeechAudio.h"
@@ -30,7 +30,7 @@ constexpr int kMaxClusteredEmbeddings = 3000;
 
 QString resolveModelDir()
 {
-    const QStringList roots = GpuPackageParse::defaultSearchPaths(
+    const QStringList roots = PackageSearchPaths::defaultSearchPaths(
         QStringLiteral("DRIFT_DIARIZE_MODEL_DIR"), QStringLiteral("models/diarization"),
         QStringLiteral("diarize-model"));
     for (const QString &root : roots) {

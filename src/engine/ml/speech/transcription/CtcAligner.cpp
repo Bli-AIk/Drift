@@ -1,6 +1,6 @@
 #include "engine/ml/speech/transcription/CtcAligner.h"
 
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/ml/runtime/OrtSupport.h"
 #include "engine/ml/speech/SpeechAudio.h"
 
@@ -72,7 +72,7 @@ bool readModelInfo(const QString &dir, ModelInfo *out)
 QList<ModelInfo> discoverModels()
 {
     QList<ModelInfo> found;
-    const QStringList roots = GpuPackageParse::defaultSearchPaths(
+    const QStringList roots = PackageSearchPaths::defaultSearchPaths(
         QStringLiteral("DRIFT_ALIGN_MODEL_DIR"), QStringLiteral("models/align"), QStringLiteral("align-model"));
     for (const QString &root : roots) {
         ModelInfo info;

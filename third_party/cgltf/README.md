@@ -11,4 +11,4 @@ Vendored in-tree rather than via FetchContent so Flatpak and offline builds do n
 at configure time. To update: replace `cgltf.h` and `LICENSE` from the tagged release, then bump
 the commit SHA recorded above.
 
-Exactly one translation unit defines `CGLTF_IMPLEMENTATION`: `src/engine/ModelAsset.cpp`.
+Exactly one translation unit defines `CGLTF_IMPLEMENTATION`: `src/engine/render3d/models/ModelAsset.cpp`.

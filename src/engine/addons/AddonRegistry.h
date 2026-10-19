@@ -9,7 +9,7 @@
 
 // What is installed, and where. Addons unpack under <AppDataLocation>/addons/<id>/ and are
 // recorded in addons/installed.json; the catalogs then pick them up through
-// GpuPackageParse::defaultSearchPaths(), which appends addonRootsForKind() to its usual roots.
+// PackageSearchPaths::defaultSearchPaths(), which appends addonRootsForKind() to its usual roots.
 //
 // This lives in driftengine deliberately: reading the registry must work in tools/ and tests/
 // with no network stack. Downloading is the app layer's job (src/app/online/addons/AddonManager).

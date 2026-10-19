@@ -1,6 +1,6 @@
 #include "engine/ml/speech/DeepFilterDenoiser.h"
 
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/ml/runtime/OrtSupport.h"
 
 #include <QDebug>
@@ -55,7 +55,7 @@ constexpr int kWindowFrames = 2000; // 20 s of output per Run
 
 QString resolveModelDir()
 {
-    const QStringList roots = GpuPackageParse::defaultSearchPaths(
+    const QStringList roots = PackageSearchPaths::defaultSearchPaths(
         QStringLiteral("DRIFT_DENOISE_MODEL_DIR"), QStringLiteral("models/deepfilternet3"),
         QStringLiteral("denoise-model"));
 

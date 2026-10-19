@@ -1,6 +1,6 @@
 #include "engine/ml/vision/Restorer.h"
 
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/ml/runtime/OrtSupport.h"
 
 #include <QDateTime>
@@ -177,7 +177,7 @@ QList<Restorer::Model> Restorer::models()
     QList<Model> addons;
     QList<Model> custom;
     QSet<QString> seen;
-    const QStringList roots = GpuPackageParse::defaultSearchPaths(
+    const QStringList roots = PackageSearchPaths::defaultSearchPaths(
         QStringLiteral("DRIFT_RESTORE_MODEL_DIR"), QStringLiteral("models/restore"),
         QStringLiteral("restore-model"));
     for (const QString &root : roots) {

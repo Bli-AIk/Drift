@@ -1,6 +1,6 @@
 #include "ui/imageproviders/clippreview/ClipPreviewImageProvider.h"
 
-#include "ui/imageproviders/clippreview/ClipPreviewImageStore.h"
+#include "playback/preview/ClipPreviewImageStore.h"
 
 ClipPreviewImageProvider::ClipPreviewImageProvider()
     : QQuickImageProvider(QQuickImageProvider::Image)

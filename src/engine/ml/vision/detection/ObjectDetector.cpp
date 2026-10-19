@@ -1,6 +1,6 @@
 #include "engine/ml/vision/detection/ObjectDetector.h"
 
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/ml/runtime/OrtRuntime.h"
 #include "engine/ml/runtime/OrtSupport.h"
 
@@ -38,7 +38,7 @@ double intersectionOverUnion(const QRectF &a, const QRectF &b)
 
 QString resolveObjectModelDir()
 {
-    const QStringList roots = GpuPackageParse::defaultSearchPaths(
+    const QStringList roots = PackageSearchPaths::defaultSearchPaths(
         QStringLiteral("DRIFT_OBJECT_MODEL_DIR"), QStringLiteral("models/yolox-tiny"),
         QStringLiteral("object-model"));
 

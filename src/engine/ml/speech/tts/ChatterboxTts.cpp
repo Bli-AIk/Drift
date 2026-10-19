@@ -1,7 +1,7 @@
 #include "engine/ml/speech/tts/ChatterboxTts.h"
 
 #include "engine/ml/speech/tts/ChatterboxTokenizer.h"
-#include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/ml/runtime/OrtSupport.h"
 
 #include <QDataStream>
@@ -84,7 +84,7 @@ bool readTensor(QDataStream &in, std::vector<T> &data, std::vector<int64_t> &sha
 
 QString resolveChatterboxModelDir()
 {
-    const QStringList roots = GpuPackageParse::defaultSearchPaths(
+    const QStringList roots = PackageSearchPaths::defaultSearchPaths(
         QStringLiteral("DRIFT_CHATTERBOX_MODEL_DIR"), QStringLiteral("models/chatterbox-multilingual"),
         QStringLiteral("tts-model"));
     for (const QString &root : roots) {

@@ -1,5 +1,6 @@
 #include "engine/packages/effects/EffectPackageLoader.h"
 
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/gpu/effects/GpuEffectDefinition.h"
 #include "engine/packages/GpuPackageParse.h"
 
@@ -214,7 +215,7 @@ QList<EffectPresetEntry> EffectPackageLoader::scanDirectories(const QStringList 
 
 QStringList EffectPackageLoader::defaultSearchPaths()
 {
-    return GpuPackageParse::defaultSearchPaths(QStringLiteral("DRIFT_EFFECTS_DIR"),
-                                               QStringLiteral("effects"),
-                                               QStringLiteral("effects"));
+    return PackageSearchPaths::defaultSearchPaths(QStringLiteral("DRIFT_EFFECTS_DIR"),
+                                                  QStringLiteral("effects"),
+                                                  QStringLiteral("effects"));
 }

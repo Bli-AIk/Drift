@@ -2,6 +2,7 @@
 
 #include "engine/packages/effects/EffectCatalog.h"
 #include "engine/packages/GpuPackageParse.h"
+#include "engine/addons/PackageSearchPaths.h"
 
 #include <QCoreApplication>
 #include <QDir>
@@ -271,9 +272,9 @@ void ensureLoaded()
 
 QStringList defaultEffectTemplateSearchPaths()
 {
-    return GpuPackageParse::defaultSearchPaths(QStringLiteral("DRIFT_TEMPLATES_DIR"),
-                                               QStringLiteral("effect-templates"),
-                                               QStringLiteral("effect-templates"));
+    return PackageSearchPaths::defaultSearchPaths(QStringLiteral("DRIFT_TEMPLATES_DIR"),
+                                                  QStringLiteral("effect-templates"),
+                                                  QStringLiteral("effect-templates"));
 }
 
 void reloadEffectTemplateCatalog(const QStringList &packageRoots)

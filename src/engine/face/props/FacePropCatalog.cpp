@@ -1,7 +1,7 @@
 #include "engine/face/props/FacePropCatalog.h"
 
+#include "engine/addons/PackageSearchPaths.h"
 #include "engine/face/props/FacePropImport.h"
-#include "engine/packages/GpuPackageParse.h"
 
 #include <QDir>
 #include <QFile>
@@ -112,9 +112,9 @@ void ensureLoadedLocked()
 
 QStringList facePropSearchPaths()
 {
-    QStringList roots = GpuPackageParse::defaultSearchPaths(QStringLiteral("DRIFT_FACE_PROPS_DIR"),
-                                                            QStringLiteral("face-props"),
-                                                            QStringLiteral("face-props"));
+    QStringList roots = PackageSearchPaths::defaultSearchPaths(
+        QStringLiteral("DRIFT_FACE_PROPS_DIR"), QStringLiteral("face-props"),
+        QStringLiteral("face-props"));
     roots.prepend(userFacePropsDir());
     roots.removeDuplicates();
     return roots;

@@ -16,7 +16,7 @@ add_test(NAME PdfSource COMMAND tst_pdfsource)
 qt_add_executable(tst_editorstate
     tst_editorstate.cpp
     ../src/ui/imageproviders/segment/SegmentImageStore.cpp
-    ../src/ui/imageproviders/clippreview/ClipPreviewImageStore.cpp
+    ../src/playback/preview/ClipPreviewImageStore.cpp
     ../src/ui/imageproviders/multicam/MulticamImageStore.cpp
     # The provider, not just the store: the id QML addresses a tile by is parsed here, and a
     # store test cannot see that half. Costs a Qt6::Quick link, but needs no QML engine —
@@ -202,7 +202,7 @@ qt_add_executable(tst_mcp
     ../src/app/mcp/protocol/McpProtocol.cpp
     ../src/app/mcp/transport/McpHttp.cpp
     ../src/ui/imageproviders/segment/SegmentImageStore.cpp
-    ../src/ui/imageproviders/clippreview/ClipPreviewImageStore.cpp
+    ../src/playback/preview/ClipPreviewImageStore.cpp
     ../src/ui/imageproviders/multicam/MulticamImageStore.cpp
     ../src/app/editor/AppController.cpp
     ../src/app/mcp/McpController.cpp
