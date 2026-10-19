@@ -689,11 +689,11 @@
     <name>AndroidComposerTimingEdge</name>
     <message>
         <source>Back one frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Quay lại một khung hình</translation>
     </message>
     <message>
         <source>Forward one frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiến lên một khung hình</translation>
     </message>
 </context>
 <context>
@@ -962,7 +962,7 @@
     </message>
     <message>
         <source>Name your project</source>
-        <translation type="unfinished"></translation>
+        <translation>Tên dự án của bạn</translation>
     </message>
     <message>
         <source>Save Project</source>
@@ -1493,7 +1493,7 @@
     <name>AndroidNotificationsSheet</name>
     <message>
         <source>Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Thông báo</translation>
     </message>
 </context>
 <context>
@@ -1519,7 +1519,7 @@
     </message>
     <message>
         <source>1/8 (Eco)</source>
-        <translation type="unfinished"></translation>
+        <translation>1/8 (Tiết kiệm)</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -1657,7 +1657,7 @@
     </message>
     <message>
         <source>Add-ons and model packs</source>
-        <translation type="unfinished"></translation>
+        <translation>Add-on và gói mô hình</translation>
     </message>
     <message>
         <source>Settings</source>
@@ -1673,15 +1673,15 @@
     </message>
     <message>
         <source>Switch the app’s colour scheme</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển đổi chế độ màu của ứng dụng</translation>
     </message>
     <message>
         <source>Switch to desktop layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển sang bố cục máy tính để bàn</translation>
     </message>
     <message>
         <source>Use the wide editor layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Sử dụng bố cục trình chỉnh sửa rộng</translation>
     </message>
     <message>
         <source>Update available</source>
@@ -1689,7 +1689,7 @@
     </message>
     <message>
         <source>A newer version of Drift is ready</source>
-        <translation type="unfinished"></translation>
+        <translation>Phiên bản mới hơn của Drift đã sẵn sàng</translation>
     </message>
     <message>
         <source>Debug info</source>
@@ -1697,15 +1697,15 @@
     </message>
     <message>
         <source>Version, device and logs</source>
-        <translation type="unfinished"></translation>
+        <translation>Phiên bản mới hơn của Drift đã sẵn sàng</translation>
     </message>
     <message>
         <source>About Drift</source>
-        <translation type="unfinished"></translation>
+        <translation>Thông tin về Drift</translation>
     </message>
     <message>
         <source>Version, licence and credits</source>
-        <translation type="unfinished"></translation>
+        <translation>Phiên bản, giấy phép và ghi công</translation>
     </message>
     <message>
         <source>Appearance, extras and agent access</source>
@@ -1792,15 +1792,15 @@
     <name>AndroidTextComposer</name>
     <message>
         <source>Previous caption</source>
-        <translation type="unfinished"></translation>
+        <translation>Chú thích trước</translation>
     </message>
     <message>
         <source>Next caption</source>
-        <translation type="unfinished"></translation>
+        <translation>Chú thích kế</translation>
     </message>
     <message>
         <source>Caption %1 / %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Chú thích %1 / %2</translation>
     </message>
     <message>
         <source>Done</source>
@@ -1835,7 +1835,7 @@
     </message>
     <message>
         <source>Select all</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn tất cả</translation>
     </message>
     <message>
         <source>Done</source>
@@ -1996,7 +1996,7 @@
     </message>
     <message>
         <source>Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Thông báo</translation>
     </message>
     <message>
         <source>Downloads</source>
@@ -2324,7 +2324,7 @@
     </message>
     <message>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>Tìm kiếm…</translation>
     </message>
     <message>
         <source>System default</source>
@@ -2586,39 +2586,39 @@
     </message>
     <message>
         <source>%1 isn’t a folder on this computer (a phone, camera or remote location). Export to a local folder, then copy the file there.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 không phải là thư mục trên máy tính này (điện thoại, máy ảnh hoặc vị trí từ xa). Hãy xuất sang một thư mục cục bộ, rồi sao chép tệp đến đó.</translation>
     </message>
     <message>
         <source>%1 is on a phone or camera connected over MTP, which can’t be written to directly. Export to a local folder, then copy the file there.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 nằm trên điện thoại hoặc máy ảnh kết nối qua MTP, không thể ghi trực tiếp vào. Hãy xuất sang thư mục cục bộ, rồi sao chép tệp đến đó.</translation>
     </message>
     <message>
         <source>The folder %1 doesn’t exist anymore.</source>
-        <translation type="unfinished"></translation>
+        <translation>Thư mục %1 không tồn tại nữa.</translation>
     </message>
     <message>
         <source>%1 is on a read-only drive. Choose another folder.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 nằm trên ổ đĩa chỉ đọc. Chọn một thư mục khác.</translation>
     </message>
     <message>
         <source>Can’t replace %1. It may be read-only or open in another app.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể thay thế %1. Nó có thể ở chế độ chỉ đọc hoặc mở trong một ứng dụng khác.</translation>
     </message>
     <message>
         <source>Can’t write to the network location %1. Check that it’s connected and that you have permission to save there.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể ghi vào vị trí mạng %1. Kiểm tra xem nó đã được kết nối chưa và bạn có quyền lưu vào đó không.</translation>
     </message>
     <message>
         <source>You don’t have permission to save in %1. Choose another folder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn không có quyền lưu vào %1. Chọn một thư mục khác.</translation>
     </message>
     <message>
         <source>Can’t write to %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể ghi vào %1: %2</translation>
     </message>
     <message>
         <source>There isn’t enough free space in %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không có đủ dung lượng trống trong %1.</translation>
     </message>
     <message>
         <source>Could not create a proxy for %1: %2</source>
@@ -3014,15 +3014,15 @@
     </message>
     <message>
         <source>Could not import the font</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể nhập phông chữ</translation>
     </message>
     <message>
         <source>Added %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Đã thêm %1</translation>
     </message>
     <message>
         <source>Removed %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Đã loại bỏ %1</translation>
     </message>
     <message>
         <source>Resize text</source>
@@ -3442,7 +3442,7 @@
     </message>
     <message>
         <source>Fly camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Camera bay</translation>
     </message>
     <message>
         <source>Audio effects go on the timeline.</source>
@@ -4054,7 +4054,7 @@
     </message>
     <message>
         <source>Export failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Xuất không thành công</translation>
     </message>
     <message>
         <source>Opening your video…</source>
@@ -4297,7 +4297,7 @@
     </message>
     <message>
         <source>Switch to mobile layout…</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển sang bố cục điện thoại di động…</translation>
     </message>
     <message>
         <source>Multicam</source>
@@ -4342,19 +4342,19 @@
     </message>
     <message>
         <source>%1 s</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 giây</translation>
     </message>
     <message>
         <source>That file isn’t a video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tệp đó không phải là một video.</translation>
     </message>
     <message>
         <source>“%1” is %2 long but the source is %3 — it can’t be its proxy.</source>
-        <translation type="unfinished"></translation>
+        <translation>“%1” dài %2 nhưng nguồn chỉ dài %3 — nó không thể là proxy của nguồn được.</translation>
     </message>
     <message>
         <source>The proxy’s name must contain “%1” and sit in the source’s folder or a subfolder of it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tên của proxy phải chứa “%1” và nằm trong thư mục của nguồn hoặc thư mục con của nó.</translation>
     </message>
 </context>
 <context>
@@ -4479,31 +4479,31 @@
     </message>
     <message>
         <source>Link Proxy</source>
-        <translation type="unfinished"></translation>
+        <translation>Liên kết Proxy</translation>
     </message>
     <message>
         <source>Link proxies by pattern?</source>
-        <translation type="unfinished"></translation>
+        <translation>Liên kết proxy theo mẫu?</translation>
     </message>
     <message>
         <source>Link</source>
-        <translation type="unfinished"></translation>
+        <translation>Liên kết</translation>
     </message>
     <message numerus="yes">
         <source>“%1” matches this clip and %n other clips in the project. Drift will link them all, and link future imports whose proxy follows the same name.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>“%1” khớp với clip này và %n clip khác trong dự án. Drift sẽ liên kết tất cả chúng, và liên kết cả các tệp nhập trong tương lai có proxy tuân theo cùng tên đó.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Linked this clip and %n other clips.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Đã liên kết clip này và %n clip khác.</numerusform>
         </translation>
     </message>
     <message>
         <source>Couldn’t save files next to the media</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể lưu tệp bên cạnh phương tiện</translation>
     </message>
     <message>
         <source>OK</source>
@@ -4511,11 +4511,11 @@
     </message>
     <message>
         <source>Drift can’t write to the folders listed below, because of their permissions or because they are on a read-only network share. The proxies or reversed clips were saved to Drift’s cache instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>Drift không thể ghi vào các thư mục được liệt kê bên dưới, do quyền truy cập của chúng hoặc do chúng nằm trên ổ chia sẻ mạng chỉ đọc. Thay vào đó, các proxy hoặc clip đảo ngược đã được lưu vào bộ nhớ đệm của Drift.</translation>
     </message>
     <message>
         <source>Linked the proxy. Future imports named like “%1” will link automatically.</source>
-        <translation type="unfinished"></translation>
+        <translation>Đã liên kết proxy. Các lần nhập trong tương lai có tên như “%1” sẽ tự động liên kết.</translation>
     </message>
     <message numerus="yes">
         <source>Imported %n files into %1 folders — as many as one folder import takes. Import the remaining subfolders separately.</source>
@@ -4812,11 +4812,11 @@
     <name>AudioEffectPresetCard</name>
     <message>
         <source>%1 — click to apply to the selection, or drag onto a clip</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - nhấp để áp dụng cho lựa chọn hoặc kéo vào clip</translation>
     </message>
     <message>
         <source>%1 — drag onto a clip in the timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - kéo vào một clip trong dòng thời gian</translation>
     </message>
     <message>
         <source>Apply to selected clip</source>
@@ -6082,7 +6082,7 @@
     </message>
     <message>
         <source>Name your project</source>
-        <translation type="unfinished"></translation>
+        <translation>Tên dự án của bạn</translation>
     </message>
     <message>
         <source>Untitled Project</source>
@@ -6163,11 +6163,11 @@
     <name>EditorHeaderNotificationsButton</name>
     <message>
         <source>Notifications — Drift %1 is available</source>
-        <translation type="unfinished"></translation>
+        <translation>Thông báo - Đã có Drift %1</translation>
     </message>
     <message>
         <source>Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Thông báo</translation>
     </message>
 </context>
 <context>
@@ -6197,7 +6197,7 @@
     <name>EditorHeaderSearchField</name>
     <message>
         <source>Search  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Tìm kiếm%1</translation>
     </message>
     <message>
         <source>Search</source>
@@ -6221,7 +6221,7 @@
     </message>
     <message>
         <source>Switch to mobile layout…</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển sang bố cục điện thoại di động…</translation>
     </message>
 </context>
 <context>
@@ -6267,7 +6267,7 @@
     </message>
     <message>
         <source>Add adjustment layer — click, or drag it onto a track</source>
-        <translation type="unfinished"></translation>
+        <translation>Thêm lớp điều chỉnh — nhấp, hoặc kéo nó vào một track</translation>
     </message>
     <message>
         <source>My Effects</source>
@@ -6371,11 +6371,11 @@
     <name>EffectPresetCard</name>
     <message>
         <source>%1 — click to apply to the selection, or drag onto a clip</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - nhấp để áp dụng cho lựa chọn hoặc kéo vào clip</translation>
     </message>
     <message>
         <source>%1 — click to add as an adjustment layer, or drag onto a clip</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - nhấp để thêm dưới dạng lớp điều chỉnh hoặc kéo vào clip</translation>
     </message>
     <message>
         <source>Apply to selected clip</source>
@@ -6437,7 +6437,7 @@
     </message>
     <message>
         <source>No saved presets</source>
-        <translation type="unfinished"></translation>
+        <translation>Không có preset nào được lưu</translation>
     </message>
     <message>
         <source>Tune a clip&apos;s effects, then use “Save as preset…” in the properties Effects tab to keep them here.</source>
@@ -6507,11 +6507,11 @@
     <name>EffectTemplateCard</name>
     <message>
         <source>%1 — click to apply music-synced effects to the selection</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 — nhấp để áp dụng hiệu ứng theo nhạc cho vùng chọn</translation>
     </message>
     <message>
         <source>%1 — select a clip, then click to apply</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - chọn một clip, sau đó nhấp để áp dụng</translation>
     </message>
     <message>
         <source>Apply to selected clip</source>
@@ -7465,15 +7465,15 @@
     <name>FontCatalog</name>
     <message>
         <source>Choose a .ttf, .otf or .ttc font file</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn tệp phông chữ .ttf, .otf hoặc .ttc</translation>
     </message>
     <message>
         <source>Could not create the fonts folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể tạo thư mục phông chữ</translation>
     </message>
     <message>
         <source>Could not copy the font file</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể sao chép tệp phông chữ</translation>
     </message>
     <message>
         <source>That file is not a usable font</source>
@@ -11248,9 +11248,10 @@
 Full, Half, Quarter and 1/8 are fixed fractions of the project resolution: Full composites exactly what an export would.
 1/8 (Eco) is for older laptops with integrated graphics.
 Auto renders only as many pixels as the preview actually shows, and lowers that further while playback cannot keep up.</source>
-        <translation type="unfinished">Chất lượng xem trước - thấp hơn sẽ mượt mà hơn khi chỉnh sửa.
-Toàn bộ, Một nửa và Một phần tư là các phần cố định của độ phân giải dự án: Tổng hợp đầy đủ chính xác những gì xuất sẽ làm.
-Tự động chỉ hiển thị số lượng pixel mà bản xem trước thực sự hiển thị và giảm số lượng pixel đó hơn nữa trong khi quá trình phát lại không thể theo kịp.</translation>
+        <translation>Chất lượng xem trước — càng thấp càng mượt khi chỉnh sửa.
+Đầy đủ, Một nửa, Một phần tư và 1/8 là các tỷ lệ cố định của độ phân giải dự án: Đầy đủ sẽ tổ hợp chính xác những gì mà bản xuất sẽ tạo ra.
+1/8 (Tiết kiệm) dành cho các laptop cũ dùng đồ họa tích hợp.
+Tự động chỉ kết xuất số pixel mà xem trước thực sự hiển thị, và giảm thêm mức đó khi quá trình phát lại không theo kịp.</translation>
     </message>
     <message>
         <source>Speed</source>
@@ -15942,7 +15943,7 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     <name>TextInspectorPresetSection</name>
     <message>
         <source>Preset</source>
-        <translation type="unfinished">Preset</translation>
+        <translation>Preset</translation>
     </message>
     <message>
         <source>A whole text style — font, colour and effect — applied in one tap</source>
