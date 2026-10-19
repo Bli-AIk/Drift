@@ -35,11 +35,13 @@ class ThemeManager : public QObject
     // "system" (follow Theme.darkMode), "dark", "light", or a user theme id.
     // Persisted as QSettings Theme/selection. Loaded once, in the constructor.
     Q_PROPERTY(QString selection READ selection NOTIFY selectionChanged)
-    // "dark" or "light" of the theme currently on screen.
-    Q_PROPERTY(QString effectiveVariant READ effectiveVariant NOTIFY themeChanged)
+    // "dark" or "light" of the theme currently on screen. Not themeChanged:
+    // a token reload must not invalidate Theme.darkMode, which writes the
+    // variant back through setVariant while that binding is evaluating.
+    Q_PROPERTY(QString effectiveVariant READ effectiveVariant NOTIFY effectiveVariantChanged)
     // True when a single-variant user theme is on screen. Theme.darkMode then
     // follows effectiveVariant, and the light/dark toggle leaves the theme.
-    Q_PROPERTY(bool appearanceFollowsTheme READ appearanceFollowsTheme NOTIFY themeChanged)
+    Q_PROPERTY(bool appearanceFollowsTheme READ appearanceFollowsTheme NOTIFY appearanceFollowsThemeChanged)
     Q_PROPERTY(QVariantList themes READ themes NOTIFY availableThemesChanged)
     Q_PROPERTY(QString lastError READ lastError NOTIFY lastErrorChanged)
     Q_PROPERTY(bool hotReload READ hotReload WRITE setHotReload NOTIFY hotReloadChanged)
@@ -113,6 +115,8 @@ public:
 
 signals:
     void themeChanged();
+    void effectiveVariantChanged();
+    void appearanceFollowsThemeChanged();
     void hotReloadChanged();
     void availableThemesChanged();
     void selectionChanged();

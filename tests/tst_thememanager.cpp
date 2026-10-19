@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QByteArray>
 #include <QElapsedTimer>
+#include <QEventLoop>
 #include <QFile>
 #include <QFileInfo>
 #include <QCoreApplication>
@@ -11,6 +12,7 @@
 #include <QJsonObject>
 #include <QQmlComponent>
 #include <QQmlEngine>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QSignalSpy>
 #include <QStandardPaths>
@@ -52,6 +54,7 @@ private slots:
     void removeAndExportRoundTrip();
     void exampleThemesLoad();
     void sessionOverrideIsNotPersisted();
+    void darkModeBindingDoesNotLoop();
 
 private:
     QString themesDir() const;
@@ -1072,6 +1075,260 @@ void ThemeManagerTest::sessionOverrideIsNotPersisted()
         settings.beginGroup(QStringLiteral("Theme"));
         QCOMPARE(settings.value(QStringLiteral("selection")).toString(), QStringLiteral("system"));
     }
+}
+
+void ThemeManagerTest::darkModeBindingDoesNotLoop()
+{
+    QVERIFY(writeJson("only-light.json", R"({
+        "name": "only-light",
+        "extends": "light",
+        "variant": "light",
+        "palette": { "appBackground": "#f4f4f4" }
+    })"));
+    QVERIFY(writeJson("only-dark.json", R"({
+        "name": "only-dark",
+        "extends": "dark",
+        "variant": "dark",
+        "palette": { "appBackground": "#111111" }
+    })"));
+    QVERIFY(writeJson("dual.json", R"({
+        "name": "dual",
+        "extends": "dark",
+        "variants": {
+            "dark": { "palette": { "appBackground": "#111111" } },
+            "light": { "palette": { "appBackground": "#eeeeee" } }
+        }
+    })"));
+
+    // Dedicated notifiers fire only when the value changes. themeChanged still
+    // fires for a same-variant token reload.
+    {
+        ThemeManager manager;
+        QSignalSpy variantSpy(&manager, &ThemeManager::effectiveVariantChanged);
+        QSignalSpy followsSpy(&manager, &ThemeManager::appearanceFollowsThemeChanged);
+
+        manager.setVariant(QStringLiteral("dark"));
+        QCOMPARE(variantSpy.count(), 0);
+        QCOMPARE(followsSpy.count(), 0);
+
+        manager.setVariant(QStringLiteral("light"));
+        QCOMPARE(variantSpy.count(), 1);
+        QCOMPARE(followsSpy.count(), 0);
+        QCOMPARE(manager.effectiveVariant(), QStringLiteral("light"));
+        manager.setVariant(QStringLiteral("light"));
+        QCOMPARE(variantSpy.count(), 1);
+
+        QVERIFY(manager.select(QStringLiteral("light")));
+        QCOMPARE(variantSpy.count(), 1);
+        QCOMPARE(followsSpy.count(), 0);
+        QVERIFY(manager.select(QStringLiteral("dark")));
+        QCOMPARE(variantSpy.count(), 2);
+        QCOMPARE(manager.effectiveVariant(), QStringLiteral("dark"));
+        manager.setVariant(QStringLiteral("light"));
+        QCOMPARE(variantSpy.count(), 2);
+        QCOMPARE(manager.currentTheme(), QStringLiteral("dark"));
+        QCOMPARE(manager.selection(), QStringLiteral("dark"));
+
+        QVERIFY(manager.select(QStringLiteral("only-light")));
+        QCOMPARE(manager.effectiveVariant(), QStringLiteral("light"));
+        QCOMPARE(variantSpy.count(), 3);
+        QCOMPARE(followsSpy.count(), 1);
+        QVERIFY(manager.appearanceFollowsTheme());
+        manager.setVariant(QStringLiteral("dark"));
+        QCOMPARE(variantSpy.count(), 3);
+        QCOMPARE(followsSpy.count(), 1);
+        QCOMPARE(manager.currentTheme(), QStringLiteral("only-light"));
+        QVERIFY(manager.select(QStringLiteral("only-light")));
+        QCOMPARE(variantSpy.count(), 3);
+        QCOMPARE(followsSpy.count(), 1);
+
+        QVERIFY(manager.select(QStringLiteral("dual")));
+        QCOMPARE(manager.effectiveVariant(), QStringLiteral("dark"));
+        QCOMPARE(variantSpy.count(), 4);
+        QCOMPARE(followsSpy.count(), 2);
+        QVERIFY(!manager.appearanceFollowsTheme());
+        manager.setVariant(QStringLiteral("dark"));
+        QCOMPARE(variantSpy.count(), 4);
+        QCOMPARE(followsSpy.count(), 2);
+        manager.setVariant(QStringLiteral("light"));
+        QCOMPARE(variantSpy.count(), 5);
+        QCOMPARE(manager.effectiveVariant(), QStringLiteral("light"));
+        manager.setVariant(QStringLiteral("light"));
+        QCOMPARE(variantSpy.count(), 5);
+        QCOMPARE(followsSpy.count(), 2);
+
+        QVERIFY(manager.applySessionOverride(QStringLiteral("only-dark")));
+        QCOMPARE(manager.currentTheme(), QStringLiteral("only-dark"));
+        QCOMPARE(manager.effectiveVariant(), QStringLiteral("dark"));
+        QCOMPARE(variantSpy.count(), 6);
+        QCOMPARE(followsSpy.count(), 3);
+        manager.setVariant(QStringLiteral("light"));
+        QCOMPARE(variantSpy.count(), 6);
+        QCOMPARE(followsSpy.count(), 3);
+        QCOMPARE(manager.currentTheme(), QStringLiteral("only-dark"));
+        QCOMPARE(manager.selection(), QStringLiteral("dual"));
+
+        QVERIFY(manager.select(QStringLiteral("system")));
+        QCOMPARE(manager.selection(), QStringLiteral("system"));
+        QCOMPARE(manager.currentTheme(), QStringLiteral("light"));
+        QCOMPARE(manager.effectiveVariant(), QStringLiteral("light"));
+        QCOMPARE(variantSpy.count(), 7);
+        QCOMPARE(followsSpy.count(), 4);
+        QVERIFY(manager.select(QStringLiteral("system")));
+        QCOMPARE(variantSpy.count(), 7);
+        QCOMPARE(followsSpy.count(), 4);
+
+        QSignalSpy themeSpy(&manager, &ThemeManager::themeChanged);
+        manager.reload();
+        QCOMPARE(themeSpy.count(), 1);
+        QCOMPARE(variantSpy.count(), 7);
+        QCOMPARE(followsSpy.count(), 4);
+    }
+
+    ThemeManager::registerSingleton();
+    ThemeManager *manager = ThemeManager::shared();
+    QVERIFY(manager->select(QStringLiteral("system")));
+    manager->setVariant(QStringLiteral("dark"));
+    QCOMPARE(manager->currentTheme(), QStringLiteral("dark"));
+    QCOMPARE(manager->selection(), QStringLiteral("system"));
+
+    QSignalSpy variantSpy(manager, &ThemeManager::effectiveVariantChanged);
+    QSignalSpy followsSpy(manager, &ThemeManager::appearanceFollowsThemeChanged);
+    QTest::failOnWarning(QRegularExpression(QStringLiteral("Binding loop")));
+
+    QQmlEngine &engine = *sharedEngine();
+    const char *qml = R"(import QtQuick
+import Drift
+QtObject {
+    // Stand-in for Qt.styleHints.colorScheme. The offscreen platform theme
+    // ignores QStyleHints::setColorScheme, so the test sets this directly.
+    // Theme.qml reads the same branch: preference when overridden, otherwise OS.
+    property bool systemPrefersDark: true
+    property bool darkModeOverridden: false
+    property bool darkModePreferred: true
+    readonly property bool darkMode: {
+        if (ThemeManager.appearanceFollowsTheme)
+            return ThemeManager.effectiveVariant === "dark"
+        if (ThemeManager.selection === "dark" || ThemeManager.selection === "light")
+            return ThemeManager.selection === "dark"
+        return darkModeOverridden ? darkModePreferred : systemPrefersDark
+    }
+    function syncVariant() {
+        ThemeManager.setVariant(darkMode ? "dark" : "light")
+    }
+    Component.onCompleted: syncVariant()
+    onDarkModeChanged: Qt.callLater(syncVariant)
+})";
+
+    auto settle = [] {
+        for (int i = 0; i < 6; ++i)
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 20);
+    };
+
+    QQmlComponent component(&engine);
+    component.setData(qml, QUrl());
+    QVERIFY2(!component.isError(), qPrintable(component.errorString()));
+
+    auto makeHost = [&](bool systemPrefersDark) {
+        return component.createWithInitialProperties(
+            {{QStringLiteral("systemPrefersDark"), systemPrefersDark}});
+    };
+
+    {
+        QObject *host = makeHost(true);
+        QVERIFY(host);
+        settle();
+        QCOMPARE(host->property("darkMode").toBool(), true);
+        QCOMPARE(manager->selection(), QStringLiteral("system"));
+        QCOMPARE(manager->currentTheme(), QStringLiteral("dark"));
+        QCOMPARE(manager->effectiveVariant(), QStringLiteral("dark"));
+        QCOMPARE(variantSpy.count(), 0);
+        QCOMPARE(followsSpy.count(), 0);
+        delete host;
+        settle();
+    }
+
+    QObject *host = makeHost(false);
+    QVERIFY(host);
+    settle();
+    QCOMPARE(host->property("systemPrefersDark").toBool(), false);
+    QCOMPARE(host->property("darkMode").toBool(), false);
+    QCOMPARE(manager->selection(), QStringLiteral("system"));
+    QCOMPARE(manager->currentTheme(), QStringLiteral("light"));
+    QCOMPARE(manager->effectiveVariant(), QStringLiteral("light"));
+    QCOMPARE(variantSpy.count(), 1);
+    QCOMPARE(followsSpy.count(), 0);
+
+    host->setProperty("darkModeOverridden", true);
+    host->setProperty("darkModePreferred", true);
+    settle();
+    QCOMPARE(host->property("darkMode").toBool(), true);
+    QCOMPARE(manager->currentTheme(), QStringLiteral("dark"));
+    QCOMPARE(manager->effectiveVariant(), QStringLiteral("dark"));
+
+    host->setProperty("darkModePreferred", false);
+    settle();
+    QCOMPARE(host->property("darkMode").toBool(), false);
+    QCOMPARE(manager->currentTheme(), QStringLiteral("light"));
+    QCOMPARE(manager->selection(), QStringLiteral("system"));
+
+    QVERIFY(manager->select(QStringLiteral("dark")));
+    settle();
+    QCOMPARE(manager->selection(), QStringLiteral("dark"));
+    QCOMPARE(manager->currentTheme(), QStringLiteral("dark"));
+    QCOMPARE(host->property("darkMode").toBool(), true);
+
+    QVERIFY(manager->select(QStringLiteral("light")));
+    settle();
+    QCOMPARE(manager->selection(), QStringLiteral("light"));
+    QCOMPARE(manager->currentTheme(), QStringLiteral("light"));
+    QCOMPARE(host->property("darkMode").toBool(), false);
+
+    QVERIFY(manager->select(QStringLiteral("only-light")));
+    settle();
+    QCOMPARE(manager->currentTheme(), QStringLiteral("only-light"));
+    QCOMPARE(manager->effectiveVariant(), QStringLiteral("light"));
+    QVERIFY(manager->appearanceFollowsTheme());
+    QCOMPARE(host->property("darkMode").toBool(), false);
+
+    QVERIFY(manager->select(QStringLiteral("only-dark")));
+    settle();
+    QCOMPARE(manager->currentTheme(), QStringLiteral("only-dark"));
+    QCOMPARE(manager->effectiveVariant(), QStringLiteral("dark"));
+    QVERIFY(manager->appearanceFollowsTheme());
+    QCOMPARE(host->property("darkMode").toBool(), true);
+
+    QVERIFY(manager->select(QStringLiteral("dual")));
+    settle();
+    QCOMPARE(manager->currentTheme(), QStringLiteral("dual"));
+    QVERIFY(!manager->appearanceFollowsTheme());
+    QCOMPARE(manager->effectiveVariant(), QStringLiteral("light"));
+    QCOMPARE(host->property("darkMode").toBool(), false);
+
+    host->setProperty("darkModePreferred", true);
+    settle();
+    QCOMPARE(manager->currentTheme(), QStringLiteral("dual"));
+    QCOMPARE(manager->effectiveVariant(), QStringLiteral("dark"));
+    QCOMPARE(host->property("darkMode").toBool(), true);
+
+    QVERIFY(manager->select(QStringLiteral("system")));
+    settle();
+    QCOMPARE(manager->selection(), QStringLiteral("system"));
+    QCOMPARE(manager->currentTheme(), QStringLiteral("dark"));
+    QCOMPARE(manager->effectiveVariant(), QStringLiteral("dark"));
+    QVERIFY(!manager->appearanceFollowsTheme());
+    QCOMPARE(host->property("darkMode").toBool(), true);
+
+    const int variants = variantSpy.count();
+    const int follows = followsSpy.count();
+    const QString theme = manager->currentTheme();
+    settle();
+    QCOMPARE(variantSpy.count(), variants);
+    QCOMPARE(followsSpy.count(), follows);
+    QCOMPARE(manager->currentTheme(), theme);
+    QCOMPARE(host->property("darkMode").toBool(), true);
+
+    delete host;
 }
 
 QTEST_MAIN(ThemeManagerTest)

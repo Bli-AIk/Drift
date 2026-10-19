@@ -180,8 +180,13 @@ QtObject {
         ThemeManager.setVariant(darkMode ? "dark" : "light")
     }
 
+    // Startup stays synchronous so the matching built-in is on screen before the
+    // first frame. A deferred swap would paint the constructor's dark theme and
+    // flash light sessions. Later changes wait until darkMode has finished
+    // evaluating: setVariant loads a theme, and doing that mid-evaluation is a
+    // binding loop.
     Component.onCompleted: syncVariant()
-    onDarkModeChanged: syncVariant()
+    onDarkModeChanged: Qt.callLater(syncVariant)
 
     // Per-component tokens. Each group is lowerCamel of the QML type name.
     readonly property var c: ThemeManager.components

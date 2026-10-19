@@ -1199,6 +1199,9 @@ std::optional<ThemeManager::Loaded> ThemeManager::readTheme(const QString &nameO
 
 void ThemeManager::apply(const Loaded &loaded)
 {
+    const QString previousVariant = m_effectiveVariant;
+    const bool previousFollows = appearanceFollowsTheme();
+
     m_currentTheme = loaded.name;
     m_sourcePath = loaded.path;
     m_userTheme = loaded.user;
@@ -1219,6 +1222,12 @@ void ThemeManager::apply(const Loaded &loaded)
     updateWatch();
     emit themeChanged();
     emit availableThemesChanged();
+    // setVariant/select/session override all land here. Emit only for a real
+    // change so Theme.darkMode is not re-entered while it is writing the side back.
+    if (m_effectiveVariant != previousVariant)
+        emit effectiveVariantChanged();
+    if (appearanceFollowsTheme() != previousFollows)
+        emit appearanceFollowsThemeChanged();
 }
 
 void ThemeManager::updateWatch()
