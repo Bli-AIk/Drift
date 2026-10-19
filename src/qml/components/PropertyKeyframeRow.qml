@@ -295,8 +295,8 @@ Column {
                 Text {
                     id: labelText
                     text: root.propDef.label
-                    color: root.animated && root.keyframesEnabled ? Theme.panelForeground
-                                                                  : Theme.mutedForeground
+                    color: root.animated && root.keyframesEnabled ? Theme.c.propertyKeyframeRow.foreground
+                                                                  : Theme.c.propertyKeyframeRow.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                     font.weight: root.animated && root.keyframesEnabled ? Font.Medium : Font.Normal
@@ -463,7 +463,7 @@ Column {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: root.unit.length > 0 || root.percent
                 text: root.percent ? "%" : root.unit
-                color: Theme.mutedForeground
+                color: Theme.c.propertyKeyframeRow.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 z: 1
@@ -527,9 +527,9 @@ Column {
 
                 Rectangle {
                     anchors.fill: parent
-                    radius: Theme.radiusSm
+                    radius: Theme.c.propertyKeyframeRow.radius
                     color: readoutArea.containsMouse || valuePopup.opened
-                           ? Theme.panelAccent : "transparent"
+                           ? Theme.c.propertyKeyframeRow.backgroundHover : "transparent"
 
                     Behavior on color {
                         ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -543,7 +543,7 @@ Column {
                     anchors.verticalCenter: parent.verticalCenter
                     horizontalAlignment: Text.AlignRight
                     text: root.sliderReadout(root.displayedValue)
-                    color: Theme.panelForeground
+                    color: Theme.c.propertyKeyframeRow.foreground
                     font.family: Theme.monoFontFamily
                     font.pixelSize: Theme.fontSizeSm
                 }
@@ -592,10 +592,10 @@ Column {
                     }
 
                     background: Rectangle {
-                        color: Theme.panelBackground
-                        border.width: Theme.borderWidth
-                        border.color: Theme.panelBorder
-                        radius: Theme.radiusMd
+                        color: Theme.c.propertyKeyframeRow.popupBackground
+                        border.width: Theme.c.propertyKeyframeRow.popupBorderWidth
+                        border.color: Theme.c.propertyKeyframeRow.popupBorder
+                        radius: Theme.c.propertyKeyframeRow.radiusPopup
                     }
 
                     // Opacity plus scale, matching ThemedContextMenu.
@@ -646,7 +646,7 @@ Column {
                             Text {
                                 width: parent.width / 2
                                 text: root.propDef.label
-                                color: Theme.panelForeground
+                                color: Theme.c.propertyKeyframeRow.foreground
                                 font.family: Theme.fontFamily
                                 font.pixelSize: Theme.fontSizeXs
                                 font.weight: Font.Medium
@@ -658,7 +658,7 @@ Column {
                                 horizontalAlignment: Text.AlignRight
                                 text: root.displayReadout(root.sliderFrom) + "–"
                                       + root.displayReadout(root.sliderTo)
-                                color: Theme.mutedForeground
+                                color: Theme.c.propertyKeyframeRow.foregroundMuted
                                 font.family: Theme.monoFontFamily
                                 font.pixelSize: Theme.fontSizeTiny
                             }
@@ -683,7 +683,7 @@ Column {
                                 anchors.verticalCenter: parent.verticalCenter
                                 visible: root.unit.length > 0 || root.percent
                                 text: root.percent ? "%" : root.unit
-                                color: Theme.mutedForeground
+                                color: Theme.c.propertyKeyframeRow.foregroundMuted
                                 font.family: Theme.fontFamily
                                 font.pixelSize: Theme.fontSizeXs
                             }

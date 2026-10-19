@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // The scene camera: one viewpoint the whole sequence is seen through. A camera clip has no pixels
 // of its own, so this is its entire inspector.
 //
@@ -45,7 +43,7 @@ Item {
             width: parent.width
             visible: !root.isCamera
             text: qsTr("Select a camera clip to frame the shot.")
-            color: Theme.mutedForeground
+            color: Theme.c.cameraInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
             wrapMode: Text.WordWrap
@@ -61,7 +59,7 @@ Item {
                 text: qsTr("Everything on the timeline is seen through this camera while the clip "
                            + "lasts. A camera at rest looks exactly like no camera at all, so the "
                            + "numbers below are all offsets from the normal view.")
-                color: Theme.mutedForeground
+                color: Theme.c.cameraInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 wrapMode: Text.WordWrap
@@ -142,7 +140,7 @@ Item {
                 text: qsTr("A short lens exaggerates depth; a long one flattens it. While this "
                            + "camera is running it replaces each clip's own Perspective value, "
                            + "because a scene has one viewer.")
-                color: Theme.mutedForeground
+                color: Theme.c.cameraInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 wrapMode: Text.WordWrap

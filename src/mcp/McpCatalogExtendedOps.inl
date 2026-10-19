@@ -45,6 +45,13 @@
                         {QStringLiteral("height"), integerProp(QStringLiteral("Canvas height pixels; requires width"))},
                         {QStringLiteral("fps"), integerProp(QStringLiteral("Frames per second"))}}),
           false, true },
+        { "close_project", "project", "Close the open timeline and return to the start screen",
+          "Discard the current timeline and show the start screen, like the header's Close project. "
+          "DISCARDS unsaved changes without warning and clears the undo stack — check inspect.dirty "
+          "and save_project first. Afterwards the open document is an empty, untitled project; "
+          "new_project or load_project leaves the start screen.",
+          objectSchema({}),
+          false, true },
         { "package_project", "project", "Save bundled copy",
           "Write a copy of the project with all media embedded. Async: returns {started:true, path} "
           "immediately — poll inspect({detail:true}).jobs.package.{active,progress} until active is false.",
@@ -1367,7 +1374,8 @@
                        {QStringLiteral("enabled")}) },
         { "close_gap", "timeline", "Close one hole on a track",
           "Shift every clip on `track` that starts at or after `at` left by the width of the gap "
-          "whose left edge is `at` (typically the end of the preceding clip). Linked A/V partners "
+          "whose left edge is `at` (typically the end of the preceding clip, or 0 for the hole before "
+          "the first clip, which moves the track to the start of the timeline). Linked A/V partners "
           "follow. With overlap off this is how you delete without leaving a hole, or how you put an "
           "intro at the front: place then close_gap behind. When moving several clips toward zero with "
           "overlap off, sequence back-to-front or each move is pushed into the clip ahead.",

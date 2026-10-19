@@ -1873,8 +1873,10 @@ QJsonObject McpDispatcher::opExport(const QJsonObject &args)
     // Remember what the agent chose in the agent's own store, so the export dialog still
     // offers the user what they last picked themselves.
     m_controller->mcp()->rememberExportSettings(map);
+    m_controller->setExportRequestedByAgent(true);
     m_controller->exportWithSettings(QUrl::fromLocalFile(info.absoluteFilePath()), map,
                                      /*rememberChoice=*/false);
+    m_controller->setExportRequestedByAgent(false);
 
     if (!wait) {
         QObject::disconnect(conn);

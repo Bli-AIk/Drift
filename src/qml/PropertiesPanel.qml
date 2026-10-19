@@ -1,18 +1,32 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import "components"
-import "components/properties"
-
 PanelFrame {
     id: root
 
     // Android bottom sheet: keep the inspector tab rail but drop the panel border
     // chrome that fights the sheet frame.
     property bool sheetMode: false
-    border.width: sheetMode ? 0 : 1
-    radius: sheetMode ? 0 : Theme.radiusSm
-    color: sheetMode ? "transparent" : Theme.panelBackground
+    border.color: Theme.c.propertiesPanel.border
+    border.width: sheetMode ? 0 : Theme.c.propertiesPanel.borderWidth
+    radius: sheetMode ? 0 : Theme.c.propertiesPanel.radius
+    color: "transparent"
+
+    // Surface lives in the slot so a theme can make the panel translucent
+    // without a second opaque layer underneath.
+    ThemeSlot {
+        slot: "PropertiesPanelBackground"
+        control: root
+        anchors.fill: parent
+        anchors.margins: root.border.width
+        z: -1
+        fallback: Component {
+            Rectangle {
+                color: root.sheetMode ? "transparent" : Theme.c.propertiesPanel.background
+            }
+        }
+    }
 
     // Raised by the Effects / Audio empty states; Main wires them to the
     // assets panel so the browse CTAs actually take the user somewhere.
@@ -191,50 +205,11 @@ PanelFrame {
         value: root.currentTabId === "subtitles" && root.clipKind === "subtitle"
     }
 
-    Column {
+    PropertiesEmptyState {
         anchors.centerIn: parent
-        width: Math.min(260, root.width - 32)
+        panelWidth: root.width
+        sheetMode: root.sheetMode
         visible: !root.hasSelection
-        spacing: 16
-
-        Rectangle {
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: 48
-            height: 48
-            radius: Theme.radiusMd
-            color: "transparent"
-            border.width: 1
-            border.color: Theme.panelBorder
-
-            IconGlyph {
-                anchors.centerIn: parent
-                glyph: Theme.icons.sliders
-                iconSize: 22
-                iconColor: Theme.mutedForeground
-            }
-        }
-
-        Text {
-            width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            text: qsTr("It's empty here")
-            color: Theme.panelForeground
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSizeBase
-            font.weight: Font.Medium
-        }
-
-        Text {
-            width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WordWrap
-            text: root.sheetMode
-                  ? qsTr("Tap a clip on the timeline to edit its properties")
-                  : qsTr("Click a clip on the timeline to edit its properties")
-            color: Theme.mutedForeground
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSizeXs
-        }
     }
 
     Item {
@@ -301,88 +276,11 @@ PanelFrame {
                         model: root.tabs
                         // Not a ThemedChip: that one's contentItem is a single Text,
                         // and stacking a glyph over the label needs two rows.
-                        delegate: AbstractButton {
-                            id: tabChip
-                            required property int index
-                            required property var modelData
-
-                            readonly property bool current: root.activeTab === tabChip.index
-
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: root.tabVisible(tabChip.modelData.id)
-                            height: tabStripHost.tabChipHeight
-                            implicitWidth: Math.max(Theme.controlHeight + Theme.spacing2xl,
-                                                    tabChipLabel.implicitWidth + Theme.spacingXl * 2)
-                            hoverEnabled: true
-                            focusPolicy: Qt.StrongFocus
-
-                            Accessible.role: Accessible.PageTab
-                            Accessible.name: tabChip.modelData.label
-                            Accessible.checked: tabChip.current
-
-                            scale: tabChip.down ? Theme.pressScale : 1.0
-
-                            Behavior on scale {
-                                NumberAnimation { duration: Theme.durationPress; easing.type: Theme.easing }
-                            }
-
-                            onClicked: {
-                                Haptics.select()
-                                root.activeTab = tabChip.index
-                            }
-
-                            background: Rectangle {
-                                radius: Theme.radiusMd
-                                color: tabChip.current
-                                       ? Theme.primary
-                                       : (tabChip.down ? Theme.panelMuted : Theme.panelAccent)
-                                border.width: Theme.borderWidth
-                                border.color: tabChip.current ? Theme.primary : Theme.panelBorder
-
-                                Behavior on color {
-                                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                                }
-                                Behavior on border.color {
-                                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                                }
-
-                                Rectangle {
-                                    anchors.fill: parent
-                                    radius: parent.radius
-                                    color: "transparent"
-                                    border.width: Theme.borderWidthFocus
-                                    border.color: Theme.focusRing
-                                    visible: tabChip.visualFocus
-                                }
-                            }
-
-                            // Wrapped in an Item so the two rows sit centred in the
-                            // pill; a bare Column would stack them against its top.
-                            contentItem: Item {
-                                Column {
-                                    anchors.centerIn: parent
-                                    spacing: Theme.spacingSm
-
-                                    IconGlyph {
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        glyph: tabChip.modelData.icon
-                                        iconSize: Theme.iconSizeLg
-                                        iconColor: tabChip.current ? Theme.primaryForeground
-                                                                   : Theme.panelForeground
-                                    }
-
-                                    Text {
-                                        id: tabChipLabel
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        text: tabChip.modelData.label
-                                        color: tabChip.current ? Theme.primaryForeground
-                                                               : Theme.panelForeground
-                                        font.family: Theme.fontFamily
-                                        font.pixelSize: Theme.fontSizeXs
-                                        font.weight: tabChip.current ? Font.Medium : Font.Normal
-                                    }
-                                }
-                            }
+                        delegate: PropertiesSheetTabChip {
+                            activeTab: root.activeTab
+                            chipHeight: tabStripHost.tabChipHeight
+                            visible: root.tabVisible(modelData.id)
+                            onTabActivated: function(index) { root.activeTab = index }
                         }
                     }
                 }
@@ -392,8 +290,8 @@ PanelFrame {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                height: Theme.borderWidth
-                color: Theme.panelBorder
+                height: Theme.c.propertiesPanel.borderWidth
+                color: Theme.c.propertiesPanel.border
             }
         }
 
@@ -473,20 +371,8 @@ PanelFrame {
                             Accessible.checked: root.activeTab === index
                         }
 
-                        Item {
-                            visible: root.showSeparatorAfter(index)
-                            width: parent.width
-                            height: visible ? Theme.spacingLg + Theme.borderWidth : 0
-
-                            Rectangle {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: Theme.iconSizeSm
-                                height: Theme.borderWidth
-                                radius: height / 2
-                                color: Theme.panelBorder
-                                opacity: 0.85
-                            }
+                        PropertiesTabRailSeparator {
+                            shown: root.showSeparatorAfter(index)
                         }
                     }
                 }
@@ -498,9 +384,9 @@ PanelFrame {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: propertiesTabRail.right
-            width: root.sheetMode ? 0 : Theme.borderWidth
+            width: root.sheetMode ? 0 : Theme.c.propertiesPanel.borderWidth
             visible: !root.sheetMode
-            color: Theme.panelBorder
+            color: Theme.c.propertiesPanel.border
         }
 
         Flickable {
@@ -554,14 +440,9 @@ PanelFrame {
                 spacing: root.sheetMode ? Theme.spacing2xl : Theme.spacingXl
                 topPadding: root.sheetMode ? Theme.spacing2xl : Theme.pagePadding
 
-                Text {
-                    // The strip above already names the tab, in a size you can read.
+                PropertiesInspectorHeading {
                     visible: !root.sheetMode
                     text: root.tabs[root.activeTab].label
-                    color: Theme.mutedForeground
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeXs
-                    font.weight: Font.Medium
                 }
 
                 // Only the open tab is instantiated. Hidden inspectors used to stay alive and

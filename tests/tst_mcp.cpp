@@ -121,6 +121,7 @@ private slots:
     void projectSetupRoundTrip();
     void projectSetupAnswersLayoutChooser();
     void newProjectWithCanvas();
+    void closeProjectShowsStartScreen();
     void captureDoesNotInsertClip();
     void framesUniformReturnsN();
     void framesChangesDedupesFourShotClip();
@@ -1314,6 +1315,41 @@ void McpTest::newProjectWithCanvas()
     QVERIFY(!state.projectLayoutChosen());
     QVERIFY(dispatcher.applyOne(QStringLiteral("new_project"), {}).value(QStringLiteral("ok")).toBool());
     QVERIFY(state.projectLayoutChosen());
+}
+
+void McpTest::closeProjectShowsStartScreen()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    drift::mcp::McpDispatcher dispatcher(&state);
+    state.addTextClip(QStringLiteral("Gone"), 0.0);
+    QSignalSpy startScreen(state.projectFile(), &ProjectFileController::startScreenRequested);
+
+    QVERIFY(dispatcher.applyOne(QStringLiteral("close_project"), {}).value(QStringLiteral("ok")).toBool());
+    int clips = 0;
+    for (const QVariant &t : state.tracks())
+        clips += t.toMap().value(QStringLiteral("clips")).toList().size();
+    QCOMPARE(clips, 0);
+    QVERIFY(!state.projectFile()->hasUnsavedChanges());
+    QCOMPARE(startScreen.count(), 1);
+    QCOMPARE(startScreen.at(0).at(0).toBool(), true);
+
+    // new_project and load_project are the agent's ways back off the start screen.
+    QVERIFY(dispatcher.applyOne(QStringLiteral("new_project"), {}).value(QStringLiteral("ok")).toBool());
+    QCOMPARE(startScreen.count(), 2);
+    QCOMPARE(startScreen.at(1).at(0).toBool(), false);
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString path = dir.filePath(QStringLiteral("closed.drift"));
+    QVERIFY(dispatcher.applyOne(QStringLiteral("save_project"), {{QStringLiteral("path"), path}})
+                .value(QStringLiteral("ok")).toBool());
+    QVERIFY(dispatcher.applyOne(QStringLiteral("close_project"), {}).value(QStringLiteral("ok")).toBool());
+    QCOMPARE(startScreen.count(), 3);
+    QVERIFY(dispatcher.applyOne(QStringLiteral("load_project"), {{QStringLiteral("path"), path}})
+                .value(QStringLiteral("ok")).toBool());
+    QCOMPARE(startScreen.count(), 4);
+    QCOMPARE(startScreen.at(3).at(0).toBool(), false);
 }
 
 void McpTest::captureDoesNotInsertClip()

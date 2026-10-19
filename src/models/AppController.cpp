@@ -120,6 +120,10 @@
 #include <QTemporaryFile>
 #include <QElapsedTimer>
 #include <QSettings>
+#include <QStorageInfo>
+#ifdef Q_OS_MACOS
+#include <sys/mount.h>
+#endif
 #include <QByteArray>
 #include <QSet>
 #include <QStandardPaths>
@@ -268,6 +272,170 @@ bool writeTargetIsDisposable(const QUrl &url)
     }
 #endif
     return false;
+}
+
+namespace {
+
+#ifdef Q_OS_MACOS
+// Path-based statfs attributes a firmlinked directory to the sealed system volume.
+// The open file's descriptor is the volume that accepted the write.
+qint64 bytesAvailableOnOpenFile(int fd)
+{
+    if (fd < 0)
+        return -1;
+    struct statfs fs {};
+    if (::fstatfs(fd, &fs) != 0 || (fs.f_flags & MNT_RDONLY) != 0 || fs.f_bsize == 0)
+        return -1;
+    if (quint64(fs.f_bavail) > std::numeric_limits<quint64>::max() / quint64(fs.f_bsize))
+        return std::numeric_limits<qint64>::max();
+    const quint64 bytes = quint64(fs.f_bavail) * quint64(fs.f_bsize);
+    const quint64 cap = quint64(std::numeric_limits<qint64>::max());
+    return bytes > cap ? std::numeric_limits<qint64>::max() : qint64(bytes);
+}
+#endif
+
+// Mount matching in QStorageInfo is by path prefix. On macOS, /private, /var, /tmp and /Users are
+// firmlinks onto the Data volume, but those paths are not under /System/Volumes/Data, so they match
+// "/" — the sealed read-only system volume — and the free-space figure is not the space a write
+// there will use. A volume mounted somewhere else (a disk image under /Volumes) already has its
+// own prefix and is left alone.
+QStorageInfo storageForExportDirectory(const QString &dirPath)
+{
+    QStorageInfo storage(dirPath);
+#ifdef Q_OS_MACOS
+    const QString root = QDir::cleanPath(storage.rootPath());
+    if (!storage.isValid() || !storage.isReadOnly() || root != QLatin1String("/"))
+        return storage;
+
+    const QString canonical = QFileInfo(dirPath).canonicalFilePath();
+    const QString dataRoot = QStringLiteral("/System/Volumes/Data");
+    if (canonical.isEmpty() || canonical == dataRoot
+        || canonical.startsWith(dataRoot + QLatin1Char('/')))
+        return storage;
+
+    const QString onData = dataRoot + canonical;
+    if (!QFileInfo(onData).isDir())
+        return storage;
+
+    QStorageInfo data(onData);
+    if (data.isValid() && data.isReady() && !data.isReadOnly()
+        && QDir::cleanPath(data.rootPath()) != root)
+        return data;
+#endif
+    return storage;
+}
+
+} // namespace
+
+// Checked before an export starts, so a location that can't take the file fails in a second with
+// the reason instead of minutes into the render with a generic encoder error. Returns an empty
+// string when the location looks writable. Android SAF documents are written through the resolver
+// and checked there.
+QString exportTargetProblem(const QUrl &url, const QString &path)
+{
+#ifdef Q_OS_ANDROID
+    if (AndroidUri::isContentUri(url))
+        return {};
+#endif
+    // gvfs/KIO hand back mtp://, smb://, sftp://… for locations with no local path.
+    if (!url.isLocalFile() || path.isEmpty()) {
+        return QCoreApplication::translate(
+                   "AppController",
+                   "%1 isn’t a folder on this computer (a phone, camera or remote location). "
+                   "Export to a local folder, then copy the file there.")
+            .arg(url.toDisplayString(QUrl::PreferLocalFile));
+    }
+
+    const QFileInfo target(path);
+    const QString dirPath = target.absolutePath();
+    const QString dirName = QDir::toNativeSeparators(dirPath);
+
+    // Phones and cameras mounted over MTP/PTP by gvfs, or a Windows shell namespace item: the
+    // FUSE layer can't seek, and every container's header is patched after the fact.
+    if (path.contains(QLatin1String("/gvfs/mtp:")) || path.contains(QLatin1String("/gvfs/gphoto2:"))
+        || path.contains(QLatin1String("::{"))) {
+        return QCoreApplication::translate(
+                   "AppController",
+                   "%1 is on a phone or camera connected over MTP, which can’t be written to "
+                   "directly. Export to a local folder, then copy the file there.")
+            .arg(dirName);
+    }
+
+    if (!QFileInfo(dirPath).isDir()) {
+        return QCoreApplication::translate("AppController", "The folder %1 doesn’t exist anymore.")
+            .arg(dirName);
+    }
+
+    const QStorageInfo storage = storageForExportDirectory(dirPath);
+    const QByteArray fsType = storage.isValid() ? storage.fileSystemType().toLower() : QByteArray();
+    const bool network = path.startsWith(QLatin1String("//")) || path.startsWith(QLatin1String("\\\\"))
+                         || fsType.startsWith("cifs") || fsType.startsWith("smb")
+                         || fsType.startsWith("nfs") || fsType == "fuse.sshfs"
+                         || fsType == "9p" || fsType.contains("webdav");
+    // Hint only. On macOS this is still true when statfs never left the sealed system volume, so
+    // a directory QTemporaryDir just created would be refused. The probe is what decides.
+    const bool reportedReadOnly = storage.isValid() && storage.isReady() && storage.isReadOnly();
+
+    // A real write is the only reliable answer: ACLs, network shares, sync folders and
+    // controlled-folder access all say yes to isWritable() and then refuse the file. The same
+    // probe catches a volume flag that says read-only when the directory is writable.
+    QTemporaryFile probe(QDir(dirPath).filePath(QStringLiteral(".drift-write-test-XXXXXX")));
+    const QByteArray block(64 * 1024, '\0');
+    const bool writable = probe.open() && probe.write(block) == block.size() && probe.seek(0)
+                          && probe.write(block.left(16)) == 16 && probe.flush();
+    if (!writable) {
+        if (reportedReadOnly) {
+            return QCoreApplication::translate("AppController",
+                                               "%1 is on a read-only drive. Choose another folder.")
+                .arg(dirName);
+        }
+        if (network) {
+            return QCoreApplication::translate(
+                       "AppController",
+                       "Can’t write to the network location %1. Check that it’s connected and "
+                       "that you have permission to save there.")
+                .arg(dirName);
+        }
+        if (probe.error() == QFileDevice::PermissionsError || !probe.isOpen()) {
+            return QCoreApplication::translate(
+                       "AppController",
+                       "You don’t have permission to save in %1. Choose another folder.")
+                .arg(dirName);
+        }
+        return QCoreApplication::translate("AppController", "Can’t write to %1: %2")
+            .arg(dirName, probe.errorString());
+    }
+
+    // Replacing a file: opening it without truncating catches read-only files and, on Windows,
+    // one that another app (a media player, a sync client) still has open. Skipped when the
+    // directory itself could not be written — that failure already has its own reason.
+    if (target.exists()) {
+        QFile existing(path);
+        if (!existing.open(QIODevice::ReadWrite)) {
+            return QCoreApplication::translate(
+                       "AppController",
+                       "Can’t replace %1. It may be read-only or open in another app.")
+                .arg(QDir::toNativeSeparators(path));
+        }
+    }
+
+    qint64 bytesAvailable = -1;
+    if (storage.isValid() && storage.isReady())
+        bytesAvailable = storage.bytesAvailable();
+#ifdef Q_OS_MACOS
+    // A flag that survived storageForExportDirectory still describes the sealed volume, so its
+    // free-space figure is not the one the probe file was written against.
+    if (reportedReadOnly)
+        bytesAvailable = bytesAvailableOnOpenFile(probe.handle());
+#endif
+
+    constexpr qint64 kMinFreeBytes = 64ll * 1024 * 1024;
+    if (bytesAvailable >= 0 && bytesAvailable < kMinFreeBytes) {
+        return QCoreApplication::translate("AppController",
+                                           "There isn’t enough free space in %1.")
+            .arg(dirName);
+    }
+    return {};
 }
 
 bool commitWriteTarget(const QString &staged, const QUrl &url,
@@ -521,6 +689,11 @@ AppController::~AppController()
     waitForMulticamRefresh();
     if (hadMulticamSession)
         m_playback.setProject(&m_project);
+    // The export worker captures `this` too; cancel it and let it unwind before teardown.
+    if (m_exportFuture.isRunning()) {
+        m_exportCancel.storeRelaxed(1);
+        m_exportFuture.waitForFinished();
+    }
 
     // Stop the agent server before the undo stack is cut loose below. McpController is
     // a child, so without this it would only be destroyed after the members a late
@@ -4380,6 +4553,8 @@ QHash<QString, QString> defaultShortcuts()
         // Timeline zoom is QML state too, so these take the same route as the tool modes.
         {QStringLiteral("zoomIn"), QStringLiteral("Ctrl+=")},
         {QStringLiteral("zoomOut"), QStringLiteral("Ctrl+-")},
+        // The global search field lives in EditorHeader, so this is QML-only as well.
+        {QStringLiteral("search"), QStringLiteral("Ctrl+K")},
         // QML owns the window, so triggerAction only raises the request — same shape as the
         // file actions above.
         {QStringLiteral("multicam"), QStringLiteral("Ctrl+Shift+C")},
@@ -4657,8 +4832,9 @@ TimelineClipsModel::Decorations AppController::trackDecorations(const drift::Tra
     TimelineClipsModel::Decorations out;
     out.adjustmentLanes = laneIndexes;
 
-    // Gaps are whatever time no clip covers between two neighbours in start order. They are
-    // never stored, only derived.
+    // Gaps are whatever time no clip covers between two neighbours in start order, plus the
+    // stretch before the first clip when it does not start at zero — closeGap() at 0 pulls the
+    // track to the start of the timeline. They are never stored, only derived.
     QList<const drift::Clip *> sorted;
     sorted.reserve(track.clips.size());
     for (const drift::Clip &clip : track.clips)
@@ -4666,6 +4842,8 @@ TimelineClipsModel::Decorations AppController::trackDecorations(const drift::Tra
     std::stable_sort(sorted.begin(), sorted.end(), [](const drift::Clip *a, const drift::Clip *b) {
         return a->timelineStart < b->timelineStart;
     });
+    if (!sorted.isEmpty() && sorted.first()->timelineStart > 0)
+        out.gaps.append({0.0, drift::usToSeconds(sorted.first()->timelineStart)});
     for (int i = 0; i + 1 < sorted.size(); ++i) {
         const drift::TimeUs gapStart = sorted.at(i)->timelineEnd();
         const drift::TimeUs gapEnd = sorted.at(i + 1)->timelineStart;
@@ -5195,6 +5373,7 @@ QVariantList AppController::actions() const
         action(QStringLiteral("zoomIn"), tr("Zoom in")),
         action(QStringLiteral("zoomOut"), tr("Zoom out")),
         action(QStringLiteral("multicam"), tr("Multicam window")),
+        action(QStringLiteral("search"), tr("Search…")),
     };
 }
 
@@ -6851,6 +7030,8 @@ void AppController::deleteSelectedClip()
     QList<QPair<int, int>> pairs = m_selection;
     expandSelectionWithLinkedPartners(m_project, pairs);
     QSet<QString> removedClipIds;
+    struct RemovedRange { int track; drift::TimeUs start; drift::TimeUs duration; };
+    QList<RemovedRange> removedRanges;
     std::sort(pairs.begin(), pairs.end(), [](const QPair<int, int> &a, const QPair<int, int> &b) {
         if (a.first != b.first)
             return a.first > b.first;
@@ -6859,8 +7040,17 @@ void AppController::deleteSelectedClip()
     for (const QPair<int, int> &pair : pairs) {
         if (!isValidClipIndex(pair.first, pair.second))
             continue;
-        removedClipIds.insert(m_project.tracks().at(pair.first).clips.at(pair.second).id);
+        const drift::Clip &clip = m_project.tracks().at(pair.first).clips.at(pair.second);
+        removedClipIds.insert(clip.id);
+        removedRanges.append({pair.first, clip.timelineStart, clip.timelineDuration});
         m_project.tracks()[pair.first].clips.removeAt(pair.second);
+    }
+    if (m_rippleEnabled) {
+        // Latest first, so each range is closed while the clips before it are still in place.
+        std::sort(removedRanges.begin(), removedRanges.end(),
+                  [](const RemovedRange &a, const RemovedRange &b) { return a.start > b.start; });
+        for (const RemovedRange &range : std::as_const(removedRanges))
+            rippleTracksFrom(m_project, {range.track}, range.start + range.duration, -range.duration, {});
     }
     for (drift::Track &track : m_project.tracks()) {
         for (int i = track.transitions.size() - 1; i >= 0; --i) {
@@ -13592,6 +13782,7 @@ bool AppController::flattenComposite(int trackIndex, int clipIndex)
     m_exportProgress = 0.0;
     emit exportProgressChanged();
     m_exportInProgress = true;
+    m_exportByAgent = m_exportRequestedByAgent;
     emit exportInProgressChanged();
     setLastMessage(tr("Flattening composite…"));
 
@@ -15174,6 +15365,14 @@ QVariantMap AppController::transitionBetweenClips(int trackIndex, int clipIndex)
             return transitionToMap(m_project, track, transition);
     }
     return {};
+}
+
+bool AppController::hasTransitionPartner(int trackIndex, int clipIndex) const
+{
+    if (trackIndex < 0 || trackIndex >= m_project.tracks().size())
+        return false;
+    const drift::Track &track = m_project.tracks().at(trackIndex);
+    return trackAllowsTransitions(track.type) && findTransitionPartnerIndex(track, clipIndex) >= 0;
 }
 
 QVariantList AppController::transitionKindsForTrack(int trackIndex) const
@@ -20796,7 +20995,9 @@ void AppController::exportWithSettings(const QUrl &outputUrl, const QVariantMap 
     const QString outputPath =
         writeTargetPath(outputUrl, Exporter::defaultSuffix(container, exportSettings.audioOnly));
     if (outputPath.isEmpty()) {
-        setLastMessage(tr("That save location isn’t valid"), QStringLiteral("error"));
+        const QString problem = exportTargetProblem(outputUrl, outputPath);
+        setLastMessage(problem.isEmpty() ? tr("That save location isn’t valid") : problem,
+                       QStringLiteral("error"));
         emit exportFinished(false);
         return;
     }
@@ -20823,6 +21024,7 @@ void AppController::exportWithSettings(const QUrl &outputUrl, const QVariantMap 
     m_exportProgress = 0.0;
     emit exportProgressChanged();
     m_exportInProgress = true;
+    m_exportByAgent = m_exportRequestedByAgent;
     emit exportInProgressChanged();
     setLastMessage(tr("Exporting…"));
 
@@ -20832,7 +21034,7 @@ void AppController::exportWithSettings(const QUrl &outputUrl, const QVariantMap 
 
     const bool disposable = writeTargetIsDisposable(outputUrl);
 
-    (void)QtConcurrent::run([this, snapshot, exportSettings, outputPath, outputUrl, disposable]() {
+    m_exportFuture = QtConcurrent::run([this, snapshot, exportSettings, outputPath, outputUrl, disposable]() {
         // Spans the encode *and* the copy into the user's document. Exporter::run takes its own
         // hold, but that one ends when run() returns — and the commit below is the phase that
         // would otherwise lose a multi-minute render to a screen that idled out mid-copy. The
@@ -20851,7 +21053,9 @@ void AppController::exportWithSettings(const QUrl &outputUrl, const QVariantMap 
             // notification's action sets the service flag.
             return m_exportCancel.loadRelaxed() == 0 && !Exporter::BackgroundHold::cancelRequested();
         };
-        bool ok = Exporter::run(snapshot, exportSettings, outputPath, &error, report);
+        // On the worker: probing a disconnected network share can block for many seconds.
+        error = exportTargetProblem(outputUrl, outputPath);
+        bool ok = error.isEmpty() && Exporter::run(snapshot, exportSettings, outputPath, &error, report);
         // Android: the encoder needs a real file, and the document the user picked is only
         // reachable through the resolver, so the finished encode is streamed into it — the bar
         // runs a second time for that, and cancel still lands.
@@ -20885,8 +21089,14 @@ void AppController::exportWithSettings(const QUrl &outputUrl, const QVariantMap 
 #endif
                 emit exportProgressChanged();
                 emit exportInProgressChanged();
-                setLastMessage(ok ? tr("Export complete") : error,
-                               ok ? QStringLiteral("success") : QStringLiteral("error"));
+                const bool cancelled = error == QLatin1String("Export cancelled")
+                                       || error == QLatin1String("Cancelled");
+                const QString severity = ok          ? QStringLiteral("success")
+                                         : cancelled ? QStringLiteral("info")
+                                                     : QStringLiteral("error");
+                setLastMessage(ok ? tr("Export complete")
+                                  : error.isEmpty() ? tr("Export failed") : error,
+                               severity);
                 emit exportFinished(ok);
             },
             Qt::QueuedConnection);

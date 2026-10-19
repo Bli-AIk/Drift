@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <QtTest>
 
 #include <QAccessible>
@@ -307,6 +308,7 @@ private slots:
     void clipsModelNotifiesOnlyTheClipThatChanged();
     void clipsModelInsertsAndRemovesWithoutReset();
     void clipsModelDerivesGapsAndOverlaps();
+    void closeGapBeforeFirstClipMovesTrackToStart();
     void timelineLayoutCullsTilesAndHits();
     void trackItemOverlaysFollowSelection();
     void trackItemExposesDrawnClipsToAccessibility();
@@ -1667,6 +1669,11 @@ void EditorStateTest::arrowKeysJogAndJumpThePlayhead()
     QCOMPARE(state.shortcutFor(QStringLiteral("jumpForward")), QStringLiteral("Shift+Right"));
     QCOMPARE(state.shortcutFor(QStringLiteral("jumpBackFar")), QStringLiteral("Ctrl+Left"));
     QCOMPARE(state.shortcutFor(QStringLiteral("jumpForwardFar")), QStringLiteral("Ctrl+Right"));
+    QCOMPARE(state.shortcutFor(QStringLiteral("search")), QStringLiteral("Ctrl+K"));
+    const QVariantList actions = state.actions();
+    QVERIFY(std::any_of(actions.cbegin(), actions.cend(), [](const QVariant &action) {
+        return action.toMap().value(QStringLiteral("id")).toString() == QLatin1String("search");
+    }));
 
     // What Main.qml's editor FocusScope does with an unaccepted arrow.
     const auto jog = [&state](int key, Qt::KeyboardModifiers mods) {
@@ -10188,6 +10195,37 @@ void EditorStateTest::playbackSuspendsThumbnailAndWaveformDecoding()
     state.setPlaying(false);
     QVERIFY(!state.m_filmstripTiles.isSuspended());
     QVERIFY(!state.m_waveformBlocks.isSuspended());
+}
+
+// A track whose first clip starts late has a gap from 0, and closing it moves the whole track to
+// the start of the timeline, keeping the spacing between its clips.
+void EditorStateTest::closeGapBeforeFirstClipMovesTrackToStart()
+{
+    AssetLibrary library;
+    TestController state(&library);
+    appendTwoVideoClips(*state.project());
+    auto &clips = state.project()->tracks()[0].clips;
+    clips[0].timelineStart = drift::secondsToUs(1.5);
+    clips[1].timelineStart = drift::secondsToUs(5.0);
+    state.notifyTracksChanged();
+
+    auto *model = qobject_cast<TimelineClipsModel *>(state.clipsModel(0));
+    QVERIFY(model);
+    QCOMPARE(model->decorations().gaps.size(), 2);
+    QCOMPARE(model->decorations().gaps.at(0).start, 0.0);
+    QCOMPARE(model->decorations().gaps.at(0).end, 1.5);
+    QCOMPARE(model->decorations().gaps.at(1).start, 3.5);
+    QCOMPARE(model->decorations().gaps.at(1).end, 5.0);
+
+    state.closeGap(0, 0.0);
+    QCOMPARE(state.project()->tracks().at(0).clips.at(0).timelineStart, drift::TimeUs(0));
+    QCOMPARE(state.project()->tracks().at(0).clips.at(1).timelineStart, drift::secondsToUs(3.5));
+    QCOMPARE(model->decorations().gaps.size(), 1);
+    QCOMPARE(model->decorations().gaps.at(0).start, 2.0);
+
+    state.undo();
+    QCOMPARE(state.project()->tracks().at(0).clips.at(0).timelineStart, drift::secondsToUs(1.5));
+    QCOMPARE(state.project()->tracks().at(0).clips.at(1).timelineStart, drift::secondsToUs(5.0));
 }
 
 void EditorStateTest::clipsModelDerivesGapsAndOverlaps()

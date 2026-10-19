@@ -3,8 +3,6 @@ import QtQuick.Controls.Basic
 import QtQuick.Templates as T
 import QtQuick.Window
 import Drift
-import "components"
-
 // CapCut-style phone editor: top bar, resizable preview | tools+timeline, bottom rail.
 Item {
     id: root
@@ -195,16 +193,7 @@ Item {
     }
 
     function saveProject() {
-        if (EditorState.projectFile.currentProjectPath && EditorState.projectFile.currentProjectPath.length > 0) {
-            EditorState.projectFile.saveProject(EditorState.fileUrl(EditorState.projectFile.currentProjectPath))
-            return !EditorState.projectFile.hasUnsavedChanges
-        }
-        const url = FileDialogs.saveFile(qsTr("Save Project"), root.projectFilter,
-                                         EditorState.projectFile.projectName, "drift")
-        if (url === "")
-            return false
-        EditorState.projectFile.saveProject(url)
-        return !EditorState.projectFile.hasUnsavedChanges
+        return Window.window.saveProject()
     }
 
     // Save As: the open project written to a second file, which the session then continues in.
@@ -387,7 +376,7 @@ Item {
 
                 Rectangle {
                     anchors.fill: parent
-                    color: Theme.panelBackground
+                    color: Theme.c.androidEditor.splitterBackground
                 }
 
                 Rectangle {
@@ -398,8 +387,9 @@ Item {
                     // land a thumb on.
                     width: editorSplit.sideBySide ? 6 : 48
                     height: editorSplit.sideBySide ? 48 : 6
-                    radius: 3
-                    color: T.SplitHandle.pressed ? Theme.primary : Theme.panelBorder
+                    radius: Theme.c.androidEditor.handleRadius
+                    color: T.SplitHandle.pressed ? Theme.c.androidEditor.handleBackgroundPressed
+                                                 : Theme.c.androidEditor.handleBackground
                 }
 
                 MouseArea {
@@ -480,8 +470,9 @@ Item {
                                 return false
                             return EditorState.clipCount === 0
                         }
-                        color: Qt.rgba(Theme.appBackground.r, Theme.appBackground.g,
-                                       Theme.appBackground.b, 0.82)
+                        color: Qt.rgba(Theme.c.androidEditor.emptyBackground.r,
+                                       Theme.c.androidEditor.emptyBackground.g,
+                                       Theme.c.androidEditor.emptyBackground.b, 0.82)
                         z: 5
 
                         Column {
@@ -493,7 +484,7 @@ Item {
                                 width: parent.width
                                 horizontalAlignment: Text.AlignHCenter
                                 text: qsTr("Your timeline is empty")
-                                color: Theme.foreground
+                                color: Theme.c.androidEditor.foreground
                                 font.family: Theme.fontFamily
                                 font.pixelSize: Theme.fontSizeBase
                                 font.weight: Font.Medium
@@ -504,7 +495,7 @@ Item {
                                 horizontalAlignment: Text.AlignHCenter
                                 wrapMode: Text.WordWrap
                                 text: qsTr("Import media or open the Media library to start editing.")
-                                color: Theme.mutedForeground
+                                color: Theme.c.androidEditor.foregroundMuted
                                 font.family: Theme.fontFamily
                                 font.pixelSize: Theme.fontSizeSm
                             }
@@ -634,63 +625,17 @@ Item {
     }
 
     // Only the buttons: the text is edited on the preview itself, which stays visible above this.
-    Rectangle {
+    AndroidTextEditBar {
         id: textEditBar
-        readonly property bool editing: preview.textEditor.active
-        readonly property real coveredHeight: editing ? height + anchors.bottomMargin : 0
+        editing: preview.textEditor.active
+        textEditor: preview.textEditor
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.leftMargin: root.SafeArea.margins.left
         anchors.rightMargin: root.SafeArea.margins.right
         anchors.bottomMargin: Math.max(root.SafeArea.margins.bottom, Theme.keyboardInset)
-        height: Theme.iconButtonSize + Theme.spacingMd * 2
-        visible: editing
-        color: Theme.panelBackground
         z: 10
-
-        Rectangle {
-            anchors.top: parent.top
-            width: parent.width
-            height: Theme.borderWidth
-            color: Theme.panelBorder
-        }
-
-        // Swallows touches that miss a control so they do not fall through to the timeline below.
-        MouseArea {
-            anchors.fill: parent
-        }
-
-        IconButton {
-            id: cancelEditButton
-            anchors.left: parent.left
-            anchors.leftMargin: Theme.spacingMd
-            anchors.verticalCenter: parent.verticalCenter
-            focusPolicy: Qt.NoFocus
-            glyph: Theme.icons.x
-            tooltip: qsTr("Cancel")
-            onClicked: preview.textEditor.cancel()
-        }
-
-        ThemedButton {
-            anchors.left: cancelEditButton.right
-            anchors.leftMargin: Theme.spacingMd
-            anchors.verticalCenter: parent.verticalCenter
-            focusPolicy: Qt.NoFocus
-            text: qsTr("Select all")
-            onClicked: preview.textEditor.selectAll()
-        }
-
-        ThemedButton {
-            anchors.right: parent.right
-            anchors.rightMargin: Theme.spacingMd
-            anchors.verticalCenter: parent.verticalCenter
-            focusPolicy: Qt.NoFocus
-            variant: "primary"
-            glyph: Theme.icons.check
-            text: qsTr("Done")
-            onClicked: preview.textEditor.commit()
-        }
     }
 
     ExportDialog {
@@ -718,6 +663,9 @@ Item {
             if (EditorState.exportInProgress) {
                 exportProgressDialog.dismissed = false
                 exportProgressDialog.openDialog()
+            } else if (EditorState.exportByAgent) {
+                // Same as the desktop header: an agent's export closes its own progress dialog.
+                exportProgressDialog.close()
             }
         }
     }

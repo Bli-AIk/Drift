@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // 3D model clip inspector: which model or splat it is, which animation plays, and the lighting knobs. The
 // model is placed like any 3D layer, from the Transform tab.
 Item {
@@ -104,7 +102,7 @@ Item {
                 IconGlyph {
                     glyph: Theme.icons.warning
                     iconSize: 12
-                    iconColor: Theme.warning
+                    iconColor: Theme.c.model3DInspector.iconWarning
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 ThemedLabel {
@@ -133,7 +131,7 @@ Item {
                     spacing: 4
                     Text {
                         text: qsTr("Animation")
-                        color: Theme.mutedForeground
+                        color: Theme.c.model3DInspector.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -152,7 +150,7 @@ Item {
                     spacing: 4
                     Text {
                         text: qsTr("After the end")
-                        color: Theme.mutedForeground
+                        color: Theme.c.model3DInspector.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -172,7 +170,7 @@ Item {
                 spacing: 4
                 Text {
                     text: qsTr("Start offset")
-                    color: Theme.mutedForeground
+                    color: Theme.c.model3DInspector.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -244,7 +242,7 @@ Item {
                             width: parent.width - lightSwatch.width - lightSwitch.width - 2 * parent.spacing
                             anchors.verticalCenter: parent.verticalCenter
                             text: qsTr("Light %1").arg(lightGroup.index + 1)
-                            color: Theme.panelForeground
+                            color: Theme.c.model3DInspector.foreground
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSizeSm
                             font.weight: Font.Medium

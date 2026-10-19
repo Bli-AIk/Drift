@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
 import Drift
-import ".."
 
 // The preview's less-used settings, behind the OSD's "⋯": preview quality, playback speed, how
 // video is decoded, and keeping mask handles up.
@@ -18,17 +17,10 @@ Popup {
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
 
     background: Rectangle {
-        color: Theme.panelBackground
-        border.width: Theme.borderWidth
-        border.color: Theme.panelBorder
-        radius: Theme.radiusMd
-    }
-
-    component RowLabel: Text {
-        color: Theme.mutedForeground
-        font.family: Theme.fontFamily
-        font.pixelSize: Theme.fontSizeXs
-        Layout.alignment: Qt.AlignVCenter
+        color: Theme.c.previewOptionsMenu.background
+        border.width: Theme.c.previewOptionsMenu.borderWidth
+        border.color: Theme.c.previewOptionsMenu.border
+        radius: Theme.c.previewOptionsMenu.radius
     }
 
     contentItem: GridLayout {
@@ -36,7 +28,7 @@ Popup {
         columnSpacing: Theme.spacingLg
         rowSpacing: Theme.spacingMd
 
-        RowLabel { text: qsTr("Quality") }
+        PreviewOptionsRowLabel { text: qsTr("Quality") }
         ThemedComboBox {
             id: qualityCombo
             Layout.fillWidth: true
@@ -58,7 +50,7 @@ Popup {
             onActivated: EditorState.playback.previewQuality = values[currentIndex]
         }
 
-        RowLabel { text: qsTr("Speed") }
+        PreviewOptionsRowLabel { text: qsTr("Speed") }
         ThemedComboBox {
             Layout.fillWidth: true
             Layout.minimumWidth: widestContentWidth + leftPadding + rightPadding
@@ -73,7 +65,7 @@ Popup {
             onActivated: EditorState.playback.playbackRate = values[currentIndex]
         }
 
-        RowLabel { text: qsTr("Decode") }
+        PreviewOptionsRowLabel { text: qsTr("Decode") }
         RowLayout {
             Layout.fillWidth: true
             spacing: Theme.spacingSm
@@ -111,19 +103,8 @@ Popup {
 
             // The combo's list is shut most of the time, so the chosen row's warning needs
             // somewhere to live on the closed control too.
-            IconGlyph {
-                id: decodeWarnGlyph
-                glyph: Theme.icons.warning
-                iconSize: Theme.iconSizeSm
-                iconColor: Theme.warning
-                readonly property var mode: decodeCombo.modes[decodeCombo.currentIndex]
-                visible: mode !== undefined && mode.warn === true
-
-                HoverHandler { id: decodeWarnHover }
-                ThemedToolTip {
-                    text: decodeWarnGlyph.mode ? decodeWarnGlyph.mode.note : ""
-                    visible: decodeWarnGlyph.visible && decodeWarnHover.hovered
-                }
+            PreviewOptionsDecodeWarning {
+                mode: decodeCombo.modes[decodeCombo.currentIndex]
             }
         }
 
@@ -140,73 +121,9 @@ Popup {
     // Picking a decoder that runs on the other GPU is a legitimate choice — some codecs only the
     // discrete card decodes — so this explains the cost rather than blocking it, and offers the
     // change that would actually fix it where Drift can make one.
-    ThemedDialog {
+    PreviewOptionsDecodeDialog {
         id: decodeGpuDialog
-
-        property var mode: null
-
-        function confirm(pending) {
-            mode = pending
-            open()
-        }
-
-        title: qsTr("Decoding on a different graphics card")
-        preferredWidth: Theme.dialogWidthMd
-        acceptText: qsTr("Use anyway")
-        rejectText: qsTr("Cancel")
-        // Destructive-ish in the sense that matters here: Enter should not commit a choice the
-        // user opened this dialog to understand.
-        acceptOnReturn: false
-
-        onAccepted: if (mode) EditorState.playback.decodeMode = mode.id
-        // The combo already moved its own highlight, so put it back on what is still in use.
-        onRejected: decodeCombo.currentIndex =
+        onRestoreSelection: decodeCombo.currentIndex =
             Math.max(0, decodeCombo.values.indexOf(EditorState.playback.decodeMode))
-
-        contentItem: Column {
-            spacing: Theme.spacingLg
-
-            ThemedLabel {
-                width: parent.width
-                tone: "default"
-                size: "sm"
-                text: decodeGpuDialog.mode ? decodeGpuDialog.mode.note : ""
-            }
-
-            ThemedLabel {
-                width: parent.width
-                visible: !EditorState.preferences.gpuPreferenceSupported && Qt.platform.os === "linux"
-                text: qsTr("Launching Drift with prime-run (or DRI_PRIME=1) puts OpenGL on the "
-                           + "same card as the decoder.")
-            }
-
-            ThemedButton {
-                visible: EditorState.preferences.gpuPreferenceSupported
-                text: qsTr("Run Drift on the high-performance graphics card")
-                variant: "secondary"
-                // Leaves the decode mode alone: this is the other way out, not a confirmation.
-                onClicked: {
-                    EditorState.preferences.preferredGpu = "discrete"
-                    decodeGpuDialog.reject()
-                }
-            }
-
-            ThemedLabel {
-                width: parent.width
-                visible: EditorState.preferences.gpuPreferenceInSystemSettings
-                text: qsTr("Set Drift to High performance in Windows Settings > Display > Graphics, "
-                           + "then restart Drift.")
-            }
-
-            ThemedButton {
-                visible: EditorState.preferences.gpuPreferenceInSystemSettings
-                text: qsTr("Open graphics settings")
-                variant: "secondary"
-                onClicked: {
-                    Qt.openUrlExternally("ms-settings:display-advancedgraphics")
-                    decodeGpuDialog.reject()
-                }
-            }
-        }
     }
 }

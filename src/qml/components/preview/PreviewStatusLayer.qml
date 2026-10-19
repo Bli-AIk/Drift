@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Window
 import Drift
-import ".."
-
 // What the canvas says when it has no picture to show, plus the diagnostics and recording badges.
 // `compact` is the phone's version: one short line per state and no badges.
 Item {
@@ -22,47 +20,14 @@ Item {
     }
 
     // Voiceover recording indicator overlay
-    Rectangle {
-        id: voiceoverRecordBadge
+    PreviewVoiceoverBadge {
         visible: !root.compact && EditorState.isRecordingAudio
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.margins: Theme.spacingLg
-        height: 28
-        radius: Theme.radiusSm
-        color: Qt.rgba(0, 0, 0, 0.75)
-        border.color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
-        border.width: 1
         z: 11
-        width: recordRow.implicitWidth + 16
-
-        Row {
-            id: recordRow
-            anchors.centerIn: parent
-            spacing: 6
-
-            Rectangle {
-                width: 8
-                height: 8
-                radius: 4
-                color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
-                anchors.verticalCenter: parent.verticalCenter
-                SequentialAnimation on opacity {
-                    running: voiceoverRecordBadge.visible && !EditorState.isAudioRecordingPaused
-                    loops: Animation.Infinite
-                    NumberAnimation { to: 0.2; duration: 400 }
-                    NumberAnimation { to: 1.0; duration: 400 }
-                }
-            }
-
-            Text {
-                text: (EditorState.isAudioRecordingPaused ? qsTr("PAUSED %1s") : qsTr("REC %1s")).arg(EditorState.audioRecordSeconds.toFixed(1))
-                font.pixelSize: 11
-                font.bold: true
-                color: Theme.panelForeground
-                anchors.verticalCenter: parent.verticalCenter
-            }
-        }
+        paused: EditorState.isAudioRecordingPaused
+        seconds: EditorState.audioRecordSeconds
     }
 
     // On a brand-new project this — the largest, most central panel — said nothing at all, while
@@ -102,37 +67,18 @@ Item {
         onActionTriggered: root.Window.window.openDebugInfo()
     }
 
-    Text {
-        anchors.centerIn: parent
-        width: parent.width - Theme.spacingXl
+    PreviewCompactGpuCaption {
         visible: root.compact && root.gpuFailed
-        text: qsTr("GPU preview unavailable")
-        horizontalAlignment: Text.AlignHCenter
-        wrapMode: Text.Wrap
-        color: Theme.guideMedium
-        font.family: Theme.fontFamily
-        font.pixelSize: Theme.fontSizeSm
     }
 
     // Fades rather than popping, so scrubbing across a gap no longer flickers this text on and
     // off. Only ever a gap message: when the compositor is down the state above explains that
     // instead.
-    Text {
-        anchors.centerIn: parent
-        visible: opacity > 0
-        opacity: EditorState.playback.hasFrame
-                 || (!root.compact && EditorState.trackCount === 0)
-                 || !EditorState.playback.gpuCompositorReady ? 0 : 1
-        text: EditorState.activeAudioClipAtPlayhead().path
-              ? qsTr("Audio only") : qsTr("No clip at the current time")
-        // Drawn on the letterbox scrim, not a panel surface, so it follows the on-media tokens in
-        // both themes.
-        color: Theme.guideMedium
-        font.family: Theme.fontFamily
-        font.pixelSize: Theme.fontSizeSm
-
-        Behavior on opacity {
-            NumberAnimation { duration: Theme.durationBase; easing.type: Theme.easing }
-        }
+    PreviewGapCaption {
+        show: !(EditorState.playback.hasFrame
+                || (!root.compact && EditorState.trackCount === 0)
+                || !EditorState.playback.gpuCompositorReady)
+        message: EditorState.activeAudioClipAtPlayhead().path
+                 ? qsTr("Audio only") : qsTr("No clip at the current time")
     }
 }

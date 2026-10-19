@@ -1,7 +1,5 @@
 import QtQuick
 import Drift
-import ".."
-
 // While a transform clip is selected, tints the rows it moves over the time it is live, so the
 // span reads on the timeline itself and not only in the header bracket. Takes no input.
 Item {
@@ -42,17 +40,8 @@ Item {
 
     Repeater {
         model: root.covered
-        delegate: Rectangle {
-            required property var modelData
-            visible: root.draggingTrack !== modelData
-            x: root.layerClip ? root.layerClip.start * root.pxPerSecond : 0
-            width: root.layerClip ? root.layerClip.duration * root.pxPerSecond : 0
-            y: root.rowTop ? root.rowTop(modelData) : 0
-            height: root.rowHeight ? root.rowHeight(modelData) : 0
-            color: Qt.rgba(Theme.clipTransform.r, Theme.clipTransform.g, Theme.clipTransform.b, 0.14)
-            border.width: 1
-            border.color: Qt.rgba(Theme.clipTransform.r, Theme.clipTransform.g, Theme.clipTransform.b, 0.45)
-            radius: Theme.radiusSm
+        delegate: TransformCoverageTint {
+            overlay: root
         }
     }
 }

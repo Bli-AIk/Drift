@@ -223,6 +223,9 @@ class AppController : public QObject
     Q_PROPERTY(bool undoAvailable READ undoAvailable NOTIFY undoStackChanged)
     Q_PROPERTY(bool redoAvailable READ redoAvailable NOTIFY undoStackChanged)
     Q_PROPERTY(bool exportInProgress READ exportInProgress NOTIFY exportInProgressChanged)
+    // True while (and after) an export an MCP agent started, until the next export begins.
+    // The progress dialog closes itself when such an export ends: nobody at the desk asked for it.
+    Q_PROPERTY(bool exportByAgent READ exportByAgent NOTIFY exportInProgressChanged)
     Q_PROPERTY(double exportProgress READ exportProgress NOTIFY exportProgressChanged)
     Q_PROPERTY(bool canShareExport READ canShareExport NOTIFY canShareExportChanged)
     Q_PROPERTY(bool subtitleGenerating READ subtitleGenerating NOTIFY subtitleGeneratingChanged)
@@ -404,6 +407,10 @@ public:
     bool undoAvailable() const { return m_undoStack.canUndo(); }
     bool redoAvailable() const { return m_undoStack.canRedo(); }
     bool exportInProgress() const { return m_exportInProgress; }
+    bool exportByAgent() const { return m_exportByAgent; }
+    // Set by the MCP dispatcher around the call that starts an export, so the start
+    // records who asked for it. Not invokable.
+    void setExportRequestedByAgent(bool byAgent) { m_exportRequestedByAgent = byAgent; }
     double exportProgress() const;
     bool canShareExport() const;
     bool subtitleGenerating() const { return m_subtitleGenerating; }
@@ -755,6 +762,7 @@ public:
     // Shifts every clip on `trackIndex` starting at/after `gapStartSeconds` left by the
     // width of the gap immediately following that position, closing it. Linked partner
     // clips on other tracks (e.g. a companion audio clip) follow along to stay in sync.
+    // At 0 it closes the gap before the first clip, moving the track to the timeline start.
     Q_INVOKABLE void closeGap(int trackIndex, double gapStartSeconds);
     Q_INVOKABLE void alignSelectedClipLeft();
     Q_INVOKABLE void alignSelectedClipRight();
@@ -1105,6 +1113,8 @@ public:
     Q_INVOKABLE void previewSetTransitionParam(int trackIndex, const QString &transitionId,
                                                const QString &key, double value);
     Q_INVOKABLE QVariantMap transitionBetweenClips(int trackIndex, int clipIndex) const;
+    // True when addTransition on this clip would find a right-hand partner to transition into.
+    Q_INVOKABLE bool hasTransitionPartner(int trackIndex, int clipIndex) const;
     Q_INVOKABLE QVariantList transitionKinds() const;
     // The kinds that make sense on this track: on an audio track only those with an audible
     // curve (crossfade, dip); everything elsewhere.
@@ -1943,8 +1953,11 @@ protected:
     bool m_subtitleEditing = false;
     int m_selectedSubtitleCue = -1;
     bool m_exportInProgress = false;
+    bool m_exportByAgent = false;
+    bool m_exportRequestedByAgent = false;
     double m_exportProgress = 0.0;
     QAtomicInt m_exportCancel = 0;
+    QFuture<void> m_exportFuture;
     QUrl m_lastExportUrl;
     QString m_lastExportName;
     // Android: the publish-to-gallery copy behind Share is on a worker, so canShareExport reports

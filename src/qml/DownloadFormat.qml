@@ -73,10 +73,10 @@ QtObject {
 
     function statusColor(job) {
         if (job.status === "failed")
-            return Theme.destructive
+            return Theme.c.downloadFormat.destructive
         if (job.status === "done")
-            return Theme.primary
-        return Theme.mutedForeground
+            return Theme.c.downloadFormat.accent
+        return Theme.c.downloadFormat.foregroundMuted
     }
 
     // The line under the title. Errors win: a failed job's reason is the whole reason the

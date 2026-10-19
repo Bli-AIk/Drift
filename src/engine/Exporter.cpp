@@ -657,6 +657,15 @@ void nv12ToYuv420p(const uint8_t *y, int yStride, const uint8_t *uv, int uvStrid
     }
 }
 
+// FFmpeg's own reason ("No space left on device", "Permission denied", …) — a bare "could not
+// write" sends people hunting for the wrong cause.
+QString avErrorText(int rc)
+{
+    char buf[AV_ERROR_MAX_STRING_SIZE] = {};
+    av_strerror(rc, buf, sizeof(buf));
+    return QString::fromLocal8Bit(buf);
+}
+
 // Sends a frame (or nullptr to flush) to the encoder and interleaves the packets.
 bool encodeWriteFrame(AVFormatContext *fmt, AVCodecContext *codec, AVStream *stream, AVFrame *frame,
                       AVPacket *pkt, QString *errorOut)
@@ -683,7 +692,7 @@ bool encodeWriteFrame(AVFormatContext *fmt, AVCodecContext *codec, AVStream *str
         av_packet_unref(pkt);
         if (rc < 0) {
             if (errorOut)
-                *errorOut = QStringLiteral("Failed to write a packet");
+                *errorOut = QStringLiteral("Could not write to the output file: %1").arg(avErrorText(rc));
             return false;
         }
     }
@@ -1046,8 +1055,8 @@ bool runAudioOnlyExport(const drift::Project &project, const ExportSettings &set
         const int frameSize = actx->frame_size > 0 ? actx->frame_size : 1024;
 
         if (!(fmt->oformat->flags & AVFMT_NOFILE)) {
-            if (avio_open(&fmt->pb, outUtf8.constData(), AVIO_FLAG_WRITE) < 0) {
-                error = QStringLiteral("Could not open the output file");
+            if (const int rc = avio_open(&fmt->pb, outUtf8.constData(), AVIO_FLAG_WRITE); rc < 0) {
+                error = QStringLiteral("Could not open the output file: %1").arg(avErrorText(rc));
                 goto cleanup;
             }
         }
@@ -1365,8 +1374,8 @@ bool runGifExport(const drift::Project &project, const ExportSettings &settings,
         vstream->time_base = vctx->time_base;
 
         if (!(fmt->oformat->flags & AVFMT_NOFILE)) {
-            if (avio_open(&fmt->pb, outUtf8.constData(), AVIO_FLAG_WRITE) < 0) {
-                error = QStringLiteral("Could not open the output file");
+            if (const int rc = avio_open(&fmt->pb, outUtf8.constData(), AVIO_FLAG_WRITE); rc < 0) {
+                error = QStringLiteral("Could not open the output file: %1").arg(avErrorText(rc));
                 goto cleanup;
             }
         }
@@ -2163,8 +2172,8 @@ bool Exporter::run(const drift::Project &project, const ExportSettings &settings
         const bool hwUpload = isHardwarePixelFormat(outPixFmt);
 
         if (!(fmt->oformat->flags & AVFMT_NOFILE)) {
-            if (avio_open(&fmt->pb, outUtf8.constData(), AVIO_FLAG_WRITE) < 0) {
-                error = QStringLiteral("Could not open the output file");
+            if (const int rc = avio_open(&fmt->pb, outUtf8.constData(), AVIO_FLAG_WRITE); rc < 0) {
+                error = QStringLiteral("Could not open the output file: %1").arg(avErrorText(rc));
                 goto cleanup;
             }
         }

@@ -2,9 +2,6 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Window
 import Drift
-import "components"
-import "components/timeline"
-
 PanelFrame {
     id: root
 
@@ -165,36 +162,36 @@ PanelFrame {
         effectDropTrack: root.effectDropTrackIndex
         effectDropClip: root.effectDropClipIndex
         style: ({
-            "clipVideo": Theme.clipVideoPlaceholder,
-            "clipAudio": Theme.clipAudio,
-            "clipText": Theme.clipText,
-            "clipSubtitle": Theme.clipSubtitle,
-            "clipGraphic": Theme.clipGraphic,
-            "clipEffect": Theme.clipEffect,
-            "clipComposite": Theme.clipComposite,
-            "adjustmentVideo": Theme.clipAdjustmentVideo,
-            "adjustmentAudio": Theme.clipAdjustmentAudio,
-            "adjustmentMask": Theme.clipAdjustmentMask,
-            "adjustmentTransform": Theme.clipTransform,
-            "primary": Theme.primary,
-            "scrim": Theme.scrimColor,
-            "proxyBand": Theme.clipProxyBand,
-            "onMedia": Theme.onMedia,
-            "waveform": Theme.waveformColor,
-            "mutedForeground": Theme.mutedForeground,
-            "panelBorder": Theme.panelBorder,
-            "proxyPill": Theme.clipProxy,
-            "proxyPillForeground": Theme.clipProxyForeground,
-            "editFriendlyPill": Theme.clipEditFriendly,
-            "editFriendlyPillForeground": Theme.clipEditFriendlyForeground,
-            "warning": Theme.warning,
+            "clipVideo": Theme.c.timelineClipItem.videoBackground,
+            "clipAudio": Theme.c.timelineClipItem.audioBackground,
+            "clipText": Theme.c.timelineClipItem.textBackground,
+            "clipSubtitle": Theme.c.timelineClipItem.subtitleBackground,
+            "clipGraphic": Theme.c.timelineClipItem.graphicBackground,
+            "clipEffect": Theme.c.timelineClipItem.effectBackground,
+            "clipComposite": Theme.c.timelineClipItem.compositeBackground,
+            "adjustmentVideo": Theme.c.timelineClipItem.adjustmentVideoBackground,
+            "adjustmentAudio": Theme.c.timelineClipItem.adjustmentAudioBackground,
+            "adjustmentMask": Theme.c.timelineClipItem.adjustmentMaskBackground,
+            "adjustmentTransform": Theme.c.timelineClipItem.transformBackground,
+            "primary": Theme.c.timelineClipItem.accent,
+            "scrim": Theme.c.timelineClipItem.scrim,
+            "proxyBand": Theme.c.timelineClipItem.proxyBand,
+            "onMedia": Theme.c.timelineClipItem.foreground,
+            "waveform": Theme.c.timelineClipItem.waveform,
+            "mutedForeground": Theme.c.timelineClipItem.foregroundMuted,
+            "panelBorder": Theme.c.timelineClipItem.border,
+            "proxyPill": Theme.c.timelineClipItem.proxyBackground,
+            "proxyPillForeground": Theme.c.timelineClipItem.proxyForeground,
+            "editFriendlyPill": Theme.c.timelineClipItem.editFriendlyBackground,
+            "editFriendlyPillForeground": Theme.c.timelineClipItem.editFriendlyForeground,
+            "warning": Theme.c.timelineClipItem.warning,
             "fontFamily": Theme.fontFamily,
             "fontSizeTiny": Theme.fontSizeTiny,
             "fontSizeXs": Theme.fontSizeXs,
-            "radiusSm": Theme.radiusSm,
-            "radiusXs": Theme.radiusXs,
-            "ringWidth": Theme.clipSelectionRingWidth,
-            "borderWidthFocus": Theme.borderWidthFocus,
+            "radiusSm": Theme.c.timelineClipItem.radius,
+            "radiusXs": Theme.c.timelineClipItem.radiusXs,
+            "ringWidth": Theme.c.timelineClipItem.selectionBorderWidth,
+            "borderWidthFocus": Theme.c.timelineClipItem.focusBorderWidth,
             "headerBandHeight": Theme.clipHeaderBandHeight,
             "clipMinWidth": Theme.clipMinWidth,
             "iconSizeSm": Theme.iconSizeSm,
@@ -577,7 +574,6 @@ PanelFrame {
         })
     }
 
-
     // Top of a row inside the track column, which stacks the visible rows with a gap.
     function trackRowTop(index) {
         var cursor = 0
@@ -597,19 +593,19 @@ PanelFrame {
     // Adjustment layers are tinted by what they act on, so a glance at a lane says whether it is
     // grading the picture, treating the audio, or cutting a mask.
     function adjustmentColor(kind) {
-        if (kind === "audioEffects") return Theme.clipAdjustmentAudio
-        if (kind === "mask") return Theme.clipAdjustmentMask
-        if (kind === "transform") return Theme.clipTransform
-        return Theme.clipAdjustmentVideo
+        if (kind === "audioEffects") return Theme.c.timelineClipItem.adjustmentAudioBackground
+        if (kind === "mask") return Theme.c.timelineClipItem.adjustmentMaskBackground
+        if (kind === "transform") return Theme.c.timelineClipItem.transformBackground
+        return Theme.c.timelineClipItem.adjustmentVideoBackground
     }
     function clipColor(type) {
-        if (type === "text") return Theme.clipText;
-        if (type === "subtitle") return Theme.clipSubtitle;
-        if (type === "audio") return Theme.clipAudio;
-        if (type === "graphic") return Theme.clipGraphic;
-        if (type === "effect" || type === "adjustment") return Theme.clipEffect;
-        if (type === "composite") return Theme.clipComposite;
-        return Theme.clipVideoPlaceholder; // video: no flat fill, thumbnails would go here
+        if (type === "text") return Theme.c.timelineClipItem.textBackground;
+        if (type === "subtitle") return Theme.c.timelineClipItem.subtitleBackground;
+        if (type === "audio") return Theme.c.timelineClipItem.audioBackground;
+        if (type === "graphic") return Theme.c.timelineClipItem.graphicBackground;
+        if (type === "effect" || type === "adjustment") return Theme.c.timelineClipItem.effectBackground;
+        if (type === "composite") return Theme.c.timelineClipItem.compositeBackground;
+        return Theme.c.timelineClipItem.videoBackground; // video: no flat fill, thumbnails would go here
     }
 
     // Computed once per model change instead of at each of the ten call sites below — one of
@@ -642,7 +638,6 @@ PanelFrame {
         }
         return -1
     }
-
 
     function timelineHasClips() {
         for (var i = 0; i < tracks.length; i++) {
@@ -1263,8 +1258,6 @@ PanelFrame {
         panLastSceneY = p.y
     }
 
-
-
     Column {
         anchors.fill: parent
 
@@ -1366,14 +1359,14 @@ PanelFrame {
                         anchors.bottom: parent.bottom
                         width: 1
                         height: parent.height
-                        color: Theme.panelBorder
+                        color: Theme.c.timelinePanel.headerBorder
                     }
                     Rectangle {
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         height: 1
-                        color: Theme.panelBorder
+                        color: Theme.c.timelinePanel.headerBorder
                     }
                 }
 
@@ -1444,6 +1437,14 @@ PanelFrame {
                     width: flick.contentWidth
                     height: flick.contentHeight
 
+                    // Track-area surface. Same panel colour as the frame behind it,
+                    // so a theme can make this layer translucent on its own.
+                    Rectangle {
+                        anchors.fill: parent
+                        color: Theme.c.timelinePanel.background
+                        z: -1
+                    }
+
                     // Wheel + middle-click pan: scoped to the ruler so it does not
                     // block timeline drops. Left/right clicks fall through.
                     MouseArea {
@@ -1485,350 +1486,28 @@ PanelFrame {
                     // seek strip (ruler + bookmark lane) ------------------------------------
                     // CapCut/Premiere-style: the whole pinned header is one scrub area so
                     // the playhead is easy to move without hunting for a tiny hit target.
-                    Item {
+                    TimelineSeekStrip {
                         id: seekStrip
-                        width: parent.width
-                        y: flick.contentY
-                        z: 2
-                        height: Theme.timelineRulerHeight + Theme.timelineBookmarkRowHeight
-
-                        Rectangle {
-                            anchors.fill: parent
-                            color: Theme.panelBackground
-                        }
-
-                        // Subtle bottom edge so the seek strip reads as a distinct bar.
-                        Rectangle {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.bottom: parent.bottom
-                            height: 1
-                            color: Theme.panelBorder
-                        }
-
-                        MouseArea {
-                            id: rulerScrub
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            preventStealing: true
-                            // Leave room for the playhead head so its drag can start first.
-                            z: 1
-
-                            function scrubTo(x) {
-                                EditorState.playheadSeconds =
-                                    EditorState.snapTime(Math.max(0, x) / root.pxPerSecond)
-                            }
-
-                            // Seeking is not a selection change: scrubbing to look at a
-                            // different point used to drop the clip you were editing.
-                            onPressed: (mouse) => {
-                                root.forceActiveFocus()
-                                root.beginPlayheadSeek()
-                                scrubTo(mouse.x)
-                            }
-                            onPositionChanged: (mouse) => {
-                                if (pressed)
-                                    scrubTo(mouse.x)
-                            }
-                            onReleased: root.endPlayheadSeek()
-                            onCanceled: root.endPlayheadSeek()
-                            // MouseArea would otherwise swallow wheel and block Ctrl-zoom.
-                            onWheel: (wheel) => root.handleTimelineWheel(wheel)
-
-                            ThemedToolTip {
-                                text: qsTr("Click or drag to seek")
-                                visible: rulerScrub.containsMouse && !rulerScrub.pressed
-                                         && !playheadDragArea.drag.active
-                            }
-                        }
-
-                        // Time ticks live in the upper half of the seek strip.
-                        // Only instantiate ticks that intersect the viewport — a 2h
-                        // timeline at 1× zoom would otherwise create thousands of Items.
-                        Item {
-                            id: ruler
-                            width: parent.width
-                            height: Theme.timelineRulerHeight
-                            z: 0
-
-                            readonly property real tickStepPx: root.tickStepSeconds * root.pxPerSecond
-                            readonly property int tickIndexMax: Math.max(0,
-                                Math.ceil(flick.contentWidth / Math.max(1, tickStepPx)))
-                            readonly property int firstVisibleTick: Math.max(0,
-                                Math.floor(flick.contentX / Math.max(1, tickStepPx)) - 1)
-                            readonly property int visibleTickCount: Math.min(
-                                tickIndexMax - firstVisibleTick + 1,
-                                Math.ceil(flick.width / Math.max(1, tickStepPx)) + 3)
-
-                            Repeater {
-                                model: Math.max(0, ruler.visibleTickCount)
-                                delegate: Item {
-                                    readonly property real tickSeconds:
-                                        (ruler.firstVisibleTick + index) * root.tickStepSeconds
-                                    x: tickSeconds * root.pxPerSecond
-                                    width: root.tickStepSeconds * root.pxPerSecond
-                                    height: ruler.height
-
-                                    Rectangle {
-                                        x: 0
-                                        y: parent.height - 10
-                                        width: 1
-                                        height: 8
-                                        color: Qt.rgba(Theme.mutedForeground.r,
-                                                       Theme.mutedForeground.g,
-                                                       Theme.mutedForeground.b, 0.28)
-                                    }
-
-                                    Text {
-                                        x: 4
-                                        y: 4
-                                        text: root.formatTick(parent.tickSeconds)
-                                        color: Theme.mutedForeground
-                                        font.pixelSize: Theme.fontSizeTick
-                                        font.family: Theme.fontFamily
-                                    }
-                                }
-                            }
-                        }
-
-                        Item {
-                            id: bookmarkRow
-                            y: Theme.timelineRulerHeight
-                            width: parent.width
-                            height: Theme.timelineBookmarkRowHeight
-                            z: 2
-
-                            property int renameIndex: -1
-
-                            Repeater {
-                                model: EditorState.bookmarks
-                                delegate: Item {
-                                    id: bookmarkDelegate
-                                    x: (bookmarkMouse.dragging
-                                        ? bookmarkMouse.dragSeconds
-                                        : modelData.seconds) * root.pxPerSecond - width / 2
-                                    width: 10
-                                    height: parent.height
-                                    z: bookmarkMouse.containsMouse || bookmarkMouse.dragging ? 4 : 3
-
-                                    // Stem into the ruler so markers read as jump flags, not dots.
-                                    Rectangle {
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        y: 0
-                                        width: 1
-                                        height: parent.height + 6
-                                        color: Theme.primary
-                                        opacity: 0.7
-                                    }
-
-                                    Rectangle {
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        width: 8
-                                        height: 8
-                                        rotation: 45
-                                        radius: 1
-                                        color: Theme.primary
-                                        border.width: bookmarkMouse.containsMouse ? Theme.borderWidth : 0
-                                        border.color: Theme.primaryForeground
-                                    }
-
-                                    ThemedToolTip {
-                                        visible: bookmarkMouse.containsMouse && !bookmarkMouse.dragging
-                                        text: modelData.label + " @ "
-                                              + root.formatTime(modelData.seconds)
-                                    }
-
-                                    MouseArea {
-                                        id: bookmarkMouse
-                                        anchors.fill: parent
-                                        anchors.margins: -6
-                                        hoverEnabled: true
-                                        cursorShape: pressed ? Qt.ClosedHandCursor : Qt.PointingHandCursor
-                                        acceptedButtons: Qt.LeftButton | Qt.RightButton
-                                        // Stop the seek strip from eating bookmark clicks / drags.
-                                        preventStealing: true
-
-                                        property bool dragging: false
-                                        property bool didDrag: false
-                                        property bool heldOpen: false
-                                        property real dragSeconds: modelData.seconds
-                                        property real pressX: 0
-                                        property bool pressedByTouch: false
-
-                                        pressAndHoldInterval: 400
-                                        onPressAndHold: (mouse) => {
-                                            if (!pressedByTouch || didDrag
-                                                    || !(mouse.buttons & Qt.LeftButton))
-                                                return
-                                            heldOpen = true
-                                            bookmarkContextMenu.bookmarkIndex = index
-                                            bookmarkContextMenu.bookmarkLabel = modelData.label
-                                            bookmarkContextMenu.bookmarkSeconds = modelData.seconds
-                                            bookmarkContextMenu.popup(bookmarkMouse, mouse.x, mouse.y)
-                                        }
-
-                                        onPressed: (mouse) => {
-                                            if (mouse.button !== Qt.LeftButton)
-                                                return
-                                            pressedByTouch = mouse.source !== Qt.MouseEventNotSynthesized
-                                            heldOpen = false
-                                            didDrag = false
-                                            dragging = false
-                                            pressX = mouse.x
-                                            dragSeconds = modelData.seconds
-                                        }
-                                        onPositionChanged: (mouse) => {
-                                            if (!pressed || !(mouse.buttons & Qt.LeftButton))
-                                                return
-                                            if (!didDrag && Math.abs(mouse.x - pressX) < 3)
-                                                return
-                                            didDrag = true
-                                            dragging = true
-                                            const globalX = mapToItem(bookmarkRow, mouse.x, 0).x
-                                            dragSeconds = EditorState.snapTime(
-                                                Math.max(0, globalX / root.pxPerSecond))
-                                        }
-                                        onReleased: (mouse) => {
-                                            if (mouse.button === Qt.LeftButton && didDrag) {
-                                                EditorState.updateBookmark(
-                                                    index, dragSeconds, modelData.label)
-                                            }
-                                            dragging = false
-                                            // Keep didDrag through onClicked (fires after release).
-                                            Qt.callLater(function() { didDrag = false })
-                                        }
-                                        onClicked: (mouse) => {
-                                            if (mouse.button === Qt.RightButton) {
-                                                bookmarkContextMenu.bookmarkIndex = index
-                                                bookmarkContextMenu.bookmarkLabel = modelData.label
-                                                bookmarkContextMenu.bookmarkSeconds = modelData.seconds
-                                                bookmarkContextMenu.popup()
-                                                return
-                                            }
-                                            if (!didDrag && !heldOpen)
-                                                EditorState.goToBookmark(index)
-                                        }
-                                        onDoubleClicked: (mouse) => {
-                                            if (mouse.button !== Qt.LeftButton)
-                                                return
-                                            bookmarkRow.renameIndex = index
-                                            bookmarkRenameField.text = modelData.label
-                                            bookmarkRenameDialog.open()
-                                        }
-                                    }
-                                }
-                            }
-
-                            ThemedContextMenu {
-                                id: bookmarkContextMenu
-                                property int bookmarkIndex: -1
-                                property string bookmarkLabel: ""
-                                property real bookmarkSeconds: 0
-
-                                ThemedMenuItem {
-                                    text: qsTr("Go to bookmark")
-                                    icon.name: Theme.icons.bookmark
-                                    onTriggered: EditorState.goToBookmark(bookmarkContextMenu.bookmarkIndex)
-                                }
-                                ThemedMenuItem {
-                                    text: qsTr("Rename…")
-                                    onTriggered: {
-                                        bookmarkRow.renameIndex = bookmarkContextMenu.bookmarkIndex
-                                        bookmarkRenameField.text = bookmarkContextMenu.bookmarkLabel
-                                        bookmarkRenameDialog.open()
-                                    }
-                                }
-                                ThemedMenuSeparator { }
-                                ThemedMenuItem {
-                                    text: qsTr("Delete")
-                                    icon.name: Theme.icons.trash
-                                    onTriggered: EditorState.removeBookmark(bookmarkContextMenu.bookmarkIndex)
-                                }
-                            }
-                        }
-
-                        // Work area highlight in the bookmark lane (between In/Out markers).
-                        Rectangle {
-                            visible: EditorState.workAreaActive
-                            y: Theme.timelineRulerHeight
-                            height: Theme.timelineBookmarkRowHeight
-                            x: EditorState.workAreaInSeconds * root.pxPerSecond
-                            width: Math.max(0, (EditorState.workAreaOutSeconds - EditorState.workAreaInSeconds)
-                                             * root.pxPerSecond)
-                            color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.18)
-                            z: 1
-                        }
+                        panel: root
+                        view: flick
+                        playheadDragging: playhead.headDragging
+                        renameDialog: bookmarkRenameDialog
+                        renameField: bookmarkRenameField
                     }
 
                     // Work area overlay across the track rows.
-                    Item {
-                        id: workAreaOverlay
-                        z: 1
-                        y: Theme.timelineRulerHeight + Theme.timelineBookmarkRowHeight
-                        width: parent.width
-                        height: Math.max(root.totalTracksHeightCached + Theme.trackGap,
-                                         flick.height - flick.headerHeight)
-
-                        readonly property real inX: EditorState.workAreaInSeconds >= 0
-                                                   ? EditorState.workAreaInSeconds * root.pxPerSecond
-                                                   : -1
-                        readonly property real outX: EditorState.workAreaOutSeconds >= 0
-                                                    ? EditorState.workAreaOutSeconds * root.pxPerSecond
-                                                    : -1
-
-                        Rectangle {
-                            visible: EditorState.workAreaActive
-                            x: parent.inX
-                            width: Math.max(0, parent.outX - parent.inX)
-                            anchors.top: parent.top
-                            anchors.bottom: parent.bottom
-                            color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
-                        }
-
-                        Rectangle {
-                            visible: EditorState.workAreaInSeconds >= 0
-                            x: parent.inX
-                            width: 2
-                            anchors.top: parent.top
-                            anchors.bottom: parent.bottom
-                            color: Theme.primary
-                            opacity: 0.85
-                        }
-
-                        Rectangle {
-                            visible: EditorState.workAreaOutSeconds >= 0
-                            x: parent.outX - width
-                            width: 2
-                            anchors.top: parent.top
-                            anchors.bottom: parent.bottom
-                            color: Theme.primary
-                            opacity: 0.85
-                        }
+                    TimelineWorkAreaOverlay {
+                        panel: root
+                        view: flick
+                        headerHeight: flick.headerHeight
                     }
 
                     // A project with no tracks used to render as a completely
                     // blank timeline, with the only route to a first track being
                     // one button among sixteen in the toolbar.
-                    EmptyState {
-                        x: flick.contentX + (flick.width - width) / 2
-                        y: flick.contentY + flick.headerHeight
-                           + Math.max(0, (flick.height - flick.headerHeight - height) / 2)
-                        width: Math.min(flick.width - Theme.spacing3xl, 320)
-                        visible: root.tracks.length === 0
-                        z: 4
-                        glyph: Theme.icons.layers
-                        title: qsTr("Your timeline is empty")
-                        hint: qsTr("Drag media here from the library, or add an empty track to start.")
-                        actionText: qsTr("New track")
-                        actionVariant: "primary"
-                        onActionTriggered: newTrackMenuFromEmpty.open()
-
-                        NewTrackMenu {
-                            id: newTrackMenuFromEmpty
-                            y: parent.height
-                        }
+                    TimelineEmptyState {
+                        view: flick
+                        panel: root
                     }
 
                     // track rows ---------------------------------------------------------
@@ -1920,10 +1599,12 @@ PanelFrame {
                                 // Faint row tint on hover, and an empty track now
                                 // reads as a track rather than as blank space.
                                 color: trackHover.hovered
-                                       ? Qt.rgba(Theme.panelAccent.r, Theme.panelAccent.g,
-                                                 Theme.panelAccent.b, 0.5)
-                                       : Qt.rgba(Theme.panelAccent.r, Theme.panelAccent.g,
-                                                 Theme.panelAccent.b, 0.22)
+                                       ? Qt.rgba(Theme.c.timelinePanel.trackBackground.r,
+                                                 Theme.c.timelinePanel.trackBackground.g,
+                                                 Theme.c.timelinePanel.trackBackground.b, 0.5)
+                                       : Qt.rgba(Theme.c.timelinePanel.trackBackground.r,
+                                                 Theme.c.timelinePanel.trackBackground.g,
+                                                 Theme.c.timelinePanel.trackBackground.b, 0.22)
 
                                 Behavior on color {
                                     ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
@@ -1932,11 +1613,9 @@ PanelFrame {
                                 HoverHandler { id: trackHover }
 
                                 // A transform layer's row carries a faint wash of its colour.
-                                Rectangle {
-                                    anchors.fill: parent
-                                    visible: root.tracks[trackRow.trackIndex].isTransformLayer === true
-                                    color: Qt.rgba(Theme.clipTransform.r, Theme.clipTransform.g,
-                                                   Theme.clipTransform.b, 0.07)
+                                TimelineTrackTransformWash {
+                                    panel: root
+                                    trackIndex: trackRow.trackIndex
                                 }
 
                                 DropArea {
@@ -2137,51 +1816,16 @@ PanelFrame {
                                 // Landing preview outline (library drop or clip move).
                                 // Hidden while creating a new track — that state uses the
                                 // reserved lane above, not a ghost on an existing row.
-                                Rectangle {
-                                    visible: root.dropTrackIndex === trackRow.trackIndex
-                                             && !root.dropCreatesNewTrack
-                                    x: root.dropStartSeconds * root.pxPerSecond
-                                    width: root.dropDurationSeconds * root.pxPerSecond
-                                    height: parent.height
-                                    radius: Theme.radiusSm
-                                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
-                                    border.width: 2
-                                    border.color: Theme.primary
-                                    z: 5
-
-                                    // The outline is held on screen after a file drop for as
-                                    // long as the import it started is still probing, so it has
-                                    // to say why it is sitting there empty.
-                                    Text {
-                                        anchors.centerIn: parent
-                                        visible: root.importDropPending
-                                        text: qsTr("Importing…")
-                                        color: Theme.primary
-                                        font.family: Theme.fontFamily
-                                        font.pixelSize: Theme.fontSizeTiny
-                                        font.weight: Font.Medium
-
-                                        SequentialAnimation on opacity {
-                                            running: root.importDropPending
-                                            loops: Animation.Infinite
-                                            NumberAnimation { to: 0.45; duration: Theme.durationSlow; easing.type: Theme.easing }
-                                            NumberAnimation { to: 1.0; duration: Theme.durationSlow; easing.type: Theme.easing }
-                                        }
-                                    }
+                                TimelineLandingOutline {
+                                    panel: root
+                                    trackIndex: trackRow.trackIndex
                                 }
 
                                 // Where a dragged transition would land. Above the transition
                                 // regions so it stays visible over an existing one it replaces.
-                                Rectangle {
-                                    visible: root.transitionDropTrackIndex === trackRow.trackIndex
-                                    x: root.transitionDropStart * root.pxPerSecond
-                                    width: Math.max(8, (root.transitionDropEnd - root.transitionDropStart) * root.pxPerSecond)
-                                    height: parent.height
-                                    radius: Theme.radiusSm
-                                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
-                                    border.width: 2
-                                    border.color: Theme.transitionOverlap
-                                    z: 11
+                                TimelineTransitionDropOutline {
+                                    panel: root
+                                    trackIndex: trackRow.trackIndex
                                 }
 
                                 // Nested adjustment lanes, drawn as strips across the top of
@@ -2199,38 +1843,11 @@ PanelFrame {
                                         // the list when a lane actually comes or goes. A JS
                                         // array here rebuilt every lane and its clips per edit.
                                         model: EditorState.clipsModel(trackRow.trackIndex).adjustmentLanes
-                                        delegate: Item {
-                                            id: laneStrip
-                                            required property var modelData
-                                            // The lane's own track index, under the name
-                                            // TimelineClipItem looks for on its `trackRow` —
-                                            // which is this Item, not the row above.
-                                            property int trackIndex: modelData
-                                            width: trackRow.width
-                                            height: Theme.adjustmentLaneHeight
-                                            opacity: (root.tracks[trackIndex] && root.tracks[trackIndex].hidden === true) ? 0.4 : 1
-
-                                            Rectangle {
-                                                anchors.fill: parent
-                                                color: Qt.rgba(Theme.clipEffect.r, Theme.clipEffect.g,
-                                                               Theme.clipEffect.b, 0.12)
-                                                Rectangle {
-                                                    anchors.left: parent.left
-                                                    anchors.right: parent.right
-                                                    anchors.bottom: parent.bottom
-                                                    height: 1
-                                                    color: Qt.rgba(0, 0, 0, 0.25)
-                                                }
-                                            }
-
-                                            TimelineTrackArea {
-                                                anchors.fill: parent
-                                                panel: root
-                                                timelineColumn: trackColumn
-                                                trackIndex: laneStrip.trackIndex
-                                                viewState: timelineViewState
-                                            }
-
+                                        delegate: TimelineAdjustmentLaneStrip {
+                                            panel: root
+                                            timelineColumn: trackColumn
+                                            viewState: timelineViewState
+                                            stripWidth: trackRow.width
                                         }
                                     }
                                 }
@@ -2261,141 +1878,10 @@ PanelFrame {
                                         viewState: timelineViewState
                                     }
 
-
                                     // Live voiceover recording indicator and waveform on this track
-                                    Rectangle {
-                                        id: liveRecordingBlock
-                                        visible: EditorState.isRecordingAudio && EditorState.recordingTrackIndex === trackClipArea.trackIndex
-                                        x: (EditorState.playheadSeconds - EditorState.audioRecordSeconds) * root.pxPerSecond
-                                        width: Math.max(2, EditorState.audioRecordSeconds * root.pxPerSecond)
-                                        height: parent.height
-                                        color: Qt.rgba(Theme.destructive.r, Theme.destructive.g, Theme.destructive.b, 0.25)
-                                        border.color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
-                                        border.width: 1
-                                        radius: Theme.radiusSm
-                                        clip: true
-                                        z: 2
-
-                                        // Real-time live audio waveform canvas
-                                        // Capped and pinned to the newest end: the block grows with the
-                                        // take, and a canvas as wide as a long recording at high zoom
-                                        // would be a huge framebuffer. Draws only the peaks it covers.
-                                        Canvas {
-                                            id: liveWaveCanvas
-                                            anchors.right: parent.right
-                                            anchors.top: parent.top
-                                            anchors.bottom: parent.bottom
-                                            anchors.margins: 1
-                                            width: Math.min(Math.max(0, parent.width - 2), 4096)
-                                            visible: parent.width > 4
-
-                                            Connections {
-                                                target: EditorState
-                                                function onAudioRecordLivePeaksChanged() {
-                                                    liveWaveCanvas.requestPaint()
-                                                }
-                                            }
-                                            onWidthChanged: requestPaint()
-                                            onHeightChanged: requestPaint()
-
-                                            onPaint: {
-                                                var ctx = getContext("2d");
-                                                ctx.clearRect(0, 0, width, height);
-                                                var peaks = EditorState.audioRecordLivePeaks;
-                                                if (!peaks || peaks.length === 0)
-                                                    return;
-
-                                                var mid = height / 2;
-                                                var half = mid * 0.85;
-                                                var w = Math.max(1, Math.floor(width));
-                                                var full = Math.max(w, liveRecordingBlock.width - 2);
-                                                var first = peaks.length * (full - w) / full;
-                                                var n = peaks.length - first;
-
-                                                // Centerline guideline
-                                                ctx.strokeStyle = Qt.rgba(1.0, 1.0, 1.0, 0.15);
-                                                ctx.lineWidth = 1;
-                                                ctx.beginPath();
-                                                ctx.moveTo(0, mid);
-                                                ctx.lineTo(w, mid);
-                                                ctx.stroke();
-
-                                                // Mirrored waveform fill
-                                                ctx.fillStyle = Qt.rgba(1.0, 1.0, 1.0, 0.85);
-                                                ctx.beginPath();
-                                                for (var x = 0; x < w; x++) {
-                                                    var i0 = Math.floor(first + x * n / w);
-                                                    var i1 = Math.floor(first + (x + 1) * n / w);
-                                                    if (i1 <= i0) i1 = Math.min(peaks.length, i0 + 1);
-                                                    var peak = 0;
-                                                    for (var i = i0; i < i1; i++) {
-                                                        if (peaks[i] > peak) peak = peaks[i];
-                                                    }
-                                                    var amp = Math.max(1.0, peak * half);
-                                                    if (x === 0) ctx.moveTo(x, mid - amp);
-                                                    else ctx.lineTo(x, mid - amp);
-                                                    ctx.lineTo(x + 1, mid - amp);
-                                                }
-                                                for (var xb = w - 1; xb >= 0; xb--) {
-                                                    var j0 = Math.floor(first + xb * n / w);
-                                                    var j1 = Math.floor(first + (xb + 1) * n / w);
-                                                    if (j1 <= j0) j1 = Math.min(peaks.length, j0 + 1);
-                                                    var peakB = 0;
-                                                    for (var j = j0; j < j1; j++) {
-                                                        if (peaks[j] > peakB) peakB = peaks[j];
-                                                    }
-                                                    var ampB = Math.max(1.0, peakB * half);
-                                                    ctx.lineTo(xb + 1, mid + ampB);
-                                                    ctx.lineTo(xb, mid + ampB);
-                                                }
-                                                ctx.closePath();
-                                                ctx.fill();
-                                            }
-                                        }
-
-                                        // Badge tag in upper-left corner of the recording clip
-                                        Rectangle {
-                                            visible: liveRecordingBlock.width > 55
-                                            anchors.left: parent.left
-                                            anchors.leftMargin: 4
-                                            anchors.top: parent.top
-                                            anchors.topMargin: 3
-                                            height: 18
-                                            radius: 3
-                                            color: Qt.rgba(0, 0, 0, 0.7)
-                                            border.color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
-                                            border.width: 1
-                                            width: liveRecRow.implicitWidth + 8
-
-                                            Row {
-                                                id: liveRecRow
-                                                anchors.centerIn: parent
-                                                spacing: 4
-
-                                                Rectangle {
-                                                    width: 6
-                                                    height: 6
-                                                    radius: 3
-                                                    color: EditorState.isAudioRecordingPaused ? "#eab308" : Theme.destructive
-                                                    anchors.verticalCenter: parent.verticalCenter
-                                                    SequentialAnimation on opacity {
-                                                        running: liveRecordingBlock.visible && !EditorState.isAudioRecordingPaused
-                                                        loops: Animation.Infinite
-                                                        NumberAnimation { to: 0.2; duration: 400 }
-                                                        NumberAnimation { to: 1.0; duration: 400 }
-                                                    }
-                                                }
-
-                                                Text {
-                                                    text: (EditorState.isAudioRecordingPaused ? qsTr("PAUSED ") : qsTr("REC "))
-                                                          + EditorState.audioRecordSeconds.toFixed(1) + "s"
-                                                    font.pixelSize: 10
-                                                    font.bold: true
-                                                    color: Theme.panelForeground
-                                                    anchors.verticalCenter: parent.verticalCenter
-                                                }
-                                            }
-                                        }
+                                    TimelineLiveRecordingBlock {
+                                        panel: root
+                                        trackIndex: trackClipArea.trackIndex
                                     }
                                 }
 
@@ -2412,11 +1898,8 @@ PanelFrame {
                                         height: trackRow.height
                                         z: 1
 
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            visible: gapMouse.containsMouse
-                                            color: Qt.rgba(Theme.panelAccent.r, Theme.panelAccent.g,
-                                                           Theme.panelAccent.b, 0.35)
+                                        TimelineGapHover {
+                                            hovered: gapMouse.containsMouse
                                         }
 
                                         MouseArea {
@@ -2445,182 +1928,9 @@ PanelFrame {
                                 // one per clip each scanning the whole track for its partner.
                                 Repeater {
                                     model: EditorState.clipsModel(trackRow.trackIndex).transitionRegions
-                                    delegate: Item {
-                                        id: transitionRegion
-                                        required property var modelData
-                                        readonly property int leftClipIndex: modelData.leftClip
-                                        readonly property bool hasTransition: modelData.hasTransition
-                                        readonly property bool transitionSelected:
-                                            EditorState.selectedTransitionTrack === trackRow.trackIndex
-                                            && EditorState.selectedTransitionLeftClip === leftClipIndex
-                                        // Duration while an edge is being dragged; < 0 otherwise.
-                                        property real liveDuration: -1
-                                        // An overlap window ends where the outgoing clip does and
-                                        // grows leftwards; a window on a cut stays centred on it.
-                                        readonly property real shownStart: {
-                                            if (liveDuration < 0)
-                                                return modelData.start
-                                            if (modelData.overlap)
-                                                return modelData.end - liveDuration
-                                            const left = root.tracks[trackRow.trackIndex].clips[leftClipIndex]
-                                            return left.start + left.duration - liveDuration / 2
-                                        }
-                                        readonly property real shownEnd:
-                                            liveDuration < 0 || modelData.overlap ? modelData.end
-                                                                                  : shownStart + liveDuration
-
-                                        z: 10
-                                        x: shownStart * root.pxPerSecond
-                                        width: Math.max(8, (shownEnd - shownStart) * root.pxPerSecond)
-                                        height: parent.height - Theme.clipSelectionRingWidth * 2
-                                        y: Theme.clipSelectionRingWidth
-
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            radius: Theme.radiusSm
-                                            color: Qt.rgba(Theme.transitionOverlap.r, Theme.transitionOverlap.g,
-                                                           Theme.transitionOverlap.b,
-                                                           transitionRegion.transitionSelected ? 0.85
-                                                           : (transitionRegion.hasTransition ? 0.65 : 0.35))
-                                            border.width: transitionRegion.transitionSelected ? 2 : 1
-                                            border.color: Theme.transitionOverlap
-
-                                            // Diagonal hatch so overlaps read as a blend zone.
-                                            Canvas {
-                                                anchors.fill: parent
-                                                anchors.margins: 1
-                                                opacity: 0.35
-                                                onPaint: {
-                                                    const ctx = getContext("2d")
-                                                    ctx.clearRect(0, 0, width, height)
-                                                    ctx.strokeStyle = Theme.onMedia
-                                                    ctx.lineWidth = 1
-                                                    const step = 6
-                                                    for (let x = -height; x < width; x += step) {
-                                                        ctx.beginPath()
-                                                        ctx.moveTo(x, height)
-                                                        ctx.lineTo(x + height, 0)
-                                                        ctx.stroke()
-                                                    }
-                                                }
-                                                onWidthChanged: requestPaint()
-                                                onHeightChanged: requestPaint()
-                                            }
-
-                                            Text {
-                                                anchors.centerIn: parent
-                                                visible: parent.width >= 28
-                                                text: transitionRegion.hasTransition && transitionRegion.modelData.label
-                                                      ? transitionRegion.modelData.label.charAt(0)
-                                                      : "≫"
-                                                color: Theme.onMedia
-                                                font.family: Theme.fontFamily
-                                                font.pixelSize: Theme.fontSizeTiny
-                                                font.weight: Font.Bold
-                                            }
-
-                                            Loader {
-                                                active: transitionMouse.containsMouse
-                                                        && transitionRegion.hasTransition
-                                                sourceComponent: ThemedToolTip {
-                                                    visible: true
-                                                    delay: 400
-                                                    text: transitionRegion.modelData.label
-                                                          || transitionRegion.modelData.kind
-                                                          || ""
-                                                }
-                                            }
-                                        }
-
-                                        DropArea {
-                                            anchors.fill: parent
-                                            keys: ["application/x-drift-transition"]
-                                            onEntered: (drop) => root.updateTransitionDropPreview(trackRow.trackIndex,
-                                                                                                  transitionRegion.x + drop.x)
-                                            onPositionChanged: (drop) => root.updateTransitionDropPreview(trackRow.trackIndex,
-                                                                                                          transitionRegion.x + drop.x)
-                                            onExited: root.clearTransitionDropPreview()
-                                            onDropped: (drop) => {
-                                                drop.accept(Qt.CopyAction)
-                                                root.clearTransitionDropPreview()
-                                                const kind = drop.getDataAsString("application/x-drift-transition")
-                                                if (kind.length > 0)
-                                                    EditorState.addTransition(trackRow.trackIndex,
-                                                                              transitionRegion.leftClipIndex,
-                                                                              root.transitionKindForTrack(trackRow.trackIndex, kind),
-                                                                              0.5)
-                                            }
-                                        }
-
-                                        MouseArea {
-                                            id: transitionMouse
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: {
-                                                if (transitionRegion.hasTransition) {
-                                                    EditorState.selectTransition(trackRow.trackIndex,
-                                                                                 transitionRegion.leftClipIndex)
-                                                } else {
-                                                    EditorState.addTransition(trackRow.trackIndex,
-                                                                              transitionRegion.leftClipIndex,
-                                                                              "crossfade", 0.5)
-                                                }
-                                            }
-                                        }
-
-                                        // Edge handles stretch the transition. A window on a cut
-                                        // grows on both sides, so each pixel dragged counts twice;
-                                        // an overlap can only move its start (the incoming clip).
-                                        Repeater {
-                                            model: !transitionRegion.hasTransition ? []
-                                                   : transitionRegion.modelData.overlap ? [-1] : [-1, 1]
-                                            delegate: MouseArea {
-                                                id: edgeHandle
-                                                required property int modelData
-                                                property real pressX: 0
-                                                property real pressDuration: 0
-
-                                                function durationAt(mouseX) {
-                                                    const dx = (mapToItem(transitionRegion.parent, mouseX, 0).x - pressX)
-                                                               / root.pxPerSecond
-                                                    const scale = transitionRegion.modelData.overlap ? 1 : 2
-                                                    const d = pressDuration + modelData * dx * scale
-                                                    return Math.max(0.1, Math.min(transitionRegion.modelData.maxDuration, d))
-                                                }
-
-                                                // Straddles the edge so it is easy to hit, but leaves the
-                                                // middle of a narrow region clickable.
-                                                readonly property real inside: Math.min(8, parent.width / 4)
-                                                width: 8 + inside
-                                                height: parent.height
-                                                x: modelData < 0 ? -8 : parent.width - inside
-                                                z: 1
-                                                hoverEnabled: true
-                                                preventStealing: true
-                                                cursorShape: Qt.SizeHorCursor
-                                                onPressed: (mouse) => {
-                                                    pressX = mapToItem(transitionRegion.parent, mouse.x, 0).x
-                                                    pressDuration = transitionRegion.modelData.end
-                                                                    - transitionRegion.modelData.start
-                                                    transitionRegion.liveDuration = pressDuration
-                                                }
-                                                onPositionChanged: (mouse) => {
-                                                    if (pressed)
-                                                        transitionRegion.liveDuration = durationAt(mouse.x)
-                                                }
-                                                onReleased: (mouse) => {
-                                                    const d = durationAt(mouse.x)
-                                                    transitionRegion.liveDuration = -1
-                                                    if (Math.abs(d - pressDuration) > 0.001)
-                                                        EditorState.setTransitionDuration(trackRow.trackIndex,
-                                                                                          transitionRegion.modelData.transitionId, d)
-                                                }
-                                                onCanceled: transitionRegion.liveDuration = -1
-
-                                                HoverHandler { cursorShape: Qt.SizeHorCursor }
-                                            }
-                                        }
+                                    delegate: TimelineTransitionRegion {
+                                        panel: root
+                                        trackIndex: trackRow.trackIndex
                                     }
                                 }
                             }
@@ -2723,393 +2033,34 @@ PanelFrame {
                     // would land in it. An overlay rather than a reserved row, so
                     // no DropArea geometry moves while a drag is live — and drawn
                     // at real track height so it reads as a track, not a hairline.
-                    Item {
-                        id: newTrackIndicator
-                        // Not also gated on the drag being active: dropCreatesNewTrack
-                        // is only ever set during one, and is cleared on exit, drop
-                        // and abandon — an extra condition here is one more way for
-                        // the ghost to silently not appear.
-                        visible: root.dropCreatesNewTrack
-                        readonly property real laneHeight: {
-                            // A file-manager drag has no bin row to ask about, so its lane is
-                            // sized from the kind guessed off the extension instead.
-                            const t = root.pendingDropKind.length > 0
-                                    ? EditorState.trackTypeForKind(root.pendingDropKind)
-                                    : EditorState.trackTypeForAsset(EditorState.draggingAssetIndex)
-                            if (t === "video") return Theme.trackHeightVideo
-                            if (t === "audio") return Theme.trackHeightAudio
-                            if (t === "shape") return Theme.trackHeightShape
-                            if (t === "subtitle") return Theme.trackHeightSubtitle
-                            return Theme.trackHeightText
-                        }
-                        x: 0
-                        y: Theme.timelineRulerHeight + Theme.timelineBookmarkRowHeight
-                           + root.newTrackBoundaryY(root.dropNewTrackIndex)
-                           - laneHeight / 2
-                        width: parent.width
-                        height: laneHeight
-                        z: 240
-
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: Theme.radiusSm
-                            color: Qt.rgba(Theme.panelBackground.r, Theme.panelBackground.g,
-                                           Theme.panelBackground.b, 0.92)
-                            border.width: Theme.borderWidth
-                            border.color: Theme.primary
-                        }
-
-                        // The boundary itself, so it is unambiguous which gap the
-                        // lane is going into.
-                        Rectangle {
-                            width: parent.width
-                            height: 2
-                            anchors.verticalCenter: parent.verticalCenter
-                            color: Theme.primary
-                        }
-
-                        Rectangle {
-                            x: root.dropStartSeconds * root.pxPerSecond
-                            width: Math.max(2, root.dropDurationSeconds * root.pxPerSecond)
-                            anchors.top: parent.top
-                            anchors.bottom: parent.bottom
-                            anchors.margins: 2
-                            radius: Theme.radiusSm
-                            color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3)
-                            border.width: 2
-                            border.color: Theme.primary
-
-                            // The outline is held on screen after a file drop for as
-                            // long as the import it started is still probing, so it has
-                            // to say why it is sitting there empty.
-                            Text {
-                                anchors.centerIn: parent
-                                visible: root.importDropPending
-                                text: qsTr("Importing…")
-                                color: Theme.primary
-                                font.family: Theme.fontFamily
-                                font.pixelSize: Theme.fontSizeTiny
-                                font.weight: Font.Medium
-
-                                SequentialAnimation on opacity {
-                                    running: root.importDropPending
-                                    loops: Animation.Infinite
-                                    NumberAnimation { to: 0.45; duration: Theme.durationSlow; easing.type: Theme.easing }
-                                    NumberAnimation { to: 1.0; duration: Theme.durationSlow; easing.type: Theme.easing }
-                                }
-                            }
-                        }
+                    TimelineNewTrackGhost {
+                        panel: root
                     }
 
                     // CapCut-style selection box drawn while marquee-dragging.
-                    Rectangle {
-                        visible: root.marqueeActive
-                                 && (root.marqueeWidth > 2 || root.marqueeHeight > 2)
-                        x: root.marqueeLeft
-                        y: Theme.timelineRulerHeight + Theme.timelineBookmarkRowHeight
-                           + root.marqueeTop
-                        width: root.marqueeWidth
-                        height: root.marqueeHeight
-                        z: 8
-                        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
-                        border.width: Theme.borderWidth
-                        border.color: Theme.primary
+                    TimelineMarqueeRect {
+                        panel: root
                     }
 
                     // snap guide -------------------------------------------------------------
-                    Rectangle {
-                        visible: opacity > 0
-                        opacity: root.snapGuideSeconds >= 0 ? 1 : 0
-                        x: root.snapGuideSeconds * root.pxPerSecond
-                        y: Theme.timelineRulerHeight + Theme.timelineBookmarkRowHeight
-                        width: Theme.borderWidth
-                        height: root.totalTracksHeightCached
-                        color: Theme.snapGuide
-                        z: 6
-
-                        Behavior on opacity {
-                            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                        }
-
-                        // Says what the clip snapped to, instead of leaving a bare
-                        // unexplained line on screen.
-                        Rectangle {
-                            visible: parent.opacity > 0
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.top: parent.top
-                            height: snapLabel.implicitHeight + Theme.spacingSm
-                            width: snapLabel.implicitWidth + Theme.spacingLg
-                            radius: Theme.radiusXs
-                            color: Theme.snapGuide
-
-                            Text {
-                                id: snapLabel
-                                anchors.centerIn: parent
-                                text: root.formatTime(root.snapGuideSeconds)
-                                color: Theme.overlayColor
-                                font.family: Theme.monoFontFamily
-                                font.pixelSize: Theme.fontSizeTiny
-                            }
-                        }
+                    TimelineSnapGuide {
+                        panel: root
                     }
 
                     // playhead ---------------------------------------------------------------
-                    Item {
+                    TimelinePlayhead {
                         id: playhead
-                        y: 0
-                        // Above the seek strip (z: 2), otherwise the scrub area
-                        // covers the handle and swallows the press before drag starts.
-                        z: 3
-                        width: Theme.playheadLineWidth
-                        height: Theme.timelineRulerHeight + Theme.timelineBookmarkRowHeight
-                                + root.totalTracksHeightCached
-
-                        Binding {
-                            target: playhead
-                            property: "x"
-                            value: needle.seconds * root.pxPerSecond
-                            when: !playheadDragArea.drag.active && !playheadLineDrag.drag.active
-                        }
-
-                        // Follow either drag live so the preview scrubs with it.
-                        onXChanged: {
-                            if (playheadDragArea.drag.active || playheadLineDrag.drag.active)
-                                EditorState.playheadSeconds = playhead.x / root.pxPerSecond
-                        }
-
-                        function finishSeek() {
-                            EditorState.playheadSeconds =
-                                EditorState.snapTime(playhead.x / root.pxPerSecond)
-                        }
-
-                        Rectangle {
-                            anchors.left: parent.left
-                            y: Theme.timelineRulerHeight * 0.55
-                            width: Theme.playheadLineWidth
-                            height: parent.height - y
-                            color: Theme.primary
-                        }
-
-                        // CapCut/Premiere-style scrubber head in the seek strip.
-                        Item {
-                            id: playheadHandle
-                            width: Theme.playheadHandleSize
-                            height: Theme.playheadHandleSize + 2
-                            x: -width / 2 + Theme.playheadLineWidth / 2
-                            y: 3
-
-                            Rectangle {
-                                anchors.top: parent.top
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                width: parent.width
-                                height: parent.height * 0.55
-                                radius: 2
-                                color: Theme.primary
-                            }
-
-                            // Pointed tip so the head reads as a scrubber, not a knob.
-                            Canvas {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.top: parent.top
-                                anchors.topMargin: parent.height * 0.4
-                                width: parent.width
-                                height: parent.height * 0.6
-                                onPaint: {
-                                    const ctx = getContext("2d")
-                                    ctx.reset()
-                                    ctx.beginPath()
-                                    ctx.moveTo(0, 0)
-                                    ctx.lineTo(width, 0)
-                                    ctx.lineTo(width * 0.5, height)
-                                    ctx.closePath()
-                                    ctx.fillStyle = Theme.primary
-                                    ctx.fill()
-                                }
-                                onWidthChanged: requestPaint()
-                                onHeightChanged: requestPaint()
-                                Component.onCompleted: requestPaint()
-                            }
-                        }
-
-                        // Wide grab across the seek strip head.
-                        MouseArea {
-                            id: playheadDragArea
-                            width: Theme.playheadSeekGrabWidth
-                            height: Theme.timelineRulerHeight + Theme.timelineBookmarkRowHeight
-                            x: -(width - Theme.playheadLineWidth) / 2
-                            y: 0
-                            cursorShape: Qt.SizeHorCursor
-                            preventStealing: true
-                            hoverEnabled: true
-                            drag.target: playhead
-                            drag.axis: Drag.XAxis
-                            drag.threshold: 0
-                            drag.minimumX: 0
-                            drag.maximumX: flick.contentWidth - Theme.playheadLineWidth
-                            onPressed: root.beginPlayheadSeek()
-                            onReleased: {
-                                playhead.finishSeek()
-                                root.endPlayheadSeek()
-                            }
-                            onCanceled: {
-                                playhead.finishSeek()
-                                root.endPlayheadSeek()
-                            }
-                        }
-
-                        // Narrow grab down the timeline line — stays thin so clip
-                        // clicks aren't stolen.
-                        MouseArea {
-                            id: playheadLineDrag
-                            width: 7
-                            height: parent.height - playheadDragArea.height
-                            x: -(width - Theme.playheadLineWidth) / 2
-                            y: playheadDragArea.height
-                            cursorShape: Qt.SizeHorCursor
-                            preventStealing: true
-                            drag.target: playhead
-                            drag.axis: Drag.XAxis
-                            drag.threshold: 0
-                            drag.minimumX: 0
-                            drag.maximumX: flick.contentWidth - Theme.playheadLineWidth
-                            onPressed: root.beginPlayheadSeek()
-                            onReleased: {
-                                playhead.finishSeek()
-                                root.endPlayheadSeek()
-                            }
-                            onCanceled: {
-                                playhead.finishSeek()
-                                root.endPlayheadSeek()
-                            }
-                        }
+                        panel: root
+                        view: flick
+                        interpolator: needle
                     }
 
                     // cut tools ----------------------------------------------------------------
                     // Sits above the tracks and playhead so it both draws the red
                     // dashed virtual playhead (and, for the trim tools, the red
                     // gradient over the doomed side) and intercepts the click.
-                    Item {
-                        id: cutOverlay
-                        visible: root.timelineTool !== ""
-                        enabled: root.timelineTool !== ""
-                        x: 0
-                        y: Theme.timelineRulerHeight + Theme.timelineBookmarkRowHeight
-                        width: parent.width
-                        height: root.totalTracksHeightCached
-                        z: 20
-
-                        readonly property bool trimMode: root.timelineTool === "trimStart"
-                                                         || root.timelineTool === "trimEnd"
-                        readonly property var hoverClip: (root.cutHoverTrack >= 0 && root.cutHoverClip >= 0
-                            && root.cutHoverTrack < root.tracks.length
-                            && root.cutHoverClip < root.tracks[root.cutHoverTrack].clips.length)
-                            ? root.tracks[root.cutHoverTrack].clips[root.cutHoverClip]
-                            : null
-
-                        function seconds(mx) {
-                            return EditorState.snapTime(Math.max(0, mx) / root.pxPerSecond)
-                        }
-
-                        function updateHover(mx, my) {
-                            root.cutHoverSeconds = seconds(mx)
-                            const trackIdx = root.trackIndexAtY(my)
-                            root.cutHoverTrack = trackIdx
-                            root.cutHoverClip = trackIdx >= 0
-                                ? root.clipIndexAtPosition(trackIdx, Math.max(0, mx))
-                                : -1
-                        }
-
-                        MouseArea {
-                            id: cutMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.CrossCursor
-                            acceptedButtons: Qt.LeftButton
-                            onEntered: cutOverlay.updateHover(mouseX, mouseY)
-                            onPositionChanged: (mouse) => cutOverlay.updateHover(mouse.x, mouse.y)
-                            onExited: {
-                                root.cutHoverSeconds = -1
-                                root.cutHoverTrack = -1
-                                root.cutHoverClip = -1
-                            }
-                            onClicked: (mouse) => {
-                                const atSeconds = cutOverlay.seconds(mouse.x)
-                                const trackIdx = root.trackIndexAtY(mouse.y)
-                                if (trackIdx < 0)
-                                    return
-                                const clipIdx = root.clipIndexAtPosition(trackIdx, Math.max(0, mouse.x))
-                                if (clipIdx < 0)
-                                    return
-                                if (root.timelineTool === "trimStart")
-                                    EditorState.splitClipLeftAt(trackIdx, clipIdx, atSeconds)
-                                else if (root.timelineTool === "trimEnd")
-                                    EditorState.splitClipRightAt(trackIdx, clipIdx, atSeconds)
-                                else
-                                    EditorState.splitClipAt(trackIdx, clipIdx, atSeconds)
-                            }
-                        }
-
-                        // Red gradient on the doomed side of the hovered clip: a
-                        // fixed band attached to the cut line, reddest at the
-                        // pointer and fading away from it, clamped to the clip.
-                        Rectangle {
-                            id: doomGradient
-                            readonly property real bandLength: 80
-                            visible: cutOverlay.trimMode && cutOverlay.hoverClip !== null
-                                     && root.cutHoverSeconds >= 0
-                            readonly property real clipStartX: cutOverlay.hoverClip
-                                ? cutOverlay.hoverClip.start * root.pxPerSecond : 0
-                            readonly property real clipEndX: cutOverlay.hoverClip
-                                ? (cutOverlay.hoverClip.start + cutOverlay.hoverClip.duration) * root.pxPerSecond : 0
-                            readonly property real cutX: Math.max(clipStartX,
-                                Math.min(clipEndX, root.cutHoverSeconds * root.pxPerSecond))
-                            readonly property color solid: Qt.rgba(Theme.destructive.r, Theme.destructive.g,
-                                                                   Theme.destructive.b, 0.55)
-                            readonly property color clear: Qt.rgba(Theme.destructive.r, Theme.destructive.g,
-                                                                   Theme.destructive.b, 0.0)
-
-                            x: root.timelineTool === "trimStart"
-                               ? Math.max(clipStartX, cutX - bandLength)
-                               : cutX
-                            width: root.timelineTool === "trimStart"
-                                   ? cutX - x
-                                   : Math.min(clipEndX, cutX + bandLength) - cutX
-                            y: root.trackOffsetY(root.cutHoverTrack)
-                            height: cutOverlay.hoverClip
-                                ? root.trackHeight(root.cutHoverTrack) : 0
-                            radius: Theme.radiusSm
-
-                            gradient: Gradient {
-                                orientation: Gradient.Horizontal
-                                // Red toward the cut line (the pointer), fading away.
-                                GradientStop {
-                                    position: 0.0
-                                    color: root.timelineTool === "trimStart"
-                                           ? doomGradient.clear : doomGradient.solid
-                                }
-                                GradientStop {
-                                    position: 1.0
-                                    color: root.timelineTool === "trimStart"
-                                           ? doomGradient.solid : doomGradient.clear
-                                }
-                            }
-                        }
-
-                        // Red dashed virtual playhead. A column of dashes reflows
-                        // with the track height without any repaint plumbing.
-                        Column {
-                            visible: root.cutHoverSeconds >= 0
-                            x: root.cutHoverSeconds * root.pxPerSecond
-                            spacing: 3
-                            Repeater {
-                                model: Math.ceil(cutOverlay.height / 7)
-                                delegate: Rectangle {
-                                    width: 2
-                                    height: 4
-                                    color: Theme.destructive
-                                }
-                            }
-                        }
+                    TimelineCutOverlay {
+                        panel: root
                     }
                 }
             }
@@ -3186,18 +2137,18 @@ PanelFrame {
             bookmarkRenameField.selectAll()
         }
         onAccepted: {
-            if (bookmarkRow.renameIndex < 0)
+            if (seekStrip.bookmarkRenameIndex < 0)
                 return
             const bookmarks = EditorState.bookmarks
-            if (bookmarkRow.renameIndex >= bookmarks.length)
+            if (seekStrip.bookmarkRenameIndex >= bookmarks.length)
                 return
-            const seconds = bookmarks[bookmarkRow.renameIndex].seconds
+            const seconds = bookmarks[seekStrip.bookmarkRenameIndex].seconds
             const label = bookmarkRenameField.text.trim()
-            EditorState.updateBookmark(bookmarkRow.renameIndex, seconds,
+            EditorState.updateBookmark(seekStrip.bookmarkRenameIndex, seconds,
                                        label.length > 0 ? label : qsTr("Bookmark"))
-            bookmarkRow.renameIndex = -1
+            seekStrip.bookmarkRenameIndex = -1
         }
-        onRejected: bookmarkRow.renameIndex = -1
+        onRejected: seekStrip.bookmarkRenameIndex = -1
     }
 
     ThemedDialog {

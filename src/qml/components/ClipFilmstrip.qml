@@ -160,63 +160,15 @@ Item {
 
     SkeletonBox {
         anchors.fill: parent
-        radius: 0
+        radius: Theme.c.clipFilmstrip.radius
         animated: root.width < 4000
         visible: root.loading
     }
 
     Repeater {
         model: root.visibleTileCount
-        delegate: Item {
-            id: tile
-            required property int index
-            readonly property int tileIndex: root.firstVisibleTile + index
-
-            x: root.stripOriginX + tileIndex * root.frameWidth
-            width: root.frameWidth
-            height: root.height
-
-            // Coarse frame from the strip: already on disk, so it draws immediately.
-            Image {
-                id: frame
-                anchors.fill: parent
-                source: root.coarseUrlForTile(tile.tileIndex)
-                fillMode: Image.PreserveAspectCrop
-                asynchronous: true
-                // Keep GPU textures small regardless of item layout.
-                sourceSize.width: root.frameWidth
-                sourceSize.height: root.frameHeight
-
-                opacity: status === Image.Ready ? 1 : 0
-
-                Behavior on opacity {
-                    NumberAnimation { duration: Theme.durationBase; easing.type: Theme.easing }
-                }
-
-                onStatusChanged: {
-                    if (tile.index !== 0)
-                        return
-                    if (status === Image.Ready || status === Image.Error)
-                        root.firstFrameReady = true
-                }
-            }
-
-            // This tile's own timestamp, decoded on demand. Sits on top so it replaces the
-            // repeated strip frame without a reload flicker once it arrives.
-            Image {
-                anchors.fill: parent
-                source: root.tileUrlForTile(tile.tileIndex)
-                fillMode: Image.PreserveAspectCrop
-                asynchronous: true
-                sourceSize.width: root.frameWidth
-                sourceSize.height: root.frameHeight
-
-                opacity: status === Image.Ready ? 1 : 0
-
-                Behavior on opacity {
-                    NumberAnimation { duration: Theme.durationBase; easing.type: Theme.easing }
-                }
-            }
+        delegate: ClipFilmstripTile {
+            strip: root
         }
     }
 }
