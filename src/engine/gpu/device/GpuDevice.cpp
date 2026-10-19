@@ -346,7 +346,12 @@ PciId renderPciId(const QString &glVendor)
     // The probed node describes the live renderer, so it cannot answer for anyone else.
     if (glVendor.isEmpty() || glVendor == drift::hwaccel::renderVendor()) {
         if (const QString node = renderDrmNode(); !node.isEmpty()) {
-            if (const PciId id = pciIdForDrmNode(node); id.isValid())
+            // The vendor hint can be overridden after the probe, so a node on another vendor's
+            // card is stale rather than an answer.
+            const quint16 nodeVendor = vendorIdForGlVendor(vendor);
+            if (const PciId id = pciIdForDrmNode(node);
+                id.isValid() && (nodeVendor == 0 || id.vendor == nodeVendor
+                                 || (nodeVendor == 0x1002 && id.vendor == 0x1022)))
                 return id;
         }
     }

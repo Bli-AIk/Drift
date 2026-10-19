@@ -6492,7 +6492,16 @@ void EngineTest::clipReaderAutoKeepsCheapClipsOnSoftware()
 
     const auto previous = ClipReader::hardwareDecodeMode();
     ClipReader::setHardwareDecodeMode(ClipReader::HardwareDecodeMode::Auto);
-    const auto restore = qScopeGuard([previous] { ClipReader::setHardwareDecodeMode(previous); });
+    // Auto lets a proven zero-copy path override the cheap-clip heuristic, and that proof is
+    // process-wide: an earlier test that imported a frame would otherwise decide this one.
+    using GlRuntime = drift::gl::GlRuntime;
+    const auto previousPath = GlRuntime::lastPreviewUploadPath();
+    const QString previousDecline = GlRuntime::lastZeroCopyDeclineReason();
+    GlRuntime::restorePreviewUploadPath(GlRuntime::PreviewUploadPath::None, QString());
+    const auto restore = qScopeGuard([=] {
+        ClipReader::setHardwareDecodeMode(previous);
+        GlRuntime::restorePreviewUploadPath(previousPath, previousDecline);
+    });
 
     ClipReader reader;
     QVERIFY(reader.open(path));
