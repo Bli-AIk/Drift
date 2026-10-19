@@ -256,7 +256,11 @@ add_test(NAME Mcp COMMAND tst_mcp)
 drift_copy_effects(tst_mcp)
 drift_copy_transitions(tst_mcp)
 
-qt_add_executable(tst_thememanager tst_thememanager.cpp ../src/theme/ThemeManager.cpp ../src/core/ZipArchive.cpp)
+qt_add_executable(tst_thememanager
+    tst_thememanager.cpp
+    ../src/theme/ThemeManager.cpp
+    ../src/core/ZipArchive.cpp
+    ../src/engine/AndroidUri.cpp)
 target_include_directories(tst_thememanager PRIVATE ../src)
 target_compile_definitions(tst_thememanager PRIVATE
     "DRIFT_MAIN_CPP=\"${CMAKE_SOURCE_DIR}/src/main.cpp\""
@@ -298,6 +302,7 @@ qt_add_executable(tst_windowbackdrop
     ../src/theme/WindowBackdrop.cpp
     ../src/theme/ThemeManager.cpp
     ../src/core/ZipArchive.cpp
+    ../src/engine/AndroidUri.cpp
     ${_drift_windowbackdrop_platform}
 )
 target_include_directories(tst_windowbackdrop PRIVATE ../src)

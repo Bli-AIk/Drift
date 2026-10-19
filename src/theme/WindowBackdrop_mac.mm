@@ -3,7 +3,33 @@
 #include <QHash>
 #include <QWindow>
 
+// qobjectdefs.h defines slots, signals, and emit. AppKit headers use those
+// words as identifiers, so the macros have to be out of the way for the import.
+#ifdef slots
+#undef slots
+#define DRIFT_RESTORE_SLOTS
+#endif
+#ifdef signals
+#undef signals
+#define DRIFT_RESTORE_SIGNALS
+#endif
+#ifdef emit
+#undef emit
+#define DRIFT_RESTORE_EMIT
+#endif
 #import <AppKit/AppKit.h>
+#ifdef DRIFT_RESTORE_SLOTS
+#define slots Q_SLOTS
+#undef DRIFT_RESTORE_SLOTS
+#endif
+#ifdef DRIFT_RESTORE_SIGNALS
+#define signals Q_SIGNALS
+#undef DRIFT_RESTORE_SIGNALS
+#endif
+#ifdef DRIFT_RESTORE_EMIT
+#define emit Q_EMIT
+#undef DRIFT_RESTORE_EMIT
+#endif
 
 namespace drift::backdrop {
 

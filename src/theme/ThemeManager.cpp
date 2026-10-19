@@ -1,6 +1,9 @@
 #include "ThemeManager.h"
 
 #include "core/ZipArchive.h"
+#include "engine/AndroidUri.h"
+
+#include <memory>
 
 #include <QColor>
 #include <QDir>
@@ -48,6 +51,27 @@ QString userThemesDirectory()
 {
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
            + QStringLiteral("/themes");
+}
+
+// A content:// document id has no suffix, and importLocal chooses json vs zip
+// from the file name. Keep the provider's display name, and sniff when it has
+// neither extension.
+QString stagedThemeFileName(const QUrl &url, const QByteArray &data)
+{
+    QString name = AndroidUri::displayName(url);
+    name.replace(QLatin1Char('/'), QLatin1Char('_'));
+    name.replace(QLatin1Char('\\'), QLatin1Char('_'));
+    name.replace(QLatin1Char(':'), QLatin1Char('_'));
+    if (name.isEmpty() || name == QLatin1String(".") || name == QLatin1String(".."))
+        name = QStringLiteral("theme");
+    const QString suffix = QFileInfo(name).suffix().toLower();
+    if (suffix != QLatin1String("json") && suffix != QLatin1String("zip")) {
+        if (drift::zip::looksLikeZip(data.left(4)))
+            name += QStringLiteral(".zip");
+        else
+            name += QStringLiteral(".json");
+    }
+    return name;
 }
 
 bool isBuiltinPath(const QString &path)
@@ -1397,15 +1421,6 @@ QUrl ThemeManager::themesFolderUrl() const
 
 bool ThemeManager::exportTheme(const QUrl &file)
 {
-    QString path;
-    if (file.isLocalFile())
-        path = file.toLocalFile();
-    else if (file.scheme().isEmpty())
-        path = file.toString();
-    if (path.isEmpty()) {
-        setLastError(QStringLiteral("export path is not a local file"));
-        return false;
-    }
     if (m_resolved.isEmpty()) {
         setLastError(QStringLiteral("no theme is loaded"));
         return false;
@@ -1415,12 +1430,35 @@ bool ThemeManager::exportTheme(const QUrl &file)
     doc.remove(QStringLiteral("extends"));
     doc.remove(QStringLiteral("variants"));
     const QJsonObject object = variantToJson(doc).toObject();
+    const QByteArray bytes = QJsonDocument(object).toJson(QJsonDocument::Indented);
+
+    // Android's save dialog returns a content:// URI. QSaveFile cannot open one;
+    // the document already exists and Qt's content file engine truncates it.
+    if (AndroidUri::isContentUri(file)) {
+        const std::unique_ptr<QFile> out = AndroidUri::openForWrite(file);
+        if (!out || out->write(bytes) != bytes.size() || !out->flush()) {
+            const QString detail = out ? QStringLiteral(": ") + out->errorString() : QString();
+            setLastError(QStringLiteral("cannot write %1%2").arg(file.toString(), detail));
+            return false;
+        }
+        setLastError({});
+        return true;
+    }
+
+    QString path;
+    if (file.isLocalFile())
+        path = file.toLocalFile();
+    else if (file.scheme().isEmpty())
+        path = file.toString();
+    if (path.isEmpty()) {
+        setLastError(QStringLiteral("export path is not a local file"));
+        return false;
+    }
     QSaveFile out(path);
     if (!out.open(QIODevice::WriteOnly)) {
         setLastError(QStringLiteral("cannot write %1: %2").arg(path, out.errorString()));
         return false;
     }
-    const QByteArray bytes = QJsonDocument(object).toJson(QJsonDocument::Indented);
     if (out.write(bytes) != bytes.size() || !out.commit()) {
         setLastError(QStringLiteral("cannot write %1: %2").arg(path, out.errorString()));
         return false;
@@ -1508,7 +1546,11 @@ QString ThemeManager::importTheme(const QUrl &url)
     else if (url.scheme().isEmpty())
         path = url.toString();
     else {
-        QFile input(url.toString());
+        // content:// (and any other non-file URL Qt can open). The fully encoded
+        // form is what Android's content file engine accepts; the display name
+        // keeps the .json/.zip suffix importLocal switches on.
+        const QString openPath = AndroidUri::filePath(url);
+        QFile input(openPath.isEmpty() ? url.toString(QUrl::FullyEncoded) : openPath);
         if (!input.open(QIODevice::ReadOnly)) {
             setLastError(QStringLiteral("cannot open %1").arg(url.toString()));
             return {};
@@ -1518,7 +1560,7 @@ QString ThemeManager::importTheme(const QUrl &url)
             setLastError(QStringLiteral("theme file is too large"));
             return {};
         }
-        path = scratch.filePath(QStringLiteral("upload"));
+        path = scratch.filePath(stagedThemeFileName(url, data));
         QFile out(path);
         if (!out.open(QIODevice::WriteOnly) || out.write(data) != data.size()) {
             setLastError(QStringLiteral("cannot stage the theme file"));
