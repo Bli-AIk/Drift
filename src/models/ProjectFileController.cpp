@@ -1393,6 +1393,7 @@ void ProjectFileController::remapProjectPaths(const QHash<QString, QString> &rem
         if (repoint(asset.path)) {
             asset.thumbnailPath.clear();
             asset.filmstripPath.clear();
+            drift::stampSourceFingerprint(asset);
         }
     }
 
