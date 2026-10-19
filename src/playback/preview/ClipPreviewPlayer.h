@@ -80,7 +80,7 @@ signals:
 private:
     int fillAudio(float *buffer, int sampleCount);
     void ensureAudioSink();
-    void onAudioSampleRateChanged();
+    void onAudioSinkRebuilt();
     void onPositionTick();
     void requestFrame(drift::TimeUs positionUs);
     void onDecoded(const QImage &image, quint64 token);

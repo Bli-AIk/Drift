@@ -187,7 +187,7 @@ signals:
 private:
     int fillAudio(float *buffer, int sampleCount);
     void ensureAudioSink();
-    void onAudioSampleRateChanged();
+    void onAudioSinkRebuilt();
     // Reads the clock and publishes the playhead when it has crossed into a new project frame.
     void advancePlayhead();
     void emitPlayhead();

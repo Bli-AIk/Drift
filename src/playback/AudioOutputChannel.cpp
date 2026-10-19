@@ -293,9 +293,9 @@ void AudioOutputChannel::rebuild()
     m_activeId = device.id();
     m_haveSink = true;
     // Before the sink is built, so the caller has re-anchored its clock and mixer by the time the
-    // first buffer is pulled at the new rate.
-    if (m_sampleRate.exchange(format.sampleRate(), std::memory_order_acq_rel) != format.sampleRate())
-        emit sampleRateChanged();
+    // first buffer is pulled from it.
+    m_sampleRate.store(format.sampleRate(), std::memory_order_release);
+    emit sinkRebuilt();
 
     QMetaObject::invokeMethod(
         m_pull, [this, device, format] { buildSink(device, format); }, Qt::QueuedConnection);

@@ -41,8 +41,7 @@ ClipPreviewPlayer::ClipPreviewPlayer(QObject *parent)
     , m_frameWorker(new ClipPreviewFrameWorker)
 {
     m_audio.setFillCallback([this](float *stereo, int frames) { return fillAudio(stereo, frames); });
-    connect(&m_audio, &AudioOutputChannel::sampleRateChanged, this,
-            &ClipPreviewPlayer::onAudioSampleRateChanged);
+    connect(&m_audio, &AudioOutputChannel::sinkRebuilt, this, &ClipPreviewPlayer::onAudioSinkRebuilt);
     m_sampleRate = m_audio.sampleRate();
 
     m_frameWorker->moveToThread(&m_frameThread);
@@ -76,10 +75,12 @@ void ClipPreviewPlayer::ensureAudioSink()
     m_sampleRate = m_audio.sampleRate();
 }
 
-// The device settled on a rate other than the project's; the retimer and clock both count in
-// output samples, so start them over on the new one.
-void ClipPreviewPlayer::onAudioSampleRateChanged()
+// The sink was reopened, possibly at a rate other than the clip's. Its played position restarts and
+// the retimer and clock both count in output samples, so start them over from what was heard.
+void ClipPreviewPlayer::onAudioSinkRebuilt()
 {
+    if (m_playing)
+        m_positionUs = m_clock.currentTimeUs();
     m_sampleRate = m_audio.sampleRate();
     m_clock.reset(m_positionUs, m_sampleRate);
     if (m_playing)
@@ -174,7 +175,7 @@ void ClipPreviewPlayer::play()
     m_clock.start();
     m_playing = true;
 
-    // May settle on a rate the clip was not prepared at, which comes back as sampleRateChanged and
+    // May settle on a rate the clip was not prepared at, which comes back as sinkRebuilt and
     // re-anchors the clock — so this has to follow m_playing being set.
     m_audio.start();
 

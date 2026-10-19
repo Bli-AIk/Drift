@@ -83,9 +83,10 @@ public:
     qint64 deliveredUSecs() const;
 
 signals:
-    // The device took a different rate than the one asked for; the caller's clock and mixer have
-    // to follow it.
-    void sampleRateChanged();
+    // A new sink was opened — a different rate, a different device, or recovery from an error. Its
+    // played position starts over from zero and whatever the old one had queued is gone, so the
+    // caller's clock and mixer have to re-anchor, at sampleRate() if that moved too.
+    void sinkRebuilt();
     // Playback cannot produce sound, with a message fit to show the user.
     void errorOccurred(const QString &message);
 

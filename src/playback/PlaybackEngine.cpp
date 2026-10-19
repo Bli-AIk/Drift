@@ -220,8 +220,7 @@ PlaybackEngine::PlaybackEngine(QObject *parent)
     m_compositor.setStats(&m_stats);
 
     m_audio.setFillCallback([this](float *stereo, int frames) { return fillAudio(stereo, frames); });
-    connect(&m_audio, &AudioOutputChannel::sampleRateChanged, this,
-            &PlaybackEngine::onAudioSampleRateChanged);
+    connect(&m_audio, &AudioOutputChannel::sinkRebuilt, this, &PlaybackEngine::onAudioSinkRebuilt);
     connect(&m_audio, &AudioOutputChannel::errorOccurred, this, &PlaybackEngine::audioError);
     m_sampleRate = m_audio.sampleRate();
 
@@ -294,10 +293,13 @@ void PlaybackEngine::ensureAudioSink()
     m_sampleRate = m_audio.sampleRate();
 }
 
-// The device would not take the project's rate, or the sink moved to a device that runs at a
-// different one. Everything downstream of the sink counts in output samples, so re-anchor it.
-void PlaybackEngine::onAudioSampleRateChanged()
+// The sink was reopened, possibly at a rate other than the project's. Its played position restarts
+// and its queue was dropped unheard, so carry on from what was actually heard, and re-anchor
+// everything downstream of the sink, which counts in output samples.
+void PlaybackEngine::onAudioSinkRebuilt()
 {
+    if (m_playing)
+        m_playheadUs = m_clock.currentTimeUs();
     m_sampleRate = m_audio.sampleRate();
     m_mixer.resetClipAudioState();
     m_audioStreamGeneration.fetch_add(1, std::memory_order_release);
@@ -705,7 +707,7 @@ void PlaybackEngine::play()
     pushAudioSnapshot();
 
     // Opening the device may settle on a rate the project did not ask for, which comes back as
-    // sampleRateChanged and re-anchors the clock — so this has to follow m_playing being set.
+    // sinkRebuilt and re-anchors the clock — so this has to follow m_playing being set.
     m_audio.start();
 
     emit playingChanged();
