@@ -29,7 +29,7 @@ QString settingsKey()
 #if defined(Q_OS_WIN)
 // Where Settings → System → Display → Graphics keeps its per-application choices: one REG_SZ per
 // executable path. Hybrid-graphics drivers consult it for OpenGL as well as Direct3D; the
-// NvOptimusEnablement / AmdPowerXpressRequestHighPerformance exports in main.cpp cover the ones
+// NvOptimusEnablement / AmdPowerXpressRequestHighPerformance exports in app/main.cpp cover the ones
 // that do not.
 constexpr const wchar_t *kUserGpuPreferences = L"Software\\Microsoft\\DirectX\\UserGpuPreferences";
 

@@ -41,7 +41,7 @@ QString timecode(drift::TimeUs us)
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-    // Must match src/main.cpp, or AppDataLocation points somewhere else and the tool cannot
+    // Must match src/app/main.cpp, or AppDataLocation points somewhere else and the tool cannot
     // see models installed as addons.
     QCoreApplication::setApplicationName("CutWire Drift");
     QCoreApplication::setOrganizationName("CutWire Drift");

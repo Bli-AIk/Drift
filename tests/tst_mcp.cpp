@@ -1,6 +1,6 @@
 #include <QtTest>
 #include "core/project/Transcript.h"
-#include "models/CloudProviders.h"
+#include "app/online/CloudProviders.h"
 
 #include <QAbstractSocket>
 #include <QCoreApplication>
@@ -25,12 +25,12 @@
 #include <QTimer>
 #include <QUrlQuery>
 
-#include "mcp/McpCatalog.h"
-#include "mcp/McpDispatcher.h"
-#include "mcp/McpJson.h"
-#include "mcp/McpProtocol.h"
-#include "mcp/McpSession.h"
-#include "mcp/McpStdio.h"
+#include "app/mcp/tools/McpCatalog.h"
+#include "app/mcp/tools/McpDispatcher.h"
+#include "app/mcp/protocol/McpJson.h"
+#include "app/mcp/protocol/McpProtocol.h"
+#include "app/mcp/protocol/McpSession.h"
+#include "app/mcp/transport/McpStdio.h"
 #include "engine/addons/AddonPackage.h"
 #include "engine/packages/audio/AudioEffectCatalog.h"
 #include "engine/ml/vision/depth/DepthSidecar.h"
@@ -41,12 +41,12 @@
 #include "engine/ml/vision/detection/ObjectDetector.h"
 #include "engine/render2d/pdf/PdfiumRuntime.h"
 #include "core/effects/EffectStackStore.h"
-#include "models/AddonManager.h"
-#include "models/AppController.h"
-#include "preview/PreviewController.h"
+#include "app/online/addons/AddonManager.h"
+#include "app/editor/AppController.h"
+#include "ui/preview/PreviewController.h"
 #include "TestZip.h"
-#include "models/AssetLibrary.h"
-#include "models/MarketClient.h"
+#include "app/bin/AssetLibrary.h"
+#include "app/online/market/MarketClient.h"
 
 #include <cmath>
 #include <cstdio>

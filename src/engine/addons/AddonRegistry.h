@@ -12,7 +12,7 @@
 // GpuPackageParse::defaultSearchPaths(), which appends addonRootsForKind() to its usual roots.
 //
 // This lives in driftengine deliberately: reading the registry must work in tools/ and tests/
-// with no network stack. Downloading is the app layer's job (src/models/AddonManager).
+// with no network stack. Downloading is the app layer's job (src/app/online/addons/AddonManager).
 
 namespace drift::addon {
 

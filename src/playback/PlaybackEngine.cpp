@@ -1,6 +1,6 @@
 #include "playback/PlaybackEngine.h"
 
-#include "playback/PerfLog.h"
+#include "playback/stats/PerfLog.h"
 
 #include <cstdio>
 

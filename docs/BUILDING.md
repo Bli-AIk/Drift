@@ -101,7 +101,7 @@ cmake --build build --target update_translations
 
 Commit the updated `.ts` files. `.qm` binaries are compiled into the app and are not committed.
 
-MCP tool names, JSON schemas, agent errors, and copied `mcp.json` / agent-guide text stay English on purpose (`src/mcp/` is excluded from `lupdate`). The Settings “Agent access” labels are ordinary UI and are translated.
+MCP tool names, JSON schemas, agent errors, and copied `mcp.json` / agent-guide text stay English on purpose (`src/app/mcp/` is excluded from `lupdate`). The Settings “Agent access” labels are ordinary UI and are translated.
 
 ## macOS
 
@@ -187,7 +187,7 @@ Homebrew ships single-architecture bottles, so the image is Apple Silicon only a
 
 Fonts, emoji stickers, and speech models download at runtime rather than shipping in the binary. That keeps the install small and lets you take only what you need. Open the Addon Manager from the header (layers icon), or follow the install prompt in the font picker, stickers tab, or auto-subtitle panel.
 
-Packages are `.driftpkg` archives — zstd-compressed, Ed25519-signed, and verified before install — under `<AppDataLocation>/addons/`. Format, registry, and installer live in `src/engine/AddonPackage.*`, `src/engine/AddonRegistry.*`, and `src/models/AddonManager.*`.
+Packages are `.driftpkg` archives — zstd-compressed, Ed25519-signed, and verified before install — under `<AppDataLocation>/addons/`. Format, registry, and installer live in `src/engine/addons/AddonPackage.*`, `src/engine/addons/AddonRegistry.*`, and `src/app/online/addons/AddonManager.*`.
 
 **Effects and transitions are bundled *and* addons.** They ship next to the binary so the editor works out of the box; `effects.core` / `transitions.core` addons can ship shader fixes without an app release. Content resolves highest-priority-first:
 
@@ -217,7 +217,7 @@ Building and publishing addons lives in a separate repository, along with the Cl
 
 ### Pointing at a different service
 
-The endpoint and client token are defined in `CMakeLists.txt` and injected as compile definitions — `src/models/AddonEndpoint.h` only reads them.
+The endpoint and client token are defined in `CMakeLists.txt` and injected as compile definitions — `src/app/online/addons/AddonEndpoint.h` only reads them.
 
 ```bash
 cmake -B build -DDRIFT_ADDON_INDEX_URL=https://addons.example.com/v1/index \
@@ -418,7 +418,7 @@ Media file → ClipReader → AudioMixer (volume, fades, audio effects)
 
 ## QML entry points
 
-Singletons registered in `main.cpp`:
+Singletons registered in `app/main.cpp`:
 
 - `EditorState` / `AppController` — timeline controller
 - `AssetLibrary` — media bin

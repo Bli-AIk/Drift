@@ -714,7 +714,7 @@ jobs:
           # provides OpenGL 3.0 — below the 3.3 the compositor needs. Whenever Qt chose
           # it, Qt Quick came up on it and the preview then stayed black (issue #139),
           # and users were fixing that by deleting the DLL by hand. Do not ship it.
-          # main.cpp sets QT_NO_OPENGL_BUGLIST so Qt stops picking it over a perfectly
+          # app/main.cpp sets QT_NO_OPENGL_BUGLIST so Qt stops picking it over a perfectly
           # good card in the first place; keep the two together.
           & "${{ env.QT_ROOT_DIR }}\bin\windeployqt.exe" --release --no-translations `
             --no-opengl-sw --qmldir src\qml dist\bin\drift.exe

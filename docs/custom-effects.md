@@ -13,7 +13,7 @@ agent over MCP (see [MCP.md](MCP.md#custom-effects)).
 | Audio effect | `audio-effect.json` | none: a built-in processor, or a graph of built-in pedals | below |
 
 The MCP op `effect_authoring_guide` returns the same material, written for agents. Keep the two in
-step: its text lives in `src/mcp/McpEffectAuthoring.cpp`.
+step: its text lives in `src/app/mcp/tools/McpEffectAuthoring.cpp`.
 
 ## Parameters → inspector controls
 

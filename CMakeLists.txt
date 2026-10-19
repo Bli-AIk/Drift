@@ -33,7 +33,7 @@ option(DRIFT_AUTO_UPDATE_TRANSLATIONS "Run lupdate as part of the default build"
 # Fonts, stickers and the Whisper model used to be fetched or extracted here and shipped inside
 # the build tree — roughly 800 MB of assets every user paid for whether or not they used them.
 # They are now addons: signed .driftpkg archives downloaded at runtime into <AppDataLocation>/
-# addons/ (src/engine/AddonPackage, src/models/AddonManager). Nothing asset-shaped is bundled,
+# addons/ (src/engine/addons/AddonPackage, src/app/online/addons/AddonManager). Nothing asset-shaped is bundled,
 # so a fresh build starts with system fonts, an empty sticker tab and no transcriber, and the
 # user installs what they want from the Addon Manager. The packaging and publishing tooling
 # lives in the drift-addons repo.
@@ -50,7 +50,7 @@ option(DRIFT_AUTO_UPDATE_TRANSLATIONS "Run lupdate as part of the default build"
 
 # --- Addon service ----------------------------------------------------------
 # Where the Addon Manager fetches from. These are the only place either value is defined —
-# src/models/AddonEndpoint.h just reads them — so a fork can point at its own Worker with:
+# src/app/online/addons/AddonEndpoint.h just reads them — so a fork can point at its own Worker with:
 #
 #   cmake -B build -DDRIFT_ADDON_INDEX_URL=https://addons.example.com/v1/index \
 #                  -DDRIFT_ADDON_CLIENT_TOKEN=...
@@ -948,7 +948,7 @@ if(DRIFT_WITH_SKIA)
     # may subclass Skia interfaces from any translation unit. vcpkg's port on Windows keeps /GR-,
     # which is harmless: MSVC emits type descriptors as COMDAT wherever they are needed, so a
     # derived class never depends on its base's archive carrying one.
-    # PRIVATE: no header outside src/engine/Skia*.h includes Skia (Vector*.cpp do, under
+    # PRIVATE: no header outside src/engine/render2d/**/Skia*.h includes Skia (Vector*.cpp do, under
     # DRIFT_WITH_SKIA), so the defines and the include root stay out of the rest of the build.
     target_link_libraries(driftengine PRIVATE Skia::Skia)
     target_compile_definitions(driftengine PUBLIC DRIFT_WITH_SKIA)
@@ -959,156 +959,156 @@ endif()
 
 # --- application ------------------------------------------------------------
 qt_add_executable(drift
-    src/main.cpp
-    src/DriftImageProvider.h
-    src/DriftImageProvider.cpp
-    src/SegmentImageProvider.h
-    src/SegmentImageProvider.cpp
-    src/SegmentImageStore.h
-    src/SegmentImageStore.cpp
-    src/ClipPreviewImageProvider.h
-    src/ClipPreviewImageProvider.cpp
-    src/ClipPreviewImageStore.h
-    src/ClipPreviewImageStore.cpp
-    src/MulticamImageProvider.h
-    src/MulticamImageProvider.cpp
-    src/MulticamImageStore.h
-    src/MulticamImageStore.cpp
-    src/TextStylePreviewImageProvider.h
-    src/TextStylePreviewImageProvider.cpp
-    src/ShapePreviewImageProvider.h
-    src/ShapePreviewImageProvider.cpp
-    src/models/AddonEndpoint.h
-    src/models/AddonManager.h
-    src/models/AddonManager.cpp
-    src/models/JobRegistry.h
-    src/models/JobRegistry.cpp
-    src/models/CloudProviders.h
-    src/models/CloudProviders.cpp
-    src/models/MarketEndpoint.h
-    src/models/MarketIdentity.h
-    src/models/MarketIdentity.cpp
-    src/models/MarketClient.h
-    src/models/MarketClient.cpp
-    src/models/DriftAssetStore.h
-    src/models/DriftAssetStore.cpp
-    src/models/SfxLibrary.h
-    src/models/SfxLibrary.cpp
+    src/app/main.cpp
+    src/ui/imageproviders/DriftImageProvider.h
+    src/ui/imageproviders/DriftImageProvider.cpp
+    src/ui/imageproviders/segment/SegmentImageProvider.h
+    src/ui/imageproviders/segment/SegmentImageProvider.cpp
+    src/ui/imageproviders/segment/SegmentImageStore.h
+    src/ui/imageproviders/segment/SegmentImageStore.cpp
+    src/ui/imageproviders/clippreview/ClipPreviewImageProvider.h
+    src/ui/imageproviders/clippreview/ClipPreviewImageProvider.cpp
+    src/ui/imageproviders/clippreview/ClipPreviewImageStore.h
+    src/ui/imageproviders/clippreview/ClipPreviewImageStore.cpp
+    src/ui/imageproviders/multicam/MulticamImageProvider.h
+    src/ui/imageproviders/multicam/MulticamImageProvider.cpp
+    src/ui/imageproviders/multicam/MulticamImageStore.h
+    src/ui/imageproviders/multicam/MulticamImageStore.cpp
+    src/ui/imageproviders/TextStylePreviewImageProvider.h
+    src/ui/imageproviders/TextStylePreviewImageProvider.cpp
+    src/ui/imageproviders/ShapePreviewImageProvider.h
+    src/ui/imageproviders/ShapePreviewImageProvider.cpp
+    src/app/online/addons/AddonEndpoint.h
+    src/app/online/addons/AddonManager.h
+    src/app/online/addons/AddonManager.cpp
+    src/app/jobs/JobRegistry.h
+    src/app/jobs/JobRegistry.cpp
+    src/app/online/CloudProviders.h
+    src/app/online/CloudProviders.cpp
+    src/app/online/market/MarketEndpoint.h
+    src/app/online/market/MarketIdentity.h
+    src/app/online/market/MarketIdentity.cpp
+    src/app/online/market/MarketClient.h
+    src/app/online/market/MarketClient.cpp
+    src/app/online/assets/DriftAssetStore.h
+    src/app/online/assets/DriftAssetStore.cpp
+    src/app/online/assets/SfxLibrary.h
+    src/app/online/assets/SfxLibrary.cpp
     src/core/base/VersionCompare.h
-    src/models/UpdateChecker.h
-    src/models/UpdateChecker.cpp
-    src/models/UpdateAsset.h
-    src/models/UpdateAsset.cpp
-    src/models/AppController.h
-    src/models/AppController.cpp
-    src/models/McpController.h
-    src/models/McpController.cpp
-    src/models/PreferencesController.h
-    src/models/PreferencesController.cpp
-    src/models/ProjectFileController.h
-    src/models/ProjectFileController.cpp
-    src/models/AssetPreviewController.h
-    src/models/AssetPreviewController.cpp
-    src/models/SpeedCurveController.h
-    src/models/SpeedCurveController.cpp
-    src/models/CurveEditorController.h
-    src/models/CurveEditorController.cpp
-    src/models/SegmentationController.h
-    src/models/SegmentationController.cpp
-    src/models/SceneDetectController.h
-    src/models/SceneDetectController.cpp
-    src/models/DepthController.h
-    src/models/DepthController.cpp
-    src/models/DenoiseController.h
-    src/models/DenoiseController.cpp
-    src/models/RestoreController.h
-    src/models/RestoreController.cpp
-    src/models/FaceTrackingController.h
-    src/models/FaceTrackingController.cpp
-    src/models/StabilizeController.h
-    src/models/StabilizeController.cpp
-    src/models/MediaBinController.h
-    src/models/MediaBinController.cpp
-    src/models/TtsController.h
-    src/models/TtsController.cpp
-    src/models/VoiceLibrary.h
-    src/models/VoiceLibrary.cpp
-    src/models/McpDetail.h
-    src/models/AppControllerDetail.h
-    src/models/EditorState.h
-    src/models/LayoutStore.h
-    src/models/LayoutStore.cpp
-    src/models/FileDialogs.h
-    src/models/FileDialogs.cpp
-    src/models/Haptics.h
-    src/models/Haptics.cpp
-    src/models/PointerDevices.h
-    src/models/PointerDevices.cpp
-    src/models/AssetLibrary.h
-    src/models/AssetLibrary.cpp
-    src/models/BinFolderListModel.h
-    src/models/BinFolderListModel.cpp
-    src/models/TimelineClipsModel.h
-    src/models/TimelineClipsModel.cpp
+    src/app/online/updates/UpdateChecker.h
+    src/app/online/updates/UpdateChecker.cpp
+    src/app/online/updates/UpdateAsset.h
+    src/app/online/updates/UpdateAsset.cpp
+    src/app/editor/AppController.h
+    src/app/editor/AppController.cpp
+    src/app/mcp/McpController.h
+    src/app/mcp/McpController.cpp
+    src/app/editor/PreferencesController.h
+    src/app/editor/PreferencesController.cpp
+    src/app/editor/ProjectFileController.h
+    src/app/editor/ProjectFileController.cpp
+    src/app/bin/AssetPreviewController.h
+    src/app/bin/AssetPreviewController.cpp
+    src/app/editor/sessions/SpeedCurveController.h
+    src/app/editor/sessions/SpeedCurveController.cpp
+    src/app/editor/sessions/CurveEditorController.h
+    src/app/editor/sessions/CurveEditorController.cpp
+    src/app/jobs/vision/SegmentationController.h
+    src/app/jobs/vision/SegmentationController.cpp
+    src/app/jobs/vision/SceneDetectController.h
+    src/app/jobs/vision/SceneDetectController.cpp
+    src/app/jobs/vision/DepthController.h
+    src/app/jobs/vision/DepthController.cpp
+    src/app/jobs/audio/DenoiseController.h
+    src/app/jobs/audio/DenoiseController.cpp
+    src/app/jobs/vision/RestoreController.h
+    src/app/jobs/vision/RestoreController.cpp
+    src/app/jobs/vision/FaceTrackingController.h
+    src/app/jobs/vision/FaceTrackingController.cpp
+    src/app/jobs/vision/StabilizeController.h
+    src/app/jobs/vision/StabilizeController.cpp
+    src/app/bin/MediaBinController.h
+    src/app/bin/MediaBinController.cpp
+    src/app/jobs/audio/TtsController.h
+    src/app/jobs/audio/TtsController.cpp
+    src/app/jobs/audio/VoiceLibrary.h
+    src/app/jobs/audio/VoiceLibrary.cpp
+    src/app/mcp/McpDetail.h
+    src/app/editor/AppControllerDetail.h
+    src/app/editor/EditorState.h
+    src/app/editor/LayoutStore.h
+    src/app/editor/LayoutStore.cpp
+    src/app/platform/FileDialogs.h
+    src/app/platform/FileDialogs.cpp
+    src/app/platform/Haptics.h
+    src/app/platform/Haptics.cpp
+    src/app/platform/PointerDevices.h
+    src/app/platform/PointerDevices.cpp
+    src/app/bin/AssetLibrary.h
+    src/app/bin/AssetLibrary.cpp
+    src/app/bin/BinFolderListModel.h
+    src/app/bin/BinFolderListModel.cpp
+    src/app/editor/TimelineClipsModel.h
+    src/app/editor/TimelineClipsModel.cpp
     src/playback/PlaybackEngine.h
     src/playback/PlaybackEngine.cpp
     src/playback/PlaybackClock.h
     src/playback/PlaybackClock.cpp
     src/playback/AudioOutputChannel.h
     src/playback/AudioOutputChannel.cpp
-    src/playback/ClipPreviewPlayer.h
-    src/playback/ClipPreviewPlayer.cpp
-    src/playback/CompositorService.h
-    src/playback/CompositorService.cpp
-    src/playback/PlaybackStats.h
-    src/playback/PlaybackStats.cpp
-    src/playback/PlaybackDiagnostics.h
-    src/playback/PlaybackDiagnostics.cpp
-    src/playback/PerfLog.h
-    src/playback/PerfLog.cpp
-    src/preview/PreviewItem.h
-    src/preview/PreviewItem.cpp
-    src/preview/PreviewController.h
-    src/preview/PreviewController.cpp
-    src/timeline/ClipThumbnailStore.h
-    src/timeline/ClipThumbnailStore.cpp
-    src/timeline/TimelineLayout.h
-    src/timeline/TimelineLayout.cpp
-    src/timeline/TimelineTrackItem.h
-    src/timeline/TimelineTrackItem.cpp
-    src/timeline/TimelineViewState.h
-    src/timeline/TimelineViewState.cpp
+    src/playback/preview/ClipPreviewPlayer.h
+    src/playback/preview/ClipPreviewPlayer.cpp
+    src/playback/preview/CompositorService.h
+    src/playback/preview/CompositorService.cpp
+    src/playback/stats/PlaybackStats.h
+    src/playback/stats/PlaybackStats.cpp
+    src/playback/stats/PlaybackDiagnostics.h
+    src/playback/stats/PlaybackDiagnostics.cpp
+    src/playback/stats/PerfLog.h
+    src/playback/stats/PerfLog.cpp
+    src/ui/preview/PreviewItem.h
+    src/ui/preview/PreviewItem.cpp
+    src/ui/preview/PreviewController.h
+    src/ui/preview/PreviewController.cpp
+    src/ui/timeline/ClipThumbnailStore.h
+    src/ui/timeline/ClipThumbnailStore.cpp
+    src/ui/timeline/TimelineLayout.h
+    src/ui/timeline/TimelineLayout.cpp
+    src/ui/timeline/TimelineTrackItem.h
+    src/ui/timeline/TimelineTrackItem.cpp
+    src/ui/timeline/TimelineViewState.h
+    src/ui/timeline/TimelineViewState.cpp
 )
 
 # The MCP server itself ships everywhere. On Android it listens on loopback like it does on
 # desktop, and an agent reaches it through `adb forward` — which is what makes the phone build
 # drivable by tooling instead of by blind coordinate taps.
 target_sources(drift PRIVATE
-    src/mcp/McpSession.h
-    src/mcp/McpSession.cpp
-    src/mcp/McpCatalog.h
-    src/mcp/McpCatalog.cpp
-    src/mcp/McpProtocol.h
-    src/mcp/McpProtocol.cpp
-    src/mcp/McpDispatcher.h
-    src/mcp/McpDispatcher.cpp
-    src/mcp/McpDispatcherExtended.cpp
-    src/mcp/McpEffectAuthoring.h
-    src/mcp/McpEffectAuthoring.cpp
-    src/mcp/McpValidate.h
-    src/mcp/McpValidate.cpp
-    src/mcp/McpMarket.cpp
-    src/mcp/McpJson.h
+    src/app/mcp/protocol/McpSession.h
+    src/app/mcp/protocol/McpSession.cpp
+    src/app/mcp/tools/McpCatalog.h
+    src/app/mcp/tools/McpCatalog.cpp
+    src/app/mcp/protocol/McpProtocol.h
+    src/app/mcp/protocol/McpProtocol.cpp
+    src/app/mcp/tools/McpDispatcher.h
+    src/app/mcp/tools/McpDispatcher.cpp
+    src/app/mcp/tools/McpDispatcherExtended.cpp
+    src/app/mcp/tools/McpEffectAuthoring.h
+    src/app/mcp/tools/McpEffectAuthoring.cpp
+    src/app/mcp/protocol/McpValidate.h
+    src/app/mcp/protocol/McpValidate.cpp
+    src/app/mcp/tools/McpMarket.cpp
+    src/app/mcp/protocol/McpJson.h
 )
 
 # The HTTP listener needs QTcpServer, which a browser has no sockets for; McpController does not
 # construct a McpServer under Q_OS_WASM.
 if(NOT EMSCRIPTEN)
     target_sources(drift PRIVATE
-        src/mcp/McpHttp.h
-        src/mcp/McpHttp.cpp
-        src/mcp/McpServer.h
-        src/mcp/McpServer.cpp
+        src/app/mcp/transport/McpHttp.h
+        src/app/mcp/transport/McpHttp.cpp
+        src/app/mcp/transport/McpServer.h
+        src/app/mcp/transport/McpServer.cpp
     )
 endif()
 
@@ -1116,12 +1116,12 @@ endif()
 # points driven from a terminal, which an APK has no equivalent of.
 if(NOT ANDROID AND NOT EMSCRIPTEN)
     target_sources(drift PRIVATE
-        src/mcp/McpStdio.h
-        src/mcp/McpStdio.cpp
-        src/mcp/McpStdioServer.h
-        src/mcp/McpStdioServer.cpp
-        src/HeadlessApp.h
-        src/HeadlessApp.cpp
+        src/app/mcp/transport/McpStdio.h
+        src/app/mcp/transport/McpStdio.cpp
+        src/app/mcp/transport/McpStdioServer.h
+        src/app/mcp/transport/McpStdioServer.cpp
+        src/app/HeadlessApp.h
+        src/app/HeadlessApp.cpp
     )
 endif()
 
@@ -1292,7 +1292,7 @@ set(DRIFT_BACKDROP_PLATFORM_SOURCES)
 set(DRIFT_BACKDROP_PLATFORM_LIBS)
 set(DRIFT_BACKDROP_PLATFORM_DEFS)
 if(WIN32)
-    list(APPEND DRIFT_BACKDROP_PLATFORM_SOURCES src/theme/WindowBackdrop_win.cpp)
+    list(APPEND DRIFT_BACKDROP_PLATFORM_SOURCES src/ui/theme/backdrop/WindowBackdrop_win.cpp)
     list(APPEND DRIFT_BACKDROP_PLATFORM_LIBS dwmapi)
 elseif(APPLE AND CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     # .mm sources are Objective-C++. The project() languages are CXX and C so
@@ -1300,10 +1300,10 @@ elseif(APPLE AND CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(CMAKE_OBJCXX_STANDARD 20)
     set(CMAKE_OBJCXX_STANDARD_REQUIRED ON)
     enable_language(OBJCXX)
-    list(APPEND DRIFT_BACKDROP_PLATFORM_SOURCES src/theme/WindowBackdrop_mac.mm)
+    list(APPEND DRIFT_BACKDROP_PLATFORM_SOURCES src/ui/theme/backdrop/WindowBackdrop_mac.mm)
     list(APPEND DRIFT_BACKDROP_PLATFORM_LIBS "-framework Cocoa")
 elseif(UNIX AND NOT ANDROID AND NOT EMSCRIPTEN AND NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
-    list(APPEND DRIFT_BACKDROP_PLATFORM_SOURCES src/theme/WindowBackdrop_linux.cpp)
+    list(APPEND DRIFT_BACKDROP_PLATFORM_SOURCES src/ui/theme/backdrop/WindowBackdrop_linux.cpp)
     find_package(KF6WindowSystem QUIET)
     if(KF6WindowSystem_FOUND)
         list(APPEND DRIFT_BACKDROP_PLATFORM_LIBS KF6::WindowSystem)
@@ -1326,10 +1326,10 @@ qt_add_qml_module(drift
     URI Drift
     VERSION 1.0
     SOURCES
-        src/theme/ThemeManager.h
-        src/theme/ThemeManager.cpp
-        src/theme/WindowBackdrop.h
-        src/theme/WindowBackdrop.cpp
+        src/ui/theme/ThemeManager.h
+        src/ui/theme/ThemeManager.cpp
+        src/ui/theme/backdrop/WindowBackdrop.h
+        src/ui/theme/backdrop/WindowBackdrop.cpp
         ${DRIFT_BACKDROP_PLATFORM_SOURCES}
     QML_FILES
         src/qml/Shell.qml
@@ -1343,7 +1343,7 @@ qt_add_qml_module(drift
         src/qml/AndroidDownloadsSheet.qml
         src/qml/AndroidNotificationsSheet.qml
         src/qml/components/shell/NavRailButton.qml
-        # Touch entry point, loaded instead of Main.qml on Android (see src/main.cpp).
+        # Touch entry point, loaded instead of Main.qml on Android (see src/app/main.cpp).
         src/qml/AndroidLayoutSheet.qml
         src/qml/AndroidMain.qml
         src/qml/AndroidMoreToolsSheet.qml
@@ -2065,7 +2065,9 @@ target_link_libraries(drift PRIVATE
     driftcore
     driftengine
 )
-target_include_directories(drift PRIVATE src src/theme src/preview)
+target_include_directories(drift PRIVATE src)
+# qmltyperegistrar emits bare-basename includes (<ThemeManager.h>) for the qml module's headers.
+target_include_directories(drift PRIVATE src/ui/theme src/ui/theme/backdrop)
 if(DRIFT_BACKDROP_PLATFORM_LIBS)
     target_link_libraries(drift PRIVATE ${DRIFT_BACKDROP_PLATFORM_LIBS})
 endif()
@@ -2162,11 +2164,14 @@ if(ANDROID OR EMSCRIPTEN)
 endif()
 
 # MCP tool names, JSON schemas, agent errors and copied configs are a machine protocol and must
-# stay English. QT_EXCLUDE_FROM_TRANSLATION is a no-op until src/mcp/ exists (the mcp branch);
-# lupdate also ignores QStringLiteral, so those files only leak if someone later adds tr().
+# stay English. lupdate also ignores QStringLiteral, so those files only leak if someone later adds tr().
 file(GLOB DRIFT_MCP_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_SOURCE_DIR}/src/mcp/*.cpp"
-    "${CMAKE_SOURCE_DIR}/src/mcp/*.h")
+    "${CMAKE_SOURCE_DIR}/src/app/mcp/protocol/*.cpp"
+    "${CMAKE_SOURCE_DIR}/src/app/mcp/protocol/*.h"
+    "${CMAKE_SOURCE_DIR}/src/app/mcp/transport/*.cpp"
+    "${CMAKE_SOURCE_DIR}/src/app/mcp/transport/*.h"
+    "${CMAKE_SOURCE_DIR}/src/app/mcp/tools/*.cpp"
+    "${CMAKE_SOURCE_DIR}/src/app/mcp/tools/*.h")
 if(DRIFT_MCP_SOURCES)
     set_source_files_properties(${DRIFT_MCP_SOURCES} PROPERTIES QT_EXCLUDE_FROM_TRANSLATION ON)
 endif()

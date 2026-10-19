@@ -1,4 +1,4 @@
-#include "models/MarketIdentity.h"
+#include "app/online/market/MarketIdentity.h"
 
 #include <QUrl>
 #include <QtTest>

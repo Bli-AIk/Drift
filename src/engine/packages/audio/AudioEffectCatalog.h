@@ -17,7 +17,7 @@
 //
 // An audio effect is a chain of JUCE DSP stages applied to a clip's audio in the mixer. Unlike the
 // GPU effect catalog there is no built-in baseline — the whole catalog comes from packages, shipped
-// as the "audio-effects" addon kind (src/models/AddonManager) or found under a local override dir.
+// as the "audio-effects" addon kind (src/app/online/addons/AddonManager) or found under a local override dir.
 //
 // The DSP itself is compiled in (src/engine/audio). A manifest either names one of the fixed
 // processors ("processor": "echo") or, with "processor": "graph", wires the compiled-in pedals

@@ -22,7 +22,7 @@
 
 #include <zlib.h>
 
-#include "theme/ThemeManager.h"
+#include "ui/theme/ThemeManager.h"
 
 class ThemeManagerTest : public QObject
 {
@@ -502,7 +502,7 @@ void ThemeManagerTest::themeSlotOverrideFollowsTrust()
     // tst_thememanager registers ThemeManager itself and does not link the Drift
     // QML module, so ThemeSlot is loaded from its source file.
     const QString slotDir = QFileInfo(QStringLiteral(DRIFT_MAIN_CPP)).dir().filePath(
-        QStringLiteral("qml/components/controls"));
+        QStringLiteral("../qml/components/controls"));
     const QByteArray qml = QStringLiteral(
         "import QtQuick\n"
         "import Drift\n"
@@ -702,7 +702,7 @@ bool writeStoredZip(const QString &path, const QList<QPair<QString, QByteArray>>
 QString repoThemes()
 {
     const QDir srcDir(QFileInfo(QStringLiteral(DRIFT_MAIN_CPP)).dir().absolutePath());
-    return QDir(srcDir.filePath(QStringLiteral(".."))).filePath(QStringLiteral("docs/themes"));
+    return QDir(srcDir.filePath(QStringLiteral("../.."))).filePath(QStringLiteral("docs/themes"));
 }
 
 } // namespace

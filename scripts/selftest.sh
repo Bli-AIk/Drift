@@ -5,7 +5,7 @@
 #
 # Pushes a plain project JSON as selftest.json plus its media into the app's external files dir —
 # app-owned, no permission needed at any API level, and a real filesystem path avformat_open_input
-# opens directly. main.cpp sees selftest.json, composites one frame, writes selftest.png and exits.
+# opens directly. app/main.cpp sees selftest.json, composites one frame, writes selftest.png and exits.
 #
 # Compare the result against the desktop for the same project and timestamp:
 #   ./build/host/tools/renderframe project.json 0 expected.png

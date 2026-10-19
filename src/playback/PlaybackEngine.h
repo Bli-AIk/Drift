@@ -1,9 +1,9 @@
 #pragma once
 
 #include "playback/AudioOutputChannel.h"
-#include "playback/CompositorService.h"
+#include "playback/preview/CompositorService.h"
 #include "playback/PlaybackClock.h"
-#include "playback/PlaybackStats.h"
+#include "playback/stats/PlaybackStats.h"
 #include "core/project/Project.h"
 #include "core/base/Time.h"
 #include "engine/audio/AudioMixer.h"

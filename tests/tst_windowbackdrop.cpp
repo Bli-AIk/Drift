@@ -8,8 +8,8 @@
 #include <QSignalSpy>
 #include <QTemporaryDir>
 
-#include "theme/ThemeManager.h"
-#include "theme/WindowBackdrop.h"
+#include "ui/theme/ThemeManager.h"
+#include "ui/theme/backdrop/WindowBackdrop.h"
 
 class WindowBackdropTest : public QObject
 {
