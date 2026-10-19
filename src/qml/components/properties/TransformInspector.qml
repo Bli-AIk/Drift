@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 Item {
     id: root
 
@@ -147,7 +145,7 @@ Item {
                     width: parent.width - selectParentButton.width - parent.spacing
                     wrapMode: Text.WordWrap
                     text: qsTr("Also moved by %1").arg(root.parentName)
-                    color: Theme.clipTransform
+                    color: Theme.c.transformInspector.accent
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }
@@ -162,7 +160,7 @@ Item {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: qsTr("Move to a time, set a value, then click the diamond to add a keyframe. With Auto keyframes on, dragging a slider or the preview also creates them.")
-                color: Theme.mutedForeground
+                color: Theme.c.transformInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -181,7 +179,7 @@ Item {
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.positionLinked ? qsTr("Position (px, linked)") : qsTr("Position (px)")
-                    color: Theme.mutedForeground
+                    color: Theme.c.transformInspector.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                     font.weight: Font.Medium
@@ -206,7 +204,7 @@ Item {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: qsTr("Measured inside %1's frame").arg(root.parentName)
-                color: Theme.mutedForeground
+                color: Theme.c.transformInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -240,7 +238,7 @@ Item {
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.sizeLinked ? qsTr("Scale") : qsTr("Size (px)")
-                    color: Theme.mutedForeground
+                    color: Theme.c.transformInspector.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                     font.weight: Font.Medium
@@ -295,7 +293,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     horizontalAlignment: Text.AlignRight
                     text: Math.round((scaleSlider.pressed ? scaleSlider.value : root.scaleAtPlayhead) * 100) + "%"
-                    color: Theme.panelForeground
+                    color: Theme.c.transformInspector.foreground
                     font.family: Theme.monoFontFamily
                     font.pixelSize: Theme.fontSizeSm
                 }
@@ -324,7 +322,7 @@ Item {
 
             Text {
                 text: qsTr("Opacity & rotation")
-                color: Theme.mutedForeground
+                color: Theme.c.transformInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 font.weight: Font.Medium
@@ -352,7 +350,7 @@ Item {
 
             Text {
                 text: qsTr("Rotate 90°")
-                color: Theme.mutedForeground
+                color: Theme.c.transformInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 font.weight: Font.Medium
@@ -512,7 +510,7 @@ Item {
             Text {
                 visible: root.clipKind === "video"
                 text: qsTr("Fix orientation")
-                color: Theme.mutedForeground
+                color: Theme.c.transformInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 font.weight: Font.Medium
@@ -523,7 +521,7 @@ Item {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: qsTr("Corrects the source's own rotation losslessly — unlike Angle above, this changes decoding, not just the on-screen box.")
-                color: Theme.mutedForeground
+                color: Theme.c.transformInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -550,7 +548,7 @@ Item {
 
             Text {
                 text: qsTr("Flip")
-                color: Theme.mutedForeground
+                color: Theme.c.transformInspector.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 font.weight: Font.Medium

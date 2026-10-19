@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Window
 import Drift
-import "components"
-
 // What the editor's project title opens: everything that acts on the project as a whole.
 //
 // This replaces AndroidTopBar's 14-row overflow popup — a 220dp menu of unlabelled corner

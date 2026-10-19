@@ -54,15 +54,11 @@ Item {
         plan = null
     }
 
-    Rectangle {
-        anchors.fill: parent
+    PreviewDropCanvasFrame {
         visible: root.showsCanvas
-        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
-        border.width: 2
-        border.color: Theme.primary
     }
 
-    Rectangle {
+    PreviewDropClipFrame {
         readonly property real sx: root.width / Math.max(1, EditorState.projectFile.projectWidth())
         readonly property real sy: root.height / Math.max(1, EditorState.projectFile.projectHeight())
         visible: root.showsClip
@@ -71,8 +67,5 @@ Item {
         width: root.showsClip ? root.plan.width * sx : 0
         height: root.showsClip ? root.plan.height * sy : 0
         rotation: root.showsClip ? root.plan.rotation : 0
-        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
-        border.width: 2
-        border.color: Theme.primary
     }
 }

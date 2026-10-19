@@ -1,9 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-import "."
-
 // Shapes tab. Shapes used to be a page inside the Stickers tab, where they came
 // and went with the sticker addon and had no room for categories of their own.
 Item {
@@ -84,7 +81,7 @@ Item {
                       : (root.activeCategory === root.favoritesId
                          ? qsTr("No favorites yet. Star shapes to save them here.")
                          : qsTr("Nothing in this category."))
-                color: Theme.mutedForeground
+                color: Theme.c.shapesTab.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
                 wrapMode: Text.WordWrap
@@ -119,110 +116,9 @@ Item {
                 cellHeight: shapeGrid.cardSize + Theme.spacingSm + Math.ceil(labelMetrics.height) + Theme.assetCardGap
                 model: root.currentShapes
 
-                delegate: Column {
-                    id: shapeCard
-                    required property var modelData
-                    width: shapeGrid.cardSize
-                    spacing: Theme.spacingSm
-
-                    opacity: shapeDrag.active ? 0.85 : 1
-                    scale: shapeDrag.active ? 1.04 : (shapeDrag.pressed ? 0.97 : 1.0)
-
-                    Behavior on opacity {
-                        NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                    }
-                    Behavior on scale {
-                        NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                    }
-
-                    Rectangle {
-                        width: shapeGrid.cardSize
-                        height: shapeGrid.cardSize
-                        radius: Theme.radiusSm
-                        color: shapeDrag.hovered ? Theme.popoverHover : Theme.panelAccent
-                        border.width: 1
-                        border.color: shapeDrag.hovered ? Theme.accent : "transparent"
-
-                        Behavior on color {
-                            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                        }
-                        Behavior on border.color {
-                            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                        }
-
-                        // The catalog entry drawn with its real default style, so the card
-                        // shows what lands on the timeline.
-                        Image {
-                            anchors.fill: parent
-                            anchors.margins: Theme.pagePadding
-                            source: "image://shape/" + shapeCard.modelData.id
-                            sourceSize: Qt.size(shapeGrid.cardSize * 2, shapeGrid.cardSize * 2)
-                            fillMode: Image.PreserveAspectFit
-                            asynchronous: true
-                            cache: true
-                            scale: shapeDrag.pressed ? 0.94 : shapeDrag.hovered ? 1.06 : 1.0
-                            Behavior on scale {
-                                NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                            }
-                        }
-
-                        ThemedToolTip {
-                            text: qsTr("%1 — click to add, or drag to the timeline or preview").arg(shapeCard.modelData.label)
-                            visible: shapeDrag.hovered && !shapeDrag.active
-                        }
-
-                        AssetDragSource {
-                            id: shapeDrag
-                            hasContextMenu: true
-                            onContextMenuRequested: cardMenu.popup()
-                            anchors.fill: parent
-                            kind: "shape"
-                            payload: shapeCard.modelData.id
-                            label: shapeCard.modelData.label
-                            glyph: Theme.icons.shapes
-                            onTapped: {
-                                EditorState.addShapeClip(shapeCard.modelData.id, -1)
-                                root.added()
-                            }
-                        }
-
-                        ThemedContextMenu {
-                            id: cardMenu
-
-                            property bool favorited: false
-
-                            onAboutToShow: favorited = EditorState.isAssetFavorite("shapes", shapeCard.modelData.id)
-
-                            ThemedMenuItem {
-                                text: qsTr("Add at playhead")
-                                icon.name: Theme.icons.plus
-                                onTriggered: shapeDrag.tapped()
-                            }
-                            ThemedMenuItem {
-                                text: cardMenu.favorited ? qsTr("Remove from favorites") : qsTr("Add to favorites")
-                                icon.name: Theme.icons.star
-                                onTriggered: EditorState.toggleAssetFavorite("shapes", shapeCard.modelData.id)
-                            }
-                        }
-
-                        AssetFavoriteButton {
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-                            anchors.margins: 3
-                            tabId: "shapes"
-                            itemId: shapeCard.modelData.id
-                        }
-                    }
-
-                    Text {
-                        width: parent.width
-                        text: modelData.label
-                        color: Theme.mutedForeground
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeCard
-                        horizontalAlignment: Text.AlignHCenter
-                        elide: Text.ElideRight
-                    }
+                delegate: ShapePresetCard {
+                    cardSize: shapeGrid.cardSize
+                    onAdded: root.added()
                 }
             }
         }

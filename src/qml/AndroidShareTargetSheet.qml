@@ -1,7 +1,5 @@
 import QtQuick
 import Drift
-import "components"
-
 // What a share into an already-open project asks.
 //
 // Sharing a clip while the editor is up is genuinely ambiguous — it can mean "put this in what

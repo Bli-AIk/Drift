@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 Item {
     id: root
 
@@ -36,7 +34,7 @@ Item {
 
         Text {
             text: qsTr("Playback speed")
-            color: Theme.mutedForeground
+            color: Theme.c.speedFadeInspector.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -121,7 +119,7 @@ Item {
                    ? qsTr("Custom speed")
                    : (root.clipData.speed || 1).toFixed(2) + "×")
                     + (root.clipData.reverse ? qsTr(" (reversed)") : "")
-            color: Theme.mutedForeground
+            color: Theme.c.speedFadeInspector.foregroundMuted
             font.family: Theme.monoFontFamily
             font.pixelSize: Theme.fontSizeSm
         }

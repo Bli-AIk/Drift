@@ -38,85 +38,21 @@ Item {
         width: parent.width
         spacing: 0
 
-        Rectangle {
-            width: parent.width
-            height: Theme.borderWidth
-            visible: root.showSeparator
-            color: Theme.panelBorder
+        CollapsibleSectionRule {
+            shown: root.showSeparator
         }
 
-        Item {
-            id: header
-            width: parent.width
-            height: Math.max(Theme.controlHeightSm,
-                             titleLabel.implicitHeight,
-                             root.showSwitch ? 20 : 0) + Theme.spacingMd
-
-            Row {
-                id: titleRow
-                anchors.left: parent.left
-                anchors.right: root.showSwitch ? switchControl.left : parent.right
-                anchors.rightMargin: root.showSwitch ? Theme.spacingSm : 0
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: root.showSeparator ? Theme.spacingMd / 2 : 0
-                spacing: Theme.spacingSm
-
-                Item {
-                    width: root.collapsible ? 14 : 0
-                    height: 14
-                    visible: root.collapsible
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    IconGlyph {
-                        anchors.centerIn: parent
-                        glyph: root.expanded ? Theme.icons.chevronDown : Theme.icons.chevronRight
-                        iconSize: 12
-                        iconColor: Theme.mutedForeground
-                    }
-                }
-
-                Text {
-                    id: titleLabel
-                    width: Math.max(0, titleRow.width - (root.collapsible ? 14 + titleRow.spacing : 0))
-                    text: root.title
-                    elide: Text.ElideRight
-                    color: Theme.panelForeground
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeSm
-                    font.weight: Font.DemiBold
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    HoverHandler { id: titleHover }
-                    ThemedToolTip {
-                        text: root.tooltip
-                        visible: root.tooltip.length > 0 && titleHover.hovered
-                    }
-                }
-            }
-
-            MouseArea {
-                anchors.fill: titleRow
-                enabled: root.collapsible
-                cursorShape: root.collapsible ? Qt.PointingHandCursor : Qt.ArrowCursor
-                onClicked: {
-                    root.expanded = !root.expanded
-                    Haptics.detent()
-                }
-            }
-
-            ThemedSwitch {
-                id: switchControl
-                anchors.right: parent.right
-                anchors.verticalCenter: titleRow.verticalCenter
-                visible: root.showSwitch
-                checked: root.switchChecked
-                tooltip: root.switchTooltip
-                // Title already names the feature; keep only the track visible.
-                text: ""
-                width: 36
-                clip: true
-                onToggled: root.switchToggled(checked)
-            }
+        CollapsibleSectionHeader {
+            title: root.title
+            tooltip: root.tooltip
+            collapsible: root.collapsible
+            expanded: root.expanded
+            showSwitch: root.showSwitch
+            switchChecked: root.switchChecked
+            switchTooltip: root.switchTooltip
+            showSeparator: root.showSeparator
+            onExpandToggled: root.expanded = !root.expanded
+            onSwitchToggled: function(checked) { root.switchToggled(checked) }
         }
 
         Column {

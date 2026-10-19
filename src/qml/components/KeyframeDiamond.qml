@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import Drift
 
@@ -13,7 +14,7 @@ Item {
     id: root
 
     // The property's curve colour, so the switch and its curve on the strip read as one series.
-    property color accentColor: Theme.primary
+    property color accentColor: Theme.c.keyframeDiamond.accent
     property bool animated: false
     property bool keysEnabled: true
     property string tooltip: ""
@@ -25,27 +26,34 @@ Item {
     width: 12
     height: 12
 
-    Rectangle {
+    ThemeSlot {
         anchors.centerIn: parent
-        width: 9
-        height: 9
-        rotation: 45
-        radius: 2
-        color: root.live ? root.accentColor : "transparent"
-        border.width: 1.5
-        border.color: root.live
-                      ? root.accentColor
-                      : (root.animated
-                         // Switched off: a ghost of the property's own colour, so it reads as
-                         // parked rather than as never keyed.
-                         ? Qt.rgba(root.accentColor.r, root.accentColor.g, root.accentColor.b, 0.45)
-                         : Theme.mutedForeground)
+        slot: "KeyframeDiamond"
+        control: root
+        fallback: Component {
+            Rectangle {
+                width: 9
+                height: 9
+                rotation: 45
+                radius: Theme.c.keyframeDiamond.radius
+                color: root.live ? root.accentColor : "transparent"
+                border.width: Theme.c.keyframeDiamond.borderWidth
+                border.color: root.live
+                              ? root.accentColor
+                              : (root.animated
+                                 // Switched off: a ghost of the property's own colour, so it reads as
+                                 // parked rather than as never keyed.
+                                 ? Qt.rgba(root.accentColor.r, root.accentColor.g, root.accentColor.b,
+                                           Theme.c.keyframeDiamond.opacityParked)
+                                 : Theme.c.keyframeDiamond.foregroundMuted)
 
-        Behavior on color {
-            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
-        Behavior on border.color {
-            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                Behavior on color {
+                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
+                Behavior on border.color {
+                    ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                }
+            }
         }
     }
 

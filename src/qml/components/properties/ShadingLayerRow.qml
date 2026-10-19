@@ -1,7 +1,5 @@
 import QtQuick
 import Drift
-import ".."
-
 // One row of a text or shape clip's shading stack. The list is shown front-most first, so
 // `position` counts from the front while the stored order (what moveStyleLayer takes) counts
 // from the back.
@@ -59,99 +57,7 @@ Column {
                  "def": Number(row.layerData[field]) || 0, "decimals": decimals }
     }
 
-    Rectangle {
-        width: parent.width
-        height: Math.max(Theme.controlHeightSm, header.implicitHeight + 8)
-        radius: Theme.radiusSm
-        color: Theme.panelAccent
-
-        Row {
-            id: header
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.leftMargin: 2
-            anchors.rightMargin: 4
-            spacing: 2
-
-            IconButton {
-                glyph: row.expanded ? Theme.icons.chevronDown : Theme.icons.chevronRight
-                variant: "ghost"
-                buttonSize: 22
-                iconSize: 12
-                anchors.verticalCenter: parent.verticalCenter
-                tooltip: row.expanded ? qsTr("Collapse layer") : qsTr("Expand layer")
-                onClicked: row.toggleRequested()
-            }
-            IconGlyph {
-                glyph: row.kindGlyphs[row.kind] || Theme.icons.layers
-                iconSize: 12
-                iconColor: row.layerEnabled ? Theme.panelForeground : Theme.mutedForeground
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            Text {
-                text: (row.kindLabels[row.kind] || row.kind) + " · " + (row.paintLabels[row.paintKind] || row.paintKind)
-                color: row.layerEnabled ? Theme.panelForeground : Theme.mutedForeground
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSizeSm
-                font.weight: Font.Medium
-                width: Math.max(20, parent.width - 22 * 6 - 12 - 4 - parent.spacing * 7)
-                elide: Text.ElideRight
-                anchors.verticalCenter: parent.verticalCenter
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: row.toggleRequested()
-                }
-            }
-            IconButton {
-                glyph: Theme.icons.chevronUp
-                variant: "ghost"
-                buttonSize: 22
-                iconSize: 12
-                enabled: row.position > 0
-                tooltip: qsTr("Bring forward")
-                onClicked: EditorState.moveStyleLayer(EditorState.selectedTrack, EditorState.selectedClip,
-                                                     row.layerId, row.storedIndex + 1)
-            }
-            IconButton {
-                glyph: Theme.icons.chevronDown
-                variant: "ghost"
-                buttonSize: 22
-                iconSize: 12
-                enabled: row.position < row.count - 1
-                tooltip: qsTr("Send backward")
-                onClicked: EditorState.moveStyleLayer(EditorState.selectedTrack, EditorState.selectedClip,
-                                                     row.layerId, row.storedIndex - 1)
-            }
-            IconButton {
-                glyph: row.layerEnabled ? Theme.icons.eye : Theme.icons.eyeOff
-                variant: "ghost"
-                buttonSize: 22
-                iconSize: 12
-                tooltip: row.layerEnabled ? qsTr("Hide layer") : qsTr("Show layer")
-                onClicked: row.setLayer({ "enabled": !row.layerEnabled })
-            }
-            IconButton {
-                glyph: Theme.icons.copy
-                variant: "ghost"
-                buttonSize: 22
-                iconSize: 12
-                tooltip: qsTr("Duplicate layer")
-                onClicked: EditorState.duplicateStyleLayer(EditorState.selectedTrack, EditorState.selectedClip,
-                                                          row.layerId)
-            }
-            IconButton {
-                glyph: Theme.icons.x
-                variant: "ghost"
-                buttonSize: 22
-                iconSize: 12
-                tooltip: qsTr("Remove layer")
-                onClicked: EditorState.removeStyleLayer(EditorState.selectedTrack, EditorState.selectedClip,
-                                                       row.layerId)
-            }
-        }
-    }
+    ShadingLayerHeader { shading: row }
 
     Column {
         width: parent.width
@@ -179,7 +85,7 @@ Column {
                 spacing: 4
                 Text {
                     text: qsTr("Blend")
-                    color: Theme.mutedForeground
+                    color: Theme.c.shadingLayerRow.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -222,7 +128,7 @@ Column {
                 spacing: 4
                 Text {
                     text: qsTr("Placement")
-                    color: Theme.mutedForeground
+                    color: Theme.c.shadingLayerRow.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -246,7 +152,7 @@ Column {
                 spacing: 4
                 Text {
                     text: qsTr("Dash")
-                    color: Theme.mutedForeground
+                    color: Theme.c.shadingLayerRow.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -314,7 +220,7 @@ Column {
                 Text {
                     text: qsTr("Sketchy")
                     anchors.verticalCenter: parent.verticalCenter
-                    color: row.sketchy ? Theme.panelForeground : Theme.mutedForeground
+                    color: row.sketchy ? Theme.c.shadingLayerRow.foreground : Theme.c.shadingLayerRow.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                     MouseArea {
@@ -357,7 +263,7 @@ Column {
                     spacing: 4
                     Text {
                         text: qsTr("Seed")
-                        color: Theme.mutedForeground
+                        color: Theme.c.shadingLayerRow.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -384,7 +290,7 @@ Column {
             visible: row.kind === "shadow" || row.kind === "glow" || row.kind === "extrude"
             Text {
                 text: qsTr("Colour")
-                color: Theme.mutedForeground
+                color: Theme.c.shadingLayerRow.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }
@@ -465,7 +371,7 @@ Column {
                 spacing: 4
                 Text {
                     text: qsTr("Angle")
-                    color: Theme.mutedForeground
+                    color: Theme.c.shadingLayerRow.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }
@@ -497,7 +403,7 @@ Column {
                     text: qsTr("How much the extruded side fades toward black")
                     visible: darkenHover.hovered
                 }
-                color: Theme.mutedForeground
+                color: Theme.c.shadingLayerRow.foregroundMuted
                 font.pixelSize: Theme.fontSizeXs
                 font.family: Theme.fontFamily
             }

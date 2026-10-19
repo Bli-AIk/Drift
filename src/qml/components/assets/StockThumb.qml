@@ -1,8 +1,6 @@
 import QtQuick
 import QtMultimedia
 import Drift
-import ".."
-
 // One stock result as a tile: thumbnail, price and duration badges, and the download state
 // drawn over it (progress with cancel, or failure with retry). A video tile plays its preview,
 // muted, while hovered.
@@ -26,11 +24,11 @@ Rectangle {
     readonly property string kind: item.media_kind || item.type || ""
     readonly property bool isVideo: kind === "video" || kind === "greenscreen"
 
-    radius: Theme.radiusSm
-    color: Theme.panelAccent
+    radius: Theme.c.stockThumb.radius
+    color: Theme.c.stockThumb.background
     clip: true
-    border.width: current ? Theme.borderWidthFocus : 0
-    border.color: Theme.focusRing
+    border.width: current ? Theme.c.stockThumb.borderWidth : 0
+    border.color: Theme.c.stockThumb.borderFocus
 
     function formatDuration(ms) {
         const n = Number(ms)
@@ -87,15 +85,15 @@ Rectangle {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.margins: Theme.spacingSm
-        color: Theme.scrimStrong
-        radius: Theme.radiusXs
+        color: Theme.c.stockThumb.badgeBackground
+        radius: Theme.c.stockThumb.badgeRadius
         width: coinLabel.implicitWidth + Theme.spacingLg
         height: coinLabel.implicitHeight + Theme.spacingSm
         Text {
             id: coinLabel
             anchors.centerIn: parent
             text: String(root.price)
-            color: Theme.onMedia
+            color: Theme.c.stockThumb.foregroundOnMedia
             font.pixelSize: Theme.fontSizeXs
             font.family: Theme.fontFamily
         }
@@ -106,15 +104,15 @@ Rectangle {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: Theme.spacingSm
-        color: Theme.scrimStrong
-        radius: Theme.radiusXs
+        color: Theme.c.stockThumb.badgeBackground
+        radius: Theme.c.stockThumb.badgeRadius
         width: durLabel.implicitWidth + Theme.spacingLg
         height: durLabel.implicitHeight + Theme.spacingSm
         Text {
             id: durLabel
             anchors.centerIn: parent
             text: root.formatDuration(root.item.duration_ms)
-            color: Theme.onMedia
+            color: Theme.c.stockThumb.foregroundOnMedia
             font.pixelSize: Theme.fontSizeXs
             font.family: Theme.fontFamily
         }
@@ -129,7 +127,7 @@ Rectangle {
     Rectangle {
         visible: root.busy
         anchors.fill: parent
-        color: Theme.scrimStrong
+        color: Theme.c.stockThumb.scrim
 
         CircularProgress {
             anchors.centerIn: parent
@@ -137,14 +135,14 @@ Rectangle {
             value: Number(root.job.progress || 0)
             indeterminate: Number(root.job.progress || 0) <= 0
             size: Theme.spacing3xl
-            progressColor: Theme.onMedia
+            progressColor: Theme.c.stockThumb.foregroundOnMedia
         }
         IconGlyph {
             anchors.centerIn: parent
             visible: !root.compact && busyHover.hovered
             glyph: Theme.icons.x
             iconSize: Theme.iconSizeBase
-            iconColor: Theme.onMedia
+            iconColor: Theme.c.stockThumb.foregroundOnMedia
         }
         IconButton {
             anchors.right: parent.right
@@ -176,7 +174,7 @@ Rectangle {
     Rectangle {
         visible: root.job.status === "failed"
         anchors.fill: parent
-        color: Theme.scrimStrong
+        color: Theme.c.stockThumb.scrim
 
         Column {
             anchors.centerIn: parent
@@ -185,7 +183,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 glyph: Theme.icons.error
                 iconSize: Theme.iconSizeBase
-                iconColor: Theme.onMedia
+                iconColor: Theme.c.stockThumb.foregroundOnMedia
             }
             ThemedButton {
                 anchors.horizontalCenter: parent.horizontalCenter

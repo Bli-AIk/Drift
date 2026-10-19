@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import "assets"
-
 // The full Unicode emoji set, offered next to the curated sticker packs — those only cover a
 // couple of hundred glyphs. Picking one rasterises it and drops it on an image track, so from the
 // timeline's point of view it is the same thing a sticker is.
@@ -79,12 +77,7 @@ Popup {
         search.forceActiveFocus()
     }
 
-    background: Rectangle {
-        radius: Theme.radiusSm
-        color: Theme.panelBackground
-        border.width: Theme.borderWidth
-        border.color: Theme.panelBorder
-    }
+    background: EmojiPickerSurface { }
 
     contentItem: Item {
         EmptyState {
@@ -166,65 +159,25 @@ Popup {
             acceptedButtons: Theme.touchUi ? Qt.LeftButton : Qt.NoButton
             ScrollBar.vertical: AppScrollBar { }
 
-            delegate: Item {
-                id: cell
-                required property var modelData
-                width: grid.cellWidth
-                height: grid.cellHeight
-
-                Rectangle {
-                    anchors.fill: parent
-                    anchors.margins: 2
-                    radius: Theme.radiusSm
-                    color: cellDrag.hovered ? Theme.popoverHover : "transparent"
-
-                    Behavior on color {
-                        ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                    }
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: cell.modelData.emoji
-                        // The addon face, not the system one, so the grid shows what the
-                        // rasteriser will actually draw.
-                        font.family: root.fontFamily
-                        font.pixelSize: Math.round(grid.cellWidth * 0.6)
-                    }
-                }
-
-                ThemedToolTip {
-                    text: cell.modelData.name
-                    visible: cellDrag.hovered && !cellDrag.active
-                }
-
-                // Draggable on the desktop; on the phone this grid is a modal popup, which a
-                // lifted card cannot leave, so there it stays tap-to-add.
-                AssetDragSource {
-                    id: cellDrag
-                    anchors.fill: parent
-                    kind: "emoji"
-                    payload: cell.modelData.emoji
-                    label: cell.modelData.name
-                    liftEnabled: false
-                    onTapped: {
-                        EditorState.addEmojiClip(cell.modelData.emoji, cell.modelData.name, -1)
-                        root.close()
-                        root.added()
-                    }
+            delegate: EmojiGridCell {
+                fontFamily: root.fontFamily
+                cellWidth: grid.cellWidth
+                cellHeight: grid.cellHeight
+                onPicked: function(emoji, name) {
+                    EditorState.addEmojiClip(emoji, name, -1)
+                    root.close()
+                    root.added()
                 }
             }
         }
 
-        Text {
+        EmojiPickerEmptyLabel {
             anchors.top: grid.top
             anchors.left: parent.left
             anchors.right: parent.right
-            visible: root.available && root.visibleEmoji.length === 0
-            text: qsTr("No emoji match “%1”.").arg(search.text)
-            color: Theme.mutedForeground
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSizeSm
-            elide: Text.ElideRight
+            available: root.available
+            matchCount: root.visibleEmoji.length
+            query: search.text
         }
     }
 }

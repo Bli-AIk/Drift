@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // The Market's first page: CutWire's own animations, face props and 3D objects, one shelf per
 // category in the order editors reach for them. Typing in the Market field filters these
 // locally and offers the stock sources underneath, so a search never dead-ends here.
@@ -158,7 +156,7 @@ Item {
                     spacing: Theme.spacingXl
                     Repeater {
                         model: 4
-                        delegate: SkeletonBox { width: root.previewHeight * 1.6; height: root.previewHeight; radius: Theme.radiusMd }
+                        delegate: SkeletonBox { width: root.previewHeight * 1.6; height: root.previewHeight; radius: Theme.c.driftAssetsHome.skeletonRadius }
                     }
                 }
             }
@@ -225,7 +223,7 @@ Item {
                 Text {
                     id: shelfTitle
                     text: shelf.modelData.label
-                    color: Theme.panelForeground
+                    color: Theme.c.driftAssetsHome.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeBase
                     font.weight: Font.DemiBold
@@ -236,7 +234,7 @@ Item {
                     anchors.verticalCenter: shelfTitle.verticalCenter
                     visible: shelfRow.contentWidth > shelfRow.width
                     text: qsTr("See all")
-                    color: seeAllHover.hovered ? Theme.panelForeground : Theme.mutedForeground
+                    color: seeAllHover.hovered ? Theme.c.driftAssetsHome.foregroundHover : Theme.c.driftAssetsHome.foregroundMuted
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                     HoverHandler { id: seeAllHover; cursorShape: Qt.PointingHandCursor }
@@ -293,7 +291,7 @@ Item {
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.categoryLabel(root.openCategory)
-                color: Theme.panelForeground
+                color: Theme.c.driftAssetsHome.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeBase
                 font.weight: Font.DemiBold
@@ -361,7 +359,7 @@ Item {
                 width: parent.width
                 visible: root.searchResults.length === 0
                 text: qsTr("No Drift Assets match “%1”.").arg(root.query)
-                color: Theme.mutedForeground
+                color: Theme.c.driftAssetsHome.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSm
                 wrapMode: Text.WordWrap
@@ -400,8 +398,8 @@ Item {
                         required property var modelData
                         width: parent.width
                         height: Theme.touchUi ? Theme.androidMinTouchTarget : Theme.controlHeight + Theme.spacingSm
-                        radius: Theme.radiusSm
-                        color: rowHover.hovered ? Theme.popoverHover : "transparent"
+                        radius: Theme.c.driftAssetsHome.rowRadius
+                        color: rowHover.hovered ? Theme.c.driftAssetsHome.rowBackgroundHover : "transparent"
 
                         IconGlyph {
                             id: rowGlyph
@@ -410,7 +408,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             glyph: Theme.icons.search
                             iconSize: Theme.iconSizeMd
-                            iconColor: Theme.mutedForeground
+                            iconColor: Theme.c.driftAssetsHome.icon
                         }
                         Text {
                             anchors.left: rowGlyph.right
@@ -418,7 +416,7 @@ Item {
                             anchors.leftMargin: Theme.spacingLg
                             anchors.verticalCenter: parent.verticalCenter
                             text: qsTr("Search %1 for “%2”").arg(String(modelData.label).toLowerCase()).arg(root.query)
-                            color: Theme.panelForeground
+                            color: Theme.c.driftAssetsHome.foreground
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSizeSm
                             elide: Text.ElideRight
@@ -430,7 +428,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             glyph: Theme.icons.chevronRight
                             iconSize: Theme.iconSizeMd
-                            iconColor: Theme.mutedForeground
+                            iconColor: Theme.c.driftAssetsHome.icon
                         }
                         HoverHandler { id: rowHover; cursorShape: Qt.PointingHandCursor }
                         TapHandler { onTapped: root.searchStockRequested(modelData.id) }
@@ -446,7 +444,7 @@ Item {
     // Phone: a bottom sheet over a scrim.
     Rectangle {
         anchors.fill: parent
-        color: Theme.scrimColor
+        color: Theme.c.driftAssetsHome.scrim
         visible: root.compact && opacity > 0
         opacity: root.detailShown ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: Theme.durationSlow; easing.type: Theme.easing } }
@@ -466,7 +464,7 @@ Item {
         x: root.compact ? 0 : (root.detailShown ? 0 : parent.width)
         y: root.compact ? (root.detailShown ? parent.height - height : parent.height) : 0
         visible: root.compact ? y < parent.height : x < parent.width
-        radius: root.compact ? Theme.radiusLg : 0
+        radius: root.compact ? Theme.c.driftAssetsHome.sheetRadius : 0
         compact: root.compact
         asset: root.detailAsset
         categoryLabel: root.categoryLabel(root.detailAsset.category || "")

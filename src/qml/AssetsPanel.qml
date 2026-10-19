@@ -3,9 +3,6 @@ import QtQuick.Controls.Basic
 import QtQuick.Window
 import QtQuick.Dialogs
 import Drift
-import "components"
-import "components/assets"
-
 PanelFrame {
     id: root
 
@@ -17,9 +14,28 @@ PanelFrame {
     // on the timeline. The phone shell closes the sheet on this; desktop, where
     // the panel is docked, simply leaves it unconnected.
     signal addCompleted()
-    border.width: sheetMode ? 0 : 1
-    radius: sheetMode ? 0 : Theme.radiusSm
-    color: sheetMode ? "transparent" : Theme.panelBackground
+    // The slot paints the docked surface. Sheet mode draws nothing so the
+    // sheet chrome stays the only background.
+    color: "transparent"
+    border.width: 0
+    radius: sheetMode ? 0 : Theme.c.assetsPanel.radius
+
+    ThemeSlot {
+        anchors.fill: parent
+        visible: !root.sheetMode
+        z: -1
+        slot: "AssetsPanelBackground"
+        control: root
+        fallback: Component {
+            Rectangle {
+                anchors.fill: parent
+                radius: Theme.c.assetsPanel.radius
+                color: Theme.c.assetsPanel.background
+                border.width: Theme.c.assetsPanel.borderWidth
+                border.color: Theme.c.assetsPanel.border
+            }
+        }
+    }
 
     Component.onCompleted: AssetLibrary.ensureAllMedia()
 
@@ -393,16 +409,16 @@ PanelFrame {
             Rectangle {
                 width: parent.width
                 height: Math.min(pickerList.contentHeight + 2, 280)
-                radius: Theme.radiusSm
-                color: Theme.appBackground
-                border.width: Theme.borderWidth
-                border.color: Theme.panelBorder
+                radius: Theme.c.assetsPanel.pickerRadius
+                color: Theme.c.assetsPanel.pickerBackground
+                border.width: Theme.c.assetsPanel.pickerBorderWidth
+                border.color: Theme.c.assetsPanel.pickerBorder
                 clip: true
 
                 ListView {
                     id: pickerList
                     anchors.fill: parent
-                    anchors.margins: 1
+                    anchors.margins: Theme.c.assetsPanel.pickerBorderWidth
                     clip: true
                     model: folderPickerDialog.folderOptions
                     interactive: contentHeight > height
@@ -421,7 +437,7 @@ PanelFrame {
                         }
 
                         background: Rectangle {
-                            color: optionRow.hovered ? Theme.popoverHover : "transparent"
+                            color: optionRow.hovered ? Theme.c.assetsPanel.optionBackgroundHover : "transparent"
                         }
 
                         contentItem: Text {
@@ -431,7 +447,7 @@ PanelFrame {
                             verticalAlignment: Text.AlignVCenter
                             text: optionRow.modelData.path
                             elide: Text.ElideRight
-                            color: Theme.panelForeground
+                            color: Theme.c.assetsPanel.optionForeground
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSizeSm
                         }
@@ -519,9 +535,9 @@ PanelFrame {
                 readOnly: true
                 selectByMouse: true
                 wrapMode: TextEdit.Wrap
-                color: Theme.foreground
-                selectionColor: Theme.primary
-                selectedTextColor: Theme.primaryForeground
+                color: Theme.c.assetsPanel.fallbackForeground
+                selectionColor: Theme.c.assetsPanel.fallbackSelection
+                selectedTextColor: Theme.c.assetsPanel.fallbackSelectionForeground
                 font.family: Theme.monoFontFamily
                 font.pixelSize: Theme.fontSizeSm
                 text: proxyFallbackDialog.folders
@@ -814,153 +830,43 @@ PanelFrame {
         }
     }
 
-    // Drag feedback. Dropping files onto the panel used to give no visual
-    // confirmation that it was even a valid target.
-    Rectangle {
-        anchors.fill: parent
-        z: 50
-        radius: Theme.radiusMd
-        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
-        border.width: Theme.borderWidthFocus
-        border.color: Theme.primary
-        visible: opacity > 0
-        opacity: assetDropArea.containsDrag ? 1 : 0
-
-        Behavior on opacity {
-            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
-
-        EmptyState {
-            anchors.centerIn: parent
-            glyph: Theme.icons.upload
-            title: qsTr("Drop to import")
-            hint: qsTr("Video, audio and image files")
-        }
+    AssetsPanelDropOverlay {
+        active: assetDropArea.containsDrag
     }
 
-    // Import progress. Probing and thumbnailing a large selection blocks for a
-    // while; the panel used to simply appear frozen.
-    Rectangle {
-        anchors.fill: parent
-        z: 60
-        color: Theme.panelBackground
-        opacity: root.importing ? 0.92 : 0
-        visible: opacity > 0
-
-        Behavior on opacity {
-            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-        }
-
-        EmptyState {
-            anchors.centerIn: parent
-            glyph: Theme.icons.spinner
-            glyphSpinning: root.importing
-            title: qsTr("Importing…")
-            hint: qsTr("Reading media and generating thumbnails.")
-        }
+    AssetsPanelImportOverlay {
+        active: root.importing
     }
 
     Row {
         anchors.fill: parent
         spacing: 0
 
-        // Vertical tab rail. Up/Down move between tabs once it has focus.
-        // Flickable so short panel heights can still reach lower icons.
-        // Hidden in sheetMode — AndroidBottomRail drives showTab() instead.
-        Flickable {
+        AssetsPanelTabRail {
             id: tabRail
-            width: root.sheetMode ? 0 : Theme.tabRailWidth
-            height: parent.height
-            visible: !root.sheetMode
-            contentWidth: width
-            contentHeight: tabRailColumn.height
-            clip: true
-            boundsBehavior: Flickable.StopAtBounds
-            interactive: contentHeight > height
-            ScrollBar.vertical: AppScrollBar {
-                policy: tabRail.contentHeight > tabRail.height
-                        ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
-            }
-
-            Accessible.role: Accessible.PageTabList
-
-            Keys.onUpPressed: function(event) {
-                root.activeTab = (root.activeTab - 1 + tabsModel.count) % tabsModel.count
-                event.accepted = true
-            }
-            Keys.onDownPressed: function(event) {
-                root.activeTab = (root.activeTab + 1) % tabsModel.count
-                event.accepted = true
-            }
-
-            Column {
-                id: tabRailColumn
-                width: parent.width
-                topPadding: Theme.spacingSm
-                spacing: Theme.spacingXs
-
-                Repeater {
-                    model: tabsModel
-                    delegate: Column {
-                        required property int index
-                        required property var model
-
-                        width: parent.width
-                        spacing: 0
-
-                        IconButton {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            glyph: root.tabIcons[model.icon]
-                            variant: "ghost"
-                            tooltip: tabLabels[model.tabId]
-                            active: root.activeTab === index
-                            onClicked: root.activeTab = index
-
-                            Accessible.role: Accessible.PageTab
-                            Accessible.name: tabLabels[model.tabId]
-                            Accessible.checked: root.activeTab === index
-                        }
-
-                        // Group divider — sits in the rail gap so related tabs
-                        // cluster and prefs stay visually apart from content.
-                        Item {
-                            visible: model.separatorAfter
-                            width: parent.width
-                            height: visible ? Theme.spacingLg + Theme.borderWidth : 0
-
-                            Rectangle {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: Theme.iconSizeSm
-                                height: Theme.borderWidth
-                                radius: height / 2
-                                color: Theme.panelBorder
-                                opacity: 0.85
-                            }
-                        }
-                    }
-                }
-            }
+            sheetMode: root.sheetMode
+            activeTab: root.activeTab
+            tabCount: tabsModel.count
+            tabLabels: root.tabLabels
+            tabIcons: root.tabIcons
+            tabs: tabsModel
+            onTabSelected: (index) => root.activeTab = index
         }
 
         Rectangle {
-            width: root.sheetMode ? 0 : Theme.borderWidth
+            width: root.sheetMode ? 0 : Theme.c.assetsPanel.borderWidth
             height: parent.height
             visible: !root.sheetMode
-            color: Theme.panelBorder
+            color: Theme.c.assetsPanel.railBorder
         }
 
         Column {
             id: assetsContent
-            width: parent.width - (root.sheetMode ? 0 : (Theme.tabRailWidth + Theme.borderWidth))
+            width: parent.width - (root.sheetMode ? 0 : (Theme.tabRailWidth + Theme.c.assetsPanel.borderWidth))
             height: parent.height
 
-            Rectangle {
+            AssetsPanelHeader {
                 id: assetsHeader
-                // In a sheet the title is the sheet's own, so this bar only earns its height when
-                // the tab has actions to put in it (media import); otherwise it was an empty band
-                // between the sheet title and the content. The catalog tabs never show it: their
-                // search field names the tab and carries its actions.
                 readonly property string tabId: tabsModel.get(root.activeTab).tabId
                 readonly property bool hasActions: kindsForTab(tabId).length > 0
                 readonly property bool searchBarTab: ["text", "stickers", "shapes", "effects", "templates",
@@ -968,140 +874,14 @@ PanelFrame {
                 width: parent.width
                 height: searchBarTab || (root.sheetMode && !hasActions) ? 0 : Theme.panelHeaderHeight
                 visible: height > 0
-                // Matches the surrounding PanelFrame; it used to paint the app
-                // background, so the header read as a different surface than the
-                // panel it belongs to.
-                color: Theme.panelBackground
-
-                Rectangle {
-                    anchors.bottom: parent.bottom
-                    width: parent.width
-                    height: Theme.borderWidth
-                    color: Theme.panelBorder
-                }
-
-                Text {
-                    anchors.left: parent.left
-                    anchors.leftMargin: Theme.pagePadding
-                    anchors.verticalCenter: parent.verticalCenter
-                    // Sheet chrome already shows the tab title.
-                    visible: !root.sheetMode
-                    text: tabLabels[tabsModel.get(root.activeTab).tabId]
-                    color: Theme.mutedForeground
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeSm
-                }
-
-                Row {
-                    anchors.right: parent.right
-                    anchors.rightMargin: 8
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 6
-                    visible: kindsForTab(tabsModel.get(root.activeTab).tabId).length > 0
-
-                    ThemedButton {
-                        text: qsTr("New Folder")
-                        variant: "ghost"
-                        glyph: Theme.icons.folder
-                        tooltip: qsTr("Create a new folder here")
-                        anchors.verticalCenter: parent.verticalCenter
-                        onClicked: newFolderDialog.open()
-                    }
-
-                    // Split button: the left half imports files, the chevron opens the
-                    // folder variant. Both halves share one bordered box so the header
-                    // reads as two actions, not three competing buttons.
-                    Rectangle {
-                        id: importSplit
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: importFilesHalf.width
-                               + (importMenuHalf.visible ? importSplitDivider.width + importMenuHalf.width : 0)
-                        height: Theme.controlHeight
-                        radius: Theme.radiusSm
-                        color: "transparent"
-                        border.width: Theme.borderWidth
-                        border.color: Theme.panelBorder
-                        opacity: root.importing ? 0.6 : 1
-
-                        Row {
-                            anchors.fill: parent
-                            spacing: 0
-
-                            ThemedButton {
-                                id: importFilesHalf
-                                text: qsTr("Import")
-                                variant: "ghost"
-                                flat: true
-                                radius: Theme.radiusXs
-                                glyph: Theme.icons.upload
-                                tooltip: qsTr("Import video, audio or image files")
-                                enabled: !root.importing
-                                height: parent.height - Theme.borderWidth * 2
-                                anchors.verticalCenter: parent.verticalCenter
-                                onClicked: root.importMedia()
-                            }
-
-                            Rectangle {
-                                id: importSplitDivider
-                                width: Theme.borderWidth
-                                height: parent.height - Theme.spacingLg
-                                anchors.verticalCenter: parent.verticalCenter
-                                color: Theme.panelBorder
-                                visible: importMenuHalf.visible
-                            }
-
-                            ThemedButton {
-                                id: importMenuHalf
-                                variant: "ghost"
-                                flat: true
-                                radius: Theme.radiusXs
-                                glyph: Theme.icons.chevronDown
-                                glyphSize: Theme.iconSizeSm
-                                leftPadding: Theme.spacingLg
-                                rightPadding: Theme.spacingLg
-                                tooltip: qsTr("More import options")
-                                enabled: !root.importing
-                                visible: !Theme.touchUi
-                                height: parent.height - Theme.borderWidth * 2
-                                anchors.verticalCenter: parent.verticalCenter
-                                onClicked: importMenu.popup(0, importSplit.height + Theme.spacingSm)
-                            }
-                        }
-
-                        ThemedContextMenu {
-                            id: importMenu
-                            implicitWidth: 220
-
-                            ThemedMenuItem {
-                                text: qsTr("Import Files…")
-                                icon.name: Theme.icons.upload
-                                onTriggered: root.importMedia()
-                            }
-
-                            ThemedMenuItem {
-                                visible: FileDialogs.supportsDirectoryPicker()
-                                height: visible ? implicitHeight : 0
-                                text: qsTr("Import Folder…")
-                                icon.name: Theme.icons.folderInput
-                                onTriggered: root.importFolder()
-                            }
-
-                            ThemedMenuSeparator {
-                                visible: FileDialogs.supportsDirectoryPicker()
-                                height: visible ? implicitHeight : 0
-                            }
-
-                            ThemedMenuItem {
-                                visible: FileDialogs.supportsDirectoryPicker()
-                                height: visible ? implicitHeight : 0
-                                text: qsTr("Collect Media to Folder…")
-                                icon.name: Theme.icons.folderOutput
-                                enabled: !EditorState.projectFile.collectingMedia
-                                onTriggered: root.collectMedia()
-                            }
-                        }
-                    }
-                }
+                title: tabLabels[tabId]
+                showTitle: !root.sheetMode
+                showActions: hasActions
+                importing: root.importing
+                onNewFolderRequested: newFolderDialog.open()
+                onImportFilesRequested: root.importMedia()
+                onImportFolderRequested: root.importFolder()
+                onCollectMediaRequested: root.collectMedia()
             }
 
             EmojiPicker {

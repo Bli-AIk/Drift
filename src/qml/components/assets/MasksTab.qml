@@ -3,9 +3,6 @@ import QtQuick.Controls.Basic
 import QtQuick.Shapes
 import QtQuick.Window
 import Drift
-import ".."
-import "."
-
 // Masks tab. A mask is a Mask-kind adjustment clip on a nested lane, so adding one is the same
 // gesture as adding an effect: drag a card onto a clip, or onto empty track space to mask
 // everything that track shows over that span. Editing one is what the properties panel is for,
@@ -62,7 +59,7 @@ Item {
             text: root.hasVisualSelection
                   ? qsTr("Click to apply to the selection, or drag onto a clip")
                   : qsTr("Select a clip, or drag a mask onto one")
-            color: Theme.mutedForeground
+            color: Theme.c.masksTab.foregroundMuted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
         }
@@ -100,7 +97,7 @@ Item {
             Text {
                 width: parent.width
                 text: qsTr("Subject")
-                color: Theme.mutedForeground
+                color: Theme.c.masksTab.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
             }
@@ -193,113 +190,10 @@ Item {
 
                 Repeater {
                     model: root.masks
-                    delegate: Column {
-                        id: maskCard
-                        required property var modelData
-                        width: maskGrid.cardSize
-                        spacing: Theme.spacingSm
-
-                        // Lift on grab: the card dims and grows slightly, so it reads as picked
-                        // up rather than merely faded.
-                        opacity: maskDrag.active ? 0.85 : 1
-                        scale: maskDrag.active ? 1.04 : (maskDrag.pressed ? 0.97 : 1.0)
-
-                        Behavior on opacity {
-                            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                        }
-                        Behavior on scale {
-                            NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                        }
-
-                        Rectangle {
-                            width: maskGrid.cardSize
-                            height: maskGrid.cardSize
-                            radius: Theme.radiusSm
-                            color: maskDrag.hovered ? Theme.popoverHover : Theme.panelAccent
-                            border.width: maskDrag.active ? 1 : 0
-                            border.color: Theme.primary
-                            clip: true
-
-                            Behavior on color {
-                                ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                            }
-                            Behavior on border.width {
-                                NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                            }
-
-                            // The coverage the mask actually produces, drawn from the same path
-                            // the compositor rasterizes: white shows through, the rest is cut.
-                            Item {
-                                anchors.fill: parent
-                                anchors.margins: Theme.spacingSm
-
-                                readonly property real side: Math.min(width, height)
-
-                                Item {
-                                    width: 100
-                                    height: 100
-                                    anchors.centerIn: parent
-                                    scale: parent.side / 100
-
-                                    Shape {
-                                        anchors.fill: parent
-                                        antialiasing: true
-
-                                        ShapePath {
-                                            strokeColor: Theme.onMedia
-                                            strokeWidth: 1
-                                            fillColor: Theme.clipAdjustmentMask
-                                            PathSvg { path: EditorState.maskShapeSvgPath(maskCard.modelData.id) }
-                                        }
-                                    }
-                                }
-                            }
-
-                            ThemedToolTip {
-                                text: root.hasVisualSelection
-                                      ? qsTr("%1 — click to apply, or drag onto a clip").arg(maskCard.modelData.label)
-                                      : qsTr("%1 — drag onto a clip").arg(maskCard.modelData.label)
-                                visible: maskDrag.hovered && !maskDrag.active
-                            }
-
-                            AssetDragSource {
-                                id: maskDrag
-                                hasContextMenu: true
-                                onContextMenuRequested: cardMenu.popup()
-                                anchors.fill: parent
-                                kind: "mask"
-                                payload: maskCard.modelData.id
-                                label: maskCard.modelData.label
-                                glyph: Theme.icons.mask
-                                onTapped: {
-                                    if (root.hasVisualSelection)
-                                        root.applyMask(maskCard.modelData.id)
-                                    else
-                                        Toasts.info(qsTr("Select a clip first, or drag the mask onto one"))
-                                }
-                            }
-
-                            ThemedContextMenu {
-                                id: cardMenu
-
-                                ThemedMenuItem {
-                                    text: qsTr("Apply to selected clip")
-                                    icon.name: Theme.icons.plus
-                                    enabled: root.hasVisualSelection
-                                    onTriggered: maskDrag.tapped()
-                                }
-                            }
-                        }
-
-                        Text {
-                            width: parent.width
-                            text: maskCard.modelData.label
-                            color: Theme.mutedForeground
-                            font.family: Theme.fontFamily
-                            font.pixelSize: Theme.fontSizeCard
-                            horizontalAlignment: Text.AlignHCenter
-                            elide: Text.ElideRight
-                        }
+                    delegate: MaskPresetCard {
+                        cardSize: maskGrid.cardSize
+                        hasVisualSelection: root.hasVisualSelection
+                        onApplyRequested: (maskId) => root.applyMask(maskId)
                     }
                 }
             }

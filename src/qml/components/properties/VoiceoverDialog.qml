@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // Speaks every caption of the selected subtitle clip and lays the lines out on new audio tracks.
 ThemedDialog {
     id: root

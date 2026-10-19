@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // Shortcuts tab. Split out of Settings, which had grown long
 // enough that the binding list was permanently below the fold.
 Item {
@@ -59,7 +57,7 @@ Item {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: qsTr("Click a shortcut, then press the keys. Esc cancels, Backspace clears.")
-                color: Theme.mutedForeground
+                color: Theme.c.shortcutsTab.foregroundMuted
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeXs
                 bottomPadding: Theme.spacingSm
@@ -84,29 +82,7 @@ Item {
             }
         }
 
-        delegate: Row {
-            required property var modelData
-            x: Theme.pagePadding
-            width: shortcutList.width - Theme.pagePadding * 2
-            spacing: Theme.spacingLg
-
-            ListView.onPooled: captureField.capturing = false
-
-            Text {
-                width: Math.max(90, parent.width - 128)
-                text: modelData.label
-                color: Theme.panelForeground
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSizeXs
-                wrapMode: Text.WordWrap
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            ShortcutCaptureField {
-                id: captureField
-                width: 120
-                actionId: modelData.id
-                shortcut: modelData.shortcut
-            }
+        delegate: ShortcutsBindingRow {
         }
 
         // Clearing a binding persists the empty string, so without this there was

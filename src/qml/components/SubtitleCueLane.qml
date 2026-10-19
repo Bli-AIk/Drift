@@ -151,46 +151,17 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.panelBackground
-        border.width: 1
-        border.color: Theme.panelBorder
+        color: Theme.c.subtitleCueLane.background
+        border.width: Theme.c.subtitleCueLane.borderWidth
+        border.color: Theme.c.subtitleCueLane.border
     }
 
     Row {
         anchors.fill: parent
 
         // Left gutter — matches track-label width so the lane lines up with the tracks.
-        Item {
-            width: root.labelsWidth
-            height: parent.height
-
-            Column {
-                anchors.fill: parent
-                anchors.margins: 6
-                spacing: 2
-
-                Text {
-                    text: qsTr("Subtitles")
-                    color: Theme.mutedForeground
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeXs
-                    font.weight: Font.Medium
-                }
-                Text {
-                    text: qsTr("%n captions", "", root.cues.length)
-                    color: Theme.mutedForeground
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeXs
-                    opacity: 0.8
-                }
-            }
-
-            Rectangle {
-                anchors.right: parent.right
-                width: 1
-                height: parent.height
-                color: Theme.panelBorder
-            }
+        SubtitleCueGutter {
+            lane: root
         }
 
         // Timeline-aligned viewport (scrolls with the tracks below).
@@ -207,329 +178,27 @@ Item {
                 height: parent.height
 
                 // Clip span backdrop.
-                Rectangle {
-                    x: root.xForSeconds(0)
-                    width: Math.max(2, root.clipDuration * root.pxPerSecond)
-                    height: parent.height
-                    color: Theme.panelAccent
-                    opacity: 0.4
+                SubtitleCueSpan {
+                    lane: root
                 }
 
                 // Voice waveform of mixed video/audio timeline audio — positioned and
                 // scaled from A/V clips only, so subtitle trim/move does not reshape it.
-                Canvas {
-                    id: voiceWaveform
-                    readonly property real rangeX0: root.mediaWaveformRange.start * root.pxPerSecond
-                    readonly property real rangeX1: (root.mediaWaveformRange.start
-                                                     + root.mediaWaveformRange.duration) * root.pxPerSecond
-                    readonly property real windowX0: Math.max(rangeX0, root.paintOriginX)
-                    readonly property real windowX1: Math.min(rangeX1, root.paintOriginX + viewport.width
-                                                                       + 2 * root.paintChunk)
-                    x: windowX0
-                    width: Math.max(2, windowX1 - windowX0)
-                    height: parent.height
-                    visible: root.mediaWaveformRange.duration > 0 && windowX1 > windowX0
-                    opacity: 0.75
-                    z: 1
-
-                    readonly property real waveStart: windowX0 / root.pxPerSecond
-                    readonly property real waveDuration: Math.max(0, windowX1 - windowX0) / root.pxPerSecond
-                    // One peak bucket per screen pixel (rounded to 64) so zoom keeps
-                    // column resolution instead of stretching a fixed 240-peak list.
-                    readonly property int peakCount: {
-                        var w = Math.max(1, Math.ceil(width))
-                        return Math.min(8192, Math.max(64, Math.ceil(w / 64) * 64))
-                    }
-
-                    // Asking for these mixes every A/V clip on the timeline, so it must not
-                    // happen until the lane is actually open — bindings evaluate while the
-                    // lane is hidden too, which meant dropping a long clip paid for the whole
-                    // mix with nothing on screen to show for it.
-                    property var peaks: {
-                        void EditorState.tracksRevision
-                        void root.waveformRevision
-                        return (root.visible && waveDuration > 0)
-                            ? EditorState.subtitleWaveformPeaks(waveStart, waveDuration, peakCount)
-                            : []
-                    }
-                    onPeaksChanged: requestPaint()
-                    onWidthChanged: requestPaint()
-                    onHeightChanged: requestPaint()
-                    onWaveStartChanged: requestPaint()
-                    onWaveDurationChanged: requestPaint()
-                    onPeakCountChanged: requestPaint()
-
-                    Connections {
-                        target: EditorState
-                        function onSubtitleWaveformReady(s, d, n) {
-                            if (Math.abs(s - voiceWaveform.waveStart) < 1e-6
-                                && Math.abs(d - voiceWaveform.waveDuration) < 1e-6
-                                && n === voiceWaveform.peakCount)
-                                root.waveformRevision++
-                        }
-                    }
-
-                    onPaint: {
-                        var ctx = getContext("2d");
-                        ctx.clearRect(0, 0, width, height);
-                        if (!peaks || peaks.length === 0)
-                            return;
-                        // One filled column per screen pixel so bars stay contiguous at any zoom.
-                        ctx.fillStyle = Theme.panelWaveformColor;
-                        var mid = height / 2;
-                        var w = Math.max(1, Math.floor(width));
-                        var n = peaks.length;
-                        for (var x = 0; x < w; x++) {
-                            var i0 = Math.floor(x * n / w);
-                            var i1 = Math.floor((x + 1) * n / w);
-                            if (i1 <= i0)
-                                i1 = Math.min(n, i0 + 1);
-                            var peak = 0;
-                            for (var i = i0; i < i1; i++) {
-                                if (peaks[i] > peak)
-                                    peak = peaks[i];
-                            }
-                            var amp = peak * mid * 0.9;
-                            if (amp > 0.5)
-                                ctx.fillRect(x, mid - amp, 1, amp * 2);
-                        }
-                    }
+                SubtitleCueWaveform {
+                    lane: root
+                    viewItem: viewport
                 }
 
                 // Playhead line, aligned with the timeline playhead.
-                Rectangle {
-                    x: root.xForSeconds(EditorState.playheadSeconds - root.clipStart) - Theme.playheadLineWidth / 2
-                    width: Theme.playheadLineWidth
-                    height: parent.height
-                    color: Theme.primary
-                    z: 50
+                SubtitleCuePlayhead {
+                    lane: root
                 }
 
                 Repeater {
                     model: root.displayCues
 
-                    delegate: Rectangle {
-                        id: block
-                        required property int index
-                        required property var modelData
-
-                        readonly property bool isSelected: index === EditorState.selectedSubtitleCue
-                        readonly property bool isActive: index === root.activeCueIndex
-                        readonly property real gripW: Math.min(8, Math.max(3, width / 4))
-                        // A finger cannot land on an 8px grip, so touch gets a 24px hit area centred
-                        // on the edge. Below three of them the cue has no body left to drag, so the
-                        // edges take the outer thirds, inside the block, and the middle stays the body.
-                        readonly property bool narrowTouch: Theme.touchInput && width < 72
-                        readonly property real edgeHitW: !Theme.touchInput ? gripW
-                                                         : (narrowTouch ? width / 3 : 24)
-                        readonly property real bodyInset: !Theme.touchInput ? gripW
-                                                          : (narrowTouch ? width / 3 : 12)
-
-                        property bool dragging: false
-                        property real dragX: 0
-                        property real dragW: 0
-                        property real editStart: 0
-                        property real editEnd: 0
-
-                        height: parent.height - 16
-                        anchors.verticalCenter: parent.verticalCenter
-                        x: dragging ? dragX : root.xForSeconds(modelData.start)
-                        width: Math.max(3, dragging ? dragW
-                                                     : (modelData.end - modelData.start) * root.pxPerSecond)
-                        radius: Theme.radiusSm
-                        color: isSelected ? Theme.clipSubtitle
-                                          : (isActive ? Qt.lighter(Theme.clipSubtitle, 1.15) : Theme.clipSubtitle)
-                        opacity: isSelected ? 1.0 : (isActive ? 0.85 : 0.5)
-                        border.width: isSelected ? 2 : 0
-                        border.color: Theme.primary
-                        z: isSelected ? 20 : 10
-
-                        Behavior on opacity { NumberAnimation { duration: 120 } }
-
-                        function startEdit() {
-                            editStart = modelData.start
-                            editEnd = modelData.end
-                            dragX = root.xForSeconds(editStart)
-                            dragW = (editEnd - editStart) * root.pxPerSecond
-                            dragging = true
-                            root.beginDrag()
-                        }
-                        function select() {
-                            EditorState.selectedSubtitleCue = index
-                            root.cueTapped(index)
-                        }
-                        function moveBy(dx) {
-                            const d = editEnd - editStart
-                            const raw = editStart + dx / root.pxPerSecond
-                            const targets = root.snapTargets(index)
-                            const snS = root.snap(raw, targets)
-                            const snE = root.snap(raw + d, targets) - d
-                            let ns = Math.abs(snS - raw) <= Math.abs(snE - raw) ? snS : snE
-                            ns = root.clampVal(ns, root.loBound(index), root.hiBound(index) - d)
-                            dragX = root.xForSeconds(ns)
-                            root.commitCue(index, ns, ns + d)
-                        }
-                        function finishEdit() {
-                            dragging = false
-                            root.endDrag()
-                            EditorState.commitPreviewDrag()
-                        }
-
-                        Text {
-                            anchors.fill: parent
-                            anchors.leftMargin: 6
-                            anchors.rightMargin: 6
-                            verticalAlignment: Text.AlignVCenter
-                            elide: Text.ElideRight
-                            text: (block.modelData.text && block.modelData.text.length)
-                                  ? block.modelData.text : qsTr("(empty)")
-                            color: Theme.onMedia
-                            font.family: Theme.fontFamily
-                            font.pixelSize: Theme.fontSizeXs
-                            font.italic: !(block.modelData.text && block.modelData.text.length)
-                        }
-
-                        // Body: click to select, drag to move (keeps duration).
-                        Item {
-                            anchors.fill: parent
-                            anchors.leftMargin: block.bodyInset
-                            anchors.rightMargin: block.bodyInset
-
-                            HoverHandler { cursorShape: Qt.OpenHandCursor }
-                            TapHandler {
-                                // Finger taps land on touchMove below, which takes the press.
-                                acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
-                                                 | PointerDevice.Stylus
-                                onTapped: block.select()
-                            }
-                            DragHandler {
-                                target: null
-                                acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
-                                                 | PointerDevice.Stylus
-                                xAxis.enabled: true
-                                yAxis.enabled: false
-                                onActiveChanged: {
-                                    if (active)
-                                        block.startEdit()
-                                    else
-                                        block.finishEdit()
-                                }
-                                onTranslationChanged: block.moveBy(translation.x)
-                            }
-
-                            // Touchscreen: a finger on the lane pans it, so a cue only
-                            // moves after a hold. Mouse presses are rejected for the DragHandler.
-                            MouseArea {
-                                id: touchMove
-                                anchors.fill: parent
-                                pressAndHoldInterval: Theme.touchLiftInterval
-                                preventStealing: armed
-                                property bool armed: false
-                                property real originX
-                                onPressed: (mouse) => {
-                                    if (mouse.source === Qt.MouseEventNotSynthesized) {
-                                        mouse.accepted = false
-                                        return
-                                    }
-                                    armed = false
-                                }
-                                onPressAndHold: (mouse) => {
-                                    originX = mapToItem(null, mouse.x, 0).x
-                                    armed = true
-                                    Haptics.pickUp()
-                                    block.startEdit()
-                                }
-                                onPositionChanged: (mouse) => {
-                                    if (armed)
-                                        block.moveBy(mapToItem(null, mouse.x, 0).x - originX)
-                                }
-                                onClicked: block.select()
-                                onReleased: finish()
-                                onCanceled: finish()
-                                function finish() {
-                                    if (!armed)
-                                        return
-                                    armed = false
-                                    block.finishEdit()
-                                }
-                            }
-                        }
-
-                        // Left edge: resize start.
-                        Rectangle {
-                            anchors.left: parent.left
-                            width: block.gripW
-                            height: parent.height
-                            color: block.isSelected ? Theme.primary : "transparent"
-                            opacity: 0.6
-                        }
-                        Item {
-                            x: (Theme.touchInput && !block.narrowTouch) ? -block.edgeHitW / 2 : 0
-                            width: block.edgeHitW
-                            height: parent.height
-                            HoverHandler { cursorShape: Qt.SizeHorCursor }
-                            DragHandler {
-                                target: null
-                                acceptedDevices: block.isSelected
-                                    ? PointerDevice.AllDevices
-                                    : PointerDevice.Mouse | PointerDevice.TouchPad | PointerDevice.Stylus
-                                xAxis.enabled: true
-                                yAxis.enabled: false
-                                onActiveChanged: {
-                                    if (active)
-                                        block.startEdit()
-                                    else
-                                        block.finishEdit()
-                                }
-                                onTranslationChanged: {
-                                    let ns = block.editStart + translation.x / root.pxPerSecond
-                                    ns = root.snap(ns, root.snapTargets(block.index))
-                                    ns = root.clampVal(ns, root.loBound(block.index),
-                                                       block.editEnd - root.minCueDur)
-                                    block.dragX = root.xForSeconds(ns)
-                                    block.dragW = (block.editEnd - ns) * root.pxPerSecond
-                                    root.commitCue(block.index, ns, block.editEnd)
-                                }
-                            }
-                        }
-
-                        // Right edge: resize end.
-                        Rectangle {
-                            anchors.right: parent.right
-                            width: block.gripW
-                            height: parent.height
-                            color: block.isSelected ? Theme.primary : "transparent"
-                            opacity: 0.6
-                        }
-                        Item {
-                            x: parent.width - ((Theme.touchInput && !block.narrowTouch)
-                                               ? block.edgeHitW / 2 : block.edgeHitW)
-                            width: block.edgeHitW
-                            height: parent.height
-                            HoverHandler { cursorShape: Qt.SizeHorCursor }
-                            DragHandler {
-                                target: null
-                                acceptedDevices: block.isSelected
-                                    ? PointerDevice.AllDevices
-                                    : PointerDevice.Mouse | PointerDevice.TouchPad | PointerDevice.Stylus
-                                xAxis.enabled: true
-                                yAxis.enabled: false
-                                onActiveChanged: {
-                                    if (active)
-                                        block.startEdit()
-                                    else
-                                        block.finishEdit()
-                                }
-                                onTranslationChanged: {
-                                    let ne = block.editEnd + translation.x / root.pxPerSecond
-                                    ne = root.snap(ne, root.snapTargets(block.index))
-                                    ne = root.clampVal(ne, block.editStart + root.minCueDur,
-                                                       root.hiBound(block.index))
-                                    block.dragW = (ne - block.editStart) * root.pxPerSecond
-                                    root.commitCue(block.index, block.editStart, ne)
-                                }
-                            }
-                        }
+                    delegate: SubtitleCueBlock {
+                        lane: root
                     }
                 }
             }

@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Window
 import Drift
-import ".."
-
 // The canvas and the view onto it, shared by the desktop panel and the phone preview: aspect fit,
 // zoom and pan, the composited picture, and the interaction tools laid over it. Children declared
 // on an instance land on this item, which is where navigation input (mode views, pinch) belongs:
@@ -79,6 +77,19 @@ Item {
         function onCanvasCropModeChanged() { viewport.resetView() }
     }
 
+    ThemeSlot {
+        anchors.fill: parent
+        z: -2
+        slot: "PreviewLetterbox"
+        control: viewport
+        fallback: Component {
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.c.previewViewport.letterbox
+            }
+        }
+    }
+
     Rectangle {
         id: canvasRect
         width: viewport.fitWidth
@@ -87,10 +98,22 @@ Item {
         y: (viewport.height - height) / 2 + viewport.panY
         // The 3D view draws the whole panel, with its own outline of the stage; this rect only
         // keeps the project frame's place for the tools.
-        color: viewport.mode3d || (EditorState.projectFile.background && EditorState.projectFile.background.kind === "transparent")
-               ? "transparent" : Theme.overlayColor
-        border.width: viewport.mode3d ? 0 : Theme.borderWidth
-        border.color: Theme.border
+        // Explicit backing for the composited frame. The window clear color is
+        // not a backstop once the surface has an alpha channel, and the frame
+        // itself stays opaque (the compositor clears it at alpha 1) except when
+        // the project background is transparent — that case is the checkerboard.
+        color: {
+            const projectBackground = EditorState.projectFile.background
+            const transparentProject = projectBackground && projectBackground.kind === "transparent"
+            if (viewport.mode3d || transparentProject)
+                return "transparent"
+            const token = Theme.c.previewViewport.background
+            if (WindowBackdrop.translucencyActive && token.a < 1)
+                return Qt.rgba(token.r, token.g, token.b, 1)
+            return token
+        }
+        border.width: viewport.mode3d ? 0 : Theme.c.previewViewport.borderWidth
+        border.color: Theme.c.previewViewport.border
         clip: !viewport.mode3d
 
         Checkerboard {

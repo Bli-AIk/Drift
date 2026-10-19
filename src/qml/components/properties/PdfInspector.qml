@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Window
 import Drift
-import ".."
-
 // PDF clip inspector: which pages show and how they are laid out, then the viewport that scrolls
 // and zooms through them. The clip frame itself is placed from the Transform tab.
 Item {
@@ -135,7 +133,7 @@ Item {
                     spacing: 4
                     Text {
                         text: qsTr("First page")
-                        color: Theme.mutedForeground
+                        color: Theme.c.pdfInspector.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -153,7 +151,7 @@ Item {
                     spacing: 4
                     Text {
                         text: qsTr("Last page")
-                        color: Theme.mutedForeground
+                        color: Theme.c.pdfInspector.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -177,7 +175,7 @@ Item {
                     spacing: 4
                     Text {
                         text: qsTr("Layout")
-                        color: Theme.mutedForeground
+                        color: Theme.c.pdfInspector.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -196,7 +194,7 @@ Item {
                     visible: root.pdf.layout === "grid"
                     Text {
                         text: qsTr("Columns")
-                        color: Theme.mutedForeground
+                        color: Theme.c.pdfInspector.foregroundMuted
                         font.pixelSize: Theme.fontSizeXs
                         font.family: Theme.fontFamily
                     }
@@ -215,7 +213,7 @@ Item {
                 spacing: 4
                 Text {
                     text: qsTr("Gap")
-                    color: Theme.mutedForeground
+                    color: Theme.c.pdfInspector.foregroundMuted
                     font.pixelSize: Theme.fontSizeXs
                     font.family: Theme.fontFamily
                 }

@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
-import ".."
-
 // Effect stacks the user saved from the effects inspector or the timeline clip menu. Lives beside
 // the built-in effect templates because those are multi-effect stacks too — and because a saved
 // stack can span video *and* audio effects, which the video-only effects browser has no room for.
@@ -79,120 +77,12 @@ Item {
 
             Repeater {
                 model: root.presets
-                delegate: Column {
-                    id: stackCard
-                    required property var modelData
-                    width: stackGrid.cardSize
-                    spacing: Theme.spacingSm
-
-                    opacity: cardDrag.active ? 0.85 : 1
-                    scale: cardDrag.active ? 1.04 : cardDrag.pressed ? 0.97 : (cardDrag.hovered ? 1.02 : 1.0)
-                    Behavior on scale {
-                        NumberAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: Math.round(width * 0.55)
-                        radius: Theme.radiusSm
-                        color: cardDrag.hovered ? Theme.panelAccent : Theme.panelBackground
-                        border.width: Theme.borderWidth
-                        border.color: Theme.panelBorder
-
-                        Behavior on color {
-                            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                        }
-
-                        AssetDragSource {
-                            id: cardDrag
-                            anchors.fill: parent
-                            kind: "effectStack"
-                            payload: stackCard.modelData.id
-                            label: stackCard.modelData.label || ""
-                            glyph: Theme.icons.layers
-                            hasContextMenu: true
-                            onContextMenuRequested: stackMenu.popup()
-                            onTapped: root.applyStack(stackCard.modelData)
-                        }
-
-                        // There is no rendered preview for a stack, so the card says what is in it.
-                        Column {
-                            anchors.fill: parent
-                            anchors.margins: Theme.spacingSm
-                            spacing: 2
-
-                            Repeater {
-                                model: Math.min(3, (stackCard.modelData.labels || []).length)
-                                delegate: Text {
-                                    required property int index
-                                    width: parent.width
-                                    text: stackCard.modelData.labels[index]
-                                    elide: Text.ElideRight
-                                    color: Theme.mutedForeground
-                                    font.family: Theme.fontFamily
-                                    font.pixelSize: Theme.fontSizeXs
-                                }
-                            }
-
-                            Text {
-                                width: parent.width
-                                visible: (stackCard.modelData.labels || []).length > 3
-                                text: qsTr("+%1 more").arg(
-                                          (stackCard.modelData.labels || []).length - 3)
-                                color: Theme.mutedForeground
-                                font.family: Theme.fontFamily
-                                font.pixelSize: Theme.fontSizeXs
-                            }
-                        }
-
-                        IconButton {
-                            anchors.top: parent.top
-                            anchors.right: parent.right
-                            anchors.margins: 2
-                            visible: cardDrag.hovered || stackMenu.visible
-                            glyph: Theme.icons.ellipsis
-                            variant: "ghost"
-                            buttonSize: 20
-                            iconSize: 12
-                            tooltip: qsTr("Preset options")
-                            onClicked: stackMenu.popup()
-                        }
-
-                        ThemedContextMenu {
-                            id: stackMenu
-
-                            ThemedMenuItem {
-                                text: qsTr("Rename…")
-                                icon.name: Theme.icons.pencil
-                                onTriggered: renameStackDialog.openFor(stackCard.modelData)
-                            }
-                            ThemedMenuItem {
-                                text: qsTr("Export…")
-                                icon.name: Theme.icons.folderOutput
-                                onTriggered: root.exportStack(stackCard.modelData)
-                            }
-                            ThemedMenuSeparator { }
-                            ThemedMenuItem {
-                                text: qsTr("Delete")
-                                icon.name: Theme.icons.trash
-                                onTriggered: deleteStackDialog.openFor(stackCard.modelData)
-                            }
-                        }
-                    }
-
-                    Text {
-                        width: parent.width
-                        text: stackCard.modelData.label
-                        elide: Text.ElideRight
-                        horizontalAlignment: Text.AlignHCenter
-                        color: cardDrag.hovered ? Theme.panelForeground : Theme.mutedForeground
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeXs
-
-                        Behavior on color {
-                            ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
-                        }
-                    }
+                delegate: EffectStackCard {
+                    cardSize: stackGrid.cardSize
+                    onApplyRequested: (preset) => root.applyStack(preset)
+                    onExportRequested: (preset) => root.exportStack(preset)
+                    onRenameRequested: (preset) => renameStackDialog.openFor(preset)
+                    onDeleteRequested: (preset) => deleteStackDialog.openFor(preset)
                 }
             }
         }
@@ -236,7 +126,7 @@ Item {
             wrapMode: Text.WordWrap
             text: qsTr("Remove “%1” from your saved presets? Clips already using it keep their effects.")
                       .arg(deleteStackDialog.presetLabel)
-            color: Theme.panelForeground
+            color: Theme.c.effectStacksSection.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSm
         }

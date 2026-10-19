@@ -188,9 +188,12 @@ QSGNode *PreviewItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
             // TextureHasAlphaChannel is required, not cosmetic. Without it the wrapper
             // reports no alpha, QSGSimpleTextureNode picks QSGOpaqueTextureMaterial, and
             // on some Android/ANGLE drivers that material draws an externally created
-            // texture as solid black. The canvas is opaque (cleared at alpha 1), so
-            // declaring the channel only selects the blending material; it does not
-            // change the pixels. The QImage branch above does not need it because
+            // texture as solid black. The compositor clears the frame at alpha 1
+            // (premultiplied, so a translucent window clear cannot show through the
+            // picture). PreviewViewport's canvas rectangle is the opaque backing
+            // behind this node; a transparent project background uses the checkerboard
+            // instead. Declaring the channel only selects the blending material.
+            // The QImage branch above does not need the flag because
             // createTextureFromImage infers alpha from the image format.
             texture = QNativeInterface::QSGOpenGLTexture::fromNative(
                 static_cast<GLuint>(m_textureId), window(), m_textureSize,

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <QtTest>
 
 #include <QAccessible>
@@ -1664,6 +1665,11 @@ void EditorStateTest::arrowKeysJogAndJumpThePlayhead()
     QCOMPARE(state.shortcutFor(QStringLiteral("jumpForward")), QStringLiteral("Shift+Right"));
     QCOMPARE(state.shortcutFor(QStringLiteral("jumpBackFar")), QStringLiteral("Ctrl+Left"));
     QCOMPARE(state.shortcutFor(QStringLiteral("jumpForwardFar")), QStringLiteral("Ctrl+Right"));
+    QCOMPARE(state.shortcutFor(QStringLiteral("search")), QStringLiteral("Ctrl+K"));
+    const QVariantList actions = state.actions();
+    QVERIFY(std::any_of(actions.cbegin(), actions.cend(), [](const QVariant &action) {
+        return action.toMap().value(QStringLiteral("id")).toString() == QLatin1String("search");
+    }));
 
     // What Main.qml's editor FocusScope does with an unaccepted arrow.
     const auto jog = [&state](int key, Qt::KeyboardModifiers mods) {
