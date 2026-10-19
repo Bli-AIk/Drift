@@ -917,6 +917,7 @@ void MediaBinController::finalizeReplace(const QString &assetId, const drift::Me
     if (refresh) {
         replacement.rotationOverride = current->rotationOverride;
         replacement.generator = current->generator;
+        replacement.sourceFrame = current->sourceFrame;
         replacement.editFriendly = current->editFriendly;
         replacement.trimInUs = current->trimInUs;
         replacement.trimOutUs = current->trimOutUs;
