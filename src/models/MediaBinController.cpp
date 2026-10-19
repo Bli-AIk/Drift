@@ -960,53 +960,55 @@ int MediaBinController::rebindClipsToAsset(const QString &assetId, const drift::
 {
     const int newBinCorrection = drift::rotationCorrectionOf(asset);
     int adjusted = 0;
-    for (drift::Track &track : m_app->m_project.tracks()) {
-        for (drift::Clip &clip : track.clips) {
-            if (clip.assetId != assetId)
-                continue;
+    m_app->m_project.forEachTrackList([&](QList<drift::Track> &tracks) {
+        for (drift::Track &track : tracks) {
+            for (drift::Clip &clip : track.clips) {
+                if (clip.assetId != assetId)
+                    continue;
 
-            // Rewriting the clip's own copy of the path is what actually moves the pixels. It
-            // also keys the reverse-proxy and audio-block caches, so for a new path both fall out
-            // of scope on their own; the same path is handled by forgetChangedMediaSource.
-            clip.path = asset.path;
-            clip.thumbnailPath = asset.thumbnailPath;
-            clip.filmstripPath = asset.filmstripPath;
-            // The clip's correction started as the bin's (applyAssetLayout) and may have been
-            // turned further on the timeline since. Keep that extra part and swap the bin's old
-            // share for its new one — most pointedly, a crop-save bakes the bin's correction into
-            // the re-encoded pixels, so the freshly probed `asset` has none left and every clip
-            // has to drop that same amount or it turns already-upright pixels a second time.
-            clip.rotationCorrection =
-                ((clip.rotationCorrection - oldBinCorrection + newBinCorrection) % 360 + 360) % 360;
-            // Landmarks are baked against the old pixels. Left in place they would keep the face
-            // warps tracking a face the new footage never had, and render without erroring.
-            if (mediaChanged) {
-                clip.faceTrackPath.clear();
-                clip.faceTrackSrcOffsetUs = 0;
-                clip.depthPath.clear();
+                // Rewriting the clip's own copy of the path is what actually moves the pixels. It
+                // also keys the reverse-proxy and audio-block caches, so for a new path both fall out
+                // of scope on their own; the same path is handled by forgetChangedMediaSource.
+                clip.path = asset.path;
+                clip.thumbnailPath = asset.thumbnailPath;
+                clip.filmstripPath = asset.filmstripPath;
+                // The clip's correction started as the bin's (applyAssetLayout) and may have been
+                // turned further on the timeline since. Keep that extra part and swap the bin's old
+                // share for its new one — most pointedly, a crop-save bakes the bin's correction into
+                // the re-encoded pixels, so the freshly probed `asset` has none left and every clip
+                // has to drop that same amount or it turns already-upright pixels a second time.
+                clip.rotationCorrection =
+                    ((clip.rotationCorrection - oldBinCorrection + newBinCorrection) % 360 + 360) % 360;
+                // Landmarks are baked against the old pixels. Left in place they would keep the face
+                // warps tracking a face the new footage never had, and render without erroring.
+                if (mediaChanged) {
+                    clip.faceTrackPath.clear();
+                    clip.faceTrackSrcOffsetUs = 0;
+                    clip.depthPath.clear();
+                }
+
+                // Stills have no source range to fit.
+                if (asset.durationUs <= 0 || clip.srcOut <= asset.durationUs)
+                    continue;
+
+                // The framed window starts past the end of the new file, so there is nothing about
+                // it worth preserving; rebase to the head and keep as much of the span as fits.
+                if (clip.srcIn >= asset.durationUs)
+                    clip.srcIn = 0;
+
+                if (clip.hasSpeedCurve()) {
+                    // Curved clips derive their timeline duration from the source range, so the
+                    // range is clamped first and the ramp re-timed against what is left.
+                    clip.srcOut = asset.durationUs;
+                    clip.syncDurationFromSpeedCurve();
+                } else {
+                    // Pulls timelineDuration along with the shortened range, so the clip never
+                    // addresses frames past the end of its media.
+                    clip.syncSrcOutFromSpeed(asset.durationUs);
+                }
+                ++adjusted;
             }
-
-            // Stills have no source range to fit.
-            if (asset.durationUs <= 0 || clip.srcOut <= asset.durationUs)
-                continue;
-
-            // The framed window starts past the end of the new file, so there is nothing about
-            // it worth preserving; rebase to the head and keep as much of the span as fits.
-            if (clip.srcIn >= asset.durationUs)
-                clip.srcIn = 0;
-
-            if (clip.hasSpeedCurve()) {
-                // Curved clips derive their timeline duration from the source range, so the
-                // range is clamped first and the ramp re-timed against what is left.
-                clip.srcOut = asset.durationUs;
-                clip.syncDurationFromSpeedCurve();
-            } else {
-                // Pulls timelineDuration along with the shortened range, so the clip never
-                // addresses frames past the end of its media.
-                clip.syncSrcOutFromSpeed(asset.durationUs);
-            }
-            ++adjusted;
         }
-    }
+    });
     return adjusted;
 }
