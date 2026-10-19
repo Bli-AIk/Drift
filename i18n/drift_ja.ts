@@ -4258,6 +4258,61 @@
     </message>
 </context>
 <context>
+    <name>AppSettingsMenu</name>
+    <message>
+        <source>Workspace</source>
+        <translation>ワークスペース</translation>
+    </message>
+    <message>
+        <source>Auto (follow canvas)</source>
+        <translation>自動 (キャンバスに追従)</translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation>横向き</translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation>縦向き</translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation>テーマ</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished">システム</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>ライト</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation>ダーク</translation>
+    </message>
+    <message>
+        <source>Language…</source>
+        <translation>言語…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished">モバイルレイアウトに切り替え…</translation>
+    </message>
+    <message>
+        <source>Multicam</source>
+        <translation>マルチカム</translation>
+    </message>
+    <message>
+        <source>Debug info…</source>
+        <translation>デバッグ情報…</translation>
+    </message>
+    <message>
+        <source>More settings…</source>
+        <translation>詳細設定…</translation>
+    </message>
+</context>
+<context>
     <name>AssetCategoryChips</name>
     <message>
         <source>My Effects</source>
@@ -6178,58 +6233,6 @@
     <message>
         <source>Workspace, theme, language and more</source>
         <translation type="unfinished">ワークスペース、テーマ、言語など</translation>
-    </message>
-    <message>
-        <source>Workspace</source>
-        <translation type="unfinished">ワークスペース</translation>
-    </message>
-    <message>
-        <source>Auto (follow canvas)</source>
-        <translation type="unfinished">自動 (キャンバスに追従)</translation>
-    </message>
-    <message>
-        <source>Landscape</source>
-        <translation type="unfinished">横向き</translation>
-    </message>
-    <message>
-        <source>Portrait</source>
-        <translation type="unfinished">縦向き</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation type="unfinished">テーマ</translation>
-    </message>
-    <message>
-        <source>System</source>
-        <translation type="unfinished">システム</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation type="unfinished">ライト</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation type="unfinished">ダーク</translation>
-    </message>
-    <message>
-        <source>Language…</source>
-        <translation type="unfinished">言語…</translation>
-    </message>
-    <message>
-        <source>Switch to mobile layout…</source>
-        <translation type="unfinished">モバイルレイアウトに切り替え…</translation>
-    </message>
-    <message>
-        <source>Multicam</source>
-        <translation type="unfinished">マルチカム</translation>
-    </message>
-    <message>
-        <source>Debug info…</source>
-        <translation type="unfinished">デバッグ情報…</translation>
-    </message>
-    <message>
-        <source>More settings…</source>
-        <translation type="unfinished">詳細設定…</translation>
     </message>
 </context>
 <context>
@@ -14808,6 +14811,37 @@ If playback stutters, try another.</source>
     <message>
         <source>Cancel</source>
         <translation>キャンセル</translation>
+    </message>
+</context>
+<context>
+    <name>StartScreen</name>
+    <message>
+        <source>Settings</source>
+        <translation>設定</translation>
+    </message>
+    <message>
+        <source>Workspace, theme, language and more</source>
+        <translation>ワークスペース、テーマ、言語など</translation>
+    </message>
+    <message>
+        <source>Debug info</source>
+        <translation type="unfinished">デバッグ情報</translation>
+    </message>
+    <message>
+        <source>System, playback and codec details for bug reports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Agent</source>
+        <translation>エージェント</translation>
+    </message>
+    <message>
+        <source>Agent access is on</source>
+        <translation>エージェントアクセスがオン</translation>
+    </message>
+    <message>
+        <source>Agent access</source>
+        <translation>エージェントアクセス</translation>
     </message>
 </context>
 <context>

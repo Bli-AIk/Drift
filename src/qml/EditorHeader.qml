@@ -246,6 +246,16 @@ Item {
             EditorState.projectFile.packageProject(url)
     }
 
+    // The start screen offers these too, so they work before any project is open. The language
+    // chooser here is the header's own, not Main's first-launch one, whose close resumes startup.
+    function openAgentAccess() {
+        agentAccessDialog.openDialog()
+    }
+
+    function openLanguageChooser() {
+        languageChooserDialogLoader.ensure().openFromHeader()
+    }
+
     function exportVideo() {
         exportDialogLoader.ensure().openDialog()
     }

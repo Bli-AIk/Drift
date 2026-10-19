@@ -4271,6 +4271,61 @@
     </message>
 </context>
 <context>
+    <name>AppSettingsMenu</name>
+    <message>
+        <source>Workspace</source>
+        <translation>වැඩබිම</translation>
+    </message>
+    <message>
+        <source>Auto (follow canvas)</source>
+        <translation>ස්වයංක්‍රීය (කැන්වසය අනුව)</translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation>තිරස් (Landscape)</translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation>සිරස් (Portrait)</translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation>තේමාව</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished">පද්ධතිය</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>ලා පැහැති</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation>අඳුරු</translation>
+    </message>
+    <message>
+        <source>Language…</source>
+        <translation>භාෂාව…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multicam</source>
+        <translation>බහු කැමරා</translation>
+    </message>
+    <message>
+        <source>Debug info…</source>
+        <translation>දෝෂ නිවාරණ තොරතුරු…</translation>
+    </message>
+    <message>
+        <source>More settings…</source>
+        <translation>තවත් සැකසීම්…</translation>
+    </message>
+</context>
+<context>
     <name>AssetCategoryChips</name>
     <message>
         <source>My Effects</source>
@@ -6205,58 +6260,6 @@
     <message>
         <source>Workspace, theme, language and more</source>
         <translation type="unfinished">වැඩබිම, තේමාව, භාෂාව සහ තවත් දෑ</translation>
-    </message>
-    <message>
-        <source>Workspace</source>
-        <translation type="unfinished">වැඩබිම</translation>
-    </message>
-    <message>
-        <source>Auto (follow canvas)</source>
-        <translation type="unfinished">ස්වයංක්‍රීය (කැන්වසය අනුව)</translation>
-    </message>
-    <message>
-        <source>Landscape</source>
-        <translation type="unfinished">තිරස් (Landscape)</translation>
-    </message>
-    <message>
-        <source>Portrait</source>
-        <translation type="unfinished">සිරස් (Portrait)</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation type="unfinished">තේමාව</translation>
-    </message>
-    <message>
-        <source>System</source>
-        <translation type="unfinished">පද්ධතිය</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation type="unfinished">ආලෝක (Light)</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation type="unfinished">අඳුරු</translation>
-    </message>
-    <message>
-        <source>Language…</source>
-        <translation type="unfinished">භාෂාව…</translation>
-    </message>
-    <message>
-        <source>Switch to mobile layout…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Multicam</source>
-        <translation type="unfinished">බහු කැමරා</translation>
-    </message>
-    <message>
-        <source>Debug info…</source>
-        <translation type="unfinished">දෝෂ නිවාරණ තොරතුරු…</translation>
-    </message>
-    <message>
-        <source>More settings…</source>
-        <translation type="unfinished">තවත් සැකසීම්…</translation>
     </message>
 </context>
 <context>
@@ -14858,6 +14861,37 @@ If playback stutters, try another.</source>
     <message>
         <source>Cancel</source>
         <translation>අවලංගු කරන්න</translation>
+    </message>
+</context>
+<context>
+    <name>StartScreen</name>
+    <message>
+        <source>Settings</source>
+        <translation>සැකසීම්</translation>
+    </message>
+    <message>
+        <source>Workspace, theme, language and more</source>
+        <translation>වැඩබිම, තේමාව, භාෂාව සහ තවත් දෑ</translation>
+    </message>
+    <message>
+        <source>Debug info</source>
+        <translation type="unfinished">දෝෂහරණ තොරතුරු</translation>
+    </message>
+    <message>
+        <source>System, playback and codec details for bug reports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Agent</source>
+        <translation>නියෝජිතයා</translation>
+    </message>
+    <message>
+        <source>Agent access is on</source>
+        <translation>නියෝජිත (Agent) ප්‍රවේශය ක්‍රියාත්මකයි</translation>
+    </message>
+    <message>
+        <source>Agent access</source>
+        <translation>නියෝජිත (Agent) ප්‍රවේශය</translation>
     </message>
 </context>
 <context>

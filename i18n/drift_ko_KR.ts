@@ -4258,6 +4258,61 @@
     </message>
 </context>
 <context>
+    <name>AppSettingsMenu</name>
+    <message>
+        <source>Workspace</source>
+        <translation>작업 공간</translation>
+    </message>
+    <message>
+        <source>Auto (follow canvas)</source>
+        <translation>자동(캔버스 따름)</translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation>가로</translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation>세로</translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation>테마</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished">시스템</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>밝게</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation>어두운</translation>
+    </message>
+    <message>
+        <source>Language…</source>
+        <translation>언어…</translation>
+    </message>
+    <message>
+        <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multicam</source>
+        <translation>멀티캠</translation>
+    </message>
+    <message>
+        <source>Debug info…</source>
+        <translation>디버그 정보…</translation>
+    </message>
+    <message>
+        <source>More settings…</source>
+        <translation>추가 설정…</translation>
+    </message>
+</context>
+<context>
     <name>AssetCategoryChips</name>
     <message>
         <source>My Effects</source>
@@ -6178,58 +6233,6 @@
     <message>
         <source>Workspace, theme, language and more</source>
         <translation type="unfinished">작업 공간, 테마, 언어 및 기타</translation>
-    </message>
-    <message>
-        <source>Workspace</source>
-        <translation type="unfinished">작업 공간</translation>
-    </message>
-    <message>
-        <source>Auto (follow canvas)</source>
-        <translation type="unfinished">자동(캔버스 따름)</translation>
-    </message>
-    <message>
-        <source>Landscape</source>
-        <translation type="unfinished">가로</translation>
-    </message>
-    <message>
-        <source>Portrait</source>
-        <translation type="unfinished">세로</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation type="unfinished">테마</translation>
-    </message>
-    <message>
-        <source>System</source>
-        <translation type="unfinished">시스템</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation type="unfinished">밝게</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation type="unfinished">어두운</translation>
-    </message>
-    <message>
-        <source>Language…</source>
-        <translation type="unfinished">언어…</translation>
-    </message>
-    <message>
-        <source>Switch to mobile layout…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Multicam</source>
-        <translation type="unfinished">멀티캠</translation>
-    </message>
-    <message>
-        <source>Debug info…</source>
-        <translation type="unfinished">디버그 정보…</translation>
-    </message>
-    <message>
-        <source>More settings…</source>
-        <translation type="unfinished">추가 설정…</translation>
     </message>
 </context>
 <context>
@@ -14801,6 +14804,37 @@ If playback stutters, try another.</source>
     <message>
         <source>Cancel</source>
         <translation>취소</translation>
+    </message>
+</context>
+<context>
+    <name>StartScreen</name>
+    <message>
+        <source>Settings</source>
+        <translation>설정</translation>
+    </message>
+    <message>
+        <source>Workspace, theme, language and more</source>
+        <translation>작업 공간, 테마, 언어 및 기타</translation>
+    </message>
+    <message>
+        <source>Debug info</source>
+        <translation type="unfinished">디버그 정보</translation>
+    </message>
+    <message>
+        <source>System, playback and codec details for bug reports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Agent</source>
+        <translation>에이전트</translation>
+    </message>
+    <message>
+        <source>Agent access is on</source>
+        <translation>에이전트 접근이 켜져 있습니다</translation>
+    </message>
+    <message>
+        <source>Agent access</source>
+        <translation>에이전트 접근</translation>
     </message>
 </context>
 <context>
