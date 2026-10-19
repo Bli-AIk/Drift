@@ -693,7 +693,9 @@ QJsonObject McpDispatcher::apply(const QJsonObject &args)
                     {QStringLiteral("done"), results}};
         }
         results.append(QJsonObject{{QStringLiteral("tool"), tool}, {QStringLiteral("result"), one}});
-        if (isUndoable(tool))
+        // A re-read lands its "Media refreshed" edit inside this batch, where undo is suspended.
+        const bool refreshed = tool == QLatin1String("import_media") && one.contains(QStringLiteral("reprobed"));
+        if (isUndoable(tool) || refreshed)
             hadUndoable = true;
     }
     m_controller->mcp()->endBatch(batchLabel(ops.size()), hadUndoable);
