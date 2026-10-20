@@ -143,6 +143,7 @@ private slots:
     void blockGlitchEffectParametersSerialization();
     void clipSpeedSourceMapping();
     void clipSpeedChangeKeepsSourceRange();
+    void clipSpeedSyncAfterRebasedSrcInKeepsSpan();
     void piecewiseLinearBreakpointsCompressLinearMotion();
     void stabilizePlanDoesNotKeyEveryFrame();
     void stabilizeApplyPlanScalesOffsetsByZoom();
@@ -2616,6 +2617,24 @@ void CoreTest::clipSpeedChangeKeepsSourceRange()
 
     QCOMPARE(clip.srcOut, drift::secondsToUs(70.0));
     QCOMPARE(clip.timelineDuration, drift::secondsToUs(5.0));
+}
+
+void CoreTest::clipSpeedSyncAfterRebasedSrcInKeepsSpan()
+{
+    // Mirrors MediaBinController::rebindClipsToAsset when the media is replaced by a shorter
+    // file and the clip's window starts past its end: srcIn is rebased to 0 and the clip keeps
+    // its 10 s span instead of widening to the whole file.
+    drift::Clip clip;
+    clip.srcIn = drift::secondsToUs(60.0);
+    clip.srcOut = drift::secondsToUs(70.0);
+    clip.timelineDuration = drift::secondsToUs(10.0);
+
+    clip.srcIn = 0;
+    clip.srcOut = clip.srcIn + clip.sourceSpanUs();
+    clip.syncSrcOutFromSpeed(drift::secondsToUs(30.0));
+
+    QCOMPARE(clip.srcOut, drift::secondsToUs(10.0));
+    QCOMPARE(clip.timelineDuration, drift::secondsToUs(10.0));
 }
 
 void CoreTest::piecewiseLinearBreakpointsCompressLinearMotion()
