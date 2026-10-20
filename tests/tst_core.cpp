@@ -142,6 +142,7 @@ private slots:
     void rgbSplitEffectParametersSerialization();
     void blockGlitchEffectParametersSerialization();
     void clipSpeedSourceMapping();
+    void clipSpeedChangeKeepsSourceRange();
     void piecewiseLinearBreakpointsCompressLinearMotion();
     void stabilizePlanDoesNotKeyEveryFrame();
     void stabilizeApplyPlanScalesOffsetsByZoom();
@@ -2601,6 +2602,20 @@ void CoreTest::clipSpeedSourceMapping()
     clip.reverse = false;
     const drift::TimeUs local = drift::secondsToUs(1.5);
     QCOMPARE(clip.sourceUsToClipLocalUs(clip.timelineToSourceUs(clip.timelineStart + local)), local);
+}
+
+void CoreTest::clipSpeedChangeKeepsSourceRange()
+{
+    drift::Clip clip;
+    clip.srcIn = drift::secondsToUs(60.0);
+    clip.srcOut = drift::secondsToUs(70.0);
+    clip.timelineDuration = drift::secondsToUs(10.0);
+    clip.speed = 2.0;
+
+    clip.syncSrcOutFromSpeed(drift::secondsToUs(120.0));
+
+    QCOMPARE(clip.srcOut, drift::secondsToUs(70.0));
+    QCOMPARE(clip.timelineDuration, drift::secondsToUs(5.0));
 }
 
 void CoreTest::piecewiseLinearBreakpointsCompressLinearMotion()
