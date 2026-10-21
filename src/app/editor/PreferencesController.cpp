@@ -183,6 +183,7 @@ PreferencesController::PreferencesController(QObject *parent)
         settings.value(QStringLiteral("preview/mediaCodecZeroCopy"), false).toBool();
     m_invertTimelineScroll = settings.value(QStringLiteral("timeline/invertScroll"), false).toBool();
     m_autoCrossfadeOverlaps = settings.value(QStringLiteral("timeline/autoCrossfadeOverlaps"), true).toBool();
+    m_autoSelectUnderPlayhead = settings.value(QStringLiteral("timeline/autoSelectUnderPlayhead"), false).toBool();
     m_uiLanguage = storedUiLanguage();
     m_needsUiLanguagePrompt = needsFirstLaunchLanguagePrompt();
     m_uiScale = storedUiScale();
@@ -436,6 +437,16 @@ void PreferencesController::setAutoCrossfadeOverlaps(bool enabled)
     QSettings settings;
     settings.setValue(QStringLiteral("timeline/autoCrossfadeOverlaps"), m_autoCrossfadeOverlaps);
     emit autoCrossfadeOverlapsChanged();
+}
+
+void PreferencesController::setAutoSelectUnderPlayhead(bool enabled)
+{
+    if (m_autoSelectUnderPlayhead == enabled)
+        return;
+    m_autoSelectUnderPlayhead = enabled;
+    QSettings settings;
+    settings.setValue(QStringLiteral("timeline/autoSelectUnderPlayhead"), m_autoSelectUnderPlayhead);
+    emit autoSelectUnderPlayheadChanged();
 }
 
 void PreferencesController::installUiTranslators()

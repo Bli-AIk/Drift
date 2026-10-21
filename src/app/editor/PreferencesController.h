@@ -70,6 +70,9 @@ class PreferencesController : public QObject
                    NOTIFY invertTimelineScrollChanged)
     Q_PROPERTY(bool autoCrossfadeOverlaps READ autoCrossfadeOverlaps WRITE setAutoCrossfadeOverlaps
                    NOTIFY autoCrossfadeOverlapsChanged)
+    // Timeline toolbar auto-select: while stopped, moving the playhead selects the clip under it.
+    Q_PROPERTY(bool autoSelectUnderPlayhead READ autoSelectUnderPlayhead WRITE setAutoSelectUnderPlayhead
+                   NOTIFY autoSelectUnderPlayheadChanged)
     // App-wide interface language, QSettings("ui/language"). Empty means follow the OS locale.
     // "en" is the source catalog (no .qm). Other codes match i18n/drift_<code>.qm.
     // needsUiLanguagePrompt is true only on a brand-new install, before the first-launch chooser
@@ -141,6 +144,8 @@ public:
     void setInvertTimelineScroll(bool enabled);
     bool autoCrossfadeOverlaps() const { return m_autoCrossfadeOverlaps; }
     void setAutoCrossfadeOverlaps(bool enabled);
+    bool autoSelectUnderPlayhead() const { return m_autoSelectUnderPlayhead; }
+    void setAutoSelectUnderPlayhead(bool enabled);
 
     QString uiLanguage() const { return m_uiLanguage; }
     QVariantList uiLanguages() const;
@@ -195,6 +200,7 @@ signals:
     void preferredGpuChanged();
     void invertTimelineScrollChanged();
     void autoCrossfadeOverlapsChanged();
+    void autoSelectUnderPlayheadChanged();
     void uiLanguageChanged();
     void uiScaleChanged();
     void interfaceShellChanged();
@@ -220,6 +226,7 @@ private:
     QString m_preferredGpu = QStringLiteral("auto");
     bool m_invertTimelineScroll = false;
     bool m_autoCrossfadeOverlaps = true;
+    bool m_autoSelectUnderPlayhead = false;
     QString m_uiLanguage;
     bool m_needsUiLanguagePrompt = false;
     double m_uiScale = 1.0;

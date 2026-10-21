@@ -296,6 +296,12 @@ Item {
             active: EditorState.allowClipOverlap
             onClicked: EditorState.allowClipOverlap = !EditorState.allowClipOverlap
         }
+        TimelineToolbarToolButton {
+            glyph: Theme.icons.locateFixed
+            tooltip: qsTr("Auto-select: select the clip under the playhead")
+            active: EditorState.preferences.autoSelectUnderPlayhead
+            onClicked: EditorState.preferences.autoSelectUnderPlayhead = !EditorState.preferences.autoSelectUnderPlayhead
+        }
 
         TimelineToolbarSeparator { }
 

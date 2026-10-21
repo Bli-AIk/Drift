@@ -746,6 +746,7 @@ public:
     bool projectLayoutChosen() const { return m_projectLayoutChosen; }
     Q_INVOKABLE void markProjectLayoutChosen();
     Q_INVOKABLE void selectClip(int trackIndex, int clipIndex);
+    void selectClipUnderPlayhead();
     Q_INVOKABLE void addToSelection(int trackIndex, int clipIndex);
     Q_INVOKABLE void setSelection(const QVariantList &pairs);
     Q_INVOKABLE void selectAllClips();

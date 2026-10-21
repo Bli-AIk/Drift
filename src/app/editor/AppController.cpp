@@ -964,6 +964,12 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
         m_playheadUs = newUs;
         emit playheadSecondsChanged();
     });
+    // Stopped only: during playback the selection would be rebuilt every frame. Stopping emits
+    // this once more, which applies the selection for where playback ended.
+    connect(this, &AppController::playheadSecondsChanged, this, [this] {
+        if (!m_playing && m_preferences->autoSelectUnderPlayhead())
+            selectClipUnderPlayhead();
+    });
     connect(this, &AppController::playheadSecondsChanged, this, [this] {
         constexpr qint64 kInspectorPlayheadIntervalMs = 100;
         if ((m_playing || m_scrubbing) && m_inspectorPlayheadClock.isValid()
@@ -6983,6 +6989,41 @@ void AppController::selectClip(int trackIndex, int clipIndex)
     m_selectedTransitionLeftClip = -1;
     notifySelectionChanged();
     emit selectedTransitionDataChanged();
+}
+
+void AppController::selectClipUnderPlayhead()
+{
+    const QList<drift::Track> &tracks = m_project.tracks();
+    // The first clip on `trackIndex` spanning the playhead, or -1.
+    auto clipUnderPlayhead = [&](int trackIndex) {
+        if (trackIndex < 0 || trackIndex >= tracks.size())
+            return -1;
+        const QList<drift::Clip> &clips = tracks.at(trackIndex).clips;
+        for (int i = 0; i < clips.size(); ++i) {
+            if (clips.at(i).containsTime(m_playheadUs))
+                return i;
+        }
+        return -1;
+    };
+
+    if (m_selectedTrack >= 0) {
+        const int clipIndex = clipUnderPlayhead(m_selectedTrack);
+        if (clipIndex >= 0) {
+            selectClip(m_selectedTrack, clipIndex);
+            return;
+        }
+    }
+    for (drift::TrackType type : {drift::TrackType::Video, drift::TrackType::Audio}) {
+        for (int trackIndex = 0; trackIndex < tracks.size(); ++trackIndex) {
+            if (tracks.at(trackIndex).type != type || tracks.at(trackIndex).hidden)
+                continue;
+            const int clipIndex = clipUnderPlayhead(trackIndex);
+            if (clipIndex >= 0) {
+                selectClip(trackIndex, clipIndex);
+                return;
+            }
+        }
+    }
 }
 
 void AppController::addToSelection(int trackIndex, int clipIndex)
