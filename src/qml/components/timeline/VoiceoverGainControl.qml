@@ -4,6 +4,7 @@ import Drift
 // Mic gain slider and its percent readout.
 Item {
     id: gainContainer
+    property real sliderWidth: 65
     width: gainRow.implicitWidth
     height: 24
     anchors.verticalCenter: parent.verticalCenter
@@ -23,7 +24,7 @@ Item {
         ThemedSlider {
             id: gainSlider
             label: qsTr("Mic gain")
-            width: 65
+            width: gainContainer.sliderWidth
             anchors.verticalCenter: parent.verticalCenter
             from: 0.0
             to: 2.0
