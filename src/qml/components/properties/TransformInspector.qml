@@ -69,6 +69,8 @@ Item {
     }
 
     property var scaleDragStart: null
+    // Fractions of the box (0, 0.5, 1 per axis) the scale keeps fixed on the canvas. Not saved.
+    property point scaleAnchor: Qt.point(0.5, 0.5)
 
     function transformAt(key, def) {
         return EditorState.propertyValueAt(EditorState.selectedTrack, EditorState.selectedClip,
@@ -82,6 +84,7 @@ Item {
             "w": transformAt("width", canvasW),
             "h": transformAt("height", canvasH),
             "scale": scaleAtPlayhead,
+            "rot": transformAt("rotation", 0) * Math.PI / 180,
             "pixelSize": (clipData.textStyle && clipData.textStyle.pixelSize) || 64
         }
     }
@@ -93,8 +96,13 @@ Item {
         const k = scale / s.scale
         const w = Math.max(1, s.w * k)
         const h = Math.max(1, s.h * k)
-        const x = s.x + (s.w - w) / 2
-        const y = s.y + (s.h - h) / 2
+        // The anchor's offset from the centre turns with the clip, so the centre moves by the rotated delta.
+        const ex = (scaleAnchor.x - 0.5) * (s.w - w)
+        const ey = (scaleAnchor.y - 0.5) * (s.h - h)
+        const cx = s.x + s.w / 2 + ex * Math.cos(s.rot) - ey * Math.sin(s.rot)
+        const cy = s.y + s.h / 2 + ex * Math.sin(s.rot) + ey * Math.cos(s.rot)
+        const x = cx - w / 2
+        const y = cy - h / 2
         if (isText) {
             EditorState.previewSetTextRect(EditorState.selectedTrack, EditorState.selectedClip,
                                            x, y, w, h, Math.round(s.pixelSize * k))
@@ -296,6 +304,38 @@ Item {
                     color: Theme.c.transformInspector.foreground
                     font.family: Theme.monoFontFamily
                     font.pixelSize: Theme.fontSizeSm
+                }
+            }
+
+            Grid {
+                visible: root.sizeLinked
+                columns: 3
+                spacing: 3
+
+                Repeater {
+                    model: 9
+                    delegate: Rectangle {
+                        readonly property real fx: (index % 3) * 0.5
+                        readonly property real fy: Math.floor(index / 3) * 0.5
+                        width: 12
+                        height: 12
+                        radius: 2
+                        color: root.scaleAnchor.x === fx && root.scaleAnchor.y === fy
+                               ? Theme.c.transformInspector.accent : Theme.c.transformInspector.foregroundMuted
+                        opacity: root.scaleAnchor.x === fx && root.scaleAnchor.y === fy ? 1 : 0.35
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.scaleAnchor = Qt.point(parent.fx, parent.fy)
+                        }
+                    }
+                }
+
+                HoverHandler { id: anchorHover }
+                ThemedToolTip {
+                    visible: anchorHover.hovered
+                    text: qsTr("Scale origin")
                 }
             }
 
