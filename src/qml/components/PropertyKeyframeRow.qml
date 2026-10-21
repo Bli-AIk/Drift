@@ -24,6 +24,9 @@ Column {
     property real sliderTo: 1
     // Snaps the slider to multiples of this (whole-number effect params); 0 is continuous.
     property real sliderStep: 0
+    // Static values can be dragged during playback. Keyed ones (or any with Auto keyframes on)
+    // stay locked: the write lands at the moving playhead, dropping a key per move.
+    property bool editableWhilePlaying: false
     property bool percent: false
     property string unit: "" // e.g. "°" — appended to the numeric readout
     // Show the slider readout in decibels with the percentage after it, for gain properties
@@ -478,7 +481,7 @@ Column {
 
             ThemedSlider {
                 id: valueSlider
-                lockWhilePlaying: true
+                lockWhilePlaying: !root.editableWhilePlaying || root.animated || EditorState.autoKeyEnabled
                 label: root.propDef.label
                 width: parent.width - readoutBox.width - parent.spacing
                 anchors.verticalCenter: parent.verticalCenter

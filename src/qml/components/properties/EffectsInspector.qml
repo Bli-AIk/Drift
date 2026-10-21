@@ -259,6 +259,7 @@ Item {
                                     keyframeList: (paramRow.paramData.keyframes
                                                    && paramRow.paramData.keyframes.points) || []
                                     useSlider: true
+                                    editableWhilePlaying: true
                                     sliderFrom: paramRow.paramData.min
                                     sliderTo: paramRow.paramData.max
                                     sliderStep: paramRow.paramData.step || 0

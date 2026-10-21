@@ -48,6 +48,7 @@ Item {
             propDef: root.propVolume
             keyframeList: (root.clipData.keyframes && root.clipData.keyframes.volume && root.clipData.keyframes.volume.points) || []
             useSlider: true
+            editableWhilePlaying: true
             sliderFrom: 0
             sliderTo: 2
             percent: true
@@ -97,7 +98,6 @@ Item {
 
             ThemedSlider {
                 id: panSlider
-                lockWhilePlaying: true
                 label: qsTr("Pan")
                 width: parent.width
                 from: -1

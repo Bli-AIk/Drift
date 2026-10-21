@@ -199,6 +199,7 @@ Item {
                                 })
                                 keyframeList: audioParamRow.keyframeList
                                 useSlider: true
+                                editableWhilePlaying: true
                                 sliderFrom: audioParamRow.paramData.min
                                 sliderTo: audioParamRow.paramData.max
                             }
