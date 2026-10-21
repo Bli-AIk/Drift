@@ -46,6 +46,15 @@ Item {
         }
     }
 
+    function activate(type) {
+        for (let i = 0; i < root.entries.length; ++i) {
+            if (root.entries[i].type === type) {
+                root.activeIndex = i
+                return
+            }
+        }
+    }
+
     onActiveIndexChanged: applyActive()
     onFullscreenChanged: applyActive()
     Component.onCompleted: place()

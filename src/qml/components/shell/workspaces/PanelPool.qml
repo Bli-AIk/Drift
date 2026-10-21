@@ -14,6 +14,7 @@ Item {
     property var timelinePanel: null
     property var audioMixerPanel: null
     property var sourceViewerPanel: null
+    property var denoisePanel: null
 
     property var _created: ({})
 
@@ -26,6 +27,12 @@ Item {
                                               && root.sourceViewerPanel.visible
                                               && root.sourceViewerPanel.parent !== root
 
+    readonly property bool denoiseInLayout: !!root.denoisePanel && root.denoisePanel.parent !== root
+
+    readonly property bool denoiseShown: !!root.denoisePanel
+                                         && root.denoisePanel.visible
+                                         && root.denoisePanel.parent !== root
+
     // One line per panel type. A type missing from here gets a placeholder.
     // "assets.<tab>" and "properties.<tab>" are handled by prefix in panel(): the full panels
     // pinned to one tab.
@@ -37,6 +44,7 @@ Item {
         "audioMixer": audioMixerC,
         "subtitles": subtitlesC,
         "recorder": recorderC,
+        "denoise": denoiseC,
         "undoHistory": historyC,
         "sourceViewer": sourceViewerC,
         "agentLog": agentLogC
@@ -49,6 +57,7 @@ Item {
     Component { id: audioMixerC; AudioMixerPanel {} }
     Component { id: subtitlesC; SubtitlesPanel {} }
     Component { id: recorderC; RecorderPanel {} }
+    Component { id: denoiseC; DenoisePanel {} }
     Component { id: historyC; HistoryPanel {} }
     Component { id: sourceViewerC; SourceViewerPanel {} }
     Component { id: agentLogC; AgentLogPanel {} }
@@ -107,6 +116,10 @@ Item {
         case "sourceViewer":
             root.sourceViewerPanel = item
             item.shown = Qt.binding(() => root.sourceViewerShown)
+            break
+        case "denoise":
+            root.denoisePanel = item
+            item.shown = Qt.binding(() => root.denoiseShown)
             break
         }
         return item

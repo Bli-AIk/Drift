@@ -5755,6 +5755,68 @@
     </message>
 </context>
 <context>
+    <name>DenoisePanel</name>
+    <message>
+        <source>Noise Removal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download noise removal (about 9 MB)</source>
+        <translation type="unfinished">ඝෝෂා ඉවත් කිරීම බාගන්න (මෙගාබයිට් 9ක් පමණ)</translation>
+    </message>
+    <message>
+        <source>Install AI engine first</source>
+        <translation type="unfinished">පළමුව AI එන්ජිම ස්ථාපනය කරන්න</translation>
+    </message>
+    <message>
+        <source>Select an audio or video clip to remove noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Add-ons</source>
+        <translation type="unfinished">ඇඩෝන විවෘත කරන්න</translation>
+    </message>
+</context>
+<context>
+    <name>DenoiseView</name>
+    <message>
+        <source>A short section of the clip is previewed here. Confirming runs the whole clip and adds the result as a new audio track above this one — the original is left untouched.</source>
+        <translation type="unfinished">ක්ලිපයේ කෙටි කොටසක් මෙහි පෙරදසුන් කෙරේ. තහවුරු කළ විට මුළු ක්ලිපයම සකසා ප්‍රතිඵලය මෙයට ඉහළින් නව ශ්‍රව්‍ය ට්‍රැකයක් ලෙස එක් කරයි — මුල් ක්ලිපයට කිසිදු වෙනසක් සිදු නොවේ.</translation>
+    </message>
+    <message>
+        <source>Original</source>
+        <translation type="unfinished">මුල් පිටපත</translation>
+    </message>
+    <message>
+        <source>Noise removed</source>
+        <translation type="unfinished">ඝෝෂා ඉවත් කරන ලදී</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished">නවත්වන්න</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">ධාවනය කරන්න</translation>
+    </message>
+    <message>
+        <source>Preview from</source>
+        <translation type="unfinished">පෙරදසුන ආරම්භය</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <translation type="unfinished">තත්</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">අවලංගු කරන්න</translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWaveformLane</name>
     <message>
         <source>· playing</source>
@@ -5766,38 +5828,6 @@
     <message>
         <source>Remove noise</source>
         <translation>ඝෝෂාව ඉවත් කරන්න</translation>
-    </message>
-    <message>
-        <source>A short section of the clip is previewed here. Confirming runs the whole clip and adds the result as a new audio track above this one — the original is left untouched.</source>
-        <translation>ක්ලිපයේ කෙටි කොටසක් මෙහි පෙරදසුන් කෙරේ. තහවුරු කළ විට මුළු ක්ලිපයම සකසා ප්‍රතිඵලය මෙයට ඉහළින් නව ශ්‍රව්‍ය ට්‍රැකයක් ලෙස එක් කරයි — මුල් ක්ලිපයට කිසිදු වෙනසක් සිදු නොවේ.</translation>
-    </message>
-    <message>
-        <source>Original</source>
-        <translation>මුල් පිටපත</translation>
-    </message>
-    <message>
-        <source>Noise removed</source>
-        <translation>ඝෝෂාව ඉවත් කළ</translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation>නවත්වන්න</translation>
-    </message>
-    <message>
-        <source>Play</source>
-        <translation>ධාවනය කරන්න</translation>
-    </message>
-    <message>
-        <source>Preview from</source>
-        <translation>පෙරදසුන ආරම්භය</translation>
-    </message>
-    <message>
-        <source>s</source>
-        <translation>තත්</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>අවලංගු කරන්න</translation>
     </message>
 </context>
 <context>
@@ -12747,7 +12777,43 @@ If playback stutters, try another.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Record a voiceover from your microphone onto an audio track</source>
+        <source>READY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PAUSED</source>
+        <translation type="unfinished">විරාමගතයි</translation>
+    </message>
+    <message>
+        <source>REC</source>
+        <translation type="unfinished">REC</translation>
+    </message>
+    <message>
+        <source>Default Mic</source>
+        <translation type="unfinished">පෙරනිමි මයික්‍රෆෝනය</translation>
+    </message>
+    <message>
+        <source>Input microphone: %1 (click to switch)</source>
+        <translation type="unfinished">ආදාන මයික්‍රෆෝනය: %1 (මාරු කිරීමට ක්ලික් කරන්න)</translation>
+    </message>
+    <message>
+        <source>Resume recording</source>
+        <translation type="unfinished">පටිගත කිරීම නැවත අරඹන්න</translation>
+    </message>
+    <message>
+        <source>Pause recording</source>
+        <translation type="unfinished">පටිගත කිරීම විරාම ගන්වන්න</translation>
+    </message>
+    <message>
+        <source>Stop - finish recording and save to track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished">පටිගත කිරීම නවත්වන්න</translation>
+    </message>
+    <message>
+        <source>Cancel - discard recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -19608,6 +19674,10 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise Removal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

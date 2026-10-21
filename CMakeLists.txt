@@ -1623,6 +1623,7 @@ qt_add_qml_module(drift
         src/qml/components/panels/AudioMixerPanel.qml
         src/qml/components/panels/SubtitlesPanel.qml
         src/qml/components/panels/RecorderPanel.qml
+        src/qml/components/panels/DenoisePanel.qml
         src/qml/components/panels/HistoryPanel.qml
         src/qml/components/panels/SourceViewerPanel.qml
         src/qml/components/panels/AgentLogPanel.qml
@@ -2096,6 +2097,7 @@ qt_add_qml_module(drift
         src/qml/components/shell/EditorHeaderExportBadge.qml
         src/qml/components/shell/EditorHeaderDownloadsButton.qml
         src/qml/components/shell/DenoiseWaveformLane.qml
+        src/qml/components/denoise/DenoiseView.qml
     RESOURCES
         # UI chrome: interface font and Lucide SVG icons (always needed, including before addons).
         # Static instances rather than the variable Inter: on Windows Qt registers application

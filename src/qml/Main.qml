@@ -684,6 +684,12 @@ ApplicationWindow {
     }
 
     function openDenoise(track, clip, durationSeconds) {
+        if (workspace.pool.denoiseInLayout && !denoiseWindowLoader.shown) {
+            const panel = workspace.pool.denoisePanel
+            panel.parent?.parent?.activate?.("denoise")
+            panel.openFor(track, clip, durationSeconds)
+            return
+        }
         denoiseWindowLoader.ensure().openFor(track, clip, durationSeconds)
     }
 

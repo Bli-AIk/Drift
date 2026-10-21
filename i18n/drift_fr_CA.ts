@@ -5757,6 +5757,68 @@
     </message>
 </context>
 <context>
+    <name>DenoisePanel</name>
+    <message>
+        <source>Noise Removal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download noise removal (about 9 MB)</source>
+        <translation type="unfinished">Télécharger la suppression du bruit (environ 9 Mo)</translation>
+    </message>
+    <message>
+        <source>Install AI engine first</source>
+        <translation type="unfinished">Installez d&apos;abord le moteur IA</translation>
+    </message>
+    <message>
+        <source>Select an audio or video clip to remove noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Add-ons</source>
+        <translation type="unfinished">Ouvrir extensions</translation>
+    </message>
+</context>
+<context>
+    <name>DenoiseView</name>
+    <message>
+        <source>A short section of the clip is previewed here. Confirming runs the whole clip and adds the result as a new audio track above this one — the original is left untouched.</source>
+        <translation type="unfinished">Une courte partie du clip est prévisualisée ici. En confirmant, l&apos;ensemble du clip est traité et le résultat est ajouté en tant que nouvelle piste audio au-dessus de celle-ci — l&apos;original reste inchangé.</translation>
+    </message>
+    <message>
+        <source>Original</source>
+        <translation type="unfinished">Original</translation>
+    </message>
+    <message>
+        <source>Noise removed</source>
+        <translation type="unfinished">Bruit supprimé</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished">Arrêter</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">Lire</translation>
+    </message>
+    <message>
+        <source>Preview from</source>
+        <translation type="unfinished">Aperçu depuis</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <translation type="unfinished">s</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation type="unfinished">Supprimer le bruit</translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWaveformLane</name>
     <message>
         <source>· playing</source>
@@ -5768,38 +5830,6 @@
     <message>
         <source>Remove noise</source>
         <translation>Supprimer le bruit</translation>
-    </message>
-    <message>
-        <source>A short section of the clip is previewed here. Confirming runs the whole clip and adds the result as a new audio track above this one — the original is left untouched.</source>
-        <translation>Une courte partie du clip est prévisualisée ici. En confirmant, l&apos;ensemble du clip est traité et le résultat est ajouté en tant que nouvelle piste audio au-dessus de celle-ci — l&apos;original reste inchangé.</translation>
-    </message>
-    <message>
-        <source>Original</source>
-        <translation>Original</translation>
-    </message>
-    <message>
-        <source>Noise removed</source>
-        <translation>Bruit supprimé</translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation>Arrêter</translation>
-    </message>
-    <message>
-        <source>Play</source>
-        <translation>Lire</translation>
-    </message>
-    <message>
-        <source>Preview from</source>
-        <translation>Aperçu depuis</translation>
-    </message>
-    <message>
-        <source>s</source>
-        <translation>s</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
     </message>
 </context>
 <context>
@@ -12750,7 +12780,43 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Record a voiceover from your microphone onto an audio track</source>
+        <source>READY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PAUSED</source>
+        <translation type="unfinished">EN PAUSE</translation>
+    </message>
+    <message>
+        <source>REC</source>
+        <translation type="unfinished">REC</translation>
+    </message>
+    <message>
+        <source>Default Mic</source>
+        <translation type="unfinished">Micro par défaut</translation>
+    </message>
+    <message>
+        <source>Input microphone: %1 (click to switch)</source>
+        <translation type="unfinished">Microphone d&apos;entrée : %1 (cliquez pour changer)</translation>
+    </message>
+    <message>
+        <source>Resume recording</source>
+        <translation type="unfinished">Reprendre l&apos;enregistrement</translation>
+    </message>
+    <message>
+        <source>Pause recording</source>
+        <translation type="unfinished">Mettre l&apos;enregistrement en pause</translation>
+    </message>
+    <message>
+        <source>Stop - finish recording and save to track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished">Arrêter l&apos;enregistrement</translation>
+    </message>
+    <message>
+        <source>Cancel - discard recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -19613,6 +19679,10 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     </message>
     <message>
         <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise Removal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

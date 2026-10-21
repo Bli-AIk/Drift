@@ -5734,6 +5734,68 @@
     </message>
 </context>
 <context>
+    <name>DenoisePanel</name>
+    <message>
+        <source>Noise Removal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download noise removal (about 9 MB)</source>
+        <translation type="unfinished">Tải xuống gói loại bỏ tiếng ồn (khoảng 9 MB)</translation>
+    </message>
+    <message>
+        <source>Install AI engine first</source>
+        <translation type="unfinished">Cài đặt công cụ AI trước</translation>
+    </message>
+    <message>
+        <source>Select an audio or video clip to remove noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Add-ons</source>
+        <translation type="unfinished">Mở tiện ích bổ sung</translation>
+    </message>
+</context>
+<context>
+    <name>DenoiseView</name>
+    <message>
+        <source>A short section of the clip is previewed here. Confirming runs the whole clip and adds the result as a new audio track above this one — the original is left untouched.</source>
+        <translation type="unfinished">Một đoạn ngắn của clip được xem trước ở đây. Xác nhận chạy toàn bộ clip và thêm kết quả dưới dạng track âm thanh mới phía trên bản này — bản gốc không bị ảnh hưởng.</translation>
+    </message>
+    <message>
+        <source>Original</source>
+        <translation type="unfinished">Nguyên bản</translation>
+    </message>
+    <message>
+        <source>Noise removed</source>
+        <translation type="unfinished">Đã khử tiếng ồn</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">Phát</translation>
+    </message>
+    <message>
+        <source>Preview from</source>
+        <translation type="unfinished">Xem trước từ</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <translation type="unfinished">giây</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Hủy bỏ</translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation type="unfinished">Khử tiếng ồn</translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWaveformLane</name>
     <message>
         <source>· playing</source>
@@ -5745,38 +5807,6 @@
     <message>
         <source>Remove noise</source>
         <translation>Khử tiếng ồn</translation>
-    </message>
-    <message>
-        <source>A short section of the clip is previewed here. Confirming runs the whole clip and adds the result as a new audio track above this one — the original is left untouched.</source>
-        <translation>Một đoạn ngắn của clip được xem trước ở đây. Xác nhận chạy toàn bộ clip và thêm kết quả dưới dạng track âm thanh mới phía trên bản này — bản gốc không bị ảnh hưởng.</translation>
-    </message>
-    <message>
-        <source>Original</source>
-        <translation>Nguyên bản</translation>
-    </message>
-    <message>
-        <source>Noise removed</source>
-        <translation>Đã khử tiếng ồn</translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation>Dừng lại</translation>
-    </message>
-    <message>
-        <source>Play</source>
-        <translation>Phát</translation>
-    </message>
-    <message>
-        <source>Preview from</source>
-        <translation>Xem trước từ</translation>
-    </message>
-    <message>
-        <source>s</source>
-        <translation>s</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Hủy bỏ</translation>
     </message>
 </context>
 <context>
@@ -12698,7 +12728,43 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Record a voiceover from your microphone onto an audio track</source>
+        <source>READY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PAUSED</source>
+        <translation type="unfinished">ĐÃ TẠM DỪNG</translation>
+    </message>
+    <message>
+        <source>REC</source>
+        <translation type="unfinished">GHI</translation>
+    </message>
+    <message>
+        <source>Default Mic</source>
+        <translation type="unfinished">Micrô mặc định</translation>
+    </message>
+    <message>
+        <source>Input microphone: %1 (click to switch)</source>
+        <translation type="unfinished">Micrô đầu vào: %1 (nhấp để chuyển đổi)</translation>
+    </message>
+    <message>
+        <source>Resume recording</source>
+        <translation type="unfinished">Tiếp tục ghi</translation>
+    </message>
+    <message>
+        <source>Pause recording</source>
+        <translation type="unfinished">Tạm dừng ghi</translation>
+    </message>
+    <message>
+        <source>Stop - finish recording and save to track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished">Dừng ghi</translation>
+    </message>
+    <message>
+        <source>Cancel - discard recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -12765,7 +12831,7 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     </message>
     <message>
         <source>s</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">giây</translation>
     </message>
     <message>
         <source>Fit</source>
@@ -13295,7 +13361,7 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     </message>
     <message>
         <source>s</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">giây</translation>
     </message>
 </context>
 <context>
@@ -19547,6 +19613,10 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     </message>
     <message>
         <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise Removal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -5755,18 +5755,30 @@
     </message>
 </context>
 <context>
-    <name>DenoiseWaveformLane</name>
+    <name>DenoisePanel</name>
     <message>
-        <source>· playing</source>
+        <source>Noise Removal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download noise removal (about 9 MB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Install AI engine first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select an audio or video clip to remove noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Add-ons</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>DenoiseWindow</name>
-    <message>
-        <source>Remove noise</source>
-        <translation type="unfinished"></translation>
-    </message>
+    <name>DenoiseView</name>
     <message>
         <source>A short section of the clip is previewed here. Confirming runs the whole clip and adds the result as a new audio track above this one — the original is left untouched.</source>
         <translation type="unfinished"></translation>
@@ -5797,6 +5809,24 @@
     </message>
     <message>
         <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DenoiseWaveformLane</name>
+    <message>
+        <source>· playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DenoiseWindow</name>
+    <message>
+        <source>Remove noise</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -12740,7 +12770,43 @@ If playback stutters, try another.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Record a voiceover from your microphone onto an audio track</source>
+        <source>READY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PAUSED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>REC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Mic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input microphone: %1 (click to switch)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resume recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop - finish recording and save to track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel - discard recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -19600,6 +19666,10 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise Removal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -5734,6 +5734,68 @@
     </message>
 </context>
 <context>
+    <name>DenoisePanel</name>
+    <message>
+        <source>Noise Removal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download noise removal (about 9 MB)</source>
+        <translation type="unfinished">ノイズ除去をダウンロード (約 9 MB)</translation>
+    </message>
+    <message>
+        <source>Install AI engine first</source>
+        <translation type="unfinished">まず AI エンジンをインストール</translation>
+    </message>
+    <message>
+        <source>Select an audio or video clip to remove noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Add-ons</source>
+        <translation type="unfinished">アドオンを開く</translation>
+    </message>
+</context>
+<context>
+    <name>DenoiseView</name>
+    <message>
+        <source>A short section of the clip is previewed here. Confirming runs the whole clip and adds the result as a new audio track above this one — the original is left untouched.</source>
+        <translation type="unfinished">クリップの短いセクションがここでプレビューされます。確定するとクリップ全体が処理され、結果がこの上に新しいオーディオトラックとして追加されます — 元のクリップはそのままです。</translation>
+    </message>
+    <message>
+        <source>Original</source>
+        <translation type="unfinished">オリジナル</translation>
+    </message>
+    <message>
+        <source>Noise removed</source>
+        <translation type="unfinished">ノイズを除去しました</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished">停止</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">再生</translation>
+    </message>
+    <message>
+        <source>Preview from</source>
+        <translation type="unfinished">プレビュー開始位置</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <translation type="unfinished">秒</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">キャンセル</translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation type="unfinished">ノイズ除去</translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWaveformLane</name>
     <message>
         <source>· playing</source>
@@ -5745,38 +5807,6 @@
     <message>
         <source>Remove noise</source>
         <translation>ノイズ除去</translation>
-    </message>
-    <message>
-        <source>A short section of the clip is previewed here. Confirming runs the whole clip and adds the result as a new audio track above this one — the original is left untouched.</source>
-        <translation>クリップの短いセクションがここでプレビューされます。確定するとクリップ全体が処理され、結果がこの上に新しいオーディオトラックとして追加されます — 元のクリップはそのままです。</translation>
-    </message>
-    <message>
-        <source>Original</source>
-        <translation>オリジナル</translation>
-    </message>
-    <message>
-        <source>Noise removed</source>
-        <translation>ノイズを除去しました</translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation>停止</translation>
-    </message>
-    <message>
-        <source>Play</source>
-        <translation>再生</translation>
-    </message>
-    <message>
-        <source>Preview from</source>
-        <translation>プレビュー開始位置</translation>
-    </message>
-    <message>
-        <source>s</source>
-        <translation>秒</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -12698,7 +12728,43 @@ If playback stutters, try another.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Record a voiceover from your microphone onto an audio track</source>
+        <source>READY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PAUSED</source>
+        <translation type="unfinished">一時停止中</translation>
+    </message>
+    <message>
+        <source>REC</source>
+        <translation type="unfinished">録音中</translation>
+    </message>
+    <message>
+        <source>Default Mic</source>
+        <translation type="unfinished">デフォルトマイク</translation>
+    </message>
+    <message>
+        <source>Input microphone: %1 (click to switch)</source>
+        <translation type="unfinished">入力マイク : %1 (クリックして切り替え)</translation>
+    </message>
+    <message>
+        <source>Resume recording</source>
+        <translation type="unfinished">録音を再開</translation>
+    </message>
+    <message>
+        <source>Pause recording</source>
+        <translation type="unfinished">録音を一時停止</translation>
+    </message>
+    <message>
+        <source>Stop - finish recording and save to track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished">録音を停止</translation>
+    </message>
+    <message>
+        <source>Cancel - discard recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -19547,6 +19613,10 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise Removal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

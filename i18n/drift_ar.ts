@@ -5839,6 +5839,68 @@
     </message>
 </context>
 <context>
+    <name>DenoisePanel</name>
+    <message>
+        <source>Noise Removal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download noise removal (about 9 MB)</source>
+        <translation type="unfinished">تنزيل إزالة الضوضاء (حوالي 9 MB)</translation>
+    </message>
+    <message>
+        <source>Install AI engine first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select an audio or video clip to remove noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Add-ons</source>
+        <translation type="unfinished">فتح الإضافات</translation>
+    </message>
+</context>
+<context>
+    <name>DenoiseView</name>
+    <message>
+        <source>A short section of the clip is previewed here. Confirming runs the whole clip and adds the result as a new audio track above this one — the original is left untouched.</source>
+        <translation type="unfinished">تتم هنا معاينة جزء قصير من المقطع. وسيؤدي التأكيد إلى معالجة المقطع بالكامل وإضافة النتيجة كمسار صوت جديد فوق هذا المسار — مع بقاء المقطع الأصلي دون أي تعديل.</translation>
+    </message>
+    <message>
+        <source>Original</source>
+        <translation type="unfinished">الأصلي</translation>
+    </message>
+    <message>
+        <source>Noise removed</source>
+        <translation type="unfinished">تمت إزالة الضوضاء</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished">إيقاف</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">تشغيل</translation>
+    </message>
+    <message>
+        <source>Preview from</source>
+        <translation type="unfinished">معاينة من</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <translation type="unfinished">s</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">إلغاء</translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation type="unfinished">إزالة الضوضاء</translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWaveformLane</name>
     <message>
         <source>· playing</source>
@@ -5850,38 +5912,6 @@
     <message>
         <source>Remove noise</source>
         <translation>إزالة الضوضاء</translation>
-    </message>
-    <message>
-        <source>A short section of the clip is previewed here. Confirming runs the whole clip and adds the result as a new audio track above this one — the original is left untouched.</source>
-        <translation>تتم هنا معاينة جزء قصير من المقطع. وسيؤدي التأكيد إلى معالجة المقطع بالكامل وإضافة النتيجة كمسار صوت جديد فوق هذا المسار — مع بقاء المقطع الأصلي دون أي تعديل.</translation>
-    </message>
-    <message>
-        <source>Original</source>
-        <translation>الأصلي</translation>
-    </message>
-    <message>
-        <source>Noise removed</source>
-        <translation>تمت إزالة الضوضاء</translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation>إيقاف</translation>
-    </message>
-    <message>
-        <source>Play</source>
-        <translation>تشغيل</translation>
-    </message>
-    <message>
-        <source>Preview from</source>
-        <translation>معاينة من</translation>
-    </message>
-    <message>
-        <source>s</source>
-        <translation>s</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>إلغاء</translation>
     </message>
 </context>
 <context>
@@ -12943,7 +12973,43 @@ If playback stutters, try another.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Record a voiceover from your microphone onto an audio track</source>
+        <source>READY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PAUSED</source>
+        <translation type="unfinished">متوقف مؤقتًا</translation>
+    </message>
+    <message>
+        <source>REC</source>
+        <translation type="unfinished">تسجيل</translation>
+    </message>
+    <message>
+        <source>Default Mic</source>
+        <translation type="unfinished">الميكروفون الافتراضي</translation>
+    </message>
+    <message>
+        <source>Input microphone: %1 (click to switch)</source>
+        <translation type="unfinished">ميكروفون الإدخال: %1 (انقر للتبديل)</translation>
+    </message>
+    <message>
+        <source>Resume recording</source>
+        <translation type="unfinished">استئناف التسجيل</translation>
+    </message>
+    <message>
+        <source>Pause recording</source>
+        <translation type="unfinished">إيقاف التسجيل مؤقتًا</translation>
+    </message>
+    <message>
+        <source>Stop - finish recording and save to track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished">إيقاف التسجيل</translation>
+    </message>
+    <message>
+        <source>Cancel - discard recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -19852,6 +19918,10 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise Removal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

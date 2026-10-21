@@ -5776,6 +5776,68 @@
     </message>
 </context>
 <context>
+    <name>DenoisePanel</name>
+    <message>
+        <source>Noise Removal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download noise removal (about 9 MB)</source>
+        <translation type="unfinished">Скачать средство удаления шума (около 9 МБ)</translation>
+    </message>
+    <message>
+        <source>Install AI engine first</source>
+        <translation type="unfinished">Сначала установите движок ИИ</translation>
+    </message>
+    <message>
+        <source>Select an audio or video clip to remove noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Add-ons</source>
+        <translation type="unfinished">Открыть дополнения</translation>
+    </message>
+</context>
+<context>
+    <name>DenoiseView</name>
+    <message>
+        <source>A short section of the clip is previewed here. Confirming runs the whole clip and adds the result as a new audio track above this one — the original is left untouched.</source>
+        <translation type="unfinished">Здесь можно прослушать короткий фрагмент клипа. После подтверждения обработается весь клип, а результат появится на новой звуковой дорожке над текущей. Оригинал сохранится.</translation>
+    </message>
+    <message>
+        <source>Original</source>
+        <translation type="unfinished">Оригинал</translation>
+    </message>
+    <message>
+        <source>Noise removed</source>
+        <translation type="unfinished">Шум удалён</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished">Остановить</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">Воспроизвести</translation>
+    </message>
+    <message>
+        <source>Preview from</source>
+        <translation type="unfinished">Прослушать с</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <translation type="unfinished">с</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DenoiseWaveformLane</name>
     <message>
         <source>· playing</source>
@@ -5787,38 +5849,6 @@
     <message>
         <source>Remove noise</source>
         <translation>Удаление шума</translation>
-    </message>
-    <message>
-        <source>A short section of the clip is previewed here. Confirming runs the whole clip and adds the result as a new audio track above this one — the original is left untouched.</source>
-        <translation>Здесь можно прослушать короткий фрагмент клипа. После подтверждения обработается весь клип, а результат появится на новой звуковой дорожке над текущей. Оригинал сохранится.</translation>
-    </message>
-    <message>
-        <source>Original</source>
-        <translation>Оригинал</translation>
-    </message>
-    <message>
-        <source>Noise removed</source>
-        <translation>Без шума</translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation>Остановить</translation>
-    </message>
-    <message>
-        <source>Play</source>
-        <translation>Воспроизвести</translation>
-    </message>
-    <message>
-        <source>Preview from</source>
-        <translation>Прослушать с</translation>
-    </message>
-    <message>
-        <source>s</source>
-        <translation>с</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Отмена</translation>
     </message>
 </context>
 <context>
@@ -12796,7 +12826,43 @@ If playback stutters, try another.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Record a voiceover from your microphone onto an audio track</source>
+        <source>READY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PAUSED</source>
+        <translation type="unfinished">ПАУЗА</translation>
+    </message>
+    <message>
+        <source>REC</source>
+        <translation type="unfinished">ЗАПИСЬ</translation>
+    </message>
+    <message>
+        <source>Default Mic</source>
+        <translation type="unfinished">Микрофон по умолчанию</translation>
+    </message>
+    <message>
+        <source>Input microphone: %1 (click to switch)</source>
+        <translation type="unfinished">Микрофон: %1 (нажмите для переключения)</translation>
+    </message>
+    <message>
+        <source>Resume recording</source>
+        <translation type="unfinished">Продолжить запись</translation>
+    </message>
+    <message>
+        <source>Pause recording</source>
+        <translation type="unfinished">Приостановить запись</translation>
+    </message>
+    <message>
+        <source>Stop - finish recording and save to track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished">Остановить запись</translation>
+    </message>
+    <message>
+        <source>Cancel - discard recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -19669,6 +19735,10 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise Removal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

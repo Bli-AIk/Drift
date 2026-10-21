@@ -5755,18 +5755,30 @@
     </message>
 </context>
 <context>
-    <name>DenoiseWaveformLane</name>
+    <name>DenoisePanel</name>
     <message>
-        <source>· playing</source>
-        <translation type="unfinished">· চালানো</translation>
+        <source>Noise Removal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download noise removal (about 9 MB)</source>
+        <translation type="unfinished">শব্দ অপসারণ ডাউনলোড করুন (প্রায় 9 এমবি)</translation>
+    </message>
+    <message>
+        <source>Install AI engine first</source>
+        <translation type="unfinished">প্রথমে AI ইঞ্জিন ইনস্টল করুন</translation>
+    </message>
+    <message>
+        <source>Select an audio or video clip to remove noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Add-ons</source>
+        <translation type="unfinished">অ্যাড-অন খুলুন</translation>
     </message>
 </context>
 <context>
-    <name>DenoiseWindow</name>
-    <message>
-        <source>Remove noise</source>
-        <translation>নয়েজ সরান</translation>
-    </message>
+    <name>DenoiseView</name>
     <message>
         <source>A short section of the clip is previewed here. Confirming runs the whole clip and adds the result as a new audio track above this one — the original is left untouched.</source>
         <translation type="unfinished">ক্লিপটির একটি ছোট অংশ এখানে প্রিভিউ করা হয়েছে। নিশ্চিত করা পুরো ক্লিপটি চালায় এবং ফলাফলটিকে এটির উপরে একটি নতুন অডিও ট্র্যাক হিসাবে যুক্ত করে — আসলটি স্পর্শ করা হয়নি.</translation>
@@ -5777,7 +5789,7 @@
     </message>
     <message>
         <source>Noise removed</source>
-        <translation>নয়েজ সরানো হয়েছে</translation>
+        <translation type="unfinished">নয়েজ সরানো হয়েছে</translation>
     </message>
     <message>
         <source>Stop</source>
@@ -5785,7 +5797,7 @@
     </message>
     <message>
         <source>Play</source>
-        <translation>চালান</translation>
+        <translation type="unfinished">চালান</translation>
     </message>
     <message>
         <source>Preview from</source>
@@ -5797,7 +5809,25 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation>বাতিল করুন</translation>
+        <translation type="unfinished">বাতিল করুন</translation>
+    </message>
+    <message>
+        <source>Remove noise</source>
+        <translation type="unfinished">নয়েজ সরান</translation>
+    </message>
+</context>
+<context>
+    <name>DenoiseWaveformLane</name>
+    <message>
+        <source>· playing</source>
+        <translation type="unfinished">· চালানো</translation>
+    </message>
+</context>
+<context>
+    <name>DenoiseWindow</name>
+    <message>
+        <source>Remove noise</source>
+        <translation>নয়েজ সরান</translation>
     </message>
 </context>
 <context>
@@ -12747,7 +12777,43 @@ If playback stutters, try another.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Record a voiceover from your microphone onto an audio track</source>
+        <source>READY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PAUSED</source>
+        <translation type="unfinished">বিরতিতে</translation>
+    </message>
+    <message>
+        <source>REC</source>
+        <translation type="unfinished">রেকর্ডিং</translation>
+    </message>
+    <message>
+        <source>Default Mic</source>
+        <translation type="unfinished">ডিফল্ট মাইক</translation>
+    </message>
+    <message>
+        <source>Input microphone: %1 (click to switch)</source>
+        <translation type="unfinished">ইনপুট মাইক্রোফোন: %1 (বদলাতে ক্লিক করুন)</translation>
+    </message>
+    <message>
+        <source>Resume recording</source>
+        <translation type="unfinished">রেকর্ডিং পুনরায় শুরু করুন</translation>
+    </message>
+    <message>
+        <source>Pause recording</source>
+        <translation type="unfinished">রেকর্ডিং বিরাম দিন</translation>
+    </message>
+    <message>
+        <source>Stop - finish recording and save to track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished">রেকর্ডিং বন্ধ করুন</translation>
+    </message>
+    <message>
+        <source>Cancel - discard recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -19608,6 +19674,10 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise Removal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
