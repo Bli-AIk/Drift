@@ -164,6 +164,17 @@ int MediaBinController::moveAssetsToFolder(const QStringList &assetIds, const QS
 
 namespace {
 
+// mm:ss.cc, the same reading the preview window's transport shows.
+QString clockLabel(double seconds)
+{
+    const int total = static_cast<int>(seconds);
+    const int centis = static_cast<int>((seconds - total) * 100);
+    return QStringLiteral("%1:%2.%3")
+        .arg(total / 60, 2, 10, QLatin1Char('0'))
+        .arg(total % 60, 2, 10, QLatin1Char('0'))
+        .arg(centis, 2, 10, QLatin1Char('0'));
+}
+
 // A folder picked by mistake — a home directory, an external drive — can hold tens of thousands
 // of files, and importing them all means a probe and a thumbnail job each. The walk stops here
 // and says so, rather than filling the bin with something nobody asked for.
@@ -716,6 +727,44 @@ bool MediaBinController::renderCopy(int assetIndex, double inSeconds, double out
             Qt::QueuedConnection);
     });
     return true;
+}
+
+QString MediaBinController::addSubclip(const QString &assetId, double inSeconds, double outSeconds)
+{
+    if (!m_app->m_assetLibrary || !std::isfinite(inSeconds) || !std::isfinite(outSeconds))
+        return {};
+    const drift::MediaAsset *source = m_app->m_project.asset(assetId);
+    if (!source || source->kind != drift::MediaKind::Video || !QFileInfo(source->path).isFile())
+        return {};
+
+    const drift::TimeUs duration = source->durationUs;
+    const drift::TimeUs trimIn = qBound<drift::TimeUs>(0, drift::secondsToUs(inSeconds), duration);
+    drift::TimeUs trimOut = qBound<drift::TimeUs>(trimIn, drift::secondsToUs(outSeconds), duration);
+    if (trimOut <= trimIn)
+        return {};
+    if (trimOut >= duration)
+        trimOut = -1;
+
+    // Copy first: the project's hash can rehash when the new asset is inserted below.
+    drift::MediaAsset sub = *source;
+    const QString range = QStringLiteral("%1–%2").arg(clockLabel(drift::usToSeconds(trimIn)),
+                                                     clockLabel(drift::usToSeconds(trimOut < 0 ? duration : trimOut)));
+    sub.id.clear();
+    sub.name = tr("%1 (%2)").arg(source->name, range);
+    sub.trimInUs = trimIn;
+    sub.trimOutUs = trimOut;
+    sub.thumbnailPath.clear();
+    sub.filmstripPath.clear();
+
+    const drift::Project before = m_app->m_project;
+    const QString id = m_app->m_project.addAsset(sub);
+    QList<QString> &order = m_app->m_project.assetOrder();
+    order.move(order.size() - 1, order.indexOf(assetId) + 1);
+    m_app->m_assetLibrary->syncToProject();
+    m_app->m_assetLibrary->ensureMedia(m_app->m_assetLibrary->indexOfId(id));
+    m_app->pushProjectEdit(before, tr("Sub-clip added"));
+    m_app->settleUndoRefresh();
+    return id;
 }
 
 void MediaBinController::startEditJob(const QString &assetId, const QString &name,

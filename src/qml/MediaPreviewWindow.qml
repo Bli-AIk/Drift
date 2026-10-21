@@ -545,6 +545,20 @@ Window {
             }
 
             ThemedButton {
+                id: addSubclipButton
+                visible: root.isVideo && root.clipId.length === 0
+                width: visible ? implicitWidth : 0
+                variant: "ghost"
+                text: qsTr("Add sub-clip")
+                enabled: !root.saving && root.outSeconds > root.inSeconds
+                         && (root.inSeconds > 0.001 || root.outSeconds < root.durationSeconds - 0.001)
+                onClicked: {
+                    if (EditorState.bin.addSubclip(root.assetId, root.inSeconds, root.outSeconds).length > 0)
+                        EditorState.setLastMessage(qsTr("Sub-clip added"))
+                }
+            }
+
+            ThemedButton {
                 id: rotateButton
                 visible: root.isVideo && root.clipId.length === 0
                 width: visible ? implicitWidth : 0
@@ -558,9 +572,10 @@ Window {
             Item {
                 height: 1
                 width: Math.max(0, parent.width - playButton.width - timeLabel.width
-                                - setInButton.width - setOutButton.width - rotateButton.width
+                                - setInButton.width - setOutButton.width - addSubclipButton.width
+                                - rotateButton.width
                                 - frameSizeLabel.implicitWidth - frameRatioLock.width
-                                - resetButton.implicitWidth - parent.spacing * 8)
+                                - resetButton.implicitWidth - parent.spacing * 9)
             }
 
             ThemedLabel {

@@ -116,6 +116,10 @@ public:
     // arrives as copyRendered, a failure as editFinished(false, ...).
     Q_INVOKABLE bool renderCopy(int assetIndex, double inSeconds, double outSeconds,
                                 double cropX, double cropY, double cropW, double cropH);
+    // Adds a bin item for the video's [inSeconds, outSeconds] range: same file, no copy, the range
+    // stored as its trim. Placed right after the source. Returns the new id, or empty when the
+    // asset is not a video or the range is empty.
+    Q_INVOKABLE QString addSubclip(const QString &assetId, double inSeconds, double outSeconds);
     // "Convert to edit-friendly format": re-encodes each video asset onto a constant, standard
     // frame rate and swaps it in, one at a time, the same undoable way a crop does, marking the
     // asset edit-friendly. The original file is left where it was.
