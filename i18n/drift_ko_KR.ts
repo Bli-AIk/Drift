@@ -2275,6 +2275,10 @@
         <translation>선택 항목을 조금 오른쪽으로 이동</translation>
     </message>
     <message>
+        <source>Go to end of timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Toggle guides</source>
         <translation>안내선 전환</translation>
     </message>
@@ -8587,6 +8591,18 @@
         <source>%1 — click to show this curve</source>
         <translation>%1 — 클릭하여 이 곡선 표시</translation>
     </message>
+    <message>
+        <source>Straight</source>
+        <translation type="unfinished">직선</translation>
+    </message>
+    <message>
+        <source>Ease</source>
+        <translation type="unfinished">이징</translation>
+    </message>
+    <message>
+        <source>Jump</source>
+        <translation type="unfinished">점프</translation>
+    </message>
 </context>
 <context>
     <name>KeyframeGraphHeaderBar</name>
@@ -9922,6 +9938,14 @@
         <translation>해당 편집 내용을 저장할 수 없습니다</translation>
     </message>
     <message>
+        <source>%1 (%2)</source>
+        <translation type="unfinished">%1(%2)</translation>
+    </message>
+    <message>
+        <source>Sub-clip added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Converting…</source>
         <translation>변환 중…</translation>
     </message>
@@ -10128,6 +10152,14 @@
     </message>
     <message>
         <source>Drag the box to crop. The original video stays available, so the crop can be changed later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add sub-clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub-clip added</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11097,6 +11129,22 @@
         <source>System default</source>
         <translation>시스템 기본값</translation>
     </message>
+    <message>
+        <source>Could not write the settings file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open the settings file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>That file is not a Drift settings export.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings imported. Restart Drift to apply them all.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Preview3DMode</name>
@@ -11356,12 +11404,20 @@ If playback stutters, try another.</source>
         <translation type="unfinished">%1(%2)</translation>
     </message>
     <message>
+        <source>Go to start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Previous frame</source>
         <translation type="unfinished">이전 프레임</translation>
     </message>
     <message>
         <source>Next frame</source>
         <translation type="unfinished">다음 프레임</translation>
+    </message>
+    <message>
+        <source>Go to end</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -13068,6 +13124,74 @@ If playback stutters, try another.</source>
         <source>Agent access</source>
         <translation type="unfinished">에이전트 접근</translation>
     </message>
+    <message>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTTP proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SOCKS5 proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How Drift reaches the internet for downloads, updates, and online services. Applies immediately.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Username (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>JSON document (*.json)</source>
+        <translation type="unfinished">JSON 문서 (*.json)</translation>
+    </message>
+    <message>
+        <source>Settings exported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SettingsAppearanceActions</name>
@@ -13357,6 +13481,14 @@ If playback stutters, try another.</source>
     <message>
         <source>Scroll pans left and right along the timeline. Shift+scroll moves between tracks. Middle-click drag also pans.</source>
         <translation type="unfinished">스크롤하면 타임라인을 좌우로 패닝합니다. Shift+스크롤은 트랙 사이를 이동합니다. 가운데 버튼 드래그로도 패닝할 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>Auto-crossfade overlapping clips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When a move creates an overlap with a neighbouring clip on the same track, add a crossfade across it.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Haptic feedback</source>
@@ -16718,6 +16850,14 @@ If playback stutters, try another.</source>
         <translation>끝 부분 자르기 — 클립을 클릭하여 컷 오른쪽의 모든 항목 삭제</translation>
     </message>
     <message>
+        <source>Trim start to playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trim end to playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Undo</source>
         <translation>실행 취소</translation>
     </message>
@@ -16771,6 +16911,10 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>Add camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-select: select the clip under the playhead</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -17379,6 +17523,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Scale clip</source>
         <translation>클립 크기 조정</translation>
+    </message>
+    <message>
+        <source>Scale origin</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Opacity &amp; rotation</source>

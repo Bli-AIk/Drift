@@ -2275,6 +2275,10 @@
         <translation>Di chuyển lựa chọn sang phải một chút</translation>
     </message>
     <message>
+        <source>Go to end of timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Toggle guides</source>
         <translation>Bật tắt đường kẻ</translation>
     </message>
@@ -8587,6 +8591,18 @@
         <source>%1 — click to show this curve</source>
         <translation>%1 - nhấp để hiển thị đường cong này</translation>
     </message>
+    <message>
+        <source>Straight</source>
+        <translation type="unfinished">Thẳng</translation>
+    </message>
+    <message>
+        <source>Ease</source>
+        <translation type="unfinished">Làm mềm</translation>
+    </message>
+    <message>
+        <source>Jump</source>
+        <translation type="unfinished">Nhảy</translation>
+    </message>
 </context>
 <context>
     <name>KeyframeGraphHeaderBar</name>
@@ -9922,6 +9938,14 @@
         <translation>Không thể lưu bản chỉnh sửa đó</translation>
     </message>
     <message>
+        <source>%1 (%2)</source>
+        <translation type="unfinished">%1 (%2)</translation>
+    </message>
+    <message>
+        <source>Sub-clip added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Converting…</source>
         <translation>Đang chuyển đổi…</translation>
     </message>
@@ -10133,6 +10157,14 @@
     <message>
         <source>Drag the box to crop. The original video stays available, so the crop can be changed later.</source>
         <translation>Kéo hộp để cắt cúp. Video gốc vẫn được giữ, nên có thể thay đổi phần cắt cúp sau.</translation>
+    </message>
+    <message>
+        <source>Add sub-clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub-clip added</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Original: %1×%2 • Crop: %3×%4</source>
@@ -11097,6 +11129,22 @@
         <source>System default</source>
         <translation>Mặc định hệ thống</translation>
     </message>
+    <message>
+        <source>Could not write the settings file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open the settings file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>That file is not a Drift settings export.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings imported. Restart Drift to apply them all.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Preview3DMode</name>
@@ -11362,12 +11410,20 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
         <translation>%1 (%2)</translation>
     </message>
     <message>
+        <source>Go to start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Previous frame</source>
         <translation>Khung hình trước</translation>
     </message>
     <message>
         <source>Next frame</source>
         <translation>Khung hình kế</translation>
+    </message>
+    <message>
+        <source>Go to end</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -13075,6 +13131,74 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
         <source>Agent access</source>
         <translation type="unfinished">Quyền truy cập của trợ lý</translation>
     </message>
+    <message>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTTP proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SOCKS5 proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How Drift reaches the internet for downloads, updates, and online services. Applies immediately.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Username (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>JSON document (*.json)</source>
+        <translation type="unfinished">Tài liệu JSON (*.json)</translation>
+    </message>
+    <message>
+        <source>Settings exported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SettingsAppearanceActions</name>
@@ -13364,6 +13488,14 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     <message>
         <source>Scroll pans left and right along the timeline. Shift+scroll moves between tracks. Middle-click drag also pans.</source>
         <translation type="unfinished">Cuộn sang trái và phải dọc theo dòng thời gian. Shift+cuộn chuột di chuyển giữa các track. Kéo chuột giữa cũng đồng thời xoay nó.</translation>
+    </message>
+    <message>
+        <source>Auto-crossfade overlapping clips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When a move creates an overlap with a neighbouring clip on the same track, add a crossfade across it.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Haptic feedback</source>
@@ -16726,6 +16858,14 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
         <translation>Cắt điểm kết thúc — nhấp vào clip để bỏ mọi thứ bên phải vị trí cắt</translation>
     </message>
     <message>
+        <source>Trim start to playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trim end to playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Undo</source>
         <translation>Hoàn tác</translation>
     </message>
@@ -16780,6 +16920,10 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     <message>
         <source>Add camera</source>
         <translation>Thêm camera</translation>
+    </message>
+    <message>
+        <source>Auto-select: select the clip under the playhead</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Toggle audio mixer strip</source>
@@ -17391,6 +17535,10 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     <message>
         <source>Scale clip</source>
         <translation>Tỷ lệ clip</translation>
+    </message>
+    <message>
+        <source>Scale origin</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Opacity &amp; rotation</source>

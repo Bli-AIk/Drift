@@ -34,9 +34,9 @@ Item {
     AppSettingsMenu {
         id: settingsMenu
         onLanguageRequested: settingsButton.languageRequested()
-        onMobileLayoutRequested: Window.window.switchShell("mobile")
-        onMulticamRequested: Window.window.openMulticam()
-        onDebugInfoRequested: Window.window.openDebugInfo()
-        onMoreSettingsRequested: Window.window.openSettings()
+        onMobileLayoutRequested: settingsButton.Window.window.switchShell("mobile")
+        onMulticamRequested: settingsButton.Window.window.openMulticam()
+        onDebugInfoRequested: settingsButton.Window.window.openDebugInfo()
+        onMoreSettingsRequested: settingsButton.Window.window.openSettings()
     }
 }

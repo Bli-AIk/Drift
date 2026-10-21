@@ -7,7 +7,7 @@ Rectangle {
 
     required property var modelData
     required property var editor
-    required property var strip
+    required property var track
     required property real inX
     required property real outX
     required property bool editing
@@ -29,7 +29,7 @@ Rectangle {
             if (!pressed)
                 return
             const t = ((parent.x + width / 2 + mouse.x)
-                       / Math.max(1, handle.strip.width)) * handle.editor.durationSeconds
+                       / Math.max(1, handle.track.width)) * handle.editor.durationSeconds
             if (handle.modelData.edge === "in")
                 handle.editor.inSeconds = t
             else

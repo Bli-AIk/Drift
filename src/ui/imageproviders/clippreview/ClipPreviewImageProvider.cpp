@@ -13,9 +13,8 @@ QImage ClipPreviewImageProvider::requestImage(const QString &id, QSize *size, co
 
     QImage image = ClipPreviewImageStore::frame();
     if (image.isNull()) {
-        if (size)
-            *size = QSize();
-        return {};
+        image = QImage(1, 1, QImage::Format_ARGB32_Premultiplied);
+        image.fill(Qt::transparent);
     }
 
     if (requestedSize.isValid() && requestedSize.width() > 0 && requestedSize.height() > 0)

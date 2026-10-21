@@ -755,7 +755,7 @@ Window {
                 ]
                 MediaPreviewTrimHandle {
                     editor: root
-                    strip: strip
+                    track: strip
                     inX: strip.inX
                     outX: strip.outX
                     editing: !root.saving

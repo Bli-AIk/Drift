@@ -2277,6 +2277,10 @@
         <translation>Mover la selección un poco a la derecha</translation>
     </message>
     <message>
+        <source>Go to end of timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Toggle guides</source>
         <translation>Alternar guías</translation>
     </message>
@@ -8618,6 +8622,18 @@
         <source>%1 — click to show this curve</source>
         <translation>%1 — haz clic para mostrar esta curva</translation>
     </message>
+    <message>
+        <source>Straight</source>
+        <translation type="unfinished">Recto</translation>
+    </message>
+    <message>
+        <source>Ease</source>
+        <translation type="unfinished">Suavizado</translation>
+    </message>
+    <message>
+        <source>Jump</source>
+        <translation type="unfinished">Salto</translation>
+    </message>
 </context>
 <context>
     <name>KeyframeGraphHeaderBar</name>
@@ -9960,6 +9976,14 @@
         <translation>No se pudo guardar esa edición</translation>
     </message>
     <message>
+        <source>%1 (%2)</source>
+        <translation type="unfinished">%1 (%2)</translation>
+    </message>
+    <message>
+        <source>Sub-clip added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Converting…</source>
         <translation>Convirtiendo…</translation>
     </message>
@@ -10174,6 +10198,14 @@
     </message>
     <message>
         <source>Drag the box to crop. The original video stays available, so the crop can be changed later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add sub-clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub-clip added</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11145,6 +11177,22 @@
         <source>System default</source>
         <translation>Valor por defecto del sistema</translation>
     </message>
+    <message>
+        <source>Could not write the settings file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open the settings file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>That file is not a Drift settings export.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings imported. Restart Drift to apply them all.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Preview3DMode</name>
@@ -11410,12 +11458,20 @@ Si la reproducción se corta, prueba con otra opción.</translation>
         <translation type="unfinished">%1 (%2)</translation>
     </message>
     <message>
+        <source>Go to start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Previous frame</source>
         <translation type="unfinished">Fotograma anterior</translation>
     </message>
     <message>
         <source>Next frame</source>
         <translation type="unfinished">Fotograma siguiente</translation>
+    </message>
+    <message>
+        <source>Go to end</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -13125,6 +13181,74 @@ Si la reproducción se corta, prueba con otra opción.</translation>
         <source>Agent access</source>
         <translation type="unfinished">Acceso de agente</translation>
     </message>
+    <message>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTTP proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SOCKS5 proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How Drift reaches the internet for downloads, updates, and online services. Applies immediately.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Username (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>JSON document (*.json)</source>
+        <translation type="unfinished">Documento JSON (*.json)</translation>
+    </message>
+    <message>
+        <source>Settings exported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SettingsAppearanceActions</name>
@@ -13414,6 +13538,14 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     <message>
         <source>Scroll pans left and right along the timeline. Shift+scroll moves between tracks. Middle-click drag also pans.</source>
         <translation type="unfinished">El desplazamiento mueve a izquierda y derecha por la línea de tiempo. Mayús+desplazamiento mueve entre pistas. Arrastrar con el botón central también desplaza la vista.</translation>
+    </message>
+    <message>
+        <source>Auto-crossfade overlapping clips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When a move creates an overlap with a neighbouring clip on the same track, add a crossfade across it.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Haptic feedback</source>
@@ -16780,6 +16912,14 @@ Si la reproducción se corta, prueba con otra opción.</translation>
         <translation>Recortar final — haz clic en un clip para descartar todo a la derecha del corte</translation>
     </message>
     <message>
+        <source>Trim start to playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trim end to playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Undo</source>
         <translation>Deshacer</translation>
     </message>
@@ -16833,6 +16973,10 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     </message>
     <message>
         <source>Add camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-select: select the clip under the playhead</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -17447,6 +17591,10 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     <message>
         <source>Scale clip</source>
         <translation>Escalar clip</translation>
+    </message>
+    <message>
+        <source>Scale origin</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Opacity &amp; rotation</source>
