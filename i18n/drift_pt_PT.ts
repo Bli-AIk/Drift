@@ -12303,6 +12303,14 @@ Se a reprodução travar, experimente outro.</translation>
         <translation>Transição</translation>
     </message>
     <message>
+        <source>Select a clip to edit its %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 doesn&apos;t apply to this clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save effect preset</source>
         <translation>Guardar predefinição de efeito</translation>
     </message>
@@ -19457,80 +19465,16 @@ Se a reprodução travar, experimente outro.</translation>
 <context>
     <name>WorkspaceDesigner</name>
     <message>
-        <source>Media</source>
-        <translation type="unfinished">Mídia</translation>
-    </message>
-    <message>
-        <source>Market</source>
-        <translation type="unfinished">Mercado</translation>
-    </message>
-    <message>
-        <source>Text</source>
-        <translation type="unfinished">Texto</translation>
-    </message>
-    <message>
-        <source>Subtitles</source>
-        <translation type="unfinished">Legendas</translation>
-    </message>
-    <message>
-        <source>Speech</source>
+        <source>Panels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Stickers</source>
-        <translation type="unfinished">Adesivos</translation>
-    </message>
-    <message>
-        <source>Shapes</source>
-        <translation type="unfinished">Formas</translation>
-    </message>
-    <message>
-        <source>Masks</source>
-        <translation type="unfinished">Máscaras</translation>
-    </message>
-    <message>
-        <source>Scenes</source>
-        <translation type="unfinished">Cenas</translation>
-    </message>
-    <message>
-        <source>Effects</source>
-        <translation type="unfinished">Efeitos</translation>
-    </message>
-    <message>
-        <source>Templates</source>
-        <translation type="unfinished">Modelos</translation>
-    </message>
-    <message>
-        <source>Transitions</source>
-        <translation type="unfinished">Transições</translation>
-    </message>
-    <message>
-        <source>Audio FX</source>
+        <source>Library tabs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>General</source>
-        <translation type="unfinished">Geral</translation>
-    </message>
-    <message>
-        <source>Transform</source>
-        <translation type="unfinished">Transformação</translation>
-    </message>
-    <message>
-        <source>Animation</source>
-        <translation type="unfinished">Animação</translation>
-    </message>
-    <message>
-        <source>Audio</source>
-        <translation type="unfinished">Áudio</translation>
-    </message>
-    <message>
-        <source>Speed</source>
-        <translation type="unfinished">Velocidade</translation>
-    </message>
-    <message>
-        <source>Blending</source>
-        <translation type="unfinished">Mesclagem</translation>
+        <source>Inspector tabs</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>New workspace</source>
@@ -19667,6 +19611,106 @@ Se a reprodução travar, experimente outro.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Media</source>
+        <translation type="unfinished">Mídia</translation>
+    </message>
+    <message>
+        <source>Market</source>
+        <translation type="unfinished">Mercado</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished">Texto</translation>
+    </message>
+    <message>
+        <source>Speech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stickers</source>
+        <translation type="unfinished">Adesivos</translation>
+    </message>
+    <message>
+        <source>Shapes</source>
+        <translation type="unfinished">Formas</translation>
+    </message>
+    <message>
+        <source>Masks</source>
+        <translation type="unfinished">Máscaras</translation>
+    </message>
+    <message>
+        <source>Scenes</source>
+        <translation type="unfinished">Cenas</translation>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation type="unfinished">Efeitos</translation>
+    </message>
+    <message>
+        <source>Templates</source>
+        <translation type="unfinished">Modelos</translation>
+    </message>
+    <message>
+        <source>Transitions</source>
+        <translation type="unfinished">Transições</translation>
+    </message>
+    <message>
+        <source>Audio FX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">Geral</translation>
+    </message>
+    <message>
+        <source>Shape</source>
+        <translation type="unfinished">Forma</translation>
+    </message>
+    <message>
+        <source>Motion</source>
+        <translation type="unfinished">Movimento</translation>
+    </message>
+    <message>
+        <source>3D Model</source>
+        <translation type="unfinished">Modelo 3D</translation>
+    </message>
+    <message>
+        <source>PDF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transform</source>
+        <translation type="unfinished">Transformação</translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stabilization</source>
+        <translation type="unfinished">Estabilização</translation>
+    </message>
+    <message>
+        <source>Animation</source>
+        <translation type="unfinished">Animação</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">Áudio</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished">Velocidade</translation>
+    </message>
+    <message>
+        <source>Blending</source>
+        <translation type="unfinished">Mesclagem</translation>
+    </message>
+    <message>
+        <source>Transition</source>
+        <translation type="unfinished">Transição</translation>
+    </message>
+    <message>
         <source>A window has no panels.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -19688,6 +19732,14 @@ Se a reprodução travar, experimente outro.</translation>
     </message>
     <message>
         <source>The &quot;%1&quot; panel is used more than once.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 · Library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 · Inspector</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

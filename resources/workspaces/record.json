@@ -14,7 +14,7 @@
             "split": "h",
             "sizes": [0.25, 0.5, 0.25],
             "children": [
-              { "panels": [ { "type": "assets", "tab": "media" } ], "active": 0 },
+              { "panels": [ { "type": "assets.media" } ], "active": 0 },
               { "panels": [ { "type": "preview" } ], "active": 0 },
               { "panels": [ { "type": "recorder" } ], "active": 0 }
             ]

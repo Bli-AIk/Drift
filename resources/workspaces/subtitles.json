@@ -14,7 +14,7 @@
             "split": "h",
             "sizes": [0.2, 0.4, 0.4],
             "children": [
-              { "panels": [ { "type": "assets", "tab": "subtitles" } ], "active": 0 },
+              { "panels": [ { "type": "assets.subtitles" }, { "type": "assets.speech" } ], "active": 0 },
               { "panels": [ { "type": "preview" } ], "active": 0 },
               { "panels": [ { "type": "subtitles" } ], "active": 0 }
             ]

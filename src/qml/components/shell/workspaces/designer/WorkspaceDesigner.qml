@@ -39,42 +39,23 @@ Item {
     readonly property var unplaced: Workspaces.panelTypes.filter(p => !placed[p.type])
     readonly property var screenNames: Qt.application.screens.map(s => s.name)
 
-    readonly property var assetsTabs: [
-        { id: "media", label: qsTr("Media") },
-        { id: "market", label: qsTr("Market") },
-        { id: "text", label: qsTr("Text") },
-        { id: "subtitles", label: qsTr("Subtitles") },
-        { id: "speech", label: qsTr("Speech") },
-        { id: "stickers", label: qsTr("Stickers") },
-        { id: "shapes", label: qsTr("Shapes") },
-        { id: "masks", label: qsTr("Masks") },
-        { id: "scenes", label: qsTr("Scenes") },
-        { id: "effects", label: qsTr("Effects") },
-        { id: "templates", label: qsTr("Templates") },
-        { id: "transitions", label: qsTr("Transitions") },
-        { id: "sounds", label: qsTr("Audio FX") }
-    ]
-    readonly property var propertiesTabs: [
-        { id: "general", label: qsTr("General") },
-        { id: "transform", label: qsTr("Transform") },
-        { id: "animation", label: qsTr("Animation") },
-        { id: "audio", label: qsTr("Audio") },
-        { id: "speed", label: qsTr("Speed") },
-        { id: "blending", label: qsTr("Blending") },
-        { id: "masks", label: qsTr("Masks") },
-        { id: "effects", label: qsTr("Effects") },
-        { id: "audioEffects", label: qsTr("Audio FX") }
+    readonly property var paletteGroups: [
+        { id: "panel", title: qsTr("Panels") },
+        { id: "assets", title: qsTr("Library tabs") },
+        { id: "properties", title: qsTr("Inspector tabs") }
     ]
 
     implicitHeight: Math.max(sidebar.implicitHeight, main.implicitHeight)
 
     function tabsFor(type) {
-        return type === "assets" ? assetsTabs : type === "properties" ? propertiesTabs : []
+        if (type !== "assets" && type !== "properties")
+            return []
+        return Workspaces.panelTypes.filter(p => p.group === type).map(p => ({ id: p.tab, label: p.label }))
     }
 
     function labelOf(type) {
         const found = Workspaces.panelTypes.find(p => p.type === type)
-        return found ? found.label : type
+        return found ? found.fullLabel : type
     }
 
     function tabLabel(type, tab) {
@@ -530,11 +511,11 @@ Item {
             border.width: 1
             border.color: root.removing ? Theme.destructive : Theme.panelBorder
 
-            Flow {
+            Column {
                 id: paletteFlow
                 anchors.fill: parent
                 anchors.margins: Theme.spacingLg
-                spacing: Theme.spacingSm
+                spacing: Theme.spacingMd
 
                 Text {
                     visible: root.unplaced.length === 0
@@ -547,20 +528,47 @@ Item {
                 }
 
                 Repeater {
-                    model: root.unplaced
+                    model: root.paletteGroups
 
-                    ThemedChip {
-                        id: chip
+                    Column {
+                        id: section
 
                         required property var modelData
+                        readonly property var chips: root.unplaced.filter(p => p.group === modelData.id)
 
-                        variant: "outline"
-                        text: modelData.label
+                        width: paletteFlow.width
+                        spacing: Theme.spacingXs
+                        visible: chips.length > 0
 
-                        DesignerDragArea {
-                            anchors.fill: parent
-                            designer: root
-                            panels: [{ type: chip.modelData.type }]
+                        Text {
+                            text: section.modelData.title
+                            color: Theme.mutedForeground
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontSizeXs
+                        }
+
+                        Flow {
+                            width: parent.width
+                            spacing: Theme.spacingSm
+
+                            Repeater {
+                                model: section.chips
+
+                                ThemedChip {
+                                    id: chip
+
+                                    required property var modelData
+
+                                    variant: "outline"
+                                    text: modelData.label
+
+                                    DesignerDragArea {
+                                        anchors.fill: parent
+                                        designer: root
+                                        panels: [{ type: chip.modelData.type }]
+                                    }
+                                }
+                            }
                         }
                     }
                 }

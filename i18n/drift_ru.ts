@@ -12352,6 +12352,14 @@ If playback stutters, try another.</source>
         <translation>Переход</translation>
     </message>
     <message>
+        <source>Select a clip to edit its %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 doesn&apos;t apply to this clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save effect preset</source>
         <translation>Сохранить пресет эффекта</translation>
     </message>
@@ -19518,80 +19526,16 @@ If playback stutters, try another.</source>
 <context>
     <name>WorkspaceDesigner</name>
     <message>
-        <source>Media</source>
-        <translation type="unfinished">Медиафайлы</translation>
-    </message>
-    <message>
-        <source>Market</source>
-        <translation type="unfinished">Магазин</translation>
-    </message>
-    <message>
-        <source>Text</source>
-        <translation type="unfinished">Текст</translation>
-    </message>
-    <message>
-        <source>Subtitles</source>
-        <translation type="unfinished">Субтитры</translation>
-    </message>
-    <message>
-        <source>Speech</source>
+        <source>Panels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Stickers</source>
-        <translation type="unfinished">Стикеры</translation>
+        <source>Library tabs</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Shapes</source>
-        <translation type="unfinished">Фигуры</translation>
-    </message>
-    <message>
-        <source>Masks</source>
-        <translation type="unfinished">Маски</translation>
-    </message>
-    <message>
-        <source>Scenes</source>
-        <translation type="unfinished">Сцены</translation>
-    </message>
-    <message>
-        <source>Effects</source>
-        <translation type="unfinished">Эффекты</translation>
-    </message>
-    <message>
-        <source>Templates</source>
-        <translation type="unfinished">Шаблоны</translation>
-    </message>
-    <message>
-        <source>Transitions</source>
-        <translation type="unfinished">Переходы</translation>
-    </message>
-    <message>
-        <source>Audio FX</source>
-        <translation type="unfinished">Аудиоэффекты</translation>
-    </message>
-    <message>
-        <source>General</source>
-        <translation type="unfinished">Общие</translation>
-    </message>
-    <message>
-        <source>Transform</source>
-        <translation type="unfinished">Трансформация</translation>
-    </message>
-    <message>
-        <source>Animation</source>
-        <translation type="unfinished">Анимация</translation>
-    </message>
-    <message>
-        <source>Audio</source>
-        <translation type="unfinished">Аудио</translation>
-    </message>
-    <message>
-        <source>Speed</source>
-        <translation type="unfinished">Скорость</translation>
-    </message>
-    <message>
-        <source>Blending</source>
-        <translation type="unfinished">Наложение</translation>
+        <source>Inspector tabs</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>New workspace</source>
@@ -19728,6 +19672,106 @@ If playback stutters, try another.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Media</source>
+        <translation type="unfinished">Медиафайлы</translation>
+    </message>
+    <message>
+        <source>Market</source>
+        <translation type="unfinished">Магазин</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished">Текст</translation>
+    </message>
+    <message>
+        <source>Speech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stickers</source>
+        <translation type="unfinished">Стикеры</translation>
+    </message>
+    <message>
+        <source>Shapes</source>
+        <translation type="unfinished">Фигуры</translation>
+    </message>
+    <message>
+        <source>Masks</source>
+        <translation type="unfinished">Маски</translation>
+    </message>
+    <message>
+        <source>Scenes</source>
+        <translation type="unfinished">Сцены</translation>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation type="unfinished">Эффекты</translation>
+    </message>
+    <message>
+        <source>Templates</source>
+        <translation type="unfinished">Шаблоны</translation>
+    </message>
+    <message>
+        <source>Transitions</source>
+        <translation type="unfinished">Переходы</translation>
+    </message>
+    <message>
+        <source>Audio FX</source>
+        <translation type="unfinished">Аудиоэффекты</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">Общие</translation>
+    </message>
+    <message>
+        <source>Shape</source>
+        <translation type="unfinished">Фигура</translation>
+    </message>
+    <message>
+        <source>Motion</source>
+        <translation type="unfinished">Движение</translation>
+    </message>
+    <message>
+        <source>3D Model</source>
+        <translation type="unfinished">3D-модель</translation>
+    </message>
+    <message>
+        <source>PDF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transform</source>
+        <translation type="unfinished">Трансформация</translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stabilization</source>
+        <translation type="unfinished">Стабилизация</translation>
+    </message>
+    <message>
+        <source>Animation</source>
+        <translation type="unfinished">Анимация</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">Аудио</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished">Скорость</translation>
+    </message>
+    <message>
+        <source>Blending</source>
+        <translation type="unfinished">Наложение</translation>
+    </message>
+    <message>
+        <source>Transition</source>
+        <translation type="unfinished">Переход</translation>
+    </message>
+    <message>
         <source>A window has no panels.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -19749,6 +19793,14 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>The &quot;%1&quot; panel is used more than once.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 · Library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 · Inspector</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

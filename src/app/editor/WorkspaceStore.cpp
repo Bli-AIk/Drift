@@ -24,6 +24,8 @@ struct PanelType
     const char *label;
 };
 
+enum class Group { Panel, Assets, Properties };
+
 const PanelType kPanelTypes[] = {
     {"assets", QT_TRANSLATE_NOOP("WorkspaceStore", "Assets")},
     {"properties", QT_TRANSLATE_NOOP("WorkspaceStore", "Properties")},
@@ -37,10 +39,50 @@ const PanelType kPanelTypes[] = {
     {"recorder", QT_TRANSLATE_NOOP("WorkspaceStore", "Recorder")},
 };
 
+// Tab ids and labels mirror AssetsPanel.qml / PropertiesPanel.qml.
+const PanelType kAssetTabTypes[] = {
+    {"assets.media", QT_TRANSLATE_NOOP("WorkspaceStore", "Media")},
+    {"assets.market", QT_TRANSLATE_NOOP("WorkspaceStore", "Market")},
+    {"assets.text", QT_TRANSLATE_NOOP("WorkspaceStore", "Text")},
+    {"assets.subtitles", QT_TRANSLATE_NOOP("WorkspaceStore", "Subtitles")},
+    {"assets.speech", QT_TRANSLATE_NOOP("WorkspaceStore", "Speech")},
+    {"assets.stickers", QT_TRANSLATE_NOOP("WorkspaceStore", "Stickers")},
+    {"assets.shapes", QT_TRANSLATE_NOOP("WorkspaceStore", "Shapes")},
+    {"assets.masks", QT_TRANSLATE_NOOP("WorkspaceStore", "Masks")},
+    {"assets.scenes", QT_TRANSLATE_NOOP("WorkspaceStore", "Scenes")},
+    {"assets.effects", QT_TRANSLATE_NOOP("WorkspaceStore", "Effects")},
+    {"assets.templates", QT_TRANSLATE_NOOP("WorkspaceStore", "Templates")},
+    {"assets.transitions", QT_TRANSLATE_NOOP("WorkspaceStore", "Transitions")},
+    {"assets.sounds", QT_TRANSLATE_NOOP("WorkspaceStore", "Audio FX")},
+};
+
+const PanelType kPropertiesTabTypes[] = {
+    {"properties.general", QT_TRANSLATE_NOOP("WorkspaceStore", "General")},
+    {"properties.text", QT_TRANSLATE_NOOP("WorkspaceStore", "Text")},
+    {"properties.shape", QT_TRANSLATE_NOOP("WorkspaceStore", "Shape")},
+    {"properties.vector", QT_TRANSLATE_NOOP("WorkspaceStore", "Motion")},
+    {"properties.model3d", QT_TRANSLATE_NOOP("WorkspaceStore", "3D Model")},
+    {"properties.pdf", QT_TRANSLATE_NOOP("WorkspaceStore", "PDF")},
+    {"properties.subtitles", QT_TRANSLATE_NOOP("WorkspaceStore", "Subtitles")},
+    {"properties.transform", QT_TRANSLATE_NOOP("WorkspaceStore", "Transform")},
+    {"properties.camera", QT_TRANSLATE_NOOP("WorkspaceStore", "Camera")},
+    {"properties.stabilize", QT_TRANSLATE_NOOP("WorkspaceStore", "Stabilization")},
+    {"properties.animation", QT_TRANSLATE_NOOP("WorkspaceStore", "Animation")},
+    {"properties.audio", QT_TRANSLATE_NOOP("WorkspaceStore", "Audio")},
+    {"properties.speed", QT_TRANSLATE_NOOP("WorkspaceStore", "Speed")},
+    {"properties.blending", QT_TRANSLATE_NOOP("WorkspaceStore", "Blending")},
+    {"properties.masks", QT_TRANSLATE_NOOP("WorkspaceStore", "Masks")},
+    {"properties.effects", QT_TRANSLATE_NOOP("WorkspaceStore", "Effects")},
+    {"properties.audioEffects", QT_TRANSLATE_NOOP("WorkspaceStore", "Audio FX")},
+    {"properties.transition", QT_TRANSLATE_NOOP("WorkspaceStore", "Transition")},
+};
+
 bool isKnownType(const QString &type)
 {
-    return std::any_of(std::begin(kPanelTypes), std::end(kPanelTypes),
-                       [&](const PanelType &p) { return type == QLatin1String(p.type); });
+    const auto known = [&](const PanelType &p) { return type == QLatin1String(p.type); };
+    return std::any_of(std::begin(kPanelTypes), std::end(kPanelTypes), known)
+           || std::any_of(std::begin(kAssetTabTypes), std::end(kAssetTabTypes), known)
+           || std::any_of(std::begin(kPropertiesTabTypes), std::end(kPropertiesTabTypes), known);
 }
 
 bool isSplit(const QVariantMap &node)
@@ -397,10 +439,34 @@ void WorkspaceStore::setActiveId(const QString &id)
 QVariantList WorkspaceStore::panelTypes() const
 {
     QVariantList out;
-    for (const PanelType &p : kPanelTypes) {
-        out << QVariantMap{{QStringLiteral("type"), QLatin1String(p.type)},
-                           {QStringLiteral("label"), tr(p.label)}};
-    }
+    const auto add = [&](const PanelType &p, Group group) {
+        const QString label = tr(p.label);
+        QVariantMap entry{{QStringLiteral("type"), QLatin1String(p.type)},
+                          {QStringLiteral("label"), label}};
+        switch (group) {
+        case Group::Panel:
+            entry[QStringLiteral("group")] = QStringLiteral("panel");
+            entry[QStringLiteral("fullLabel")] = label;
+            break;
+        case Group::Assets:
+            entry[QStringLiteral("group")] = QStringLiteral("assets");
+            entry[QStringLiteral("tab")] = QString::fromLatin1(p.type).mid(7);
+            entry[QStringLiteral("fullLabel")] = tr("%1 · Library").arg(label);
+            break;
+        case Group::Properties:
+            entry[QStringLiteral("group")] = QStringLiteral("properties");
+            entry[QStringLiteral("tab")] = QString::fromLatin1(p.type).mid(11);
+            entry[QStringLiteral("fullLabel")] = tr("%1 · Inspector").arg(label);
+            break;
+        }
+        out << entry;
+    };
+    for (const PanelType &p : kPanelTypes)
+        add(p, Group::Panel);
+    for (const PanelType &p : kAssetTabTypes)
+        add(p, Group::Assets);
+    for (const PanelType &p : kPropertiesTabTypes)
+        add(p, Group::Properties);
     return out;
 }
 

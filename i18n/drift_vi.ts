@@ -12254,6 +12254,14 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
         <translation>Chuyển cảnh</translation>
     </message>
     <message>
+        <source>Select a clip to edit its %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 doesn&apos;t apply to this clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save effect preset</source>
         <translation>Lưu preset hiệu ứng</translation>
     </message>
@@ -19396,80 +19404,16 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
 <context>
     <name>WorkspaceDesigner</name>
     <message>
-        <source>Media</source>
-        <translation type="unfinished">Phương tiện</translation>
-    </message>
-    <message>
-        <source>Market</source>
+        <source>Panels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Text</source>
-        <translation type="unfinished">Văn bản</translation>
-    </message>
-    <message>
-        <source>Subtitles</source>
-        <translation type="unfinished">Phụ đề</translation>
-    </message>
-    <message>
-        <source>Speech</source>
-        <translation type="unfinished">Giọng nói</translation>
-    </message>
-    <message>
-        <source>Stickers</source>
-        <translation type="unfinished">Nhãn dán</translation>
-    </message>
-    <message>
-        <source>Shapes</source>
-        <translation type="unfinished">Hình dạng</translation>
-    </message>
-    <message>
-        <source>Masks</source>
-        <translation type="unfinished">Mặt nạ</translation>
-    </message>
-    <message>
-        <source>Scenes</source>
-        <translation type="unfinished">Phân cảnh</translation>
-    </message>
-    <message>
-        <source>Effects</source>
-        <translation type="unfinished">Hiệu ứng</translation>
-    </message>
-    <message>
-        <source>Templates</source>
-        <translation type="unfinished">Mẫu</translation>
-    </message>
-    <message>
-        <source>Transitions</source>
-        <translation type="unfinished">Chuyển cảnh</translation>
-    </message>
-    <message>
-        <source>Audio FX</source>
+        <source>Library tabs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>General</source>
-        <translation type="unfinished">Chung</translation>
-    </message>
-    <message>
-        <source>Transform</source>
-        <translation type="unfinished">Chuyển đổi</translation>
-    </message>
-    <message>
-        <source>Animation</source>
-        <translation type="unfinished">Hoạt ảnh</translation>
-    </message>
-    <message>
-        <source>Audio</source>
-        <translation type="unfinished">Âm thanh</translation>
-    </message>
-    <message>
-        <source>Speed</source>
-        <translation type="unfinished">Tốc độ</translation>
-    </message>
-    <message>
-        <source>Blending</source>
-        <translation type="unfinished">Trộn</translation>
+        <source>Inspector tabs</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>New workspace</source>
@@ -19606,6 +19550,106 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Media</source>
+        <translation type="unfinished">Phương tiện</translation>
+    </message>
+    <message>
+        <source>Market</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished">Văn bản</translation>
+    </message>
+    <message>
+        <source>Speech</source>
+        <translation type="unfinished">Giọng nói</translation>
+    </message>
+    <message>
+        <source>Stickers</source>
+        <translation type="unfinished">Nhãn dán</translation>
+    </message>
+    <message>
+        <source>Shapes</source>
+        <translation type="unfinished">Hình dạng</translation>
+    </message>
+    <message>
+        <source>Masks</source>
+        <translation type="unfinished">Mặt nạ</translation>
+    </message>
+    <message>
+        <source>Scenes</source>
+        <translation type="unfinished">Phân cảnh</translation>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation type="unfinished">Hiệu ứng</translation>
+    </message>
+    <message>
+        <source>Templates</source>
+        <translation type="unfinished">Mẫu</translation>
+    </message>
+    <message>
+        <source>Transitions</source>
+        <translation type="unfinished">Chuyển cảnh</translation>
+    </message>
+    <message>
+        <source>Audio FX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">Chung</translation>
+    </message>
+    <message>
+        <source>Shape</source>
+        <translation type="unfinished">Hình dạng</translation>
+    </message>
+    <message>
+        <source>Motion</source>
+        <translation type="unfinished">Chuyển động</translation>
+    </message>
+    <message>
+        <source>3D Model</source>
+        <translation type="unfinished">Mô hình 3D</translation>
+    </message>
+    <message>
+        <source>PDF</source>
+        <translation type="unfinished">PDF</translation>
+    </message>
+    <message>
+        <source>Transform</source>
+        <translation type="unfinished">Chuyển đổi</translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished">Camera</translation>
+    </message>
+    <message>
+        <source>Stabilization</source>
+        <translation type="unfinished">Ổn định</translation>
+    </message>
+    <message>
+        <source>Animation</source>
+        <translation type="unfinished">Hoạt ảnh</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">Âm thanh</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished">Tốc độ</translation>
+    </message>
+    <message>
+        <source>Blending</source>
+        <translation type="unfinished">Trộn</translation>
+    </message>
+    <message>
+        <source>Transition</source>
+        <translation type="unfinished">Chuyển cảnh</translation>
+    </message>
+    <message>
         <source>A window has no panels.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -19627,6 +19671,14 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     </message>
     <message>
         <source>The &quot;%1&quot; panel is used more than once.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 · Library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 · Inspector</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

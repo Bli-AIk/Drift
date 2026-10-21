@@ -12248,6 +12248,14 @@ If playback stutters, try another.</source>
         <translation>전환</translation>
     </message>
     <message>
+        <source>Select a clip to edit its %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 doesn&apos;t apply to this clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save effect preset</source>
         <translation>효과 프리셋 저장</translation>
     </message>
@@ -19388,80 +19396,16 @@ If playback stutters, try another.</source>
 <context>
     <name>WorkspaceDesigner</name>
     <message>
-        <source>Media</source>
-        <translation type="unfinished">미디어</translation>
-    </message>
-    <message>
-        <source>Market</source>
-        <translation type="unfinished">마켓</translation>
-    </message>
-    <message>
-        <source>Text</source>
-        <translation type="unfinished">텍스트</translation>
-    </message>
-    <message>
-        <source>Subtitles</source>
-        <translation type="unfinished">자막</translation>
-    </message>
-    <message>
-        <source>Speech</source>
+        <source>Panels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Stickers</source>
-        <translation type="unfinished">스티커</translation>
+        <source>Library tabs</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Shapes</source>
-        <translation type="unfinished">도형</translation>
-    </message>
-    <message>
-        <source>Masks</source>
-        <translation type="unfinished">마스크</translation>
-    </message>
-    <message>
-        <source>Scenes</source>
-        <translation type="unfinished">장면</translation>
-    </message>
-    <message>
-        <source>Effects</source>
-        <translation type="unfinished">효과</translation>
-    </message>
-    <message>
-        <source>Templates</source>
-        <translation type="unfinished">템플릿</translation>
-    </message>
-    <message>
-        <source>Transitions</source>
-        <translation type="unfinished">전환</translation>
-    </message>
-    <message>
-        <source>Audio FX</source>
-        <translation type="unfinished">오디오 효과</translation>
-    </message>
-    <message>
-        <source>General</source>
-        <translation type="unfinished">일반</translation>
-    </message>
-    <message>
-        <source>Transform</source>
-        <translation type="unfinished">변환</translation>
-    </message>
-    <message>
-        <source>Animation</source>
-        <translation type="unfinished">애니메이션</translation>
-    </message>
-    <message>
-        <source>Audio</source>
-        <translation type="unfinished">오디오</translation>
-    </message>
-    <message>
-        <source>Speed</source>
-        <translation type="unfinished">속도</translation>
-    </message>
-    <message>
-        <source>Blending</source>
-        <translation type="unfinished">혼합</translation>
+        <source>Inspector tabs</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>New workspace</source>
@@ -19598,6 +19542,106 @@ If playback stutters, try another.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Media</source>
+        <translation type="unfinished">미디어</translation>
+    </message>
+    <message>
+        <source>Market</source>
+        <translation type="unfinished">마켓</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished">텍스트</translation>
+    </message>
+    <message>
+        <source>Speech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stickers</source>
+        <translation type="unfinished">스티커</translation>
+    </message>
+    <message>
+        <source>Shapes</source>
+        <translation type="unfinished">도형</translation>
+    </message>
+    <message>
+        <source>Masks</source>
+        <translation type="unfinished">마스크</translation>
+    </message>
+    <message>
+        <source>Scenes</source>
+        <translation type="unfinished">장면</translation>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation type="unfinished">효과</translation>
+    </message>
+    <message>
+        <source>Templates</source>
+        <translation type="unfinished">템플릿</translation>
+    </message>
+    <message>
+        <source>Transitions</source>
+        <translation type="unfinished">전환</translation>
+    </message>
+    <message>
+        <source>Audio FX</source>
+        <translation type="unfinished">오디오 효과</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">일반</translation>
+    </message>
+    <message>
+        <source>Shape</source>
+        <translation type="unfinished">도형</translation>
+    </message>
+    <message>
+        <source>Motion</source>
+        <translation type="unfinished">모션</translation>
+    </message>
+    <message>
+        <source>3D Model</source>
+        <translation type="unfinished">3D 모델</translation>
+    </message>
+    <message>
+        <source>PDF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transform</source>
+        <translation type="unfinished">변환</translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stabilization</source>
+        <translation type="unfinished">안정화</translation>
+    </message>
+    <message>
+        <source>Animation</source>
+        <translation type="unfinished">애니메이션</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">오디오</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished">속도</translation>
+    </message>
+    <message>
+        <source>Blending</source>
+        <translation type="unfinished">혼합</translation>
+    </message>
+    <message>
+        <source>Transition</source>
+        <translation type="unfinished">전환</translation>
+    </message>
+    <message>
         <source>A window has no panels.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -19619,6 +19663,14 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>The &quot;%1&quot; panel is used more than once.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 · Library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 · Inspector</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

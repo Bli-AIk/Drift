@@ -27,6 +27,8 @@ Item {
                                               && root.sourceViewerPanel.parent !== root
 
     // One line per panel type. A type missing from here gets a placeholder.
+    // "assets.<tab>" and "properties.<tab>" are handled by prefix in panel(): the full panels
+    // pinned to one tab.
     readonly property var factories: ({
         "assets": assetsC,
         "properties": propertiesC,
@@ -56,17 +58,32 @@ Item {
         const types = Workspaces.panelTypes
         for (let i = 0; i < types.length; ++i) {
             if (types[i].type === type)
-                return types[i].label
+                return types[i].fullLabel
         }
         return type
     }
 
+    function create(type) {
+        if (type.startsWith("assets."))
+            return assetsC.createObject(root, { lockedTab: type.slice(7) })
+        if (type.startsWith("properties.")) {
+            const pane = propertiesC.createObject(root, { lockedTab: type.slice(11) })
+            pane.browseEffectsRequested.connect(root.browseEffects)
+            pane.browseAudioEffectsRequested.connect(root.browseAudioEffects)
+            return pane
+        }
+        const factory = root.factories[type]
+        return factory ? factory.createObject(root)
+                       : placeholderC.createObject(root, { label: root.label(type) })
+    }
+
+    function browseEffects() { root.assetsPanel?.showTab("effects") }
+    function browseAudioEffects() { root.assetsPanel?.showTab("sounds") }
+
     function panel(type) {
         if (root._created[type])
             return root._created[type]
-        const factory = root.factories[type]
-        const item = factory ? factory.createObject(root)
-                             : placeholderC.createObject(root, { label: root.label(type) })
+        const item = root.create(type)
         root._created[type] = item
         switch (type) {
         case "assets":
@@ -108,8 +125,8 @@ Item {
     Connections {
         target: root.propertiesPanel
         // Empty-state browse CTAs jump the assets panel to the matching library tab.
-        function onBrowseEffectsRequested() { root.assetsPanel?.showTab("effects") }
-        function onBrowseAudioEffectsRequested() { root.assetsPanel?.showTab("sounds") }
+        function onBrowseEffectsRequested() { root.browseEffects() }
+        function onBrowseAudioEffectsRequested() { root.browseAudioEffects() }
     }
 
     Connections {

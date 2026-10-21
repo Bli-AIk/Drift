@@ -12254,6 +12254,14 @@ If playback stutters, try another.</source>
         <translation>トランジション</translation>
     </message>
     <message>
+        <source>Select a clip to edit its %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 doesn&apos;t apply to this clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save effect preset</source>
         <translation>エフェクトプリセットを保存</translation>
     </message>
@@ -19396,80 +19404,16 @@ If playback stutters, try another.</source>
 <context>
     <name>WorkspaceDesigner</name>
     <message>
-        <source>Media</source>
-        <translation type="unfinished">メディア</translation>
+        <source>Panels</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Market</source>
-        <translation type="unfinished">マーケット</translation>
+        <source>Library tabs</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Text</source>
-        <translation type="unfinished">テキスト</translation>
-    </message>
-    <message>
-        <source>Subtitles</source>
-        <translation type="unfinished">字幕</translation>
-    </message>
-    <message>
-        <source>Speech</source>
-        <translation type="unfinished">スピーチ</translation>
-    </message>
-    <message>
-        <source>Stickers</source>
-        <translation type="unfinished">スタンプ</translation>
-    </message>
-    <message>
-        <source>Shapes</source>
-        <translation type="unfinished">シェイプ</translation>
-    </message>
-    <message>
-        <source>Masks</source>
-        <translation type="unfinished">マスク</translation>
-    </message>
-    <message>
-        <source>Scenes</source>
-        <translation type="unfinished">シーン</translation>
-    </message>
-    <message>
-        <source>Effects</source>
-        <translation type="unfinished">エフェクト</translation>
-    </message>
-    <message>
-        <source>Templates</source>
-        <translation type="unfinished">テンプレート</translation>
-    </message>
-    <message>
-        <source>Transitions</source>
-        <translation type="unfinished">トランジション</translation>
-    </message>
-    <message>
-        <source>Audio FX</source>
-        <translation type="unfinished">オーディオ FX</translation>
-    </message>
-    <message>
-        <source>General</source>
-        <translation type="unfinished">全般</translation>
-    </message>
-    <message>
-        <source>Transform</source>
-        <translation type="unfinished">変形</translation>
-    </message>
-    <message>
-        <source>Animation</source>
-        <translation type="unfinished">アニメーション</translation>
-    </message>
-    <message>
-        <source>Audio</source>
-        <translation type="unfinished">オーディオ</translation>
-    </message>
-    <message>
-        <source>Speed</source>
-        <translation type="unfinished">速度</translation>
-    </message>
-    <message>
-        <source>Blending</source>
-        <translation type="unfinished">ブレンド</translation>
+        <source>Inspector tabs</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>New workspace</source>
@@ -19606,6 +19550,106 @@ If playback stutters, try another.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Media</source>
+        <translation type="unfinished">メディア</translation>
+    </message>
+    <message>
+        <source>Market</source>
+        <translation type="unfinished">マーケット</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished">テキスト</translation>
+    </message>
+    <message>
+        <source>Speech</source>
+        <translation type="unfinished">スピーチ</translation>
+    </message>
+    <message>
+        <source>Stickers</source>
+        <translation type="unfinished">スタンプ</translation>
+    </message>
+    <message>
+        <source>Shapes</source>
+        <translation type="unfinished">シェイプ</translation>
+    </message>
+    <message>
+        <source>Masks</source>
+        <translation type="unfinished">マスク</translation>
+    </message>
+    <message>
+        <source>Scenes</source>
+        <translation type="unfinished">シーン</translation>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation type="unfinished">エフェクト</translation>
+    </message>
+    <message>
+        <source>Templates</source>
+        <translation type="unfinished">テンプレート</translation>
+    </message>
+    <message>
+        <source>Transitions</source>
+        <translation type="unfinished">トランジション</translation>
+    </message>
+    <message>
+        <source>Audio FX</source>
+        <translation type="unfinished">オーディオ FX</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">全般</translation>
+    </message>
+    <message>
+        <source>Shape</source>
+        <translation type="unfinished">シェイプ</translation>
+    </message>
+    <message>
+        <source>Motion</source>
+        <translation type="unfinished">モーション</translation>
+    </message>
+    <message>
+        <source>3D Model</source>
+        <translation type="unfinished">3D モデル</translation>
+    </message>
+    <message>
+        <source>PDF</source>
+        <translation type="unfinished">PDF</translation>
+    </message>
+    <message>
+        <source>Transform</source>
+        <translation type="unfinished">変形</translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished">カメラ</translation>
+    </message>
+    <message>
+        <source>Stabilization</source>
+        <translation type="unfinished">手ぶれ補正</translation>
+    </message>
+    <message>
+        <source>Animation</source>
+        <translation type="unfinished">アニメーション</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">オーディオ</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished">速度</translation>
+    </message>
+    <message>
+        <source>Blending</source>
+        <translation type="unfinished">ブレンド</translation>
+    </message>
+    <message>
+        <source>Transition</source>
+        <translation type="unfinished">トランジション</translation>
+    </message>
+    <message>
         <source>A window has no panels.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -19627,6 +19671,14 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>The &quot;%1&quot; panel is used more than once.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 · Library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 · Inspector</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

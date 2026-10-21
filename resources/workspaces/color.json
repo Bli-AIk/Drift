@@ -14,9 +14,9 @@
             "split": "h",
             "sizes": [0.2, 0.55, 0.25],
             "children": [
-              { "panels": [ { "type": "assets", "tab": "effects" } ], "active": 0 },
+              { "panels": [ { "type": "assets.effects" } ], "active": 0 },
               { "panels": [ { "type": "preview" } ], "active": 0 },
-              { "panels": [ { "type": "properties" } ], "active": 0 }
+              { "panels": [ { "type": "properties.effects" } ], "active": 0 }
             ]
           },
           { "panels": [ { "type": "timeline" } ], "active": 0 }

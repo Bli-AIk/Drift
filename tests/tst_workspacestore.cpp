@@ -17,6 +17,7 @@ private slots:
     void everyBuiltinPresetValidates();
     void roundTripAndOverride();
     void rejectsDuplicatePanels();
+    void acceptsTabPanelTypes();
     void sizesAreNormalizedAndSplitCollapses();
     void setSizesIsQuiet();
     void duplicateAndRemove();
@@ -119,6 +120,30 @@ void WorkspaceStoreTest::rejectsDuplicatePanels()
     QVERIFY(!store.saveWorkspace(workspaceWith(root)).isEmpty());
     QVERIFY(!store.saveWorkspace(workspaceWith(slot("bogus"))).isEmpty());
     QCOMPARE(store.workspaces().size(), 8);
+}
+
+void WorkspaceStoreTest::acceptsTabPanelTypes()
+{
+    WorkspaceStore store;
+    const QVariantMap ok{{"split", "h"},
+                         {"children", QVariantList{slot("assets.effects"), slot("properties.transform"),
+                                                   slot("assets")}}};
+    QCOMPARE(store.validate(workspaceWith(ok)), QString());
+    const QVariantMap dup{{"split", "h"},
+                          {"children", QVariantList{slot("assets.effects"), slot("assets.effects")}}};
+    QVERIFY(!store.validate(workspaceWith(dup)).isEmpty());
+    QVERIFY(!store.validate(workspaceWith(slot("assets.nope"))).isEmpty());
+
+    int tabTypes = 0;
+    for (const QVariant &v : store.panelTypes()) {
+        const QVariantMap t = v.toMap();
+        if (t.value("group").toString() == "panel")
+            continue;
+        ++tabTypes;
+        QVERIFY(t.value("type").toString().startsWith(t.value("group").toString() + "."));
+        QVERIFY(!t.value("tab").toString().isEmpty());
+    }
+    QCOMPARE(tabTypes, 31);
 }
 
 void WorkspaceStoreTest::sizesAreNormalizedAndSplitCollapses()

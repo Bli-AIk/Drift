@@ -9,6 +9,10 @@ PanelFrame {
     // When true (Android bottom sheet), hide the side tab rail — the phone
     // bottom rail already picks the active library tab.
     property bool sheetMode: false
+    // Pins the panel to one tab and drops the rail: the standalone "Library tab" workspace panes.
+    property string lockedTab: ""
+    readonly property bool locked: lockedTab !== ""
+    readonly property bool railHidden: sheetMode || locked
     readonly property var selectedMediaAssetIds: mediaBrowser.item?.selectedAssetIds ?? []
 
     // One of the click-to-add tabs (text, subtitles, stickers, shapes) put a clip
@@ -690,12 +694,22 @@ PanelFrame {
     // Selects a tab by id. Used by cross-panel jumps such as the properties
     // panel's "Browse effects" / "Browse audio effects" empty-state actions.
     function showTab(tabId) {
+        if (root.locked)
+            return
         for (var i = 0; i < tabsModel.count; ++i) {
             if (tabsModel.get(i).tabId === tabId) {
                 root.activeTab = i
                 return
             }
         }
+    }
+
+    function tabIndexOf(tabId) {
+        for (let i = 0; i < tabsModel.count; ++i) {
+            if (tabsModel.get(i).tabId === tabId)
+                return i
+        }
+        return 0
     }
 
     function tabLabel(tabId) {
@@ -771,7 +785,7 @@ PanelFrame {
         Theme.icons.store,
         Theme.icons.micVocal
     ]
-    property int activeTab: 0
+    property int activeTab: locked ? tabIndexOf(lockedTab) : 0
     readonly property string currentTabId: tabsModel.get(activeTab).tabId
 
     // Per-tab view state that outlives the tab being unloaded, keyed by tabId. Plain
@@ -822,6 +836,7 @@ PanelFrame {
     DropArea {
         id: assetDropArea
         anchors.fill: parent
+        enabled: !root.locked || root.kindsForTab(root.currentTabId).length > 0
         keys: ["text/uri-list"]
         onDropped: (drop) => {
             if (drop.hasUrls)
@@ -834,7 +849,7 @@ PanelFrame {
     }
 
     AssetsPanelImportOverlay {
-        active: root.importing
+        active: root.importing && assetDropArea.enabled
     }
 
     Row {
@@ -843,7 +858,7 @@ PanelFrame {
 
         AssetsPanelTabRail {
             id: tabRail
-            sheetMode: root.sheetMode
+            sheetMode: root.railHidden
             activeTab: root.activeTab
             tabCount: tabsModel.count
             tabLabels: root.tabLabels
@@ -853,15 +868,15 @@ PanelFrame {
         }
 
         Rectangle {
-            width: root.sheetMode ? 0 : Theme.c.assetsPanel.borderWidth
+            width: root.railHidden ? 0 : Theme.c.assetsPanel.borderWidth
             height: parent.height
-            visible: !root.sheetMode
+            visible: !root.railHidden
             color: Theme.c.assetsPanel.railBorder
         }
 
         Column {
             id: assetsContent
-            width: parent.width - (root.sheetMode ? 0 : (Theme.tabRailWidth + Theme.c.assetsPanel.borderWidth))
+            width: parent.width - (root.railHidden ? 0 : (Theme.tabRailWidth + Theme.c.assetsPanel.borderWidth))
             height: parent.height
 
             AssetsPanelHeader {
@@ -871,7 +886,7 @@ PanelFrame {
                 readonly property bool searchBarTab: ["text", "stickers", "shapes", "effects", "templates",
                                                       "transitions", "sounds"].indexOf(tabId) >= 0
                 width: parent.width
-                height: searchBarTab || (root.sheetMode && !hasActions) ? 0 : Theme.panelHeaderHeight
+                height: (searchBarTab && !root.locked) || (root.sheetMode && !hasActions) ? 0 : Theme.panelHeaderHeight
                 visible: height > 0
                 title: tabLabels[tabId]
                 showTitle: !root.sheetMode
@@ -887,7 +902,7 @@ PanelFrame {
                 id: emojiPicker
                 // Hangs off the stickers search bar's + at the panel's right edge, and slides back
                 // rather than running off-window when the panel is dragged narrow.
-                x: Math.max(-Theme.tabRailWidth, assetsContent.width - width - Theme.pagePadding)
+                x: Math.max(root.railHidden ? 0 : -Theme.tabRailWidth, assetsContent.width - width - Theme.pagePadding)
                 y: assetsHeader.height + Theme.pagePadding + Theme.controlHeight + 4
                 onAddonManagerRequested: ShellBridge.main.openAddonManager("stickers")
                 onAdded: root.addCompleted()

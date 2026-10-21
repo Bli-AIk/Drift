@@ -14,9 +14,9 @@
             "split": "h",
             "sizes": [0.22, 0.38, 0.2, 0.2],
             "children": [
-              { "panels": [ { "type": "assets", "tab": "sounds" } ], "active": 0 },
+              { "panels": [ { "type": "assets.sounds" } ], "active": 0 },
               { "panels": [ { "type": "preview" } ], "active": 0 },
-              { "panels": [ { "type": "properties" }, { "type": "undoHistory" } ], "active": 0 },
+              { "panels": [ { "type": "properties.audioEffects" }, { "type": "properties.audio" }, { "type": "undoHistory" } ], "active": 0 },
               { "panels": [ { "type": "audioMixer" } ], "active": 0 }
             ]
           },

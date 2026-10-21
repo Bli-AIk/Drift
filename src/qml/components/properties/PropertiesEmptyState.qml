@@ -7,6 +7,8 @@ Column {
 
     property bool sheetMode: false
     property real panelWidth: 260
+    // Replaces the click-a-clip hint; set by the standalone single-tab panes.
+    property string hint: ""
 
     width: Math.min(260, panelWidth - 32)
     spacing: 16
@@ -42,7 +44,8 @@ Column {
         width: parent.width
         horizontalAlignment: Text.AlignHCenter
         wrapMode: Text.WordWrap
-        text: root.sheetMode
+        text: root.hint !== "" ? root.hint
+              : root.sheetMode
               ? qsTr("Tap a clip on the timeline to edit its properties")
               : qsTr("Click a clip on the timeline to edit its properties")
         color: Theme.c.propertiesEmptyState.foregroundMuted

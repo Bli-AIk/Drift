@@ -8,6 +8,13 @@ PanelFrame {
     // Android bottom sheet: keep the inspector tab rail but drop the panel border
     // chrome that fights the sheet frame.
     property bool sheetMode: false
+    // Pins the panel to one inspector tab and drops the rail: the standalone "Inspector tab"
+    // workspace panes. It never follows the selection to another tab, and leaves the
+    // timeline-facing state (subtitle lane, keyframe lane) to the full panel.
+    property string lockedTab: ""
+    readonly property bool locked: lockedTab !== ""
+    readonly property bool railHidden: sheetMode || locked
+    readonly property bool tabApplies: !locked || tabVisible(lockedTab)
     border.color: Theme.c.propertiesPanel.border
     border.width: sheetMode ? 0 : Theme.c.propertiesPanel.borderWidth
     radius: sheetMode ? 0 : Theme.c.propertiesPanel.radius
@@ -66,7 +73,7 @@ PanelFrame {
         property var shapeExpandedLayerIds: ({})
     }
 
-    property int activeTab: 0
+    property int activeTab: locked ? tabIndexOf(lockedTab) : 0
     readonly property string currentTabId: tabs[activeTab].id
     readonly property bool keyframesTab: !!tabs[activeTab].keyframes
 
@@ -87,7 +94,7 @@ PanelFrame {
             root.syncActiveTab()
         }
         function onSelectedTransitionDataChanged() {
-            if (root.hasTransitionSelection)
+            if (root.hasTransitionSelection && !root.locked)
                 root.activeTab = root.transitionTabIndex
         }
         function onTracksChanged() {
@@ -97,7 +104,7 @@ PanelFrame {
         // selected it, so the Text tab exists; callLater lets the tab switch settle before the
         // focus lands on a child of the page that was hidden a moment ago.
         function onInlineTextEditRequested(trackIndex, clipIndex) {
-            if (!root.tabVisible("text"))
+            if (root.locked || !root.tabVisible("text"))
                 return
             root.activeTab = root.textTabIndex
             Qt.callLater(() => {
@@ -182,6 +189,8 @@ PanelFrame {
     // also offers the Masks tab, but its effect stack is what you came for, so `opens` decides
     // and not tab order.
     function syncAdjustmentTab() {
+        if (root.locked)
+            return
         for (let i = 0; i < root.tabs.length; i++) {
             const opens = root.tabs[i].opens
             if (opens && root.caps.indexOf(opens) >= 0) {
@@ -194,6 +203,8 @@ PanelFrame {
     // A tab that the new selection does not support would leave an empty pane. With nothing
     // selected the tab is kept, so reselecting a clip lands where you were.
     function syncActiveTab() {
+        if (root.locked)
+            return
         if (root.hasSelection && !root.tabVisible(root.currentTabId))
             root.activeTab = 0
     }
@@ -202,6 +213,7 @@ PanelFrame {
     Binding {
         target: EditorState
         property: "subtitleEditing"
+        when: !root.locked
         value: root.currentTabId === "subtitles" && root.clipKind === "subtitle"
     }
 
@@ -209,13 +221,16 @@ PanelFrame {
         anchors.centerIn: parent
         panelWidth: root.width
         sheetMode: root.sheetMode
-        visible: !root.hasSelection
+        visible: !root.hasSelection || !root.tabApplies
+        hint: !root.locked ? ""
+              : !root.hasSelection ? qsTr("Select a clip to edit its %1").arg(root.tabs[root.activeTab].label)
+              : qsTr("%1 doesn't apply to this clip").arg(root.tabs[root.activeTab].label)
     }
 
     Item {
         id: content
         anchors.fill: parent
-        visible: root.hasSelection
+        visible: root.hasSelection && root.tabApplies
 
         // === Phone: a labelled tab strip across the top ===============================
         // The desktop rail below is a column of thirteen unlabelled icons. Inside a
@@ -303,8 +318,8 @@ PanelFrame {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            width: root.sheetMode ? 0 : Theme.tabRailWidth
-            visible: !root.sheetMode
+            width: root.railHidden ? 0 : Theme.tabRailWidth
+            visible: !root.railHidden
             contentWidth: width
             contentHeight: propertiesTabRailColumn.height
             clip: true
@@ -384,8 +399,8 @@ PanelFrame {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: propertiesTabRail.right
-            width: root.sheetMode ? 0 : Theme.c.propertiesPanel.borderWidth
-            visible: !root.sheetMode
+            width: root.railHidden ? 0 : Theme.c.propertiesPanel.borderWidth
+            visible: !root.railHidden
             color: Theme.c.propertiesPanel.border
         }
 
