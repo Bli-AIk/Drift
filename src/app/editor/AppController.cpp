@@ -42,6 +42,7 @@
 #include "engine/packages/audio/AudioEffectCatalog.h"
 #include "engine/packages/effects/EffectCatalog.h"
 #include "engine/packages/effects/EffectTemplateCatalog.h"
+#include "engine/packages/looks/LookCatalog.h"
 #include "engine/encode/export/Exporter.h"
 #include "engine/packages/assets/EmojiCatalog.h"
 #include "engine/packages/assets/FontCatalog.h"
@@ -50,6 +51,7 @@
 // caches have no other owner outside src/engine to ask. A one-line forwarder on GpuCompositor
 // would restore the boundary.
 #include "engine/gpu/GlRuntime.h"
+#include "engine/color/CubeLut.h"
 #include "engine/media/thumbnails/MediaThumbnail.h"
 #include "engine/ml/vision/detection/ObjectDetector.h"
 #include "engine/ml/runtime/OrtRuntime.h"
@@ -728,6 +730,8 @@ void AppController::setAddonManager(AddonManager *manager)
     m_addonManager = manager;
     if (manager && m_tts)
         connect(manager, &AddonManager::kindChanged, m_tts, &TtsController::refreshAvailability);
+    if (manager && m_color)
+        connect(manager, &AddonManager::kindChanged, m_color, &ColorController::refreshForKind);
     if (manager) {
         connect(manager, &AddonManager::kindChanged, this, [this](const QString &kind) {
             if (kind != QLatin1String(drift::pdfium::kPdfiumKind))
@@ -772,6 +776,7 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
     m_sceneDetect = new SceneDetectController(this, this);
     m_depth = new DepthController(this, this);
     m_denoise = new DenoiseController(this, this);
+    m_color = new ColorController(this, this);
     m_restore = new RestoreController(this, this);
     m_faces = new FaceTrackingController(this, this);
     m_stabilize = new StabilizeController(this, this);
@@ -3461,6 +3466,13 @@ QVariantMap effectToMap(const drift::Effect &effect, int effectIndex, drift::Tim
             }
             if (paramDef.isEnum())
                 param.insert(QStringLiteral("options"), paramDef.options);
+            if (paramDef.type == drift::EffectParamType::Lut) {
+                const QString look = value.toString();
+                const std::optional<drift::LookEntry> entry = drift::lookForId(look);
+                param.insert(QStringLiteral("lookLabel"), entry ? entry->label : look);
+                param.insert(QStringLiteral("missing"),
+                             !look.isEmpty() && drift::resolveLutPath(look).isEmpty());
+            }
             if (paramDef.step > 0.0)
                 param.insert(QStringLiteral("step"), paramDef.step);
             if (paramDef.isColor())
@@ -17396,6 +17408,34 @@ void AppController::previewSetEffectVec2Param(int trackIndex, int clipIndex, int
     previewSetEffectParam(trackIndex, clipIndex, effectIndex, key + QLatin1String(".y"), y);
 }
 
+void AppController::previewSetEffectTextParam(int trackIndex, int clipIndex, int effectIndex,
+                                              const QString &key, const QString &value)
+{
+    if (trackIndex < 0 || trackIndex >= m_project.tracks().size())
+        return;
+    const int announceTrack = trackIndex;
+    const int announceClip = clipIndex;
+    if (!redirectToEffectHost(&trackIndex, &clipIndex, drift::AdjustmentKind::VideoEffects,
+                              /*create=*/false)) {
+        return;
+    }
+
+    drift::Track &track = m_project.tracks()[trackIndex];
+    if (clipIndex < 0 || clipIndex >= track.clips.size())
+        return;
+
+    drift::Clip &clip = track.clips[clipIndex];
+    if (effectIndex < 0 || effectIndex >= clip.effects.size())
+        return;
+    if (key.isEmpty())
+        return;
+
+    beginImplicitPreviewDrag(tr("Edit effect"));
+    clip.effects[effectIndex].parameters.insert(key, value);
+    emitPreviewEdit(announceTrack, announceClip,
+                    {QStringLiteral("fx.%1.%2").arg(effectIndex).arg(key)});
+}
+
 // Colour params take this path rather than widening setEffectParam, which every existing QML call
 // site passes a double to. There is no preview variant on purpose: a swatch commits once, so there
 // is no drag stream to coalesce the way a slider needs.
@@ -17580,6 +17620,51 @@ QVariantMap AppController::effectClipTarget(int trackIndex, int clipIndex, int e
                             m.value(QStringLiteral("clip")).toInt(), false);
     }
     return {};
+}
+
+bool AppController::setEffectTextParam(int trackIndex, int clipIndex, int effectIndex,
+                                      const QString &key, const QString &value)
+{
+    if (trackIndex < 0 || trackIndex >= m_project.tracks().size())
+        return false;
+    if (!redirectToEffectHost(&trackIndex, &clipIndex, drift::AdjustmentKind::VideoEffects,
+                              /*create=*/false)) {
+        return false;
+    }
+
+    drift::Track &track = m_project.tracks()[trackIndex];
+    if (clipIndex < 0 || clipIndex >= track.clips.size())
+        return false;
+
+    drift::Clip &clip = track.clips[clipIndex];
+    if (effectIndex < 0 || effectIndex >= clip.effects.size())
+        return false;
+
+    const EffectPresetEntry *def = effectDefForId(clip.effects[effectIndex].catalogId);
+    if (!def)
+        return false;
+    const auto specIt = std::find_if(def->meta.parameters.cbegin(), def->meta.parameters.cend(),
+                                     [&](const drift::EffectParamSpec &p) { return p.key == key; });
+    if (specIt == def->meta.parameters.cend()
+        || (specIt->type != drift::EffectParamType::Curve && specIt->type != drift::EffectParamType::Gradient
+            && specIt->type != drift::EffectParamType::Lut)) {
+        return false;
+    }
+    if (specIt->type == drift::EffectParamType::Curve) {
+        QJsonParseError parseError;
+        const QJsonDocument keys = QJsonDocument::fromJson(value.toUtf8(), &parseError);
+        if (parseError.error != QJsonParseError::NoError || !keys.isArray())
+            return false;
+    }
+
+    const QString undoText = specIt->type == drift::EffectParamType::Lut     ? tr("Change look")
+                             : specIt->type == drift::EffectParamType::Curve ? tr("Edit curve")
+                                                                             : tr("Edit gradient");
+    const drift::Project before = m_project;
+    clip.effects[effectIndex].parameters.insert(key, value);
+    pushProjectEdit(before, undoText);
+    finishEdit(tr("Effect updated"));
+    return true;
 }
 
 bool AppController::setEffectStringParam(int trackIndex, int clipIndex, int effectIndex,

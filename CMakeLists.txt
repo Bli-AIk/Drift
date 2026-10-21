@@ -775,6 +775,10 @@ add_library(driftengine STATIC
     src/engine/gpu/effects/GpuEffectExecutor.cpp
     src/engine/gpu/effects/LookupTextures.h
     src/engine/gpu/effects/LookupTextures.cpp
+    src/engine/color/CubeLut.h
+    src/engine/color/CubeLut.cpp
+    src/engine/color/ScopeAnalysis.h
+    src/engine/color/ScopeAnalysis.cpp
     src/engine/compositor/effects/CompositorFrameHistory.h
     src/engine/compositor/effects/CompositorFrameHistory.cpp
     src/engine/compositor/FrameCompositor.h
@@ -785,6 +789,10 @@ add_library(driftengine STATIC
     src/engine/packages/audio/AudioEffectCatalog.cpp
     src/engine/packages/effects/EffectTemplateCatalog.h
     src/engine/packages/effects/EffectTemplateCatalog.cpp
+    src/engine/packages/looks/LookCatalog.h
+    src/engine/packages/looks/LookCatalog.cpp
+    src/engine/packages/looks/LookImport.h
+    src/engine/packages/looks/LookImport.cpp
     src/engine/audio/AudioMixer.h
     src/engine/audio/AudioMixer.cpp
     src/engine/ml/speech/transcription/WhisperTokenizer.h
@@ -984,6 +992,14 @@ qt_add_executable(drift
     src/ui/imageproviders/TextStylePreviewImageProvider.cpp
     src/ui/imageproviders/ShapePreviewImageProvider.h
     src/ui/imageproviders/ShapePreviewImageProvider.cpp
+    src/ui/imageproviders/color/ColorImageProvider.h
+    src/ui/imageproviders/color/ColorImageProvider.cpp
+    src/app/color/LookThumbnailService.h
+    src/app/color/ColorController.cpp
+    src/app/color/ColorController.h
+    src/app/color/ScopesController.h
+    src/app/color/ScopesController.cpp
+    src/app/color/LookThumbnailService.cpp
     src/app/online/addons/AddonEndpoint.h
     src/app/online/addons/AddonManager.h
     src/app/online/addons/AddonManager.cpp
@@ -1531,6 +1547,8 @@ qt_add_qml_module(drift
         src/qml/components/properties/EffectsOccludeSection.qml
         src/qml/components/properties/EffectsHueParam.qml
         src/qml/components/properties/EffectsFileParam.qml
+        src/qml/components/properties/EffectsCurveParam.qml
+        src/qml/components/properties/EffectsLookParam.qml
         src/qml/components/properties/EffectsFaceSection.qml
         src/qml/components/properties/EffectsFaceIndexParam.qml
         src/qml/components/properties/EffectsEnumParam.qml
@@ -1624,6 +1642,13 @@ qt_add_qml_module(drift
         src/qml/components/panels/SubtitlesPanel.qml
         src/qml/components/panels/RecorderPanel.qml
         src/qml/components/panels/DenoisePanel.qml
+        src/qml/components/panels/ColorPanel.qml
+        src/qml/components/panels/LooksPanel.qml
+        src/qml/components/panels/ScopesPanel.qml
+        src/qml/components/color/GradeSlider.qml
+        src/qml/components/color/ColorWheel.qml
+        src/qml/components/color/CurveEditor.qml
+        src/qml/components/color/CurveMath.js
         src/qml/components/panels/HistoryPanel.qml
         src/qml/components/panels/SourceViewerPanel.qml
         src/qml/components/panels/AgentLogPanel.qml

@@ -10,8 +10,10 @@
 #include "engine/audio/dsp/ClipAudioRetimer.h"
 
 #include <memory>
+#include <QElapsedTimer>
 #include <QImage>
 #include <QMutex>
+#include <QSet>
 #include <QObject>
 #include <QTimer>
 
@@ -57,6 +59,11 @@ public:
     // unchanged pointer) and invalidated the compositor snapshot twice. Coalesces every edit
     // delivered in one event-loop turn into a single composite request.
     void notifyProjectEdited();
+    // Preview-only bypass of catalog effects on the given clips. See CompositorService.
+    void setPreviewEffectBypass(const QSet<QString> &clipIds, const QSet<QString> &catalogIds);
+    // Reference-counted: the preview reads a small copy of each frame back while any scope is open.
+    void acquireScopes();
+    void releaseScopes();
     void setPlayheadUs(drift::TimeUs us);
     // A scrub gesture is under way: seeks in between show approximate frames (see
     // RenderOptions::approximateSeek), and the exact one is drawn when the finger rests or the
@@ -175,6 +182,7 @@ signals:
 
     void gpuCompositorStatusChanged();
     void currentFrameChanged();
+    void scopeFrame(const QImage &image);
     void playingChanged();
     void previewQualityChanged();
     void playbackRateChanged();
@@ -235,6 +243,8 @@ private:
     QString m_gpuStatusDetail;
     GpuFrameTexture m_currentFrame;
     mutable QMutex m_frameMutex;
+    int m_scopeConsumers = 0;
+    QElapsedTimer m_scopeTimer;
     drift::TimeUs m_playheadUs = 0;
     std::atomic<bool> m_playing = false;
     // Auto, not full. Auto is full quality plus the adaptive ratchet in CompositorService,

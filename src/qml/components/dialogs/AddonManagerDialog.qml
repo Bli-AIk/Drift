@@ -203,7 +203,7 @@ ThemedDialog {
             root.kindFilter = "effects"
             root.kindFilterKinds = ["effects"]
         } else if (kind === "transitions" || kind === "audio-effects"
-                   || kind === "fonts" || kind === "stickers") {
+                   || kind === "fonts" || kind === "stickers" || kind === "looks") {
             root.kindFilter = kind
             root.kindFilterKinds = [kind]
         } else {
@@ -257,6 +257,7 @@ ThemedDialog {
                     { id: "effects", label: qsTr("Effects"), kinds: ["effects"] },
                     { id: "transitions", label: qsTr("Transitions"), kinds: ["transitions"] },
                     { id: "audio-effects", label: qsTr("Audio FX"), kinds: ["audio-effects"] },
+                    { id: "looks", label: qsTr("Looks"), kinds: ["looks"] },
                     { id: "fonts", label: qsTr("Fonts"), kinds: ["fonts"] },
                     { id: "stickers", label: qsTr("Stickers"), kinds: ["stickers"] },
                     { id: "whisper-model", label: qsTr("AI tools"),

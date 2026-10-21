@@ -173,6 +173,8 @@ struct GpuScene
     QList<GpuItem> items; // back-to-front
     // Paused preview: keep converted video sources on the GPU between composites.
     bool cacheVideoSources = false;
+    // Width of the small readback GpuFrameTexture::scopeImage gets for the scopes; 0 skips it.
+    int scopeReadbackWidth = 0;
     // The preview's 3D mode: every layer is placed through `editorViewProj` (world -> homogeneous
     // canvas px), and the scene camera at `editorCamera` is drawn as a guide. Never set on export.
     bool editorView = false;
@@ -192,6 +194,8 @@ struct GpuFrameTexture
     // refused to put the compositor's context in the scene graph's share group,
     // which makes textureId unusable there. Premultiplied ARGB32, ready to upload.
     QImage image;
+    // Small upright copy of the canvas for the scopes, only when GpuScene asked for one.
+    QImage scopeImage;
 
     bool isValid() const { return !size.isEmpty() && (textureId != 0 || !image.isNull()); }
 };

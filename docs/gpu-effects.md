@@ -37,6 +37,34 @@ Search order: `DRIFT_EFFECTS_DIR`, `<applicationDir>/effects`, `<AppDataLocation
 | `choice` / `enum` | `float` (option index) | `options[]` (at least two); rendered as a dropdown |
 | `int` / `integer` | `float` (rounded) | `minValue`/`maxValue`/`defaultValue`; the slider snaps to whole numbers; keyframable. A `float` may also set `step` (or `ui.step`) to snap |
 | `file` | *(not bound)* | Absolute path string; `fileFilters` for the picker. Used by `model3d` |
+| `curve` | `sampler2D` (256×1) | `defaultValue` is a key array `[{"x", "y", "ease"}]`; keys are baked to a 256-texel curve. Ease `"spline"` (see below) |
+| `lut` | `sampler2D` (1089×33) | `defaultValue` is a look id, `""` for none. The look's `.cube` file, resampled to 33³ and tiled (see below). An empty or unresolved id binds the identity |
+
+A `lut` parameter's value is a look id from the looks catalog, not a file path. The engine bakes the
+look's `look.cube` to a 33×33×33 lattice laid out as 33 tiles of 33×33 side by side: texel
+`(b * 33 + r, g)` holds the output for input `(r, g, b)`, so the texture is 1089 wide and 33 high.
+A shader samples it with a trilinear lookup across the two neighbouring blue tiles:
+
+```glsl
+vec3 lutSample(sampler2D t, vec3 c) {
+    float bz = c.b * 32.0;
+    float b0 = floor(bz);
+    float b1 = min(b0 + 1.0, 32.0);
+    float f = bz - b0;
+    float v = (c.g * 32.0 + 0.5) / 33.0;
+    float u0 = (b0 * 33.0 + c.r * 32.0 + 0.5) / 1089.0;
+    float u1 = (b1 * 33.0 + c.r * 32.0 + 0.5) / 1089.0;
+    return mix(texture(t, vec2(u0, v)).rgb, texture(t, vec2(u1, v)).rgb, f);
+}
+```
+
+A `curve` key's `"ease"` shapes the segment to its right. `"spline"` is a monotone cubic
+(Fritsch–Carlson) through all of the curve's keys, so the curve passes through every key and never
+overshoots between them. The other eases are `linear`, `smooth`, `in`, `out` and `hold`.
+
+Features a package needs from the engine go in `nextFeatures` (`"param:lut"`, `"curve:spline"`,
+…). A feature this build does not know rejects the package with "needs a newer Drift", so a
+package that uses a new param type never loads silently on an older release.
 
 A colour parameter may list `"swatches": ["#rrggbb", …]`, preset shades the inspector shows as a
 grid under the picker, and `"enables": "<bool key>"`, a bool parameter that picking any colour

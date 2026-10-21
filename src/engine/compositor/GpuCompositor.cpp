@@ -1907,6 +1907,8 @@ GpuFrameTexture renderToTexture(const GpuScene &scene)
             // convert back would both be pure waste on this path.
             out.image = canvas.fbo->toImage(false);
             out.size = out.image.size();
+            if (scene.scopeReadbackWidth > 0)
+                out.scopeImage = out.image.scaledToWidth(scene.scopeReadbackWidth, Qt::FastTransformation);
             rt.releaseTarget(std::move(canvas));
         });
         return out;
@@ -1927,6 +1929,15 @@ GpuFrameTexture renderToTexture(const GpuScene &scene)
         // composite is already on its way — a repeat reads as a dropped frame, not a flash.
         if (lostVideo)
             return;
+
+        if (scene.scopeReadbackWidth > 0) {
+            const int w = scene.scopeReadbackWidth;
+            const int h = qMax(1, qRound(double(w) * canvas.height / canvas.width));
+            GlTarget scope = rt.acquireTarget(w, h);
+            if (blitTextureToTarget(rt, rt.functions(), canvas.texture(), scope))
+                out.scopeImage = rt.readTarget(scope);
+            rt.releaseTarget(std::move(scope));
+        }
 
         // Insert a present fence without waiting: Qt Quick samples on the next
         // vsync. acquirePresentTarget waits this fence before reusing the slot.

@@ -34,6 +34,8 @@ public:
         // Reuse converted video frames across composites. Only the paused preview sets it: an
         // edit there re-renders the same source frames, where playback never repeats one.
         bool cacheVideoSources = false;
+        // Width of the scope readback (GpuFrameTexture::scopeImage); 0 means none is wanted.
+        int scopeReadbackWidth = 0;
         // Scrubbing: a video layer may show the nearest frame that is cheap to get (cached, or
         // the keyframe at or before the time) instead of decoding forward to the exact one. The
         // caller asks again without it once the gesture settles.

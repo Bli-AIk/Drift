@@ -22,6 +22,7 @@ private slots:
     void setSizesIsQuiet();
     void duplicateAndRemove();
     void migratesOldFractions();
+    void colorPresetHasGradingPanels();
 
 private:
     QString m_org;
@@ -45,6 +46,14 @@ QVariantMap workspaceWith(const QVariantMap &root, const QString &id = {})
 QVariantMap mainRoot(const QVariantMap &ws)
 {
     return ws.value("windows").toList().first().toMap().value("root").toMap();
+}
+
+void collectPanelTypes(const QVariantMap &node, QStringList &out)
+{
+    for (const QVariant &child : node.value("children").toList())
+        collectPanelTypes(child.toMap(), out);
+    for (const QVariant &panel : node.value("panels").toList())
+        out << panel.toMap().value("type").toString();
 }
 
 } // namespace
@@ -210,6 +219,16 @@ void WorkspaceStoreTest::migratesOldFractions()
     QCOMPARE(portrait.value("sizes").toList().at(1).toDouble(), 0.3);
     QVERIFY(settings.contains("ui/workspaces/list"));
     QVERIFY(settings.contains("ui/layout/landscape/assets"));
+}
+
+void WorkspaceStoreTest::colorPresetHasGradingPanels()
+{
+    WorkspaceStore store;
+    QStringList types;
+    collectPanelTypes(mainRoot(store.workspace("color")), types);
+    QVERIFY(types.contains("color"));
+    QVERIFY(types.contains("looks"));
+    QVERIFY(types.contains("scopes"));
 }
 
 QTEST_MAIN(WorkspaceStoreTest)

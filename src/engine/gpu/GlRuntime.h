@@ -221,6 +221,16 @@ public:
     };
     std::list<BakedLookup> bakedLookups; // most recent first
     static constexpr size_t kMaxBakedLookups = 64;
+    // Look (.cube) params: 1089x33 tiled RGBA8 per look, keyed by path or "identity". The source
+    // bytes are held so a rebaked look (new mtime) is recognised and re-uploaded.
+    struct LutTexture
+    {
+        QString key;
+        std::shared_ptr<const QByteArray> source;
+        GLuint texture = 0;
+    };
+    std::list<LutTexture> lutTextures; // most recent first
+    static constexpr size_t kMaxLutTextures = 8;
     // A 1x1 transparent texture for sampler params with nothing to show (track, trackMask, audio).
     GLuint sharedTransparentTexture = 0;
     // The 512x2 analysis texture of each audio param, keyed "<effect index>/<param key>". Re-uploaded

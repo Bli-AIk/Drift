@@ -1543,6 +1543,7 @@ GpuScene buildGpuScene(const drift::Project &project, drift::TimeUs timelineUs, 
     GpuScene scene;
     scene.canvasSize = QSize(width, height);
     scene.cacheVideoSources = options.cacheVideoSources;
+    scene.scopeReadbackWidth = options.scopeReadbackWidth;
 
     const int projectWidth = project.width();
     const int projectHeight = project.height();

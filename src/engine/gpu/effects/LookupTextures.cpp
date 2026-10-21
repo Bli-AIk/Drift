@@ -3,6 +3,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QPointF>
 
 #include <algorithm>
 #include <array>
@@ -58,6 +59,58 @@ uint8_t toByte(double v)
 }
 
 } // namespace
+
+double evalMonotoneSpline(const std::vector<QPointF> &keys, double x)
+{
+    const size_t n = keys.size();
+    if (n == 0)
+        return 0.0;
+    if (x <= keys.front().x())
+        return keys.front().y();
+    if (x >= keys.back().x())
+        return keys.back().y();
+
+    const size_t segments = n - 1;
+    std::vector<double> d(segments);
+    for (size_t j = 0; j < segments; ++j) {
+        const double dx = keys[j + 1].x() - keys[j].x();
+        d[j] = dx > 0.0 ? (keys[j + 1].y() - keys[j].y()) / dx : 0.0;
+    }
+    std::vector<double> m(n);
+    m.front() = d.front();
+    m.back() = d.back();
+    for (size_t j = 1; j < segments; ++j)
+        m[j] = d[j - 1] * d[j] <= 0.0 ? 0.0 : (d[j - 1] + d[j]) / 2.0;
+    for (size_t j = 0; j < segments; ++j) {
+        if (d[j] == 0.0) {
+            m[j] = 0.0;
+            m[j + 1] = 0.0;
+            continue;
+        }
+        const double a = m[j] / d[j];
+        const double b = m[j + 1] / d[j];
+        const double s = a * a + b * b;
+        if (s > 9.0) {
+            const double t = 3.0 / std::sqrt(s);
+            m[j] = t * a * d[j];
+            m[j + 1] = t * b * d[j];
+        }
+    }
+
+    size_t k = 0;
+    while (k + 2 < n && keys[k + 1].x() <= x)
+        ++k;
+    const double h = keys[k + 1].x() - keys[k].x();
+    const double t = (x - keys[k].x()) / h;
+    const double t2 = t * t;
+    const double t3 = t2 * t;
+    const double h00 = 2.0 * t3 - 3.0 * t2 + 1.0;
+    const double h10 = t3 - 2.0 * t2 + t;
+    const double h01 = -2.0 * t3 + 3.0 * t2;
+    const double h11 = t3 - t2;
+    const double y = h00 * keys[k].y() + h10 * h * m[k] + h01 * keys[k + 1].y() + h11 * h * m[k + 1];
+    return std::clamp(y, 0.0, 1.0);
+}
 
 QByteArray bakeGradient(const QString &json)
 {
@@ -130,6 +183,11 @@ QByteArray bakeCurve(const QString &json)
         return {};
     std::stable_sort(keys.begin(), keys.end(), [](const Key &a, const Key &b) { return a.x < b.x; });
 
+    std::vector<QPointF> points;
+    points.reserve(keys.size());
+    for (const Key &key : keys)
+        points.emplace_back(key.x, key.y);
+
     QByteArray out(kTexels * 4, Qt::Uninitialized);
     for (int i = 0; i < kTexels; ++i) {
         const double t = i / 255.0;
@@ -142,8 +200,12 @@ QByteArray bakeCurve(const QString &json)
             const auto right = std::lower_bound(keys.begin(), keys.end(), t,
                                                 [](const Key &k, double v) { return k.x < v; });
             const Key &left = *(right - 1);
-            const double k = (t - left.x) / (right->x - left.x);
-            y = left.y + (right->y - left.y) * applyEase(left.ease, k);
+            if (left.ease == QLatin1String("spline")) {
+                y = evalMonotoneSpline(points, t);
+            } else {
+                const double k = (t - left.x) / (right->x - left.x);
+                y = left.y + (right->y - left.y) * applyEase(left.ease, k);
+            }
         }
         const char value = char(toByte(y));
         out[i * 4 + 0] = value;

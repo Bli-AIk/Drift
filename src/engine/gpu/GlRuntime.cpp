@@ -1,5 +1,6 @@
 #include "engine/gpu/GlRuntime.h"
 #include "engine/gpu/effects/LookupTextures.h"
+#include "engine/color/CubeLut.h"
 
 #include "engine/decode/readers/ClipReader.h"
 #include "engine/face/tracking/Face111.h"
@@ -1449,6 +1450,9 @@ void GlRuntime::shutdown()
                 for (const BakedLookup &entry : bakedLookups)
                     gl->glDeleteTextures(1, &entry.texture);
                 bakedLookups.clear();
+                for (const GlRuntime::LutTexture &entry : lutTextures)
+                    gl->glDeleteTextures(1, &entry.texture);
+                lutTextures.clear();
                 if (sharedTransparentTexture) {
                     gl->glDeleteTextures(1, &sharedTransparentTexture);
                     sharedTransparentTexture = 0;
@@ -3861,6 +3865,35 @@ GLuint bakedLookupTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl, bool curve, 
     return rt.bakedLookups.front().texture;
 }
 
+// A look's .cube file baked to 1089x33, most recently used first. A look that does not resolve or
+// does not parse shows the identity.
+GLuint lutTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString &lookId)
+{
+    static const std::shared_ptr<const QByteArray> identity =
+        std::make_shared<const QByteArray>(drift::bakeTiledRgba8(drift::identityLut(33)));
+    std::shared_ptr<const QByteArray> source = drift::bakedLutForId(lookId);
+    const QString key = source ? drift::resolveLutPath(lookId) : QStringLiteral("identity");
+    if (!source)
+        source = identity;
+
+    const auto it = std::find_if(rt.lutTextures.begin(), rt.lutTextures.end(),
+                                 [&key](const GlRuntime::LutTexture &entry) { return entry.key == key; });
+    if (it != rt.lutTextures.end() && it->source == source) {
+        rt.lutTextures.splice(rt.lutTextures.begin(), rt.lutTextures, it);
+        return it->texture;
+    }
+    if (it != rt.lutTextures.end()) {
+        gl->glDeleteTextures(1, &it->texture);
+        rt.lutTextures.erase(it);
+    }
+    rt.lutTextures.push_front({key, source, uploadRgba8(gl, 1089, 33, source->constData())});
+    while (rt.lutTextures.size() > GlRuntime::kMaxLutTextures) {
+        gl->glDeleteTextures(1, &rt.lutTextures.back().texture);
+        rt.lutTextures.pop_back();
+    }
+    return rt.lutTextures.front().texture;
+}
+
 } // namespace
 
 GLuint uploadAudioTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString &key, const QByteArray &rgba)
@@ -3926,6 +3959,9 @@ GlTarget runPipeline(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString &ca
                 break;
             case drift::EffectParamType::Curve:
                 paramTextures.push_back(bakedLookupTexture(rt, gl, true, value.toString()));
+                break;
+            case drift::EffectParamType::Lut:
+                paramTextures.push_back(lutTexture(rt, gl, value.toString()));
                 break;
             case drift::EffectParamType::Track:
             case drift::EffectParamType::TrackMask:

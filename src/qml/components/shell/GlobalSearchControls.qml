@@ -6,6 +6,7 @@ QtObject {
     readonly property string properties: qsTr("Properties")
     readonly property string assets: qsTr("Assets")
     readonly property string settings: qsTr("Settings")
+    readonly property string grading: qsTr("Color")
 
     readonly property string anyClip: qsTr("Select a clip")
     readonly property string visualClip: qsTr("Select a video, image, text or shape clip")
@@ -23,6 +24,10 @@ QtObject {
 
     function setting(pageId, label, keywords) {
         return { label: label, path: [settings], hint: "", keywords: keywords, page: pageId }
+    }
+
+    function color(label, hint, keywords) {
+        return { label: label, path: [grading], hint: hint, keywords: keywords, workspace: "color" }
     }
 
     readonly property var entries: [
@@ -78,6 +83,28 @@ QtObject {
         prop(qsTr("PDF"), qsTr("PDF page"), qsTr("Select a PDF clip"), "scroll"),
         prop(qsTr("3D Model"), qsTr("3D model"), qsTr("Select a 3D model clip"), "mesh"),
 
+        color(qsTr("Exposure"), anyClip, "light brightness"),
+        color(qsTr("Contrast"), anyClip, "light"),
+        color(qsTr("Highlights"), anyClip, "light bright"),
+        color(qsTr("Shadows"), anyClip, "light dark"),
+        color(qsTr("Whites"), anyClip, "light"),
+        color(qsTr("Blacks"), anyClip, "light"),
+        color(qsTr("Temperature"), anyClip, "white balance warm cool kelvin"),
+        color(qsTr("Tint"), anyClip, "white balance green magenta"),
+        color(qsTr("Saturation"), anyClip, "color intensity"),
+        color(qsTr("Vibrance"), anyClip, "color saturation"),
+        color(qsTr("Color wheels"), anyClip, "lift gamma gain shadows midtones highlights"),
+        color(qsTr("Curves"), anyClip, "rgb curve"),
+        color(qsTr("Looks"), anyClip, "lut filter preset cube"),
+        color(qsTr("Import looks"), anyClip, "import cube lut look"),
+        color(qsTr("Scopes"), qsTr("Open the Color workspace"), "histogram waveform vectorscope parade"),
+        color(qsTr("Film Grain"), anyClip, "grain noise film"),
+        color(qsTr("Glow"), anyClip, "bloom glow halation"),
+        color(qsTr("Vignette"), anyClip, "dark corners edges"),
+        color(qsTr("Chromatic Aberration"), anyClip, "color fringe lens"),
+        color(qsTr("Compare"), anyClip, "before after bypass original"),
+        color(qsTr("Apply to all clips"), anyClip, "grade timeline all clips copy"),
+
         setting("general", qsTr("General"), "language locale startup autosave recovery cache backup"),
         setting("appearance", qsTr("Appearance"), "theme dark light color workspace layout translucency"),
         setting("workspaces", qsTr("Workspaces"), "workspace layout panel window monitor screen dock preset"),
@@ -97,6 +124,7 @@ QtObject {
         "transitions": [assets, qsTr("Transitions")],
         "audio-effects": [assets, qsTr("Audio FX")],
         "effect-templates": [assets, qsTr("Templates")],
+        "looks": [qsTr("Color"), qsTr("Looks")],
         "stickers": [assets, qsTr("Stickers")],
         "fonts": [properties, qsTr("Text"), qsTr("Font")],
         "whisper-model": [assets, qsTr("Subtitles")],

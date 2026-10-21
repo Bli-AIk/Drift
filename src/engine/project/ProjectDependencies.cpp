@@ -5,6 +5,7 @@
 #include "engine/encode/writers/AudioFileWriter.h"
 #include "engine/packages/effects/EffectCatalog.h"
 #include "engine/packages/assets/FontCatalog.h"
+#include "engine/packages/looks/LookCatalog.h"
 #include "engine/encode/MediaEditor.h"
 #include "engine/packages/transitions/TransitionCatalog.h"
 #include "core/project/media/ImageSequence.h"
@@ -289,6 +290,13 @@ QList<AddonRef> collectAddons(const Project &project)
                         const QString modelPath = effect.parameters.value(spec.key).toString();
                         if (!modelPath.isEmpty())
                             addForPath(modelPath, QStringLiteral("face-props"));
+                    }
+                    for (const drift::EffectParamSpec &spec : def->meta.parameters) {
+                        if (spec.type != drift::EffectParamType::Lut)
+                            continue;
+                        const QString look = effect.parameters.value(spec.key).toString();
+                        if (!look.isEmpty())
+                            addForPath(drift::lookCubePathForId(look), QStringLiteral("looks"));
                     }
                 }
             }

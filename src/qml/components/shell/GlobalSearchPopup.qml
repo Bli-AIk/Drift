@@ -236,7 +236,8 @@ Popup {
             const e = controls[i]
             rows.push({ kind: "control", label: e.label, sub: e.path.concat([e.label]).join(" › "),
                         hint: e.hint, keywords: e.keywords, shortcut: "", enabled: true,
-                        run: e.page ? () => win.openSettings(e.page) : null })
+                        run: e.page ? () => win.openSettings(e.page)
+                                    : (e.workspace ? () => { Workspaces.activeId = e.workspace } : null) })
         }
 
         root._index = rows

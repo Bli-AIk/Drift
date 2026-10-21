@@ -33,6 +33,10 @@ qt_add_executable(tst_editorstate
     ../src/app/jobs/vision/SceneDetectController.cpp
     ../src/app/jobs/vision/DepthController.cpp
     ../src/app/jobs/audio/DenoiseController.cpp
+    ../src/app/color/ColorController.cpp
+    ../src/app/color/ScopesController.cpp
+    ../src/app/color/LookThumbnailService.cpp
+    ../src/ui/imageproviders/color/ColorImageProvider.cpp
     ../src/app/jobs/vision/RestoreController.cpp
     ../src/app/jobs/vision/FaceTrackingController.cpp
     ../src/app/jobs/vision/StabilizeController.cpp
@@ -215,6 +219,10 @@ qt_add_executable(tst_mcp
     ../src/app/jobs/vision/SceneDetectController.cpp
     ../src/app/jobs/vision/DepthController.cpp
     ../src/app/jobs/audio/DenoiseController.cpp
+    ../src/app/color/ColorController.cpp
+    ../src/app/color/ScopesController.cpp
+    ../src/app/color/LookThumbnailService.cpp
+    ../src/ui/imageproviders/color/ColorImageProvider.cpp
     ../src/app/jobs/vision/RestoreController.cpp
     ../src/app/jobs/vision/FaceTrackingController.cpp
     ../src/app/jobs/vision/StabilizeController.cpp
@@ -250,7 +258,7 @@ qt_add_executable(tst_mcp
     ../src/app/mcp/transport/McpStdioServer.cpp
 )
 target_include_directories(tst_mcp PRIVATE ../src)
-target_link_libraries(tst_mcp PRIVATE Qt6::Test Qt6::Gui Qt6::Network Qt6::Multimedia Qt6::Concurrent driftcore driftengine)
+target_link_libraries(tst_mcp PRIVATE Qt6::Test Qt6::Gui Qt6::Quick Qt6::Network Qt6::Multimedia Qt6::Concurrent driftcore driftengine)
 target_compile_definitions(tst_mcp PRIVATE DRIFT_VERSION="${PROJECT_VERSION}"
     DRIFT_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
 add_test(NAME Mcp COMMAND tst_mcp)

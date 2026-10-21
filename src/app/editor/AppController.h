@@ -63,6 +63,7 @@ struct MediaEditSpec;
 #include "ui/preview/PreviewController.h"
 #include "app/bin/AssetPreviewController.h"
 #include "app/editor/sessions/CurveEditorController.h"
+#include "app/color/ColorController.h"
 #include "app/jobs/audio/DenoiseController.h"
 #include "app/jobs/vision/DepthController.h"
 #include "app/jobs/vision/FaceTrackingController.h"
@@ -96,6 +97,7 @@ class AppController : public QObject
     friend class SceneDetectController;
     friend class DepthController;
     friend class DenoiseController;
+    friend class ColorController;
     friend class RestoreController;
     friend class FaceTrackingController;
     friend class StabilizeController;
@@ -129,6 +131,8 @@ class AppController : public QObject
     Q_PROPERTY(DepthController *depth READ depth CONSTANT)
     // Noise removal for a clip's audio. QML: EditorState.denoise.
     Q_PROPERTY(DenoiseController *denoise READ denoise CONSTANT)
+    // Colour grade, finishing effects and looks. QML: EditorState.color.
+    Q_PROPERTY(ColorController *color READ color CONSTANT)
     // Video restore and enhance (decompression, upscaling). QML: EditorState.restore.
     Q_PROPERTY(RestoreController *restore READ restore CONSTANT)
     // Face landmark tracking and Face Swap source ingest. QML: EditorState.faces.
@@ -327,6 +331,7 @@ public:
     SceneDetectController *scenes() const { return m_sceneDetect; }
     DepthController *depth() const { return m_depth; }
     DenoiseController *denoise() const { return m_denoise; }
+    ColorController *color() const { return m_color; }
     RestoreController *restore() const { return m_restore; }
     FaceTrackingController *faces() const { return m_faces; }
     StabilizeController *stabilize() const { return m_stabilize; }
@@ -737,6 +742,8 @@ public:
                                            const QString &key, double value);
     Q_INVOKABLE void previewSetEffectVec2Param(int trackIndex, int clipIndex, int effectIndex,
                                                const QString &key, double x, double y);
+    Q_INVOKABLE void previewSetEffectTextParam(int trackIndex, int clipIndex, int effectIndex,
+                                               const QString &key, const QString &value);
     // Needs an explicit beginPreviewDrag; the colour eyedropper bypasses the effect it is picking
     // for (a chroma key would otherwise sample its own keyed-out output) and then cancels.
     Q_INVOKABLE void previewSetEffectEnabled(int trackIndex, int clipIndex, int effectIndex,
@@ -1193,6 +1200,10 @@ public:
                                         const QString &key, double x, double y);
     Q_INVOKABLE bool setEffectColorParam(int trackIndex, int clipIndex, int effectIndex,
                                          const QString &key, const QString &value);
+    // Curve, gradient and look params: the value is a JSON string (curve, gradient) or a look id
+    // (lut). Commit-once; previewSetEffectTextParam is the drag stream for curve editors.
+    Q_INVOKABLE bool setEffectTextParam(int trackIndex, int clipIndex, int effectIndex,
+                                        const QString &key, const QString &value);
     // File-path params (model3d .glb). Same commit-once path as colour — no preview stream.
     // Takes a QUrl like bin().replaceSource / importSubtitleFile so the portal and native
     // dialogs hand us a real local path without QML having to call toLocalFile().
@@ -2050,6 +2061,7 @@ protected:
     SceneDetectController *m_sceneDetect = nullptr;
     DepthController *m_depth = nullptr;
     DenoiseController *m_denoise = nullptr;
+    ColorController *m_color = nullptr;
     RestoreController *m_restore = nullptr;
     FaceTrackingController *m_faces = nullptr;
     StabilizeController *m_stabilize = nullptr;

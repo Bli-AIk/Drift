@@ -8,6 +8,7 @@
 #include "engine/packages/audio/AudioEffectCatalog.h"
 #include "engine/packages/effects/EffectCatalog.h"
 #include "engine/packages/effects/EffectTemplateCatalog.h"
+#include "engine/packages/looks/LookCatalog.h"
 #include "engine/packages/assets/EmojiCatalog.h"
 #include "engine/packages/assets/FontCatalog.h"
 #include "engine/face/props/FacePropCatalog.h"
@@ -712,6 +713,8 @@ void AddonManager::reloadForKinds(const QStringList &kinds)
             reloadAudioEffectCatalog();
         else if (kind == QLatin1String("effect-templates"))
             reloadEffectTemplateCatalog();
+        else if (kind == QLatin1String("looks"))
+            drift::reloadLookCatalog();
         else if (kind == QLatin1String(drift::ort::kRuntimeKind)
                  || kind == QLatin1String(drift::ort::kPluginEpKind)) {
             // Nothing to reload. But a runtime that has already been loaded stays loaded for the

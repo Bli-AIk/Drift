@@ -38,6 +38,9 @@ const PanelType kPanelTypes[] = {
     {"agentLog", QT_TRANSLATE_NOOP("WorkspaceStore", "Agent Log")},
     {"recorder", QT_TRANSLATE_NOOP("WorkspaceStore", "Recorder")},
     {"denoise", QT_TRANSLATE_NOOP("WorkspaceStore", "Noise Removal")},
+    {"color", QT_TRANSLATE_NOOP("WorkspaceStore", "Color")},
+    {"looks", QT_TRANSLATE_NOOP("WorkspaceStore", "Looks")},
+    {"scopes", QT_TRANSLATE_NOOP("WorkspaceStore", "Scopes")},
 };
 
 // Tab ids and labels mirror AssetsPanel.qml / PropertiesPanel.qml.

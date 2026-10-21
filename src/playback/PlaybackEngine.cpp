@@ -94,6 +94,8 @@ constexpr int kGpuProbeMaxAttempts = 20;
 // competes with the frames playback actually needs. Every edit or seek discards the part of the
 // buffer past the change.
 constexpr drift::TimeUs kReadAheadUs = 2 * drift::kUsPerSecond;
+constexpr qint64 kScopeIntervalMs = 100;
+constexpr int kScopeReadbackWidth = 256;
 
 // The rates the preview transport offers. All sit inside the stretcher's own clamp
 // (kMinCurveSpeed..kMaxCurveSpeed), and nothing outside this list is accepted.
@@ -343,6 +345,24 @@ void PlaybackEngine::notifyProjectEdited()
     m_compositor.invalidateSnapshot();
     if (!m_editRefreshTimer.isActive())
         m_editRefreshTimer.start();
+}
+
+void PlaybackEngine::setPreviewEffectBypass(const QSet<QString> &clipIds, const QSet<QString> &catalogIds)
+{
+    m_compositor.setPreviewBypass(clipIds, catalogIds);
+    refreshFrame();
+}
+
+void PlaybackEngine::acquireScopes()
+{
+    if (m_scopeConsumers++ == 0 && !m_playing)
+        refreshFrame();
+}
+
+void PlaybackEngine::releaseScopes()
+{
+    if (m_scopeConsumers > 0)
+        --m_scopeConsumers;
 }
 
 void PlaybackEngine::setPlayheadUs(drift::TimeUs us)
@@ -944,6 +964,10 @@ void PlaybackEngine::onFrameReady(const GpuFrameTexture &frame)
         QMutexLocker lock(&m_frameMutex);
         m_currentFrame = frame;
     }
+    if (!frame.scopeImage.isNull()) {
+        m_scopeTimer.restart();
+        emit scopeFrame(frame.scopeImage);
+    }
     m_stats.setUploadPath(GpuCompositor::previewUploadPathId());
     if (drift::perf::enabled() && !frame.image.isNull())
         drift::perf::record("frame.readback", 0.0);
@@ -994,6 +1018,9 @@ FrameCompositor::RenderOptions PlaybackEngine::playbackRenderOptions() const
     options.allowProxies = true;
     options.deferAudioAnalysis = true;
     options.editor = m_editorView;
+    if (m_scopeConsumers > 0
+        && (!m_playing || !m_scopeTimer.isValid() || m_scopeTimer.hasExpired(kScopeIntervalMs)))
+        options.scopeReadbackWidth = kScopeReadbackWidth;
     // The 3D view fills the panel, and is antialiased by rendering it at twice the panel's
     // resolution, which the scene graph's linear filter averages back down. Orbiting re-renders
     // the whole scene per step, so it drops to one sample per pixel until the release.

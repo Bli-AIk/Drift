@@ -155,6 +155,10 @@ private slots:
     void splitLeftRightKeepOuterFades();
     void audioTrackTakesTransitions();
     void videoTransitionMirrorsToLinkedAudio();
+    void colorGradeCreatedOnFirstDragIsOneUndoStep();
+    void colorApplyToAllReplacesExistingGrade();
+    void colorBypassLeavesUndoAndDirtyUntouched();
+    void setEffectTextParamRejectsNonTextParams();
     void deleteLeftRightActionsCutAtThePlayhead();
     void playbackRateStepsThroughTheOfferedRates();
     void previewQualityEighthRendersAtOneEighth();
@@ -10653,6 +10657,119 @@ void EditorStateTest::videoTransitionMirrorsToLinkedAudio()
     state.addTransition(vt, 0, QStringLiteral("crossfade"), 0.5, false);
     QCOMPARE(state.project()->tracks().at(vt).transitions.size(), 1);
     QCOMPARE(state.project()->tracks().at(at).transitions.size(), 0);
+}
+
+void EditorStateTest::colorGradeCreatedOnFirstDragIsOneUndoStep()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    appendTwoVideoClips(*state.project());
+    state.selectClip(0, 0);
+    const int tracksBefore = state.project()->tracks().size();
+    const int undoBefore = state.undoIndex();
+
+    state.color()->beginEdit(QStringLiteral("x"));
+    state.color()->setParam(QStringLiteral("exposure"), 1.0);
+    state.color()->commitEdit();
+
+    const QList<drift::Effect> grades = videoEffectsOf(*state.project(), mediaClip(*state.project(), 0, 0));
+    QCOMPARE(grades.size(), 1);
+    QCOMPARE(grades.at(0).catalogId, QStringLiteral("color.grade"));
+    QCOMPARE(grades.at(0).parameters.value(QStringLiteral("exposure")).toDouble(), 1.0);
+    QCOMPARE(state.undoIndex(), undoBefore + 1);
+
+    state.undo();
+    QVERIFY(videoEffectsOf(*state.project(), mediaClip(*state.project(), 0, 0)).isEmpty());
+    QCOMPARE(state.project()->tracks().size(), tracksBefore);
+    QCOMPARE(state.undoIndex(), undoBefore);
+}
+
+void EditorStateTest::colorApplyToAllReplacesExistingGrade()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    appendTwoVideoClips(*state.project());
+    const auto gradesOf = [&](int clipIndex) {
+        return videoEffectsOf(*state.project(), mediaClip(*state.project(), 0, clipIndex));
+    };
+    const auto gradeCount = [&](int clipIndex) {
+        int count = 0;
+        for (const drift::Effect &effect : gradesOf(clipIndex))
+            count += effect.catalogId == QStringLiteral("color.grade");
+        return count;
+    };
+
+    state.selectClip(0, 0);
+    state.color()->beginEdit(QStringLiteral("a"));
+    state.color()->setParam(QStringLiteral("exposure"), 0.5);
+    state.color()->commitEdit();
+
+    state.selectClip(0, 1);
+    state.color()->beginEdit(QStringLiteral("b"));
+    state.color()->setParam(QStringLiteral("exposure"), -1.0);
+    state.color()->commitEdit();
+    QCOMPARE(gradeCount(1), 1);
+
+    state.selectClip(0, 0);
+    const int undoBefore = state.undoIndex();
+    QCOMPARE(state.color()->applyToAll(false), 1);
+    QCOMPARE(state.undoIndex(), undoBefore + 1);
+
+    QCOMPARE(gradeCount(1), 1);
+    const drift::Effect copied = gradesOf(1).at(0);
+    QCOMPARE(copied.parameters.value(QStringLiteral("exposure")).toDouble(), 0.5);
+
+    state.undo();
+    QCOMPARE(gradeCount(1), 1);
+    QCOMPARE(gradesOf(1).at(0).parameters.value(QStringLiteral("exposure")).toDouble(), -1.0);
+}
+
+void EditorStateTest::colorBypassLeavesUndoAndDirtyUntouched()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    appendTwoVideoClips(*state.project());
+    state.selectClip(0, 0);
+    state.color()->beginEdit(QStringLiteral("x"));
+    state.color()->setParam(QStringLiteral("exposure"), 1.0);
+    state.color()->commitEdit();
+
+    state.projectFile()->setDirty(false);
+    const int undoBefore = state.undoIndex();
+    state.color()->setBypass(true);
+    QVERIFY(state.color()->bypass());
+    QCOMPARE(state.undoIndex(), undoBefore);
+    QVERIFY(!state.projectFile()->hasUnsavedChanges());
+
+    state.color()->setBypass(false);
+    QVERIFY(!state.color()->bypass());
+    QCOMPARE(state.undoIndex(), undoBefore);
+    QVERIFY(!state.projectFile()->hasUnsavedChanges());
+}
+
+void EditorStateTest::setEffectTextParamRejectsNonTextParams()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    appendTwoVideoClips(*state.project());
+    state.selectClip(0, 0);
+    state.color()->beginEdit(QStringLiteral("x"));
+    state.color()->setParam(QStringLiteral("exposure"), 0.25);
+    state.color()->commitEdit();
+
+    const QList<drift::Effect> effects = videoEffectsOf(*state.project(), mediaClip(*state.project(), 0, 0));
+    int grade = -1;
+    for (int i = 0; i < effects.size(); ++i) {
+        if (effects.at(i).catalogId == QStringLiteral("color.grade"))
+            grade = i;
+    }
+    QVERIFY(grade >= 0);
+
+    QVERIFY(!state.setEffectTextParam(0, 0, grade, QStringLiteral("exposure"), QStringLiteral("1")));
+    QVERIFY(state.setEffectTextParam(0, 0, grade, QStringLiteral("look"), QStringLiteral("warm_tone")));
+    QCOMPARE(videoEffectsOf(*state.project(), mediaClip(*state.project(), 0, 0)).at(grade)
+                 .parameters.value(QStringLiteral("look")).toString(),
+             QStringLiteral("warm_tone"));
 }
 
 QTEST_MAIN(EditorStateTest)

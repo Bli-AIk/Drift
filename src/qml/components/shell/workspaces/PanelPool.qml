@@ -15,6 +15,9 @@ Item {
     property var audioMixerPanel: null
     property var sourceViewerPanel: null
     property var denoisePanel: null
+    property var colorPanel: null
+    property var looksPanel: null
+    property var scopesPanel: null
 
     property var _created: ({})
 
@@ -33,6 +36,18 @@ Item {
                                          && root.denoisePanel.visible
                                          && root.denoisePanel.parent !== root
 
+    readonly property bool colorShown: !!root.colorPanel
+                                       && root.colorPanel.visible
+                                       && root.colorPanel.parent !== root
+
+    readonly property bool looksShown: !!root.looksPanel
+                                       && root.looksPanel.visible
+                                       && root.looksPanel.parent !== root
+
+    readonly property bool scopesShown: !!root.scopesPanel
+                                        && root.scopesPanel.visible
+                                        && root.scopesPanel.parent !== root
+
     // One line per panel type. A type missing from here gets a placeholder.
     // "assets.<tab>" and "properties.<tab>" are handled by prefix in panel(): the full panels
     // pinned to one tab.
@@ -45,6 +60,9 @@ Item {
         "subtitles": subtitlesC,
         "recorder": recorderC,
         "denoise": denoiseC,
+        "color": colorC,
+        "looks": looksC,
+        "scopes": scopesC,
         "undoHistory": historyC,
         "sourceViewer": sourceViewerC,
         "agentLog": agentLogC
@@ -58,6 +76,9 @@ Item {
     Component { id: subtitlesC; SubtitlesPanel {} }
     Component { id: recorderC; RecorderPanel {} }
     Component { id: denoiseC; DenoisePanel {} }
+    Component { id: colorC; ColorPanel {} }
+    Component { id: looksC; LooksPanel {} }
+    Component { id: scopesC; ScopesPanel {} }
     Component { id: historyC; HistoryPanel {} }
     Component { id: sourceViewerC; SourceViewerPanel {} }
     Component { id: agentLogC; AgentLogPanel {} }
@@ -120,6 +141,18 @@ Item {
         case "denoise":
             root.denoisePanel = item
             item.shown = Qt.binding(() => root.denoiseShown)
+            break
+        case "color":
+            root.colorPanel = item
+            item.shown = Qt.binding(() => root.colorShown)
+            break
+        case "looks":
+            root.looksPanel = item
+            item.shown = Qt.binding(() => root.looksShown)
+            break
+        case "scopes":
+            root.scopesPanel = item
+            item.shown = Qt.binding(() => root.scopesShown)
             break
         }
         return item
