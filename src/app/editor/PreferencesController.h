@@ -68,6 +68,8 @@ class PreferencesController : public QObject
     Q_PROPERTY(bool gpuPreferenceInSystemSettings READ gpuPreferenceInSystemSettings CONSTANT)
     Q_PROPERTY(bool invertTimelineScroll READ invertTimelineScroll WRITE setInvertTimelineScroll
                    NOTIFY invertTimelineScrollChanged)
+    Q_PROPERTY(bool autoCrossfadeOverlaps READ autoCrossfadeOverlaps WRITE setAutoCrossfadeOverlaps
+                   NOTIFY autoCrossfadeOverlapsChanged)
     // App-wide interface language, QSettings("ui/language"). Empty means follow the OS locale.
     // "en" is the source catalog (no .qm). Other codes match i18n/drift_<code>.qm.
     // needsUiLanguagePrompt is true only on a brand-new install, before the first-launch chooser
@@ -137,6 +139,8 @@ public:
     bool gpuPreferenceInSystemSettings() const;
     bool invertTimelineScroll() const { return m_invertTimelineScroll; }
     void setInvertTimelineScroll(bool enabled);
+    bool autoCrossfadeOverlaps() const { return m_autoCrossfadeOverlaps; }
+    void setAutoCrossfadeOverlaps(bool enabled);
 
     QString uiLanguage() const { return m_uiLanguage; }
     QVariantList uiLanguages() const;
@@ -190,6 +194,7 @@ signals:
     void mediaCodecZeroCopyChanged();
     void preferredGpuChanged();
     void invertTimelineScrollChanged();
+    void autoCrossfadeOverlapsChanged();
     void uiLanguageChanged();
     void uiScaleChanged();
     void interfaceShellChanged();
@@ -214,6 +219,7 @@ private:
     bool m_mediaCodecZeroCopy = false;
     QString m_preferredGpu = QStringLiteral("auto");
     bool m_invertTimelineScroll = false;
+    bool m_autoCrossfadeOverlaps = true;
     QString m_uiLanguage;
     bool m_needsUiLanguagePrompt = false;
     double m_uiScale = 1.0;

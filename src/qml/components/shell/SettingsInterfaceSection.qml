@@ -94,6 +94,13 @@ SettingsSectionCard {
     }
 
     ThemedSwitch {
+        checked: EditorState.preferences.autoCrossfadeOverlaps
+        text: qsTr("Auto-crossfade overlapping clips")
+        tooltip: qsTr("When a move creates an overlap with a neighbouring clip on the same track, add a crossfade across it.")
+        onToggled: EditorState.preferences.autoCrossfadeOverlaps = checked
+    }
+
+    ThemedSwitch {
         visible: Haptics.supported
         checked: Haptics.enabled
         text: qsTr("Haptic feedback")

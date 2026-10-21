@@ -7100,6 +7100,44 @@ void AppController::deleteSelectedClip()
     finishEdit(tr("Clip deleted"));
 }
 
+// Overlaps the edit just applied created: physically overlapping pairs with no transition yet,
+// that did not already overlap in `before`. Each gets the same crossfade the blend-zone click adds.
+void AppController::autoCrossfadeNewOverlaps(const drift::Project &before)
+{
+    if (!m_preferences->autoCrossfadeOverlaps())
+        return;
+
+    QList<QPair<int, int>> created;
+    for (int t = 0; t < m_project.tracks().size(); ++t) {
+        const drift::Track &track = m_project.tracks().at(t);
+        if (!trackAllowsTransitions(track.type))
+            continue;
+        const drift::Track &oldTrack = before.tracks().at(t);
+        for (int left = 0; left < track.clips.size(); ++left) {
+            const int right = findTransitionPartnerIndex(track, left);
+            if (right < 0)
+                continue;
+            const drift::Clip &fromClip = track.clips.at(left);
+            const drift::Clip &toClip = track.clips.at(right);
+            if (!drift::clipsPhysicallyOverlap(fromClip, toClip))
+                continue;
+            const drift::Clip *oldFrom = drift::clipById(oldTrack, fromClip.id);
+            const drift::Clip *oldTo = drift::clipById(oldTrack, toClip.id);
+            if (oldFrom && oldTo && drift::clipsPhysicallyOverlap(*oldFrom, *oldTo))
+                continue;
+            const bool hasTransition = std::any_of(track.transitions.cbegin(), track.transitions.cend(),
+                                                   [&](const drift::Transition &t) {
+                                                       return t.fromClipId == fromClip.id && t.toClipId == toClip.id;
+                                                   });
+            if (!hasTransition)
+                created.append(qMakePair(t, left));
+        }
+    }
+    // addTransition only changes transitions, so the clip indices recorded above stay valid.
+    for (const QPair<int, int> &pair : std::as_const(created))
+        addTransition(pair.first, pair.second, QStringLiteral("crossfade"), 0.5);
+}
+
 void AppController::moveClip(int trackIndex, int clipIndex, double newStart)
 {
     if (trackIndex < 0 || trackIndex >= m_project.tracks().size())
@@ -7172,7 +7210,10 @@ void AppController::moveClip(int trackIndex, int clipIndex, double newStart)
         const drift::Clip &clip = m_project.tracks().at(pair.first).clips.at(pair.second);
         syncLinkedPartnersFrom(m_project, clip, movedIds);
     }
+    m_undoStack.beginMacro(tr("Clip moved"));
     pushProjectEdit(before, tr("Clip moved"));
+    autoCrossfadeNewOverlaps(before);
+    m_undoStack.endMacro();
     finishEdit(tr("Clip moved"));
 }
 
@@ -8221,7 +8262,10 @@ void AppController::moveClipToTrack(int trackIndex, int clipIndex, int newTrackI
     m_selectedTransitionTrack = -1;
     m_selectedTransitionLeftClip = -1;
 
+    m_undoStack.beginMacro(tr("Clips moved"));
     pushProjectEdit(before, tr("Clips moved"));
+    autoCrossfadeNewOverlaps(before);
+    m_undoStack.endMacro();
     finishEdit(tr("Clips moved"));
 }
 

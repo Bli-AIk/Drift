@@ -1864,6 +1864,7 @@ protected:
                                       const std::function<QList<drift::Clip>(const drift::Clip &)> &build,
                                       bool ripple, SegmentReplaceResult *out, QString *error);
     void trimClipGroupAt(int trackIndex, int clipIndex, drift::TimeUs atUs, bool dropLeft);
+    void autoCrossfadeNewOverlaps(const drift::Project &before);
     void applyRippleShift(drift::Track &track, int fromClipIndex, drift::TimeUs delta);
     void restoreFilmstripsAfterLoad();
     void normalizeSelection();
