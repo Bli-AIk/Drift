@@ -785,6 +785,10 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
             [this](const QString &text) {
                 setLastMessage(text, QStringLiteral("info"));
             });
+    m_projectFile->setAutosaveIntervalSeconds(m_preferences->autosaveIntervalSeconds());
+    connect(m_preferences, &PreferencesController::autosaveIntervalSecondsChanged, this, [this] {
+        m_projectFile->setAutosaveIntervalSeconds(m_preferences->autosaveIntervalSeconds());
+    });
 
     // selectedClipData reflects the current clip's live values, so it must
     // refresh on both selection changes and any edit to the timeline (e.g. a
@@ -6292,7 +6296,7 @@ void AppController::setSnapRadius(double pixels, double pxPerSecond)
 drift::TimeUs AppController::clipDurationForAssetIndex(int assetIndex) const
 {
     if (!m_assetLibrary)
-        return drift::kImageClipDurationUs;
+        return drift::imageClipDurationUs();
     return drift::clipDurationForAsset(m_project.asset(m_assetLibrary->assetIdAt(assetIndex)));
 }
 
@@ -9757,7 +9761,7 @@ void AppController::addShapeClipAt(const QString &shapeId, int trackIndex, doubl
     if (target < 0 || target >= m_project.tracks().size()
         || !m_project.tracks().at(target).allowsClipType(drift::ClipType::Shape)) {
         target = drift::ensureFreeTrackForClipType(m_project, drift::ClipType::Shape, wantStart,
-                                                   drift::kImageClipDurationUs, true);
+                                                   drift::imageClipDurationUs(), true);
     }
     if (target < 0)
         return;
@@ -9765,7 +9769,7 @@ void AppController::addShapeClipAt(const QString &shapeId, int trackIndex, doubl
     drift::Track &track = m_project.tracks()[target];
     const drift::TimeUs startSeconds = wantStart;
     const drift::TimeUs start = drift::resolveClipStart(m_project, track, -1, startSeconds,
-                                                        drift::kImageClipDurationUs, m_snapEnabled, m_playheadUs);
+                                                        drift::imageClipDurationUs(), m_snapEnabled, m_playheadUs);
 
     drift::Clip clip;
     clip.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -9773,9 +9777,9 @@ void AppController::addShapeClipAt(const QString &shapeId, int trackIndex, doubl
     clip.name = entry ? entry->label : drift::shapeKindToString(style.kind);
     clip.shapeStyle = style;
     clip.timelineStart = start;
-    clip.timelineDuration = drift::kImageClipDurationUs;
+    clip.timelineDuration = drift::imageClipDurationUs();
     clip.srcIn = 0;
-    clip.srcOut = drift::kImageClipDurationUs;
+    clip.srcOut = drift::imageClipDurationUs();
     applyDefaultVisualLayout(clip, m_project.width(), m_project.height(),
                              entry ? entry->aspect : 1.6);
 
@@ -10109,7 +10113,7 @@ void AppController::addAdjustmentClipWithEffect(const QString &effectId, int tra
     int target = trackIndex;
     const drift::TimeUs durUs = durationSeconds > 0.0
         ? drift::secondsToUs(durationSeconds)
-        : drift::kImageClipDurationUs;
+        : drift::imageClipDurationUs();
     const drift::TimeUs startSeconds = atSeconds < 0.0 ? m_playheadUs : drift::secondsToUs(atSeconds);
 
     // A free-standing adjustment goes on a standalone adjustment track — never into a nested
@@ -10221,7 +10225,7 @@ void AppController::addAdjustmentTrack(const QString &kind)
         clip.adjustmentKind = drift::AdjustmentKind::AudioEffects;
         clip.name = tr("Audio adjustment");
         clip.timelineStart = m_playheadUs;
-        clip.timelineDuration = drift::kImageClipDurationUs;
+        clip.timelineDuration = drift::imageClipDurationUs();
         clip.srcOut = clip.timelineDuration;
         m_project.tracks()[0].clips.append(clip);
         newClipId = clip.id;
@@ -10240,7 +10244,7 @@ int AppController::ensureAdjustmentLane(int parentTrackIndex, const QString &kin
     const drift::TimeUs startUs =
         atSeconds < 0.0 ? m_playheadUs : drift::secondsToUs(atSeconds);
     const drift::TimeUs durUs = durationSeconds > 0.0 ? drift::secondsToUs(durationSeconds)
-                                                      : drift::kImageClipDurationUs;
+                                                      : drift::imageClipDurationUs();
 
     const drift::Project before = m_project;
     const int laneIndex =
@@ -10479,7 +10483,7 @@ void AppController::addImageOverlayClip(const QString &path, const QString &name
     if (trackIndex < 0 || trackIndex >= m_project.tracks().size()
         || !m_project.tracks().at(trackIndex).allowsClipType(drift::ClipType::Image)) {
         trackIndex = drift::ensureFreeTrackForClipType(
-            m_project, drift::ClipType::Image, wantStart, drift::kImageClipDurationUs, true);
+            m_project, drift::ClipType::Image, wantStart, drift::imageClipDurationUs(), true);
     }
     if (trackIndex < 0)
         return;
@@ -10487,7 +10491,7 @@ void AppController::addImageOverlayClip(const QString &path, const QString &name
     drift::Track &track = m_project.tracks()[trackIndex];
     const drift::TimeUs startSeconds = wantStart;
     const drift::TimeUs start = drift::resolveClipStart(m_project, track, -1, startSeconds,
-                                                        drift::kImageClipDurationUs, m_snapEnabled, m_playheadUs);
+                                                        drift::imageClipDurationUs(), m_snapEnabled, m_playheadUs);
 
     drift::Clip clip;
     clip.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -10498,9 +10502,9 @@ void AppController::addImageOverlayClip(const QString &path, const QString &name
     clip.filmstripPath = path;
     clip.emoji = emoji;
     clip.timelineStart = start;
-    clip.timelineDuration = drift::kImageClipDurationUs;
+    clip.timelineDuration = drift::imageClipDurationUs();
     clip.srcIn = 0;
-    clip.srcOut = drift::kImageClipDurationUs;
+    clip.srcOut = drift::imageClipDurationUs();
     applyDefaultVisualLayout(clip, m_project.width(), m_project.height());
 
     track.clips.append(clip);
@@ -10623,7 +10627,7 @@ QVariantMap AppController::planAssetDrop(const QString &kind, const QString &pay
     if (const std::optional<drift::ClipType> type = placeableClipType(kind)) {
         const double duration = drift::usToSeconds(*type == drift::ClipType::Text
                                                        ? drift::kTextClipDurationUs
-                                                       : drift::kImageClipDurationUs);
+                                                       : drift::imageClipDurationUs());
         QVariantMap plan{{QStringLiteral("accepted"), true},
                          {QStringLiteral("landingStart"), at},
                          {QStringLiteral("landingDuration"), duration},
@@ -10685,7 +10689,7 @@ QVariantMap AppController::planAssetDrop(const QString &kind, const QString &pay
         return {{QStringLiteral("accepted"), true}, {QStringLiteral("mode"), QStringLiteral("gap")},
                 {QStringLiteral("track"), trackIndex},
                 {QStringLiteral("landingStart"), at},
-                {QStringLiteral("landingDuration"), drift::usToSeconds(drift::kImageClipDurationUs)}};
+                {QStringLiteral("landingDuration"), drift::usToSeconds(drift::imageClipDurationUs())}};
     }
     return rejectDrop(tr("Drop that onto a clip to apply it."));
 }
@@ -10732,7 +10736,7 @@ QVariantMap AppController::dropAsset(const QString &kind, const QString &payload
             if (entry.toMap().value(QStringLiteral("kind")).toString() == payload)
                 transition = payload;
         }
-        addTransition(track, clip, transition, 0.5);
+        addTransition(track, clip, transition, m_preferences->transitionDurationSeconds());
         return plan;
     }
 
@@ -10759,7 +10763,7 @@ QVariantMap AppController::dropAsset(const QString &kind, const QString &payload
     // already sits there, else a new one. Any other placement changes what it applies to.
     const auto adjustmentTrackAbove = [this, at](int trackIndex) {
         const drift::TimeUs start = drift::secondsToUs(at);
-        const drift::TimeUs end = start + drift::kImageClipDurationUs;
+        const drift::TimeUs end = start + drift::imageClipDurationUs();
         if (trackIndex > 0) {
             const drift::Track &above = m_project.tracks().at(trackIndex - 1);
             bool free = above.isAdjustment() && !above.isAdjustmentLane() && !above.isTransformLayer();
@@ -13452,7 +13456,7 @@ void AppController::addTransformTrack()
     const int layer = drift::insertTransformTrack(m_project.tracks(), 0,
                                                   lowestTransformableTrackId(m_project.tracks()));
     const drift::Clip clip = drift::makeTransformClip(
-        0, qMax(m_project.durationUs(), drift::kImageClipDurationUs));
+        0, qMax(m_project.durationUs(), drift::imageClipDurationUs()));
     m_project.tracks()[layer].clips.append(clip);
     if (m_selectedTransitionTrack >= 0)
         ++m_selectedTransitionTrack;
@@ -13467,7 +13471,7 @@ void AppController::addTransformClip(int trackIndex, double atSeconds, double du
         || !m_project.tracks().at(trackIndex).isTransformLayer())
         return;
     const drift::TimeUs durUs = durationSeconds > 0.0 ? drift::secondsToUs(durationSeconds)
-                                                      : drift::kImageClipDurationUs;
+                                                      : drift::imageClipDurationUs();
     const drift::TimeUs wanted = atSeconds < 0.0 ? m_playheadUs : drift::secondsToUs(atSeconds);
     const drift::Project before = m_project;
     drift::Track &track = m_project.tracks()[trackIndex];
@@ -13496,7 +13500,7 @@ void AppController::addTransformLayerAbove(int trackIndex)
     }
     if (end <= start) {
         start = m_playheadUs;
-        end = start + drift::kImageClipDurationUs;
+        end = start + drift::imageClipDurationUs();
     }
 
     const drift::Project before = m_project;
@@ -13520,7 +13524,7 @@ void AppController::addTransformLayerForSelection()
     m_project.ensureTrackIds();
     const int layer = drift::insertTransformTrack(m_project.tracks(), 0,
                                                   lowestTransformableTrackId(m_project.tracks()));
-    const drift::Clip clip = drift::makeTransformClip(m_playheadUs, drift::kImageClipDurationUs);
+    const drift::Clip clip = drift::makeTransformClip(m_playheadUs, drift::imageClipDurationUs());
     m_project.tracks()[layer].clips.append(clip);
     if (m_selectedTransitionTrack >= 0)
         ++m_selectedTransitionTrack;
@@ -13551,7 +13555,7 @@ void AppController::addCameraTrack()
     // Long enough to cover the whole sequence, so the first camera frames every shot rather than
     // snapping back to the default viewpoint partway through. An empty timeline still gets a
     // usable clip to drag keys onto.
-    const drift::TimeUs span = qMax(m_project.durationUs(), drift::kImageClipDurationUs);
+    const drift::TimeUs span = qMax(m_project.durationUs(), drift::imageClipDurationUs());
     const drift::Clip clip = drift::makeCameraClip(0, span);
     m_project.tracks()[index].clips.append(clip);
     pushProjectEdit(before, tr("Add camera"));
@@ -13562,7 +13566,7 @@ void AppController::addCameraTrack()
 void AppController::addCameraClip(double atSeconds, double durationSeconds)
 {
     const drift::TimeUs durUs = durationSeconds > 0.0 ? drift::secondsToUs(durationSeconds)
-                                                      : drift::kImageClipDurationUs;
+                                                      : drift::imageClipDurationUs();
     const drift::TimeUs wanted = atSeconds < 0.0 ? m_playheadUs : drift::secondsToUs(atSeconds);
     const drift::Project before = m_project;
     m_project.ensureTrackIds();
@@ -14676,7 +14680,7 @@ QVariantMap AppController::addModel3dClip(const QString &path, int trackIndex, d
     const drift::Project before = m_project;
 
     drift::TimeUs duration =
-        model.animationDurationUs() > 0 ? model.animationDurationUs() : drift::kImageClipDurationUs;
+        model.animationDurationUs() > 0 ? model.animationDurationUs() : drift::imageClipDurationUs();
     if (opts.value(QStringLiteral("duration")).toDouble() > 0.0)
         duration = drift::secondsToUs(opts.value(QStringLiteral("duration")).toDouble());
     duration = qMax(duration, drift::kMinClipDurationUs);
@@ -14797,7 +14801,7 @@ QVariantMap AppController::addVectorClip(const QString &source, int trackIndex, 
     const drift::Project before = m_project;
 
     // Plays once by default; a still gets the image default.
-    drift::TimeUs duration = vector.durationUs > 0 ? vector.durationUs : drift::kImageClipDurationUs;
+    drift::TimeUs duration = vector.durationUs > 0 ? vector.durationUs : drift::imageClipDurationUs();
     if (opts.value(QStringLiteral("duration")).toDouble() > 0.0)
         duration = drift::secondsToUs(opts.value(QStringLiteral("duration")).toDouble());
     duration = qMax(duration, drift::kMinClipDurationUs);
@@ -15160,7 +15164,7 @@ void AppController::addMaskLaneClip(int trackIndex, const QString &shape, double
         atSeconds < 0.0 ? m_playheadUs : drift::secondsToUs(atSeconds);
     const drift::TimeUs durationUs = durationSeconds > 0.0
                                          ? drift::secondsToUs(durationSeconds)
-                                         : drift::kImageClipDurationUs;
+                                         : drift::imageClipDurationUs();
 
     const drift::Project before = m_project;
     const drift::ClipRef added =
@@ -19533,7 +19537,7 @@ void AppController::freezeFrameAtPlayhead()
 
                 drift::Track &track = m_project.tracks()[trackIndex];
                 const drift::TimeUs start = drift::resolveClipStart(m_project, track, -1, playheadUs,
-                                                                    drift::kImageClipDurationUs, m_snapEnabled,
+                                                                    drift::imageClipDurationUs(), m_snapEnabled,
                                                                     playheadUs);
 
                 drift::Clip freezeClip;
@@ -19545,9 +19549,9 @@ void AppController::freezeFrameAtPlayhead()
                 freezeClip.thumbnailPath = thumb;
                 freezeClip.filmstripPath = thumb;
                 freezeClip.timelineStart = start;
-                freezeClip.timelineDuration = drift::kImageClipDurationUs;
+                freezeClip.timelineDuration = drift::imageClipDurationUs();
                 freezeClip.srcIn = 0;
-                freezeClip.srcOut = drift::kImageClipDurationUs;
+                freezeClip.srcOut = drift::imageClipDurationUs();
                 fitClipLayoutToCanvas(freezeClip, size.width(), size.height(), m_project.width(),
                                       m_project.height());
 

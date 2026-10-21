@@ -296,11 +296,7 @@ Platform.MenuBar {
         Platform.MenuItem {
             text: qsTr("Keyboard Shortcuts")
             shortcut: "F1"
-            onTriggered: {
-                if (menuBar.appWindow.previewFullscreen)
-                    menuBar.appWindow.togglePreviewFullscreen()
-                menuBar.assets.showTab("shortcuts")
-            }
+            onTriggered: menuBar.appWindow.openSettings("keymap")
         }
         Platform.MenuItem {
             text: qsTr("Extras…")

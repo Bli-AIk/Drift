@@ -1536,7 +1536,6 @@ qt_add_qml_module(drift
         src/qml/components/assets/MasksTab.qml
         src/qml/components/assets/SoundsTab.qml
         src/qml/components/assets/TransitionsTab.qml
-        src/qml/components/assets/ShortcutsTab.qml
         src/qml/components/assets/MediaAssetsTab.qml
         src/qml/components/assets/MarketConsentPanel.qml
         src/qml/components/assets/MarketTab.qml
@@ -1557,7 +1556,6 @@ qt_add_qml_module(drift
         src/qml/components/assets/TextStylePackCard.qml
         src/qml/components/assets/StockAudioRow.qml
         src/qml/components/assets/StickerPresetCard.qml
-        src/qml/components/assets/ShortcutsBindingRow.qml
         src/qml/components/assets/ShapePresetCard.qml
         src/qml/components/assets/SfxSoundRow.qml
         src/qml/components/assets/ScenesShotRow.qml
@@ -1592,7 +1590,9 @@ qt_add_qml_module(drift
         src/qml/components/assets/AssetsPanelDropOverlay.qml
         src/qml/TimelinePanel.qml
         src/qml/components/timeline/TimelineToolbar.qml
+        src/qml/components/timeline/TimelineToolbarActions.qml
         src/qml/components/timeline/TimelineToolbarCustomizeDialog.qml
+        src/qml/components/timeline/TimelineToolbarCustomizer.qml
         src/qml/components/timeline/TimelineOverview.qml
         src/qml/components/timeline/TrackHeaderColumn.qml
         src/qml/components/timeline/TransformSpanBracket.qml
@@ -2007,18 +2007,25 @@ qt_add_qml_module(drift
         src/qml/components/shell/StartScreenRecents.qml
         src/qml/components/shell/StartScreenProjectRow.qml
         src/qml/components/shell/StartScreenActions.qml
-        src/qml/components/shell/SettingsSectionCard.qml
-        src/qml/components/shell/SettingsAppearanceSection.qml
-        src/qml/components/shell/SettingsThemeList.qml
-        src/qml/components/shell/SettingsThemeEntry.qml
+        src/qml/components/shell/SettingsAboutPage.qml
+        src/qml/components/shell/SettingsAiPage.qml
         src/qml/components/shell/SettingsAppearanceActions.qml
+        src/qml/components/shell/SettingsAppearancePage.qml
         src/qml/components/shell/SettingsAppearanceTranslucency.qml
-        src/qml/components/shell/SettingsPreviewSection.qml
-        src/qml/components/shell/SettingsPlaybackSection.qml
-        src/qml/components/shell/SettingsMarketplaceSection.qml
-        src/qml/components/shell/SettingsInterfaceSection.qml
+        src/qml/components/shell/SettingsAudioPage.qml
         src/qml/components/shell/SettingsCloudProvidersSection.qml
-        src/qml/components/shell/SettingsAppSection.qml
+        src/qml/components/shell/SettingsGeneralPage.qml
+        src/qml/components/shell/SettingsGroupHeader.qml
+        src/qml/components/shell/SettingsKeymapPage.qml
+        src/qml/components/shell/SettingsMarketplacePage.qml
+        src/qml/components/shell/SettingsNetworkPage.qml
+        src/qml/components/shell/SettingsPage.qml
+        src/qml/components/shell/SettingsPreviewPage.qml
+        src/qml/components/shell/SettingsRow.qml
+        src/qml/components/shell/SettingsThemeEntry.qml
+        src/qml/components/shell/SettingsThemeList.qml
+        src/qml/components/shell/SettingsTimelinePage.qml
+        src/qml/components/shell/SettingsToolbarPage.qml
         src/qml/components/shell/SegmentationFrameColumn.qml
         src/qml/components/shell/SegmentationControlColumn.qml
         src/qml/components/shell/RestoreUpscalerPicker.qml

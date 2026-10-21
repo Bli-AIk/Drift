@@ -3,9 +3,24 @@
 #include <QUuid>
 
 #include <algorithm>
+#include <atomic>
 #include <optional>
 
 namespace drift {
+
+namespace {
+std::atomic<TimeUs> g_imageClipDurationUs{5 * kUsPerSecond};
+} // namespace
+
+TimeUs imageClipDurationUs()
+{
+    return g_imageClipDurationUs.load(std::memory_order_relaxed);
+}
+
+void setImageClipDurationUs(TimeUs duration)
+{
+    g_imageClipDurationUs.store(duration, std::memory_order_relaxed);
+}
 
 void SnapTargets::build(const Project &project, TimeUs playheadUs,
                         const QList<TimeUs> &extraTargets, const QString &excludeClipId)
@@ -1089,15 +1104,15 @@ int insertTrackAboveForClipType(Project &project, int trackIndex, ClipType type)
 TimeUs clipDurationForAsset(const MediaAsset *asset)
 {
     if (!asset)
-        return kImageClipDurationUs;
+        return imageClipDurationUs();
 
     if (asset->kind == MediaKind::Image)
-        return kImageClipDurationUs;
+        return imageClipDurationUs();
 
     if (asset->durationUs > 0)
         return asset->durationUs;
 
-    return kImageClipDurationUs;
+    return imageClipDurationUs();
 }
 
 TimeUs sourceDurationForClip(const Project &project, const Clip &clip)
@@ -1116,7 +1131,7 @@ TimeUs sourceDurationForClip(const Project &project, const Clip &clip)
     if (clip.type == ClipType::Image || clip.type == ClipType::Shape || clip.type == ClipType::Vector
         || clip.type == ClipType::Model3d || clip.type == ClipType::Pdf
         || clip.type == ClipType::Adjustment)
-        return kImageClipDurationUs;
+        return imageClipDurationUs();
 
     return qMax(clip.srcOut, clip.timelineDuration);
 }

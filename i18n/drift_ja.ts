@@ -4264,56 +4264,16 @@
 <context>
     <name>AppSettingsMenu</name>
     <message>
-        <source>Workspace</source>
-        <translation>ワークスペース</translation>
-    </message>
-    <message>
-        <source>Auto (follow canvas)</source>
-        <translation>自動 (キャンバスに追従)</translation>
-    </message>
-    <message>
-        <source>Landscape</source>
-        <translation>横向き</translation>
-    </message>
-    <message>
-        <source>Portrait</source>
-        <translation>縦向き</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation>テーマ</translation>
-    </message>
-    <message>
-        <source>System</source>
-        <translation type="unfinished">システム</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation>ライト</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation>ダーク</translation>
-    </message>
-    <message>
-        <source>Language…</source>
-        <translation>言語…</translation>
-    </message>
-    <message>
         <source>Switch to mobile layout…</source>
         <translation type="unfinished">モバイルレイアウトに切り替え…</translation>
     </message>
     <message>
+        <source>Settings…</source>
+        <translation type="unfinished">設定…</translation>
+    </message>
+    <message>
         <source>Multicam</source>
         <translation>マルチカム</translation>
-    </message>
-    <message>
-        <source>Debug info…</source>
-        <translation>デバッグ情報…</translation>
-    </message>
-    <message>
-        <source>More settings…</source>
-        <translation>詳細設定…</translation>
     </message>
 </context>
 <context>
@@ -4598,10 +4558,6 @@
     <message>
         <source>Audio FX</source>
         <translation>オーディオ FX</translation>
-    </message>
-    <message>
-        <source>Shortcuts</source>
-        <translation>ショートカット</translation>
     </message>
     <message>
         <source>New folder</source>
@@ -6233,10 +6189,6 @@
     <message>
         <source>Settings</source>
         <translation type="unfinished">設定</translation>
-    </message>
-    <message>
-        <source>Workspace, theme, language and more</source>
-        <translation type="unfinished">ワークスペース、テーマ、言語など</translation>
     </message>
 </context>
 <context>
@@ -7962,30 +7914,6 @@
         <translation>3D モデルクリップを選択</translation>
     </message>
     <message>
-        <source>Preview settings</source>
-        <translation>プレビュー設定</translation>
-    </message>
-    <message>
-        <source>Playback settings</source>
-        <translation>再生設定</translation>
-    </message>
-    <message>
-        <source>Interface settings</source>
-        <translation>インターフェース設定</translation>
-    </message>
-    <message>
-        <source>App settings</source>
-        <translation>アプリの設定</translation>
-    </message>
-    <message>
-        <source>Cloud providers</source>
-        <translation>クラウドプロバイダー</translation>
-    </message>
-    <message>
-        <source>Marketplace settings</source>
-        <translation>マーケットプレイス設定</translation>
-    </message>
-    <message>
         <source>Transitions</source>
         <translation>トランジション</translation>
     </message>
@@ -8020,6 +7948,34 @@
     <message>
         <source>Preview</source>
         <translation>プレビュー</translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation type="unfinished">外観</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">タイムライン</translation>
+    </message>
+    <message>
+        <source>Timeline toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AI &amp; Cloud</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Upscale…</source>
@@ -13066,30 +13022,34 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsAppSection</name>
+    <name>SettingsAboutPage</name>
     <message>
-        <source>App</source>
-        <translation type="unfinished">アプリ</translation>
+        <source>About</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reopen last project on startup</source>
-        <translation type="unfinished">起動時に最後のプロジェクトを開く</translation>
+        <source>Drift</source>
+        <translation type="unfinished">Drift</translation>
     </message>
     <message>
-        <source>Automatically restore the last open project on startup. Closing still asks you to save; a crash snapshot never overwrites your save file.</source>
-        <translation type="unfinished">起動時に最後に開いていたプロジェクトを自動的に復元します。終了時には依然として保存を確認します；クラッシュ時のスナップショットが保存ファイルを上書きすることはありません。</translation>
+        <source>Version %1</source>
+        <translation type="unfinished">Version %1</translation>
     </message>
     <message>
         <source>Updates</source>
         <translation type="unfinished">アップデート</translation>
     </message>
     <message>
-        <source>Check on startup</source>
-        <translation type="unfinished">起動時に確認</translation>
+        <source>Check for updates on startup</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Once a day, check whether a newer Drift has been released</source>
-        <translation type="unfinished">1日1回、新しい Drift がリリースされていないか確認する</translation>
+        <source>Once a day, check whether a newer Drift has been released.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check for updates</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Checking…</source>
@@ -13104,99 +13064,66 @@ If playback stutters, try another.</source>
         <translation type="unfinished">今すぐ確認</translation>
     </message>
     <message>
-        <source>Drift %1</source>
-        <translation type="unfinished">Drift %1</translation>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Extra packs</source>
-        <translation type="unfinished">拡張パック</translation>
+        <source>About Drift</source>
+        <translation type="unfinished">Drift について</translation>
     </message>
     <message>
-        <source>Remind about essential packs</source>
-        <translation type="unfinished">必須パックの通知</translation>
+        <source>Open-source video editor by CutWire Studios.</source>
+        <translation type="unfinished">Open-source video editor by CutWire Studios.</translation>
     </message>
     <message>
-        <source>Pulse the Extras icon when the video, transitions, and audio packs are not installed</source>
-        <translation type="unfinished">ビデオ、トランジション、オーディオパックがインストールされていないときに拡張機能アイコンを点滅させる</translation>
+        <source>Show about dialog</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remind about pack updates</source>
-        <translation type="unfinished">パックアップデートの通知</translation>
+        <source>Debug info</source>
+        <translation type="unfinished">デバッグ情報</translation>
     </message>
     <message>
-        <source>Pulse the Extras icon when updates are available for packs you already have installed</source>
-        <translation type="unfinished">インストール済みのパックにアップデートが利用可能なときに拡張機能アイコンを点滅させる</translation>
+        <source>System, playback and codec details for bug reports.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open debug info…</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsAiPage</name>
+    <message>
+        <source>AI &amp; Cloud</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Agent access</source>
         <translation type="unfinished">エージェントアクセス</translation>
     </message>
     <message>
-        <source>Network</source>
+        <source>Let Cursor or Claude edit this project for you. Only programs on this device can connect.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>System proxy</source>
+        <source>Start agent access on launch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No proxy</source>
+        <source>Turn agent access on automatically the next time you open Drift. Turning access off resets this.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>HTTP proxy</source>
-        <translation type="unfinished"></translation>
+        <source>Cloud providers</source>
+        <translation type="unfinished">クラウドプロバイダー</translation>
     </message>
     <message>
-        <source>SOCKS5 proxy</source>
-        <translation type="unfinished"></translation>
+        <source>Scene detection sensitivity</source>
+        <translation type="unfinished">シーン検出の感度</translation>
     </message>
     <message>
-        <source>How Drift reaches the internet for downloads, updates, and online services. Applies immediately.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Proxy host</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Username (optional)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Password (optional)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Settings file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export settings…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>JSON document (*.json)</source>
-        <translation type="unfinished">JSON ドキュメント (*.json)</translation>
-    </message>
-    <message>
-        <source>Settings exported</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Import settings…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Import Settings</source>
+        <source>Higher finds more cuts. When a clip is flat or heavily graded, Drift still falls back to an adaptive threshold.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -13292,13 +13219,25 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsAppearanceSection</name>
+    <name>SettingsAppearancePage</name>
     <message>
         <source>Appearance</source>
         <translation type="unfinished">外観</translation>
     </message>
     <message>
         <source>Could not use that theme.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation type="unfinished">テーマ</translation>
+    </message>
+    <message>
+        <source>Color theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light and Dark follow your system. Other themes can be installed or imported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13317,9 +13256,6 @@ If playback stutters, try another.</source>
         <source>This theme has a dark and a light variant. The header toggle switches between them.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>SettingsAppearanceTranslucency</name>
     <message>
         <source>Translucent windows</source>
         <translation type="unfinished"></translation>
@@ -13328,6 +13264,81 @@ If playback stutters, try another.</source>
         <source>Lets the desktop show through panels when a theme asks for it. Takes effect after restart.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Interface</source>
+        <translation type="unfinished">インターフェース</translation>
+    </message>
+    <message>
+        <source>Interface size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Drift to apply this size.</source>
+        <translation type="unfinished">このサイズを適用するには Drift を再起動してください。</translation>
+    </message>
+    <message>
+        <source>Makes buttons, text, and icons larger, on top of your display settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>100% (system)</source>
+        <translation type="unfinished">100% (システム)</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation type="unfinished">レイアウト</translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished">レイアウトを切り替えるには Drift を再起動してください。</translation>
+    </message>
+    <message>
+        <source>Desktop suits a mouse and keyboard. Mobile is the touch layout made for phones.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished">自動</translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation type="unfinished">デスクトップ</translation>
+    </message>
+    <message>
+        <source>Mobile</source>
+        <translation type="unfinished">モバイル</translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished">今すぐ再起動</translation>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation type="unfinished">ワークスペース</translation>
+    </message>
+    <message>
+        <source>Workspace orientation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Landscape or portrait workspace. Auto follows the shape of the canvas.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto (follow canvas)</source>
+        <translation type="unfinished">自動 (キャンバスに追従)</translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation type="unfinished">横向き</translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation type="unfinished">縦向き</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsAppearanceTranslucency</name>
     <message>
         <source>Restart Drift to apply window transparency.</source>
         <translation type="unfinished"></translation>
@@ -13350,11 +13361,34 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsCloudProvidersSection</name>
+    <name>SettingsAudioPage</name>
     <message>
-        <source>Cloud providers</source>
-        <translation type="unfinished">クラウドプロバイダー</translation>
+        <source>Audio</source>
+        <translation type="unfinished">オーディオ</translation>
     </message>
+    <message>
+        <source>Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio output</source>
+        <translation type="unfinished">オーディオ出力</translation>
+    </message>
+    <message>
+        <source>Where playback is heard. “System default” follows whatever your computer is set to, including when that changes.</source>
+        <translation type="unfinished">再生が聞こえる場所。「システムデフォルト」はコンピューターの設定に追従し、変更時も反映されます。</translation>
+    </message>
+    <message>
+        <source>Microphone input</source>
+        <translation type="unfinished">マイク入力</translation>
+    </message>
+    <message>
+        <source>Audio device used for recording voiceovers onto audio tracks.</source>
+        <translation type="unfinished">オーディオトラックにボイスオーバーを録音するために使用するオーディオデバイス。</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsCloudProvidersSection</name>
     <message>
         <source>Keys are stored unencrypted in Drift&apos;s settings. ELEVENLABS_API_KEY and FISH_API_KEY in the environment take precedence. Use is billed to your own account.</source>
         <translation type="unfinished">キーは暗号化されずに Drift の設定に保存されます。環境変数の ELEVENLABS_API_KEY および FISH_API_KEY が優先されます。利用料金はお客様のアカウントに請求されます。</translation>
@@ -13432,69 +13466,97 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsInterfaceSection</name>
+    <name>SettingsGeneralPage</name>
     <message>
-        <source>Interface</source>
-        <translation type="unfinished">インターフェース</translation>
+        <source>General</source>
+        <translation type="unfinished">全般</translation>
     </message>
     <message>
-        <source>Size</source>
-        <translation type="unfinished">サイズ</translation>
+        <source>%1 GB</source>
+        <translation type="unfinished">%1 GB</translation>
     </message>
     <message>
-        <source>100% (system)</source>
-        <translation type="unfinished">100% (システム)</translation>
+        <source>%1 MB</source>
+        <translation type="unfinished">%1 MB</translation>
     </message>
     <message>
-        <source>Makes buttons, text, and icons larger. This is extra scale on top of the size already set in your display settings. Takes effect after restart.</source>
-        <translation type="unfinished">ボタン、テキスト、アイコンを大きくします。これはディスプレイ設定で既に設定されているサイズに加えての拡大です。再起動後に有効になります。</translation>
-    </message>
-    <message>
-        <source>Restart Drift to apply this size.</source>
-        <translation type="unfinished">このサイズを適用するには Drift を再起動してください。</translation>
-    </message>
-    <message>
-        <source>Layout</source>
-        <translation type="unfinished">レイアウト</translation>
-    </message>
-    <message>
-        <source>Automatic</source>
-        <translation type="unfinished">自動</translation>
-    </message>
-    <message>
-        <source>Desktop</source>
-        <translation type="unfinished">デスクトップ</translation>
-    </message>
-    <message>
-        <source>Mobile</source>
-        <translation type="unfinished">モバイル</translation>
-    </message>
-    <message>
-        <source>Desktop suits a mouse and keyboard, including tablets in desktop mode. Mobile is the touch layout made for phones. Takes effect after restart.</source>
-        <translation type="unfinished">デスクトップはマウスとキーボードに適しており、デスクトップモードのタブレットも含みます。モバイルはスマートフォン向けのタッチレイアウトです。再起動後に有効になります。</translation>
-    </message>
-    <message>
-        <source>Restart Drift to switch layouts.</source>
-        <translation type="unfinished">レイアウトを切り替えるには Drift を再起動してください。</translation>
-    </message>
-    <message>
-        <source>Restart now</source>
-        <translation type="unfinished">今すぐ再起動</translation>
-    </message>
-    <message>
-        <source>Horizontal mouse-wheel pan</source>
-        <translation type="unfinished">マウスホイール水平パン</translation>
-    </message>
-    <message>
-        <source>Scroll pans left and right along the timeline. Shift+scroll moves between tracks. Middle-click drag also pans.</source>
-        <translation type="unfinished">スクロールでタイムラインに沿って左右にパンします。Shift+スクロールでトラック間を移動します。中クリックドラッグでもパンします。</translation>
-    </message>
-    <message>
-        <source>Auto-crossfade overlapping clips</source>
+        <source>Language &amp; region</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>When a move creates an overlap with a neighbouring clip on the same track, add a crossfade across it.</source>
+        <source>Language</source>
+        <translation type="unfinished">言語</translation>
+    </message>
+    <message>
+        <source>Language for menus and labels. Takes effect immediately.</source>
+        <translation type="unfinished">メニューとラベルの言語。即座に反映されます。</translation>
+    </message>
+    <message>
+        <source>Startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reopen last project on startup</source>
+        <translation type="unfinished">起動時に最後のプロジェクトを開く</translation>
+    </message>
+    <message>
+        <source>Restores the last open project. Closing still asks you to save.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saving</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Autosave interval</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How often unsaved work is snapshotted for crash recovery.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished">オフ</translation>
+    </message>
+    <message>
+        <source>Every 15 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every 30 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every 5 minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extras</source>
+        <translation type="unfinished">拡張機能</translation>
+    </message>
+    <message>
+        <source>Remind about essential packs</source>
+        <translation type="unfinished">必須パックの通知</translation>
+    </message>
+    <message>
+        <source>Pulse the Extras icon when the video, transitions, and audio packs are not installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remind about pack updates</source>
+        <translation type="unfinished">パックアップデートの通知</translation>
+    </message>
+    <message>
+        <source>Pulse the Extras icon when updates are available for packs you already have installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13506,19 +13568,90 @@ If playback stutters, try another.</source>
         <translation type="unfinished">タップ、スナップ、編集時に振動します。このデバイスが独自の触覚エフェクトを持っている場合はそれを使用します。</translation>
     </message>
     <message>
-        <source>Language</source>
-        <translation type="unfinished">言語</translation>
+        <source>Storage</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Language for menus and labels. Takes effect immediately.</source>
-        <translation type="unfinished">メニューとラベルの言語。即座に反映されます。</translation>
+        <source>Cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 used, stored in %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export and import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save your preferences to a JSON file, or load them from one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>JSON document (*.json)</source>
+        <translation type="unfinished">JSON ドキュメント (*.json)</translation>
+    </message>
+    <message>
+        <source>Settings exported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>SettingsMarketplaceSection</name>
+    <name>SettingsKeymapPage</name>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click a shortcut, then press the keys. Esc cancels, Backspace clears.</source>
+        <translation type="unfinished">ショートカットをクリックし、キーを押します。Esc でキャンセル、Backspace でクリアします。</translation>
+    </message>
+    <message>
+        <source>Reset to defaults</source>
+        <translation type="unfinished">デフォルトにリセット</translation>
+    </message>
+    <message>
+        <source>Restores every shortcut to its original key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shortcuts reset to defaults.</source>
+        <translation type="unfinished">ショートカットをデフォルトにリセットしました。</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMarketplacePage</name>
     <message>
         <source>Marketplace</source>
         <translation type="unfinished">マーケットプレイス</translation>
+    </message>
+    <message>
+        <source>Account</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Account connected (%1)</source>
@@ -13538,45 +13671,152 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPlaybackSection</name>
+    <name>SettingsNetworkPage</name>
     <message>
-        <source>Playback</source>
-        <translation type="unfinished">再生</translation>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audio output</source>
-        <translation type="unfinished">オーディオ出力</translation>
+        <source>Connection</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Where playback is heard. “System default” follows whatever your computer is set to, including when that changes.</source>
-        <translation type="unfinished">再生が聞こえる場所。「システムデフォルト」はコンピューターの設定に追従し、変更時も反映されます。</translation>
+        <source>Proxy</source>
+        <translation type="unfinished">プロキシ</translation>
     </message>
     <message>
-        <source>Microphone input</source>
-        <translation type="unfinished">マイク入力</translation>
+        <source>How Drift reaches the internet for downloads, updates, and online services. Applies immediately.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audio device used for recording voiceovers onto audio tracks.</source>
-        <translation type="unfinished">オーディオトラックにボイスオーバーを録音するために使用するオーディオデバイス。</translation>
+        <source>System proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTTP proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SOCKS5 proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Host and port of the proxy. The username and password are optional.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Username (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password (optional)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>SettingsPreviewSection</name>
+    <name>SettingsPane</name>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">全般</translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation type="unfinished">外観</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">タイムライン</translation>
+    </message>
+    <message>
+        <source>Timeline toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Preview</source>
         <translation type="unfinished">プレビュー</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">オーディオ</translation>
+    </message>
+    <message>
+        <source>AI &amp; Cloud</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Marketplace</source>
+        <translation type="unfinished">マーケットプレイス</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No settings match “%1”</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPreviewPage</name>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished">プレビュー</translation>
+    </message>
+    <message>
+        <source>Guides</source>
+        <translation type="unfinished">ガイド</translation>
     </message>
     <message>
         <source>Show guides</source>
         <translation type="unfinished">ガイドを表示</translation>
     </message>
     <message>
-        <source>Show alignment guides over the preview</source>
-        <translation type="unfinished">プレビューにアライメントガイドを表示</translation>
+        <source>Alignment guides drawn over the preview.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guide sets</source>
+        <translation type="unfinished">ガイドセット</translation>
+    </message>
+    <message>
+        <source>Choose which guide sets are drawn over the preview.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Background</source>
         <translation type="unfinished">背景</translation>
+    </message>
+    <message>
+        <source>Fill behind clips that don’t cover the whole screen.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Solid color</source>
@@ -13591,16 +13831,100 @@ If playback stutters, try another.</source>
         <translation type="unfinished">透明</translation>
     </message>
     <message>
-        <source>Fill behind clips that don’t cover the whole screen</source>
-        <translation type="unfinished">画面全体を覆わないクリップの後ろを埋める</translation>
+        <source>Background colour</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Choose background colour</source>
-        <translation type="unfinished">背景色を選択</translation>
+        <source>Colour of the solid background.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Blur strength</source>
         <translation type="unfinished">ブラーの強さ</translation>
+    </message>
+    <message>
+        <source>How much the background is blurred behind clips.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lower is smoother while editing. Full matches an export exactly; Auto renders only the pixels on screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full</source>
+        <translation type="unfinished">フル</translation>
+    </message>
+    <message>
+        <source>Half</source>
+        <translation type="unfinished">半分</translation>
+    </message>
+    <message>
+        <source>Quarter</source>
+        <translation type="unfinished">4分の1</translation>
+    </message>
+    <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished">自動</translation>
+    </message>
+    <message>
+        <source>Decoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How video is decoded for preview. Software is smoother for most clips but uses more CPU. Hardware suits high-quality 4K.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Faster preview (experimental)</source>
+        <translation type="unfinished">高速プレビュー (実験的)</translation>
+    </message>
+    <message>
+        <source>Can make playback smoother by keeping video on the graphics card. Turn it off if the picture looks wrong. Takes effect after restart.</source>
+        <translation type="unfinished">ビデオをグラフィックスカード上に保持することで再生を滑らかにできます。画像がおかしくなる場合はオフにしてください。再起動後に有効になります。</translation>
+    </message>
+    <message>
+        <source>Graphics card</source>
+        <translation type="unfinished">グラフィックスカード</translation>
+    </message>
+    <message>
+        <source>Which graphics card Drift runs on. High performance keeps video decoded on an NVIDIA card on that card; power saving uses less battery. Takes effect after restart.</source>
+        <translation type="unfinished">Driftがどのグラフィックスカードで動作するかを設定します。ハイパフォーマンスにすると、NVIDIA カード上での動画デコード処理がそのカード内で行われます。省電力にすると、バッテリー消費が抑えられます。設定は再起動後に反映されます。</translation>
+    </message>
+    <message>
+        <source>Windows default</source>
+        <translation type="unfinished">Windows デフォルト</translation>
+    </message>
+    <message>
+        <source>Power saving (integrated GPU)</source>
+        <translation type="unfinished">省電力 (内蔵GPU)</translation>
+    </message>
+    <message>
+        <source>High performance (discrete GPU)</source>
+        <translation type="unfinished">ハイパフォーマンス (discrete GPU)</translation>
+    </message>
+    <message>
+        <source>Choose which graphics card Drift runs on in Windows Settings, under Display &gt; Graphics. Takes effect after restart.</source>
+        <translation type="unfinished">Windows の設定の ディスプレイ &gt; グラフィックス で、Drift がどのグラフィックスカードで動作するかを選択します。再起動後に有効になります。</translation>
+    </message>
+    <message>
+        <source>Open graphics settings</source>
+        <translation type="unfinished">グラフィック設定を開く</translation>
+    </message>
+    <message>
+        <source>Proxies</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Use proxies for preview</source>
@@ -13613,6 +13937,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Proxy resolution</source>
         <translation type="unfinished">プロキシ解像度</translation>
+    </message>
+    <message>
+        <source>Size of new proxies. Proxies made at another size are not used until you create them again.</source>
+        <translation type="unfinished">新規プロキシのサイズ。別のサイズで作成されたプロキシは、再度作成するまで使用されません。</translation>
     </message>
     <message>
         <source>360p</source>
@@ -13631,10 +13959,6 @@ If playback stutters, try another.</source>
         <translation type="unfinished">1080p</translation>
     </message>
     <message>
-        <source>Size of new proxies. Proxies made at another size are not used until you create them again.</source>
-        <translation type="unfinished">新規プロキシのサイズ。別のサイズで作成されたプロキシは、再度作成するまで使用されません。</translation>
-    </message>
-    <message>
         <source>Proxy name patterns</source>
         <translation type="unfinished">プロキシ名パターン</translation>
     </message>
@@ -13649,42 +13973,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Reset to defaults</source>
         <translation type="unfinished">デフォルトにリセット</translation>
-    </message>
-    <message>
-        <source>Faster preview (experimental)</source>
-        <translation type="unfinished">高速プレビュー (実験的)</translation>
-    </message>
-    <message>
-        <source>Can make playback smoother by keeping video on the graphics card. Turn it off if the picture looks wrong. Takes effect after restart.</source>
-        <translation type="unfinished">ビデオをグラフィックスカード上に保持することで再生を滑らかにできます。画像がおかしくなる場合はオフにしてください。再起動後に有効になります。</translation>
-    </message>
-    <message>
-        <source>Graphics card</source>
-        <translation type="unfinished">グラフィックスカード</translation>
-    </message>
-    <message>
-        <source>Windows default</source>
-        <translation type="unfinished">Windows デフォルト</translation>
-    </message>
-    <message>
-        <source>Power saving (integrated GPU)</source>
-        <translation type="unfinished">省電力 (内蔵GPU)</translation>
-    </message>
-    <message>
-        <source>High performance (discrete GPU)</source>
-        <translation type="unfinished">ハイパフォーマンス (discrete GPU)</translation>
-    </message>
-    <message>
-        <source>Which graphics card Drift runs on. High performance keeps video decoded on an NVIDIA card on that card; power saving uses less battery. Takes effect after restart.</source>
-        <translation type="unfinished">Driftがどのグラフィックスカードで動作するかを設定します。ハイパフォーマンスにすると、NVIDIA カード上での動画デコード処理がそのカード内で行われます。省電力にすると、バッテリー消費が抑えられます。設定は再起動後に反映されます。</translation>
-    </message>
-    <message>
-        <source>Choose which graphics card Drift runs on in Windows Settings, under Display &gt; Graphics. Takes effect after restart.</source>
-        <translation type="unfinished">Windows の設定の ディスプレイ &gt; グラフィックス で、Drift がどのグラフィックスカードで動作するかを選択します。再起動後に有効になります。</translation>
-    </message>
-    <message>
-        <source>Open graphics settings</source>
-        <translation type="unfinished">グラフィック設定を開く</translation>
     </message>
 </context>
 <context>
@@ -13731,6 +14019,124 @@ If playback stutters, try another.</source>
     <message>
         <source>Theme</source>
         <translation type="unfinished">テーマ</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsTimelinePage</name>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">タイムライン</translation>
+    </message>
+    <message>
+        <source>Scrolling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mouse wheel scrolls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What the mouse wheel moves on the timeline. Hold Shift for the other direction; middle-click drag also pans.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tracks (up and down)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time (left and right)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Editing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-crossfade overlapping clips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When a move creates an overlap with a neighbouring clip on the same track, add a crossfade across it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-select clip under playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the clip under the playhead as the playhead moves.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto keyframes</source>
+        <translation type="unfinished">自動キーフレーム</translation>
+    </message>
+    <message>
+        <source>Dragging a slider also creates keyframes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loop work area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback repeats between the work area in and out points.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Still image duration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of images and stills when added to the timeline.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transition length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of new transitions dropped between clips.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show timeline overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A minimap of the whole project. Click or drag it to jump the view.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show audio mixer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the audio mixer strip beside the timeline.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsToolbarPage</name>
+    <message>
+        <source>Timeline toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toolbar layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose which actions appear on the toolbar above the timeline and which go in its overflow menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -14379,37 +14785,6 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>ShortcutsTab</name>
-    <message>
-        <source>Search shortcuts</source>
-        <translation>ショートカットを検索</translation>
-    </message>
-    <message>
-        <source>Click a shortcut, then press the keys. Esc cancels, Backspace clears.</source>
-        <translation>ショートカットをクリックし、キーを押します。Esc でキャンセル、Backspace でクリアします。</translation>
-    </message>
-    <message>
-        <source>No shortcuts available</source>
-        <translation>利用可能なショートカットはありません</translation>
-    </message>
-    <message>
-        <source>No shortcuts match “%1”</source>
-        <translation>「%1」に一致するショートカットはありません</translation>
-    </message>
-    <message>
-        <source>Try a different name or key.</source>
-        <translation>別の名前またはキーを試してください。</translation>
-    </message>
-    <message>
-        <source>Reset to defaults</source>
-        <translation>デフォルトにリセット</translation>
-    </message>
-    <message>
-        <source>Shortcuts reset to defaults.</source>
-        <translation>ショートカットをデフォルトにリセットしました。</translation>
-    </message>
-</context>
-<context>
     <name>SpeechTab</name>
     <message>
         <source>Voice saved</source>
@@ -14958,10 +15333,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Settings</source>
         <translation>設定</translation>
-    </message>
-    <message>
-        <source>Workspace, theme, language and more</source>
-        <translation>ワークスペース、テーマ、言語など</translation>
     </message>
     <message>
         <source>Debug info</source>
@@ -16818,110 +17189,6 @@ If playback stutters, try another.</source>
         <translation>再生</translation>
     </message>
     <message>
-        <source>Select — normal editing</source>
-        <translation>選択 — 通常編集</translation>
-    </message>
-    <message>
-        <source>Select</source>
-        <translation>選択</translation>
-    </message>
-    <message>
-        <source>Cut mode</source>
-        <translation>切り取りモード</translation>
-    </message>
-    <message>
-        <source>Cut mode — click a clip to split it</source>
-        <translation>切り取りモード — クリップをクリックして分割</translation>
-    </message>
-    <message>
-        <source>Show audio on separate track</source>
-        <translation>音声を別のトラックに表示する</translation>
-    </message>
-    <message>
-        <source>Link selected clips</source>
-        <translation>選択中のクリップをリンク</translation>
-    </message>
-    <message>
-        <source>Trim start</source>
-        <translation>トリム開始</translation>
-    </message>
-    <message>
-        <source>Trim start — click a clip to drop everything left of the cut</source>
-        <translation>開始トリム — クリップをクリックして切り取り位置より左を削除</translation>
-    </message>
-    <message>
-        <source>Trim end</source>
-        <translation>トリム終了</translation>
-    </message>
-    <message>
-        <source>Trim end — click a clip to drop everything right of the cut</source>
-        <translation>終了トリム — クリップをクリックして切り取り位置より右を削除</translation>
-    </message>
-    <message>
-        <source>Trim start to playhead</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Trim end to playhead</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Undo</source>
-        <translation>元に戻す</translation>
-    </message>
-    <message>
-        <source>Redo</source>
-        <translation>やり直し</translation>
-    </message>
-    <message>
-        <source>Delete clip</source>
-        <translation>クリップを削除</translation>
-    </message>
-    <message>
-        <source>Copy selection</source>
-        <translation>選択範囲をコピー</translation>
-    </message>
-    <message>
-        <source>Paste at current time</source>
-        <translation>現在の時間に貼り付け</translation>
-    </message>
-    <message>
-        <source>Duplicate clip</source>
-        <translation>クリップを複製</translation>
-    </message>
-    <message>
-        <source>Add/remove bookmark at current time</source>
-        <translation>現在の時間にブックマークを追加/削除</translation>
-    </message>
-    <message>
-        <source>Mark work area in</source>
-        <translation>ワークエリアのインをマーク</translation>
-    </message>
-    <message>
-        <source>Mark work area out</source>
-        <translation>ワークエリアのアウトをマーク</translation>
-    </message>
-    <message>
-        <source>Loop work area playback</source>
-        <translation>ワークエリアをループ再生</translation>
-    </message>
-    <message>
-        <source>Clear work area</source>
-        <translation>ワークエリアをクリア</translation>
-    </message>
-    <message>
-        <source>Add transform layer</source>
-        <translation>変形レイヤーを追加</translation>
-    </message>
-    <message>
-        <source>Add transform layer — moves the selected clips&apos; tracks as one</source>
-        <translation>変形レイヤーを追加 — 選択したクリップのトラックをまとめて移動します</translation>
-    </message>
-    <message>
-        <source>Add camera</source>
-        <translation>カメラを追加</translation>
-    </message>
-    <message>
         <source>Auto-select: select the clip under the playhead</source>
         <translation type="unfinished"></translation>
     </message>
@@ -16932,26 +17199,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Timeline overview — a minimap of the whole project; click or drag it to jump the view</source>
         <translation>タイムライン概要 — プロジェクト全体のミニマップ。クリックまたはドラッグして表示を移動します</translation>
-    </message>
-    <message>
-        <source>Unlink video and audio</source>
-        <translation>ビデオとオーディオのリンクを解除</translation>
-    </message>
-    <message>
-        <source>Merge adjacent clips</source>
-        <translation>隣接クリップを結合</translation>
-    </message>
-    <message>
-        <source>Freeze frame at current time</source>
-        <translation>現在の時間でフリーズフレーム</translation>
-    </message>
-    <message>
-        <source>Add adjustment layer</source>
-        <translation>調整レイヤーを追加</translation>
-    </message>
-    <message>
-        <source>Add camera — one viewpoint the whole timeline is seen through. With a camera already there, adds a new camera clip (a cut to a new framing) at the playhead</source>
-        <translation>カメラを追加 — タイムライン全体をこの 1 つの視点を通して見る。すでにカメラがある場合は、再生ヘッド位置に新しいカメラクリップ (新しいフレーミングへのカット) を追加します</translation>
     </message>
     <message>
         <source>Toggle snapping</source>
@@ -16967,6 +17214,133 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>TimelineToolbarActions</name>
+    <message>
+        <source>Select</source>
+        <translation type="unfinished">選択</translation>
+    </message>
+    <message>
+        <source>Select — normal editing</source>
+        <translation type="unfinished">選択 — 通常編集</translation>
+    </message>
+    <message>
+        <source>Cut mode</source>
+        <translation type="unfinished">切り取りモード</translation>
+    </message>
+    <message>
+        <source>Cut mode — click a clip to split it</source>
+        <translation type="unfinished">切り取りモード — クリップをクリックして分割</translation>
+    </message>
+    <message>
+        <source>Show audio on separate track</source>
+        <translation type="unfinished">音声を別のトラックに表示する</translation>
+    </message>
+    <message>
+        <source>Unlink video and audio</source>
+        <translation type="unfinished">ビデオとオーディオのリンクを解除</translation>
+    </message>
+    <message>
+        <source>Link selected clips</source>
+        <translation type="unfinished">選択中のクリップをリンク</translation>
+    </message>
+    <message>
+        <source>Trim start</source>
+        <translation type="unfinished">トリム開始</translation>
+    </message>
+    <message>
+        <source>Trim start — click a clip to drop everything left of the cut</source>
+        <translation type="unfinished">開始トリム — クリップをクリックして切り取り位置より左を削除</translation>
+    </message>
+    <message>
+        <source>Trim end</source>
+        <translation type="unfinished">トリム終了</translation>
+    </message>
+    <message>
+        <source>Trim end — click a clip to drop everything right of the cut</source>
+        <translation type="unfinished">終了トリム — クリップをクリックして切り取り位置より右を削除</translation>
+    </message>
+    <message>
+        <source>Trim start to playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trim end to playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation type="unfinished">元に戻す</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation type="unfinished">やり直し</translation>
+    </message>
+    <message>
+        <source>Delete clip</source>
+        <translation type="unfinished">クリップを削除</translation>
+    </message>
+    <message>
+        <source>Copy selection</source>
+        <translation type="unfinished">選択範囲をコピー</translation>
+    </message>
+    <message>
+        <source>Paste at current time</source>
+        <translation type="unfinished">現在の時間に貼り付け</translation>
+    </message>
+    <message>
+        <source>Duplicate clip</source>
+        <translation type="unfinished">クリップを複製</translation>
+    </message>
+    <message>
+        <source>Add/remove bookmark at current time</source>
+        <translation type="unfinished">現在の時間にブックマークを追加/削除</translation>
+    </message>
+    <message>
+        <source>Mark work area in</source>
+        <translation type="unfinished">ワークエリアのインをマーク</translation>
+    </message>
+    <message>
+        <source>Mark work area out</source>
+        <translation type="unfinished">ワークエリアのアウトをマーク</translation>
+    </message>
+    <message>
+        <source>Loop work area playback</source>
+        <translation type="unfinished">ワークエリアをループ再生</translation>
+    </message>
+    <message>
+        <source>Clear work area</source>
+        <translation type="unfinished">ワークエリアをクリア</translation>
+    </message>
+    <message>
+        <source>Merge adjacent clips</source>
+        <translation type="unfinished">隣接クリップを結合</translation>
+    </message>
+    <message>
+        <source>Freeze frame at current time</source>
+        <translation type="unfinished">現在の時間でフリーズフレーム</translation>
+    </message>
+    <message>
+        <source>Add adjustment layer</source>
+        <translation type="unfinished">調整レイヤーを追加</translation>
+    </message>
+    <message>
+        <source>Add transform layer</source>
+        <translation type="unfinished">変形レイヤーを追加</translation>
+    </message>
+    <message>
+        <source>Add transform layer — moves the selected clips&apos; tracks as one</source>
+        <translation type="unfinished">変形レイヤーを追加 — 選択したクリップのトラックをまとめて移動します</translation>
+    </message>
+    <message>
+        <source>Add camera</source>
+        <translation type="unfinished">カメラを追加</translation>
+    </message>
+    <message>
+        <source>Add camera — one viewpoint the whole timeline is seen through. With a camera already there, adds a new camera clip (a cut to a new framing) at the playhead</source>
+        <translation type="unfinished">カメラを追加 — タイムライン全体をこの 1 つの視点を通して見る。すでにカメラがある場合は、再生ヘッド位置に新しいカメラクリップ (新しいフレーミングへのカット) を追加します</translation>
+    </message>
+</context>
+<context>
     <name>TimelineToolbarCustomizeDialog</name>
     <message>
         <source>Customize timeline toolbar</source>
@@ -16975,18 +17349,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Save</source>
         <translation>保存</translation>
-    </message>
-    <message>
-        <source>Drag items to reorder them. Items above the divider are toolbar buttons; the rest are in the More menu.</source>
-        <translation>項目をドラッグして並べ替えます。区切り線より上の項目はツールバーボタンになり、残りは「その他」メニューに入ります。</translation>
-    </message>
-    <message>
-        <source>Add separator</source>
-        <translation>区切り線を追加</translation>
-    </message>
-    <message>
-        <source>Reset to defaults</source>
-        <translation>デフォルトにリセット</translation>
     </message>
 </context>
 <context>
@@ -17013,6 +17375,21 @@ If playback stutters, try another.</source>
     <message>
         <source>Remove separator</source>
         <translation type="unfinished">区切り線を削除</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarCustomizer</name>
+    <message>
+        <source>Drag items to reorder them. Items above the divider are toolbar buttons; the rest are in the More menu.</source>
+        <translation type="unfinished">項目をドラッグして並べ替えます。区切り線より上の項目はツールバーボタンになり、残りは「その他」メニューに入ります。</translation>
+    </message>
+    <message>
+        <source>Add separator</source>
+        <translation type="unfinished">区切り線を追加</translation>
+    </message>
+    <message>
+        <source>Reset to defaults</source>
+        <translation type="unfinished">デフォルトにリセット</translation>
     </message>
 </context>
 <context>
@@ -17793,8 +18170,8 @@ If playback stutters, try another.</source>
         <translation>このクリップの後にトランジションはありません。次のクリップとの切り取り位置に追加します。</translation>
     </message>
     <message>
-        <source>Add crossfade (0.5 s)</source>
-        <translation>クロスフェードを追加 (0.5秒)</translation>
+        <source>Add crossfade (%1 s)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Overlap transition. Drag another kind from Transitions to replace it.</source>

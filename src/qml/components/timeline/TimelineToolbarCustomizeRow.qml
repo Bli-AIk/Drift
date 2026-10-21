@@ -5,7 +5,7 @@ import Drift
 Rectangle {
     id: row
 
-    property var dialog
+    property var customizer
     property var view
     property var entryModel
     required property string itemId
@@ -14,7 +14,7 @@ Rectangle {
     readonly property bool isSeparator: itemId === "separator"
 
     width: view.width
-    height: dialog.rowHeight
+    height: customizer.rowHeight
     radius: Theme.c.timelineToolbarCustomizeRow.radius
     color: isDivider ? "transparent"
            : (grip.pressed ? Theme.c.timelineToolbarCustomizeRow.backgroundPressed : "transparent")
@@ -30,7 +30,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.leftMargin: Theme.spacingSm
         anchors.verticalCenter: parent.verticalCenter
-        dialog: row.dialog
+        customizer: row.customizer
         view: row.view
         rowIndex: row.index
     }
@@ -41,7 +41,7 @@ Rectangle {
         anchors.left: grip.right
         anchors.leftMargin: Theme.spacingLg
         anchors.verticalCenter: parent.verticalCenter
-        glyph: visible ? row.dialog.toolbar.actionMeta[row.itemId].glyph : ""
+        glyph: visible ? row.customizer.actions.actionMeta[row.itemId].glyph : ""
         iconSize: Theme.iconSizeBase
         iconColor: Theme.c.timelineToolbarCustomizeRow.icon
     }
@@ -54,7 +54,7 @@ Rectangle {
         anchors.rightMargin: Theme.spacingSm
         anchors.verticalCenter: parent.verticalCenter
         text: row.isSeparator ? qsTr("— Separator —")
-                              : (row.isDivider ? "" : row.dialog.toolbar.actionMeta[row.itemId].label)
+                              : (row.isDivider ? "" : row.customizer.actions.actionMeta[row.itemId].label)
         color: row.isSeparator ? Theme.c.timelineToolbarCustomizeRow.foregroundMuted : Theme.c.timelineToolbarCustomizeRow.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
@@ -73,21 +73,21 @@ Rectangle {
             variant: "text"
             tooltip: qsTr("Move up")
             enabled: row.index > 0
-            onClicked: row.dialog.moveEntry(row.index, row.index - 1)
+            onClicked: row.customizer.moveEntry(row.index, row.index - 1)
         }
         IconButton {
             glyph: Theme.icons.chevronDown
             variant: "text"
             tooltip: qsTr("Move down")
             enabled: row.index < row.entryModel.count - 1
-            onClicked: row.dialog.moveEntry(row.index, row.index + 1)
+            onClicked: row.customizer.moveEntry(row.index, row.index + 1)
         }
         IconButton {
             visible: row.isSeparator
             glyph: Theme.icons.x
             variant: "text"
             tooltip: qsTr("Remove separator")
-            onClicked: row.entryModel.remove(row.index)
+            onClicked: row.customizer.removeEntry(row.index)
         }
     }
 }

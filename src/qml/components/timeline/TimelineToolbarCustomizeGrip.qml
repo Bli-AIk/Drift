@@ -1,11 +1,11 @@
 import QtQuick
 import Drift
 
-// Drag handle that reorders a customize-dialog row as the pointer crosses other rows.
+// Drag handle that reorders a customize row as the pointer crosses other rows.
 IconGlyph {
     id: gripGlyph
 
-    property var dialog
+    property var customizer
     property var view
     property int rowIndex: -1
     readonly property bool pressed: grip.pressed
@@ -28,7 +28,7 @@ IconGlyph {
             const p = mapToItem(gripGlyph.view.contentItem, mouse.x, mouse.y)
             const target = gripGlyph.view.indexAt(1, p.y)
             if (target >= 0)
-                gripGlyph.dialog.moveEntry(gripGlyph.rowIndex, target)
+                gripGlyph.customizer.moveEntry(gripGlyph.rowIndex, target)
         }
     }
 }

@@ -5,10 +5,14 @@
 #include "engine/decode/hw/HwAccel.h"
 #include "engine/decode/hw/VaapiZeroCopy.h"
 #include "engine/platform/AndroidUri.h"
+#include "core/edit/TimelineOps.h"
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QDirIterator>
 #include <QFile>
+#include <QFileInfo>
+#include <QFutureWatcher>
 #include <QGuiApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -23,9 +27,11 @@
 #include <QScreen>
 #include <QSet>
 #include <QSettings>
+#include <QStandardPaths>
 #include <QTranslator>
 #include <QUrl>
 #include <QVariantMap>
+#include <QtConcurrent>
 
 #ifdef Q_OS_ANDROID
 #include <QJniEnvironment>
@@ -165,6 +171,55 @@ QString languageLabel(const QString &code)
     return native;
 }
 
+int normalizedAutosaveInterval(int seconds)
+{
+    return seconds == 0 || seconds == 15 || seconds == 30 || seconds == 60 || seconds == 300
+        ? seconds
+        : 15;
+}
+
+// Owned by a live QNetworkDiskCache or an update download; deleting them breaks their owner.
+bool isLiveCacheFolder(const QString &name)
+{
+    return name == QLatin1String("qml-http") || name == QLatin1String("marketplace")
+        || name == QLatin1String("updates");
+}
+
+qint64 cacheFolderSize(const QString &root)
+{
+    qint64 total = 0;
+    const QFileInfoList entries = QDir(root).entryInfoList(
+        QDir::AllEntries | QDir::Hidden | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+    for (const QFileInfo &entry : entries) {
+        if (isLiveCacheFolder(entry.fileName()))
+            continue;
+        if (!entry.isDir()) {
+            total += entry.size();
+            continue;
+        }
+        QDirIterator it(entry.absoluteFilePath(), QDir::Files | QDir::Hidden | QDir::NoSymLinks,
+                        QDirIterator::Subdirectories);
+        while (it.hasNext()) {
+            it.next();
+            total += it.fileInfo().size();
+        }
+    }
+    return total;
+}
+
+void clearCacheFolder(const QString &root)
+{
+    const QFileInfoList entries = QDir(root).entryInfoList(
+        QDir::AllEntries | QDir::Hidden | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+    for (const QFileInfo &entry : entries) {
+        if (isLiveCacheFolder(entry.fileName()))
+            continue;
+        if (entry.isDir())
+            QDir(entry.absoluteFilePath()).removeRecursively();
+        else
+            QFile::remove(entry.absoluteFilePath());
+    }
+}
 } // namespace
 
 PreferencesController::PreferencesController(QObject *parent)
@@ -207,6 +262,13 @@ PreferencesController::PreferencesController(QObject *parent)
     m_networkProxyPort = settings.value(QStringLiteral("network/proxyPort")).toInt();
     m_networkProxyUser = settings.value(QStringLiteral("network/proxyUser")).toString();
     m_networkProxyPassword = settings.value(QStringLiteral("network/proxyPassword")).toString();
+    m_autosaveIntervalSeconds =
+        normalizedAutosaveInterval(settings.value(QStringLiteral("editor/autosaveIntervalSeconds"), 15).toInt());
+    m_stillDurationSeconds = qBound(0.5,
+        settings.value(QStringLiteral("timeline/stillDurationSeconds"), 5.0).toDouble(), 60.0);
+    drift::setImageClipDurationUs(drift::secondsToUs(m_stillDurationSeconds));
+    m_transitionDurationSeconds = qBound(0.1,
+        settings.value(QStringLiteral("timeline/transitionDurationSeconds"), 0.5).toDouble(), 5.0);
     applyNetworkProxy(m_networkProxyMode, m_networkProxyHost, m_networkProxyPort, m_networkProxyUser,
                       m_networkProxyPassword);
     m_uiLanguage = storedUiLanguage();
@@ -491,6 +553,73 @@ void PreferencesController::setNetworkProxy(const QString &mode, const QString &
     applyNetworkProxy(m_networkProxyMode, m_networkProxyHost, m_networkProxyPort, m_networkProxyUser,
                       m_networkProxyPassword);
     emit networkProxyChanged();
+}
+
+void PreferencesController::setAutosaveIntervalSeconds(int seconds)
+{
+    seconds = normalizedAutosaveInterval(seconds);
+    if (m_autosaveIntervalSeconds == seconds)
+        return;
+    m_autosaveIntervalSeconds = seconds;
+    QSettings().setValue(QStringLiteral("editor/autosaveIntervalSeconds"), m_autosaveIntervalSeconds);
+    emit autosaveIntervalSecondsChanged();
+}
+
+void PreferencesController::setStillDurationSeconds(double seconds)
+{
+    seconds = qBound(0.5, seconds, 60.0);
+    if (qFuzzyCompare(m_stillDurationSeconds, seconds))
+        return;
+    m_stillDurationSeconds = seconds;
+    QSettings().setValue(QStringLiteral("timeline/stillDurationSeconds"), m_stillDurationSeconds);
+    drift::setImageClipDurationUs(drift::secondsToUs(m_stillDurationSeconds));
+    emit stillDurationSecondsChanged();
+}
+
+void PreferencesController::setTransitionDurationSeconds(double seconds)
+{
+    seconds = qBound(0.1, seconds, 5.0);
+    if (qFuzzyCompare(m_transitionDurationSeconds, seconds))
+        return;
+    m_transitionDurationSeconds = seconds;
+    QSettings().setValue(QStringLiteral("timeline/transitionDurationSeconds"), m_transitionDurationSeconds);
+    emit transitionDurationSecondsChanged();
+}
+
+QString PreferencesController::cacheLocation() const
+{
+    return QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+}
+
+void PreferencesController::refreshCacheSize()
+{
+    runCacheJob(false);
+}
+
+void PreferencesController::clearCache()
+{
+    runCacheJob(true);
+}
+
+void PreferencesController::runCacheJob(bool clear)
+{
+    if (m_cacheBusy)
+        return;
+    m_cacheBusy = true;
+    emit cacheSizeChanged();
+    const QString root = cacheLocation();
+    auto *watcher = new QFutureWatcher<qint64>(this);
+    connect(watcher, &QFutureWatcher<qint64>::finished, this, [this, watcher] {
+        m_cacheSizeBytes = watcher->result();
+        m_cacheBusy = false;
+        watcher->deleteLater();
+        emit cacheSizeChanged();
+    });
+    watcher->setFuture(QtConcurrent::run([root, clear] {
+        if (clear)
+            clearCacheFolder(root);
+        return cacheFolderSize(root);
+    }));
 }
 
 void PreferencesController::installUiTranslators()

@@ -711,7 +711,7 @@ PanelFrame {
         if (tabId === "text" || tabId === "subtitles" || tabId === "speech" || tabId === "stickers" || tabId === "shapes"
                 || tabId === "effects" || tabId === "templates" || tabId === "adjustment"
                 || tabId === "sounds" || tabId === "transitions" || tabId === "masks"
-                || tabId === "shortcuts" || tabId === "scenes" || tabId === "market")
+                || tabId === "scenes" || tabId === "market")
             return false
         const kinds = kindsForTab(tabId)
         return kinds.length === 0 || kinds.indexOf(kind) >= 0
@@ -732,8 +732,7 @@ PanelFrame {
         "effects": qsTr("Effects"),
         "templates": qsTr("Templates"),
         "transitions": qsTr("Transitions"),
-        "sounds": qsTr("Audio FX"),
-        "shortcuts": qsTr("Shortcuts")
+        "sounds": qsTr("Audio FX")
     })
 
     // Rail order: project media → on-canvas graphics → processing → prefs.
@@ -754,7 +753,6 @@ PanelFrame {
         ListElement { tabId: "templates"; icon: 6; separatorAfter: false }
         ListElement { tabId: "transitions"; icon: 7; separatorAfter: false }
         ListElement { tabId: "sounds"; icon: 8; separatorAfter: true }
-        ListElement { tabId: "shortcuts"; icon: 9; separatorAfter: false }
     }
     property var tabIcons: [
         Theme.icons.film,
@@ -1005,20 +1003,6 @@ PanelFrame {
                         }
                         onSortByScoreChanged: root.rememberTab("scenes", "sortByScore", sortByScore)
                         onLabelFilterChanged: root.rememberTab("scenes", "labelFilter", labelFilter)
-                    }
-                }
-            }
-
-            Loader {
-                active: root.currentTabId === "shortcuts"
-                visible: active
-                width: parent.width
-                height: parent.height - assetsHeader.height
-                opacity: root.tabOpacity
-                sourceComponent: Component {
-                    ShortcutsTab {
-                        Component.onCompleted: root.restoreBrowserTab(this, "shortcuts")
-                        onSearchTextChanged: root.rememberTab("shortcuts", "search", searchText)
                     }
                 }
             }

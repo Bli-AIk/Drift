@@ -1531,7 +1531,7 @@ void CoreTest::shapeStyleSerialization()
     clip.type = drift::ClipType::Shape;
     clip.name = QStringLiteral("Hexagon");
     clip.timelineStart = 0;
-    clip.timelineDuration = drift::kImageClipDurationUs;
+    clip.timelineDuration = drift::imageClipDurationUs();
     clip.shapeStyle.kind = drift::ShapeKind::Hexagon;
     clip.shapeStyle.layers = drift::defaultShapeLayers(QColor(10, 20, 30, 200), QColor(40, 50, 60, 128), Qt::white, 6.0);
     drift::TextShadingLayer &fill = clip.shapeStyle.layers[0];
@@ -1626,7 +1626,7 @@ void CoreTest::legacyShapeStyleLoadsWithDefaults()
                   QJsonArray{QJsonObject{
                       {QStringLiteral("id"), QStringLiteral("legacy-shape")},
                       {QStringLiteral("type"), QStringLiteral("shape")},
-                      {QStringLiteral("timelineDurationUs"), qint64(drift::kImageClipDurationUs)},
+                      {QStringLiteral("timelineDurationUs"), qint64(drift::imageClipDurationUs())},
                       {QStringLiteral("shapeStyle"), shapeStyle}}}}}}}};
         QString error;
         const drift::Project loaded = drift::Project::fromJson(json, &error);
@@ -1910,7 +1910,7 @@ void CoreTest::vectorClipIsSyntheticOnGraphicTracks()
     clip.timelineDuration = drift::secondsToUs(12.0);
     clip.srcOut = drift::secondsToUs(12.0);
     // No media behind it: the source range is a convention, like an image's.
-    QCOMPARE(drift::sourceDurationForClip(project, clip), drift::kImageClipDurationUs);
+    QCOMPARE(drift::sourceDurationForClip(project, clip), drift::imageClipDurationUs());
 
     // Speed and reverse are the ordinary clip remap; the vector renderer folds what comes out.
     clip.timelineStart = drift::secondsToUs(1.0);
@@ -2029,7 +2029,7 @@ void CoreTest::model3dSourceSerialization()
     synthetic.type = drift::ClipType::Model3d;
     synthetic.timelineDuration = drift::secondsToUs(12.0);
     synthetic.srcOut = drift::secondsToUs(12.0);
-    QCOMPARE(drift::sourceDurationForClip(project, synthetic), drift::kImageClipDurationUs);
+    QCOMPARE(drift::sourceDurationForClip(project, synthetic), drift::imageClipDurationUs());
 }
 
 void CoreTest::model3dScalarClampsAndResolves()

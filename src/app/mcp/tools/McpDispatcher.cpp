@@ -1731,9 +1731,10 @@ QJsonObject McpDispatcher::opAddTransition(const QJsonObject &args)
         if (kind.isEmpty())
             return unknownCatalogId("transition", raw, nearest, "list_transitions");
     }
+    const double defaultDuration = m_controller->preferences()->transitionDurationSeconds();
     const double duration = args.contains(QStringLiteral("duration"))
-                                ? jsonNumber(args.value(QStringLiteral("duration")), 0.5)
-                                : 0.5;
+                                ? jsonNumber(args.value(QStringLiteral("duration")), defaultDuration)
+                                : defaultDuration;
     if (m_controller->project()->tracks().at(ref.track).type == drift::TrackType::Audio) {
         bool audible = false;
         for (const QVariant &k : m_controller->transitionKindsForTrack(ref.track))

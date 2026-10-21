@@ -13,8 +13,6 @@ Column {
 
     ThemedSwitch {
         checked: WindowBackdrop.translucentWindows
-        text: qsTr("Translucent windows")
-        tooltip: qsTr("Lets the desktop show through panels when a theme asks for it. Takes effect after restart.")
         onToggled: WindowBackdrop.translucentWindows = checked
     }
 

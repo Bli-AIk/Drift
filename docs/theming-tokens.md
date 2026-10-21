@@ -276,7 +276,6 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | keyframe.curves.volume | $palette.curveVolume | $palette.curveVolume |
 | keyframe.ramp | ["$palette.rampSky", "$palette.curveRotationX", "$palette.rampGreen", "$palette.rampViolet", "$palette.rampRose", "$palette.curveRotationY", "$palette.curveVolume", "$palette.rampIndigo"] | ["$palette.rampSky", "$palette.curveRotationX", "$palette.rampGreen", "$palette.rampViolet", "$palette.rampRose", "$palette.curveRotationY", "$palette.curveVolume", "$palette.rampIndigo"] |
 | category | ["$palette.categoryAmber", "$palette.categoryRed", "$palette.categoryViolet", "$palette.categoryBlue", "$palette.categoryEmerald", "$palette.categoryPink", "$palette.categoryCyan", "$palette.categoryLime", "$palette.categoryOrange", "$palette.categoryIndigo"] | ["$palette.categoryAmber", "$palette.categoryRed", "$palette.categoryViolet", "$palette.categoryBlue", "$palette.categoryEmerald", "$palette.categoryPink", "$palette.categoryCyan", "$palette.categoryLime", "$palette.categoryOrange", "$palette.categoryIndigo"] |
-| shell.settingsSectionCardBackground | $semantic.panel.accent | $semantic.surface.app |
 | eyedropper.shadow | $palette.eyedropperShadow | $palette.eyedropperShadow |
 | androidShell.recordingPaused | $palette.androidRecordingPaused | $palette.androidRecordingPaused |
 | androidShell.sheetScrim | $palette.androidSheetScrim | $palette.androidSheetScrim |
@@ -550,21 +549,27 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | toastHost | accentSuccess | $semantic.constructive | $semantic.constructive |
 | toastHost | accent | $semantic.primary | $semantic.primary |
 | toastHost | accentWidth | 3 | 3 |
-| settingsSectionCard | background | $semantic.shell.settingsSectionCardBackground | $semantic.shell.settingsSectionCardBackground |
-| settingsSectionCard | border | $semantic.panel.border | $semantic.panel.border |
-| settingsSectionCard | borderWidth | $metrics.borderWidth | $metrics.borderWidth |
-| settingsSectionCard | radius | $metrics.radius.md | $metrics.radius.md |
-| settingsSectionCard | foreground | $semantic.panel.foreground | $semantic.panel.foreground |
-| settingsSectionCard | divider | $semantic.panel.border | $semantic.panel.border |
-| settingsPreviewSection | foreground | $semantic.panel.secondary.foreground | $semantic.panel.secondary.foreground |
-| settingsMarketplaceSection | foreground | $semantic.panel.foreground | $semantic.panel.foreground |
-| settingsInterfaceSection | foreground | $semantic.panel.secondary.foreground | $semantic.panel.secondary.foreground |
+| settingsPane | sidebarBackground | $semantic.surface.panel | $semantic.surface.panel |
+| settingsPane | selectedBackground | $semantic.panel.accent | $semantic.panel.accent |
+| settingsPane | hoverBackground | $semantic.panel.muted | $semantic.panel.muted |
+| settingsPane | foreground | $semantic.panel.foreground | $semantic.panel.foreground |
+| settingsPane | foregroundMuted | $semantic.mutedForeground | $semantic.mutedForeground |
+| settingsPane | divider | $semantic.panel.border | $semantic.panel.border |
+| settingsPane | borderWidth | $metrics.borderWidth | $metrics.borderWidth |
+| settingsPane | radius | $metrics.radius.sm | $metrics.radius.sm |
+| settingsPage | foreground | $semantic.panel.foreground | $semantic.panel.foreground |
+| settingsPage | titleSize | 22 | 22 |
+| settingsGroupHeader | foregroundMuted | $semantic.mutedForeground | $semantic.mutedForeground |
+| settingsGroupHeader | divider | $semantic.panel.border | $semantic.panel.border |
+| settingsGroupHeader | borderWidth | $metrics.borderWidth | $metrics.borderWidth |
+| settingsRow | foreground | $semantic.panel.foreground | $semantic.panel.foreground |
+| settingsRow | foregroundMuted | $semantic.mutedForeground | $semantic.mutedForeground |
+| settingsRow | divider | $semantic.panel.border | $semantic.panel.border |
+| settingsRow | borderWidth | $metrics.borderWidth | $metrics.borderWidth |
+| settingsRow | controlWidth | 220 | 220 |
 | settingsCloudProvidersSection | foregroundMuted | $semantic.mutedForeground | $semantic.mutedForeground |
 | settingsCloudProvidersSection | divider | $semantic.panel.border | $semantic.panel.border |
 | settingsCloudProvidersSection | borderWidth | $metrics.borderWidth | $metrics.borderWidth |
-| settingsAppSection | divider | $semantic.panel.border | $semantic.panel.border |
-| settingsAppSection | borderWidth | $metrics.borderWidth | $metrics.borderWidth |
-| settingsAppearanceSection | foreground | $semantic.panel.secondary.foreground | $semantic.panel.secondary.foreground |
 | settingsThemeList | foreground | $semantic.panel.foreground | $semantic.panel.foreground |
 | settingsThemeEntry | background | $semantic.panel.accent | $semantic.panel.accent |
 | settingsThemeEntry | backgroundSelected | $semantic.panel.secondary.background | $semantic.panel.secondary.background |
@@ -2115,8 +2120,6 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | shapePresetCard | foregroundMuted | $semantic.mutedForeground | $semantic.mutedForeground |
 | shapePresetCard | radius | $metrics.radius.sm | $metrics.radius.sm |
 | shapesTab | foregroundMuted | $semantic.mutedForeground | $semantic.mutedForeground |
-| shortcutsBindingRow | foreground | $semantic.panel.foreground | $semantic.panel.foreground |
-| shortcutsTab | foregroundMuted | $semantic.mutedForeground | $semantic.mutedForeground |
 | speechTab | accent | $semantic.primary | $semantic.primary |
 | speechTab | destructive | $semantic.destructive | $semantic.destructive |
 | speechTab | foreground | $semantic.panel.foreground | $semantic.panel.foreground |

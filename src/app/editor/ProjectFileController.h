@@ -141,6 +141,8 @@ public:
     // the OS reclaims a backgrounded process — and backgrounding is how a phone app normally ends.
     // The shell calls this on the way out so the floor is the last edit, not the last 15s tick.
     Q_INVOKABLE void flushRecoverySnapshot();
+    // 0 stops the periodic snapshot; anything else restarts it at that many seconds.
+    void setAutosaveIntervalSeconds(int seconds);
     // First non-flag positional argument as a local file URL (paths, file://, portal URIs).
     static QUrl startupProjectUrlFromArguments(const QStringList &args);
     // argv / QFileOpenEvent. Queued until consumeStartupProject(); after that, emits

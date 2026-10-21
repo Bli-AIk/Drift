@@ -85,7 +85,7 @@ Item {
                 EditorState.addTransition(trackIndex,
                                           transitionRegion.leftClipIndex,
                                           panel.transitionKindForTrack(trackIndex, kind),
-                                          0.5)
+                                          EditorState.preferences.transitionDurationSeconds)
         }
     }
 
@@ -101,7 +101,7 @@ Item {
             } else {
                 EditorState.addTransition(trackIndex,
                                           transitionRegion.leftClipIndex,
-                                          "crossfade", 0.5)
+                                          "crossfade", EditorState.preferences.transitionDurationSeconds)
             }
         }
     }

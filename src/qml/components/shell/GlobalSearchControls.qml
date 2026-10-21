@@ -21,6 +21,10 @@ QtObject {
         return { label: label, path: [properties, tab], hint: hint, keywords: keywords || "" }
     }
 
+    function setting(pageId, label, keywords) {
+        return { label: label, path: [settings], hint: "", keywords: keywords, page: pageId }
+    }
+
     readonly property var entries: [
         prop(qsTr("General"), qsTr("Clip name"), anyClip, "rename"),
         prop(qsTr("General"), qsTr("Crop"), visualClip, "cut frame"),
@@ -74,12 +78,16 @@ QtObject {
         prop(qsTr("PDF"), qsTr("PDF page"), qsTr("Select a PDF clip"), "scroll"),
         prop(qsTr("3D Model"), qsTr("3D model"), qsTr("Select a 3D model clip"), "mesh"),
 
-        { label: qsTr("Preview settings"), path: [settings], hint: "", keywords: "quality resolution" },
-        { label: qsTr("Playback settings"), path: [settings], hint: "", keywords: "" },
-        { label: qsTr("Interface settings"), path: [settings], hint: "", keywords: "ui" },
-        { label: qsTr("App settings"), path: [settings], hint: "", keywords: "" },
-        { label: qsTr("Cloud providers"), path: [settings], hint: "", keywords: "api key" },
-        { label: qsTr("Marketplace settings"), path: [settings], hint: "", keywords: "market" },
+        setting("general", qsTr("General"), "language locale startup autosave recovery cache backup"),
+        setting("appearance", qsTr("Appearance"), "theme dark light color workspace layout translucency"),
+        setting("timeline", qsTr("Timeline"), "scroll wheel horizontal vertical crossfade transition overview minimap"),
+        setting("toolbar", qsTr("Timeline toolbar"), "toolbar buttons customize"),
+        setting("keymap", qsTr("Keyboard shortcuts"), "keymap keys hotkeys bindings"),
+        setting("preview", qsTr("Preview"), "quality resolution decode proxies guides background graphics gpu"),
+        setting("audio", qsTr("Audio"), "sound speakers microphone output input"),
+        setting("ai", qsTr("AI & Cloud"), "agent mcp claude cursor api key elevenlabs voice scene detection"),
+        setting("network", qsTr("Network"), "proxy http socks internet firewall"),
+        setting("about", qsTr("About"), "version updates debug info diagnostics"),
     ]
 
     // Where an installed addon's feature is used. Kinds missing here fall back to Extras.

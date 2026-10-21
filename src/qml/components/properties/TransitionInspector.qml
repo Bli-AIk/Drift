@@ -65,7 +65,7 @@ Item {
         if (!root.hasActiveTransition)
             return
         if (transitionDurationField && !transitionDurationField.activeFocus)
-            transitionDurationField.value = root.activeTransition.duration || 0.5
+            transitionDurationField.value = root.activeTransition.duration || EditorState.preferences.transitionDurationSeconds
         if (transitionKindBox) {
             const kinds = EditorState.transitionKindsForTrack(root.transitionEditTrack)
             const active = root.activeTransition.kind || "crossfade"
@@ -156,11 +156,11 @@ Item {
             }
 
             ThemedButton {
-                text: qsTr("Add crossfade (0.5 s)")
+                text: qsTr("Add crossfade (%1 s)").arg(EditorState.preferences.transitionDurationSeconds)
                 variant: "primary"
                 onClicked: EditorState.addTransition(
                                EditorState.selectedTrack, EditorState.selectedClip,
-                               "crossfade", 0.5)
+                               "crossfade", EditorState.preferences.transitionDurationSeconds)
             }
         }
 

@@ -9,7 +9,11 @@
 
 namespace drift {
 
-constexpr TimeUs kImageClipDurationUs = 5 * kUsPerSecond;
+// Length given to a still image, or any clip without a usable source length. Set from
+// PreferencesController (timeline/stillDurationSeconds); 5 s until then.
+TimeUs imageClipDurationUs();
+void setImageClipDurationUs(TimeUs duration);
+
 constexpr TimeUs kTextClipDurationUs = 5 * kUsPerSecond;
 constexpr TimeUs kSubtitleClipDurationUs = 30 * kUsPerSecond;
 constexpr TimeUs kMinClipDurationUs = kUsPerSecond / 10;

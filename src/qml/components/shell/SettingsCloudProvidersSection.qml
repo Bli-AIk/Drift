@@ -1,8 +1,9 @@
 import QtQuick
 import Drift
 
-SettingsSectionCard {
-    title: qsTr("Cloud providers")
+Column {
+    width: parent.width
+    spacing: Theme.spacingXl
 
     ThemedLabel {
         width: parent.width

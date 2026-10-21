@@ -252,10 +252,6 @@ Item {
         agentAccessDialog.openDialog()
     }
 
-    function openLanguageChooser() {
-        languageChooserDialogLoader.ensure().openFromHeader()
-    }
-
     function exportVideo() {
         exportDialogLoader.ensure().openDialog()
     }
@@ -455,9 +451,7 @@ Item {
             }
 
 
-            EditorHeaderSettingsButton {
-                onLanguageRequested: languageChooserDialogLoader.ensure().openFromHeader()
-            }
+            EditorHeaderSettingsButton { }
 
             EditorHeaderSeparator {}
 

@@ -4277,56 +4277,16 @@
 <context>
     <name>AppSettingsMenu</name>
     <message>
-        <source>Workspace</source>
-        <translation>Espacio de trabajo</translation>
-    </message>
-    <message>
-        <source>Auto (follow canvas)</source>
-        <translation>Automático (seguir lienzo)</translation>
-    </message>
-    <message>
-        <source>Landscape</source>
-        <translation>Horizontal</translation>
-    </message>
-    <message>
-        <source>Portrait</source>
-        <translation>Vertical</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation>Tema</translation>
-    </message>
-    <message>
-        <source>System</source>
-        <translation type="unfinished">Sistema</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation>Claro</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation>Oscuro</translation>
-    </message>
-    <message>
-        <source>Language…</source>
-        <translation>Idioma…</translation>
-    </message>
-    <message>
         <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings…</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Multicam</source>
         <translation>Cámara múltiple</translation>
-    </message>
-    <message>
-        <source>Debug info…</source>
-        <translation>Información de depuración…</translation>
-    </message>
-    <message>
-        <source>More settings…</source>
-        <translation>Más ajustes…</translation>
     </message>
 </context>
 <context>
@@ -4617,10 +4577,6 @@
     <message>
         <source>Audio FX</source>
         <translation>Efectos de audio</translation>
-    </message>
-    <message>
-        <source>Shortcuts</source>
-        <translation>Atajos</translation>
     </message>
     <message>
         <source>New folder</source>
@@ -6260,10 +6216,6 @@
     <message>
         <source>Settings</source>
         <translation type="unfinished">Ajustes</translation>
-    </message>
-    <message>
-        <source>Workspace, theme, language and more</source>
-        <translation type="unfinished">Espacio de trabajo, tema, idioma y más</translation>
     </message>
 </context>
 <context>
@@ -7990,30 +7942,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Preview settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Playback settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Interface settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>App settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cloud providers</source>
-        <translation type="unfinished">Proveedores en la nube</translation>
-    </message>
-    <message>
-        <source>Marketplace settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Transitions</source>
         <translation type="unfinished">Transiciones</translation>
     </message>
@@ -8048,6 +7976,34 @@
     <message>
         <source>Preview</source>
         <translation type="unfinished">Vista previa</translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation type="unfinished">Apariencia</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">Línea de tiempo</translation>
+    </message>
+    <message>
+        <source>Timeline toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AI &amp; Cloud</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Upscale…</source>
@@ -13116,29 +13072,33 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     </message>
 </context>
 <context>
-    <name>SettingsAppSection</name>
+    <name>SettingsAboutPage</name>
     <message>
-        <source>App</source>
-        <translation type="unfinished">Aplicación</translation>
+        <source>About</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reopen last project on startup</source>
-        <translation type="unfinished">Reabrir último proyecto al iniciar</translation>
+        <source>Drift</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Automatically restore the last open project on startup. Closing still asks you to save; a crash snapshot never overwrites your save file.</source>
-        <translation type="unfinished">Restaura automáticamente el último proyecto abierto al iniciar. Al cerrar aún se te pedirá guardar; una instantánea de recuperación nunca sobrescribe tu archivo de guardado.</translation>
+        <source>Version %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Updates</source>
         <translation type="unfinished">Actualizaciones</translation>
     </message>
     <message>
-        <source>Check on startup</source>
-        <translation type="unfinished">Comprobar al iniciar</translation>
+        <source>Check for updates on startup</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Once a day, check whether a newer Drift has been released</source>
+        <source>Once a day, check whether a newer Drift has been released.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check for updates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13154,99 +13114,66 @@ Si la reproducción se corta, prueba con otra opción.</translation>
         <translation type="unfinished">Comprobar ahora</translation>
     </message>
     <message>
-        <source>Drift %1</source>
-        <translation type="unfinished">Drift %1</translation>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Extra packs</source>
-        <translation type="unfinished">Paquetes adicionales</translation>
+        <source>About Drift</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remind about essential packs</source>
-        <translation type="unfinished">Recordar sobre paquetes esenciales</translation>
+        <source>Open-source video editor by CutWire Studios.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Pulse the Extras icon when the video, transitions, and audio packs are not installed</source>
-        <translation type="unfinished">Hacer parpadear el icono de Extras cuando los paquetes de vídeo, transiciones y audio no estén instalados</translation>
+        <source>Show about dialog</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remind about pack updates</source>
-        <translation type="unfinished">Recordar sobre actualizaciones de paquetes</translation>
+        <source>Debug info</source>
+        <translation type="unfinished">Información de depuración</translation>
     </message>
     <message>
-        <source>Pulse the Extras icon when updates are available for packs you already have installed</source>
-        <translation type="unfinished">Hacer parpadear el icono de Extras cuando haya actualizaciones disponibles para los paquetes que ya tienes instalados</translation>
+        <source>System, playback and codec details for bug reports.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open debug info…</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsAiPage</name>
+    <message>
+        <source>AI &amp; Cloud</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Agent access</source>
         <translation type="unfinished">Acceso de agente</translation>
     </message>
     <message>
-        <source>Network</source>
+        <source>Let Cursor or Claude edit this project for you. Only programs on this device can connect.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>System proxy</source>
+        <source>Start agent access on launch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No proxy</source>
+        <source>Turn agent access on automatically the next time you open Drift. Turning access off resets this.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>HTTP proxy</source>
-        <translation type="unfinished"></translation>
+        <source>Cloud providers</source>
+        <translation type="unfinished">Proveedores en la nube</translation>
     </message>
     <message>
-        <source>SOCKS5 proxy</source>
-        <translation type="unfinished"></translation>
+        <source>Scene detection sensitivity</source>
+        <translation type="unfinished">Sensibilidad de detección de escenas</translation>
     </message>
     <message>
-        <source>How Drift reaches the internet for downloads, updates, and online services. Applies immediately.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Proxy host</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Username (optional)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Password (optional)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Settings file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export settings…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>JSON document (*.json)</source>
-        <translation type="unfinished">Documento JSON (*.json)</translation>
-    </message>
-    <message>
-        <source>Settings exported</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Import settings…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Import Settings</source>
+        <source>Higher finds more cuts. When a clip is flat or heavily graded, Drift still falls back to an adaptive threshold.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -13342,13 +13269,25 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     </message>
 </context>
 <context>
-    <name>SettingsAppearanceSection</name>
+    <name>SettingsAppearancePage</name>
     <message>
         <source>Appearance</source>
         <translation type="unfinished">Apariencia</translation>
     </message>
     <message>
         <source>Could not use that theme.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation type="unfinished">Tema</translation>
+    </message>
+    <message>
+        <source>Color theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light and Dark follow your system. Other themes can be installed or imported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13367,9 +13306,6 @@ Si la reproducción se corta, prueba con otra opción.</translation>
         <source>This theme has a dark and a light variant. The header toggle switches between them.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>SettingsAppearanceTranslucency</name>
     <message>
         <source>Translucent windows</source>
         <translation type="unfinished"></translation>
@@ -13378,6 +13314,81 @@ Si la reproducción se corta, prueba con otra opción.</translation>
         <source>Lets the desktop show through panels when a theme asks for it. Takes effect after restart.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Interface</source>
+        <translation type="unfinished">Interfaz</translation>
+    </message>
+    <message>
+        <source>Interface size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Drift to apply this size.</source>
+        <translation type="unfinished">Reinicia Drift para aplicar este tamaño.</translation>
+    </message>
+    <message>
+        <source>Makes buttons, text, and icons larger, on top of your display settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>100% (system)</source>
+        <translation type="unfinished">100% (sistema)</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop suits a mouse and keyboard. Mobile is the touch layout made for phones.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mobile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation type="unfinished">Espacio de trabajo</translation>
+    </message>
+    <message>
+        <source>Workspace orientation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Landscape or portrait workspace. Auto follows the shape of the canvas.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto (follow canvas)</source>
+        <translation type="unfinished">Automático (seguir lienzo)</translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation type="unfinished">Horizontal</translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation type="unfinished">Vertical</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsAppearanceTranslucency</name>
     <message>
         <source>Restart Drift to apply window transparency.</source>
         <translation type="unfinished"></translation>
@@ -13400,11 +13411,34 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     </message>
 </context>
 <context>
-    <name>SettingsCloudProvidersSection</name>
+    <name>SettingsAudioPage</name>
     <message>
-        <source>Cloud providers</source>
-        <translation type="unfinished">Proveedores en la nube</translation>
+        <source>Audio</source>
+        <translation type="unfinished">Audio</translation>
     </message>
+    <message>
+        <source>Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio output</source>
+        <translation type="unfinished">Salida de audio</translation>
+    </message>
+    <message>
+        <source>Where playback is heard. “System default” follows whatever your computer is set to, including when that changes.</source>
+        <translation type="unfinished">Dónde se escucha la reproducción. “Predeterminado del sistema” sigue la configuración de tu equipo, incluso si cambia.</translation>
+    </message>
+    <message>
+        <source>Microphone input</source>
+        <translation type="unfinished">Entrada de micrófono</translation>
+    </message>
+    <message>
+        <source>Audio device used for recording voiceovers onto audio tracks.</source>
+        <translation type="unfinished">Dispositivo de audio utilizado para grabar voces en off en pistas de audio.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsCloudProvidersSection</name>
     <message>
         <source>Keys are stored unencrypted in Drift&apos;s settings. ELEVENLABS_API_KEY and FISH_API_KEY in the environment take precedence. Use is billed to your own account.</source>
         <translation type="unfinished">Las claves se guardan sin cifrar en la configuración de Drift. ELEVENLABS_API_KEY y FISH_API_KEY en el entorno tienen prioridad. El uso se factura a tu propia cuenta.</translation>
@@ -13482,69 +13516,97 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     </message>
 </context>
 <context>
-    <name>SettingsInterfaceSection</name>
+    <name>SettingsGeneralPage</name>
     <message>
-        <source>Interface</source>
-        <translation type="unfinished">Interfaz</translation>
+        <source>General</source>
+        <translation type="unfinished">General</translation>
     </message>
     <message>
-        <source>Size</source>
-        <translation type="unfinished">Tamaño</translation>
+        <source>%1 GB</source>
+        <translation type="unfinished">%1 GB</translation>
     </message>
     <message>
-        <source>100% (system)</source>
-        <translation type="unfinished">100% (sistema)</translation>
+        <source>%1 MB</source>
+        <translation type="unfinished">%1 MB</translation>
     </message>
     <message>
-        <source>Makes buttons, text, and icons larger. This is extra scale on top of the size already set in your display settings. Takes effect after restart.</source>
-        <translation type="unfinished">Hace que los botones, el texto y los iconos sean más grandes. Es una escala adicional sobre el tamaño ya configurado en la pantalla. Surte efecto tras reiniciar.</translation>
-    </message>
-    <message>
-        <source>Restart Drift to apply this size.</source>
-        <translation type="unfinished">Reinicia Drift para aplicar este tamaño.</translation>
-    </message>
-    <message>
-        <source>Layout</source>
+        <source>Language &amp; region</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Automatic</source>
+        <source>Language</source>
+        <translation type="unfinished">Idioma</translation>
+    </message>
+    <message>
+        <source>Language for menus and labels. Takes effect immediately.</source>
+        <translation type="unfinished">Idioma para menús y etiquetas. Surte efecto inmediatamente.</translation>
+    </message>
+    <message>
+        <source>Startup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Desktop</source>
+        <source>Reopen last project on startup</source>
+        <translation type="unfinished">Reabrir último proyecto al iniciar</translation>
+    </message>
+    <message>
+        <source>Restores the last open project. Closing still asks you to save.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Mobile</source>
+        <source>Saving</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Desktop suits a mouse and keyboard, including tablets in desktop mode. Mobile is the touch layout made for phones. Takes effect after restart.</source>
+        <source>Autosave interval</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Restart Drift to switch layouts.</source>
+        <source>How often unsaved work is snapshotted for crash recovery.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Restart now</source>
+        <source>Off</source>
+        <translation type="unfinished">Desactivado</translation>
+    </message>
+    <message>
+        <source>Every 15 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Horizontal mouse-wheel pan</source>
-        <translation type="unfinished">Desplazamiento horizontal con la rueda del ratón</translation>
-    </message>
-    <message>
-        <source>Scroll pans left and right along the timeline. Shift+scroll moves between tracks. Middle-click drag also pans.</source>
-        <translation type="unfinished">El desplazamiento mueve a izquierda y derecha por la línea de tiempo. Mayús+desplazamiento mueve entre pistas. Arrastrar con el botón central también desplaza la vista.</translation>
-    </message>
-    <message>
-        <source>Auto-crossfade overlapping clips</source>
+        <source>Every 30 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>When a move creates an overlap with a neighbouring clip on the same track, add a crossfade across it.</source>
+        <source>Every minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every 5 minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extras</source>
+        <translation type="unfinished">Extras</translation>
+    </message>
+    <message>
+        <source>Remind about essential packs</source>
+        <translation type="unfinished">Recordar sobre paquetes esenciales</translation>
+    </message>
+    <message>
+        <source>Pulse the Extras icon when the video, transitions, and audio packs are not installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remind about pack updates</source>
+        <translation type="unfinished">Recordar sobre actualizaciones de paquetes</translation>
+    </message>
+    <message>
+        <source>Pulse the Extras icon when updates are available for packs you already have installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13556,19 +13618,90 @@ Si la reproducción se corta, prueba con otra opción.</translation>
         <translation type="unfinished">Vibra con toques, ajustes y ediciones. Usa los efectos hápticos propios de este dispositivo cuando los tiene.</translation>
     </message>
     <message>
-        <source>Language</source>
-        <translation type="unfinished">Idioma</translation>
+        <source>Storage</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Language for menus and labels. Takes effect immediately.</source>
-        <translation type="unfinished">Idioma para menús y etiquetas. Surte efecto inmediatamente.</translation>
+        <source>Cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 used, stored in %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export and import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save your preferences to a JSON file, or load them from one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>JSON document (*.json)</source>
+        <translation type="unfinished">Documento JSON (*.json)</translation>
+    </message>
+    <message>
+        <source>Settings exported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>SettingsMarketplaceSection</name>
+    <name>SettingsKeymapPage</name>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click a shortcut, then press the keys. Esc cancels, Backspace clears.</source>
+        <translation type="unfinished">Haz clic en un atajo y pulsa las teclas. Esc cancela, Retroceso borra.</translation>
+    </message>
+    <message>
+        <source>Reset to defaults</source>
+        <translation type="unfinished">Restablecer valores predeterminados</translation>
+    </message>
+    <message>
+        <source>Restores every shortcut to its original key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shortcuts reset to defaults.</source>
+        <translation type="unfinished">Atajos restablecidos a los valores predeterminados.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMarketplacePage</name>
     <message>
         <source>Marketplace</source>
         <translation type="unfinished">Mercado</translation>
+    </message>
+    <message>
+        <source>Account</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Account connected (%1)</source>
@@ -13588,45 +13721,152 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     </message>
 </context>
 <context>
-    <name>SettingsPlaybackSection</name>
+    <name>SettingsNetworkPage</name>
     <message>
-        <source>Playback</source>
-        <translation type="unfinished">Reproducción</translation>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audio output</source>
-        <translation type="unfinished">Salida de audio</translation>
+        <source>Connection</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Where playback is heard. “System default” follows whatever your computer is set to, including when that changes.</source>
-        <translation type="unfinished">Dónde se escucha la reproducción. “Predeterminado del sistema” sigue la configuración de tu equipo, incluso si cambia.</translation>
+        <source>Proxy</source>
+        <translation type="unfinished">Proxy</translation>
     </message>
     <message>
-        <source>Microphone input</source>
-        <translation type="unfinished">Entrada de micrófono</translation>
+        <source>How Drift reaches the internet for downloads, updates, and online services. Applies immediately.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audio device used for recording voiceovers onto audio tracks.</source>
-        <translation type="unfinished">Dispositivo de audio utilizado para grabar voces en off en pistas de audio.</translation>
+        <source>System proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTTP proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SOCKS5 proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Host and port of the proxy. The username and password are optional.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Username (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password (optional)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>SettingsPreviewSection</name>
+    <name>SettingsPane</name>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">General</translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation type="unfinished">Apariencia</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">Línea de tiempo</translation>
+    </message>
+    <message>
+        <source>Timeline toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Preview</source>
         <translation type="unfinished">Vista previa</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">Audio</translation>
+    </message>
+    <message>
+        <source>AI &amp; Cloud</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Marketplace</source>
+        <translation type="unfinished">Mercado</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No settings match “%1”</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPreviewPage</name>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished">Vista previa</translation>
+    </message>
+    <message>
+        <source>Guides</source>
+        <translation type="unfinished">Guías</translation>
     </message>
     <message>
         <source>Show guides</source>
         <translation type="unfinished">Mostrar guías</translation>
     </message>
     <message>
-        <source>Show alignment guides over the preview</source>
-        <translation type="unfinished">Mostrar guías de alineación sobre la vista previa</translation>
+        <source>Alignment guides drawn over the preview.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guide sets</source>
+        <translation type="unfinished">Conjuntos de guías</translation>
+    </message>
+    <message>
+        <source>Choose which guide sets are drawn over the preview.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Background</source>
         <translation type="unfinished">Fondo</translation>
+    </message>
+    <message>
+        <source>Fill behind clips that don’t cover the whole screen.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Solid color</source>
@@ -13641,16 +13881,100 @@ Si la reproducción se corta, prueba con otra opción.</translation>
         <translation type="unfinished">Transparente</translation>
     </message>
     <message>
-        <source>Fill behind clips that don’t cover the whole screen</source>
-        <translation type="unfinished">Relleno detrás de los clips que no cubren toda la pantalla</translation>
+        <source>Background colour</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Choose background colour</source>
-        <translation type="unfinished">Elegir color de fondo</translation>
+        <source>Colour of the solid background.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Blur strength</source>
         <translation type="unfinished">Intensidad del desenfoque</translation>
+    </message>
+    <message>
+        <source>How much the background is blurred behind clips.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lower is smoother while editing. Full matches an export exactly; Auto renders only the pixels on screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full</source>
+        <translation type="unfinished">Completa</translation>
+    </message>
+    <message>
+        <source>Half</source>
+        <translation type="unfinished">Media</translation>
+    </message>
+    <message>
+        <source>Quarter</source>
+        <translation type="unfinished">Un cuarto</translation>
+    </message>
+    <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished">Automático</translation>
+    </message>
+    <message>
+        <source>Decoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How video is decoded for preview. Software is smoother for most clips but uses more CPU. Hardware suits high-quality 4K.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Faster preview (experimental)</source>
+        <translation type="unfinished">Vista previa más rápida (experimental)</translation>
+    </message>
+    <message>
+        <source>Can make playback smoother by keeping video on the graphics card. Turn it off if the picture looks wrong. Takes effect after restart.</source>
+        <translation type="unfinished">Puede hacer que la reproducción sea más fluida al mantener el vídeo en la tarjeta gráfica. Desactívalo si la imagen no se ve bien. Surte efecto tras reiniciar.</translation>
+    </message>
+    <message>
+        <source>Graphics card</source>
+        <translation type="unfinished">Tarjeta gráfica</translation>
+    </message>
+    <message>
+        <source>Which graphics card Drift runs on. High performance keeps video decoded on an NVIDIA card on that card; power saving uses less battery. Takes effect after restart.</source>
+        <translation type="unfinished">En qué tarjeta gráfica se ejecuta Drift. Alto rendimiento mantiene el vídeo descodificado en una tarjeta NVIDIA en esa misma tarjeta; ahorro de energía usa menos batería. Surte efecto tras reiniciar.</translation>
+    </message>
+    <message>
+        <source>Windows default</source>
+        <translation type="unfinished">Valor por defecto de Windows</translation>
+    </message>
+    <message>
+        <source>Power saving (integrated GPU)</source>
+        <translation type="unfinished">Ahorro de energía (GPU integrada)</translation>
+    </message>
+    <message>
+        <source>High performance (discrete GPU)</source>
+        <translation type="unfinished">Alto rendimiento (GPU dedicada)</translation>
+    </message>
+    <message>
+        <source>Choose which graphics card Drift runs on in Windows Settings, under Display &gt; Graphics. Takes effect after restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open graphics settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxies</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Use proxies for preview</source>
@@ -13663,6 +13987,10 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     <message>
         <source>Proxy resolution</source>
         <translation type="unfinished">Resolución del proxy</translation>
+    </message>
+    <message>
+        <source>Size of new proxies. Proxies made at another size are not used until you create them again.</source>
+        <translation type="unfinished">Tamaño de los nuevos proxies. Los proxies creados con otro tamaño no se usan hasta que los vuelvas a crear.</translation>
     </message>
     <message>
         <source>360p</source>
@@ -13681,10 +14009,6 @@ Si la reproducción se corta, prueba con otra opción.</translation>
         <translation type="unfinished">1080p</translation>
     </message>
     <message>
-        <source>Size of new proxies. Proxies made at another size are not used until you create them again.</source>
-        <translation type="unfinished">Tamaño de los nuevos proxies. Los proxies creados con otro tamaño no se usan hasta que los vuelvas a crear.</translation>
-    </message>
-    <message>
         <source>Proxy name patterns</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13699,42 +14023,6 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     <message>
         <source>Reset to defaults</source>
         <translation type="unfinished">Restablecer valores predeterminados</translation>
-    </message>
-    <message>
-        <source>Faster preview (experimental)</source>
-        <translation type="unfinished">Vista previa más rápida (experimental)</translation>
-    </message>
-    <message>
-        <source>Can make playback smoother by keeping video on the graphics card. Turn it off if the picture looks wrong. Takes effect after restart.</source>
-        <translation type="unfinished">Puede hacer que la reproducción sea más fluida al mantener el vídeo en la tarjeta gráfica. Desactívalo si la imagen no se ve bien. Surte efecto tras reiniciar.</translation>
-    </message>
-    <message>
-        <source>Graphics card</source>
-        <translation type="unfinished">Tarjeta gráfica</translation>
-    </message>
-    <message>
-        <source>Windows default</source>
-        <translation type="unfinished">Valor por defecto de Windows</translation>
-    </message>
-    <message>
-        <source>Power saving (integrated GPU)</source>
-        <translation type="unfinished">Ahorro de energía (GPU integrada)</translation>
-    </message>
-    <message>
-        <source>High performance (discrete GPU)</source>
-        <translation type="unfinished">Alto rendimiento (GPU dedicada)</translation>
-    </message>
-    <message>
-        <source>Which graphics card Drift runs on. High performance keeps video decoded on an NVIDIA card on that card; power saving uses less battery. Takes effect after restart.</source>
-        <translation type="unfinished">En qué tarjeta gráfica se ejecuta Drift. Alto rendimiento mantiene el vídeo descodificado en una tarjeta NVIDIA en esa misma tarjeta; ahorro de energía usa menos batería. Surte efecto tras reiniciar.</translation>
-    </message>
-    <message>
-        <source>Choose which graphics card Drift runs on in Windows Settings, under Display &gt; Graphics. Takes effect after restart.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open graphics settings</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -13781,6 +14069,124 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     <message>
         <source>Theme</source>
         <translation type="unfinished">Tema</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsTimelinePage</name>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">Línea de tiempo</translation>
+    </message>
+    <message>
+        <source>Scrolling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mouse wheel scrolls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What the mouse wheel moves on the timeline. Hold Shift for the other direction; middle-click drag also pans.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tracks (up and down)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time (left and right)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Editing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-crossfade overlapping clips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When a move creates an overlap with a neighbouring clip on the same track, add a crossfade across it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-select clip under playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the clip under the playhead as the playhead moves.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto keyframes</source>
+        <translation type="unfinished">Fotogramas clave automáticos</translation>
+    </message>
+    <message>
+        <source>Dragging a slider also creates keyframes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loop work area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback repeats between the work area in and out points.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Still image duration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of images and stills when added to the timeline.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transition length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of new transitions dropped between clips.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show timeline overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A minimap of the whole project. Click or drag it to jump the view.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show audio mixer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the audio mixer strip beside the timeline.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsToolbarPage</name>
+    <message>
+        <source>Timeline toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toolbar layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose which actions appear on the toolbar above the timeline and which go in its overflow menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -14429,37 +14835,6 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     </message>
 </context>
 <context>
-    <name>ShortcutsTab</name>
-    <message>
-        <source>Search shortcuts</source>
-        <translation>Buscar atajos</translation>
-    </message>
-    <message>
-        <source>Click a shortcut, then press the keys. Esc cancels, Backspace clears.</source>
-        <translation>Haz clic en un atajo y pulsa las teclas. Esc cancela, Retroceso borra.</translation>
-    </message>
-    <message>
-        <source>No shortcuts available</source>
-        <translation>No hay atajos disponibles</translation>
-    </message>
-    <message>
-        <source>No shortcuts match “%1”</source>
-        <translation>Ningún atajo coincide con “%1”</translation>
-    </message>
-    <message>
-        <source>Try a different name or key.</source>
-        <translation>Prueba con otro nombre o tecla.</translation>
-    </message>
-    <message>
-        <source>Reset to defaults</source>
-        <translation>Restablecer valores predeterminados</translation>
-    </message>
-    <message>
-        <source>Shortcuts reset to defaults.</source>
-        <translation>Atajos restablecidos a los valores predeterminados.</translation>
-    </message>
-</context>
-<context>
     <name>SpeechTab</name>
     <message>
         <source>Voice saved</source>
@@ -15008,10 +15383,6 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     <message>
         <source>Settings</source>
         <translation>Ajustes</translation>
-    </message>
-    <message>
-        <source>Workspace, theme, language and more</source>
-        <translation>Espacio de trabajo, tema, idioma y más</translation>
     </message>
     <message>
         <source>Debug info</source>
@@ -16872,110 +17243,6 @@ Si la reproducción se corta, prueba con otra opción.</translation>
         <translation>Reproducir</translation>
     </message>
     <message>
-        <source>Select — normal editing</source>
-        <translation>Selección — edición normal</translation>
-    </message>
-    <message>
-        <source>Select</source>
-        <translation>Seleccionar</translation>
-    </message>
-    <message>
-        <source>Cut mode</source>
-        <translation>Modo de corte</translation>
-    </message>
-    <message>
-        <source>Cut mode — click a clip to split it</source>
-        <translation>Modo de corte — haz clic en un clip para dividirlo</translation>
-    </message>
-    <message>
-        <source>Show audio on separate track</source>
-        <translation>Mostrar audio en pista separada</translation>
-    </message>
-    <message>
-        <source>Link selected clips</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Trim start</source>
-        <translation>Inicio del recorte</translation>
-    </message>
-    <message>
-        <source>Trim start — click a clip to drop everything left of the cut</source>
-        <translation>Recortar inicio — haz clic en un clip para descartar todo a la izquierda del corte</translation>
-    </message>
-    <message>
-        <source>Trim end</source>
-        <translation>Final del recorte</translation>
-    </message>
-    <message>
-        <source>Trim end — click a clip to drop everything right of the cut</source>
-        <translation>Recortar final — haz clic en un clip para descartar todo a la derecha del corte</translation>
-    </message>
-    <message>
-        <source>Trim start to playhead</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Trim end to playhead</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Undo</source>
-        <translation>Deshacer</translation>
-    </message>
-    <message>
-        <source>Redo</source>
-        <translation>Rehacer</translation>
-    </message>
-    <message>
-        <source>Delete clip</source>
-        <translation>Eliminar clip</translation>
-    </message>
-    <message>
-        <source>Copy selection</source>
-        <translation>Copiar selección</translation>
-    </message>
-    <message>
-        <source>Paste at current time</source>
-        <translation>Pegar en la posición actual</translation>
-    </message>
-    <message>
-        <source>Duplicate clip</source>
-        <translation>Duplicar clip</translation>
-    </message>
-    <message>
-        <source>Add/remove bookmark at current time</source>
-        <translation>Añadir/eliminar marcador en la posición actual</translation>
-    </message>
-    <message>
-        <source>Mark work area in</source>
-        <translation>Marcar entrada del área de trabajo</translation>
-    </message>
-    <message>
-        <source>Mark work area out</source>
-        <translation>Marcar salida del área de trabajo</translation>
-    </message>
-    <message>
-        <source>Loop work area playback</source>
-        <translation>Reproducir en bucle el área de trabajo</translation>
-    </message>
-    <message>
-        <source>Clear work area</source>
-        <translation>Borrar área de trabajo</translation>
-    </message>
-    <message>
-        <source>Add transform layer</source>
-        <translation>Añadir capa de transformación</translation>
-    </message>
-    <message>
-        <source>Add transform layer — moves the selected clips&apos; tracks as one</source>
-        <translation>Añadir capa de transformación — mueve las pistas de los clips seleccionados como una sola</translation>
-    </message>
-    <message>
-        <source>Add camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Auto-select: select the clip under the playhead</source>
         <translation type="unfinished"></translation>
     </message>
@@ -16986,26 +17253,6 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     <message>
         <source>Timeline overview — a minimap of the whole project; click or drag it to jump the view</source>
         <translation>Vista general de la línea de tiempo — un minimapa de todo el proyecto; haz clic o arrástralo para desplazar la vista</translation>
-    </message>
-    <message>
-        <source>Unlink video and audio</source>
-        <translation>Desvincular vídeo y audio</translation>
-    </message>
-    <message>
-        <source>Merge adjacent clips</source>
-        <translation>Combinar clips adyacentes</translation>
-    </message>
-    <message>
-        <source>Freeze frame at current time</source>
-        <translation>Congelar fotograma en la posición actual</translation>
-    </message>
-    <message>
-        <source>Add adjustment layer</source>
-        <translation>Añadir capa de ajuste</translation>
-    </message>
-    <message>
-        <source>Add camera — one viewpoint the whole timeline is seen through. With a camera already there, adds a new camera clip (a cut to a new framing) at the playhead</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Toggle snapping</source>
@@ -17021,6 +17268,133 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     </message>
 </context>
 <context>
+    <name>TimelineToolbarActions</name>
+    <message>
+        <source>Select</source>
+        <translation type="unfinished">Seleccionar</translation>
+    </message>
+    <message>
+        <source>Select — normal editing</source>
+        <translation type="unfinished">Selección — edición normal</translation>
+    </message>
+    <message>
+        <source>Cut mode</source>
+        <translation type="unfinished">Modo de corte</translation>
+    </message>
+    <message>
+        <source>Cut mode — click a clip to split it</source>
+        <translation type="unfinished">Modo de corte — haz clic en un clip para dividirlo</translation>
+    </message>
+    <message>
+        <source>Show audio on separate track</source>
+        <translation type="unfinished">Mostrar audio en pista separada</translation>
+    </message>
+    <message>
+        <source>Unlink video and audio</source>
+        <translation type="unfinished">Desvincular vídeo y audio</translation>
+    </message>
+    <message>
+        <source>Link selected clips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trim start</source>
+        <translation type="unfinished">Inicio del recorte</translation>
+    </message>
+    <message>
+        <source>Trim start — click a clip to drop everything left of the cut</source>
+        <translation type="unfinished">Recortar inicio — haz clic en un clip para descartar todo a la izquierda del corte</translation>
+    </message>
+    <message>
+        <source>Trim end</source>
+        <translation type="unfinished">Final del recorte</translation>
+    </message>
+    <message>
+        <source>Trim end — click a clip to drop everything right of the cut</source>
+        <translation type="unfinished">Recortar final — haz clic en un clip para descartar todo a la derecha del corte</translation>
+    </message>
+    <message>
+        <source>Trim start to playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trim end to playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation type="unfinished">Deshacer</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation type="unfinished">Rehacer</translation>
+    </message>
+    <message>
+        <source>Delete clip</source>
+        <translation type="unfinished">Eliminar clip</translation>
+    </message>
+    <message>
+        <source>Copy selection</source>
+        <translation type="unfinished">Copiar selección</translation>
+    </message>
+    <message>
+        <source>Paste at current time</source>
+        <translation type="unfinished">Pegar en la posición actual</translation>
+    </message>
+    <message>
+        <source>Duplicate clip</source>
+        <translation type="unfinished">Duplicar clip</translation>
+    </message>
+    <message>
+        <source>Add/remove bookmark at current time</source>
+        <translation type="unfinished">Añadir/eliminar marcador en la posición actual</translation>
+    </message>
+    <message>
+        <source>Mark work area in</source>
+        <translation type="unfinished">Marcar entrada del área de trabajo</translation>
+    </message>
+    <message>
+        <source>Mark work area out</source>
+        <translation type="unfinished">Marcar salida del área de trabajo</translation>
+    </message>
+    <message>
+        <source>Loop work area playback</source>
+        <translation type="unfinished">Reproducir en bucle el área de trabajo</translation>
+    </message>
+    <message>
+        <source>Clear work area</source>
+        <translation type="unfinished">Borrar área de trabajo</translation>
+    </message>
+    <message>
+        <source>Merge adjacent clips</source>
+        <translation type="unfinished">Combinar clips adyacentes</translation>
+    </message>
+    <message>
+        <source>Freeze frame at current time</source>
+        <translation type="unfinished">Congelar fotograma en la posición actual</translation>
+    </message>
+    <message>
+        <source>Add adjustment layer</source>
+        <translation type="unfinished">Añadir capa de ajuste</translation>
+    </message>
+    <message>
+        <source>Add transform layer</source>
+        <translation type="unfinished">Añadir capa de transformación</translation>
+    </message>
+    <message>
+        <source>Add transform layer — moves the selected clips&apos; tracks as one</source>
+        <translation type="unfinished">Añadir capa de transformación — mueve las pistas de los clips seleccionados como una sola</translation>
+    </message>
+    <message>
+        <source>Add camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add camera — one viewpoint the whole timeline is seen through. With a camera already there, adds a new camera clip (a cut to a new framing) at the playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TimelineToolbarCustomizeDialog</name>
     <message>
         <source>Customize timeline toolbar</source>
@@ -17029,18 +17403,6 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     <message>
         <source>Save</source>
         <translation>Guardar</translation>
-    </message>
-    <message>
-        <source>Drag items to reorder them. Items above the divider are toolbar buttons; the rest are in the More menu.</source>
-        <translation>Arrastra los elementos para reordenarlos. Los elementos por encima del separador son botones de la barra de herramientas; el resto está en el menú Más.</translation>
-    </message>
-    <message>
-        <source>Add separator</source>
-        <translation>Añadir separador</translation>
-    </message>
-    <message>
-        <source>Reset to defaults</source>
-        <translation>Restablecer valores predeterminados</translation>
     </message>
 </context>
 <context>
@@ -17067,6 +17429,21 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     <message>
         <source>Remove separator</source>
         <translation type="unfinished">Eliminar separador</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarCustomizer</name>
+    <message>
+        <source>Drag items to reorder them. Items above the divider are toolbar buttons; the rest are in the More menu.</source>
+        <translation type="unfinished">Arrastra los elementos para reordenarlos. Los elementos por encima del separador son botones de la barra de herramientas; el resto está en el menú Más.</translation>
+    </message>
+    <message>
+        <source>Add separator</source>
+        <translation type="unfinished">Añadir separador</translation>
+    </message>
+    <message>
+        <source>Reset to defaults</source>
+        <translation type="unfinished">Restablecer valores predeterminados</translation>
     </message>
 </context>
 <context>
@@ -17852,8 +18229,8 @@ Si la reproducción se corta, prueba con otra opción.</translation>
         <translation>No hay transición después de este clip. Añade una en el corte con el siguiente clip.</translation>
     </message>
     <message>
-        <source>Add crossfade (0.5 s)</source>
-        <translation>Añadir fundido cruzado (0,5 s)</translation>
+        <source>Add crossfade (%1 s)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Overlap transition. Drag another kind from Transitions to replace it.</source>

@@ -119,7 +119,6 @@ Slots (the `slot` string on each `ThemeSlot`):
 - PreviewOsdClusterBackground
 - PreviewTransportBarBackground
 - PropertiesPanelBackground
-- SettingsSectionCardBackground
 - StartScreenBackground
 - ThemedButtonBackground
 - ThemedCheckBoxIndicator

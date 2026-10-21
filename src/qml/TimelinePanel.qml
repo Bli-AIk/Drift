@@ -513,7 +513,7 @@ PanelFrame {
         const target = transitionDropTarget(trackIndex, xPixels)
         if (!target || !kind || kind.length === 0)
             return
-        EditorState.addTransition(trackIndex, target.leftClip, transitionKindForTrack(trackIndex, kind), 0.5)
+        EditorState.addTransition(trackIndex, target.leftClip, transitionKindForTrack(trackIndex, kind), EditorState.preferences.transitionDurationSeconds)
     }
 
     // The bin row's media kind ("video", "audio", "image", ...), which is what the track-fit

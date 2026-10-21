@@ -3291,7 +3291,7 @@ void McpTest::importSvgBecomesVectorAsset()
     QCOMPARE(clip.value(QStringLiteral("kind")).toString(), QStringLiteral("vector"));
     QCOMPARE(clip.value(QStringLiteral("vector")).toMap().value(QStringLiteral("kind")).toString(), QStringLiteral("svg"));
     QCOMPARE(clip.value(QStringLiteral("vector")).toMap().value(QStringLiteral("width")).toInt(), 120);
-    QCOMPARE(clip.value(QStringLiteral("duration")).toDouble(), drift::usToSeconds(drift::kImageClipDurationUs));
+    QCOMPARE(clip.value(QStringLiteral("duration")).toDouble(), drift::usToSeconds(drift::imageClipDurationUs()));
 }
 
 void McpTest::model3dToolboxIsCatalogued()
@@ -3337,7 +3337,7 @@ void McpTest::importGlbBecomesModel3dAsset()
     QVERIFY(clip.value(QStringLiteral("layer3d")).toBool());
     QCOMPARE(model.value(QStringLiteral("loop")).toString(), QStringLiteral("loop"));
     QVERIFY(model.value(QStringLiteral("animations")).toList().isEmpty());
-    QCOMPARE(clip.value(QStringLiteral("duration")).toDouble(), drift::usToSeconds(drift::kImageClipDurationUs));
+    QCOMPARE(clip.value(QStringLiteral("duration")).toDouble(), drift::usToSeconds(drift::imageClipDurationUs()));
     // The overlay box is the model's bounding-box front face, centred on the canvas.
     bool found = false;
     for (const QVariant &entry : state.preview()->clipsAtPlayhead()) {

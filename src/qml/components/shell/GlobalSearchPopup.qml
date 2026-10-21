@@ -178,7 +178,7 @@ Popup {
                                       : (canTransition ? qsTr("Not available on this track")
                                                        : c.transitionClip),
                         keywords: e.kind, shortcut: "", enabled: enabled,
-                        run: () => EditorState.addTransition(t, ci, e.kind, 0.5) })
+                        run: () => EditorState.addTransition(t, ci, e.kind, EditorState.preferences.transitionDurationSeconds) })
         }
 
         // Same rule as MasksTab: audio has no picture, text and subtitles are styled, not masked.
@@ -227,7 +227,8 @@ Popup {
         for (let i = 0; i < controls.length; ++i) {
             const e = controls[i]
             rows.push({ kind: "control", label: e.label, sub: e.path.concat([e.label]).join(" › "),
-                        hint: e.hint, keywords: e.keywords, shortcut: "", enabled: true, run: null })
+                        hint: e.hint, keywords: e.keywords, shortcut: "", enabled: true,
+                        run: e.page ? () => win.openSettings(e.page) : null })
         }
 
         root._index = rows

@@ -4277,56 +4277,16 @@
 <context>
     <name>AppSettingsMenu</name>
     <message>
-        <source>Workspace</source>
-        <translation>কর্মক্ষেত্র</translation>
-    </message>
-    <message>
-        <source>Auto (follow canvas)</source>
-        <translation>স্বয়ংক্রিয় (ক্যানভাস অনুযায়ী)</translation>
-    </message>
-    <message>
-        <source>Landscape</source>
-        <translation>আড়াআড়ি</translation>
-    </message>
-    <message>
-        <source>Portrait</source>
-        <translation>লম্বালম্বি</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation>থিম</translation>
-    </message>
-    <message>
-        <source>System</source>
-        <translation type="unfinished">সিস্টেম</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation>লাইট</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation>ডার্ক</translation>
-    </message>
-    <message>
-        <source>Language…</source>
-        <translation>ভাষা…</translation>
-    </message>
-    <message>
         <source>Switch to mobile layout…</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Settings…</source>
+        <translation type="unfinished">সেটিংস…</translation>
+    </message>
+    <message>
         <source>Multicam</source>
         <translation>মাল্টিক্যাম</translation>
-    </message>
-    <message>
-        <source>Debug info…</source>
-        <translation>ডিবাগ তথ্য…</translation>
-    </message>
-    <message>
-        <source>More settings…</source>
-        <translation>আরও সেটিংস…</translation>
     </message>
 </context>
 <context>
@@ -4617,10 +4577,6 @@
     <message>
         <source>Audio FX</source>
         <translation>অডিও ইফেক্ট</translation>
-    </message>
-    <message>
-        <source>Shortcuts</source>
-        <translation type="unfinished">শর্টকাট</translation>
     </message>
     <message>
         <source>New folder</source>
@@ -6260,10 +6216,6 @@
     <message>
         <source>Settings</source>
         <translation type="unfinished">সেটিংস</translation>
-    </message>
-    <message>
-        <source>Workspace, theme, language and more</source>
-        <translation type="unfinished">কর্মক্ষেত্র, থিম, ভাষা ও আরও সেটিংস</translation>
     </message>
 </context>
 <context>
@@ -7990,30 +7942,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Preview settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Playback settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Interface settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>App settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cloud providers</source>
-        <translation type="unfinished">ক্লাউড প্রদানকারী</translation>
-    </message>
-    <message>
-        <source>Marketplace settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Transitions</source>
         <translation type="unfinished">ট্রানজিশন</translation>
     </message>
@@ -8048,6 +7976,34 @@
     <message>
         <source>Preview</source>
         <translation type="unfinished">পূর্বরূপ</translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation type="unfinished">চেহারা</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">টাইমলাইন</translation>
+    </message>
+    <message>
+        <source>Timeline toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AI &amp; Cloud</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Upscale…</source>
@@ -13116,30 +13072,34 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsAppSection</name>
+    <name>SettingsAboutPage</name>
     <message>
-        <source>App</source>
-        <translation type="unfinished">অ্যাপ</translation>
+        <source>About</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reopen last project on startup</source>
-        <translation type="unfinished">স্টার্টআপে শেষ প্রজেক্ট আবার খুলুন</translation>
+        <source>Drift</source>
+        <translation type="unfinished">Drift</translation>
     </message>
     <message>
-        <source>Automatically restore the last open project on startup. Closing still asks you to save; a crash snapshot never overwrites your save file.</source>
-        <translation type="unfinished">স্টার্টআপে শেষ খোলা প্রকল্পটি স্বয়ংক্রিয়ভাবে পুনরুদ্ধার করুন। বন্ধ করা এখনও আপনাকে সংরক্ষণ করতে বলে; একটি ক্র্যাশ স্ন্যাপশট কখনই আপনার সেভ ফাইল ওভাররাইট করে না.</translation>
+        <source>Version %1</source>
+        <translation type="unfinished">সংস্করণ %1</translation>
     </message>
     <message>
         <source>Updates</source>
         <translation type="unfinished">আপডেট</translation>
     </message>
     <message>
-        <source>Check on startup</source>
-        <translation type="unfinished">স্টার্টআপ পরীক্ষা করুন</translation>
+        <source>Check for updates on startup</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Once a day, check whether a newer Drift has been released</source>
-        <translation type="unfinished">দিনে একবার, একটি নতুন Drift প্রকাশিত হয়েছে কিনা তা পরীক্ষা করুন।</translation>
+        <source>Once a day, check whether a newer Drift has been released.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check for updates</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Checking…</source>
@@ -13154,99 +13114,66 @@ If playback stutters, try another.</source>
         <translation type="unfinished">এখনই চেক করুন</translation>
     </message>
     <message>
-        <source>Drift %1</source>
-        <translation type="unfinished">Drift %1</translation>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Extra packs</source>
-        <translation type="unfinished">অতিরিক্ত প্যাক</translation>
+        <source>About Drift</source>
+        <translation type="unfinished">Drift সম্পর্কে</translation>
     </message>
     <message>
-        <source>Remind about essential packs</source>
-        <translation type="unfinished">প্রয়োজনীয় প্যাক সম্পর্কে মনে করিয়ে দিন</translation>
+        <source>Open-source video editor by CutWire Studios.</source>
+        <translation type="unfinished">CutWire Studios-এর তৈরি ওপেন সোর্স ভিডিও এডিটর.</translation>
     </message>
     <message>
-        <source>Pulse the Extras icon when the video, transitions, and audio packs are not installed</source>
-        <translation type="unfinished">ভিডিও, ট্রানজিশন এবং অডিও প্যাক ইনস্টল না থাকলে অতিরিক্ত আইকনটি পালস করুন</translation>
+        <source>Show about dialog</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remind about pack updates</source>
-        <translation type="unfinished">প্যাক আপডেট সম্পর্কে মনে করিয়ে দিন</translation>
+        <source>Debug info</source>
+        <translation type="unfinished">ডিবাগ তথ্য</translation>
     </message>
     <message>
-        <source>Pulse the Extras icon when updates are available for packs you already have installed</source>
-        <translation type="unfinished">আপনার ইতিমধ্যে ইনস্টল করা প্যাকগুলির জন্য আপডেটগুলি উপলব্ধ হলে অতিরিক্ত আইকনটি পালস করুন</translation>
+        <source>System, playback and codec details for bug reports.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open debug info…</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsAiPage</name>
+    <message>
+        <source>AI &amp; Cloud</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Agent access</source>
         <translation type="unfinished">এজেন্ট অ্যাক্সেস</translation>
     </message>
     <message>
-        <source>Network</source>
+        <source>Let Cursor or Claude edit this project for you. Only programs on this device can connect.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>System proxy</source>
+        <source>Start agent access on launch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No proxy</source>
+        <source>Turn agent access on automatically the next time you open Drift. Turning access off resets this.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>HTTP proxy</source>
-        <translation type="unfinished"></translation>
+        <source>Cloud providers</source>
+        <translation type="unfinished">ক্লাউড প্রদানকারী</translation>
     </message>
     <message>
-        <source>SOCKS5 proxy</source>
-        <translation type="unfinished"></translation>
+        <source>Scene detection sensitivity</source>
+        <translation type="unfinished">দৃশ্য সনাক্তকরণ সংবেদনশীলতা</translation>
     </message>
     <message>
-        <source>How Drift reaches the internet for downloads, updates, and online services. Applies immediately.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Proxy host</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Username (optional)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Password (optional)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Settings file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export settings…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>JSON document (*.json)</source>
-        <translation type="unfinished">JSON নথি (*.json)</translation>
-    </message>
-    <message>
-        <source>Settings exported</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Import settings…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Import Settings</source>
+        <source>Higher finds more cuts. When a clip is flat or heavily graded, Drift still falls back to an adaptive threshold.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -13342,13 +13269,25 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsAppearanceSection</name>
+    <name>SettingsAppearancePage</name>
     <message>
         <source>Appearance</source>
         <translation type="unfinished">চেহারা</translation>
     </message>
     <message>
         <source>Could not use that theme.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation type="unfinished">থিম</translation>
+    </message>
+    <message>
+        <source>Color theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light and Dark follow your system. Other themes can be installed or imported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13367,9 +13306,6 @@ If playback stutters, try another.</source>
         <source>This theme has a dark and a light variant. The header toggle switches between them.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>SettingsAppearanceTranslucency</name>
     <message>
         <source>Translucent windows</source>
         <translation type="unfinished"></translation>
@@ -13378,6 +13314,81 @@ If playback stutters, try another.</source>
         <source>Lets the desktop show through panels when a theme asks for it. Takes effect after restart.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Interface</source>
+        <translation type="unfinished">ইন্টারফেস</translation>
+    </message>
+    <message>
+        <source>Interface size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Drift to apply this size.</source>
+        <translation type="unfinished">এই আকার প্রয়োগ করতে Drift পুনরায় চালু করুন.</translation>
+    </message>
+    <message>
+        <source>Makes buttons, text, and icons larger, on top of your display settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>100% (system)</source>
+        <translation type="unfinished">100% (সিস্টেম)</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop suits a mouse and keyboard. Mobile is the touch layout made for phones.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mobile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation type="unfinished">কর্মক্ষেত্র</translation>
+    </message>
+    <message>
+        <source>Workspace orientation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Landscape or portrait workspace. Auto follows the shape of the canvas.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto (follow canvas)</source>
+        <translation type="unfinished">স্বয়ংক্রিয় (ক্যানভাস অনুযায়ী)</translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation type="unfinished">আড়াআড়ি</translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation type="unfinished">লম্বালম্বি</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsAppearanceTranslucency</name>
     <message>
         <source>Restart Drift to apply window transparency.</source>
         <translation type="unfinished"></translation>
@@ -13400,11 +13411,34 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsCloudProvidersSection</name>
+    <name>SettingsAudioPage</name>
     <message>
-        <source>Cloud providers</source>
-        <translation type="unfinished">ক্লাউড প্রদানকারী</translation>
+        <source>Audio</source>
+        <translation type="unfinished">অডিও</translation>
     </message>
+    <message>
+        <source>Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio output</source>
+        <translation type="unfinished">অডিও আউটপুট</translation>
+    </message>
+    <message>
+        <source>Where playback is heard. “System default” follows whatever your computer is set to, including when that changes.</source>
+        <translation type="unfinished">যেখানে প্লেব্যাক শোনা যায়। &quot;সিস্টেম ডিফল্ট&quot; আপনার কম্পিউটার সেট করা যাই হোক না কেন তা অনুসরণ করে, যখন এটি পরিবর্তন হয়.</translation>
+    </message>
+    <message>
+        <source>Microphone input</source>
+        <translation type="unfinished">মাইক্রোফোন ইনপুট</translation>
+    </message>
+    <message>
+        <source>Audio device used for recording voiceovers onto audio tracks.</source>
+        <translation type="unfinished">অডিও ট্র্যাকগুলিতে ভয়েসওভার রেকর্ড করার জন্য ব্যবহৃত অডিও ডিভাইস.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsCloudProvidersSection</name>
     <message>
         <source>Keys are stored unencrypted in Drift&apos;s settings. ELEVENLABS_API_KEY and FISH_API_KEY in the environment take precedence. Use is billed to your own account.</source>
         <translation type="unfinished">কীগুলি Drift এর সেটিংসে এনক্রিপ্ট না করে সংরক্ষণ করা হয়। পরিবেশে ELEVENLABS_API_KEY এবং FISH_API_KEY প্রাধান্য পায়। ব্যবহার আপনার নিজের অ্যাকাউন্টে বিল করা হয়.</translation>
@@ -13482,69 +13516,97 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsInterfaceSection</name>
+    <name>SettingsGeneralPage</name>
     <message>
-        <source>Interface</source>
-        <translation type="unfinished">ইন্টারফেস</translation>
+        <source>General</source>
+        <translation type="unfinished">সাধারণ</translation>
     </message>
     <message>
-        <source>Size</source>
-        <translation type="unfinished">আকার</translation>
+        <source>%1 GB</source>
+        <translation type="unfinished">%1 GB</translation>
     </message>
     <message>
-        <source>100% (system)</source>
-        <translation type="unfinished">100% (সিস্টেম)</translation>
+        <source>%1 MB</source>
+        <translation type="unfinished">%1 MB</translation>
     </message>
     <message>
-        <source>Makes buttons, text, and icons larger. This is extra scale on top of the size already set in your display settings. Takes effect after restart.</source>
-        <translation type="unfinished">বোতাম, টেক্সট এবং আইকনগুলিকে আরও বড় করে। এটি আপনার প্রদর্শন সেটিংসে ইতিমধ্যে সেট করা আকারের উপরে অতিরিক্ত স্কেল। পুনরায় চালু করার পরে কার্যকর হয়.</translation>
-    </message>
-    <message>
-        <source>Restart Drift to apply this size.</source>
-        <translation type="unfinished">এই আকার প্রয়োগ করতে Drift পুনরায় চালু করুন.</translation>
-    </message>
-    <message>
-        <source>Layout</source>
+        <source>Language &amp; region</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Automatic</source>
+        <source>Language</source>
+        <translation type="unfinished">ভাষা</translation>
+    </message>
+    <message>
+        <source>Language for menus and labels. Takes effect immediately.</source>
+        <translation type="unfinished">মেনু ও লেবেলের ভাষা। সঙ্গে সঙ্গে কার্যকর হবে.</translation>
+    </message>
+    <message>
+        <source>Startup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Desktop</source>
+        <source>Reopen last project on startup</source>
+        <translation type="unfinished">স্টার্টআপে শেষ প্রজেক্ট আবার খুলুন</translation>
+    </message>
+    <message>
+        <source>Restores the last open project. Closing still asks you to save.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Mobile</source>
+        <source>Saving</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Desktop suits a mouse and keyboard, including tablets in desktop mode. Mobile is the touch layout made for phones. Takes effect after restart.</source>
+        <source>Autosave interval</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Restart Drift to switch layouts.</source>
+        <source>How often unsaved work is snapshotted for crash recovery.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Restart now</source>
+        <source>Off</source>
+        <translation type="unfinished">বন্ধ</translation>
+    </message>
+    <message>
+        <source>Every 15 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Horizontal mouse-wheel pan</source>
-        <translation type="unfinished">অনুভূমিক মাউস-হুইল প্যান</translation>
-    </message>
-    <message>
-        <source>Scroll pans left and right along the timeline. Shift+scroll moves between tracks. Middle-click drag also pans.</source>
-        <translation type="unfinished">টাইমলাইন বরাবর বাম এবং ডানদিকে স্ক্রোল করুন। শিফট+স্ক্রোল ট্র্যাকের মধ্যে চলে। মিডল-ক্লিক টেনে আনে.</translation>
-    </message>
-    <message>
-        <source>Auto-crossfade overlapping clips</source>
+        <source>Every 30 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>When a move creates an overlap with a neighbouring clip on the same track, add a crossfade across it.</source>
+        <source>Every minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every 5 minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extras</source>
+        <translation type="unfinished">অতিরিক্ত প্যাক</translation>
+    </message>
+    <message>
+        <source>Remind about essential packs</source>
+        <translation type="unfinished">প্রয়োজনীয় প্যাক সম্পর্কে মনে করিয়ে দিন</translation>
+    </message>
+    <message>
+        <source>Pulse the Extras icon when the video, transitions, and audio packs are not installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remind about pack updates</source>
+        <translation type="unfinished">প্যাক আপডেট সম্পর্কে মনে করিয়ে দিন</translation>
+    </message>
+    <message>
+        <source>Pulse the Extras icon when updates are available for packs you already have installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13556,19 +13618,90 @@ If playback stutters, try another.</source>
         <translation type="unfinished">ট্যাপ, স্ন্যাপ এবং সম্পাদনায় ভাইব্রেট করুন। এই ডিভাইসের নিজস্ব হ্যাপটিক ইফেক্ট ব্যবহার করে যখন সেগুলি থাকে.</translation>
     </message>
     <message>
-        <source>Language</source>
-        <translation type="unfinished">ভাষা</translation>
+        <source>Storage</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Language for menus and labels. Takes effect immediately.</source>
-        <translation type="unfinished">মেনু ও লেবেলের ভাষা। সঙ্গে সঙ্গে কার্যকর হবে.</translation>
+        <source>Cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 used, stored in %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export and import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save your preferences to a JSON file, or load them from one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>JSON document (*.json)</source>
+        <translation type="unfinished">JSON নথি (*.json)</translation>
+    </message>
+    <message>
+        <source>Settings exported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>SettingsMarketplaceSection</name>
+    <name>SettingsKeymapPage</name>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click a shortcut, then press the keys. Esc cancels, Backspace clears.</source>
+        <translation type="unfinished">শর্টকাটে ক্লিক করে কী চাপুন। Esc বাতিল করে, Backspace মুছে দেয়.</translation>
+    </message>
+    <message>
+        <source>Reset to defaults</source>
+        <translation type="unfinished">ডিফল্ট সেটিংস ফিরিয়ে আনুন</translation>
+    </message>
+    <message>
+        <source>Restores every shortcut to its original key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shortcuts reset to defaults.</source>
+        <translation type="unfinished">শর্টকাটগুলো ডিফল্টে ফিরিয়ে আনা হয়েছে.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMarketplacePage</name>
     <message>
         <source>Marketplace</source>
         <translation type="unfinished">মার্কেটপ্লেস</translation>
+    </message>
+    <message>
+        <source>Account</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Account connected (%1)</source>
@@ -13588,45 +13721,152 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPlaybackSection</name>
+    <name>SettingsNetworkPage</name>
     <message>
-        <source>Playback</source>
-        <translation type="unfinished">প্লেব্যাক</translation>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audio output</source>
-        <translation type="unfinished">অডিও আউটপুট</translation>
+        <source>Connection</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Where playback is heard. “System default” follows whatever your computer is set to, including when that changes.</source>
-        <translation type="unfinished">যেখানে প্লেব্যাক শোনা যায়। &quot;সিস্টেম ডিফল্ট&quot; আপনার কম্পিউটার সেট করা যাই হোক না কেন তা অনুসরণ করে, যখন এটি পরিবর্তন হয়.</translation>
+        <source>Proxy</source>
+        <translation type="unfinished">প্রক্সি</translation>
     </message>
     <message>
-        <source>Microphone input</source>
-        <translation type="unfinished">মাইক্রোফোন ইনপুট</translation>
+        <source>How Drift reaches the internet for downloads, updates, and online services. Applies immediately.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audio device used for recording voiceovers onto audio tracks.</source>
-        <translation type="unfinished">অডিও ট্র্যাকগুলিতে ভয়েসওভার রেকর্ড করার জন্য ব্যবহৃত অডিও ডিভাইস.</translation>
+        <source>System proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTTP proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SOCKS5 proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Host and port of the proxy. The username and password are optional.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Username (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password (optional)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>SettingsPreviewSection</name>
+    <name>SettingsPane</name>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">সাধারণ</translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation type="unfinished">চেহারা</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">টাইমলাইন</translation>
+    </message>
+    <message>
+        <source>Timeline toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Preview</source>
         <translation type="unfinished">পূর্বরূপ</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">অডিও</translation>
+    </message>
+    <message>
+        <source>AI &amp; Cloud</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Marketplace</source>
+        <translation type="unfinished">মার্কেটপ্লেস</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No settings match “%1”</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPreviewPage</name>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished">পূর্বরূপ</translation>
+    </message>
+    <message>
+        <source>Guides</source>
+        <translation type="unfinished">গাইড</translation>
     </message>
     <message>
         <source>Show guides</source>
         <translation type="unfinished">গাইড দেখান</translation>
     </message>
     <message>
-        <source>Show alignment guides over the preview</source>
-        <translation type="unfinished">প্রিভিউতে অ্যালাইনমেন্ট গাইড দেখান</translation>
+        <source>Alignment guides drawn over the preview.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guide sets</source>
+        <translation type="unfinished">গাইড সেট</translation>
+    </message>
+    <message>
+        <source>Choose which guide sets are drawn over the preview.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Background</source>
         <translation type="unfinished">পটভূমি</translation>
+    </message>
+    <message>
+        <source>Fill behind clips that don’t cover the whole screen.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Solid color</source>
@@ -13641,16 +13881,100 @@ If playback stutters, try another.</source>
         <translation type="unfinished">স্বচ্ছ</translation>
     </message>
     <message>
-        <source>Fill behind clips that don’t cover the whole screen</source>
-        <translation type="unfinished">ক্লিপগুলির পিছনে পূরণ করুন যা পুরো স্ক্রীনকে কভার করে না</translation>
+        <source>Background colour</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Choose background colour</source>
-        <translation type="unfinished">পটভূমির রঙ চয়ন করুন</translation>
+        <source>Colour of the solid background.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Blur strength</source>
         <translation type="unfinished">ঝাপসা শক্তি</translation>
+    </message>
+    <message>
+        <source>How much the background is blurred behind clips.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lower is smoother while editing. Full matches an export exactly; Auto renders only the pixels on screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full</source>
+        <translation type="unfinished">পূর্ণ</translation>
+    </message>
+    <message>
+        <source>Half</source>
+        <translation type="unfinished">অর্ধেক</translation>
+    </message>
+    <message>
+        <source>Quarter</source>
+        <translation type="unfinished">এক-চতুর্থাংশ</translation>
+    </message>
+    <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished">স্বয়ংক্রিয়</translation>
+    </message>
+    <message>
+        <source>Decoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How video is decoded for preview. Software is smoother for most clips but uses more CPU. Hardware suits high-quality 4K.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Faster preview (experimental)</source>
+        <translation type="unfinished">দ্রুত পূর্বরূপ (পরীক্ষামূলক)</translation>
+    </message>
+    <message>
+        <source>Can make playback smoother by keeping video on the graphics card. Turn it off if the picture looks wrong. Takes effect after restart.</source>
+        <translation type="unfinished">গ্রাফিক্স কার্ডে ভিডিও রেখে প্লেব্যাককে স্মুথ করতে পারে। ছবি ভুল মনে হলে এটি বন্ধ করুন। পুনরায় চালু করার পরে কার্যকর হয়.</translation>
+    </message>
+    <message>
+        <source>Graphics card</source>
+        <translation type="unfinished">গ্রাফিক্স কার্ড</translation>
+    </message>
+    <message>
+        <source>Which graphics card Drift runs on. High performance keeps video decoded on an NVIDIA card on that card; power saving uses less battery. Takes effect after restart.</source>
+        <translation type="unfinished">কোন গ্রাফিক্স কার্ড Drift চলে। উচ্চ কর্মক্ষমতা সেই কার্ডের একটি NVIDIA কার্ডে ভিডিও ডিকোড রাখে; পাওয়ার সেভিং কম ব্যাটারি ব্যবহার করে। পুনরায় চালু করার পরে কার্যকর হয়.</translation>
+    </message>
+    <message>
+        <source>Windows default</source>
+        <translation type="unfinished">উইন্ডোজ ডিফল্ট</translation>
+    </message>
+    <message>
+        <source>Power saving (integrated GPU)</source>
+        <translation type="unfinished">পাওয়ার সেভিং (ইন্টিগ্রেটেড GPU)</translation>
+    </message>
+    <message>
+        <source>High performance (discrete GPU)</source>
+        <translation type="unfinished">উচ্চ কর্মক্ষমতা (বিচ্ছিন্ন GPU)</translation>
+    </message>
+    <message>
+        <source>Choose which graphics card Drift runs on in Windows Settings, under Display &gt; Graphics. Takes effect after restart.</source>
+        <translation type="unfinished">ডিসপ্লে &gt; গ্রাফিক্সের অধীনে উইন্ডোজ সেটিংসে কোন গ্রাফিক্স কার্ড Drift চলবে তা বেছে নিন। পুনরায় চালু করার পরে কার্যকর হয়.</translation>
+    </message>
+    <message>
+        <source>Open graphics settings</source>
+        <translation type="unfinished">গ্রাফিক্স সেটিংস খুলুন</translation>
+    </message>
+    <message>
+        <source>Proxies</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Use proxies for preview</source>
@@ -13663,6 +13987,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Proxy resolution</source>
         <translation type="unfinished">প্রক্সি রেজোলিউশন</translation>
+    </message>
+    <message>
+        <source>Size of new proxies. Proxies made at another size are not used until you create them again.</source>
+        <translation type="unfinished">নতুন প্রক্সির আকার। অন্য আকারে তৈরি প্রক্সি ব্যবহার করা হয় না যতক্ষণ না আপনি সেগুলি আবার তৈরি করেন.</translation>
     </message>
     <message>
         <source>360p</source>
@@ -13681,10 +14009,6 @@ If playback stutters, try another.</source>
         <translation type="unfinished">1080p</translation>
     </message>
     <message>
-        <source>Size of new proxies. Proxies made at another size are not used until you create them again.</source>
-        <translation type="unfinished">নতুন প্রক্সির আকার। অন্য আকারে তৈরি প্রক্সি ব্যবহার করা হয় না যতক্ষণ না আপনি সেগুলি আবার তৈরি করেন.</translation>
-    </message>
-    <message>
         <source>Proxy name patterns</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13699,42 +14023,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Reset to defaults</source>
         <translation type="unfinished">ডিফল্ট সেটিংস ফিরিয়ে আনুন</translation>
-    </message>
-    <message>
-        <source>Faster preview (experimental)</source>
-        <translation type="unfinished">দ্রুত পূর্বরূপ (পরীক্ষামূলক)</translation>
-    </message>
-    <message>
-        <source>Can make playback smoother by keeping video on the graphics card. Turn it off if the picture looks wrong. Takes effect after restart.</source>
-        <translation type="unfinished">গ্রাফিক্স কার্ডে ভিডিও রেখে প্লেব্যাককে স্মুথ করতে পারে। ছবি ভুল মনে হলে এটি বন্ধ করুন। পুনরায় চালু করার পরে কার্যকর হয়.</translation>
-    </message>
-    <message>
-        <source>Graphics card</source>
-        <translation type="unfinished">গ্রাফিক্স কার্ড</translation>
-    </message>
-    <message>
-        <source>Windows default</source>
-        <translation type="unfinished">উইন্ডোজ ডিফল্ট</translation>
-    </message>
-    <message>
-        <source>Power saving (integrated GPU)</source>
-        <translation type="unfinished">পাওয়ার সেভিং (ইন্টিগ্রেটেড GPU)</translation>
-    </message>
-    <message>
-        <source>High performance (discrete GPU)</source>
-        <translation type="unfinished">উচ্চ কর্মক্ষমতা (বিচ্ছিন্ন GPU)</translation>
-    </message>
-    <message>
-        <source>Which graphics card Drift runs on. High performance keeps video decoded on an NVIDIA card on that card; power saving uses less battery. Takes effect after restart.</source>
-        <translation type="unfinished">কোন গ্রাফিক্স কার্ড Drift চলে। উচ্চ কর্মক্ষমতা সেই কার্ডের একটি NVIDIA কার্ডে ভিডিও ডিকোড রাখে; পাওয়ার সেভিং কম ব্যাটারি ব্যবহার করে। পুনরায় চালু করার পরে কার্যকর হয়.</translation>
-    </message>
-    <message>
-        <source>Choose which graphics card Drift runs on in Windows Settings, under Display &gt; Graphics. Takes effect after restart.</source>
-        <translation type="unfinished">ডিসপ্লে &gt; গ্রাফিক্সের অধীনে উইন্ডোজ সেটিংসে কোন গ্রাফিক্স কার্ড Drift চলবে তা বেছে নিন। পুনরায় চালু করার পরে কার্যকর হয়.</translation>
-    </message>
-    <message>
-        <source>Open graphics settings</source>
-        <translation type="unfinished">গ্রাফিক্স সেটিংস খুলুন</translation>
     </message>
 </context>
 <context>
@@ -13781,6 +14069,124 @@ If playback stutters, try another.</source>
     <message>
         <source>Theme</source>
         <translation type="unfinished">থিম</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsTimelinePage</name>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">টাইমলাইন</translation>
+    </message>
+    <message>
+        <source>Scrolling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mouse wheel scrolls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What the mouse wheel moves on the timeline. Hold Shift for the other direction; middle-click drag also pans.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tracks (up and down)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time (left and right)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Editing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-crossfade overlapping clips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When a move creates an overlap with a neighbouring clip on the same track, add a crossfade across it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-select clip under playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the clip under the playhead as the playhead moves.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto keyframes</source>
+        <translation type="unfinished">অটো কীফ্রেম</translation>
+    </message>
+    <message>
+        <source>Dragging a slider also creates keyframes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loop work area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback repeats between the work area in and out points.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Still image duration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of images and stills when added to the timeline.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transition length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of new transitions dropped between clips.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show timeline overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A minimap of the whole project. Click or drag it to jump the view.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show audio mixer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the audio mixer strip beside the timeline.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsToolbarPage</name>
+    <message>
+        <source>Timeline toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toolbar layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose which actions appear on the toolbar above the timeline and which go in its overflow menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -14429,37 +14835,6 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>ShortcutsTab</name>
-    <message>
-        <source>Search shortcuts</source>
-        <translation>শর্টকাট খুঁজুন</translation>
-    </message>
-    <message>
-        <source>Click a shortcut, then press the keys. Esc cancels, Backspace clears.</source>
-        <translation>শর্টকাটে ক্লিক করে কী চাপুন। Esc বাতিল করে, Backspace মুছে দেয়.</translation>
-    </message>
-    <message>
-        <source>No shortcuts available</source>
-        <translation>কোনো শর্টকাট নেই</translation>
-    </message>
-    <message>
-        <source>No shortcuts match “%1”</source>
-        <translation>“%1”-এর সঙ্গে মেলে এমন কোনো শর্টকাট নেই</translation>
-    </message>
-    <message>
-        <source>Try a different name or key.</source>
-        <translation>অন্য নাম বা কী দিয়ে চেষ্টা করুন.</translation>
-    </message>
-    <message>
-        <source>Reset to defaults</source>
-        <translation>ডিফল্ট সেটিংস ফিরিয়ে আনুন</translation>
-    </message>
-    <message>
-        <source>Shortcuts reset to defaults.</source>
-        <translation>শর্টকাটগুলো ডিফল্টে ফিরিয়ে আনা হয়েছে.</translation>
-    </message>
-</context>
-<context>
     <name>SpeechTab</name>
     <message>
         <source>Voice saved</source>
@@ -15008,10 +15383,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Settings</source>
         <translation>সেটিংস</translation>
-    </message>
-    <message>
-        <source>Workspace, theme, language and more</source>
-        <translation>কর্মক্ষেত্র, থিম, ভাষা ও আরও সেটিংস</translation>
     </message>
     <message>
         <source>Debug info</source>
@@ -16872,110 +17243,6 @@ If playback stutters, try another.</source>
         <translation>চালান</translation>
     </message>
     <message>
-        <source>Select — normal editing</source>
-        <translation>নির্বাচন — সাধারণ সম্পাদনা</translation>
-    </message>
-    <message>
-        <source>Select</source>
-        <translation>নির্বাচন করুন</translation>
-    </message>
-    <message>
-        <source>Cut mode</source>
-        <translation>কাট মোড</translation>
-    </message>
-    <message>
-        <source>Cut mode — click a clip to split it</source>
-        <translation>কাট মোড — বিভক্ত করতে ক্লিপে ক্লিক করুন</translation>
-    </message>
-    <message>
-        <source>Show audio on separate track</source>
-        <translation>আলাদা ট্র্যাকে অডিও দেখান</translation>
-    </message>
-    <message>
-        <source>Link selected clips</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Trim start</source>
-        <translation>শুরুর অংশ ছাঁটুন</translation>
-    </message>
-    <message>
-        <source>Trim start — click a clip to drop everything left of the cut</source>
-        <translation type="unfinished">ট্রিম স্টার্ট — কাটার বাকি সবকিছু ফেলে দিতে একটি ক্লিপে ক্লিক করুন</translation>
-    </message>
-    <message>
-        <source>Trim end</source>
-        <translation>শেষের অংশ ছাঁটুন</translation>
-    </message>
-    <message>
-        <source>Trim end — click a clip to drop everything right of the cut</source>
-        <translation type="unfinished">ট্রিম এন্ড — কাটার ডানদিকে সবকিছু ছেড়ে দিতে একটি ক্লিপে ক্লিক করুন</translation>
-    </message>
-    <message>
-        <source>Trim start to playhead</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Trim end to playhead</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Undo</source>
-        <translation>পূর্বাবস্থায় ফেরান</translation>
-    </message>
-    <message>
-        <source>Redo</source>
-        <translation>আবার করুন</translation>
-    </message>
-    <message>
-        <source>Delete clip</source>
-        <translation>ক্লিপ মুছুন</translation>
-    </message>
-    <message>
-        <source>Copy selection</source>
-        <translation>নির্বাচিত অংশ কপি করুন</translation>
-    </message>
-    <message>
-        <source>Paste at current time</source>
-        <translation>বর্তমান সময়ে পেস্ট করুন</translation>
-    </message>
-    <message>
-        <source>Duplicate clip</source>
-        <translation>ক্লিপের অনুলিপি তৈরি করুন</translation>
-    </message>
-    <message>
-        <source>Add/remove bookmark at current time</source>
-        <translation type="unfinished">বর্তমান সময়ে বুকমার্ক যোগ/সরান</translation>
-    </message>
-    <message>
-        <source>Mark work area in</source>
-        <translation>কাজের অংশের শুরু চিহ্নিত করুন</translation>
-    </message>
-    <message>
-        <source>Mark work area out</source>
-        <translation>কাজের অংশের শেষ চিহ্নিত করুন</translation>
-    </message>
-    <message>
-        <source>Loop work area playback</source>
-        <translation>কাজের অংশ বারবার চালান</translation>
-    </message>
-    <message>
-        <source>Clear work area</source>
-        <translation>কাজের অংশের সীমা মুছুন</translation>
-    </message>
-    <message>
-        <source>Add transform layer</source>
-        <translation>ট্রান্সফর্ম লেয়ার যোগ করুন</translation>
-    </message>
-    <message>
-        <source>Add transform layer — moves the selected clips&apos; tracks as one</source>
-        <translation type="unfinished">ট্রান্সফর্ম লেয়ার যোগ করুন — নির্বাচিত ক্লিপগুলির ট্র্যাকগুলিকে এক হিসাবে সরান।</translation>
-    </message>
-    <message>
-        <source>Add camera</source>
-        <translation>ক্যামেরা যোগ করুন</translation>
-    </message>
-    <message>
         <source>Auto-select: select the clip under the playhead</source>
         <translation type="unfinished"></translation>
     </message>
@@ -16986,26 +17253,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Timeline overview — a minimap of the whole project; click or drag it to jump the view</source>
         <translation type="unfinished">টাইমলাইন ওভারভিউ — পুরো প্রকল্পের একটি মিনিম্যাপ; ভিউ জাম্প করতে ক্লিক করুন বা টেনে আনুন</translation>
-    </message>
-    <message>
-        <source>Unlink video and audio</source>
-        <translation>ভিডিও ও অডিওর সংযোগ বিচ্ছিন্ন করুন</translation>
-    </message>
-    <message>
-        <source>Merge adjacent clips</source>
-        <translation>পাশাপাশি ক্লিপগুলো একত্র করুন</translation>
-    </message>
-    <message>
-        <source>Freeze frame at current time</source>
-        <translation>বর্তমান সময়ের ফ্রেম স্থির করুন</translation>
-    </message>
-    <message>
-        <source>Add adjustment layer</source>
-        <translation>অ্যাডজাস্টমেন্ট লেয়ার যোগ করুন</translation>
-    </message>
-    <message>
-        <source>Add camera — one viewpoint the whole timeline is seen through. With a camera already there, adds a new camera clip (a cut to a new framing) at the playhead</source>
-        <translation type="unfinished">ক্যামেরা যোগ করুন — একটি ভিউপয়েন্টের মাধ্যমে পুরো টাইমলাইন দেখা যায়। ইতিমধ্যেই একটি ক্যামেরা আছে, প্লেহেডে একটি নতুন ক্যামেরা ক্লিপ (একটি নতুন ফ্রেমিংয়ে কাটা) যোগ করে।</translation>
     </message>
     <message>
         <source>Toggle snapping</source>
@@ -17021,6 +17268,133 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>TimelineToolbarActions</name>
+    <message>
+        <source>Select</source>
+        <translation type="unfinished">নির্বাচন করুন</translation>
+    </message>
+    <message>
+        <source>Select — normal editing</source>
+        <translation type="unfinished">নির্বাচন — সাধারণ সম্পাদনা</translation>
+    </message>
+    <message>
+        <source>Cut mode</source>
+        <translation type="unfinished">কাট মোড</translation>
+    </message>
+    <message>
+        <source>Cut mode — click a clip to split it</source>
+        <translation type="unfinished">কাট মোড — বিভক্ত করতে ক্লিপে ক্লিক করুন</translation>
+    </message>
+    <message>
+        <source>Show audio on separate track</source>
+        <translation type="unfinished">আলাদা ট্র্যাকে অডিও দেখান</translation>
+    </message>
+    <message>
+        <source>Unlink video and audio</source>
+        <translation type="unfinished">ভিডিও ও অডিওর সংযোগ বিচ্ছিন্ন করুন</translation>
+    </message>
+    <message>
+        <source>Link selected clips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trim start</source>
+        <translation type="unfinished">শুরুর অংশ ছাঁটুন</translation>
+    </message>
+    <message>
+        <source>Trim start — click a clip to drop everything left of the cut</source>
+        <translation type="unfinished">ট্রিম স্টার্ট — কাটার বাকি সবকিছু ফেলে দিতে একটি ক্লিপে ক্লিক করুন</translation>
+    </message>
+    <message>
+        <source>Trim end</source>
+        <translation type="unfinished">শেষের অংশ ছাঁটুন</translation>
+    </message>
+    <message>
+        <source>Trim end — click a clip to drop everything right of the cut</source>
+        <translation type="unfinished">ট্রিম এন্ড — কাটার ডানদিকে সবকিছু ছেড়ে দিতে একটি ক্লিপে ক্লিক করুন</translation>
+    </message>
+    <message>
+        <source>Trim start to playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trim end to playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation type="unfinished">পূর্বাবস্থায় ফেরান</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation type="unfinished">আবার করুন</translation>
+    </message>
+    <message>
+        <source>Delete clip</source>
+        <translation type="unfinished">ক্লিপ মুছুন</translation>
+    </message>
+    <message>
+        <source>Copy selection</source>
+        <translation type="unfinished">নির্বাচিত অংশ কপি করুন</translation>
+    </message>
+    <message>
+        <source>Paste at current time</source>
+        <translation type="unfinished">বর্তমান সময়ে পেস্ট করুন</translation>
+    </message>
+    <message>
+        <source>Duplicate clip</source>
+        <translation type="unfinished">ক্লিপের অনুলিপি তৈরি করুন</translation>
+    </message>
+    <message>
+        <source>Add/remove bookmark at current time</source>
+        <translation type="unfinished">বর্তমান সময়ে বুকমার্ক যোগ/সরান</translation>
+    </message>
+    <message>
+        <source>Mark work area in</source>
+        <translation type="unfinished">কাজের অংশের শুরু চিহ্নিত করুন</translation>
+    </message>
+    <message>
+        <source>Mark work area out</source>
+        <translation type="unfinished">কাজের অংশের শেষ চিহ্নিত করুন</translation>
+    </message>
+    <message>
+        <source>Loop work area playback</source>
+        <translation type="unfinished">কাজের অংশ বারবার চালান</translation>
+    </message>
+    <message>
+        <source>Clear work area</source>
+        <translation type="unfinished">কাজের অংশের সীমা মুছুন</translation>
+    </message>
+    <message>
+        <source>Merge adjacent clips</source>
+        <translation type="unfinished">পাশাপাশি ক্লিপগুলো একত্র করুন</translation>
+    </message>
+    <message>
+        <source>Freeze frame at current time</source>
+        <translation type="unfinished">বর্তমান সময়ের ফ্রেম স্থির করুন</translation>
+    </message>
+    <message>
+        <source>Add adjustment layer</source>
+        <translation type="unfinished">অ্যাডজাস্টমেন্ট লেয়ার যোগ করুন</translation>
+    </message>
+    <message>
+        <source>Add transform layer</source>
+        <translation type="unfinished">ট্রান্সফর্ম লেয়ার যোগ করুন</translation>
+    </message>
+    <message>
+        <source>Add transform layer — moves the selected clips&apos; tracks as one</source>
+        <translation type="unfinished">ট্রান্সফর্ম লেয়ার যোগ করুন — নির্বাচিত ক্লিপগুলির ট্র্যাকগুলিকে এক হিসাবে সরান।</translation>
+    </message>
+    <message>
+        <source>Add camera</source>
+        <translation type="unfinished">ক্যামেরা যোগ করুন</translation>
+    </message>
+    <message>
+        <source>Add camera — one viewpoint the whole timeline is seen through. With a camera already there, adds a new camera clip (a cut to a new framing) at the playhead</source>
+        <translation type="unfinished">ক্যামেরা যোগ করুন — একটি ভিউপয়েন্টের মাধ্যমে পুরো টাইমলাইন দেখা যায়। ইতিমধ্যেই একটি ক্যামেরা আছে, প্লেহেডে একটি নতুন ক্যামেরা ক্লিপ (একটি নতুন ফ্রেমিংয়ে কাটা) যোগ করে।</translation>
+    </message>
+</context>
+<context>
     <name>TimelineToolbarCustomizeDialog</name>
     <message>
         <source>Customize timeline toolbar</source>
@@ -17029,18 +17403,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Save</source>
         <translation>সংরক্ষণ করুন</translation>
-    </message>
-    <message>
-        <source>Drag items to reorder them. Items above the divider are toolbar buttons; the rest are in the More menu.</source>
-        <translation type="unfinished">আইটেমগুলিকে পুনরায় সাজাতে টেনে আনুন। বিভাজকের উপরের আইটেমগুলি হল টুলবার বোতাম; বাকিগুলি আরও মেনুতে রয়েছে.</translation>
-    </message>
-    <message>
-        <source>Add separator</source>
-        <translation type="unfinished">বিভাজক যোগ করুন</translation>
-    </message>
-    <message>
-        <source>Reset to defaults</source>
-        <translation>ডিফল্ট সেটিংস ফিরিয়ে আনুন</translation>
     </message>
 </context>
 <context>
@@ -17067,6 +17429,21 @@ If playback stutters, try another.</source>
     <message>
         <source>Remove separator</source>
         <translation type="unfinished">বিভাজক সরান</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarCustomizer</name>
+    <message>
+        <source>Drag items to reorder them. Items above the divider are toolbar buttons; the rest are in the More menu.</source>
+        <translation type="unfinished">আইটেমগুলিকে পুনরায় সাজাতে টেনে আনুন। বিভাজকের উপরের আইটেমগুলি হল টুলবার বোতাম; বাকিগুলি আরও মেনুতে রয়েছে.</translation>
+    </message>
+    <message>
+        <source>Add separator</source>
+        <translation type="unfinished">বিভাজক যোগ করুন</translation>
+    </message>
+    <message>
+        <source>Reset to defaults</source>
+        <translation type="unfinished">ডিফল্ট সেটিংস ফিরিয়ে আনুন</translation>
     </message>
 </context>
 <context>
@@ -17852,8 +18229,8 @@ If playback stutters, try another.</source>
         <translation type="unfinished">এই ক্লিপের পরে কোন পরিবর্তন নেই। পরবর্তী ক্লিপে কাটাতে একটি যোগ করুন.</translation>
     </message>
     <message>
-        <source>Add crossfade (0.5 s)</source>
-        <translation type="unfinished">ক্রসফেড যোগ করুন (0.5 সেকেন্ড)</translation>
+        <source>Add crossfade (%1 s)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Overlap transition. Drag another kind from Transitions to replace it.</source>

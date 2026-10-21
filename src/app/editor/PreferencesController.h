@@ -79,6 +79,22 @@ class PreferencesController : public QObject
     Q_PROPERTY(int networkProxyPort READ networkProxyPort NOTIFY networkProxyChanged)
     Q_PROPERTY(QString networkProxyUser READ networkProxyUser NOTIFY networkProxyChanged)
     Q_PROPERTY(QString networkProxyPassword READ networkProxyPassword NOTIFY networkProxyChanged)
+    // Recovery snapshot interval for unsaved work, QSettings("editor/autosaveIntervalSeconds").
+    // 0 is off; the other choices are 15, 30, 60 and 300. AppController applies it live.
+    Q_PROPERTY(int autosaveIntervalSeconds READ autosaveIntervalSeconds WRITE setAutosaveIntervalSeconds
+                   NOTIFY autosaveIntervalSecondsChanged)
+    // Length of a still image dropped on the timeline, QSettings("timeline/stillDurationSeconds").
+    Q_PROPERTY(double stillDurationSeconds READ stillDurationSeconds WRITE setStillDurationSeconds
+                   NOTIFY stillDurationSecondsChanged)
+    // Length of a transition added to a plain cut, QSettings("timeline/transitionDurationSeconds").
+    // Transitions on an overlap keep the overlap's length.
+    Q_PROPERTY(double transitionDurationSeconds READ transitionDurationSeconds
+                   WRITE setTransitionDurationSeconds NOTIFY transitionDurationSecondsChanged)
+    // Size of the cache folder, minus the subfolders a live disk cache owns. refreshCacheSize and
+    // clearCache run off the GUI thread; cacheBusy is true while either is in flight.
+    Q_PROPERTY(qint64 cacheSizeBytes READ cacheSizeBytes NOTIFY cacheSizeChanged)
+    Q_PROPERTY(bool cacheBusy READ cacheBusy NOTIFY cacheSizeChanged)
+    Q_PROPERTY(QString cacheLocation READ cacheLocation CONSTANT)
     // App-wide interface language, QSettings("ui/language"). Empty means follow the OS locale.
     // "en" is the source catalog (no .qm). Other codes match i18n/drift_<code>.qm.
     // needsUiLanguagePrompt is true only on a brand-new install, before the first-launch chooser
@@ -160,6 +176,18 @@ public:
     Q_INVOKABLE void setNetworkProxy(const QString &mode, const QString &host, int port,
                                      const QString &user, const QString &password);
 
+    int autosaveIntervalSeconds() const { return m_autosaveIntervalSeconds; }
+    void setAutosaveIntervalSeconds(int seconds);
+    double stillDurationSeconds() const { return m_stillDurationSeconds; }
+    void setStillDurationSeconds(double seconds);
+    double transitionDurationSeconds() const { return m_transitionDurationSeconds; }
+    void setTransitionDurationSeconds(double seconds);
+    qint64 cacheSizeBytes() const { return m_cacheSizeBytes; }
+    bool cacheBusy() const { return m_cacheBusy; }
+    QString cacheLocation() const;
+    Q_INVOKABLE void refreshCacheSize();
+    Q_INVOKABLE void clearCache();
+
     QString uiLanguage() const { return m_uiLanguage; }
     QVariantList uiLanguages() const;
     bool needsUiLanguagePrompt() const { return m_needsUiLanguagePrompt; }
@@ -215,6 +243,10 @@ signals:
     void autoCrossfadeOverlapsChanged();
     void autoSelectUnderPlayheadChanged();
     void networkProxyChanged();
+    void autosaveIntervalSecondsChanged();
+    void stillDurationSecondsChanged();
+    void transitionDurationSecondsChanged();
+    void cacheSizeChanged();
     void uiLanguageChanged();
     void uiScaleChanged();
     void interfaceShellChanged();
@@ -251,4 +283,11 @@ private:
     double m_uiScale = 1.0;
     QString m_interfaceShell = QStringLiteral("auto");
     bool m_relaunchOnQuit = false;
+    int m_autosaveIntervalSeconds = 15;
+    double m_stillDurationSeconds = 5.0;
+    double m_transitionDurationSeconds = 0.5;
+    qint64 m_cacheSizeBytes = 0;
+    bool m_cacheBusy = false;
+
+    void runCacheJob(bool clear);
 };

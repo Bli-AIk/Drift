@@ -357,8 +357,8 @@ ApplicationWindow {
                 return
             }
         }
-        const modals = [shellSwitchDialogLoader.item, debugInfoDialogLoader.item, settingsDialogLoader.item,
-                        pasteAttributesDialogLoader.item, updateDialogLoader.item, aboutDialogLoader.item,
+        const modals = [shellSwitchDialogLoader.item, aboutDialogLoader.item, debugInfoDialogLoader.item,
+                        settingsDialogLoader.item, pasteAttributesDialogLoader.item, updateDialogLoader.item,
                         addonManagerDialogLoader.item, missingAddonsDialogLoader.item, addonStartupDialog,
                         projectSetupDialogLoader.item, layoutChooserDialogLoader.item,
                         languageChooserDialogLoader.item, recoveryDialogLoader.item,
@@ -788,8 +788,12 @@ ApplicationWindow {
 
     // Opened from the header's Settings menu. Every preference lives here now; the
     // assets rail no longer carries a settings tab.
-    function openSettings() {
-        settingsDialogLoader.ensure().open()
+    function openSettings(pageId) {
+        const dialog = settingsDialogLoader.ensure()
+        if (pageId)
+            dialog.openPage(pageId)
+        else
+            dialog.open()
     }
 
     function switchShell(target) {
@@ -1393,17 +1397,13 @@ ApplicationWindow {
 
     // There is no menu bar and no help overlay, so the only route to the shortcut
     // list was an unlabelled icon in a vertical rail that can itself be scrolled out
-    // of view on a short window. F1 is the conventional way in and reuses the tab
-    // that already exists.
+    // of view on a short window. F1 is the conventional way in and opens the
+    // keyboard shortcuts page of Settings.
     Shortcut {
         sequence: "F1"
         context: Qt.ApplicationShortcut
         enabled: !window.showStartScreen
-        onActivated: {
-            if (window.previewFullscreen)
-                window.togglePreviewFullscreen()
-            assetsPanel.showTab("shortcuts")
-        }
+        onActivated: window.openSettings("keymap")
     }
 
     // Arrow-key actions (frame step, 1s/10s jump, Alt-nudge, Alt cut-point)
@@ -1454,7 +1454,6 @@ ApplicationWindow {
                 onNewProjectRequested: window.requestNewProject()
                 onOpenProjectRequested: window.requestOpenProjectDialog()
                 onOpenRecentRequested: (path) => window.requestOpenRecentProject(path)
-                onLanguageRequested: editorHeader.openLanguageChooser()
                 onMobileLayoutRequested: window.switchShell("mobile")
                 onMoreSettingsRequested: window.openSettings()
                 onDebugInfoRequested: window.openDebugInfo()

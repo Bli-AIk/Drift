@@ -313,9 +313,6 @@
       "$palette.categoryOrange",
       "$palette.categoryIndigo"
     ],
-    "shell": {
-      "settingsSectionCardBackground": "$semantic.panel.accent"
-    },
     "eyedropper": {
       "shadow": "$palette.eyedropperShadow"
     },
@@ -666,34 +663,36 @@
       "accent": "$semantic.primary",
       "accentWidth": 3
     },
-    "settingsSectionCard": {
-      "background": "$semantic.shell.settingsSectionCardBackground",
-      "border": "$semantic.panel.border",
-      "borderWidth": "$metrics.borderWidth",
-      "radius": "$metrics.radius.md",
+    "settingsPane": {
+      "sidebarBackground": "$semantic.surface.panel",
+      "selectedBackground": "$semantic.panel.accent",
+      "hoverBackground": "$semantic.panel.muted",
       "foreground": "$semantic.panel.foreground",
-      "divider": "$semantic.panel.border"
+      "foregroundMuted": "$semantic.mutedForeground",
+      "divider": "$semantic.panel.border",
+      "borderWidth": "$metrics.borderWidth",
+      "radius": "$metrics.radius.sm"
     },
-    "settingsPreviewSection": {
-      "foreground": "$semantic.panel.secondary.foreground"
+    "settingsPage": {
+      "foreground": "$semantic.panel.foreground",
+      "titleSize": 22
     },
-    "settingsMarketplaceSection": {
-      "foreground": "$semantic.panel.foreground"
+    "settingsGroupHeader": {
+      "foregroundMuted": "$semantic.mutedForeground",
+      "divider": "$semantic.panel.border",
+      "borderWidth": "$metrics.borderWidth"
     },
-    "settingsInterfaceSection": {
-      "foreground": "$semantic.panel.secondary.foreground"
+    "settingsRow": {
+      "foreground": "$semantic.panel.foreground",
+      "foregroundMuted": "$semantic.mutedForeground",
+      "divider": "$semantic.panel.border",
+      "borderWidth": "$metrics.borderWidth",
+      "controlWidth": 220
     },
     "settingsCloudProvidersSection": {
       "foregroundMuted": "$semantic.mutedForeground",
       "divider": "$semantic.panel.border",
       "borderWidth": "$metrics.borderWidth"
-    },
-    "settingsAppSection": {
-      "divider": "$semantic.panel.border",
-      "borderWidth": "$metrics.borderWidth"
-    },
-    "settingsAppearanceSection": {
-      "foreground": "$semantic.panel.secondary.foreground"
     },
     "settingsThemeList": {
       "foreground": "$semantic.panel.foreground"
@@ -3069,12 +3068,6 @@
       "radius": "$metrics.radius.sm"
     },
     "shapesTab": {
-      "foregroundMuted": "$semantic.mutedForeground"
-    },
-    "shortcutsBindingRow": {
-      "foreground": "$semantic.panel.foreground"
-    },
-    "shortcutsTab": {
       "foregroundMuted": "$semantic.mutedForeground"
     },
     "speechTab": {

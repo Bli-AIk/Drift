@@ -14,7 +14,6 @@ Item {
     signal openRecentRequested(string path)
     // The header's app-level entries, which do not need a project: without them here,
     // turning on agent access or changing a setting meant creating an empty project first.
-    signal languageRequested()
     signal mobileLayoutRequested()
     signal moreSettingsRequested()
     signal debugInfoRequested()
@@ -50,15 +49,13 @@ Item {
             variant: "ghost"
             text: qsTr("Settings")
             active: settingsMenu.opened
-            tooltip: qsTr("Workspace, theme, language and more")
+            tooltip: qsTr("Settings")
             onClicked: settingsMenu.popup(0, settingsButton.height + Theme.spacingMd)
 
             AppSettingsMenu {
                 id: settingsMenu
                 projectTools: false
-                onLanguageRequested: root.languageRequested()
                 onMobileLayoutRequested: root.mobileLayoutRequested()
-                onDebugInfoRequested: root.debugInfoRequested()
                 onMoreSettingsRequested: root.moreSettingsRequested()
             }
         }

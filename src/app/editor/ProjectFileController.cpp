@@ -64,12 +64,11 @@ ProjectFileController::ProjectFileController(AppController *app, QObject *parent
     // The file is also removed when the user saves, loads another project,
     // starts fresh, or discards recovery.
     m_autosaveTimer = new QTimer(this);
-    m_autosaveTimer->setInterval(kAutosaveIntervalMs);
     connect(m_autosaveTimer, &QTimer::timeout, this, [this] {
         if (m_dirty)
             writeRecoveryFile();
     });
-    m_autosaveTimer->start();
+    m_autosaveTimer->start(kAutosaveIntervalMs);
     connect(qApp, &QCoreApplication::aboutToQuit, this, [this] {
         // Remember the open project so opt-in reopen can load a clean .drift next launch.
         QSettings().setValue(QStringLiteral("lastSessionPath"), m_currentProjectPath);
@@ -78,6 +77,15 @@ ProjectFileController::ProjectFileController(AppController *app, QObject *parent
         else
             m_recoveryWrite.waitForFinished();
     });
+}
+
+void ProjectFileController::setAutosaveIntervalSeconds(int seconds)
+{
+    if (seconds <= 0) {
+        m_autosaveTimer->stop();
+        return;
+    }
+    m_autosaveTimer->start(seconds * 1000);
 }
 
 namespace {

@@ -4329,56 +4329,16 @@
 <context>
     <name>AppSettingsMenu</name>
     <message>
-        <source>Workspace</source>
-        <translation>مساحة العمل</translation>
-    </message>
-    <message>
-        <source>Auto (follow canvas)</source>
-        <translation>تلقائي (اتّباع اللوحة)</translation>
-    </message>
-    <message>
-        <source>Landscape</source>
-        <translation>أفقي</translation>
-    </message>
-    <message>
-        <source>Portrait</source>
-        <translation>عمودي</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation>المظهر</translation>
-    </message>
-    <message>
-        <source>System</source>
-        <translation type="unfinished">النظام</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation>فاتح</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation>داكن</translation>
-    </message>
-    <message>
-        <source>Language…</source>
-        <translation>اللغة…</translation>
-    </message>
-    <message>
         <source>Switch to mobile layout…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings…</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Multicam</source>
         <translation>كاميرات متعددة</translation>
-    </message>
-    <message>
-        <source>Debug info…</source>
-        <translation>معلومات تصحيح الأخطاء…</translation>
-    </message>
-    <message>
-        <source>More settings…</source>
-        <translation>المزيد من الإعدادات…</translation>
     </message>
 </context>
 <context>
@@ -4693,10 +4653,6 @@
     <message>
         <source>Audio FX</source>
         <translation>تأثيرات الصوت</translation>
-    </message>
-    <message>
-        <source>Shortcuts</source>
-        <translation>اختصارات</translation>
     </message>
     <message>
         <source>New folder</source>
@@ -6368,10 +6324,6 @@
     <message>
         <source>Settings</source>
         <translation type="unfinished">الإعدادات</translation>
-    </message>
-    <message>
-        <source>Workspace, theme, language and more</source>
-        <translation type="unfinished">مساحة العمل والمظهر واللغة والمزيد</translation>
     </message>
 </context>
 <context>
@@ -8102,30 +8054,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Preview settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Playback settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Interface settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>App settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cloud providers</source>
-        <translation type="unfinished">موفرو الخدمات السحابية</translation>
-    </message>
-    <message>
-        <source>Marketplace settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Transitions</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8160,6 +8088,34 @@
     <message>
         <source>Preview</source>
         <translation type="unfinished">معاينة</translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation type="unfinished">المظهر</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">المخطط الزمني</translation>
+    </message>
+    <message>
+        <source>Timeline toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AI &amp; Cloud</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Upscale…</source>
@@ -13316,29 +13272,33 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsAppSection</name>
+    <name>SettingsAboutPage</name>
     <message>
-        <source>App</source>
-        <translation type="unfinished">التطبيق</translation>
+        <source>About</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reopen last project on startup</source>
-        <translation type="unfinished">إعادة فتح المشروع الأخير عند بدء التشغيل</translation>
+        <source>Drift</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Automatically restore the last open project on startup. Closing still asks you to save; a crash snapshot never overwrites your save file.</source>
-        <translation type="unfinished">استعادة آخر مشروع مفتوح تلقائيًا عند بدء التشغيل. سيطلب منك الإغلاق حفظ التغييرات؛ ولن تؤدي لقطة التعطل أبدًا إلى الكتابة فوق ملف الحفظ الخاص بك.</translation>
+        <source>Version %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Updates</source>
         <translation type="unfinished">التحديثات</translation>
     </message>
     <message>
-        <source>Check on startup</source>
-        <translation type="unfinished">التحقق عند بدء التشغيل</translation>
+        <source>Check for updates on startup</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Once a day, check whether a newer Drift has been released</source>
+        <source>Once a day, check whether a newer Drift has been released.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check for updates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13354,99 +13314,66 @@ If playback stutters, try another.</source>
         <translation type="unfinished">التحقق الآن</translation>
     </message>
     <message>
-        <source>Drift %1</source>
-        <translation type="unfinished">Drift %1</translation>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Extra packs</source>
-        <translation type="unfinished">حزم إضافية</translation>
+        <source>About Drift</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remind about essential packs</source>
-        <translation type="unfinished">التذكير بالحزم الأساسية</translation>
+        <source>Open-source video editor by CutWire Studios.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Pulse the Extras icon when the video, transitions, and audio packs are not installed</source>
-        <translation type="unfinished">وميض أيقونة الإضافات عند عدم تثبيت حزم الفيديو والانتقالات والصوت</translation>
+        <source>Show about dialog</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remind about pack updates</source>
-        <translation type="unfinished">التذكير بتحديثات الحزم</translation>
+        <source>Debug info</source>
+        <translation type="unfinished">معلومات تصحيح الأخطاء</translation>
     </message>
     <message>
-        <source>Pulse the Extras icon when updates are available for packs you already have installed</source>
-        <translation type="unfinished">وميض أيقونة الإضافات عند توفر تحديثات للحزم المثبتة لديك بالفعل</translation>
+        <source>System, playback and codec details for bug reports.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open debug info…</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsAiPage</name>
+    <message>
+        <source>AI &amp; Cloud</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Agent access</source>
         <translation type="unfinished">وصول الوكيل</translation>
     </message>
     <message>
-        <source>Network</source>
+        <source>Let Cursor or Claude edit this project for you. Only programs on this device can connect.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>System proxy</source>
+        <source>Start agent access on launch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No proxy</source>
+        <source>Turn agent access on automatically the next time you open Drift. Turning access off resets this.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>HTTP proxy</source>
-        <translation type="unfinished"></translation>
+        <source>Cloud providers</source>
+        <translation type="unfinished">موفرو الخدمات السحابية</translation>
     </message>
     <message>
-        <source>SOCKS5 proxy</source>
-        <translation type="unfinished"></translation>
+        <source>Scene detection sensitivity</source>
+        <translation type="unfinished">حساسية اكتشاف المشاهد</translation>
     </message>
     <message>
-        <source>How Drift reaches the internet for downloads, updates, and online services. Applies immediately.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Proxy host</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Username (optional)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Password (optional)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Settings file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export settings…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>JSON document (*.json)</source>
-        <translation type="unfinished">مستند JSON (*.json)</translation>
-    </message>
-    <message>
-        <source>Settings exported</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Import settings…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Import Settings</source>
+        <source>Higher finds more cuts. When a clip is flat or heavily graded, Drift still falls back to an adaptive threshold.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -13542,13 +13469,25 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsAppearanceSection</name>
+    <name>SettingsAppearancePage</name>
     <message>
         <source>Appearance</source>
         <translation type="unfinished">المظهر</translation>
     </message>
     <message>
         <source>Could not use that theme.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation type="unfinished">المظهر</translation>
+    </message>
+    <message>
+        <source>Color theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light and Dark follow your system. Other themes can be installed or imported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13567,9 +13506,6 @@ If playback stutters, try another.</source>
         <source>This theme has a dark and a light variant. The header toggle switches between them.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>SettingsAppearanceTranslucency</name>
     <message>
         <source>Translucent windows</source>
         <translation type="unfinished"></translation>
@@ -13578,6 +13514,81 @@ If playback stutters, try another.</source>
         <source>Lets the desktop show through panels when a theme asks for it. Takes effect after restart.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Interface</source>
+        <translation type="unfinished">الواجهة</translation>
+    </message>
+    <message>
+        <source>Interface size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Drift to apply this size.</source>
+        <translation type="unfinished">أعد تشغيل Drift لتطبيق هذا الحجم.</translation>
+    </message>
+    <message>
+        <source>Makes buttons, text, and icons larger, on top of your display settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>100% (system)</source>
+        <translation type="unfinished">100% (النظام)</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Drift to switch layouts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop suits a mouse and keyboard. Mobile is the touch layout made for phones.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mobile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation type="unfinished">مساحة العمل</translation>
+    </message>
+    <message>
+        <source>Workspace orientation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Landscape or portrait workspace. Auto follows the shape of the canvas.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto (follow canvas)</source>
+        <translation type="unfinished">تلقائي (اتّباع اللوحة)</translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation type="unfinished">أفقي</translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation type="unfinished">عمودي</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsAppearanceTranslucency</name>
     <message>
         <source>Restart Drift to apply window transparency.</source>
         <translation type="unfinished"></translation>
@@ -13600,11 +13611,34 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsCloudProvidersSection</name>
+    <name>SettingsAudioPage</name>
     <message>
-        <source>Cloud providers</source>
-        <translation type="unfinished">موفرو الخدمات السحابية</translation>
+        <source>Audio</source>
+        <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio output</source>
+        <translation type="unfinished">مخرج الصوت</translation>
+    </message>
+    <message>
+        <source>Where playback is heard. “System default” follows whatever your computer is set to, including when that changes.</source>
+        <translation type="unfinished">حيث يُسمع التشغيل. يتبع «الافتراضي للنظام» إعدادات الكمبيوتر، بما في ذلك عند تغييرها.</translation>
+    </message>
+    <message>
+        <source>Microphone input</source>
+        <translation type="unfinished">مدخل الميكروفون</translation>
+    </message>
+    <message>
+        <source>Audio device used for recording voiceovers onto audio tracks.</source>
+        <translation type="unfinished">جهاز الصوت المستخدم لتسجيل التعليقات الصوتية على مسارات الصوت.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsCloudProvidersSection</name>
     <message>
         <source>Keys are stored unencrypted in Drift&apos;s settings. ELEVENLABS_API_KEY and FISH_API_KEY in the environment take precedence. Use is billed to your own account.</source>
         <translation type="unfinished">تُخزن المفاتيح دون تشفير في إعدادات Drift. وتكون الأولوية لـ ELEVENLABS_API_KEY و FISH_API_KEY في البيئة. وتتم فوترة الاستخدام على حسابك الخاص.</translation>
@@ -13682,69 +13716,97 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsInterfaceSection</name>
+    <name>SettingsGeneralPage</name>
     <message>
-        <source>Interface</source>
-        <translation type="unfinished">الواجهة</translation>
+        <source>General</source>
+        <translation type="unfinished">عام</translation>
     </message>
     <message>
-        <source>Size</source>
-        <translation type="unfinished">الحجم</translation>
+        <source>%1 GB</source>
+        <translation type="unfinished">%1 GB</translation>
     </message>
     <message>
-        <source>100% (system)</source>
-        <translation type="unfinished">100% (النظام)</translation>
+        <source>%1 MB</source>
+        <translation type="unfinished">%1 MB</translation>
     </message>
     <message>
-        <source>Makes buttons, text, and icons larger. This is extra scale on top of the size already set in your display settings. Takes effect after restart.</source>
-        <translation type="unfinished">يجعل الأزرار والنصوص والأيقونات أكبر حجمًا. هذا تحجيم إضافي يضاف إلى الحجم المحدد بالفعل في إعدادات شاشتك. يسري المفعول بعد إعادة التشغيل.</translation>
-    </message>
-    <message>
-        <source>Restart Drift to apply this size.</source>
-        <translation type="unfinished">أعد تشغيل Drift لتطبيق هذا الحجم.</translation>
-    </message>
-    <message>
-        <source>Layout</source>
+        <source>Language &amp; region</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Automatic</source>
+        <source>Language</source>
+        <translation type="unfinished">اللغة</translation>
+    </message>
+    <message>
+        <source>Language for menus and labels. Takes effect immediately.</source>
+        <translation type="unfinished">لغة القوائم والتسميات. تُطبق فورًا.</translation>
+    </message>
+    <message>
+        <source>Startup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Desktop</source>
+        <source>Reopen last project on startup</source>
+        <translation type="unfinished">إعادة فتح المشروع الأخير عند بدء التشغيل</translation>
+    </message>
+    <message>
+        <source>Restores the last open project. Closing still asks you to save.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Mobile</source>
+        <source>Saving</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Desktop suits a mouse and keyboard, including tablets in desktop mode. Mobile is the touch layout made for phones. Takes effect after restart.</source>
+        <source>Autosave interval</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Restart Drift to switch layouts.</source>
+        <source>How often unsaved work is snapshotted for crash recovery.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Restart now</source>
+        <source>Off</source>
+        <translation type="unfinished">إيقاف</translation>
+    </message>
+    <message>
+        <source>Every 15 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Horizontal mouse-wheel pan</source>
-        <translation type="unfinished">التحريك الأفقي بعجلة الفأرة</translation>
-    </message>
-    <message>
-        <source>Scroll pans left and right along the timeline. Shift+scroll moves between tracks. Middle-click drag also pans.</source>
-        <translation type="unfinished">يؤدي التمرير إلى التحريك يسارًا ويمينًا على طول المخطط الزمني. وينقل Shift+التمرير بين المسارات. كما يؤدي السحب بالنقر بالزر الأوسط إلى التحريك أيضًا.</translation>
-    </message>
-    <message>
-        <source>Auto-crossfade overlapping clips</source>
+        <source>Every 30 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>When a move creates an overlap with a neighbouring clip on the same track, add a crossfade across it.</source>
+        <source>Every minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every 5 minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extras</source>
+        <translation type="unfinished">الإضافات</translation>
+    </message>
+    <message>
+        <source>Remind about essential packs</source>
+        <translation type="unfinished">التذكير بالحزم الأساسية</translation>
+    </message>
+    <message>
+        <source>Pulse the Extras icon when the video, transitions, and audio packs are not installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remind about pack updates</source>
+        <translation type="unfinished">التذكير بتحديثات الحزم</translation>
+    </message>
+    <message>
+        <source>Pulse the Extras icon when updates are available for packs you already have installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13756,19 +13818,90 @@ If playback stutters, try another.</source>
         <translation type="unfinished">الاهتزاز عند النقر والمحاذاة التلقائية والتعديلات. يستخدم التأثيرات اللمسية الخاصة بهذا الجهاز عند توفرها.</translation>
     </message>
     <message>
-        <source>Language</source>
-        <translation type="unfinished">اللغة</translation>
+        <source>Storage</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Language for menus and labels. Takes effect immediately.</source>
-        <translation type="unfinished">لغة القوائم والتسميات. تُطبق فورًا.</translation>
+        <source>Cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 used, stored in %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export and import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save your preferences to a JSON file, or load them from one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>JSON document (*.json)</source>
+        <translation type="unfinished">مستند JSON (*.json)</translation>
+    </message>
+    <message>
+        <source>Settings exported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>SettingsMarketplaceSection</name>
+    <name>SettingsKeymapPage</name>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click a shortcut, then press the keys. Esc cancels, Backspace clears.</source>
+        <translation type="unfinished">انقر على اختصار، ثم اضغط على المفاتيح. Esc للإلغاء، وBackspace للمسح.</translation>
+    </message>
+    <message>
+        <source>Reset to defaults</source>
+        <translation type="unfinished">إعادة التعيين إلى الإعدادات الافتراضية</translation>
+    </message>
+    <message>
+        <source>Restores every shortcut to its original key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shortcuts reset to defaults.</source>
+        <translation type="unfinished">تمت إعادة تعيين الاختصارات إلى الإعدادات الافتراضية.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMarketplacePage</name>
     <message>
         <source>Marketplace</source>
         <translation type="unfinished">المتجر</translation>
+    </message>
+    <message>
+        <source>Account</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Account connected (%1)</source>
@@ -13788,45 +13921,152 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPlaybackSection</name>
+    <name>SettingsNetworkPage</name>
     <message>
-        <source>Playback</source>
-        <translation type="unfinished">التشغيل</translation>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audio output</source>
-        <translation type="unfinished">مخرج الصوت</translation>
+        <source>Connection</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Where playback is heard. “System default” follows whatever your computer is set to, including when that changes.</source>
-        <translation type="unfinished">حيث يُسمع التشغيل. يتبع «الافتراضي للنظام» إعدادات الكمبيوتر، بما في ذلك عند تغييرها.</translation>
+        <source>Proxy</source>
+        <translation type="unfinished">ملف وكيل</translation>
     </message>
     <message>
-        <source>Microphone input</source>
-        <translation type="unfinished">مدخل الميكروفون</translation>
+        <source>How Drift reaches the internet for downloads, updates, and online services. Applies immediately.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audio device used for recording voiceovers onto audio tracks.</source>
-        <translation type="unfinished">جهاز الصوت المستخدم لتسجيل التعليقات الصوتية على مسارات الصوت.</translation>
+        <source>System proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTTP proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SOCKS5 proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Host and port of the proxy. The username and password are optional.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Username (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password (optional)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>SettingsPreviewSection</name>
+    <name>SettingsPane</name>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">عام</translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation type="unfinished">المظهر</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">المخطط الزمني</translation>
+    </message>
+    <message>
+        <source>Timeline toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Preview</source>
         <translation type="unfinished">معاينة</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AI &amp; Cloud</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Marketplace</source>
+        <translation type="unfinished">المتجر</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No settings match “%1”</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPreviewPage</name>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished">معاينة</translation>
+    </message>
+    <message>
+        <source>Guides</source>
+        <translation type="unfinished">خطوط إرشادية</translation>
     </message>
     <message>
         <source>Show guides</source>
         <translation type="unfinished">إظهار الخطوط الإرشادية</translation>
     </message>
     <message>
-        <source>Show alignment guides over the preview</source>
-        <translation type="unfinished">إظهار خطوط إرشاد المحاذاة فوق المعاينة</translation>
+        <source>Alignment guides drawn over the preview.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guide sets</source>
+        <translation type="unfinished">مجموعات الخطوط الإرشادية</translation>
+    </message>
+    <message>
+        <source>Choose which guide sets are drawn over the preview.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Background</source>
         <translation type="unfinished">خلفية</translation>
+    </message>
+    <message>
+        <source>Fill behind clips that don’t cover the whole screen.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Solid color</source>
@@ -13841,16 +14081,100 @@ If playback stutters, try another.</source>
         <translation type="unfinished">شفاف</translation>
     </message>
     <message>
-        <source>Fill behind clips that don’t cover the whole screen</source>
-        <translation type="unfinished">تعبئة خلف المقاطع التي لا تغطي الشاشة بالكامل</translation>
+        <source>Background colour</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Choose background colour</source>
+        <source>Colour of the solid background.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Blur strength</source>
         <translation type="unfinished">شدة التمويه</translation>
+    </message>
+    <message>
+        <source>How much the background is blurred behind clips.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lower is smoother while editing. Full matches an export exactly; Auto renders only the pixels on screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full</source>
+        <translation type="unfinished">كاملة</translation>
+    </message>
+    <message>
+        <source>Half</source>
+        <translation type="unfinished">نصف</translation>
+    </message>
+    <message>
+        <source>Quarter</source>
+        <translation type="unfinished">ربع</translation>
+    </message>
+    <message>
+        <source>1/8 (Eco)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished">تلقائي</translation>
+    </message>
+    <message>
+        <source>Decoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How video is decoded for preview. Software is smoother for most clips but uses more CPU. Hardware suits high-quality 4K.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Faster preview (experimental)</source>
+        <translation type="unfinished">معاينة أسرع (تجريبي)</translation>
+    </message>
+    <message>
+        <source>Can make playback smoother by keeping video on the graphics card. Turn it off if the picture looks wrong. Takes effect after restart.</source>
+        <translation type="unfinished">يمكن أن يجعل التشغيل أكثر سلاسة عن طريق إبقاء الفيديو على بطاقة الرسومات. أوقف تشغيله إذا ظهرت الصورة بشكل غير صحيح. يسري المفعول بعد إعادة التشغيل.</translation>
+    </message>
+    <message>
+        <source>Graphics card</source>
+        <translation type="unfinished">بطاقة الرسومات</translation>
+    </message>
+    <message>
+        <source>Which graphics card Drift runs on. High performance keeps video decoded on an NVIDIA card on that card; power saving uses less battery. Takes effect after restart.</source>
+        <translation type="unfinished">تحديد بطاقة الرسومات التي يعمل عليها Drift. يبقي الأداء العالي الفيديو الذي تم فك ترميزه على بطاقة NVIDIA عليها؛ بينما يستهلك وضع توفير الطاقة قدرًا أقل من البطارية. يسري المفعول بعد إعادة التشغيل.</translation>
+    </message>
+    <message>
+        <source>Windows default</source>
+        <translation type="unfinished">الافتراضي في Windows</translation>
+    </message>
+    <message>
+        <source>Power saving (integrated GPU)</source>
+        <translation type="unfinished">توفير الطاقة (GPU مدمج)</translation>
+    </message>
+    <message>
+        <source>High performance (discrete GPU)</source>
+        <translation type="unfinished">أداء عالٍ (GPU منفصل)</translation>
+    </message>
+    <message>
+        <source>Choose which graphics card Drift runs on in Windows Settings, under Display &gt; Graphics. Takes effect after restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open graphics settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxies</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Use proxies for preview</source>
@@ -13863,6 +14187,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Proxy resolution</source>
         <translation type="unfinished">دقة الملف الوكيل</translation>
+    </message>
+    <message>
+        <source>Size of new proxies. Proxies made at another size are not used until you create them again.</source>
+        <translation type="unfinished">حجم الملفات الوكيلة الجديدة. لا تُستخدم الملفات الوكيلة التي تم إنشاؤها بحجم آخر حتى تعيد إنشاءها.</translation>
     </message>
     <message>
         <source>360p</source>
@@ -13881,10 +14209,6 @@ If playback stutters, try another.</source>
         <translation type="unfinished">1080p</translation>
     </message>
     <message>
-        <source>Size of new proxies. Proxies made at another size are not used until you create them again.</source>
-        <translation type="unfinished">حجم الملفات الوكيلة الجديدة. لا تُستخدم الملفات الوكيلة التي تم إنشاؤها بحجم آخر حتى تعيد إنشاءها.</translation>
-    </message>
-    <message>
         <source>Proxy name patterns</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13899,42 +14223,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Reset to defaults</source>
         <translation type="unfinished">إعادة التعيين إلى الإعدادات الافتراضية</translation>
-    </message>
-    <message>
-        <source>Faster preview (experimental)</source>
-        <translation type="unfinished">معاينة أسرع (تجريبي)</translation>
-    </message>
-    <message>
-        <source>Can make playback smoother by keeping video on the graphics card. Turn it off if the picture looks wrong. Takes effect after restart.</source>
-        <translation type="unfinished">يمكن أن يجعل التشغيل أكثر سلاسة عن طريق إبقاء الفيديو على بطاقة الرسومات. أوقف تشغيله إذا ظهرت الصورة بشكل غير صحيح. يسري المفعول بعد إعادة التشغيل.</translation>
-    </message>
-    <message>
-        <source>Graphics card</source>
-        <translation type="unfinished">بطاقة الرسومات</translation>
-    </message>
-    <message>
-        <source>Windows default</source>
-        <translation type="unfinished">الافتراضي في Windows</translation>
-    </message>
-    <message>
-        <source>Power saving (integrated GPU)</source>
-        <translation type="unfinished">توفير الطاقة (GPU مدمج)</translation>
-    </message>
-    <message>
-        <source>High performance (discrete GPU)</source>
-        <translation type="unfinished">أداء عالٍ (GPU منفصل)</translation>
-    </message>
-    <message>
-        <source>Which graphics card Drift runs on. High performance keeps video decoded on an NVIDIA card on that card; power saving uses less battery. Takes effect after restart.</source>
-        <translation type="unfinished">تحديد بطاقة الرسومات التي يعمل عليها Drift. يبقي الأداء العالي الفيديو الذي تم فك ترميزه على بطاقة NVIDIA عليها؛ بينما يستهلك وضع توفير الطاقة قدرًا أقل من البطارية. يسري المفعول بعد إعادة التشغيل.</translation>
-    </message>
-    <message>
-        <source>Choose which graphics card Drift runs on in Windows Settings, under Display &gt; Graphics. Takes effect after restart.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open graphics settings</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -13981,6 +14269,124 @@ If playback stutters, try another.</source>
     <message>
         <source>Theme</source>
         <translation type="unfinished">المظهر</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsTimelinePage</name>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">المخطط الزمني</translation>
+    </message>
+    <message>
+        <source>Scrolling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mouse wheel scrolls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What the mouse wheel moves on the timeline. Hold Shift for the other direction; middle-click drag also pans.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tracks (up and down)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time (left and right)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Editing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-crossfade overlapping clips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When a move creates an overlap with a neighbouring clip on the same track, add a crossfade across it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-select clip under playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the clip under the playhead as the playhead moves.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto keyframes</source>
+        <translation type="unfinished">إطارات مفتاحية تلقائية</translation>
+    </message>
+    <message>
+        <source>Dragging a slider also creates keyframes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loop work area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback repeats between the work area in and out points.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Still image duration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of images and stills when added to the timeline.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transition length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of new transitions dropped between clips.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show timeline overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A minimap of the whole project. Click or drag it to jump the view.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show audio mixer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the audio mixer strip beside the timeline.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsToolbarPage</name>
+    <message>
+        <source>Timeline toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toolbar layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose which actions appear on the toolbar above the timeline and which go in its overflow menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -14629,37 +15035,6 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
-    <name>ShortcutsTab</name>
-    <message>
-        <source>Search shortcuts</source>
-        <translation>البحث في الاختصارات</translation>
-    </message>
-    <message>
-        <source>Click a shortcut, then press the keys. Esc cancels, Backspace clears.</source>
-        <translation>انقر على اختصار، ثم اضغط على المفاتيح. Esc للإلغاء، وBackspace للمسح.</translation>
-    </message>
-    <message>
-        <source>No shortcuts available</source>
-        <translation>لا توجد اختصارات متاحة</translation>
-    </message>
-    <message>
-        <source>No shortcuts match “%1”</source>
-        <translation>لا توجد اختصارات تطابق “%1”</translation>
-    </message>
-    <message>
-        <source>Try a different name or key.</source>
-        <translation>جرّب اسمًا أو مفتاحًا مختلفًا.</translation>
-    </message>
-    <message>
-        <source>Reset to defaults</source>
-        <translation>إعادة التعيين إلى الإعدادات الافتراضية</translation>
-    </message>
-    <message>
-        <source>Shortcuts reset to defaults.</source>
-        <translation>تمت إعادة تعيين الاختصارات إلى الإعدادات الافتراضية.</translation>
-    </message>
-</context>
-<context>
     <name>SpeechTab</name>
     <message>
         <source>Voice saved</source>
@@ -15208,10 +15583,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Settings</source>
         <translation>الإعدادات</translation>
-    </message>
-    <message>
-        <source>Workspace, theme, language and more</source>
-        <translation>مساحة العمل والمظهر واللغة والمزيد</translation>
     </message>
     <message>
         <source>Debug info</source>
@@ -17088,110 +17459,6 @@ If playback stutters, try another.</source>
         <translation>تشغيل</translation>
     </message>
     <message>
-        <source>Select — normal editing</source>
-        <translation>تحديد — تحرير عادي</translation>
-    </message>
-    <message>
-        <source>Select</source>
-        <translation>تحديد</translation>
-    </message>
-    <message>
-        <source>Cut mode</source>
-        <translation>وضع القطع</translation>
-    </message>
-    <message>
-        <source>Cut mode — click a clip to split it</source>
-        <translation>وضع القطع — انقر على مقطع لتقسيمه</translation>
-    </message>
-    <message>
-        <source>Show audio on separate track</source>
-        <translation>إظهار الصوت في مسار منفصل</translation>
-    </message>
-    <message>
-        <source>Link selected clips</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Trim start</source>
-        <translation>قص البداية</translation>
-    </message>
-    <message>
-        <source>Trim start — click a clip to drop everything left of the cut</source>
-        <translation>قص البداية — انقر على مقطع لحذف كل شيء على يسار القطع</translation>
-    </message>
-    <message>
-        <source>Trim end</source>
-        <translation>قص النهاية</translation>
-    </message>
-    <message>
-        <source>Trim end — click a clip to drop everything right of the cut</source>
-        <translation>قص النهاية — انقر على مقطع لحذف كل شيء على يمين القطع</translation>
-    </message>
-    <message>
-        <source>Trim start to playhead</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Trim end to playhead</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Undo</source>
-        <translation>تراجع</translation>
-    </message>
-    <message>
-        <source>Redo</source>
-        <translation>إعادة</translation>
-    </message>
-    <message>
-        <source>Delete clip</source>
-        <translation>حذف المقطع</translation>
-    </message>
-    <message>
-        <source>Copy selection</source>
-        <translation>نسخ التحديد</translation>
-    </message>
-    <message>
-        <source>Paste at current time</source>
-        <translation>لصق عند الوقت الحالي</translation>
-    </message>
-    <message>
-        <source>Duplicate clip</source>
-        <translation>تكرار المقطع</translation>
-    </message>
-    <message>
-        <source>Add/remove bookmark at current time</source>
-        <translation>إضافة/إزالة إشارة مرجعية عند الوقت الحالي</translation>
-    </message>
-    <message>
-        <source>Mark work area in</source>
-        <translation>تحديد بداية منطقة العمل</translation>
-    </message>
-    <message>
-        <source>Mark work area out</source>
-        <translation>تحديد نهاية منطقة العمل</translation>
-    </message>
-    <message>
-        <source>Loop work area playback</source>
-        <translation>تكرار تشغيل منطقة العمل</translation>
-    </message>
-    <message>
-        <source>Clear work area</source>
-        <translation>مسح منطقة العمل</translation>
-    </message>
-    <message>
-        <source>Add transform layer</source>
-        <translation>إضافة طبقة تحويل</translation>
-    </message>
-    <message>
-        <source>Add transform layer — moves the selected clips&apos; tracks as one</source>
-        <translation>إضافة طبقة تحويل — تحرك مسارات المقاطع المحددة كوحدة واحدة</translation>
-    </message>
-    <message>
-        <source>Add camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Auto-select: select the clip under the playhead</source>
         <translation type="unfinished"></translation>
     </message>
@@ -17202,26 +17469,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Timeline overview — a minimap of the whole project; click or drag it to jump the view</source>
         <translation>نظرة عامة على المخطط الزمني — خريطة مصغرة للمشروع بأكمله؛ انقر عليها أو اسحبها لنقل العرض</translation>
-    </message>
-    <message>
-        <source>Unlink video and audio</source>
-        <translation>فك ربط الفيديو والصوت</translation>
-    </message>
-    <message>
-        <source>Merge adjacent clips</source>
-        <translation>دمج المقاطع المتجاورة</translation>
-    </message>
-    <message>
-        <source>Freeze frame at current time</source>
-        <translation>تجميد الإطار عند الوقت الحالي</translation>
-    </message>
-    <message>
-        <source>Add adjustment layer</source>
-        <translation>إضافة طبقة ضبط</translation>
-    </message>
-    <message>
-        <source>Add camera — one viewpoint the whole timeline is seen through. With a camera already there, adds a new camera clip (a cut to a new framing) at the playhead</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Toggle snapping</source>
@@ -17237,6 +17484,133 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>TimelineToolbarActions</name>
+    <message>
+        <source>Select</source>
+        <translation type="unfinished">تحديد</translation>
+    </message>
+    <message>
+        <source>Select — normal editing</source>
+        <translation type="unfinished">تحديد — تحرير عادي</translation>
+    </message>
+    <message>
+        <source>Cut mode</source>
+        <translation type="unfinished">وضع القطع</translation>
+    </message>
+    <message>
+        <source>Cut mode — click a clip to split it</source>
+        <translation type="unfinished">وضع القطع — انقر على مقطع لتقسيمه</translation>
+    </message>
+    <message>
+        <source>Show audio on separate track</source>
+        <translation type="unfinished">إظهار الصوت في مسار منفصل</translation>
+    </message>
+    <message>
+        <source>Unlink video and audio</source>
+        <translation type="unfinished">فك ربط الفيديو والصوت</translation>
+    </message>
+    <message>
+        <source>Link selected clips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trim start</source>
+        <translation type="unfinished">قص البداية</translation>
+    </message>
+    <message>
+        <source>Trim start — click a clip to drop everything left of the cut</source>
+        <translation type="unfinished">قص البداية — انقر على مقطع لحذف كل شيء على يسار القطع</translation>
+    </message>
+    <message>
+        <source>Trim end</source>
+        <translation type="unfinished">قص النهاية</translation>
+    </message>
+    <message>
+        <source>Trim end — click a clip to drop everything right of the cut</source>
+        <translation type="unfinished">قص النهاية — انقر على مقطع لحذف كل شيء على يمين القطع</translation>
+    </message>
+    <message>
+        <source>Trim start to playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trim end to playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation type="unfinished">تراجع</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation type="unfinished">إعادة</translation>
+    </message>
+    <message>
+        <source>Delete clip</source>
+        <translation type="unfinished">حذف المقطع</translation>
+    </message>
+    <message>
+        <source>Copy selection</source>
+        <translation type="unfinished">نسخ التحديد</translation>
+    </message>
+    <message>
+        <source>Paste at current time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate clip</source>
+        <translation type="unfinished">تكرار المقطع</translation>
+    </message>
+    <message>
+        <source>Add/remove bookmark at current time</source>
+        <translation type="unfinished">إضافة/إزالة إشارة مرجعية عند الوقت الحالي</translation>
+    </message>
+    <message>
+        <source>Mark work area in</source>
+        <translation type="unfinished">تحديد نقطة بداية منطقة العمل</translation>
+    </message>
+    <message>
+        <source>Mark work area out</source>
+        <translation type="unfinished">تحديد نقطة نهاية منطقة العمل</translation>
+    </message>
+    <message>
+        <source>Loop work area playback</source>
+        <translation type="unfinished">تكرار تشغيل منطقة العمل</translation>
+    </message>
+    <message>
+        <source>Clear work area</source>
+        <translation type="unfinished">مسح منطقة العمل</translation>
+    </message>
+    <message>
+        <source>Merge adjacent clips</source>
+        <translation type="unfinished">دمج المقاطع المتجاورة</translation>
+    </message>
+    <message>
+        <source>Freeze frame at current time</source>
+        <translation type="unfinished">تجميد الإطار عند الوقت الحالي</translation>
+    </message>
+    <message>
+        <source>Add adjustment layer</source>
+        <translation type="unfinished">إضافة طبقة ضبط</translation>
+    </message>
+    <message>
+        <source>Add transform layer</source>
+        <translation type="unfinished">إضافة طبقة تحويل</translation>
+    </message>
+    <message>
+        <source>Add transform layer — moves the selected clips&apos; tracks as one</source>
+        <translation type="unfinished">إضافة طبقة تحويل — تحرك مسارات المقاطع المحددة كوحدة واحدة</translation>
+    </message>
+    <message>
+        <source>Add camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add camera — one viewpoint the whole timeline is seen through. With a camera already there, adds a new camera clip (a cut to a new framing) at the playhead</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TimelineToolbarCustomizeDialog</name>
     <message>
         <source>Customize timeline toolbar</source>
@@ -17245,18 +17619,6 @@ If playback stutters, try another.</source>
     <message>
         <source>Save</source>
         <translation>حفظ</translation>
-    </message>
-    <message>
-        <source>Drag items to reorder them. Items above the divider are toolbar buttons; the rest are in the More menu.</source>
-        <translation>اسحب العناصر لإعادة ترتيبها. العناصر الموجودة أعلى الفاصل هي أزرار شريط الأدوات؛ والبقية في قائمة المزيد.</translation>
-    </message>
-    <message>
-        <source>Add separator</source>
-        <translation>إضافة فاصل</translation>
-    </message>
-    <message>
-        <source>Reset to defaults</source>
-        <translation>إعادة التعيين إلى الإعدادات الافتراضية</translation>
     </message>
 </context>
 <context>
@@ -17283,6 +17645,21 @@ If playback stutters, try another.</source>
     <message>
         <source>Remove separator</source>
         <translation type="unfinished">إزالة الفاصل</translation>
+    </message>
+</context>
+<context>
+    <name>TimelineToolbarCustomizer</name>
+    <message>
+        <source>Drag items to reorder them. Items above the divider are toolbar buttons; the rest are in the More menu.</source>
+        <translation type="unfinished">اسحب العناصر لإعادة ترتيبها. العناصر الموجودة أعلى الفاصل هي أزرار شريط الأدوات؛ والبقية في قائمة المزيد.</translation>
+    </message>
+    <message>
+        <source>Add separator</source>
+        <translation type="unfinished">إضافة فاصل</translation>
+    </message>
+    <message>
+        <source>Reset to defaults</source>
+        <translation type="unfinished">إعادة التعيين إلى الإعدادات الافتراضية</translation>
     </message>
 </context>
 <context>
@@ -18088,8 +18465,8 @@ If playback stutters, try another.</source>
         <translation>لا يوجد انتقال بعد هذا المقطع. أضف انتقالًا عند موضع القطع مع المقطع التالي.</translation>
     </message>
     <message>
-        <source>Add crossfade (0.5 s)</source>
-        <translation>إضافة تلاشٍ متداخل (0.5 s)</translation>
+        <source>Add crossfade (%1 s)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Overlap transition. Drag another kind from Transitions to replace it.</source>

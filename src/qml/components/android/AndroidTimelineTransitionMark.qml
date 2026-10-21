@@ -88,7 +88,7 @@ Item {
                 Haptics.confirm()
                 EditorState.addTransition(transitionRegion.trackIndex,
                                           transitionRegion.leftClipIndex,
-                                          "crossfade", 0.5)
+                                          "crossfade", EditorState.preferences.transitionDurationSeconds)
             }
         }
     }
