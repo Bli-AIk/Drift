@@ -164,6 +164,8 @@ jobs:
               exit 0
             fi
             sed -i.bak -E "s/(sha256 arm: *\")[a-f0-9]{64}/\1${SHA256}/; s/(intel: *\")[a-f0-9]{64}/\1${SHA256_INTEL}/" Casks/drift.rb
+            # The tap kept Intel out until a release shipped an Intel DMG; this is that release.
+            sed -i.bak -E '/^\s*depends_on arch: :arm64\s*$/d' Casks/drift.rb
           else
             sed -i.bak -E "s/sha256 \"[a-f0-9]{64}\"/sha256 \"${SHA256}\"/" Casks/drift.rb
           fi
