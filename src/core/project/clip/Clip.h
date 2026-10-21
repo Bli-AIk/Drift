@@ -259,8 +259,7 @@ struct Clip
 
     void syncSrcOutFromSpeed(TimeUs maxSourceUs)
     {
-        const TimeUs span = sourceSpanUs();
-        srcOut = qMin(srcIn + span, maxSourceUs);
+        srcOut = qMin(srcOut, maxSourceUs);
         if (effectiveSpeed() > 0.0) {
             const TimeUs actualSpan = srcOut - srcIn;
             timelineDuration = static_cast<TimeUs>(llround(static_cast<double>(actualSpan) / effectiveSpeed()));
