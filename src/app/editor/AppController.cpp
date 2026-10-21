@@ -4555,6 +4555,7 @@ QHash<QString, QString> defaultShortcuts()
         {QStringLiteral("jumpBackFar"), QStringLiteral("Ctrl+Left")},
         {QStringLiteral("jumpForwardFar"), QStringLiteral("Ctrl+Right")},
         {QStringLiteral("goToStart"), QStringLiteral("Home")},
+        {QStringLiteral("goToEnd"), QStringLiteral("End")},
         // Premiere's ripple-trim-to-playhead keys, which is exactly what these do.
         {QStringLiteral("deleteLeft"), QStringLiteral("Q")},
         {QStringLiteral("deleteRight"), QStringLiteral("W")},
@@ -5384,6 +5385,7 @@ QVariantList AppController::actions() const
         action(QStringLiteral("jumpBackFar"), tr("Jump back 10 seconds")),
         action(QStringLiteral("jumpForwardFar"), tr("Jump forward 10 seconds")),
         action(QStringLiteral("goToStart"), tr("Go to start of timeline")),
+        action(QStringLiteral("goToEnd"), tr("Go to end of timeline")),
         action(QStringLiteral("deleteLeft"), tr("Delete left of the playhead")),
         action(QStringLiteral("deleteRight"), tr("Delete right of the playhead")),
         action(QStringLiteral("speedUp"), tr("Increase playback speed")),
@@ -20000,6 +20002,8 @@ void AppController::triggerAction(const QString &actionId)
         jumpSeconds(10.0);
     else if (actionId == QStringLiteral("goToStart"))
         setPlayheadUs(0);
+    else if (actionId == QStringLiteral("goToEnd"))
+        setPlayheadUs(m_project.durationUs());
     else if (actionId == QStringLiteral("deleteLeft"))
         splitSelectedClipLeft();
     else if (actionId == QStringLiteral("deleteRight"))

@@ -57,6 +57,9 @@ Item {
             Layout.alignment: Qt.AlignVCenter
             spacing: Theme.spacingXs
 
+            PreviewTransportGoToStartButton {
+                shortcutTip: bar.withShortcut(qsTr("Go to start"), "goToStart")
+            }
             PreviewTransportRewindButton { }
             PreviewTransportStepBackButton {
                 shortcutTip: bar.withShortcut(qsTr("Previous frame"), "stepBack")
@@ -67,6 +70,9 @@ Item {
             }
             PreviewTransportLoopButton { }
             PreviewTransportFastForwardButton { }
+            PreviewTransportGoToEndButton {
+                shortcutTip: bar.withShortcut(qsTr("Go to end"), "goToEnd")
+            }
         }
 
         Item { Layout.fillWidth: true; Layout.minimumWidth: 0 }

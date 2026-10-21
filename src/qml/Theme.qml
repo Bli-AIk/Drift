@@ -574,6 +574,8 @@ QtObject {
         stepForward: "step-forward",
         rewind: "rewind",
         fastForward: "fast-forward",
+        skipBack: "skip-back",
+        skipForward: "skip-forward",
         maximize: "maximize",
         group: "group",
         locateFixed: "locate-fixed",
