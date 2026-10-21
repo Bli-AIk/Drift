@@ -16079,6 +16079,44 @@ void AppController::setKeyframeInterpolation(int trackIndex, int clipIndex, cons
     finishEdit(tr("Keyframe easing updated"));
 }
 
+void AppController::setKeyframeEasingAt(int trackIndex, int clipIndex, const QString &prop,
+                                        double atSeconds, const QString &mode)
+{
+    if (trackIndex < 0 || trackIndex >= m_project.tracks().size())
+        return;
+    redirectToKeyframeHost(&trackIndex, &clipIndex, prop);
+
+    drift::Track &track = m_project.tracks()[trackIndex];
+    if (clipIndex < 0 || clipIndex >= track.clips.size())
+        return;
+
+    drift::Clip &clip = track.clips[clipIndex];
+    drift::KeyframeTrack<double> *kt = keyframeTrackForProp(clip, prop, /*createIfMissing=*/false);
+    if (!kt || kt->isEmpty())
+        return;
+
+    const drift::TimeUs local = drift::secondsToUs(atSeconds) - clip.timelineStart;
+    const drift::TimeUs at = kt->nearestKeyframe(local, drift::kUsPerSecond / 60);
+    if (at < 0)
+        return;
+
+    const drift::Project before = m_project;
+    kt->setEasing(at, drift::interpolationFromString(mode));
+
+    if (m_positionLinked && (prop == QLatin1String("x") || prop == QLatin1String("y"))) {
+        const QString otherProp = (prop == QLatin1String("x")) ? QStringLiteral("y") : QStringLiteral("x");
+        drift::KeyframeTrack<double> *otherKt = keyframeTrackForProp(clip, otherProp, /*createIfMissing=*/false);
+        if (otherKt && !otherKt->isEmpty()) {
+            const drift::TimeUs otherAt = otherKt->nearestKeyframe(local, drift::kUsPerSecond / 60);
+            if (otherAt >= 0)
+                otherKt->setEasing(otherAt, drift::interpolationFromString(mode));
+        }
+    }
+
+    pushProjectEdit(before, tr("Keyframe easing changed"));
+    finishEdit(tr("Keyframe easing updated"));
+}
+
 void AppController::syncLinkedTangents(int trackIndex, int clipIndex, const QString &prop,
                                        double atSeconds, double inDx, double inDy,
                                        double outDx, double outDy, bool corner)

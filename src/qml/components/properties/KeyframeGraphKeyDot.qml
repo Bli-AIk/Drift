@@ -48,6 +48,12 @@ Rectangle {
         onDoubleTapped: root.remove()
     }
 
+    TapHandler {
+        acceptedButtons: Qt.RightButton
+        acceptedDevices: PointerDevice.Mouse
+        onTapped: host.openKeyMenu(root, point.position.x, point.position.y)
+    }
+
     function beginMove() {
         host.focusedProp = root.modelData.prop
         root.editSeconds = root.modelData.seconds

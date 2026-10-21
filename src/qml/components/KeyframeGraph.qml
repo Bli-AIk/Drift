@@ -386,6 +386,13 @@ Item {
         focusedProp = entry.prop
     }
 
+    function openKeyMenu(dot, x, y) {
+        keyMenu.keyProp = dot.modelData.prop
+        keyMenu.keySeconds = dot.modelData.seconds
+        keyMenu.point = dot.entry.points[dot.modelData.pointIndex]
+        keyMenu.popup(dot, x, y)
+    }
+
     // Absolute timeline X — same mapping as clips on the track.
     function xForSeconds(seconds) {
         return seconds * pxPerSecond
@@ -584,5 +591,38 @@ Item {
     KeyframeGraphResizeGrip {
         id: resizeGrip
         host: root
+    }
+
+    // Right-click on a key: how the segment leaving it moves. Checks the key's current choice.
+    ThemedContextMenu {
+        id: keyMenu
+
+        property string keyProp: ""
+        property real keySeconds: 0
+        property var point: null
+
+        function isEasing(mode) {
+            return !!point && !point.custom && point.easing === mode
+        }
+        function setEasing(mode) {
+            EditorState.setKeyframeEasingAt(EditorState.selectedTrack, EditorState.selectedClip,
+                                            keyProp, keySeconds, mode)
+        }
+
+        ThemedMenuItem {
+            text: qsTr("Straight")
+            icon.name: keyMenu.isEasing("linear") ? Theme.icons.check : ""
+            onTriggered: keyMenu.setEasing("linear")
+        }
+        ThemedMenuItem {
+            text: qsTr("Ease")
+            icon.name: keyMenu.isEasing("ease") ? Theme.icons.check : ""
+            onTriggered: keyMenu.setEasing("ease")
+        }
+        ThemedMenuItem {
+            text: qsTr("Jump")
+            icon.name: keyMenu.isEasing("hold") ? Theme.icons.check : ""
+            onTriggered: keyMenu.setEasing("hold")
+        }
     }
 }
