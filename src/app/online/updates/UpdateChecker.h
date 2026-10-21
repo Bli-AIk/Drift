@@ -17,7 +17,7 @@ class QCryptographicHash;
 // raises a badge in the header when it is newer than this build.
 //
 // The Windows installer, macOS disk image and AppImage builds download their own replacement
-// (Drift-Setup-*-x64.exe, Drift-*-arm64.dmg, Drift-*-x86_64.AppImage), but only once the user
+// (Drift-Setup-*.exe, Drift-*.dmg, Drift-*.AppImage, one per architecture), but only once the user
 // presses Update, and never quit on their own: the user either restarts from the prompt or lets
 // the install run when they next close Drift. Either way a helper waits until this process is gone
 // before running the installer, copying the app into /Applications or replacing the AppImage.

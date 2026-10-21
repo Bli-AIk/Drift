@@ -39,14 +39,19 @@ ReleaseAsset selectReleaseAsset(const QJsonArray &assets, const QString &platfor
     const bool windows = platform == QLatin1String("windows");
     const bool macos = platform == QLatin1String("macos");
     QString suffix;
+    const bool arm64 = arch == QLatin1String("arm64") || arch == QLatin1String("aarch64");
     if (windows && arch == QLatin1String("x86_64"))
         suffix = QStringLiteral("-x64.exe");
-    else if (macos && (arch == QLatin1String("arm64") || arch == QLatin1String("aarch64")))
+    else if (windows && arm64)
+        suffix = QStringLiteral("-arm64.exe");
+    else if (macos && arm64)
         suffix = QStringLiteral("-arm64.dmg");
     else if (macos && arch == QLatin1String("x86_64"))
         suffix = QStringLiteral("-x86_64.dmg");
     else if (platform == QLatin1String("linux") && arch == QLatin1String("x86_64"))
         suffix = QStringLiteral("-x86_64.AppImage");
+    else if (platform == QLatin1String("linux") && arm64)
+        suffix = QStringLiteral("-aarch64.AppImage");
     else
         return {};
 
@@ -148,15 +153,19 @@ QString installerFileName(const QString &platform, const QString &arch, const QS
 {
     if (version.isEmpty())
         return {};
+    const bool arm64 = arch == QLatin1String("arm64") || arch == QLatin1String("aarch64");
     if (platform == QLatin1String("windows") && arch == QLatin1String("x86_64"))
         return QStringLiteral("Drift-Setup-%1-x64.exe").arg(version);
-    if (platform == QLatin1String("macos")
-        && (arch == QLatin1String("arm64") || arch == QLatin1String("aarch64")))
+    if (platform == QLatin1String("windows") && arm64)
+        return QStringLiteral("Drift-Setup-%1-arm64.exe").arg(version);
+    if (platform == QLatin1String("macos") && arm64)
         return QStringLiteral("Drift-%1-arm64.dmg").arg(version);
     if (platform == QLatin1String("macos") && arch == QLatin1String("x86_64"))
         return QStringLiteral("Drift-%1-x86_64.dmg").arg(version);
     if (platform == QLatin1String("linux") && arch == QLatin1String("x86_64"))
         return QStringLiteral("Drift-%1-x86_64.AppImage").arg(version);
+    if (platform == QLatin1String("linux") && arm64)
+        return QStringLiteral("Drift-%1-aarch64.AppImage").arg(version);
     return {};
 }
 

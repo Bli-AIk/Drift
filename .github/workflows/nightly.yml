@@ -158,14 +158,18 @@ jobs:
           ## Installing
 
           - **AppImage** (Linux, any distro): `chmod +x Drift-nightly-x86_64.AppImage && ./Drift-nightly-x86_64.AppImage`
-          - **Windows installer**: run `Drift-Setup-nightly-x64.exe`. Installs as "Drift Nightly" in its
-            own directory; it does not touch an existing Drift install or take over `.drift` files.
-          - **Windows portable**: extract `Drift-Portable-nightly-x64.zip` and run `drift.exe` from the
-            `Drift Nightly` folder inside it.
-          - **macOS** (Apple Silicon): open `Drift-nightly-arm64.dmg` and drag *Drift Nightly* to
-            Applications. Ad-hoc signed, so the first launch needs right-click → Open.
-          - **Arch Linux**: `sudo pacman -U drift-nightly-x86_64.pkg.tar.zst` (replaces `drift`).
-          - **Flatpak**: `flatpak install --user Drift-nightly.flatpak` — app id
+            (`Drift-nightly-aarch64.AppImage` on ARM64 machines)
+          - **Windows installer**: run `Drift-Setup-nightly-x64.exe` (`Drift-Setup-nightly-arm64.exe` on
+            Windows on ARM). Installs as "Drift Nightly" in its own directory; it does not touch an
+            existing Drift install or take over `.drift` files.
+          - **Windows portable**: extract `Drift-Portable-nightly-x64.zip` (or `-arm64.zip`) and run
+            `drift.exe` from the `Drift Nightly` folder inside it.
+          - **macOS**: open `Drift-nightly-arm64.dmg` (Apple Silicon) or `Drift-nightly-x86_64.dmg`
+            (Intel) and drag *Drift Nightly* to Applications. Ad-hoc signed, so the first launch needs
+            right-click → Open.
+          - **Arch Linux**: `sudo pacman -U drift-nightly-x86_64.pkg.tar.zst` (replaces `drift`); on
+            Arch Linux ARM use `drift-nightly-aarch64.pkg.tar.zst`.
+          - **Flatpak**: `flatpak install --user Drift-nightly-x86_64.flatpak` (or `-aarch64.flatpak`) — app id
             `org.cutwire.Drift.Nightly`, so it sits beside a Flathub install.
           - **Android**: `adb install Drift-nightly-arm64-v8a.apk` (`x86_64` for emulators). Package id
             `org.cutwire.drift.nightly`.
@@ -189,13 +193,13 @@ jobs:
           set -euo pipefail
           shopt -s nullglob
           assets=(
-            dist/linux-appimage/*.AppImage
-            dist/linux-appimage/*.AppImage.zsync
-            dist/windows-installer/*.exe
-            dist/windows-portable/*.zip
-            dist/macos-dmg/*.dmg
-            dist/arch-package/*.pkg.tar.zst
-            dist/flatpak-bundle/*.flatpak
+            dist/linux-appimage-*/*.AppImage
+            dist/linux-appimage-*/*.AppImage.zsync
+            dist/windows-installer-*/*.exe
+            dist/windows-portable-*/*.zip
+            dist/macos-dmg-*/*.dmg
+            dist/arch-package-*/*.pkg.tar.zst
+            dist/flatpak-bundle-*/*.flatpak
             dist/android-apk-*/*.apk
           )
           if [ ${#assets[@]} -eq 0 ]; then

@@ -90,9 +90,9 @@ Or grab a build for your platform from the
 
 | Platform | Package |
 |----------|---------|
-| Linux | [Flathub](https://flathub.org/apps/org.cutwire.Drift) · [AppImage](https://github.com/CutWire-Studios/Drift/releases/latest) |
-| Windows | [Microsoft Store](https://apps.microsoft.com/detail/9PHHBZ07FRSZ) · [Installer (.exe)](https://github.com/CutWire-Studios/Drift/releases/latest) · [Portable zip](https://github.com/CutWire-Studios/Drift/releases/latest) |
-| macOS | [Homebrew Tap](https://github.com/CutWire-Studios/homebrew-tap) · [Disk image (.dmg, Apple Silicon)](https://github.com/CutWire-Studios/Drift/releases/latest) |
+| Linux | [Flathub](https://flathub.org/apps/org.cutwire.Drift) · [AppImage (x86_64, aarch64)](https://github.com/CutWire-Studios/Drift/releases/latest) |
+| Windows | [Microsoft Store](https://apps.microsoft.com/detail/9PHHBZ07FRSZ) · [Installer (.exe, x64 / arm64)](https://github.com/CutWire-Studios/Drift/releases/latest) · [Portable zip (x64 / arm64)](https://github.com/CutWire-Studios/Drift/releases/latest) |
+| macOS | [Homebrew Tap](https://github.com/CutWire-Studios/homebrew-tap) · [Disk image (.dmg, Apple Silicon / Intel)](https://github.com/CutWire-Studios/Drift/releases/latest) |
 | Android | [Google Play (closed testing)](docs/play-testing.md) · [APK (arm64-v8a)](https://github.com/CutWire-Studios/Drift/releases/latest) · [APK (armeabi-v7a)](https://github.com/CutWire-Studios/Drift/releases/latest) · [APK (x86_64)](https://github.com/CutWire-Studios/Drift/releases/latest) |
 
 On a phone, join [closed testing on Google Play](docs/play-testing.md), or grab `Drift-*-arm64-v8a.apk` from the latest release and install it (or `adb install Drift-*-arm64-v8a.apk`). Use `x86_64` for emulators.

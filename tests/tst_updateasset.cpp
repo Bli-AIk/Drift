@@ -52,7 +52,17 @@ void UpdateAssetTest::windowsInstallerIgnoresPortableZip()
     QCOMPARE(asset.sha256,
              QStringLiteral("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"));
     QCOMPARE(asset.size, qint64(42));
+    // An x64 installer is not offered to an arm64 machine.
     QVERIFY(drift::selectReleaseAsset(assets, QStringLiteral("windows"), QStringLiteral("arm64")).url.isEmpty());
+
+    QJsonArray withArm = assets;
+    withArm.append(QJsonObject{{QStringLiteral("name"), QStringLiteral("Drift-Setup-1.2.0-arm64.exe")},
+                               {QStringLiteral("browser_download_url"),
+                                QStringLiteral("https://github.com/CutWire-Studios/Drift/releases/download/v1.2.0/Drift-Setup-1.2.0-arm64.exe")}});
+    QCOMPARE(drift::selectReleaseAsset(withArm, QStringLiteral("windows"), QStringLiteral("arm64")).name,
+             QStringLiteral("Drift-Setup-1.2.0-arm64.exe"));
+    QCOMPARE(drift::selectReleaseAsset(withArm, QStringLiteral("windows"), QStringLiteral("x86_64")).name,
+             QStringLiteral("Drift-Setup-1.2.0-x64.exe"));
 }
 
 void UpdateAssetTest::macDiskImage()
@@ -134,9 +144,15 @@ void UpdateAssetTest::installerFileName()
     QCOMPARE(drift::installerFileName(QStringLiteral("linux"), QStringLiteral("x86_64"),
                                       QStringLiteral("0.7.5")),
              QStringLiteral("Drift-0.7.5-x86_64.AppImage"));
-    QVERIFY(drift::installerFileName(QStringLiteral("linux"), QStringLiteral("arm64"),
-                                     QStringLiteral("0.7.5"))
-                    .isEmpty());
+    QCOMPARE(drift::installerFileName(QStringLiteral("linux"), QStringLiteral("arm64"),
+                                      QStringLiteral("0.7.5")),
+             QStringLiteral("Drift-0.7.5-aarch64.AppImage"));
+    QCOMPARE(drift::installerFileName(QStringLiteral("windows"), QStringLiteral("arm64"),
+                                      QStringLiteral("0.7.5")),
+             QStringLiteral("Drift-Setup-0.7.5-arm64.exe"));
+    QCOMPARE(drift::installerFileName(QStringLiteral("macos"), QStringLiteral("x86_64"),
+                                      QStringLiteral("0.7.5")),
+             QStringLiteral("Drift-0.7.5-x86_64.dmg"));
 }
 
 QTEST_GUILESS_MAIN(UpdateAssetTest)

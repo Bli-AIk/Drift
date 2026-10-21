@@ -37,9 +37,26 @@ env:
 
 jobs:
   msix:
-    name: Windows MSIX
-    runs-on: windows-2022
+    name: Windows MSIX (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 180
+    strategy:
+      # Each arch reports its own result: a failing arm64 build should not hide x64's.
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runner: windows-2022
+            qt_host: windows
+            qt_arch: win64_msvc2022_64
+            cmake_arch: x64
+            ffmpeg_platform: win64
+          - arch: arm64
+            runner: windows-11-arm
+            qt_host: windows_arm64
+            qt_arch: win64_msvc2022_arm64
+            cmake_arch: ARM64
+            ffmpeg_platform: winarm64
 
     steps:
       - uses: actions/checkout@v4
@@ -113,22 +130,22 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
-          host: windows
+          host: ${{ matrix.qt_host }}
           target: desktop
-          arch: win64_msvc2022_64
+          arch: ${{ matrix.qt_arch }}
           modules: ${{ env.QT_MODULES }}
           cache: true
           add-tools-to-path: true
 
-      # Same key as package.yml so a Store build reuses the installer job's vcpkg binaries.
+      # Same key as package.yml's windows job so a Store build reuses the installer job's vcpkg binaries.
       - name: Restore vcpkg binary cache
         id: vcpkg-cache
         uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}\vcpkg_bincache
-          key: vcpkg-bincache-win-${{ hashFiles('CMakeLists.txt', '.github/workflows/package.yml') }}
+          key: vcpkg-bincache-win-${{ matrix.arch }}-${{ hashFiles('CMakeLists.txt', '.github/workflows/package.yml') }}
           restore-keys: |
-            vcpkg-bincache-win-
+            vcpkg-bincache-win-${{ matrix.arch }}-
 
       # See package.yml for why zlib and Skia are static-md while the rest are dynamic.
       - name: Install vcpkg dependencies
@@ -141,15 +158,15 @@ jobs:
             git clone --depth 1 https://github.com/microsoft/vcpkg.git vcpkg
             .\vcpkg\bootstrap-vcpkg.bat
           }
-          .\vcpkg\vcpkg.exe install zstd openssl soundtouch --triplet x64-windows
-          .\vcpkg\vcpkg.exe install zlib "skia[gl,harfbuzz,icu,freetype,png]" --triplet x64-windows-static-md
+          .\vcpkg\vcpkg.exe install zstd openssl soundtouch --triplet ${{ matrix.arch }}-windows
+          .\vcpkg\vcpkg.exe install zlib "skia[gl,harfbuzz,icu,freetype,png]" --triplet ${{ matrix.arch }}-windows-static-md
 
       - name: Save vcpkg binary cache
         if: always() && steps.vcpkg-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: ${{ github.workspace }}\vcpkg_bincache
-          key: vcpkg-bincache-win-${{ hashFiles('CMakeLists.txt', '.github/workflows/package.yml') }}
+          key: vcpkg-bincache-win-${{ matrix.arch }}-${{ hashFiles('CMakeLists.txt', '.github/workflows/package.yml') }}
 
       - name: Cache FetchContent dependencies
         uses: actions/cache@v4
@@ -162,7 +179,7 @@ jobs:
         run: |
           Remove-Item -Recurse -Force .deps\ffmpeg, .deps\ffmpeg_extracted -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Force -Path .deps\ffmpeg | Out-Null
-          Invoke-WebRequest -Uri "https://github.com/$env:FFMPEG_REPO/releases/download/$env:FFMPEG_TAG/ffmpeg-$env:FFMPEG_TAG-win64-gpl-shared.zip" -OutFile ffmpeg.zip
+          Invoke-WebRequest -Uri "https://github.com/$env:FFMPEG_REPO/releases/download/$env:FFMPEG_TAG/ffmpeg-$env:FFMPEG_TAG-${{ matrix.ffmpeg_platform }}-gpl-shared.zip" -OutFile ffmpeg.zip
           Expand-Archive -Path ffmpeg.zip -DestinationPath .deps\ffmpeg_extracted -Force
           $extractedRoot = (Get-ChildItem .deps\ffmpeg_extracted)[0].FullName
           Copy-Item -Path "$extractedRoot\*" -Destination .deps\ffmpeg -Recurse -Force
@@ -171,13 +188,13 @@ jobs:
       - name: Configure
         shell: pwsh
         run: |
-          cmake -B build -G "Visual Studio 17 2022" -A x64 `
+          cmake -B build -G "Visual Studio 17 2022" -A ${{ matrix.cmake_arch }} `
             -DCMAKE_BUILD_TYPE=Release `
             -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake `
-            -DCMAKE_PREFIX_PATH="${{ env.QT_ROOT_DIR }};${{ github.workspace }}\.deps\ffmpeg;${{ github.workspace }}\vcpkg\installed\x64-windows-static-md" `
+            -DCMAKE_PREFIX_PATH="${{ env.QT_ROOT_DIR }};${{ github.workspace }}\.deps\ffmpeg;${{ github.workspace }}\vcpkg\installed\${{ matrix.arch }}-windows-static-md" `
             -DFETCHCONTENT_BASE_DIR=${{ env.FETCHCONTENT_BASE_DIR }} `
-            -DZLIB_INCLUDE_DIR=${{ github.workspace }}\vcpkg\installed\x64-windows-static-md\include `
-            -DZLIB_LIBRARY=${{ github.workspace }}\vcpkg\installed\x64-windows-static-md\lib\zs.lib `
+            -DZLIB_INCLUDE_DIR=${{ github.workspace }}\vcpkg\installed\${{ matrix.arch }}-windows-static-md\include `
+            -DZLIB_LIBRARY=${{ github.workspace }}\vcpkg\installed\${{ matrix.arch }}-windows-static-md\lib\zs.lib `
             -DDRIFT_BUNDLE_ONNXRUNTIME=OFF `
             -DDRIFT_WITH_SKIA=ON `
             -DDRIFT_DISTRIBUTION=${{ steps.meta.outputs.distribution }} `
@@ -196,13 +213,13 @@ jobs:
           # See package.yml for --no-opengl-sw.
           & "${{ env.QT_ROOT_DIR }}\bin\windeployqt.exe" --release --no-translations `
             --no-opengl-sw --qmldir src\qml dist\bin\drift.exe
-          Copy-Item vcpkg\installed\x64-windows\bin\*.dll dist\bin -Force
+          Copy-Item vcpkg\installed\${{ matrix.arch }}-windows\bin\*.dll dist\bin -Force
           Copy-Item .deps\ffmpeg\bin\*.dll dist\bin -Force
           foreach ($dir in "effects", "transitions", "effect-templates", "audio-effects") {
             Copy-Item "build\Release\$dir" dist\bin -Recurse -Force
           }
 
-      # An MSIX cannot run vc_redist.x64.exe at install time, so the CRT goes in app-local.
+      # An MSIX cannot run vc_redist.${{ matrix.arch }}.exe at install time, so the CRT goes in app-local.
       - name: Bundle MSVC runtime
         shell: pwsh
         run: |
@@ -211,8 +228,8 @@ jobs:
           $redist = Get-ChildItem "$vs\VC\Redist\MSVC" -Directory |
             Where-Object { $_.Name -match '^\d+\.\d+\.\d+$' } |
             Sort-Object { [version]$_.Name } | Select-Object -Last 1
-          $crt = Get-ChildItem "$($redist.FullName)\x64" -Directory -Filter 'Microsoft.VC*.CRT' | Select-Object -First 1
-          if (-not $crt) { throw "no Microsoft.VC*.CRT under $($redist.FullName)\x64" }
+          $crt = Get-ChildItem "$($redist.FullName)\${{ matrix.arch }}" -Directory -Filter 'Microsoft.VC*.CRT' | Select-Object -First 1
+          if (-not $crt) { throw "no Microsoft.VC*.CRT under $($redist.FullName)\${{ matrix.arch }}" }
           Write-Host "CRT from $($crt.FullName)"
           Copy-Item "$($crt.FullName)\*.dll" dist\bin -Force
 
@@ -244,20 +261,22 @@ jobs:
         shell: pwsh
         env:
           MSIX_VERSION: ${{ steps.meta.outputs.msix_version }}
+          ARCH: ${{ matrix.arch }}
         run: |
           $layout = "$env:RUNNER_TEMP\layout"
           New-Item -ItemType Directory -Force -Path $layout, out | Out-Null
           Copy-Item dist\bin\* $layout -Recurse -Force
           Copy-Item "$env:RUNNER_TEMP\msix\Assets" $layout -Recurse -Force
-          (Get-Content "$env:RUNNER_TEMP\msix\AppxManifest.xml" -Raw).Replace('@VERSION@', $env:MSIX_VERSION) |
+          (Get-Content "$env:RUNNER_TEMP\msix\AppxManifest.xml" -Raw).Replace('@VERSION@', $env:MSIX_VERSION).Replace('@ARCH@', $env:ARCH) |
             Set-Content "$layout\AppxManifest.xml" -Encoding utf8
 
+          # x64 makeappx on both runners: the SDK always carries it and it runs under emulation on arm64.
           $makeappx = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\10.*\x64\makeappx.exe" |
             Sort-Object { [version]$_.Directory.Parent.Name } | Select-Object -Last 1
           if (-not $makeappx) { throw "makeappx.exe not found in the Windows SDK" }
           Write-Host "Using $($makeappx.FullName)"
 
-          $msix = "out\Drift-$env:MSIX_VERSION-x64.msix"
+          $msix = "out\Drift-$env:MSIX_VERSION-$env:ARCH.msix"
           & $makeappx.FullName pack /d $layout /p $msix /o
           if ($LASTEXITCODE -ne 0) { throw "makeappx pack failed" }
           & $makeappx.FullName unpack /p $msix /d "$env:RUNNER_TEMP\unpacked" /o
@@ -266,8 +285,8 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: drift-${{ steps.meta.outputs.msix_version }}-msix
-          path: out/Drift-${{ steps.meta.outputs.msix_version }}-x64.msix
+          name: drift-${{ steps.meta.outputs.msix_version }}-msix-${{ matrix.arch }}
+          path: out/Drift-${{ steps.meta.outputs.msix_version }}-${{ matrix.arch }}.msix
           retention-days: 30
           if-no-files-found: error
 
@@ -281,5 +300,58 @@ jobs:
             echo "- **version:** ${{ steps.meta.outputs.version }}"
             echo "- **MSIX version:** ${{ steps.meta.outputs.msix_version }}"
             echo "- **distribution:** ${{ steps.meta.outputs.distribution }}"
-            echo "- **artifact:** \`Drift-${{ steps.meta.outputs.msix_version }}-x64.msix\`"
+            echo "- **arch:** ${{ matrix.arch }}"
+            echo "- **artifact:** \`Drift-${{ steps.meta.outputs.msix_version }}-${{ matrix.arch }}.msix\` (\`drift-${{ steps.meta.outputs.msix_version }}-msix-${{ matrix.arch }}\`)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # Partner Center takes one upload covering both architectures. Unsigned like the per-arch
+  # packages: the Store re-signs the bundle.
+  msixbundle:
+    name: Windows MSIX bundle
+    needs: msix
+    runs-on: windows-2022
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: drift-*-msix-*
+          merge-multiple: true
+          path: in
+
+      # The version is read back from the package names, so this job needs nothing from the
+      # matrix jobs but their artifacts.
+      - name: Bundle
+        id: bundle
+        shell: pwsh
+        run: |
+          $msix = Get-ChildItem in\*.msix
+          Get-Item $msix | Format-Table Name, Length
+          foreach ($arch in "x64", "arm64") {
+            if (-not ($msix | Where-Object Name -like "*-$arch.msix")) { throw "no $arch package among the downloaded artifacts" }
+          }
+          $ver = ($msix[0].BaseName -replace '^Drift-(.+)-(x64|arm64)$', '$1')
+          $makeappx = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\10.*\x64\makeappx.exe" |
+            Sort-Object { [version]$_.Directory.Parent.Name } | Select-Object -Last 1
+          if (-not $makeappx) { throw "makeappx.exe not found in the Windows SDK" }
+          New-Item -ItemType Directory -Force -Path out | Out-Null
+          $bundle = "out\Drift-$ver.msixbundle"
+          & $makeappx.FullName bundle /d in /p $bundle /bv $ver /o
+          if ($LASTEXITCODE -ne 0) { throw "makeappx bundle failed" }
+          Get-Item $bundle | Format-List Name, Length
+          "version=$ver" >> $env:GITHUB_OUTPUT
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: drift-${{ steps.bundle.outputs.version }}-msixbundle
+          path: out/Drift-${{ steps.bundle.outputs.version }}.msixbundle
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Summary
+        shell: bash
+        run: |
+          {
+            echo "## Microsoft Store MSIX bundle"
+            echo "- **artifact:** \`Drift-${{ steps.bundle.outputs.version }}.msixbundle\` (\`drift-${{ steps.bundle.outputs.version }}-msixbundle\`)"
           } >> "$GITHUB_STEP_SUMMARY"

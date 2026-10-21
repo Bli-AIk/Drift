@@ -77,10 +77,19 @@ env:
 
 jobs:
   flatpak:
-    name: Flatpak bundle
-    runs-on: ubuntu-latest
+    name: Flatpak bundle (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
     if: inputs.platforms == 'all' || inputs.platforms == 'flatpak'
     timeout-minutes: 120
+    strategy:
+      # Each arch reports its own result: a failing aarch64 build should not hide x86_64's.
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
 
@@ -95,16 +104,20 @@ jobs:
           printf '%s\n' 'Acquire::http::Timeout "10";' 'Acquire::https::Timeout "10";' \
             'Acquire::Retries "2";' 'APT::Acquire::Retries "2";' \
             | sudo tee /etc/apt/apt.conf.d/99-ci-timeouts >/dev/null
-          {
-            curl -fsSL --max-time 8 http://mirrors.ubuntu.com/mirrors.txt || true
-            echo "http://us.archive.ubuntu.com/ubuntu/"
-            echo "http://security.ubuntu.com/ubuntu/"
-          } | sed 's:/*$:/:' \
-            | grep -vi 'azure.archive.ubuntu.com' \
-            | grep -viE '^https?://archive\.ubuntu\.com/' \
-            | awk 'NF && !seen[$0]++' \
-            | awk '{ printf "%s\tpriority:%d\n", $0, NR }' \
-            | sudo tee /etc/apt/apt-mirrors.txt
+          # The mirror list is x86 only: arm runners fetch from ports.ubuntu.com, which these
+          # archive mirrors do not carry.
+          if [ "$(uname -m)" = x86_64 ]; then
+            {
+              curl -fsSL --max-time 8 http://mirrors.ubuntu.com/mirrors.txt || true
+              echo "http://us.archive.ubuntu.com/ubuntu/"
+              echo "http://security.ubuntu.com/ubuntu/"
+            } | sed 's:/*$:/:' \
+              | grep -vi 'azure.archive.ubuntu.com' \
+              | grep -viE '^https?://archive\.ubuntu\.com/' \
+              | awk 'NF && !seen[$0]++' \
+              | awk '{ printf "%s\tpriority:%d\n", $0, NR }' \
+              | sudo tee /etc/apt/apt-mirrors.txt
+          fi
           sudo apt-get update -o Acquire::Retries=3
           sudo apt-get install -y -o Acquire::Retries=3 flatpak flatpak-builder appstream desktop-file-utils
           flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -120,7 +133,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.local/share/flatpak
-          key: flatpak-runtimes-${{ hashFiles('flatpak/org.cutwire.Drift.yml') }}
+          key: flatpak-runtimes-${{ matrix.arch }}-${{ hashFiles('flatpak/org.cutwire.Drift.yml') }}
 
       # A nightly bundle installed under org.cutwire.Drift would replace the user's Flathub
       # install, so it gets its own app id — and with it its own .desktop, icon and AppStream id,
@@ -149,20 +162,40 @@ jobs:
         run: |
           mkdir -p dist
           flatpak build-bundle "${{ runner.temp }}/flatpak-repo" \
-            "dist/Drift-${{ env.ASSET_LABEL }}.flatpak" \
-            "${APP_ID}"
+            "dist/Drift-${{ env.ASSET_LABEL }}-${{ matrix.arch }}.flatpak" \
+            "${APP_ID}" --arch="${{ matrix.arch }}"
 
       - name: Upload flatpak bundle
         uses: actions/upload-artifact@v4
         with:
-          name: flatpak-bundle
+          name: flatpak-bundle-${{ matrix.arch }}
           path: dist/*.flatpak
 
   linux:
-    name: Linux AppImage
-    runs-on: ubuntu-22.04
+    name: Linux AppImage (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
     if: inputs.platforms == 'all' || inputs.platforms == 'linux'
     timeout-minutes: 90
+    strategy:
+      # Each arch reports its own result: a failing aarch64 build should not hide x86_64's.
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-22.04
+            qt_host: linux
+            qt_arch: linux_gcc_64
+            # Also the ONNX Runtime addon suffix and the build-skia.sh target.
+            target: linux-x64
+            ffmpeg_platform: linux64
+            libdir: /usr/lib/x86_64-linux-gnu
+          - arch: aarch64
+            runner: ubuntu-22.04-arm
+            qt_host: linux_arm64
+            qt_arch: linux_gcc_arm64
+            target: linux-arm64
+            ffmpeg_platform: linuxarm64
+            libdir: /usr/lib/aarch64-linux-gnu
     steps:
       - uses: actions/checkout@v4
 
@@ -189,10 +222,10 @@ jobs:
           dl="${RUNNER_TEMP}/driftpkg"
           mkdir -p "$dl"
           gh release download packages -R CutWire-Studios/Drift-Addons -D "$dl" \
-            -p deepfilternet.v3-1.0.0.driftpkg -p silero.vad-1.0.0.driftpkg -p onnxruntime.cpu.linux-x64-1.0.0.driftpkg
+            -p deepfilternet.v3-1.0.0.driftpkg -p silero.vad-1.0.0.driftpkg -p onnxruntime.cpu.${{ matrix.target }}-1.0.0.driftpkg
           python3 scripts/unpack-driftpkg.py "$dl/deepfilternet.v3-1.0.0.driftpkg" "${GITHUB_WORKSPACE}"
           python3 scripts/unpack-driftpkg.py "$dl/silero.vad-1.0.0.driftpkg" "${GITHUB_WORKSPACE}/drift-addons/staging/silero-vad"
-          python3 scripts/unpack-driftpkg.py "$dl/onnxruntime.cpu.linux-x64-1.0.0.driftpkg" "${GITHUB_WORKSPACE}/.ort"
+          python3 scripts/unpack-driftpkg.py "$dl/onnxruntime.cpu.${{ matrix.target }}-1.0.0.driftpkg" "${GITHUB_WORKSPACE}/.ort"
           test -d "${GITHUB_WORKSPACE}/models/deepfilternet3"
           test -f "${GITHUB_WORKSPACE}/drift-addons/staging/silero-vad/models/silero-vad/silero_vad.onnx"
           test -f "${GITHUB_WORKSPACE}/.ort/runtime/lib/libonnxruntime.so"
@@ -224,16 +257,20 @@ jobs:
           printf '%s\n' 'Acquire::http::Timeout "10";' 'Acquire::https::Timeout "10";' \
             'Acquire::Retries "2";' 'APT::Acquire::Retries "2";' \
             | sudo tee /etc/apt/apt.conf.d/99-ci-timeouts >/dev/null
-          {
-            curl -fsSL --max-time 8 http://mirrors.ubuntu.com/mirrors.txt || true
-            echo "http://us.archive.ubuntu.com/ubuntu/"
-            echo "http://security.ubuntu.com/ubuntu/"
-          } | sed 's:/*$:/:' \
-            | grep -vi 'azure.archive.ubuntu.com' \
-            | grep -viE '^https?://archive\.ubuntu\.com/' \
-            | awk 'NF && !seen[$0]++' \
-            | awk '{ printf "%s\tpriority:%d\n", $0, NR }' \
-            | sudo tee /etc/apt/apt-mirrors.txt
+          # The mirror list is x86 only: arm runners fetch from ports.ubuntu.com, which these
+          # archive mirrors do not carry.
+          if [ "$(uname -m)" = x86_64 ]; then
+            {
+              curl -fsSL --max-time 8 http://mirrors.ubuntu.com/mirrors.txt || true
+              echo "http://us.archive.ubuntu.com/ubuntu/"
+              echo "http://security.ubuntu.com/ubuntu/"
+            } | sed 's:/*$:/:' \
+              | grep -vi 'azure.archive.ubuntu.com' \
+              | grep -viE '^https?://archive\.ubuntu\.com/' \
+              | awk 'NF && !seen[$0]++' \
+              | awk '{ printf "%s\tpriority:%d\n", $0, NR }' \
+              | sudo tee /etc/apt/apt-mirrors.txt
+          fi
           sudo apt-get update -o Acquire::Retries=3
           # Complex-script text tests need Noto faces.
           sudo apt-get install -y -o Acquire::Retries=3 \
@@ -254,9 +291,9 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
-          host: linux
+          host: ${{ matrix.qt_host }}
           target: desktop
-          arch: linux_gcc_64
+          arch: ${{ matrix.qt_arch }}
           modules: ${{ env.QT_MODULES }}
           cache: true
           add-tools-to-path: true
@@ -265,7 +302,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .deps
-          key: v2-deps-linux-${{ hashFiles('CMakeLists.txt') }}
+          key: v2-deps-linux-${{ matrix.arch }}-${{ hashFiles('CMakeLists.txt') }}
 
       # Skia is built once per script revision and cached: 15–20 minutes on a miss, seconds on a
       # hit. clang-15 because Skia's GN toolchain files are written for clang and jammy's default
@@ -276,13 +313,13 @@ jobs:
         id: skia-cache
         uses: actions/cache@v4
         with:
-          path: third_party/prebuilt/skia/linux-x64
-          key: v2-skia-linux-x64-${{ hashFiles('third_party/build-skia.sh') }}
+          path: third_party/prebuilt/skia/${{ matrix.target }}
+          key: v2-skia-${{ matrix.target }}-${{ hashFiles('third_party/build-skia.sh') }}
 
       - name: Build Skia
         if: steps.skia-cache.outputs.cache-hit != 'true'
         run: |
-          JOBS="$(nproc)" CC=clang-15 CXX=clang++-15 SKIA_SYSTEM_ICU=0 third_party/build-skia.sh linux-x64
+          JOBS="$(nproc)" CC=clang-15 CXX=clang++-15 SKIA_SYSTEM_ICU=0 third_party/build-skia.sh ${{ matrix.target }}
           rm -rf third_party/src
 
       - name: Fetch pinned FFmpeg
@@ -290,7 +327,7 @@ jobs:
         run: |
           rm -rf "${GITHUB_WORKSPACE}/.deps/ffmpeg"
           mkdir -p "${GITHUB_WORKSPACE}/.deps/ffmpeg"
-          curl -fsSL "https://github.com/${FFMPEG_REPO}/releases/download/${FFMPEG_TAG}/ffmpeg-${FFMPEG_TAG}-linux64-gpl-shared.tar.xz" \
+          curl -fsSL "https://github.com/${FFMPEG_REPO}/releases/download/${FFMPEG_TAG}/ffmpeg-${FFMPEG_TAG}-${{ matrix.ffmpeg_platform }}-gpl-shared.tar.xz" \
             | tar -xJf - --strip-components=1 -C "${GITHUB_WORKSPACE}/.deps/ffmpeg"
 
       # DRIFT_BUNDLE_ONNXRUNTIME=OFF: a packaged build ships no runtime at all. Drift dlopens the
@@ -395,9 +432,12 @@ jobs:
       - name: Build AppImage
         shell: bash
         run: |
-          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage -O linuxdeploy.AppImage
-          wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage -O linuxdeploy-plugin-qt.AppImage
+          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${{ matrix.arch }}.AppImage -O linuxdeploy.AppImage
+          wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-${{ matrix.arch }}.AppImage -O linuxdeploy-plugin-qt.AppImage
           chmod +x linuxdeploy.AppImage linuxdeploy-plugin-qt.AppImage
+          # The arm64 runner image is not guaranteed to have libfuse2, which the tool AppImages
+          # need to mount themselves.
+          export APPIMAGE_EXTRACT_AND_RUN=1
           export QMAKE="${QT_ROOT_DIR}/bin/qmake"
           export VERSION="${{ inputs.version }}"
           # Update information for AppImageUpdate and friends: appimagetool embeds it and writes
@@ -405,11 +445,11 @@ jobs:
           # The .zsync points at the AppImage by basename, so LDAI_OUTPUT has to be the final
           # asset name rather than renaming afterwards.
           if [ "${{ inputs.channel }}" = "nightly" ]; then
-            export LDAI_UPDATE_INFORMATION="gh-releases-zsync|${GITHUB_REPOSITORY/\//|}|nightly|Drift-nightly-x86_64.AppImage.zsync"
+            export LDAI_UPDATE_INFORMATION="gh-releases-zsync|${GITHUB_REPOSITORY/\//|}|nightly|Drift-nightly-${{ matrix.arch }}.AppImage.zsync"
           else
-            export LDAI_UPDATE_INFORMATION="gh-releases-zsync|${GITHUB_REPOSITORY/\//|}|latest|Drift-*-x86_64.AppImage.zsync"
+            export LDAI_UPDATE_INFORMATION="gh-releases-zsync|${GITHUB_REPOSITORY/\//|}|latest|Drift-*-${{ matrix.arch }}.AppImage.zsync"
           fi
-          export LDAI_OUTPUT="Drift-${{ env.ASSET_LABEL }}-x86_64.AppImage"
+          export LDAI_OUTPUT="Drift-${{ env.ASSET_LABEL }}-${{ matrix.arch }}.AppImage"
           # Drift's own QML is compiled into the binary, but the Qt Quick modules it imports are
           # not: without QML_SOURCES_PATHS the qt plugin has nothing to scan and ships an AppImage
           # whose every import fails at startup.
@@ -448,25 +488,44 @@ jobs:
             -d "${{ steps.appimage_meta.outputs.desktop }}" \
             -i "${{ steps.appimage_meta.outputs.icon }}" \
             -e AppDir/usr/bin/drift \
-            -l /usr/lib/x86_64-linux-gnu/libssl.so.3 \
-            -l /usr/lib/x86_64-linux-gnu/libcrypto.so.3
+            -l ${{ matrix.libdir }}/libssl.so.3 \
+            -l ${{ matrix.libdir }}/libcrypto.so.3
           test -f "${LDAI_OUTPUT}.zsync"
           mv "${LDAI_OUTPUT}" "${LDAI_OUTPUT}.zsync" dist/
 
       - name: Upload AppImage artifact
         uses: actions/upload-artifact@v4
         with:
-          name: linux-appimage
+          name: linux-appimage-${{ matrix.arch }}
           path: |
             dist/*.AppImage
             dist/*.AppImage.zsync
 
   windows:
-    name: Windows installer
-    runs-on: windows-2022
+    name: Windows installer (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
     if: inputs.platforms == 'all' || inputs.platforms == 'windows'
     # 180, not 120: a cold vcpkg binary cache now also compiles Skia and a static ICU.
     timeout-minutes: 180
+    strategy:
+      # Each arch reports its own result: a failing arm64 build should not hide x64's.
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runner: windows-2022
+            qt_host: windows
+            qt_arch: win64_msvc2022_64
+            cmake_arch: x64
+            ffmpeg_platform: win64
+          - arch: arm64
+            runner: windows-11-arm
+            # Native arm64 host kit: Qt 6.10 ships win64_msvc2022_arm64 for windows_arm64, so
+            # moc/rcc/qmlcachegen run natively and no desktop host Qt (autodesktop) is needed.
+            qt_host: windows_arm64
+            qt_arch: win64_msvc2022_arm64
+            cmake_arch: ARM64
+            ffmpeg_platform: winarm64
     steps:
       - uses: actions/checkout@v4
 
@@ -494,10 +553,10 @@ jobs:
           dl="${RUNNER_TEMP}/driftpkg"
           mkdir -p "$dl"
           gh release download packages -R CutWire-Studios/Drift-Addons -D "$dl" \
-            -p deepfilternet.v3-1.0.0.driftpkg -p silero.vad-1.0.0.driftpkg -p onnxruntime.cpu.win-x64-1.0.0.driftpkg
+            -p deepfilternet.v3-1.0.0.driftpkg -p silero.vad-1.0.0.driftpkg -p onnxruntime.cpu.win-${{ matrix.arch }}-1.0.0.driftpkg
           python "scripts/unpack-driftpkg.py" "$dl/deepfilternet.v3-1.0.0.driftpkg" "${GITHUB_WORKSPACE}"
           python "scripts/unpack-driftpkg.py" "$dl/silero.vad-1.0.0.driftpkg" "drift-addons/staging/silero-vad"
-          python "scripts/unpack-driftpkg.py" "$dl/onnxruntime.cpu.win-x64-1.0.0.driftpkg" "${GITHUB_WORKSPACE}/.ort"
+          python "scripts/unpack-driftpkg.py" "$dl/onnxruntime.cpu.win-${{ matrix.arch }}-1.0.0.driftpkg" "${GITHUB_WORKSPACE}/.ort"
           test -d models/deepfilternet3
           test -f drift-addons/staging/silero-vad/models/silero-vad/silero_vad.onnx
           test -f .ort/runtime/lib/onnxruntime.dll
@@ -518,9 +577,9 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
-          host: windows
+          host: ${{ matrix.qt_host }}
           target: desktop
-          arch: win64_msvc2022_64
+          arch: ${{ matrix.qt_arch }}
           modules: ${{ env.QT_MODULES }}
           cache: true
           add-tools-to-path: true
@@ -533,9 +592,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}\vcpkg_bincache
-          key: vcpkg-bincache-win-${{ hashFiles('CMakeLists.txt', '.github/workflows/package.yml') }}
+          key: vcpkg-bincache-win-${{ matrix.arch }}-${{ hashFiles('CMakeLists.txt', '.github/workflows/package.yml') }}
           restore-keys: |
-            vcpkg-bincache-win-
+            vcpkg-bincache-win-${{ matrix.arch }}-
 
       # zstd (addon package decompression), openssl (addon signature verification), soundtouch
       # (voice-effect pitch shifting) and zlib (the project-file importers' inflate) are the
@@ -559,12 +618,12 @@ jobs:
             git clone --depth 1 https://github.com/microsoft/vcpkg.git vcpkg
             .\vcpkg\bootstrap-vcpkg.bat
           }
-          .\vcpkg\vcpkg.exe install zstd openssl soundtouch --triplet x64-windows
+          .\vcpkg\vcpkg.exe install zstd openssl soundtouch --triplet ${{ matrix.arch }}-windows
           # Skia comes from vcpkg here rather than third_party/build-skia.sh: the port pins the
           # same Skia commit, and its static build turns Skottie/SVG/SkParagraph on by default.
-          # x64-windows-static-md, not x64-windows: Skottie needs a static Skia
+          # <arch>-windows-static-md, not <arch>-windows: Skottie needs a static Skia
           # (skia_enable_skottie = !is_component_build), and -md keeps the dynamic CRT Qt uses.
-          .\vcpkg\vcpkg.exe install zlib "skia[gl,harfbuzz,icu,freetype,png]" --triplet x64-windows-static-md
+          .\vcpkg\vcpkg.exe install zlib "skia[gl,harfbuzz,icu,freetype,png]" --triplet ${{ matrix.arch }}-windows-static-md
 
       # Save even when a later step fails so the vcpkg build is not repeated on
       # the next run (actions/cache only saves on job success).
@@ -573,7 +632,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ${{ github.workspace }}\vcpkg_bincache
-          key: vcpkg-bincache-win-${{ hashFiles('CMakeLists.txt', '.github/workflows/package.yml') }}
+          key: vcpkg-bincache-win-${{ matrix.arch }}-${{ hashFiles('CMakeLists.txt', '.github/workflows/package.yml') }}
 
       - name: Cache FetchContent dependencies
         uses: actions/cache@v4
@@ -588,7 +647,7 @@ jobs:
         run: |
           Remove-Item -Recurse -Force .deps\ffmpeg, .deps\ffmpeg_extracted -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Force -Path .deps\ffmpeg | Out-Null
-          Invoke-WebRequest -Uri "https://github.com/$env:FFMPEG_REPO/releases/download/$env:FFMPEG_TAG/ffmpeg-$env:FFMPEG_TAG-win64-gpl-shared.zip" -OutFile ffmpeg.zip
+          Invoke-WebRequest -Uri "https://github.com/$env:FFMPEG_REPO/releases/download/$env:FFMPEG_TAG/ffmpeg-$env:FFMPEG_TAG-${{ matrix.ffmpeg_platform }}-gpl-shared.zip" -OutFile ffmpeg.zip
           Expand-Archive -Path ffmpeg.zip -DestinationPath .deps\ffmpeg_extracted -Force
           $extractedRoot = (Get-ChildItem .deps\ffmpeg_extracted)[0].FullName
           Copy-Item -Path "$extractedRoot\*" -Destination .deps\ffmpeg -Recurse -Force
@@ -596,13 +655,13 @@ jobs:
       - name: Configure
         shell: pwsh
         run: |
-          cmake -B build -G "Visual Studio 17 2022" -A x64 `
+          cmake -B build -G "Visual Studio 17 2022" -A ${{ matrix.cmake_arch }} `
             -DCMAKE_BUILD_TYPE=Release `
             -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake `
-            -DCMAKE_PREFIX_PATH="${{ env.QT_ROOT_DIR }};${{ github.workspace }}\.deps\ffmpeg;${{ github.workspace }}\vcpkg\installed\x64-windows-static-md" `
+            -DCMAKE_PREFIX_PATH="${{ env.QT_ROOT_DIR }};${{ github.workspace }}\.deps\ffmpeg;${{ github.workspace }}\vcpkg\installed\${{ matrix.arch }}-windows-static-md" `
             -DFETCHCONTENT_BASE_DIR=${{ env.FETCHCONTENT_BASE_DIR }} `
-            -DZLIB_INCLUDE_DIR=${{ github.workspace }}\vcpkg\installed\x64-windows-static-md\include `
-            -DZLIB_LIBRARY=${{ github.workspace }}\vcpkg\installed\x64-windows-static-md\lib\zs.lib `
+            -DZLIB_INCLUDE_DIR=${{ github.workspace }}\vcpkg\installed\${{ matrix.arch }}-windows-static-md\include `
+            -DZLIB_LIBRARY=${{ github.workspace }}\vcpkg\installed\${{ matrix.arch }}-windows-static-md\lib\zs.lib `
             -DDRIFT_BUNDLE_ONNXRUNTIME=OFF `
             -DDRIFT_WITH_SKIA=ON `
             -DDRIFT_DISTRIBUTION=windows `
@@ -625,7 +684,10 @@ jobs:
       # The DLLs sit beside each test exe because opengl32.dll is in System32 and PATH cannot
       # override it, while the application directory is searched first. Not shipped: Stage runtime
       # files copies only drift.exe and its deploy set, never anything under build\tests.
+      # mesa-dist-win ships no arm64 build (the 7z has x64 and x86 only), and an arm64 process
+      # cannot load x64 DLLs, so the arm64 lane runs the suite on whatever GL the runner has.
       - name: Install Mesa llvmpipe for the GPU tests
+        if: matrix.arch == 'x64'
         shell: pwsh
         env:
           MESA_WIN_VERSION: "26.2.4"
@@ -635,7 +697,7 @@ jobs:
           & "$env:ProgramFiles\7-Zip\7z.exe" x $archive -omesa -y | Out-Null
           # Only the GL pair: the archive also carries d3d10warp.dll, va.dll and EGL/GLES, which
           # would shadow the system copies the D3D11 and decode tests rely on.
-          $dlls = Get-Item mesa\x64\opengl32.dll, mesa\x64\libgallium_wgl.dll
+          $dlls = Get-Item mesa\${{ matrix.arch }}\opengl32.dll, mesa\${{ matrix.arch }}\libgallium_wgl.dll
           $testDirs = Get-ChildItem build -Recurse -Filter "tst_*.exe" | ForEach-Object { $_.DirectoryName } | Sort-Object -Unique
           if (-not $testDirs) { throw "no tst_*.exe under build; the GPU tests would run on the system Mesa" }
           foreach ($dir in $testDirs) {
@@ -718,7 +780,7 @@ jobs:
           # good card in the first place; keep the two together.
           & "${{ env.QT_ROOT_DIR }}\bin\windeployqt.exe" --release --no-translations `
             --no-opengl-sw --qmldir src\qml dist\bin\drift.exe
-          Copy-Item vcpkg\installed\x64-windows\bin\*.dll dist\bin -Force
+          Copy-Item vcpkg\installed\${{ matrix.arch }}-windows\bin\*.dll dist\bin -Force
           Copy-Item .deps\ffmpeg\bin\*.dll dist\bin -Force
           # Bundled effect/transition/template packages: a POST_BUILD step already put them beside
           # the exe, and the app resolves them relative to it.
@@ -772,6 +834,7 @@ jobs:
           options: |
             /DMyAppVersion=${{ inputs.version }}
             /DMyAppSource=${{ github.workspace }}\dist\bin
+            ${{ matrix.arch == 'arm64' && '/DArm64' || '' }}
             ${{ inputs.channel == 'nightly' && '/DNightly' || '' }}
 
       # Wildcard rather than a fixed name: the nightly channel's OutputBaseFilename differs, and
@@ -781,12 +844,12 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path dist | Out-Null
           $built = Get-ChildItem installer\windows\output\*.exe
-          Copy-Item $built.FullName "dist\Drift-Setup-${{ env.ASSET_LABEL }}-x64.exe" -Force
+          Copy-Item $built.FullName "dist\Drift-Setup-${{ env.ASSET_LABEL }}-${{ matrix.arch }}.exe" -Force
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-installer
+          name: windows-installer-${{ matrix.arch }}
           path: dist/*.exe
 
       # The same staged tree the installer wraps, minus the install: a zip holding a single Drift\
@@ -806,20 +869,33 @@ jobs:
           New-Item -ItemType Directory -Force -Path "portable\$env:FOLDER", dist\portable | Out-Null
           Copy-Item dist\bin\* "portable\$env:FOLDER" -Recurse -Force
           & "$env:ProgramFiles\7-Zip\7z.exe" a -tzip -mx=9 `
-            "dist\portable\Drift-Portable-${{ env.ASSET_LABEL }}-x64.zip" ".\portable\$env:FOLDER"
+            "dist\portable\Drift-Portable-${{ env.ASSET_LABEL }}-${{ matrix.arch }}.zip" ".\portable\$env:FOLDER"
 
       - name: Upload portable artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-portable
+          name: windows-portable-${{ matrix.arch }}
           path: dist/portable/*.zip
 
   macos:
-    name: macOS disk image
-    # Apple Silicon only: Homebrew bottles are single-architecture.
-    runs-on: macos-26
+    name: macOS disk image (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
     if: inputs.platforms == 'all' || inputs.platforms == 'macos'
     timeout-minutes: 120
+    strategy:
+      # Separate per-arch images, not a universal one: Homebrew bottles are single-architecture.
+      # Each arch reports its own result: a failing x86_64 build should not hide arm64's.
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-26
+            skia_target: mac-arm64
+            ort_pkg: onnxruntime.cpu.osx-arm64-1.0.0.driftpkg
+          - arch: x86_64
+            runner: macos-15-intel
+            skia_target: mac-x64
+            ort_pkg: onnxruntime.cpu.osx-x64-1.0.0.driftpkg
     steps:
       - uses: actions/checkout@v4
 
@@ -861,10 +937,10 @@ jobs:
           dl="${RUNNER_TEMP}/driftpkg"
           mkdir -p "$dl"
           gh release download packages -R CutWire-Studios/Drift-Addons -D "$dl" \
-            -p deepfilternet.v3-1.0.0.driftpkg -p silero.vad-1.0.0.driftpkg -p onnxruntime.cpu.osx-arm64-1.0.0.driftpkg
+            -p deepfilternet.v3-1.0.0.driftpkg -p silero.vad-1.0.0.driftpkg -p ${{ matrix.ort_pkg }}
           python3 scripts/unpack-driftpkg.py "$dl/deepfilternet.v3-1.0.0.driftpkg" "${GITHUB_WORKSPACE}"
           python3 scripts/unpack-driftpkg.py "$dl/silero.vad-1.0.0.driftpkg" "${GITHUB_WORKSPACE}/drift-addons/staging/silero-vad"
-          python3 scripts/unpack-driftpkg.py "$dl/onnxruntime.cpu.osx-arm64-1.0.0.driftpkg" "${GITHUB_WORKSPACE}/.ort"
+          python3 scripts/unpack-driftpkg.py "$dl/${{ matrix.ort_pkg }}" "${GITHUB_WORKSPACE}/.ort"
           test -d "${GITHUB_WORKSPACE}/models/deepfilternet3"
           test -f "${GITHUB_WORKSPACE}/drift-addons/staging/silero-vad/models/silero-vad/silero_vad.onnx"
           test -f "${GITHUB_WORKSPACE}/.ort/runtime/lib/libonnxruntime.dylib"
@@ -874,12 +950,12 @@ jobs:
       - name: Resolve Qt FFmpeg plugin cache key
         id: qt-ffmpeg-key
         run: |
-          echo "key=v1-qt-ffmpeg-plugin-$(brew list --versions qtmultimedia | awk '{print $NF}')-ffmpeg-$(brew list --versions ffmpeg | awk '{print $NF}')-${{ hashFiles('third_party/build-qt-ffmpeg-plugin.sh') }}" >> "$GITHUB_OUTPUT"
+          echo "key=v1-qt-ffmpeg-plugin-${{ matrix.arch }}-$(brew list --versions qtmultimedia | awk '{print $NF}')-ffmpeg-$(brew list --versions ffmpeg | awk '{print $NF}')-${{ hashFiles('third_party/build-qt-ffmpeg-plugin.sh') }}" >> "$GITHUB_OUTPUT"
 
       - name: Restore Qt FFmpeg plugin
         uses: actions/cache@v4
         with:
-          path: third_party/prebuilt/qt-ffmpeg-plugin/arm64
+          path: third_party/prebuilt/qt-ffmpeg-plugin/${{ matrix.arch }}
           key: ${{ steps.qt-ffmpeg-key.outputs.key }}
 
       - name: Build Qt FFmpeg plugin
@@ -892,13 +968,13 @@ jobs:
         id: skia-cache
         uses: actions/cache@v4
         with:
-          path: third_party/prebuilt/skia/mac-arm64
-          key: v2-skia-mac-arm64-${{ hashFiles('third_party/build-skia.sh') }}
+          path: third_party/prebuilt/skia/${{ matrix.skia_target }}
+          key: v2-skia-${{ matrix.skia_target }}-${{ hashFiles('third_party/build-skia.sh') }}
 
       - name: Build Skia
         if: steps.skia-cache.outputs.cache-hit != 'true'
         run: |
-          JOBS="$(sysctl -n hw.ncpu)" third_party/build-skia.sh mac-arm64
+          JOBS="$(sysctl -n hw.ncpu)" third_party/build-skia.sh ${{ matrix.skia_target }}
           rm -rf third_party/src
 
       - name: Configure
@@ -1034,7 +1110,7 @@ jobs:
       # nightly is renamed to the channel-constant asset name here.
       - name: Name the artifact for this release
         run: |
-          want="dist/Drift-${{ env.ASSET_LABEL }}-arm64.dmg"
+          want="dist/Drift-${{ env.ASSET_LABEL }}-${{ matrix.arch }}.dmg"
           for f in dist/Drift-*.dmg; do
             [ "$f" = "$want" ] || mv "$f" "$want"
           done
@@ -1042,18 +1118,51 @@ jobs:
       - name: Upload disk image artifact
         uses: actions/upload-artifact@v4
         with:
-          name: macos-dmg
+          name: macos-dmg-${{ matrix.arch }}
           path: dist/*.dmg
 
   arch:
-    name: Arch package
-    runs-on: ubuntu-24.04
+    name: Arch package (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
     if: inputs.platforms == 'all' || inputs.platforms == 'arch'
     timeout-minutes: 60
-    container:
-      image: archlinux:base-devel
+    strategy:
+      # Each arch reports its own result: a failing aarch64 build should not hide x86_64's.
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+            # Also the ONNX Runtime addon suffix.
+            target: linux-x64
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+            target: linux-arm64
+    # Arch Linux ARM publishes no Docker image, so on aarch64 the job runs on the bare runner
+    # and every step is routed into a container imported from the official rootfs (the
+    # "Start Arch Linux ARM container" step) by defaults.run.shell. x86_64 keeps the job-level
+    # container, which is why its steps are unchanged.
+    container: ${{ matrix.arch == 'x86_64' && 'archlinux:base-devel' || null }}
+    defaults:
+      run:
+        shell: ${{ matrix.arch == 'aarch64' && 'bash scripts/ci/docker-exec-shell.sh {0}' || 'bash -e {0}' }}
+    env:
+      CI_CONTAINER: archarm
     steps:
       - uses: actions/checkout@v4
+
+      # The rootfs is imported rather than pulled, and the runner's workspace parent (which also
+      # holds _temp, where step scripts and $GITHUB_OUTPUT/$GITHUB_STEP_SUMMARY live) is mounted
+      # at the same path so every step sees the same files as the host-side actions do.
+      - name: Start Arch Linux ARM container
+        if: matrix.arch == 'aarch64'
+        shell: bash
+        run: |
+          curl -fsSL http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz \
+            | docker import - archlinuxarm
+          docker run -d --name "${CI_CONTAINER}" \
+            -v "$(dirname "${RUNNER_WORKSPACE}"):$(dirname "${RUNNER_WORKSPACE}")" \
+            archlinuxarm sleep infinity
 
       # fonts/, emoji-fonts/ and the addon effect catalogue are gitignored addon content; the tests
       # need them. Same sparse checkout as tests.yml.
@@ -1075,7 +1184,16 @@ jobs:
       # installs the PKGBUILD's own makedepends.
       - name: Set up builder user
         run: |
-          pacman -Syu --noconfirm
+          if [ "$(uname -m)" = aarch64 ]; then
+            # The imported rootfs has an empty keyring. CheckSpace cannot map mount points
+            # inside a container and aborts every transaction.
+            sed -i 's/^CheckSpace/#CheckSpace/' /etc/pacman.conf
+            pacman-key --init
+            pacman-key --populate archlinuxarm
+            pacman -Syu --noconfirm --needed base-devel sudo
+          else
+            pacman -Syu --noconfirm
+          fi
           pacman -S --needed --noconfirm python noto-fonts zstd
           useradd -m builder
           echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
@@ -1090,10 +1208,10 @@ jobs:
           mkdir -p "$dl"
           curl -fsSL -o "$dl/deepfilternet.v3-1.0.0.driftpkg" "$base/deepfilternet.v3-1.0.0.driftpkg"
           curl -fsSL -o "$dl/silero.vad-1.0.0.driftpkg" "$base/silero.vad-1.0.0.driftpkg"
-          curl -fsSL -o "$dl/onnxruntime.cpu.linux-x64-1.0.0.driftpkg" "$base/onnxruntime.cpu.linux-x64-1.0.0.driftpkg"
+          curl -fsSL -o "$dl/onnxruntime.cpu.${{ matrix.target }}-1.0.0.driftpkg" "$base/onnxruntime.cpu.${{ matrix.target }}-1.0.0.driftpkg"
           python3 scripts/unpack-driftpkg.py "$dl/deepfilternet.v3-1.0.0.driftpkg" "${GITHUB_WORKSPACE}"
           python3 scripts/unpack-driftpkg.py "$dl/silero.vad-1.0.0.driftpkg" "${GITHUB_WORKSPACE}/drift-addons/staging/silero-vad"
-          python3 scripts/unpack-driftpkg.py "$dl/onnxruntime.cpu.linux-x64-1.0.0.driftpkg" "${GITHUB_WORKSPACE}/.ort"
+          python3 scripts/unpack-driftpkg.py "$dl/onnxruntime.cpu.${{ matrix.target }}-1.0.0.driftpkg" "${GITHUB_WORKSPACE}/.ort"
           test -d "${GITHUB_WORKSPACE}/models/deepfilternet3"
           test -f "${GITHUB_WORKSPACE}/drift-addons/staging/silero-vad/models/silero-vad/silero_vad.onnx"
           test -f "${GITHUB_WORKSPACE}/.ort/runtime/lib/libonnxruntime.so"
@@ -1159,7 +1277,7 @@ jobs:
         run: |
           mkdir -p dist
           if [ "${{ inputs.channel }}" = "nightly" ]; then
-            cp "${PKGDIR}"/*.pkg.tar.zst dist/drift-nightly-x86_64.pkg.tar.zst
+            cp "${PKGDIR}"/*.pkg.tar.zst dist/drift-nightly-${{ matrix.arch }}.pkg.tar.zst
           else
             cp "${PKGDIR}"/*.pkg.tar.zst dist/
           fi
@@ -1167,8 +1285,13 @@ jobs:
       - name: Upload Arch package artifact
         uses: actions/upload-artifact@v4
         with:
-          name: arch-package
+          name: arch-package-${{ matrix.arch }}
           path: dist/*.pkg.tar.zst
+
+      - name: Hand the workspace back to the runner user
+        if: always() && matrix.arch == 'aarch64'
+        shell: bash
+        run: docker exec "${CI_CONTAINER}" chown -R "$(id -u):$(id -g)" "$(dirname "${RUNNER_WORKSPACE}")"
 
   # Multi-ABI APKs. Push-time compile coverage is android.yml (arm64, no packaging); this job is
   # what build.yml and release.yml call for installable artifacts.

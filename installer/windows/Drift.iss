@@ -9,16 +9,27 @@
 ;    /DNightly  builds the nightly channel installer: its own AppId, name and install
 ;               directory, so it sits beside a stable install instead of upgrading it.
 ;
+;    /DArm64    builds the arm64 installer (default x64): only the allowed and 64-bit-mode
+;               architecture and the output name change.
+;
 ; Never change either AppId: it is what lets an installer upgrade an existing install
 ; in place instead of leaving two copies behind.
+#ifdef Arm64
+  #define Arch "arm64"
+  #define MyArchSpec "arm64"
+#else
+  #define Arch "x64"
+  #define MyArchSpec "x64compatible"
+#endif
+
 #ifdef Nightly
   #define MyAppName "Drift Nightly"
   #define MyAppId "1699D9B5-080B-4892-ACEE-EC56B595E89B"
-  #define MyOutputBase "Drift-Setup-Nightly-x64"
+  #define MyOutputBase "Drift-Setup-Nightly-" + Arch
 #else
   #define MyAppName "Drift"
   #define MyAppId "1FC80696-7700-464A-8E35-CCBB3239EDFB"
-  #define MyOutputBase "Drift-Setup-x64"
+  #define MyOutputBase "Drift-Setup-" + Arch
 #endif
 #define MyAppPublisher "CutWire Studios"
 #define MyAppExeName "drift.exe"
@@ -31,8 +42,8 @@ AppPublisher={#MyAppPublisher}
 AppSupportURL=https://github.com/CutWire-Studios/Drift/issues
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-ArchitecturesAllowed=x64compatible
-ArchitecturesInstallIn64BitMode=x64compatible
+ArchitecturesAllowed={#MyArchSpec}
+ArchitecturesInstallIn64BitMode={#MyArchSpec}
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern

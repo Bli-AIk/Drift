@@ -3,7 +3,7 @@ pkgname=drift
 pkgver=0.8.0
 pkgrel=1
 pkgdesc="Beginner-friendly open-source video editor built with Qt 6, QML and FFmpeg"
-arch=('x86_64')
+arch=('x86_64' 'aarch64')
 url="https://github.com/CutWire-Studios/Drift"
 license=('GPL-3.0-or-later')
 options=('!debug')
@@ -51,8 +51,12 @@ sha256sums=('SKIP'
 
 build() {
     cd "$pkgname"
+    case "$CARCH" in
+        aarch64) _skia_target=linux-arm64 ;;
+        *) _skia_target=linux-x64 ;;
+    esac
     CC=clang CXX=clang++ JOBS="$(nproc)" SKIA_SRC_DIR="$srcdir/skia-$_skia_commit" \
-        third_party/build-skia.sh linux-x64
+        third_party/build-skia.sh "$_skia_target"
     cmake -B build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/usr \

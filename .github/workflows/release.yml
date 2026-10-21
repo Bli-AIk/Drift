@@ -78,16 +78,17 @@ jobs:
 
           ## Installing
 
-          - **AppImage** (Linux, any distro): `chmod +x Drift-*.AppImage && ./Drift-*.AppImage`
-          - **Windows installer**: run `Drift-Setup-*.exe`
-          - **Windows portable**: extract `Drift-Portable-*.zip` anywhere and run `drift.exe` from
+          - **AppImage** (Linux, any distro): `chmod +x Drift-*-x86_64.AppImage && ./Drift-*-x86_64.AppImage`
+            (`Drift-*-aarch64.AppImage` on ARM64 machines)
+          - **Windows installer**: run `Drift-Setup-*-x64.exe` (`Drift-Setup-*-arm64.exe` on Windows on ARM)
+          - **Windows portable**: extract `Drift-Portable-*-x64.zip` (or `-arm64.zip`) anywhere and run `drift.exe` from
             the `Drift` folder inside it. Nothing is installed, but settings and addons are still
             stored per-user under `%APPDATA%\Drift`.
-          - **macOS** (Apple Silicon): open `Drift-*-arm64.dmg` and drag Drift to Applications. The
+          - **macOS**: open `Drift-*-arm64.dmg` (Apple Silicon) or `Drift-*-x86_64.dmg` (Intel) and drag Drift to Applications. The
             app is signed ad-hoc rather than notarised, so the first launch needs right-click →
             Open, or `xattr -dr com.apple.quarantine /Applications/Drift.app`.
-          - **Arch Linux**: `sudo pacman -U drift-*.pkg.tar.zst`
-          - **Flatpak**: requires `flatpak` with the Flathub remote added (`flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo`), then `flatpak install --user Drift-*.flatpak`
+          - **Arch Linux**: `sudo pacman -U drift-*-x86_64.pkg.tar.zst` (Arch Linux ARM: `sudo pacman -U drift-*-aarch64.pkg.tar.zst`)
+          - **Flatpak** (`x86_64` and `aarch64` bundles): requires `flatpak` with the Flathub remote added (`flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo`), then `flatpak install --user Drift-*-<arch>.flatpak`
           - **Android**: install the APK for your ABI (`arm64-v8a` on virtually all phones; `x86_64` for emulators). Sideload with `adb install Drift-*-arm64-v8a.apk`.
 
           Fonts, stickers, speech models and GPU/CPU acceleration runtimes are not bundled — install
@@ -99,12 +100,12 @@ jobs:
       - name: Write SHA256SUMS
         run: |
           sha256sum \
-            dist/linux-appimage/*.AppImage \
-            dist/windows-installer/*.exe \
-            dist/windows-portable/*.zip \
-            dist/macos-dmg/*.dmg \
-            dist/arch-package/*.pkg.tar.zst \
-            dist/flatpak-bundle/*.flatpak \
+            dist/linux-appimage-*/*.AppImage \
+            dist/windows-installer-*/*.exe \
+            dist/windows-portable-*/*.zip \
+            dist/macos-dmg-*/*.dmg \
+            dist/arch-package-*/*.pkg.tar.zst \
+            dist/flatpak-bundle-*/*.flatpak \
             dist/android-apk-*/*.apk \
             | sed -E 's#  .*/#  #' > SHA256SUMS
           cat SHA256SUMS
@@ -116,13 +117,13 @@ jobs:
           gh release create "${GITHUB_REF_NAME}" \
             --title "Drift ${GITHUB_REF_NAME}" \
             --notes-file notes.md \
-            dist/linux-appimage/*.AppImage \
-            dist/linux-appimage/*.AppImage.zsync \
-            dist/windows-installer/*.exe \
-            dist/windows-portable/*.zip \
-            dist/macos-dmg/*.dmg \
-            dist/arch-package/*.pkg.tar.zst \
-            dist/flatpak-bundle/*.flatpak \
+            dist/linux-appimage-*/*.AppImage \
+            dist/linux-appimage-*/*.AppImage.zsync \
+            dist/windows-installer-*/*.exe \
+            dist/windows-portable-*/*.zip \
+            dist/macos-dmg-*/*.dmg \
+            dist/arch-package-*/*.pkg.tar.zst \
+            dist/flatpak-bundle-*/*.flatpak \
             dist/android-apk-*/*.apk \
             SHA256SUMS
 
@@ -137,19 +138,35 @@ jobs:
           fi
 
           VERSION="${GITHUB_REF_NAME#v}"
-          DMG_FILE=$(ls dist/macos-dmg/Drift-*-arm64.dmg 2>/dev/null | head -n 1)
-          if [ -z "$DMG_FILE" ] || [ ! -f "$DMG_FILE" ]; then
-            echo "::warning::macOS DMG not found in dist/macos-dmg/; skipping Homebrew tap update."
+          DMG_ARM=$(ls dist/macos-dmg-arm64/Drift-*-arm64.dmg 2>/dev/null | head -n 1)
+          DMG_INTEL=$(ls dist/macos-dmg-x86_64/Drift-*-x86_64.dmg 2>/dev/null | head -n 1)
+          if [ -z "$DMG_ARM" ] || [ ! -f "$DMG_ARM" ]; then
+            echo "::warning::Apple Silicon DMG not found in dist/macos-dmg-arm64/; skipping Homebrew tap update."
             exit 0
           fi
 
-          SHA256=$(sha256sum "$DMG_FILE" | awk '{print $1}')
+          SHA256=$(sha256sum "$DMG_ARM" | awk '{print $1}')
+          SHA256_INTEL=""
+          if [ -n "$DMG_INTEL" ] && [ -f "$DMG_INTEL" ]; then
+            SHA256_INTEL=$(sha256sum "$DMG_INTEL" | awk '{print $1}')
+          fi
 
           git clone "https://x-access-token:${TAP_GITHUB_TOKEN}@github.com/CutWire-Studios/homebrew-tap.git" tap
           cd tap
 
           sed -i.bak -E "s/version \"[0-9.]+\"/version \"${VERSION}\"/" Casks/drift.rb
-          sed -i.bak -E "s/sha256 \"[a-f0-9]{64}\"/sha256 \"${SHA256}\"/" Casks/drift.rb
+          # A single `sha256 "..."` is the Apple Silicon build. A per-arch cask
+          # (`sha256 arm: "...", intel: "..."`) gets both hashes; the url must then pick the
+          # arch itself (e.g. `Drift-#{version}-#{arch}.dmg` with `arch arm: "arm64", intel: "x86_64"`).
+          if grep -qE 'sha256 arm:' Casks/drift.rb; then
+            if [ -z "$SHA256_INTEL" ]; then
+              echo "::warning::Intel DMG not found; skipping Homebrew tap update."
+              exit 0
+            fi
+            sed -i.bak -E "s/(sha256 arm: *\")[a-f0-9]{64}/\1${SHA256}/; s/(intel: *\")[a-f0-9]{64}/\1${SHA256_INTEL}/" Casks/drift.rb
+          else
+            sed -i.bak -E "s/sha256 \"[a-f0-9]{64}\"/sha256 \"${SHA256}\"/" Casks/drift.rb
+          fi
           rm -f Casks/drift.rb.bak
           # Drift updates itself in place, so brew should not treat the cask's version as stale.
           if ! grep -qE '^\s*auto_updates true' Casks/drift.rb; then
@@ -218,18 +235,6 @@ jobs:
               n = name.lower()
               if "debug" in n or n.endswith(".zsync"):
                   return None
-              if n.endswith(".appimage"):
-                  return "Linux AppImage"
-              if n.endswith(".dmg"):
-                  return "macOS (Apple Silicon)"
-              if "portable" in n and n.endswith(".zip"):
-                  return "Windows portable"
-              if "setup" in n and n.endswith(".exe"):
-                  return "Windows installer"
-              if n.endswith(".flatpak"):
-                  return "Flatpak bundle"
-              if n.endswith(".pkg.tar.zst"):
-                  return "Arch Linux"
               if n.endswith(".apk"):
                   if "arm64" in n:
                       return "Android (arm64)"
@@ -238,6 +243,19 @@ jobs:
                   if "x86_64" in n:
                       return "Android (x86_64)"
                   return "Android"
+              is_arm = "arm64" in n or "aarch64" in n
+              if n.endswith(".appimage"):
+                  return "Linux AppImage (aarch64)" if is_arm else "Linux AppImage (x86_64)"
+              if n.endswith(".dmg"):
+                  return "macOS (Apple Silicon)" if is_arm else "macOS (Intel)"
+              if "portable" in n and n.endswith(".zip"):
+                  return "Windows portable (arm64)" if is_arm else "Windows portable (x64)"
+              if "setup" in n and n.endswith(".exe"):
+                  return "Windows installer (arm64)" if is_arm else "Windows installer (x64)"
+              if n.endswith(".flatpak"):
+                  return "Flatpak bundle (aarch64)" if is_arm else "Flatpak bundle (x86_64)"
+              if n.endswith(".pkg.tar.zst"):
+                  return "Arch Linux (aarch64)" if is_arm else "Arch Linux (x86_64)"
               return name
 
           tag = release.get("tag_name") or ""

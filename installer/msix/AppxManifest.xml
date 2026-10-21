@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Microsoft Store package manifest. .github/workflows/msstore.yml substitutes @VERSION@ and packs
+  Microsoft Store package manifest. .github/workflows/msstore.yml substitutes @VERSION@ and @ARCH@ and packs
   it with the staged dist\bin tree.
 
   Identity Name, Publisher and PublisherDisplayName must be copied exactly from Partner Center >
@@ -17,7 +17,7 @@
     Name="CutWireStudios.CutWireDrift"
     Publisher="CN=A1BDBE2E-BBD1-4A05-AD2B-AAA11012BB68"
     Version="@VERSION@"
-    ProcessorArchitecture="x64" />
+    ProcessorArchitecture="@ARCH@" />
 
   <Properties>
     <DisplayName>CutWire Drift</DisplayName>
