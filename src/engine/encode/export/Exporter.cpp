@@ -56,6 +56,14 @@ extern "C" {
 
 namespace {
 
+// Matches what FrameCompositor and AudioMixer render: hidden tracks draw nothing, muted audio is silent.
+bool outputsToExport(const drift::Track &track)
+{
+    if (track.hidden)
+        return false;
+    return !(track.type == drift::TrackType::Audio && track.muted);
+}
+
 void resolveExportRange(const drift::Project &project, const ExportSettings &settings,
                         drift::TimeUs *startUsOut, drift::TimeUs *endUsOut, QString *errorOut)
 {
@@ -66,6 +74,29 @@ void resolveExportRange(const drift::Project &project, const ExportSettings &set
     if (startUs == 0 && endUs == 0) {
         startUs = 0;
         endUs = projectDuration;
+
+        bool anyVisible = false;
+        bool anyHidden = false;
+        drift::TimeUs visibleStart = 0;
+        drift::TimeUs visibleEnd = 0;
+        drift::TimeUs hiddenStart = 0;
+        for (const drift::Track &track : project.tracks()) {
+            const bool visible = outputsToExport(track);
+            for (const drift::Clip &clip : track.clips) {
+                if (visible) {
+                    visibleStart = anyVisible ? qMin(visibleStart, clip.timelineStart) : clip.timelineStart;
+                    visibleEnd = qMax(visibleEnd, clip.timelineEnd());
+                    anyVisible = true;
+                } else {
+                    hiddenStart = anyHidden ? qMin(hiddenStart, clip.timelineStart) : clip.timelineStart;
+                    anyHidden = true;
+                }
+            }
+        }
+        if (anyVisible) {
+            endUs = visibleEnd;
+            startUs = (anyHidden && hiddenStart < visibleStart) ? visibleStart : 0;
+        }
     } else {
         if (startUs < 0 || endUs <= startUs) {
             if (errorOut)
