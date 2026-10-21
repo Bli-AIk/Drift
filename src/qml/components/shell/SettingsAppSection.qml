@@ -106,6 +106,95 @@ SettingsSectionCard {
         color: Theme.c.settingsAppSection.divider
     }
 
+    Rectangle {
+        width: parent.width
+        height: Theme.c.settingsAppSection.borderWidth
+        color: Theme.c.settingsAppSection.divider
+    }
+
+    ThemedLabel {
+        text: qsTr("Network")
+    }
+
+    Column {
+        id: proxyColumn
+        width: parent.width
+        spacing: Theme.spacingMd
+
+        function saveProxy() {
+            EditorState.preferences.setNetworkProxy(proxyModeCombo.model[proxyModeCombo.currentIndex].id,
+                                                    proxyHostField.text, parseInt(proxyPortField.text) || 0,
+                                                    proxyUserField.text, proxyPasswordField.text)
+        }
+
+        ThemedComboBox {
+            id: proxyModeCombo
+            width: parent.width
+            textRole: "label"
+            valueRole: "id"
+            model: [
+                { id: "system", label: qsTr("System proxy") },
+                { id: "none", label: qsTr("No proxy") },
+                { id: "http", label: qsTr("HTTP proxy") },
+                { id: "socks5", label: qsTr("SOCKS5 proxy") }
+            ]
+            tooltip: qsTr("How Drift reaches the internet for downloads, updates, and online services. Applies immediately.")
+            currentIndex: {
+                for (var i = 0; i < model.length; ++i) {
+                    if (model[i].id === EditorState.preferences.networkProxyMode)
+                        return i
+                }
+                return 0
+            }
+            onActivated: proxyColumn.saveProxy()
+        }
+
+        Column {
+            width: parent.width
+            spacing: Theme.spacingMd
+            visible: proxyModeCombo.model[proxyModeCombo.currentIndex].id === "http"
+                     || proxyModeCombo.model[proxyModeCombo.currentIndex].id === "socks5"
+
+            Row {
+                width: parent.width
+                spacing: Theme.spacingMd
+
+                ThemedTextField {
+                    id: proxyHostField
+                    width: parent.width - proxyPortField.width - parent.spacing
+                    placeholderText: qsTr("Proxy host")
+                    text: EditorState.preferences.networkProxyHost
+                    onEditingFinished: proxyColumn.saveProxy()
+                }
+
+                ThemedTextField {
+                    id: proxyPortField
+                    width: 96
+                    placeholderText: qsTr("Port")
+                    text: EditorState.preferences.networkProxyPort > 0 ? String(EditorState.preferences.networkProxyPort) : ""
+                    onEditingFinished: proxyColumn.saveProxy()
+                }
+            }
+
+            ThemedTextField {
+                id: proxyUserField
+                width: parent.width
+                placeholderText: qsTr("Username (optional)")
+                text: EditorState.preferences.networkProxyUser
+                onEditingFinished: proxyColumn.saveProxy()
+            }
+
+            ThemedTextField {
+                id: proxyPasswordField
+                width: parent.width
+                echoMode: TextInput.Password
+                placeholderText: qsTr("Password (optional)")
+                text: EditorState.preferences.networkProxyPassword
+                onEditingFinished: proxyColumn.saveProxy()
+            }
+        }
+    }
+
     ThemedLabel {
         text: qsTr("Settings file")
     }

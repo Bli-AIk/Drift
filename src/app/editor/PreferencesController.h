@@ -73,6 +73,12 @@ class PreferencesController : public QObject
     // Timeline toolbar auto-select: while stopped, moving the playhead selects the clip under it.
     Q_PROPERTY(bool autoSelectUnderPlayhead READ autoSelectUnderPlayhead WRITE setAutoSelectUnderPlayhead
                    NOTIFY autoSelectUnderPlayheadChanged)
+    // Network proxy, QSettings("network/proxy*"). Mode is system, none, http or socks5.
+    Q_PROPERTY(QString networkProxyMode READ networkProxyMode NOTIFY networkProxyChanged)
+    Q_PROPERTY(QString networkProxyHost READ networkProxyHost NOTIFY networkProxyChanged)
+    Q_PROPERTY(int networkProxyPort READ networkProxyPort NOTIFY networkProxyChanged)
+    Q_PROPERTY(QString networkProxyUser READ networkProxyUser NOTIFY networkProxyChanged)
+    Q_PROPERTY(QString networkProxyPassword READ networkProxyPassword NOTIFY networkProxyChanged)
     // App-wide interface language, QSettings("ui/language"). Empty means follow the OS locale.
     // "en" is the source catalog (no .qm). Other codes match i18n/drift_<code>.qm.
     // needsUiLanguagePrompt is true only on a brand-new install, before the first-launch chooser
@@ -146,6 +152,13 @@ public:
     void setAutoCrossfadeOverlaps(bool enabled);
     bool autoSelectUnderPlayhead() const { return m_autoSelectUnderPlayhead; }
     void setAutoSelectUnderPlayhead(bool enabled);
+    QString networkProxyMode() const { return m_networkProxyMode; }
+    QString networkProxyHost() const { return m_networkProxyHost; }
+    int networkProxyPort() const { return m_networkProxyPort; }
+    QString networkProxyUser() const { return m_networkProxyUser; }
+    QString networkProxyPassword() const { return m_networkProxyPassword; }
+    Q_INVOKABLE void setNetworkProxy(const QString &mode, const QString &host, int port,
+                                     const QString &user, const QString &password);
 
     QString uiLanguage() const { return m_uiLanguage; }
     QVariantList uiLanguages() const;
@@ -201,6 +214,7 @@ signals:
     void invertTimelineScrollChanged();
     void autoCrossfadeOverlapsChanged();
     void autoSelectUnderPlayheadChanged();
+    void networkProxyChanged();
     void uiLanguageChanged();
     void uiScaleChanged();
     void interfaceShellChanged();
@@ -227,6 +241,11 @@ private:
     bool m_invertTimelineScroll = false;
     bool m_autoCrossfadeOverlaps = true;
     bool m_autoSelectUnderPlayhead = false;
+    QString m_networkProxyMode = QStringLiteral("system");
+    QString m_networkProxyHost;
+    int m_networkProxyPort = 0;
+    QString m_networkProxyUser;
+    QString m_networkProxyPassword;
     QString m_uiLanguage;
     bool m_needsUiLanguagePrompt = false;
     double m_uiScale = 1.0;

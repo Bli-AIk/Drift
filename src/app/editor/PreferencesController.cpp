@@ -15,6 +15,8 @@
 #include <QJsonValue>
 #include <QLibraryInfo>
 #include <QLocale>
+#include <QNetworkProxy>
+#include <QNetworkProxyFactory>
 #if !defined(Q_OS_WASM)
 #include <QProcess>
 #endif
@@ -98,9 +100,25 @@ bool isMachineOrSecretSetting(const QString &key)
         QStringLiteral("hardwareDecode"), QStringLiteral("vaapiZeroCopy"), QStringLiteral("d3d11ZeroCopy"),
         QStringLiteral("mediaCodecZeroCopy"), QStringLiteral("preferredGpu"),
         QStringLiteral("speedFactor"), QStringLiteral("speedCalibrated"),
+        QStringLiteral("proxyPassword"),
     };
     return key.startsWith(QLatin1String("ui/layout/"))
            || kLeaves.contains(key.section(QLatin1Char('/'), -1));
+}
+
+void applyNetworkProxy(const QString &mode, const QString &host, int port, const QString &user,
+                       const QString &password)
+{
+    if ((mode == QLatin1String("http") || mode == QLatin1String("socks5")) && !host.isEmpty()) {
+        const auto type = mode == QLatin1String("http") ? QNetworkProxy::HttpProxy
+                                                        : QNetworkProxy::Socks5Proxy;
+        QNetworkProxy::setApplicationProxy(QNetworkProxy(type, host, port, user, password));
+    } else if (mode == QLatin1String("none")) {
+        QNetworkProxy::setApplicationProxy(QNetworkProxy(QNetworkProxy::NoProxy));
+    } else {
+        QNetworkProxyFactory::setUseSystemConfiguration(true);
+        QNetworkProxy::setApplicationProxy(QNetworkProxy(QNetworkProxy::DefaultProxy));
+    }
 }
 
 double normalizeUiScale(double scale)
@@ -184,6 +202,13 @@ PreferencesController::PreferencesController(QObject *parent)
     m_invertTimelineScroll = settings.value(QStringLiteral("timeline/invertScroll"), false).toBool();
     m_autoCrossfadeOverlaps = settings.value(QStringLiteral("timeline/autoCrossfadeOverlaps"), true).toBool();
     m_autoSelectUnderPlayhead = settings.value(QStringLiteral("timeline/autoSelectUnderPlayhead"), false).toBool();
+    m_networkProxyMode = settings.value(QStringLiteral("network/proxyMode"), QStringLiteral("system")).toString();
+    m_networkProxyHost = settings.value(QStringLiteral("network/proxyHost")).toString();
+    m_networkProxyPort = settings.value(QStringLiteral("network/proxyPort")).toInt();
+    m_networkProxyUser = settings.value(QStringLiteral("network/proxyUser")).toString();
+    m_networkProxyPassword = settings.value(QStringLiteral("network/proxyPassword")).toString();
+    applyNetworkProxy(m_networkProxyMode, m_networkProxyHost, m_networkProxyPort, m_networkProxyUser,
+                      m_networkProxyPassword);
     m_uiLanguage = storedUiLanguage();
     m_needsUiLanguagePrompt = needsFirstLaunchLanguagePrompt();
     m_uiScale = storedUiScale();
@@ -447,6 +472,25 @@ void PreferencesController::setAutoSelectUnderPlayhead(bool enabled)
     QSettings settings;
     settings.setValue(QStringLiteral("timeline/autoSelectUnderPlayhead"), m_autoSelectUnderPlayhead);
     emit autoSelectUnderPlayheadChanged();
+}
+
+void PreferencesController::setNetworkProxy(const QString &mode, const QString &host, int port,
+                                            const QString &user, const QString &password)
+{
+    m_networkProxyMode = mode;
+    m_networkProxyHost = host.trimmed();
+    m_networkProxyPort = port;
+    m_networkProxyUser = user;
+    m_networkProxyPassword = password;
+    QSettings settings;
+    settings.setValue(QStringLiteral("network/proxyMode"), m_networkProxyMode);
+    settings.setValue(QStringLiteral("network/proxyHost"), m_networkProxyHost);
+    settings.setValue(QStringLiteral("network/proxyPort"), m_networkProxyPort);
+    settings.setValue(QStringLiteral("network/proxyUser"), m_networkProxyUser);
+    settings.setValue(QStringLiteral("network/proxyPassword"), m_networkProxyPassword);
+    applyNetworkProxy(m_networkProxyMode, m_networkProxyHost, m_networkProxyPort, m_networkProxyUser,
+                      m_networkProxyPassword);
+    emit networkProxyChanged();
 }
 
 void PreferencesController::installUiTranslators()
