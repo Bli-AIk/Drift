@@ -992,6 +992,7 @@ FrameCompositor::RenderOptions PlaybackEngine::playbackRenderOptions() const
         options.textEdit = m_textEditDecor;
 
     options.allowProxies = true;
+    options.deferAudioAnalysis = true;
     options.editor = m_editorView;
     // The 3D view fills the panel, and is antialiased by rendering it at twice the panel's
     // resolution, which the scene graph's linear filter averages back down. Orbiting re-renders

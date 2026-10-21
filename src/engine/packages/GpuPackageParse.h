@@ -26,12 +26,18 @@ QVariant jsonToVariant(const QJsonValue &value);
 bool parseParameters(const QJsonArray &params, QList<drift::EffectParamSpec> *out, bool gpuBackend,
                      QString *errorOut, const QString &packageDir = {});
 
+// Refuse a package whose "nextFeatures" names something this Drift doesn't implement.
+bool checkNextFeatures(const QJsonObject &root, QString *errorOut);
+
 void parseFixedParams(const QJsonObject &obj, QMap<QString, QVariant> *out);
 
 // Parse "pipeline": { intermediateBuffers, textures, passes }. Sets out->valid on success.
 // maxSourceIndex bounds "source_texture" indices: 0 for effects, 1 for transitions.
 bool loadGpuPipeline(const QJsonObject &root, const QString &packageDir, int maxSourceIndex,
                      drift::GpuEffectDefinition *out, QString *errorOut);
+
+// Copy the sampler and region params out of a parsed parameter list onto a pipeline, for the runtime.
+void collectRuntimeParams(const QList<drift::EffectParamSpec> &params, drift::GpuEffectDefinition *out);
 
 // Resolve an optional relative/absolute asset path inside a package; empty when missing.
 QString resolvePackageAsset(const QString &packageDir, const QString &relOrAbs);

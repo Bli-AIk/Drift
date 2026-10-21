@@ -100,6 +100,10 @@ EffectPresetEntry EffectPackageLoader::loadPackage(const QString &packageDir, QS
     entry.thumbnailPath = GpuPackageParse::resolvePackageAsset(packageDir, thumbRel);
 
     QString error;
+    if (!GpuPackageParse::checkNextFeatures(root, &error)) {
+        setError(errorOut, &entry, error);
+        return entry;
+    }
     // model3d is not a GPU fragment pipeline, but its parameters still use the same schema
     // (and may include file defaults resolved against the package dir).
     const bool reservedUniforms = backend == QLatin1String("gpu");
@@ -139,6 +143,7 @@ EffectPresetEntry EffectPackageLoader::loadPackage(const QString &packageDir, QS
             setError(errorOut, &entry, error);
             return entry;
         }
+        GpuPackageParse::collectRuntimeParams(entry.meta.parameters, &entry.gpu);
         // The mesh comes from the face track, which only "requires": "face" clips get.
         for (const drift::GpuEffectPass &pass : std::as_const(entry.gpu.passes)) {
             if (pass.geometry == drift::GpuEffectPass::Geometry::Face111 && !entry.needsFace) {

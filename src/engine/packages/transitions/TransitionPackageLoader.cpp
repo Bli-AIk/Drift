@@ -88,6 +88,10 @@ TransitionPresetEntry TransitionPackageLoader::loadPackage(const QString &packag
     }
 
     QString error;
+    if (!GpuPackageParse::checkNextFeatures(root, &error)) {
+        setError(errorOut, &entry, error);
+        return entry;
+    }
     if (!GpuPackageParse::parseParameters(root.value(QStringLiteral("parameters")).toArray(),
                                           &entry.meta.parameters, /*gpuBackend=*/true, &error,
                                           packageDir)) {
@@ -104,6 +108,7 @@ TransitionPresetEntry TransitionPackageLoader::loadPackage(const QString &packag
         setError(errorOut, &entry, error);
         return entry;
     }
+    GpuPackageParse::collectRuntimeParams(entry.meta.parameters, &entry.gpu);
 
     // Only "mask" means anything to a transition: the outgoing clip's masks, laid out on the
     // canvas. Other requirements were never read here, so they stay ignored rather than refused.

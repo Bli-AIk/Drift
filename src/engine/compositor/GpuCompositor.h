@@ -10,9 +10,11 @@
 #include "engine/ml/vision/depth/DepthSidecar.h"
 #include "engine/face/tracking/FaceLandmarker.h"
 #include "engine/gpu/device/GpuStatus.h"
+#include "engine/audio/analysis/AudioFrameAnalysis.h"
 #include "engine/decode/readers/PreviewVideoFrame.h"
 
 #include <QColor>
+#include <QHash>
 #include <QImage>
 #include <QList>
 #include <QMap>
@@ -77,6 +79,13 @@ struct GpuLayer
     // index-parallel: it replaces the layer's colour outright, which only makes sense when one
     // media mask owns the coverage — see soleMediaIndex.
     MaskMediaFrame fgr;
+    // The pictures and masks this layer's track params read, keyed "<effect index>/<param key>".
+    // Built one level deep: an input carries none of its own, so a track cannot chain or cycle.
+    QHash<QString, std::shared_ptr<const GpuLayer>> trackInputs;
+    // The audio the layer's "audio" params read, keyed like trackInputs. globalAudio is the Timeline
+    // mix, set only when an effect on the layer reads u_audioLevel, u_audioBass or u_audioBeat.
+    QHash<QString, std::shared_ptr<const AudioFrame>> audioInputs;
+    std::shared_ptr<const AudioFrame> globalAudio;
     QRectF rect;             // destination rect on the canvas, in canvas pixels
     double rotation = 0.0;   // degrees, clockwise, about the rect centre
     drift::ClipPose3d pose3d; // tilt and depth on top of rect/rotation, in canvas pixels

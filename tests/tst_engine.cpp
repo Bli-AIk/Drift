@@ -45,6 +45,7 @@
 #include "core/project/clip/Stabilize.h"
 #include "core/edit/TimelineOps.h"
 #include "engine/audio/AudioMixer.h"
+#include "engine/audio/analysis/AudioFrameAnalysis.h"
 #include "engine/decode/readers/ClipReader.h"
 #include "engine/audio/analysis/LoudnessMeter.h"
 #include "engine/decode/probe/StillImage.h"
@@ -112,6 +113,7 @@
 #include "engine/render2d/text/SkiaTextPainter.h"
 #endif
 #include "engine/gpu/effects/GpuEffectExecutor.h"
+#include "engine/gpu/effects/LookupTextures.h"
 #include "engine/packages/GpuPackageParse.h"
 
 #include "engine/compositor/layers/MaskApplier.h"
@@ -176,6 +178,9 @@ private slots:
     void vdaInferenceSizeKeepsAspectOnPatchGrid();
     void effectPackageLoaderParsesDepthRequirement();
     void effectPackageNewParamTypes();
+    void bakeGradientInterpolatesAndHoldsEnds();
+    void bakeCurveAppliesEaseAndHoldsEnds();
+    void paramSamplerUnitSkipsDepthAndMaskUnits();
     void depthPipelineBindsMapInFrameOrientation();
     void depthEffectsRenderWithDepthAndPassThroughWithout();
     void depthOfFieldKeepsFocusSharpAndBlursTheRest();
@@ -191,6 +196,11 @@ private slots:
     void sceneCameraRendersThroughTheCompositor();
     void sceneCameraClipDrivesTheWholeTimeline();
     void depthOcclusionOverridesTrackOrderWhenOptedIn();
+    void trackParamResolvesItsSourceClip();
+    void audioWindowOfSilenceIsFlat();
+    void audioWindowSineLandsInItsLogBin();
+    void audioWindowBassSplitsLowFromHigh();
+    void audioFrameTextureLayout();
     void clipGizmoSolvesDrags();
     void faceTrackV2CarriesContoursAndPose();
     void faceTrackV1FileStillLoads();
@@ -8768,6 +8778,120 @@ void EngineTest::gpuMultiPassPreservesVerticalOrientation()
                             .arg(bottomGlow)));
 }
 
+// A track param reads another track's clip at this instant, hidden tracks included, and the source
+// gets no track inputs of its own. An empty or unknown id leaves no entry for the param.
+void EngineTest::trackParamResolvesItsSourceClip()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString root = dir.path();
+    const QString pkg = QDir(root).filePath(QStringLiteral("track_param"));
+    QVERIFY(QDir().mkpath(pkg));
+    QFile json(QDir(pkg).filePath(QStringLiteral("effect.json")));
+    QVERIFY(json.open(QIODevice::WriteOnly | QIODevice::Text));
+    json.write(R"({
+      "id": "test.track_param",
+      "displayName": "Track param",
+      "category": "dreamy",
+      "backend": "gpu",
+      "parameters": [
+        {"identifier": "picture", "displayName": "Picture", "type": "track"},
+        {"identifier": "matte", "displayName": "Matte", "type": "trackMask"}],
+      "pipeline": {"intermediateBuffers": [], "passes": [
+        {"passIndex": 0, "fragmentShader": "track.frag",
+         "inputs": [{"type": "source_texture"}], "output": {"type": "canvas"}}]}
+    })");
+    json.close();
+    QFile frag(QDir(pkg).filePath(QStringLiteral("track.frag")));
+    QVERIFY(frag.open(QIODevice::WriteOnly | QIODevice::Text));
+    frag.write("#version 330 core\nin vec2 v_texCoord; out vec4 fragColor;\n"
+               "uniform sampler2D u_currentTexture;\nuniform sampler2D picture;\nuniform sampler2D matte;\n"
+               "void main(){ fragColor = texture(picture, v_texCoord); }\n");
+    frag.close();
+    reloadEffectCatalog({root, QString::fromUtf8(DRIFT_TEST_EFFECTS_DIR)});
+    const EffectPresetEntry *def = effectDefForId(QStringLiteral("test.track_param"));
+    QVERIFY(def);
+    QVERIFY(def->gpu.valid);
+
+    QImage red(40, 40, QImage::Format_RGBA8888);
+    red.fill(QColor(230, 20, 20));
+    const QString redPath = dir.filePath(QStringLiteral("red.png"));
+    QVERIFY(red.save(redPath));
+    QImage white(40, 40, QImage::Format_RGBA8888);
+    white.fill(Qt::white);
+    const QString whitePath = dir.filePath(QStringLiteral("white.png"));
+    QVERIFY(white.save(whitePath));
+
+    drift::Project project;
+    project.setResolution(160, 160);
+    project.tracks().clear();
+    project.tracks().append(drift::Track{.type = drift::TrackType::Video});
+    project.tracks().append(drift::Track{.type = drift::TrackType::Video});
+    project.tracks()[1].hidden = true;
+    project.ensureTrackIds();
+    const QString matteTrackId = project.tracks().at(1).id;
+
+    drift::Clip host;
+    host.id = QStringLiteral("host");
+    host.type = drift::ClipType::Image;
+    host.path = redPath;
+    host.timelineDuration = drift::secondsToUs(2.0);
+    host.srcOut = host.timelineDuration;
+    drift::Effect effect;
+    effect.catalogId = def->meta.id;
+    effect.parameters.insert(QStringLiteral("picture"), matteTrackId);
+    effect.parameters.insert(QStringLiteral("matte"), matteTrackId);
+    host.effects.append(effect);
+    project.tracks()[0].clips.append(host);
+
+    drift::Clip matte;
+    matte.id = QStringLiteral("matte");
+    matte.type = drift::ClipType::Image;
+    matte.path = whitePath;
+    matte.timelineDuration = drift::secondsToUs(2.0);
+    matte.srcOut = matte.timelineDuration;
+    project.tracks()[1].clips.append(matte);
+
+    FrameCompositor compositor;
+    compositor.setProject(&project);
+    GpuScene scene;
+    QVERIFY(compositor.buildSceneAt(0, {}, &scene));
+    // The hidden matte track draws nothing: the host is the only item.
+    QCOMPARE(scene.items.size(), 1);
+    const GpuLayer &layer = scene.items.at(0).layer;
+    QCOMPARE(layer.trackInputs.size(), 2);
+    const std::shared_ptr<const GpuLayer> picture = layer.trackInputs.value(QStringLiteral("0/picture"));
+    QVERIFY(picture != nullptr);
+    QVERIFY(picture->valid);
+    QVERIFY(!picture->source.isNull());
+    // One level deep: the input carries no track inputs of its own.
+    QVERIFY(picture->trackInputs.isEmpty());
+    QVERIFY(layer.trackInputs.value(QStringLiteral("0/matte")) != nullptr);
+
+    // The shader shows the picture, so the hidden white matte fills the host where it lands, and an
+    // empty id shows nothing over the black background.
+    if (GpuCompositor::isAvailable()) {
+        QCOMPARE(compositor.compositeAt(0).pixelColor(80, 80).red(), 255);
+        QCOMPARE(compositor.compositeAt(0).pixelColor(80, 80).blue(), 255);
+    }
+
+    // An empty id, then an unknown one, resolve to nothing.
+    project.tracks()[0].clips[0].effects[0].parameters.insert(QStringLiteral("picture"), QString());
+    project.tracks()[0].clips[0].effects[0].parameters.insert(QStringLiteral("matte"), QString());
+    QVERIFY(compositor.buildSceneAt(0, {}, &scene));
+    QVERIFY(scene.items.at(0).layer.trackInputs.isEmpty());
+    if (GpuCompositor::isAvailable())
+        QCOMPARE(compositor.compositeAt(0).pixelColor(80, 80).red(), 0);
+    project.tracks()[0].clips[0].effects[0].parameters.insert(QStringLiteral("picture"),
+                                                             QStringLiteral("no-such-track"));
+    project.tracks()[0].clips[0].effects[0].parameters.insert(QStringLiteral("matte"),
+                                                             QStringLiteral("no-such-track"));
+    QVERIFY(compositor.buildSceneAt(0, {}, &scene));
+    QVERIFY(scene.items.at(0).layer.trackInputs.isEmpty());
+
+    reloadEffectCatalog({QString::fromUtf8(DRIFT_TEST_EFFECTS_DIR)});
+}
+
 void EngineTest::gpuBrokenShaderPassthrough()
 {
     QTemporaryDir dir;
@@ -15933,6 +16057,140 @@ void EngineTest::splatSampleLoads()
     for (float v : {d.aabbMin.x(), d.aabbMin.y(), d.aabbMin.z(), d.aabbMax.x(), d.aabbMax.y(), d.aabbMax.z()})
         QVERIFY(std::isfinite(v));
     qInfo() << "sample aabb" << d.aabbMin << d.aabbMax;
+}
+
+namespace {
+int texelChannel(const QByteArray &rgba, int texel, int channel)
+{
+    return int(uchar(rgba.at(texel * 4 + channel)));
+}
+} // namespace
+
+void EngineTest::bakeGradientInterpolatesAndHoldsEnds()
+{
+    const QByteArray twoStops = drift::bakeGradient(
+        QStringLiteral(R"([{"position":0,"color":"#000000ff"},{"position":1,"color":"#ffffffff"}])"));
+    QCOMPARE(twoStops.size(), qsizetype(256 * 4));
+    QCOMPARE(texelChannel(twoStops, 0, 0), 0);
+    QCOMPARE(texelChannel(twoStops, 255, 0), 255);
+    QVERIFY(std::abs(texelChannel(twoStops, 128, 0) - 128) <= 1);
+    QVERIFY(std::abs(texelChannel(twoStops, 128, 2) - 128) <= 1);
+    QCOMPARE(texelChannel(twoStops, 128, 3), 255);
+
+    // Texels before the first stop and after the last hold those stops' colours.
+    const QByteArray held = drift::bakeGradient(
+        QStringLiteral(R"([{"position":0.25,"color":"#ff0000ff"},{"position":0.75,"color":"#0000ffff"}])"));
+    QCOMPARE(texelChannel(held, 0, 0), 255);
+    QCOMPARE(texelChannel(held, 0, 2), 0);
+    QCOMPARE(texelChannel(held, 255, 0), 0);
+    QCOMPARE(texelChannel(held, 255, 2), 255);
+
+    QVERIFY(drift::bakeGradient(QStringLiteral("not json")).isEmpty());
+    QVERIFY(drift::bakeGradient(QStringLiteral("[]")).isEmpty());
+}
+
+void EngineTest::bakeCurveAppliesEaseAndHoldsEnds()
+{
+    // The left key's ease shapes the fraction: smooth at the midpoint is 0.5 exactly.
+    const QByteArray smooth = drift::bakeCurve(
+        QStringLiteral(R"([{"x":0,"y":0,"ease":"smooth"},{"x":1,"y":1,"ease":"linear"}])"));
+    QCOMPARE(smooth.size(), qsizetype(256 * 4));
+    QVERIFY(std::abs(texelChannel(smooth, 128, 0) - 128) <= 1);
+    QCOMPARE(texelChannel(smooth, 128, 1), texelChannel(smooth, 128, 0));
+    QCOMPARE(texelChannel(smooth, 128, 2), texelChannel(smooth, 128, 0));
+    QCOMPARE(texelChannel(smooth, 128, 3), 255);
+    QCOMPARE(texelChannel(smooth, 255, 0), 255);
+
+    // A hold key keeps its y across the whole segment.
+    const QByteArray hold = drift::bakeCurve(
+        QStringLiteral(R"([{"x":0,"y":0,"ease":"hold"},{"x":1,"y":1,"ease":"linear"}])"));
+    QCOMPARE(texelChannel(hold, 200, 0), 0);
+
+    // Outside the keys the curve holds the nearest key's y.
+    const QByteArray ends = drift::bakeCurve(
+        QStringLiteral(R"([{"x":0.25,"y":0.5,"ease":"linear"},{"x":0.75,"y":1,"ease":"linear"}])"));
+    QVERIFY(std::abs(texelChannel(ends, 0, 0) - 128) <= 1);
+    QCOMPARE(texelChannel(ends, 255, 0), 255);
+
+    QVERIFY(drift::bakeCurve(QStringLiteral("[]")).isEmpty());
+}
+
+void EngineTest::paramSamplerUnitSkipsDepthAndMaskUnits()
+{
+    QCOMPARE(drift::gl::paramSamplerUnit(7, 0), 7);
+    QCOMPARE(drift::gl::paramSamplerUnit(7, 1), 10);
+    QCOMPARE(drift::gl::paramSamplerUnit(7, 2), 11);
+    for (int i = 0; i < 7; ++i)
+        QCOMPARE(drift::gl::paramSamplerUnit(1, i), i + 1);
+    QCOMPARE(drift::gl::paramSamplerUnit(1, 7), 10);
+}
+
+// The analysis window is 2048 samples at 48 kHz. Sines are generated with the phase at 0.
+namespace {
+std::vector<float> sineWindow(double hz, double amplitude = 1.0)
+{
+    std::vector<float> samples(2048);
+    for (int n = 0; n < int(samples.size()); ++n)
+        samples[n] = float(amplitude * std::sin(2.0 * M_PI * hz * n / 48000.0));
+    return samples;
+}
+} // namespace
+
+void EngineTest::audioWindowOfSilenceIsFlat()
+{
+    const std::vector<float> silence(2048, 0.0f);
+    const AudioFrame frame = analyzeWindow(silence.data(), 48000);
+    for (int k = 0; k < 512; ++k) {
+        QCOMPARE(frame.spectrum[k], 0.0f);
+        QCOMPARE(frame.wave[k], 0.5f);
+    }
+    QCOMPARE(frame.level, 0.0f);
+    QCOMPARE(frame.bass, 0.0f);
+    QCOMPARE(frame.beat, 0.0f);
+}
+
+// A full-scale sine at an FFT bin centre reads 0 dBFS at its bin, so its log bin maps to 1, and
+// the log bins far from it read 0. The level of a full-scale sine is its RMS, 3.01 dB under peak.
+void EngineTest::audioWindowSineLandsInItsLogBin()
+{
+    const double hz = 43.0 * 48000.0 / 2048.0; // 1007.8125 Hz, bin 43
+    const AudioFrame frame = analyzeWindow(sineWindow(hz).data(), 48000);
+    const int expected = int(std::floor(std::log(hz / 20.0) / std::log(1000.0) * 512.0));
+    QCOMPARE(expected, 290);
+    QVERIFY(frame.spectrum[expected] > 0.99f);
+    QCOMPARE(frame.spectrum[expected - 40], 0.0f);
+    QCOMPARE(frame.spectrum[expected + 40], 0.0f);
+    QVERIFY(std::abs(frame.level - (1.0f - 3.0103f / 60.0f)) < 0.005f);
+    QCOMPARE(frame.beat, 0.0f);
+}
+
+void EngineTest::audioWindowBassSplitsLowFromHigh()
+{
+    const AudioFrame low = analyzeWindow(sineWindow(60.0).data(), 48000);
+    QVERIFY(low.bass > 0.8f);
+    const AudioFrame high = analyzeWindow(sineWindow(5000.0).data(), 48000);
+    QVERIFY(high.bass < 0.2f);
+}
+
+void EngineTest::audioFrameTextureLayout()
+{
+    AudioFrame frame;
+    frame.spectrum[3] = 1.0f;
+    frame.wave[7] = 0.0f;
+    frame.wave[8] = 1.0f;
+    const QByteArray rgba = frame.rgba();
+    QCOMPARE(rgba.size(), 512 * 2 * 4);
+    const auto texel = [&rgba](int x, int row) {
+        return reinterpret_cast<const uchar *>(rgba.constData()) + (row * 512 + x) * 4;
+    };
+    QCOMPARE(texel(3, 0)[0], 255);
+    QCOMPARE(texel(3, 0)[1], 255);
+    QCOMPARE(texel(3, 0)[2], 255);
+    QCOMPARE(texel(3, 0)[3], 255);
+    QCOMPARE(texel(0, 0)[0], 0);
+    QCOMPARE(texel(7, 1)[0], 0);
+    QCOMPARE(texel(8, 1)[0], 255);
+    QCOMPARE(texel(8, 1)[3], 255);
 }
 
 QTEST_MAIN(EngineTest)

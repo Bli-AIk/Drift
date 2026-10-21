@@ -25,6 +25,22 @@ enum class EffectParamType {
     Enum,
     // A float rounded to a whole number at bind time.
     Int,
+    // A float seed, shown with a shuffle button. Bound as a float.
+    Seed,
+    // Stored as four numbers, "<key>.x/.y/.w/.h", each keyframable; bound as a vec4.
+    Region,
+    // A picture file in the package, stored as an absolute path; bound as a sampler2D.
+    Image,
+    // Gradient stops stored as a JSON string; baked to a 256x1 sampler2D.
+    Gradient,
+    // Curve keys stored as a JSON string; baked to a 256x1 sampler2D.
+    Curve,
+    // Another track's picture, by track id ("" = none); bound as a sampler2D.
+    Track,
+    // Another track's folded mask lanes, by track id; bound as a sampler2D.
+    TrackMask,
+    // Another track's audio, by track id ("" = Timeline mix); a sampler2D plus scalars.
+    Audio,
 };
 
 // User-adjustable parameter metadata for an effect preset (GUI-free).
@@ -60,6 +76,10 @@ struct EffectParamSpec
     // Vec2 params: default position and per-axis range (min/max above are the shared range).
     double defaultX = 0.0;
     double defaultY = 0.0;
+    // Region params: the default width and height, and the shape the preview draws.
+    double defaultW = 1.0;
+    double defaultH = 1.0;
+    QString regionShape = QStringLiteral("rect");
     // Colour params: carries opacity, so the stored hex is #rrggbbaa and the uniform is a vec4.
     bool alpha = false;
 
@@ -68,10 +88,17 @@ struct EffectParamSpec
     bool isFilePath() const { return type == EffectParamType::FilePath; }
     bool isClip() const { return type == EffectParamType::Clip; }
     bool isVec2() const { return type == EffectParamType::Vec2; }
+    bool isRegion() const { return type == EffectParamType::Region; }
     bool isEnum() const { return type == EffectParamType::Enum; }
     bool isInt() const { return type == EffectParamType::Int; }
+    bool isSampler() const
+    {
+        return type == EffectParamType::Image || type == EffectParamType::Gradient
+               || type == EffectParamType::Curve || type == EffectParamType::Track
+               || type == EffectParamType::TrackMask || type == EffectParamType::Audio;
+    }
     // Strings on the parameter map rather than numbers: never keyframed, never bound as uniforms.
-    bool isText() const { return isColor() || isFilePath() || isClip(); }
+    bool isText() const { return isColor() || isFilePath() || isClip() || isSampler(); }
 
     // The catalog default as the QVariant a parameter map wants. Every caller used to spell this
     // out as a ternary, and each one was a place to forget a new type.
@@ -85,25 +112,41 @@ struct EffectParamSpec
         case EffectParamType::FilePath:
             return QVariant(defaultString);
         case EffectParamType::Clip:
+        case EffectParamType::Track:
+        case EffectParamType::TrackMask:
+        case EffectParamType::Audio:
             return QVariant(QString());
+        case EffectParamType::Image:
+        case EffectParamType::Gradient:
+        case EffectParamType::Curve:
+            return QVariant(defaultString);
         case EffectParamType::Vec2:
+        case EffectParamType::Region:
             return QVariant(defaultX);
         case EffectParamType::Float:
         case EffectParamType::Enum:
         case EffectParamType::Int:
+        case EffectParamType::Seed:
             break;
         }
         return QVariant(defaultValue);
     }
 
-    // Seeds a parameter map with this param's default. A vec2 is two entries, so callers should
-    // not insert defaultVariant() under `key` themselves.
+    // Seeds a parameter map with this param's default. A vec2 or region is several entries, so
+    // callers should not insert defaultVariant() under `key` themselves.
     template<typename Map>
     void insertDefault(Map &params) const
     {
         if (type == EffectParamType::Vec2) {
             params.insert(key + QStringLiteral(".x"), QVariant(defaultX));
             params.insert(key + QStringLiteral(".y"), QVariant(defaultY));
+            return;
+        }
+        if (type == EffectParamType::Region) {
+            params.insert(key + QStringLiteral(".x"), QVariant(defaultX));
+            params.insert(key + QStringLiteral(".y"), QVariant(defaultY));
+            params.insert(key + QStringLiteral(".w"), QVariant(defaultW));
+            params.insert(key + QStringLiteral(".h"), QVariant(defaultH));
             return;
         }
         params.insert(key, defaultVariant());
@@ -127,6 +170,22 @@ struct EffectParamSpec
             return QStringLiteral("enum");
         case EffectParamType::Int:
             return QStringLiteral("int");
+        case EffectParamType::Seed:
+            return QStringLiteral("seed");
+        case EffectParamType::Region:
+            return QStringLiteral("region");
+        case EffectParamType::Image:
+            return QStringLiteral("image");
+        case EffectParamType::Gradient:
+            return QStringLiteral("gradient");
+        case EffectParamType::Curve:
+            return QStringLiteral("curve");
+        case EffectParamType::Track:
+            return QStringLiteral("track");
+        case EffectParamType::TrackMask:
+            return QStringLiteral("trackMask");
+        case EffectParamType::Audio:
+            return QStringLiteral("audio");
         case EffectParamType::Float:
             break;
         }

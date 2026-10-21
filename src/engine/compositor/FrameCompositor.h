@@ -38,6 +38,10 @@ public:
         // the keyframe at or before the time) instead of decoding forward to the exact one. The
         // caller asks again without it once the gesture settles.
         bool approximateSeek = false;
+        // Audio params: a source whose onsets are not computed yet is analysed in the background
+        // and its beat reads 0 until it is. Only the preview sets it; export and every other caller
+        // wait, so a frame never depends on how fast the analysis happened to run.
+        bool deferAudioAnalysis = false;
         // The preview's 3D mode: the scene seen from the editor's free viewpoint, with the camera
         // and the stage drawn as guides. Only the preview sets it; export never does.
         struct EditorView

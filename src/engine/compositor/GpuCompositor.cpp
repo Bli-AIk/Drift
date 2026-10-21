@@ -562,6 +562,12 @@ QMatrix4x4 layerViewProjection(const GpuLayer &layer, const QSize &canvas)
     return view;
 }
 
+void bindTrackInputs(GlRuntime &rt, QOpenGLExtraFunctions *gl, const GpuLayer &layer, int effectIndex,
+                     const drift::GpuEffectDefinition &gpu, const QSize &canvasSize,
+                     QHash<QString, GLuint> &textures, std::vector<GlTarget> &held);
+void bindAudioInputs(GlRuntime &rt, QOpenGLExtraFunctions *gl, const GpuLayer &layer, int effectIndex,
+                     const drift::GpuEffectDefinition &gpu, PipelineAux &aux);
+
 // `modelDepth`: for a model layer that takes part in depth occlusion, its packed depth.
 GlTarget buildLayerTarget(GlRuntime &rt, QOpenGLExtraFunctions *gl, const GpuLayer &layer,
                           const QSize &canvasSize, GlTarget *modelDepth = nullptr)
@@ -610,7 +616,8 @@ GlTarget buildLayerTarget(GlRuntime &rt, QOpenGLExtraFunctions *gl, const GpuLay
     GlTarget clipMask;
     bool clipMaskTried = false;
 
-    for (const drift::Effect &effect : layer.effects) {
+    for (int effectIndex = 0; effectIndex < layer.effects.size(); ++effectIndex) {
+        const drift::Effect &effect = layer.effects.at(effectIndex);
         const EffectPresetEntry *def =
             effect.catalogId.isEmpty() ? nullptr : effectDefForId(effect.catalogId);
         if (!def)
@@ -655,10 +662,18 @@ GlTarget buildLayerTarget(GlRuntime &rt, QOpenGLExtraFunctions *gl, const GpuLay
                 clipMask = composeMaskTarget(rt, gl, layer, target.size());
         }
 
+        // Audio goes after the track inputs: rendering one can run a layer that uploads its own
+        // analysis under the same key.
+        PipelineAux aux{layer.depth, clipMask.isValid() ? clipMask.texture() : 0u};
+        std::vector<GlTarget> inputTargets;
+        bindTrackInputs(rt, gl, layer, effectIndex, def->gpu, canvasSize, aux.paramTextures, inputTargets);
+        bindAudioInputs(rt, gl, layer, effectIndex, def->gpu, aux);
+
         const std::vector<const GlTarget *> sources{&target};
-        const PipelineAux aux{layer.depth, clipMask.isValid() ? clipMask.texture() : 0u};
         GlTarget next = runPipeline(rt, gl, def->meta.id, def->gpu, sources, params,
                                     layer.clipTimeUs, 0.0, target.size(), &aux);
+        for (GlTarget &input : inputTargets)
+            rt.releaseTarget(std::move(input));
         if (!next.isValid())
             continue; // grace mode
 
@@ -1378,6 +1393,62 @@ GlTarget renderIsolatedLayer(GlRuntime &rt, QOpenGLExtraFunctions *gl, const Gpu
     }
     rt.releaseTarget(std::move(source));
     return isolated;
+}
+
+// Renders the track inputs one effect reads: a track's picture, or its folded masks laid out on the
+// canvas. Targets go to `held` and stay alive until the pass that samples them has run. A param
+// with no input, or one that comes out empty, is left out of `textures` and binds transparent.
+void bindTrackInputs(GlRuntime &rt, QOpenGLExtraFunctions *gl, const GpuLayer &layer, int effectIndex,
+                     const drift::GpuEffectDefinition &gpu, const QSize &canvasSize,
+                     QHash<QString, GLuint> &textures, std::vector<GlTarget> &held)
+{
+    for (const drift::GpuSamplerParam &sampler : gpu.samplerParams) {
+        if (sampler.type != drift::EffectParamType::Track
+            && sampler.type != drift::EffectParamType::TrackMask)
+            continue;
+        const auto input =
+            layer.trackInputs.constFind(QStringLiteral("%1/%2").arg(effectIndex).arg(sampler.key));
+        if (input == layer.trackInputs.constEnd() || !*input)
+            continue;
+
+        if (sampler.type == drift::EffectParamType::Track) {
+            GlTarget picture = renderIsolatedLayer(rt, gl, **input, canvasSize);
+            if (!picture.isValid())
+                continue;
+            textures.insert(sampler.key, picture.texture());
+            held.push_back(std::move(picture));
+            continue;
+        }
+
+        GlTarget coverage;
+        GlTarget colour = renderIsolatedLayer(rt, gl, **input, canvasSize, &coverage);
+        if (colour.isValid())
+            rt.releaseTarget(std::move(colour));
+        if (coverage.isValid()) {
+            textures.insert(sampler.key, coverage.texture());
+            held.push_back(std::move(coverage));
+        }
+    }
+}
+
+// Uploads the analysis each audio param of one effect reads and sets its scalars. A param without
+// an input is left out, so it binds transparent and reads 0.
+void bindAudioInputs(GlRuntime &rt, QOpenGLExtraFunctions *gl, const GpuLayer &layer, int effectIndex,
+                     const drift::GpuEffectDefinition &gpu, PipelineAux &aux)
+{
+    for (const drift::GpuSamplerParam &sampler : gpu.samplerParams) {
+        if (sampler.type != drift::EffectParamType::Audio)
+            continue;
+        const QString id = QStringLiteral("%1/%2").arg(effectIndex).arg(sampler.key);
+        const auto input = layer.audioInputs.constFind(id);
+        if (input == layer.audioInputs.constEnd() || !*input)
+            continue;
+        const AudioFrame &frame = **input;
+        aux.paramTextures.insert(sampler.key, uploadAudioTexture(rt, gl, id, frame.rgba()));
+        aux.audioScalars.insert(sampler.key, {frame.level, frame.bass, frame.beat});
+    }
+    if (gpu.usesGlobalAudio && layer.globalAudio)
+        aux.globalAudio = {layer.globalAudio->level, layer.globalAudio->bass, layer.globalAudio->beat};
 }
 
 bool replacesSeeThroughCanvas(const GpuScene &scene, drift::BlendMode blend)

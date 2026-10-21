@@ -437,6 +437,46 @@ void accumulateClipAudio(const drift::Project &project, const drift::Clip &clip,
 
 } // namespace
 
+QVector<float> AudioMixer::readClipGainedAudio(const drift::Project &project, const drift::Track &track,
+                                               const drift::Clip &clip, quint64 streamId,
+                                               drift::TimeUs winStartUs, int outFrames, int sampleRate)
+{
+    drift::AudioTransitionEdge edge;
+    if (!track.transitions.isEmpty())
+        edge = drift::audioTransitionEdgeFor(track, clip, drift::sourceDurationForClip(project, clip));
+
+    drift::ClipAudioRetimer retimer;
+    QVector<float> out;
+    readClipAudio(out, clip, streamId, winStartUs, outFrames, sampleRate, &retimer, {},
+                  clip.timelineStart - edge.extendBeforeUs, clip.timelineEnd() + edge.extendAfterUs);
+    if (outFrames <= 0)
+        return out;
+
+    const auto gainAt = [&](int frame) {
+        const drift::TimeUs t =
+            winStartUs + static_cast<drift::TimeUs>((static_cast<int64_t>(frame) * drift::kUsPerSecond) / sampleRate);
+        return static_cast<float>(volumeForClip(clip, t) * transitionGainForClip(track, clip, t, edge)
+                                  * clip.fadeMultiplier(t, edge.ownsIn, edge.ownsOut)
+                                  * clip.audioEdgeMultiplier(t, edge.ownsIn, edge.ownsOut));
+    };
+    // Same control-point stepping as accumulateClipAudio.
+    constexpr int kGainStep = 32;
+    float gainA = gainAt(0);
+    for (int start = 0; start < outFrames; start += kGainStep) {
+        const int end = qMin(outFrames, start + kGainStep);
+        const float gainB = end < outFrames ? gainAt(end) : gainAt(outFrames - 1);
+        const int span = end < outFrames ? kGainStep : qMax(1, outFrames - 1 - start);
+        const float slope = (gainB - gainA) / float(span);
+        for (int i = start; i < end; ++i) {
+            const float gain = gainA + slope * float(i - start);
+            out[i * 2] *= gain;
+            out[i * 2 + 1] *= gain;
+        }
+        gainA = gainB;
+    }
+    return out;
+}
+
 void AudioMixer::setProject(const drift::Project *project)
 {
     if (m_project != project) {

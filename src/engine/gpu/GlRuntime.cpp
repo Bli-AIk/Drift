@@ -1,4 +1,5 @@
 #include "engine/gpu/GlRuntime.h"
+#include "engine/gpu/effects/LookupTextures.h"
 
 #include "engine/decode/readers/ClipReader.h"
 #include "engine/face/tracking/Face111.h"
@@ -22,14 +23,18 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QOffscreenSurface>
+#include <QFileInfo>
 #include <QOpenGLContext>
+#include <QSet>
 #include <QScopeGuard>
 #include <QSettings>
 #include <QSurfaceFormat>
 #include <QVector2D>
 #include <QVector3D>
 
+#include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <cstring>
 #include <mutex>
 
@@ -1436,6 +1441,21 @@ void GlRuntime::shutdown()
                 for (const DepthTexture &entry : depthTextures)
                     gl->glDeleteTextures(1, &entry.texture);
                 depthTextures.clear();
+                for (const auto &entry : paramImages) {
+                    if (entry.second.texture)
+                        gl->glDeleteTextures(1, &entry.second.texture);
+                }
+                paramImages.clear();
+                for (const BakedLookup &entry : bakedLookups)
+                    gl->glDeleteTextures(1, &entry.texture);
+                bakedLookups.clear();
+                if (sharedTransparentTexture) {
+                    gl->glDeleteTextures(1, &sharedTransparentTexture);
+                    sharedTransparentTexture = 0;
+                }
+                for (const auto &entry : audioTextures)
+                    gl->glDeleteTextures(1, &entry.second);
+                audioTextures.clear();
                 if (modelDepthTexture) {
                     gl->glDeleteTextures(1, &modelDepthTexture);
                     modelDepthTexture = 0;
@@ -3577,8 +3597,25 @@ void GlRuntime::restorePreviewUploadPath(PreviewUploadPath path, const QString &
     g_zeroCopyDeclineReason = declineReason;
 }
 
-void setPackageUniforms(QOpenGLShaderProgram *program, const QMap<QString, QVariant> &parameters,
-                        const QSize &resolution, drift::TimeUs timeUs, double progress)
+int paramSamplerUnit(int inputCount, int index)
+{
+    int unit = inputCount;
+    for (int seen = 0;; ++unit) {
+        if (unit == kDepthTextureUnit || unit == kClipMaskTextureUnit)
+            continue;
+        if (seen++ == index)
+            return unit;
+    }
+}
+
+// The scalars an audio param sets beside its sampler, and the Timeline mix's uniforms. Both in the
+// order level, bass, beat.
+constexpr const char *kAudioScalarSuffixes[] = {"_level", "_bass", "_beat"};
+constexpr const char *kGlobalAudioUniforms[] = {"u_audioLevel", "u_audioBass", "u_audioBeat"};
+
+void setPackageUniforms(QOpenGLShaderProgram *program, const drift::GpuEffectDefinition &gpu,
+                        const QMap<QString, QVariant> &parameters, const QSize &resolution,
+                        drift::TimeUs timeUs, double progress, const PipelineAux *aux)
 {
     program->setUniformValue("u_currentTexture", 0);
     program->setUniformValue("u_resolution",
@@ -3590,8 +3627,44 @@ void setPackageUniforms(QOpenGLShaderProgram *program, const QMap<QString, QVari
     program->setUniformValue("u_timeUs", float(timeUs));
     program->setUniformValue("u_progress", float(qBound(0.0, progress, 1.0)));
 
+    // Sampler params bind as textures in runPipeline, and region params as one vec4 here. Their
+    // keys are skipped below, or a track id would bind as 0.0 to a sampler and a region's x/y
+    // would bind as a vec2 over its vec4.
+    QSet<QString> handled;
+    for (const drift::GpuSamplerParam &sampler : gpu.samplerParams)
+        handled.insert(sampler.key);
+    for (const QString &region : gpu.regionParams) {
+        for (const char *axis : {".x", ".y", ".w", ".h"})
+            handled.insert(region + QLatin1String(axis));
+    }
+    for (const QString &region : gpu.regionParams) {
+        const int loc = program->uniformLocation(region);
+        if (loc < 0)
+            continue;
+        program->setUniformValue(loc, QVector4D(float(parameters.value(region + QLatin1String(".x")).toDouble()),
+                                                float(parameters.value(region + QLatin1String(".y")).toDouble()),
+                                                float(parameters.value(region + QLatin1String(".w")).toDouble()),
+                                                float(parameters.value(region + QLatin1String(".h")).toDouble())));
+    }
+    for (const drift::GpuSamplerParam &sampler : gpu.samplerParams) {
+        if (sampler.type != drift::EffectParamType::Audio)
+            continue;
+        const std::array<float, 3> scalars = aux ? aux->audioScalars.value(sampler.key) : std::array<float, 3>{};
+        for (int s = 0; s < 3; ++s) {
+            const int loc = program->uniformLocation(sampler.key + QLatin1String(kAudioScalarSuffixes[s]));
+            if (loc >= 0)
+                program->setUniformValue(loc, scalars[s]);
+        }
+    }
+    const std::array<float, 3> global = aux ? aux->globalAudio : std::array<float, 3>{};
+    for (int s = 0; s < 3; ++s) {
+        const int loc = program->uniformLocation(kGlobalAudioUniforms[s]);
+        if (loc >= 0)
+            program->setUniformValue(loc, global[s]);
+    }
+
     for (auto it = parameters.constBegin(); it != parameters.constEnd(); ++it) {
-        if (drift::isEngineBoundGpuUniform(it.key()))
+        if (drift::isEngineBoundGpuUniform(it.key()) || handled.contains(it.key()))
             continue;
         // A vec2 param travels as "<key>.x" and "<key>.y"; the shader sees one vec2 under <key>.
         if (it.key().endsWith(QLatin1String(".y"))
@@ -3716,6 +3789,93 @@ bool uploadFace111Mesh(GlRuntime &rt, QOpenGLExtraFunctions *gl,
 
 } // namespace
 
+namespace {
+
+// Tightly packed RGBA8 with the state every sampler param wants: clamped, linear.
+GLuint uploadRgba8(QOpenGLExtraFunctions *gl, int width, int height, const void *pixels)
+{
+    GLuint tex = 0;
+    gl->glGenTextures(1, &tex);
+    gl->glBindTexture(GL_TEXTURE_2D, tex);
+    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    gl->glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    gl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    return tex;
+}
+
+GLuint transparentTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl)
+{
+    if (!rt.sharedTransparentTexture) {
+        const uint8_t pixel[4] = {0, 0, 0, 0};
+        rt.sharedTransparentTexture = uploadRgba8(gl, 1, 1, pixel);
+    }
+    return rt.sharedTransparentTexture;
+}
+
+// An image param's picture, re-uploaded when the file's mtime changes. Unreadable files and
+// missing paths show transparent black.
+GLuint paramImageTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString &path)
+{
+    const QFileInfo info(path);
+    if (!info.isFile())
+        return transparentTexture(rt, gl);
+    const qint64 modifiedMs = info.lastModified().toMSecsSinceEpoch();
+    const auto it = rt.paramImages.find(path);
+    if (it != rt.paramImages.end() && it->second.modifiedMs == modifiedMs)
+        return it->second.texture ? it->second.texture : transparentTexture(rt, gl);
+    if (it != rt.paramImages.end() && it->second.texture)
+        gl->glDeleteTextures(1, &it->second.texture);
+
+    GLuint tex = 0;
+    QImage image;
+    if (image.load(path) && !image.isNull()) {
+        tex = uploadTexture(gl, image);
+    } else {
+        qWarning("GlRuntime: failed to load image param '%s'", qPrintable(path));
+    }
+    rt.paramImages[path] = {modifiedMs, tex};
+    return tex ? tex : transparentTexture(rt, gl);
+}
+
+// A gradient or curve value baked to 256x1, most recently used first.
+GLuint bakedLookupTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl, bool curve, const QString &json)
+{
+    const QString key = (curve ? QStringLiteral("curve|") : QStringLiteral("gradient|")) + json;
+    const auto it = std::find_if(rt.bakedLookups.begin(), rt.bakedLookups.end(),
+                                 [&key](const GlRuntime::BakedLookup &entry) { return entry.key == key; });
+    if (it != rt.bakedLookups.end()) {
+        rt.bakedLookups.splice(rt.bakedLookups.begin(), rt.bakedLookups, it);
+        return it->texture;
+    }
+    const QByteArray rgba = curve ? drift::bakeCurve(json) : drift::bakeGradient(json);
+    if (rgba.isEmpty())
+        return transparentTexture(rt, gl);
+    rt.bakedLookups.push_front({key, uploadRgba8(gl, 256, 1, rgba.constData())});
+    while (rt.bakedLookups.size() > GlRuntime::kMaxBakedLookups) {
+        gl->glDeleteTextures(1, &rt.bakedLookups.back().texture);
+        rt.bakedLookups.pop_back();
+    }
+    return rt.bakedLookups.front().texture;
+}
+
+} // namespace
+
+GLuint uploadAudioTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString &key, const QByteArray &rgba)
+{
+    GLuint &texture = rt.audioTextures[key];
+    if (!texture) {
+        texture = uploadRgba8(gl, 512, 2, rgba.constData());
+        return texture;
+    }
+    gl->glBindTexture(GL_TEXTURE_2D, texture);
+    gl->glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    gl->glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 512, 2, GL_RGBA, GL_UNSIGNED_BYTE, rgba.constData());
+    return texture;
+}
+
 GlTarget runPipeline(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString &cacheKey,
                      const drift::GpuEffectDefinition &gpu, const std::vector<const GlTarget *> &sources,
                      const QMap<QString, QVariant> &parameters, drift::TimeUs timeUs, double progress,
@@ -3748,6 +3908,38 @@ GlTarget runPipeline(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString &ca
     std::map<QString, GLuint> textures;
     for (const drift::GpuEffectTextureSpec &spec : gpu.textures)
         textures[spec.id] = staticTexture(rt, gl, spec.path);
+
+    // One texture per sampler param, bound per pass below. Track and trackMask take the texture
+    // the compositor rendered for them; audio has no input until its analysis lands.
+    GLint maxUnits = 0;
+    std::vector<GLuint> paramTextures;
+    if (!gpu.samplerParams.isEmpty()) {
+        gl->glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxUnits);
+        for (const drift::GpuSamplerParam &sampler : gpu.samplerParams) {
+            const QVariant value = parameters.value(sampler.key);
+            switch (sampler.type) {
+            case drift::EffectParamType::Image:
+                paramTextures.push_back(paramImageTexture(rt, gl, value.toString()));
+                break;
+            case drift::EffectParamType::Gradient:
+                paramTextures.push_back(bakedLookupTexture(rt, gl, false, value.toString()));
+                break;
+            case drift::EffectParamType::Curve:
+                paramTextures.push_back(bakedLookupTexture(rt, gl, true, value.toString()));
+                break;
+            case drift::EffectParamType::Track:
+            case drift::EffectParamType::TrackMask:
+            case drift::EffectParamType::Audio: {
+                const GLuint input = aux ? aux->paramTextures.value(sampler.key) : 0u;
+                paramTextures.push_back(input ? input : transparentTexture(rt, gl));
+                break;
+            }
+            default:
+                paramTextures.push_back(transparentTexture(rt, gl));
+                break;
+            }
+        }
+    }
 
     GLuint depthTex = 0;
     QSize depthSize;
@@ -3810,7 +4002,7 @@ GlTarget runPipeline(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString &ca
         }
 
         program->bind();
-        setPackageUniforms(program, parameters, inputSize, timeUs, progress);
+        setPackageUniforms(program, gpu, parameters, inputSize, timeUs, progress, aux);
 
         // Bind all declared inputs: unit 0 → u_currentTexture, unit i → u_texture{i}.
         const QList<drift::GpuEffectPassInput> inputs =
@@ -3868,6 +4060,29 @@ GlTarget runPipeline(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString &ca
             // Re-apply resolution after possible buffer-sized primary input.
             program->setUniformValue("u_resolution",
                                      QVector2D(float(inputSize.width()), float(inputSize.height())));
+
+            // Only a param this pass declares takes a unit, so the index counts those alone, as
+            // Forge's paramSamplers does.
+            int samplerIndex = 0;
+            for (int p = 0; p < gpu.samplerParams.size(); ++p) {
+                const int loc = program->uniformLocation(gpu.samplerParams[p].key);
+                if (loc < 0)
+                    continue;
+                const int unit = paramSamplerUnit(int(inputs.size()), samplerIndex++);
+                if (unit >= maxUnits) {
+                    static bool warned = false;
+                    if (!warned) {
+                        warned = true;
+                        qWarning("GlRuntime: no texture unit left for parameter '%s'",
+                                 qPrintable(gpu.samplerParams[p].key));
+                    }
+                    continue;
+                }
+                gl->glActiveTexture(GL_TEXTURE0 + unit);
+                gl->glBindTexture(GL_TEXTURE_2D, paramTextures[size_t(p)]);
+                program->setUniformValue(loc, unit);
+            }
+            gl->glActiveTexture(GL_TEXTURE0);
 
             if (gpu.needsDepth) {
                 gl->glActiveTexture(GL_TEXTURE0 + kDepthTextureUnit);

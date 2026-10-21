@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonArray>
+#include <QJsonDocument>
 #include <QRegularExpression>
 #include <QSet>
 
@@ -77,6 +78,25 @@ bool parsePassOutput(const QJsonObject &obj, drift::GpuEffectPassOutput *out, QS
     return false;
 }
 
+// "#rrggbb" or CSS "#rrggbbaa" to the "#rrggbbaa" a gradient stop is stored as.
+bool normalizeRgbaHex(const QString &hex, QString *out)
+{
+    if (!hex.startsWith(QLatin1Char('#')) || (hex.size() != 7 && hex.size() != 9))
+        return false;
+    const QColor color(hex.left(7));
+    if (!color.isValid())
+        return false;
+    int alpha = 255;
+    if (hex.size() == 9) {
+        bool ok = false;
+        alpha = hex.right(2).toInt(&ok, 16);
+        if (!ok)
+            return false;
+    }
+    *out = color.name(QColor::HexRgb) + QStringLiteral("%1").arg(alpha, 2, 16, QLatin1Char('0'));
+    return true;
+}
+
 } // namespace
 
 QString readTextFile(const QString &path, QString *errorOut)
@@ -143,6 +163,22 @@ bool parseParameters(const QJsonArray &params, QList<drift::EffectParamSpec> *ou
             spec.type = drift::EffectParamType::Int;
         else if (type == QLatin1String("float") || type == QLatin1String("number"))
             spec.type = drift::EffectParamType::Float;
+        else if (type == QLatin1String("seed"))
+            spec.type = drift::EffectParamType::Seed;
+        else if (type == QLatin1String("region"))
+            spec.type = drift::EffectParamType::Region;
+        else if (type == QLatin1String("image"))
+            spec.type = drift::EffectParamType::Image;
+        else if (type == QLatin1String("gradient"))
+            spec.type = drift::EffectParamType::Gradient;
+        else if (type == QLatin1String("curve"))
+            spec.type = drift::EffectParamType::Curve;
+        else if (type == QLatin1String("track"))
+            spec.type = drift::EffectParamType::Track;
+        else if (type == QLatin1String("trackMask"))
+            spec.type = drift::EffectParamType::TrackMask;
+        else if (type == QLatin1String("audio"))
+            spec.type = drift::EffectParamType::Audio;
         else {
             // An unknown type must not quietly become a float: that is how a colour param ends up
             // binding 0.0 to a vec3 uniform and rendering the frame black. But refusing the package
@@ -182,6 +218,18 @@ bool parseParameters(const QJsonArray &params, QList<drift::EffectParamSpec> *ou
             const QJsonArray xy = defV.toArray();
             spec.defaultX = xy.size() > 0 ? xy.at(0).toDouble(0.0) : 0.0;
             spec.defaultY = xy.size() > 1 ? xy.at(1).toDouble(0.0) : 0.0;
+        } else if (spec.type == drift::EffectParamType::Region) {
+            const QJsonArray xywh = defV.toArray();
+            spec.defaultX = xywh.size() > 0 ? xywh.at(0).toDouble(0.0) : 0.0;
+            spec.defaultY = xywh.size() > 1 ? xywh.at(1).toDouble(0.0) : 0.0;
+            spec.defaultW = xywh.size() > 2 ? xywh.at(2).toDouble(1.0) : 1.0;
+            spec.defaultH = xywh.size() > 3 ? xywh.at(3).toDouble(1.0) : 1.0;
+            spec.regionShape = p.value(QStringLiteral("shape")).toString(QStringLiteral("rect"));
+            if (spec.regionShape != QLatin1String("rect") && spec.regionShape != QLatin1String("ellipse")) {
+                fail(errorOut, QStringLiteral("parameter '%1' has an unknown region shape '%2'")
+                                   .arg(spec.key, spec.regionShape));
+                return false;
+            }
         } else {
             spec.defaultValue = defV.toDouble(0.0);
         }
@@ -260,6 +308,63 @@ bool parseParameters(const QJsonArray &params, QList<drift::EffectParamSpec> *ou
             }
             if (spec.fileFilters.isEmpty())
                 spec.fileFilters.append(QStringLiteral("All files (*)"));
+        } else if (spec.type == drift::EffectParamType::Image) {
+            const QString file = p.value(QStringLiteral("defaultValue")).toString();
+            if (!file.isEmpty()) {
+                spec.defaultString = resolvePackageAsset(packageDir, file);
+                if (spec.defaultString.isEmpty()) {
+                    fail(errorOut, QStringLiteral("parameter '%1' default image '%2' is missing")
+                                       .arg(spec.key, file));
+                    return false;
+                }
+            }
+        } else if (spec.type == drift::EffectParamType::Gradient) {
+            QJsonArray stops;
+            for (const QJsonValue &sv : defV.toArray()) {
+                const QJsonObject stop = sv.toObject();
+                QString rgba;
+                if (!normalizeRgbaHex(stop.value(QStringLiteral("color")).toString(), &rgba)) {
+                    fail(errorOut, QStringLiteral("parameter '%1' has an invalid gradient colour '%2'")
+                                       .arg(spec.key, stop.value(QStringLiteral("color")).toString()));
+                    return false;
+                }
+                const QJsonObject normalized{
+                    {QStringLiteral("position"),
+                     qBound(0.0, stop.value(QStringLiteral("position")).toDouble(0.0), 1.0)},
+                    {QStringLiteral("color"), rgba},
+                };
+                stops.append(normalized);
+            }
+            if (stops.isEmpty()) {
+                fail(errorOut, QStringLiteral("parameter '%1' needs at least one gradient stop").arg(spec.key));
+                return false;
+            }
+            spec.defaultString = QString::fromUtf8(QJsonDocument(stops).toJson(QJsonDocument::Compact));
+        } else if (spec.type == drift::EffectParamType::Curve) {
+            static const QStringList kEases{QStringLiteral("linear"), QStringLiteral("smooth"),
+                                            QStringLiteral("in"), QStringLiteral("out"),
+                                            QStringLiteral("hold")};
+            QJsonArray keys;
+            for (const QJsonValue &kv : defV.toArray()) {
+                const QJsonObject point = kv.toObject();
+                const QString ease = point.value(QStringLiteral("ease")).toString(QStringLiteral("linear"));
+                if (!kEases.contains(ease)) {
+                    fail(errorOut, QStringLiteral("parameter '%1' has an unknown curve ease '%2'")
+                                       .arg(spec.key, ease));
+                    return false;
+                }
+                const QJsonObject normalized{
+                    {QStringLiteral("x"), qBound(0.0, point.value(QStringLiteral("x")).toDouble(0.0), 1.0)},
+                    {QStringLiteral("y"), qBound(0.0, point.value(QStringLiteral("y")).toDouble(0.0), 1.0)},
+                    {QStringLiteral("ease"), ease},
+                };
+                keys.append(normalized);
+            }
+            if (keys.isEmpty()) {
+                fail(errorOut, QStringLiteral("parameter '%1' needs at least one curve key").arg(spec.key));
+                return false;
+            }
+            spec.defaultString = QString::fromUtf8(QJsonDocument(keys).toJson(QJsonDocument::Compact));
         }
         // File params are never GPU uniforms — skip the reserved-name check for them so a
         // package can still call a file param something that would collide as a uniform.
@@ -283,7 +388,63 @@ bool parseParameters(const QJsonArray &params, QList<drift::EffectParamSpec> *ou
             return false;
         }
     }
+    // An audio param's scalars are named after it, so they must not shadow another parameter or
+    // a uniform the engine already binds.
+    for (const drift::EffectParamSpec &spec : std::as_const(*out)) {
+        if (spec.type != drift::EffectParamType::Audio)
+            continue;
+        for (const char *suffix : {"_level", "_bass", "_beat"}) {
+            const QString scalar = spec.key + QLatin1String(suffix);
+            const bool taken = std::any_of(out->cbegin(), out->cend(), [&](const drift::EffectParamSpec &o) {
+                return o.key == scalar;
+            });
+            if (taken || (gpuBackend && drift::isReservedGpuUniform(scalar))) {
+                fail(errorOut, QStringLiteral("audio parameter '%1' collides with '%2'")
+                                   .arg(spec.key, scalar));
+                return false;
+            }
+        }
+    }
     return true;
+}
+
+void collectRuntimeParams(const QList<drift::EffectParamSpec> &params, drift::GpuEffectDefinition *out)
+{
+    out->samplerParams.clear();
+    out->regionParams.clear();
+    for (const drift::EffectParamSpec &spec : params) {
+        if (spec.isSampler())
+            out->samplerParams.append({spec.key, spec.type});
+        else if (spec.isRegion())
+            out->regionParams.append(spec.key);
+    }
+}
+
+bool checkNextFeatures(const QJsonObject &root, QString *errorOut)
+{
+    static const QSet<QString> kSupported{
+        QStringLiteral("param:int"),        QStringLiteral("param:point"),
+        QStringLiteral("param:choice"),     QStringLiteral("param:seed"),
+        QStringLiteral("param:region"),     QStringLiteral("param:image"),
+        QStringLiteral("param:gradient"),   QStringLiteral("param:curve"),
+        QStringLiteral("param:track"),      QStringLiteral("param:trackMask"),
+        QStringLiteral("param:audio"),      QStringLiteral("param:color-alpha"),
+        QStringLiteral("uniform:audio"),    QStringLiteral("requires:mask"),
+        QStringLiteral("requires:depth"),   QStringLiteral("requires:face"),
+    };
+    QStringList unsupported;
+    for (const QJsonValue &v : root.value(QStringLiteral("nextFeatures")).toArray()) {
+        const QString feature = v.toString();
+        // Forge's graph nodes are internal to it, so every node entry is accepted.
+        if (feature.startsWith(QLatin1String("node:")) || kSupported.contains(feature))
+            continue;
+        unsupported.append(feature);
+    }
+    if (unsupported.isEmpty())
+        return true;
+    fail(errorOut, QStringLiteral("needs a newer Drift (unsupported: %1)")
+                       .arg(unsupported.join(QLatin1String(", "))));
+    return false;
 }
 
 void parseFixedParams(const QJsonObject &obj, QMap<QString, QVariant> *out)
@@ -449,6 +610,12 @@ bool loadGpuPipeline(const QJsonObject &root, const QString &packageDir, int max
         out->passes.append(pass);
         ++index;
     }
+
+    static const QRegularExpression kGlobalAudioUniform(QStringLiteral("\\bu_audio(Level|Bass|Beat)\\b"));
+    out->usesGlobalAudio = std::any_of(out->passes.cbegin(), out->passes.cend(),
+                                       [](const drift::GpuEffectPass &pass) {
+                                           return kGlobalAudioUniform.match(pass.fragmentShaderSource).hasMatch();
+                                       });
 
     out->valid = true;
     return true;

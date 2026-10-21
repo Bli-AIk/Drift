@@ -92,6 +92,13 @@ public:
                               drift::TimeUs audibleStartUs = -1, drift::TimeUs audibleEndUs = -1);
 
 
+    // One clip's audio over a window as the mix hears it before the track's volume and pan: the
+    // clip's gain, transition and fade envelopes applied, no effects chain. Stateless, so analysis
+    // can read any window without disturbing playback.
+    static QVector<float> readClipGainedAudio(const drift::Project &project, const drift::Track &track,
+                                              const drift::Clip &clip, quint64 streamId,
+                                              drift::TimeUs winStartUs, int outFrames, int sampleRate);
+
     void setMasterVolume(double volume) { m_masterVolume = volume; }
     double masterVolume() const { return m_masterVolume; }
     void setMasterMuted(bool muted) { m_masterMuted = muted; }

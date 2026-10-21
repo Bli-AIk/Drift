@@ -1701,7 +1701,7 @@
     </message>
     <message>
         <source>About Drift</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thông tin về Drift</translation>
     </message>
     <message>
         <source>Version, licence and credits</source>
@@ -7923,7 +7923,7 @@
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Camera</translation>
     </message>
     <message>
         <source>Camera position</source>
@@ -7935,7 +7935,7 @@
     </message>
     <message>
         <source>PDF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PDF</translation>
     </message>
     <message>
         <source>PDF page</source>
@@ -7999,7 +7999,7 @@
     </message>
     <message>
         <source>Speech</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Giọng nói</translation>
     </message>
     <message>
         <source>Subject</source>
@@ -9006,7 +9006,7 @@
     </message>
     <message>
         <source>About Drift</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thông tin về Drift</translation>
     </message>
     <message>
         <source>Settings…</source>
@@ -9580,7 +9580,7 @@
     </message>
     <message>
         <source>PDF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PDF</translation>
     </message>
     <message>
         <source>PDF (needs the PDF Viewer addon)</source>
@@ -13331,7 +13331,7 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     </message>
     <message>
         <source>Layout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bố cục</translation>
     </message>
     <message>
         <source>Automatic</source>
@@ -13351,11 +13351,11 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     </message>
     <message>
         <source>Restart Drift to switch layouts.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Khởi động lại Drift để chuyển bố cục.</translation>
     </message>
     <message>
         <source>Restart now</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Khởi động lại ngay</translation>
     </message>
     <message>
         <source>Horizontal mouse-wheel pan</source>
@@ -15978,7 +15978,7 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     </message>
     <message>
         <source>Generate voiceover</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tạo lồng tiếng</translation>
     </message>
     <message>
         <source>Speak every caption with a generated voice</source>
@@ -16431,7 +16431,7 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     </message>
     <message>
         <source>Crop…</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cắt cúp…</translation>
     </message>
     <message>
         <source>Enhance video…</source>

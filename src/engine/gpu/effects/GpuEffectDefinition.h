@@ -1,9 +1,12 @@
 #pragma once
 
+#include "core/effects/EffectPreset.h"
+
 #include <QList>
 #include <QMetaType>
 #include <QRectF>
 #include <QString>
+#include <QStringList>
 #include <QVector>
 
 namespace drift {
@@ -45,7 +48,9 @@ inline bool isEngineBoundGpuUniform(const QString &name)
 // declaring its own u_face* slider would collide with what the engine injects.
 inline bool isReservedGpuUniform(const QString &name)
 {
-    return isEngineBoundGpuUniform(name) || name.startsWith(QLatin1String("u_face"));
+    return isEngineBoundGpuUniform(name) || name.startsWith(QLatin1String("u_face"))
+           || name == QLatin1String("u_audioLevel") || name == QLatin1String("u_audioBass")
+           || name == QLatin1String("u_audioBeat");
 }
 
 struct GpuEffectBufferSpec
@@ -95,6 +100,13 @@ struct GpuEffectPass
     QRectF templateBounds;
 };
 
+// A parameter the runtime binds as a sampler2D: an image, a baked gradient or curve, or a track.
+struct GpuSamplerParam
+{
+    QString key;
+    EffectParamType type = EffectParamType::Image;
+};
+
 // Parsed, validated GPU package pipeline (effect.json / transition.json + shaders).
 struct GpuEffectDefinition
 {
@@ -109,6 +121,11 @@ struct GpuEffectDefinition
     // stack is bound beside the declared inputs. The package consumes the masks: the clip is no
     // longer cut out by them. See docs/gpu-effects.md.
     bool needsMask = false;
+    // Parameters bound beyond plain scalars, from the package's parameter list (declaration order).
+    QList<GpuSamplerParam> samplerParams;
+    QStringList regionParams; // bound as a vec4 under the key
+    // A pass reads u_audioLevel, u_audioBass or u_audioBeat, so the Timeline mix is analysed for it.
+    bool usesGlobalAudio = false;
     bool valid = false;
     QString errorMessage;
 };

@@ -1,5 +1,6 @@
 #include "engine/compositor/FrameCompositor.h"
 
+#include "engine/audio/analysis/AudioFrameAnalysis.h"
 #include "engine/decode/probe/StillImage.h"
 
 #include "engine/decode/readers/ClipReaderPool.h"
@@ -95,6 +96,18 @@ struct NestedScope
         t_streamSalt = previousSalt;
         t_sequenceChain.removeLast();
     }
+    quint64 previousSalt;
+};
+
+// A track input decodes its source clip under a stream id of its own. The source track draws that
+// same clip at the same instant, and sharing its cursor would seek the decoder back and forth.
+struct TrackInputScope
+{
+    TrackInputScope() : previousSalt(t_streamSalt)
+    {
+        t_streamSalt = qHashMulti(t_streamSalt, QStringLiteral("track-input"));
+    }
+    ~TrackInputScope() { t_streamSalt = previousSalt; }
     quint64 previousSalt;
 };
 
@@ -208,6 +221,17 @@ drift::TimeUs maskMediaTimeUs(const drift::Clip &host, const drift::Mask &mask, 
     return mediaUs;
 }
 
+// The media masks one clip's lanes contribute at `timelineUs`, with the stream id each decodes under.
+template <typename Visit>
+void forEachLaneMediaMask(const drift::Project &project, int trackIndex, const drift::Clip &clip,
+                          drift::TimeUs timelineUs, Visit &&visit)
+{
+    for (const drift::LaneMask &laneMask : drift::laneMasksAt(project, trackIndex, timelineUs, clip.id)) {
+        if (laneMask.mask.isMedia())
+            visit(clip, laneMask.mask, streamIdFor(laneMask.adjustmentId));
+    }
+}
+
 // Visit every (host clip, media mask) pair that contributes at `timelineUs`, with the stream id
 // the mask's media decodes under. Shared by the two collectors below and mirrored by
 // buildGpuLayer, so retention, warming and the composite cannot disagree about what is read.
@@ -241,15 +265,8 @@ void forEachMediaMask(const drift::Project &project, drift::TimeUs timelineUs, V
         }
 
         for (const drift::Clip &clip : track.clips) {
-            if (!clip.containsTime(timelineUs))
-                continue;
-            const QList<drift::LaneMask> laneMasks = drift::laneMasksAt(project, t, timelineUs, clip.id);
-            for (const drift::LaneMask &laneMask : laneMasks) {
-                if (!laneMask.mask.isMedia())
-                    continue;
-                visit(clip, laneMask.mask,
-                      streamIdFor(laneMask.adjustmentId));
-            }
+            if (clip.containsTime(timelineUs))
+                forEachLaneMediaMask(project, t, clip, timelineUs, visit);
         }
     }
 }
@@ -279,6 +296,102 @@ drift::TimeUs firstDrawnUs(const drift::Track &track, const drift::Clip &clip)
     return firstUs;
 }
 
+QList<drift::Effect> resolvedClipEffects(const drift::Clip &clip, drift::TimeUs clipTimeUs);
+QList<drift::Effect> laneAdjustmentEffects(const drift::Project &project, int trackIndex,
+                                           drift::TimeUs timelineUs, const QString &hostClipId);
+
+// The clip a track or trackMask param reads at `timelineUs`: the one on the named track whose range
+// holds that instant, hidden tracks included. Where a transition overlaps, the outgoing clip wins.
+struct TrackInput
+{
+    const drift::Clip *clip = nullptr;
+    int trackIndex = -1;
+};
+
+// Null for an empty or unknown id, an audio or adjustment track, and a gap.
+TrackInput trackInputAt(const drift::Project &project, const QString &trackId, drift::TimeUs timelineUs)
+{
+    if (trackId.isEmpty())
+        return {};
+    const QList<drift::Track> &tracks = project.tracks();
+    for (int t = 0; t < tracks.size(); ++t) {
+        const drift::Track &track = tracks.at(t);
+        if (track.id != trackId)
+            continue;
+        if (track.type == drift::TrackType::Audio || track.isAdjustment())
+            return {};
+        TrackInput found;
+        for (const drift::Clip &clip : track.clips) {
+            if (clip.type == drift::ClipType::Adjustment || !clip.containsTime(timelineUs))
+                continue;
+            if (!found.clip || clip.timelineStart < found.clip->timelineStart)
+                found = {&clip, t};
+        }
+        return found;
+    }
+    return {};
+}
+
+// One track or trackMask param on a clip's effect chain.
+struct TrackParamRead
+{
+    QString key; // GpuLayer::trackInputs key, "<effect index>/<param key>"
+    TrackInput input;
+    bool mask = false;
+};
+
+QList<TrackParamRead> trackParamReads(const drift::Project &project, const QList<drift::Effect> &chain,
+                                      drift::TimeUs timelineUs)
+{
+    QList<TrackParamRead> reads;
+    for (int i = 0; i < chain.size(); ++i) {
+        const drift::Effect &effect = chain.at(i);
+        const EffectPresetEntry *def = effect.catalogId.isEmpty() ? nullptr : effectDefForId(effect.catalogId);
+        if (!def || !def->isGpu || !def->gpu.valid)
+            continue;
+        for (const drift::GpuSamplerParam &sampler : def->gpu.samplerParams) {
+            if (sampler.type != drift::EffectParamType::Track
+                && sampler.type != drift::EffectParamType::TrackMask)
+                continue;
+            const QMap<QString, QVariant> params = resolvedEffectParameters(effect, *def);
+            reads.append(TrackParamRead{
+                QStringLiteral("%1/%2").arg(i).arg(sampler.key),
+                trackInputAt(project, params.value(sampler.key).toString(), timelineUs),
+                sampler.type == drift::EffectParamType::TrackMask});
+        }
+    }
+    return reads;
+}
+
+// Every track param a plain clip on a visible track reads at `timelineUs`, with the chain
+// buildGpuScene draws for it. Transition sides and adjustments carry no track inputs, so they are
+// skipped as hosts too.
+template <typename Visit>
+void forEachTrackParamRead(const drift::Project &project, drift::TimeUs timelineUs, Visit &&visit)
+{
+    const QList<drift::Track> &tracks = project.tracks();
+    for (int t = 0; t < tracks.size(); ++t) {
+        const drift::Track &track = tracks.at(t);
+        if (track.hidden || track.isAdjustment() || track.type == drift::TrackType::Audio)
+            continue;
+
+        const QSet<QString> transitionClipIds = activeTransitionClipIds(track, timelineUs);
+        for (const drift::Clip &clip : track.clips) {
+            if (transitionClipIds.contains(clip.id) || !clip.containsTime(timelineUs)
+                || clip.type == drift::ClipType::Adjustment) {
+                continue;
+            }
+            const QList<drift::Effect> chain =
+                resolvedClipEffects(clip, timelineUs - clip.timelineStart)
+                + laneAdjustmentEffects(project, t, timelineUs, clip.id);
+            for (const TrackParamRead &read : trackParamReads(project, chain, timelineUs)) {
+                if (read.input.clip)
+                    visit(read);
+            }
+        }
+    }
+}
+
 void collectActivePaths(const drift::Project *project, drift::TimeUs timelineUs, QSet<QString> &videoPaths,
                         QSet<QString> &audioPaths)
 {
@@ -287,12 +400,20 @@ void collectActivePaths(const drift::Project *project, drift::TimeUs timelineUs,
 
     // Retained separately from clip.path: mask media has its own reader, and dropping it here
     // would tear the worker down and re-open the file every frame.
-    forEachMediaMask(*project, timelineUs,
-                     [&](const drift::Clip &, const drift::Mask &mask, quint64) {
-                         videoPaths.insert(mask.mediaPath);
-                         if (!mask.mediaFgrPath.isEmpty() && !mask.invert)
-                             videoPaths.insert(mask.mediaFgrPath);
-                     });
+    const auto retainMask = [&](const drift::Clip &, const drift::Mask &mask, quint64) {
+        videoPaths.insert(mask.mediaPath);
+        if (!mask.mediaFgrPath.isEmpty() && !mask.invert)
+            videoPaths.insert(mask.mediaFgrPath);
+    };
+    forEachMediaMask(*project, timelineUs, retainMask);
+
+    forEachTrackParamRead(*project, timelineUs, [&](const TrackParamRead &read) {
+        const drift::Clip &source = *read.input.clip;
+        if (source.type == drift::ClipType::Video && !source.path.isEmpty())
+            videoPaths.insert(drift::videoReadPath(source, t_allowProxies));
+        if (read.mask)
+            forEachLaneMediaMask(*project, read.input.trackIndex, source, timelineUs, retainMask);
+    });
 
     for (const drift::Track &track : project->tracks()) {
         if (track.hidden)
@@ -351,21 +472,37 @@ QList<ClipReaderPool::VideoRequest> collectVideoRequests(const drift::Project *p
 
     // Mask media decodes like any other video, so warm it alongside the sources rather than
     // stalling the composite on a serial read later.
-    forEachMediaMask(*project, timelineUs,
-                     [&](const drift::Clip &host, const drift::Mask &mask, quint64 streamId) {
-                         const drift::TimeUs mediaUs = maskMediaTimeUs(host, mask, timelineUs);
-                         if (!maskMediaIsStillImage(mask.mediaPath)) {
-                             requests.append(ClipReaderPool::VideoRequest{
-                                 mask.mediaPath, streamId, mediaUs, maxWidth, maxHeight});
-                         }
-                         // The pool keys workers by path, so the sidecar reusing the mask's stream
-                         // id gets its own reader rather than fighting the coverage for one.
-                         if (!mask.mediaFgrPath.isEmpty() && !mask.invert
-                             && !maskMediaIsStillImage(mask.mediaFgrPath)) {
-                             requests.append(ClipReaderPool::VideoRequest{
-                                 mask.mediaFgrPath, streamId, mediaUs, maxWidth, maxHeight});
-                         }
-                     });
+    const auto warmMask = [&](const drift::Clip &host, const drift::Mask &mask, quint64 streamId) {
+        const drift::TimeUs mediaUs = maskMediaTimeUs(host, mask, timelineUs);
+        if (!maskMediaIsStillImage(mask.mediaPath)) {
+            requests.append(ClipReaderPool::VideoRequest{
+                mask.mediaPath, streamId, mediaUs, maxWidth, maxHeight});
+        }
+        // The pool keys workers by path, so the sidecar reusing the mask's stream
+        // id gets its own reader rather than fighting the coverage for one.
+        if (!mask.mediaFgrPath.isEmpty() && !mask.invert
+            && !maskMediaIsStillImage(mask.mediaFgrPath)) {
+            requests.append(ClipReaderPool::VideoRequest{
+                mask.mediaFgrPath, streamId, mediaUs, maxWidth, maxHeight});
+        }
+    };
+    forEachMediaMask(*project, timelineUs, warmMask);
+
+    // A track param decodes its source clip at this instant, and a trackMask its lanes' media too.
+    // Hidden tracks count: a matte usually sits on one.
+    forEachTrackParamRead(*project, timelineUs, [&](const TrackParamRead &read) {
+        const TrackInputScope scope;
+        const drift::Clip &source = *read.input.clip;
+        if (source.type == drift::ClipType::Video && !source.path.isEmpty()) {
+            const drift::VideoRead video = drift::resolveVideoRead(source, timelineUs, t_allowProxies);
+            requests.append(ClipReaderPool::VideoRequest{video.path, streamIdFor(source.id), video.sourceUs,
+                                                         qCeil(maxWidth / source.sourceFrame.width()),
+                                                         qCeil(maxHeight / source.sourceFrame.height()),
+                                                         source.rotationCorrection});
+        }
+        if (read.mask)
+            forEachLaneMediaMask(*project, read.input.trackIndex, source, timelineUs, warmMask);
+    });
 
     for (const drift::Track &track : project->tracks()) {
         if (track.hidden || track.type == drift::TrackType::Audio)
@@ -1585,6 +1722,53 @@ GpuScene buildGpuScene(const drift::Project &project, drift::TimeUs timelineUs, 
         layer.viewActive = sceneViewActive;
         layer.layoutCanvas = layoutCanvas;
     };
+    // The pictures and masks a layer's track params read, built as a transition side is: on its own
+    // track's transform and camera, with its lanes. They carry no track inputs of their own.
+    const auto attachTrackInputs = [&](GpuLayer &layer) {
+        for (const TrackParamRead &read : trackParamReads(project, layer.effects, timelineUs)) {
+            if (!read.input.clip)
+                continue;
+            const TrackInputScope scope;
+            const drift::Clip &source = *read.input.clip;
+            GpuLayer input = buildGpuLayer(project, source, timelineUs, projectWidth, projectHeight, renderScale,
+                                           width, height, fps, options.maxTimeEchoHistoryFrames,
+                                           laneAdjustmentEffects(project, read.input.trackIndex, timelineUs, source.id),
+                                           drift::laneMasksAt(project, read.input.trackIndex, timelineUs, source.id));
+            if (!input.valid)
+                continue;
+            applyParent(input, read.input.trackIndex);
+            applyCamera(input);
+            layer.trackInputs.insert(read.key, std::make_shared<const GpuLayer>(std::move(input)));
+        }
+    };
+    // One analysis per source for the whole scene, so two effects reading one source share it.
+    // The Timeline mix is only analysed when an effect reads its globals.
+    QHash<QString, std::shared_ptr<const AudioFrame>> audioFrames;
+    const auto audioFrameFor = [&](const QString &trackId) {
+        std::shared_ptr<const AudioFrame> &frame = audioFrames[trackId];
+        if (!frame) {
+            frame = std::make_shared<const AudioFrame>(
+                analyzeAt(project, trackId, timelineUs, !options.deferAudioAnalysis));
+        }
+        return frame;
+    };
+    const auto attachAudioInputs = [&](GpuLayer &layer) {
+        for (int i = 0; i < layer.effects.size(); ++i) {
+            const drift::Effect &effect = layer.effects.at(i);
+            const EffectPresetEntry *def = effect.catalogId.isEmpty() ? nullptr : effectDefForId(effect.catalogId);
+            if (!def || !def->isGpu || !def->gpu.valid)
+                continue;
+            if (def->gpu.usesGlobalAudio && !layer.globalAudio)
+                layer.globalAudio = audioFrameFor(QString());
+            const QMap<QString, QVariant> params = resolvedEffectParameters(effect, *def);
+            for (const drift::GpuSamplerParam &sampler : def->gpu.samplerParams) {
+                if (sampler.type != drift::EffectParamType::Audio)
+                    continue;
+                layer.audioInputs.insert(QStringLiteral("%1/%2").arg(i).arg(sampler.key),
+                                         audioFrameFor(params.value(sampler.key).toString()));
+            }
+        }
+    };
 
     // Track 0 is topmost and composites in front, so emit back-to-front.
     const QList<drift::Track> &tracks = project.tracks();
@@ -1702,6 +1886,8 @@ GpuScene buildGpuScene(const drift::Project &project, drift::TimeUs timelineUs, 
                 continue;
             applyParent(item.layer, ti);
             applyCamera(item.layer);
+            attachTrackInputs(item.layer);
+            attachAudioInputs(item.layer);
             noteSelection(clip, item.layer);
             placeRelief(clip, item.layer);
             placeModelLights(clip, item.layer);

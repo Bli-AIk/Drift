@@ -714,6 +714,8 @@ add_library(driftengine STATIC
     src/engine/media/waveforms/WaveformBlockCache.cpp
     src/engine/audio/analysis/AudioOnsets.h
     src/engine/audio/analysis/AudioOnsets.cpp
+    src/engine/audio/analysis/AudioFrameAnalysis.h
+    src/engine/audio/analysis/AudioFrameAnalysis.cpp
     src/engine/ml/vision/detection/SceneDetect.h
     src/engine/ml/vision/detection/SceneDetect.cpp
     src/engine/diagnostics/sheets/FrameSheet.h
@@ -771,6 +773,8 @@ add_library(driftengine STATIC
     src/engine/decode/hw/VaapiZeroCopy.h
     src/engine/gpu/effects/GpuEffectExecutor.h
     src/engine/gpu/effects/GpuEffectExecutor.cpp
+    src/engine/gpu/effects/LookupTextures.h
+    src/engine/gpu/effects/LookupTextures.cpp
     src/engine/compositor/effects/CompositorFrameHistory.h
     src/engine/compositor/effects/CompositorFrameHistory.cpp
     src/engine/compositor/FrameCompositor.h

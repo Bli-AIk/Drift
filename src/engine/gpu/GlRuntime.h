@@ -17,6 +17,7 @@
 #include <QVector4D>
 #include <QByteArray>
 #include <QElapsedTimer>
+#include <QHash>
 #include <QImage>
 #include <QMap>
 #include <QMutex>
@@ -31,6 +32,7 @@
 
 #include <QThread>
 
+#include <array>
 #include <cstdint>
 #include <functional>
 #include <list>
@@ -204,6 +206,26 @@ public:
     };
     std::list<DepthTexture> depthTextures;
     static constexpr size_t kMaxDepthTextures = 4;
+
+    // Sampler params (image, gradient, curve) upload through these. Destroyed in shutdown().
+    struct ParamImage
+    {
+        qint64 modifiedMs = 0; // file mtime at upload; a changed file re-uploads
+        GLuint texture = 0;    // 0: unreadable, binds the shared transparent texture
+    };
+    std::map<QString, ParamImage> paramImages; // absolute path -> upload
+    struct BakedLookup
+    {
+        QString key; // "gradient|<json>" or "curve|<json>"
+        GLuint texture = 0;
+    };
+    std::list<BakedLookup> bakedLookups; // most recent first
+    static constexpr size_t kMaxBakedLookups = 64;
+    // A 1x1 transparent texture for sampler params with nothing to show (track, trackMask, audio).
+    GLuint sharedTransparentTexture = 0;
+    // The 512x2 analysis texture of each audio param, keyed "<effect index>/<param key>". Re-uploaded
+    // in place each frame. Destroyed in shutdown().
+    std::map<QString, GLuint> audioTextures;
 
     // A sampleable depth attachment for model clips that take part in depth occlusion: the
     // pooled targets carry a renderbuffer, which a later pass cannot read. One is enough, since
@@ -561,6 +583,10 @@ constexpr int kDepthTextureUnit = 8;
 // The clip's folded mask stack, for "requires": "mask" packages. Next to the depth unit.
 constexpr int kClipMaskTextureUnit = 9;
 
+// The texture unit for a pass's index-th sampler param, after its `inputCount` input units and
+// skipping the depth and mask units. Mirrors paramSamplerUnit in Forge's compiler/passes.ts.
+int paramSamplerUnit(int inputCount, int index);
+
 // A single-channel 16-bit texture of a depth frame, uploaded once and cached by DepthFrame::key.
 // R16 where the context has it; GLES without EXT_texture_norm16 gets R16F, which is filterable in
 // core ES 3.0 and keeps about 11 bits — plenty for normalised depth.
@@ -573,7 +599,16 @@ struct PipelineAux
     // The clip's masks folded into one coverage map (r: 1 inside), in the same uv space as the
     // pipeline's source 0. 0 leaves u_hasClipMask at 0.
     GLuint clipMask = 0;
+    // Track, trackMask and audio params' textures, keyed by param key. A missing key binds transparent.
+    QHash<QString, GLuint> paramTextures;
+    // Audio params' level, bass and beat, keyed by param key; a missing key reads 0.
+    QHash<QString, std::array<float, 3>> audioScalars;
+    // The Timeline mix's level, bass and beat for u_audioLevel, u_audioBass and u_audioBeat.
+    std::array<float, 3> globalAudio{};
 };
+
+// Upload an audio param's 512x2 RGBA8 analysis (AudioFrame::rgba) into the texture kept under `key`.
+GLuint uploadAudioTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString &key, const QByteArray &rgba);
 
 // Upload a QImage into a pooled FBO, so sources, intermediate buffers and the
 // canvas all share one texture orientation. A null image becomes transparent
@@ -599,8 +634,9 @@ GlTarget promoteVideoFrameToTarget(GlRuntime &rt, QOpenGLExtraFunctions *gl,
 GlTarget promoteVideoFrameToTargetCached(GlRuntime &rt, QOpenGLExtraFunctions *gl,
                                          const PreviewVideoFrame &frame);
 
-void setPackageUniforms(QOpenGLShaderProgram *program, const QMap<QString, QVariant> &parameters,
-                        const QSize &resolution, drift::TimeUs timeUs, double progress);
+void setPackageUniforms(QOpenGLShaderProgram *program, const drift::GpuEffectDefinition &gpu,
+                        const QMap<QString, QVariant> &parameters, const QSize &resolution,
+                        drift::TimeUs timeUs, double progress, const PipelineAux *aux);
 
 // Run every pass of one GPU package, reading from `sources` and returning a new
 // pooled target with the result. Nothing is read back to the CPU. Returns an

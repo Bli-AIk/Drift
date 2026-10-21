@@ -3374,7 +3374,7 @@ QVariantMap effectToMap(const drift::Effect &effect, int effectIndex, drift::Tim
             if (paramDef.desktopGlOnly && runningOnGles())
                 continue;
             QVariant value = effect.parameters.value(
-                paramDef.isVec2() ? paramDef.key + QLatin1String(".x") : paramDef.key);
+                paramDef.isVec2() || paramDef.isRegion() ? paramDef.key + QLatin1String(".x") : paramDef.key);
             if (!value.isValid())
                 value = paramDef.defaultVariant();
 
@@ -3396,6 +3396,15 @@ QVariantMap effectToMap(const drift::Effect &effect, int effectIndex, drift::Tim
                 const QVariant y = effect.parameters.value(paramDef.key + QLatin1String(".y"),
                                                            paramDef.defaultY);
                 param.insert(QStringLiteral("valueY"), y);
+            }
+            if (paramDef.isRegion()) {
+                param.insert(QStringLiteral("valueY"),
+                             effect.parameters.value(paramDef.key + QLatin1String(".y"), paramDef.defaultY));
+                param.insert(QStringLiteral("valueW"),
+                             effect.parameters.value(paramDef.key + QLatin1String(".w"), paramDef.defaultW));
+                param.insert(QStringLiteral("valueH"),
+                             effect.parameters.value(paramDef.key + QLatin1String(".h"), paramDef.defaultH));
+                param.insert(QStringLiteral("regionShape"), paramDef.regionShape);
             }
             if (paramDef.isEnum())
                 param.insert(QStringLiteral("options"), paramDef.options);
@@ -3421,13 +3430,14 @@ QVariantMap effectToMap(const drift::Effect &effect, int effectIndex, drift::Tim
                 && paramDef.key.endsWith(QLatin1String("hue"), Qt::CaseInsensitive)) {
                 param.insert(QStringLiteral("hue"), true);
             }
-            // File paths and clips carry no `prop`: the keyframe stack is typed double. A colour
-            // and a vec2 animate as per-channel tracks ("<key>.r", "<key>.x"), which share their
-            // key times, so the first channel's track stands in for the whole param.
-            if (!paramDef.isFilePath() && !paramDef.isClip()) {
+            // File paths, clips and sampler inputs carry no `prop`: the keyframe stack is typed
+            // double. A colour, vec2 and region animate as per-channel tracks ("<key>.r", "<key>.x"),
+            // which share their key times, so the first channel's track stands in for the whole param.
+            if (!paramDef.isFilePath() && !paramDef.isClip() && !paramDef.isSampler()) {
                 const QString trackKey = paramDef.isColor()  ? paramDef.key + QLatin1String(".r")
-                                         : paramDef.isVec2() ? paramDef.key + QLatin1String(".x")
-                                                             : paramDef.key;
+                                         : paramDef.isVec2() || paramDef.isRegion()
+                                             ? paramDef.key + QLatin1String(".x")
+                                             : paramDef.key;
                 param.insert(QStringLiteral("prop"),
                              QStringLiteral("fx.%1.%2").arg(effectIndex).arg(paramDef.key));
                 param.insert(QStringLiteral("keyframes"),
@@ -4403,6 +4413,12 @@ bool declaresParam(const QList<drift::EffectParamSpec> &parameters, const QStrin
         // A vec2 is stored as "<key>.x" / "<key>.y", so each axis is writable on its own.
         if (param.isVec2() && (key == param.key + QLatin1String(".x") || key == param.key + QLatin1String(".y")))
             return true;
+        if (param.isRegion()) {
+            for (const char *axis : {".x", ".y", ".w", ".h"}) {
+                if (key == param.key + QLatin1String(axis))
+                    return true;
+            }
+        }
     }
     return false;
 }

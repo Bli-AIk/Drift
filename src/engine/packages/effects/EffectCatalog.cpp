@@ -204,6 +204,8 @@ QMap<QString, QVariant> resolvedEffectParameters(const drift::Effect &effect, co
             params.insert(spec.key, spec.defaultString);
         if (spec.isClip() && params.value(spec.key).typeId() != QMetaType::QString)
             params.insert(spec.key, QString());
+        if (spec.isSampler() && params.value(spec.key).typeId() != QMetaType::QString)
+            params.insert(spec.key, spec.defaultVariant());
     }
 
     // Derived placeholders used by graph templates.
