@@ -229,6 +229,7 @@ private slots:
     void trimClipRightRejectsANoOpMove();
     void tracksCacheIsInvalidatedByEveryMutation();
     void removeTransitionDoesNotMoveOverlappingClips();
+    void editsCannotOverlapAClipCompletely();
     void separateAudioFromCombinedClip();
     void mergeSelectedSubtitleClips();
     void mergeAllSubtitlesOnTrackIgnoresSelection();
@@ -4846,6 +4847,38 @@ void EditorStateTest::generateSubtitlesRefusesOverlappingSources()
     QVERIFY(!state.subtitleGenerating());
 }
 
+void EditorStateTest::editsCannotOverlapAClipCompletely()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.setAllowClipOverlap(true);
+    state.setSnapEnabled(false);
+
+    state.addTextClip(QStringLiteral("One"), 0.0);
+    state.setClipDuration(0, 0, 10.0);
+    state.addTextClip(QStringLiteral("Two"), 10.0);
+    state.setClipDuration(0, 1, 4.0);
+    const auto clips = [&] { return state.project()->tracks().at(0).clips; };
+
+    // Moving Two inside One is cancelled; a partial overlap is allowed.
+    state.moveClip(0, 1, 3.0);
+    QCOMPARE(clips().at(1).timelineStart, drift::secondsToUs(10.0));
+    state.moveClip(0, 1, 7.0);
+    QCOMPARE(clips().at(1).timelineStart, drift::secondsToUs(7.0));
+
+    // Equal overlap and shortest length counts as complete.
+    state.moveClip(0, 1, 6.0);
+    QCOMPARE(clips().at(1).timelineStart, drift::secondsToUs(7.0));
+
+    // Extending One's tail to Two's end, or shortening Two to inside One, is refused.
+    state.trimClipRight(0, 0, 11.0);
+    QCOMPARE(clips().at(0).timelineEnd(), drift::secondsToUs(10.0));
+    state.trimClipRight(0, 0, 10.5);
+    QCOMPARE(clips().at(0).timelineEnd(), drift::secondsToUs(10.5));
+    state.setClipDuration(0, 1, 3.0);
+    QCOMPARE(clips().at(1).timelineDuration, drift::secondsToUs(4.0));
+}
+
 void EditorStateTest::separateAudioFromCombinedClip()
 {
     AssetLibrary library;
@@ -6114,10 +6147,10 @@ void EditorStateTest::removeTransitionDoesNotMoveOverlappingClips()
     state.setClipDuration(0, 0, 20.0);
     state.addTextClip(QStringLiteral("Two"), 20.0);
     state.setClipDuration(0, 1, 18.5);
-    state.moveClip(0, 1, 0.0);
+    state.moveClip(0, 1, 15.0);
 
     QCOMPARE(state.project()->tracks().at(0).clips.at(0).timelineStart, drift::TimeUs{0});
-    QCOMPARE(state.project()->tracks().at(0).clips.at(1).timelineStart, drift::TimeUs{0});
+    QCOMPARE(state.project()->tracks().at(0).clips.at(1).timelineStart, drift::secondsToUs(15.0));
 
     state.addTransition(0, 0, QStringLiteral("crossfade"), 0.5);
     const QVariantMap transition = state.transitionBetweenClips(0, 0);
@@ -6129,7 +6162,7 @@ void EditorStateTest::removeTransitionDoesNotMoveOverlappingClips()
 
     QCOMPARE(state.project()->tracks().at(0).transitions.size(), 0);
     QCOMPARE(state.project()->tracks().at(0).clips.at(0).timelineStart, drift::TimeUs{0});
-    QCOMPARE(state.project()->tracks().at(0).clips.at(1).timelineStart, drift::TimeUs{0});
+    QCOMPARE(state.project()->tracks().at(0).clips.at(1).timelineStart, drift::secondsToUs(15.0));
     QCOMPARE(state.durationSeconds(), durationBefore);
 }
 

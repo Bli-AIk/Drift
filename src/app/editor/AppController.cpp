@@ -1169,6 +1169,46 @@ int faceTrackFaceCount(const QString &path)
 QVariantMap transitionToMap(const drift::Project &project, const drift::Track &track, const drift::Transition &t);
 drift::Mask maskFromMap(const QVariantMap &m);
 
+// One clip covering the whole of another leaves nothing to cross between them.
+bool clipsOverlapCompletely(const drift::Clip &a, const drift::Clip &b)
+{
+    const drift::TimeUs overlap = qMin(a.timelineEnd(), b.timelineEnd()) - qMax(a.timelineStart, b.timelineStart);
+    return overlap > 0 && overlap >= qMin(a.timelineDuration, b.timelineDuration);
+}
+
+bool trackHasCompleteOverlap(const drift::Track &track, const drift::Clip &clip, const drift::Clip *before)
+{
+    for (const drift::Clip &other : track.clips) {
+        if (other.id == clip.id || !clipsOverlapCompletely(clip, other))
+            continue;
+        if (!before || !clipsOverlapCompletely(*before, other))
+            return true;
+    }
+    return false;
+}
+
+// Pairs that already overlapped completely in `before` (an older project) are left alone.
+bool editCreatesCompleteOverlap(const drift::Project &before, const drift::Project &after)
+{
+    QSet<QPair<QString, QString>> existing;
+    for (const drift::Track &track : before.tracks()) {
+        for (int i = 0; i < track.clips.size(); ++i)
+            for (int j = i + 1; j < track.clips.size(); ++j)
+                if (clipsOverlapCompletely(track.clips.at(i), track.clips.at(j))) {
+                    existing.insert(qMakePair(track.clips.at(i).id, track.clips.at(j).id));
+                    existing.insert(qMakePair(track.clips.at(j).id, track.clips.at(i).id));
+                }
+    }
+    for (const drift::Track &track : after.tracks()) {
+        for (int i = 0; i < track.clips.size(); ++i)
+            for (int j = i + 1; j < track.clips.size(); ++j)
+                if (clipsOverlapCompletely(track.clips.at(i), track.clips.at(j))
+                    && !existing.contains(qMakePair(track.clips.at(i).id, track.clips.at(j).id)))
+                    return true;
+    }
+    return false;
+}
+
 int findTransitionPartnerIndex(const drift::Track &track, int fromIndex)
 {
     if (fromIndex < 0 || fromIndex >= track.clips.size())
@@ -7255,6 +7295,11 @@ void AppController::moveClip(int trackIndex, int clipIndex, double newStart)
         const drift::Clip &clip = m_project.tracks().at(pair.first).clips.at(pair.second);
         syncLinkedPartnersFrom(m_project, clip, movedIds);
     }
+    if (editCreatesCompleteOverlap(before, m_project)) {
+        m_project = before;
+        setLastMessage(tr("A clip can't completely cover another"), QStringLiteral("warning"));
+        return;
+    }
     m_undoStack.beginMacro(tr("Clip moved"));
     pushProjectEdit(before, tr("Clip moved"));
     autoCrossfadeNewOverlaps(before);
@@ -7752,6 +7797,10 @@ AppController::TrimComputation AppController::computeTrimLeft(int trackIndex, in
             cue.endUs -= delta;
         }
         syncSyntheticSourceRange(clip);
+        if (!m_rippleEnabled && trackHasCompleteOverlap(track, clip, &track.clips.at(clipIndex))) {
+            out.outcome = TrimBlocked;
+            return out;
+        }
         finishRipple(clip);
         out.clip = clip;
         out.changed = true;
@@ -7808,6 +7857,10 @@ AppController::TrimComputation AppController::computeTrimLeft(int trackIndex, in
         }
     }
 
+    if (!m_rippleEnabled && trackHasCompleteOverlap(track, clip, &track.clips.at(clipIndex))) {
+        out.outcome = TrimBlocked;
+        return out;
+    }
     clip.syncDurationFromSpeedCurve();
     finishRipple(clip);
     out.clip = clip;
@@ -7871,6 +7924,10 @@ AppController::TrimComputation AppController::computeTrimRight(int trackIndex, i
         clip.srcIn = qMax<drift::TimeUs>(0, clip.srcOut - span);
     } else {
         clip.srcOut = qMin(clip.srcIn + span, maxSrcOut);
+    }
+    if (!m_rippleEnabled && trackHasCompleteOverlap(track, clip, &track.clips.at(clipIndex))) {
+        out.outcome = TrimBlocked;
+        return out;
     }
     clip.syncDurationFromSpeedCurve();
     if (m_rippleEnabled) {
@@ -8296,6 +8353,11 @@ void AppController::moveClipToTrack(int trackIndex, int clipIndex, int newTrackI
         }
     }
 
+    if (editCreatesCompleteOverlap(before, m_project)) {
+        m_project = before;
+        setLastMessage(tr("A clip can't completely cover another"), QStringLiteral("warning"));
+        return;
+    }
     m_selection = newSelection;
     if (selectedT >= 0 && selectedC >= 0) {
         m_selectedTrack = selectedT;
@@ -11411,6 +11473,11 @@ void AppController::setClipDuration(int trackIndex, int clipIndex, double durati
             clip.srcIn = qMax<drift::TimeUs>(0, clip.srcOut - span);
         else
             clip.srcOut = qMin(clip.srcIn + span, maxSource);
+    }
+    if (editCreatesCompleteOverlap(before, m_project)) {
+        m_project = before;
+        setLastMessage(tr("A clip can't completely cover another"), QStringLiteral("warning"));
+        return;
     }
     pushProjectEdit(before, tr("Duration updated"));
     finishEdit(tr("Duration updated"));
@@ -19731,6 +19798,11 @@ void AppController::nudgeSelection(double deltaSeconds)
                 clip.timelineStart += maxPushRight;
             }
         }
+    }
+    if (editCreatesCompleteOverlap(before, m_project)) {
+        m_project = before;
+        setLastMessage(tr("A clip can't completely cover another"), QStringLiteral("warning"));
+        return;
     }
     pushProjectEdit(before, tr("Nudge selection"));
     finishEdit(tr("Selection nudged"));
