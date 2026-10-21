@@ -58,6 +58,10 @@ Item {
                        tip: qsTr("Trim start — click a clip to drop everything left of the cut") },
         "trimEnd": { glyph: Theme.icons.trimEnd, label: qsTr("Trim end"),
                      tip: qsTr("Trim end — click a clip to drop everything right of the cut") },
+        "deleteLeft": { glyph: Theme.icons.trimStart, label: qsTr("Trim start to playhead"),
+                        shortcut: "deleteLeft" },
+        "deleteRight": { glyph: Theme.icons.trimEnd, label: qsTr("Trim end to playhead"),
+                         shortcut: "deleteRight" },
         "undo": { glyph: Theme.icons.undo, label: qsTr("Undo"), shortcut: "undo" },
         "redo": { glyph: Theme.icons.redo, label: qsTr("Redo"), shortcut: "redo" },
         "delete": { glyph: Theme.icons.trash, label: qsTr("Delete clip"), shortcut: "delete" },
@@ -85,7 +89,7 @@ Item {
     })
 
     readonly property var defaultToolbarItems: [
-        "select", "cut", "separator", "undo", "redo", "delete", "separator",
+        "select", "cut", "deleteLeft", "deleteRight", "separator", "undo", "redo", "delete", "separator",
         "separateAudio", "unlink", "link"
     ]
     readonly property var defaultMenuItems: [
@@ -131,6 +135,8 @@ Item {
         case "cut": panel.timelineTool = panel.timelineTool === "split" ? "" : "split"; break
         case "trimStart": panel.timelineTool = panel.timelineTool === "trimStart" ? "" : "trimStart"; break
         case "trimEnd": panel.timelineTool = panel.timelineTool === "trimEnd" ? "" : "trimEnd"; break
+        case "deleteLeft": EditorState.splitSelectedClipLeft(); break
+        case "deleteRight": EditorState.splitSelectedClipRight(); break
         case "separateAudio": EditorState.separateAudioFromSelection(); break
         case "unlink": EditorState.unlinkSelectedClips(); break
         case "link": EditorState.linkSelectedClips(); break
