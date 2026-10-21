@@ -4,18 +4,25 @@
 #include "engine/gpu/device/GpuPreference.h"
 #include "engine/decode/hw/HwAccel.h"
 #include "engine/decode/hw/VaapiZeroCopy.h"
+#include "engine/platform/AndroidUri.h"
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QFile>
 #include <QGuiApplication>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 #include <QLibraryInfo>
 #include <QLocale>
 #if !defined(Q_OS_WASM)
 #include <QProcess>
 #endif
 #include <QScreen>
+#include <QSet>
 #include <QSettings>
 #include <QTranslator>
+#include <QUrl>
 #include <QVariantMap>
 
 #ifdef Q_OS_ANDROID
@@ -69,6 +76,31 @@ bool needsFirstLaunchLanguagePrompt()
 void markUiLanguageChosen()
 {
     QSettings().setValue(QStringLiteral("ui/languageChosen"), true);
+}
+
+// Settings that describe this machine or hold a credential or trust grant. Matched on the last
+// path segment, so cloud/<provider>/apiKey and market/accessToken are caught without a list per
+// provider. ui/layout/<panel> is matched by prefix: panel geometry is tied to the display.
+bool isMachineOrSecretSetting(const QString &key)
+{
+    static const QSet<QString> kLeaves = {
+        QStringLiteral("accessToken"), QStringLiteral("refreshToken"), QStringLiteral("expiresAt"),
+        QStringLiteral("accountId"), QStringLiteral("accountName"), QStringLiteral("coins"),
+        QStringLiteral("apiKey"), QStringLiteral("token"), QStringLiteral("consent"),
+        QStringLiteral("consented"), QStringLiteral("trusted"),
+        QStringLiteral("geometry"), QStringLiteral("maximized"), QStringLiteral("lastSessionPath"),
+        QStringLiteral("recentProjects"), QStringLiteral("lastFolder"), QStringLiteral("lastDownloadDir"),
+        QStringLiteral("lastCheck"), QStringLiteral("announcedVersion"), QStringLiteral("skippedVersion"),
+        QStringLiteral("pendingVersion"), QStringLiteral("pendingUrl"), QStringLiteral("pendingAssetUrl"),
+        QStringLiteral("pendingAssetName"), QStringLiteral("pendingAssetSha256"),
+        QStringLiteral("pendingAssetSize"), QStringLiteral("pendingNotes"),
+        QStringLiteral("variant"), QStringLiteral("outputDeviceId"), QStringLiteral("decodeMode"),
+        QStringLiteral("hardwareDecode"), QStringLiteral("vaapiZeroCopy"), QStringLiteral("d3d11ZeroCopy"),
+        QStringLiteral("mediaCodecZeroCopy"), QStringLiteral("preferredGpu"),
+        QStringLiteral("speedFactor"), QStringLiteral("speedCalibrated"),
+    };
+    return key.startsWith(QLatin1String("ui/layout/"))
+           || kLeaves.contains(key.section(QLatin1Char('/'), -1));
 }
 
 double normalizeUiScale(double scale)
@@ -600,6 +632,52 @@ bool PreferencesController::canRestart() const
 #else
     return !qEnvironmentVariableIsSet("FLATPAK_ID");
 #endif
+}
+
+QString PreferencesController::exportSettings(const QUrl &url)
+{
+    QSettings settings;
+    QJsonObject values;
+    for (const QString &key : settings.allKeys()) {
+        if (isMachineOrSecretSetting(key))
+            continue;
+        const QVariant value = settings.value(key);
+        if (value.typeId() == QMetaType::QByteArray)
+            continue;
+        const QJsonValue json = QJsonValue::fromVariant(value);
+        if (json.isNull() || json.isUndefined())
+            continue;
+        values.insert(key, json);
+    }
+
+    const QJsonObject root{{QStringLiteral("drift_settings"), 1}, {QStringLiteral("values"), values}};
+    const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Indented);
+    std::unique_ptr<QFile> file = AndroidUri::openForWrite(url);
+    if (!file || file->write(data) != data.size())
+        return tr("Could not write the settings file.");
+    return {};
+}
+
+QString PreferencesController::importSettings(const QUrl &url)
+{
+    std::unique_ptr<QFile> file = AndroidUri::openForRead(url);
+    if (!file)
+        return tr("Could not open the settings file.");
+    QJsonParseError error;
+    const QJsonObject root = QJsonDocument::fromJson(file->readAll(), &error).object();
+    if (error.error != QJsonParseError::NoError
+        || root.value(QStringLiteral("drift_settings")).toInt() != 1)
+        return tr("That file is not a Drift settings export.");
+
+    const QJsonObject values = root.value(QStringLiteral("values")).toObject();
+    QSettings settings;
+    for (auto it = values.begin(); it != values.end(); ++it) {
+        if (!isMachineOrSecretSetting(it.key()))
+            settings.setValue(it.key(), it.value().toVariant());
+    }
+    settings.sync();
+    emit restartNoticeRequested(tr("Settings imported. Restart Drift to apply them all."));
+    return {};
 }
 
 void PreferencesController::restartApp()

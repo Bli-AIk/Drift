@@ -99,4 +99,46 @@ SettingsSectionCard {
         width: parent.width
         showIntro: false
     }
+
+    Rectangle {
+        width: parent.width
+        height: Theme.c.settingsAppSection.borderWidth
+        color: Theme.c.settingsAppSection.divider
+    }
+
+    ThemedLabel {
+        text: qsTr("Settings file")
+    }
+
+    Row {
+        width: parent.width
+        spacing: Theme.spacingMd
+
+        ThemedButton {
+            variant: "secondary"
+            text: qsTr("Export settings…")
+            onClicked: {
+                const url = FileDialogs.saveFile(qsTr("Export Settings"), [qsTr("JSON document (*.json)")],
+                                                 "drift-settings", "json", "", ["application/json"])
+                if (url == "")
+                    return
+                const error = EditorState.preferences.exportSettings(url)
+                EditorState.setLastMessage(error || qsTr("Settings exported"), error ? "error" : "success")
+            }
+        }
+
+        ThemedButton {
+            variant: "secondary"
+            text: qsTr("Import settings…")
+            onClicked: {
+                const url = FileDialogs.openFile(qsTr("Import Settings"), [qsTr("JSON document (*.json)")],
+                                                 ["application/json"])
+                if (url == "")
+                    return
+                const error = EditorState.preferences.importSettings(url)
+                if (error)
+                    EditorState.setLastMessage(error, "error")
+            }
+        }
+    }
 }

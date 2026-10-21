@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QStringList>
+#include <QUrl>
 #include <QVariantList>
 
 // App-wide QSettings preferences and persisted UI layout. Reached from QML as
@@ -167,6 +168,10 @@ public:
     // arms a relaunch for aboutToQuit, so the caller still closes the window and the
     // unsaved-changes prompt gets its say.
     Q_INVOKABLE void restartApp();
+    // Writes every preference except machine-specific and secret ones as JSON. Import applies the
+    // same filter, then asks for a restart. Both return "" on success, else the message to show.
+    Q_INVOKABLE QString exportSettings(const QUrl &url);
+    Q_INVOKABLE QString importSettings(const QUrl &url);
     // Installs the .qm for ui/language (or the system locale). Call once after QApplication
     // is named, and again from setUiLanguage. Safe before any PreferencesController exists.
     static void installUiTranslators();
