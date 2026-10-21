@@ -2754,6 +2754,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>A clip can&apos;t completely cover another</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Clips moved</source>
         <translation type="unfinished"></translation>
     </message>

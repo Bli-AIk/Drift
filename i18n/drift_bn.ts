@@ -2349,6 +2349,10 @@
         <translation type="unfinished">ক্লিপ মুছে ফেলা হয়েছে।</translation>
     </message>
     <message>
+        <source>A clip can&apos;t completely cover another</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Clip moved</source>
         <translation type="unfinished">ক্লিপ সরানো হয়েছে</translation>
     </message>

@@ -2349,6 +2349,10 @@
         <translation>ක්ලිපය මකා දමන ලදී</translation>
     </message>
     <message>
+        <source>A clip can&apos;t completely cover another</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Clip moved</source>
         <translation>ක්ලිපය ගෙනයන ලදී</translation>
     </message>

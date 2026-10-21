@@ -2749,6 +2749,10 @@
         <translation>録音をキャンセルしました</translation>
     </message>
     <message>
+        <source>A clip can&apos;t completely cover another</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Clips moved</source>
         <translation>クリップを移動しました</translation>
     </message>

@@ -2349,6 +2349,10 @@
         <translation>Clipe excluído</translation>
     </message>
     <message>
+        <source>A clip can&apos;t completely cover another</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Clip moved</source>
         <translation>Clipe movido</translation>
     </message>
