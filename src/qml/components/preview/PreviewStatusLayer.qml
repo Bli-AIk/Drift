@@ -64,7 +64,7 @@ Item {
                     .arg(EditorState.playback.gpuCompositorDetail)
               : qsTr("Drift could not start its GPU renderer, so the preview cannot draw.")
         actionText: qsTr("Debug info")
-        onActionTriggered: root.Window.window.openDebugInfo()
+        onActionTriggered: ShellBridge.main.openDebugInfo()
     }
 
     PreviewCompactGpuCaption {

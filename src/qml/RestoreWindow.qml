@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Window
-import Drift 1.0
+import Drift
 
 // Compression removal and upscaling for one clip's used range, or a whole bin video. One frame can
 // be previewed first, original and enhanced split by a draggable divider under a shared zoom; the

@@ -6,13 +6,11 @@ import Drift
 ApplicationWindow {
     id: window
     property alias editorHeader: workspace.editorHeader
-    property alias rootSplit: workspace.rootSplit
-    property alias outerSplit: workspace.outerSplit
-    property alias innerSplit: workspace.innerSplit
-    property alias assetsPanel: workspace.assetsPanel
-    property alias previewPanel: workspace.previewPanel
-    property alias propertiesPanel: workspace.propertiesPanel
-    property alias timelinePanel: workspace.timelinePanel
+    // Null until a layout puts the panel in play; the pool creates panels on demand.
+    readonly property var assetsPanel: workspace.pool.assetsPanel
+    readonly property var previewPanel: workspace.pool.previewPanel
+    readonly property var propertiesPanel: workspace.pool.propertiesPanel
+    readonly property var timelinePanel: workspace.pool.timelinePanel
     property alias androidMediaPreviewLoader: mediaPreviewHost.loader
 
     // Qt creates some chrome itself — most visibly the Undo/Cut/Copy/Paste menu on every
@@ -122,8 +120,10 @@ ApplicationWindow {
         // Before any of the branches below, so a quit that is cancelled at the
         // unsaved prompt still records where the window was.
         window.persistWindowState()
-        if (window.forceClose || !EditorState.projectFile.hasUnsavedChanges)
+        if (window.forceClose || !EditorState.projectFile.hasUnsavedChanges) {
+            workspace.closeWindows()
             return
+        }
         close.accepted = false
         // Leave preview fullscreen so the save prompt isn't sitting on a blank
         // full-window preview.
@@ -161,7 +161,7 @@ ApplicationWindow {
             // an ordinary window — it is only the three modes below that are not.
             const mode = window.visibility
             if (mode !== Window.Maximized && mode !== Window.FullScreen
-                    && mode !== Window.Minimized && !window.previewFullscreen)
+                    && mode !== Window.Minimized && !window.mainPreviewFullscreen)
                 window.windowedGeometry = Qt.rect(window.x, window.y, window.width, window.height)
             window.persistWindowState()
         }
@@ -254,83 +254,37 @@ ApplicationWindow {
         LayoutMemory.saveWindowState(window.windowedGeometry, maximized === 1)
     }
 
-    // Panel sizes are kept as a fraction of the split they sit in rather than a pixel
-    // width, so a layout dragged out on a 4K display still reads on a laptop screen.
-    // Keyed by workspace, because portrait and landscape are different arrangements
-    // and each deserves to remember its own.
-    //
-    // Fractions are written only when the user finishes dragging a handle, and
-    // reapplied whenever the split they are a fraction of changes size. Sampling them
-    // at any other time is what made them shrink every launch (#326): the window first
-    // lays out at its windowed size and is maximized after, so pixel sizes restored on
-    // that first pass were then read back against the larger window.
-
-    // Writing an attached SplitView size drops the default binding behind it — which
-    // is the point: from here on the panel keeps the size the user chose, exactly as
-    // it does after a handle drag. Fullscreen collapses every panel around the
-    // preview; those sizes are a mode, not a layout, and are left alone.
-    function applyEditorRowFraction() {
-        if (window.previewFullscreen || outerSplit.height <= 0)
-            return
-        const editorRow = LayoutMemory.panelFraction(window.workspaceLayout + "/editorRow", 0)
-        if (editorRow > 0)
-            innerSplit.SplitView.preferredHeight = outerSplit.height * editorRow
-    }
-
-    function applySidePanelFractions() {
-        if (window.previewFullscreen || innerSplit.width <= 0)
-            return
-        const prefix = window.workspaceLayout + "/"
-        const assets = LayoutMemory.panelFraction(prefix + "assets", 0)
-        if (assets > 0)
-            assetsPanel.SplitView.preferredWidth = innerSplit.width * assets
-        const properties = LayoutMemory.panelFraction(prefix + "properties", 0)
-        if (properties > 0)
-            propertiesPanel.SplitView.preferredWidth = innerSplit.width * properties
-    }
-
-    // Landscape hands the preview the slack in its row (fillWidth), so it has no
-    // width of its own there.
-    function applyPreviewFraction() {
-        if (window.previewFullscreen || !window.portraitWorkspace || rootSplit.width <= 0)
-            return
-        const preview = LayoutMemory.panelFraction(window.workspaceLayout + "/preview", 0)
-        if (preview > 0)
-            previewPanel.SplitView.preferredWidth = rootSplit.width * preview
-    }
-
-    // A workspace flip moves the preview between splits, so the panels around it are
-    // still resizing on the frame the flip lands. Reapplying immediately would divide
-    // by stale extents; waiting lets the new arrangement settle first.
-    Timer {
-        id: workspaceApplyTimer
-        interval: 100
-        onTriggered: {
-            window.applyEditorRowFraction()
-            window.applySidePanelFractions()
-            window.applyPreviewFraction()
-        }
-    }
-
     // Fullscreen preview: the window goes fullscreen *and* every panel around the
     // preview collapses, so the video actually fills the display. Toggling the
     // window alone just scaled the same three-pane layout up.
     property bool previewFullscreen: false
+    // The window that went fullscreen: the one holding the preview, which may be a secondary
+    // workspace window.
+    property var fullscreenWindow: null
+    readonly property bool mainPreviewFullscreen: previewFullscreen && fullscreenWindow === window
     // Restoring to Windowed unconditionally would silently un-maximize a window
     // that was maximized before going fullscreen.
     property int _preFullscreenVisibility: Window.Windowed
 
     function togglePreviewFullscreen() {
         if (previewFullscreen) {
+            const target = fullscreenWindow ?? window
             previewFullscreen = false
+            fullscreenWindow = null
             // KDE Plasma doesn't handle Fullscreen -> Maximized for some reason
-            visibility = _preFullscreenVisibility // Fullscreen -> Windowed
-            visibility = _preFullscreenVisibility // Windowed -> Maximized (if it was previously maximized)
+            target.visibility = _preFullscreenVisibility // Fullscreen -> Windowed
+            target.visibility = _preFullscreenVisibility // Windowed -> Maximized (if it was previously maximized)
         } else {
-            _preFullscreenVisibility = visibility
+            const target = previewPanel?.Window.window ?? window
+            _preFullscreenVisibility = target.visibility
+            fullscreenWindow = target
             previewFullscreen = true
-            visibility = Window.FullScreen
+            target.visibility = Window.FullScreen
         }
+    }
+
+    function restoreWindows() {
+        workspace.restoreWindows()
     }
 
     // Android's system Back, which is not Escape. Newest-on-top: a tool window is a full-screen
@@ -388,22 +342,27 @@ ApplicationWindow {
         onActivated: window.togglePreviewFullscreen()
     }
 
-    // Which of the two panel arrangements the editor is in. The preference is
-    // stored as "not chosen" / portrait / landscape rather than a single bool, so
-    // the canvas can keep driving it until the user takes the decision away — the
-    // effective value is resolved here because it depends on both preference and
-    // canvas, which are separate notifiers on the C++ side.
+    // The preference is stored as "not chosen" / portrait / landscape rather than a single
+    // bool, so the canvas can keep driving it until the user takes the decision away — the
+    // effective value is resolved here because it depends on both preference and canvas,
+    // which are separate notifiers on the C++ side.
     readonly property string workspaceLayout: EditorState.preferences.workspaceLayoutOverridden
                                               ? EditorState.preferences.workspaceLayoutPreferred
                                               : (EditorState.projectPortrait ? "portrait" : "landscape")
-    readonly property bool portraitWorkspace: workspaceLayout === "portrait"
 
-    onPortraitWorkspaceChanged: {
-        rootSplit.relocatePreview()
-        // The two workspaces remember their own proportions, so the flip pulls in the
-        // other one's.
-        workspaceApplyTimer.restart()
+    // The workspace actually on screen: the active one, or its portrait alternative when
+    // the layout preference (or the canvas, in auto) asks for portrait.
+    readonly property string effectiveWorkspaceId: {
+        Workspaces.workspaces
+        const active = Workspaces.activeId
+        const alternative = Workspaces.workspace(active).portraitAlternative
+        if (alternative && window.workspaceLayout === "portrait"
+                && Workspaces.workspace(alternative).id === alternative)
+            return alternative
+        return active
     }
+    readonly property bool portraitWorkspace: window.effectiveWorkspaceId !== Workspaces.activeId
+                                              || window.effectiveWorkspaceId === "edit-portrait"
 
     function configureAndAddAsset(assetIndex, runner) {
         if (!EditorState.shouldConfigureProjectForAsset(assetIndex)) {
@@ -752,6 +711,8 @@ ApplicationWindow {
         fadeCurveWindowLoader.ensure().openForTransition(track, transitionId)
     }
 
+    readonly property bool mediaPreviewWindowOpen: mediaPreviewWindowLoader.shown
+
     function openMediaPreview(assetIndex) {
         // A VideoOutput in a secondary window paints black on Android, so use the in-window page.
         if (Qt.platform.os === "android") {
@@ -762,9 +723,12 @@ ApplicationWindow {
             window.mediaPreviewPage.openFor(assetIndex)
             return
         }
-        const w = mediaPreviewWindowLoader.ensure()
-        w.host = window
-        w.openFor(assetIndex)
+        const viewer = workspace.pool.sourceViewerShown ? workspace.pool.sourceViewerPanel : null
+        if (viewer && !mediaPreviewWindowLoader.shown) {
+            viewer.openAsset(assetIndex)
+            return
+        }
+        mediaPreviewWindowLoader.ensure().openFor(assetIndex)
     }
 
     function openCrop(track, clip) {
@@ -777,6 +741,8 @@ ApplicationWindow {
             window.mediaPreviewPage.openClip(track, clip)
             return
         }
+        if (workspace.pool.sourceViewerShown)
+            workspace.pool.sourceViewerPanel.release()
         mediaPreviewWindowLoader.ensure().openClip(track, clip)
     }
 
@@ -788,6 +754,10 @@ ApplicationWindow {
 
     // Opened from the header's Settings menu. Every preference lives here now; the
     // assets rail no longer carries a settings tab.
+    function openAgentAccess() {
+        editorHeader.openAgentAccess()
+    }
+
     function openSettings(pageId) {
         const dialog = settingsDialogLoader.ensure()
         if (pageId)
@@ -949,11 +919,11 @@ ApplicationWindow {
     function showAssetsTab(tabId) {
         if (window.previewFullscreen)
             window.togglePreviewFullscreen()
-        assetsPanel.showTab(tabId)
+        assetsPanel?.showTab(tabId)
     }
 
     function assetsTabLabel(tabId) {
-        return assetsPanel.tabLabel(tabId)
+        return assetsPanel?.tabLabel(tabId) ?? ""
     }
 
     function focusEditor() {
@@ -1003,8 +973,11 @@ ApplicationWindow {
         onTriggered: window.promptLayoutChooserIfNeeded()
     }
 
+    Component.onDestruction: if (ShellBridge.main === window) ShellBridge.main = null
+
     Component.onCompleted: {
         WindowBackdrop.attach(window)
+        ShellBridge.main = window
         Theme.windowWidth = window.width
         MediaImport.sequencePrompt = function (found, done) {
             imageSequenceDialogLoader.ensure().ask(found, done)
@@ -1325,12 +1298,20 @@ ApplicationWindow {
     // Escape (clearSelection): CapCut-style — if a timeline cut tool is active,
     // first press returns to Select; only then does Escape clear the selection.
     function dispatchAction(id) {
+        if (id === "workspace.restoreWindows") {
+            window.restoreWindows()
+            return
+        }
+        if (id === "clearSelection" && previewFullscreen && fullscreenWindow !== window) {
+            window.togglePreviewFullscreen()
+            return
+        }
         if (id === "clearSelection" && EditorState.preview.guideEditSetId !== "") {
             EditorState.preview.guideEditSetId = ""
             return
         }
         if (id === "clearSelection"
-                && timelinePanel.visible
+                && timelinePanel?.visible
                 && timelinePanel.timelineTool !== "") {
             timelinePanel.timelineTool = ""
             return
@@ -1338,29 +1319,45 @@ ApplicationWindow {
         // Tool modes are QML state, so they are dispatched here rather
         // than by triggerAction.
         if (id === "selectTool") {
-            timelinePanel.timelineTool = ""
+            if (timelinePanel)
+                timelinePanel.timelineTool = ""
             return
         }
         if (id === "bladeTool") {
-            timelinePanel.timelineTool = "split"
+            if (timelinePanel)
+                timelinePanel.timelineTool = "split"
             return
         }
         // Timeline zoom is QML state as well, and the 1.5 step matches the
         // toolbar buttons. setZoom clamps to minZoom/maxZoom and re-anchors on
         // the playhead, so holding the key walks to the end of the range and stops.
         if (id === "zoomIn") {
-            if (timelinePanel.visible)
+            if (timelinePanel?.visible)
                 timelinePanel.setZoom(timelinePanel.zoom * 1.5)
             return
         }
         if (id === "zoomOut") {
-            if (timelinePanel.visible)
+            if (timelinePanel?.visible)
                 timelinePanel.setZoom(timelinePanel.zoom / 1.5)
             return
         }
         if (id === "search") {
             if (editorHeader.visible)
                 editorHeader.focusSearch()
+            return
+        }
+        if (id === "workspace.next" || id === "workspace.prev") {
+            const list = Workspaces.workspaces
+            const step = id === "workspace.next" ? 1 : -1
+            const index = list.findIndex(w => w.id === Workspaces.activeId)
+            if (list.length > 0)
+                Workspaces.activeId = list[(index + step + list.length) % list.length].id
+            return
+        }
+        if (/^workspace\.[1-9]$/.test(id)) {
+            const ws = Workspaces.workspaces[Number(id.slice(10)) - 1]
+            if (ws)
+                Workspaces.activeId = ws.id
             return
         }
         EditorState.triggerAction(id)

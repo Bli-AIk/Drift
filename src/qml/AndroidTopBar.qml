@@ -138,10 +138,10 @@ Item {
                 glyph: Theme.icons.puzzle
                 variant: "text"
                 tooltip: qsTr("Extras")
-                onClicked: Window.window.openExtras()
+                onClicked: ShellBridge.main.openExtras()
 
                 AndroidAttentionDot {
-                    visible: Window.window.addonAttentionNeeded
+                    visible: ShellBridge.main?.addonAttentionNeeded
                     anchors.right: parent.right
                     anchors.top: parent.top
                     anchors.margins: Theme.spacingSm

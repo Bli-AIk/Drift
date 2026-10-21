@@ -15,7 +15,7 @@ Item {
     // The canvas sheet is hosted by the window, the properties sheet by this page.
     readonly property real nonBlockingSheetHeight: Math.max(
         (propertiesSheet.opened && !propertiesSheet.blocking) ? propertiesSheet.panelHeight : 0,
-        Window.window.nonBlockingSheetHeight,
+        (ShellBridge.main?.nonBlockingSheetHeight ?? 0),
         composer.coveredHeight,
         textEditBar.coveredHeight)
 
@@ -193,7 +193,7 @@ Item {
     }
 
     function saveProject() {
-        return Window.window.saveProject()
+        return ShellBridge.main.saveProject()
     }
 
     // Save As: the open project written to a second file, which the session then continues in.
@@ -218,7 +218,7 @@ Item {
     // Reached from EditorState's own signals (desktop menus, launch intents), not from any
     // phone control: Open and New are tiles on Home -> Projects now.
     function openProject() {
-        Window.window.confirmIfDirty(function () {
+        ShellBridge.main.confirmIfDirty(function () {
             const url = FileDialogs.openFile(qsTr("Open Project"), root.projectFilter)
             if (url !== "")
                 EditorState.projectFile.loadProject(url)
@@ -226,9 +226,9 @@ Item {
     }
 
     function requestNewProject() {
-        Window.window.confirmIfDirty(function () {
+        ShellBridge.main.confirmIfDirty(function () {
             EditorState.projectFile.newProject()
-            Window.window.showHome()
+            ShellBridge.main.showHome()
         })
     }
 
@@ -255,7 +255,7 @@ Item {
             root.packageProject()
             break
         case "layout":
-            Window.window.openLayoutChooser()
+            ShellBridge.main.openLayoutChooser()
             break
         case "crop":
             // The overlay carries its own Cancel/Apply, and the preview goes
@@ -263,31 +263,31 @@ Item {
             EditorState.preview.canvasCropMode = true
             break
         case "properties":
-            Window.window.openProjectProperties()
+            ShellBridge.main.openProjectProperties()
             break
         case "multicam":
-            Window.window.openMulticam()
+            ShellBridge.main.openMulticam()
             break
         case "extras":
-            Window.window.openExtras()
+            ShellBridge.main.openExtras()
             break
         case "settings":
-            Window.window.openSettings()
+            ShellBridge.main.openSettings()
             break
         case "theme":
             Theme.toggleDarkMode()
             break
         case "desktopLayout":
-            Window.window.switchShell("desktop")
+            ShellBridge.main.switchShell("desktop")
             break
         case "update":
-            Window.window.openUpdateDialog()
+            ShellBridge.main.openUpdateDialog()
             break
         case "debug":
-            Window.window.openDebugInfo()
+            ShellBridge.main.openDebugInfo()
             break
         case "about":
-            Window.window.openAboutDialog()
+            ShellBridge.main.openAboutDialog()
             break
         }
     }

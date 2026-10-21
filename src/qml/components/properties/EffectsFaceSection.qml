@@ -198,7 +198,7 @@ Column {
               ? qsTr("Download face detection (about 5 MB)")
               : qsTr("Install AI engine first")
         variant: "primary"
-        onClicked: faceSection.Window.window.openAddonManager(
+        onClicked: ShellBridge.main.openAddonManager(
             faceSection.runtimeReady ? "face-model" : "onnxruntime")
     }
 }

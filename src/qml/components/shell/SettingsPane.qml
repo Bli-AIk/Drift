@@ -23,6 +23,7 @@ Item {
     readonly property var pages: [
         { id: "general", title: qsTr("General") },
         { id: "appearance", title: qsTr("Appearance") },
+        { id: "workspaces", title: qsTr("Workspaces") },
         { id: "timeline", title: qsTr("Timeline") },
         { id: "toolbar", title: qsTr("Timeline toolbar") },
         { id: "keymap", title: qsTr("Keyboard shortcuts") },
@@ -37,7 +38,7 @@ Item {
         (page) => page.id !== "marketplace" || (Market.configured && Market.authenticated))
 
     readonly property bool searchHasMatches: generalPage.hasMatches || appearancePage.hasMatches
-        || timelinePage.hasMatches || toolbarPage.hasMatches || keymapPage.hasMatches
+        || workspacesPage.hasMatches        || timelinePage.hasMatches || toolbarPage.hasMatches || keymapPage.hasMatches
         || previewPage.hasMatches || audioPage.hasMatches || aiPage.hasMatches
         || networkPage.hasMatches || marketplacePage.hasMatches || aboutPage.hasMatches
 
@@ -170,6 +171,12 @@ Item {
 
             SettingsAppearancePage {
                 id: appearancePage
+                query: root.query
+                visible: root.query.length > 0 ? hasMatches : pageId === root.currentPage
+            }
+
+            SettingsWorkspacesPage {
+                id: workspacesPage
                 query: root.query
                 visible: root.query.length > 0 ? hasMatches : pageId === root.currentPage
             }

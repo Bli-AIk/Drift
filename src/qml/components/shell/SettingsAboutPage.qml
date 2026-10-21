@@ -65,7 +65,7 @@ SettingsPage {
         ThemedButton {
             variant: "secondary"
             text: qsTr("Show about dialog")
-            onClicked: page.Window.window.openAboutDialog()
+            onClicked: ShellBridge.main.openAboutDialog()
         }
     }
 
@@ -78,7 +78,7 @@ SettingsPage {
         ThemedButton {
             variant: "secondary"
             text: qsTr("Open debug info…")
-            onClicked: page.Window.window.openDebugInfo()
+            onClicked: ShellBridge.main.openDebugInfo()
         }
     }
 }

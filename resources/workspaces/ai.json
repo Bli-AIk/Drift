@@ -1,0 +1,33 @@
+{
+  "id": "ai",
+  "name": "AI",
+  "builtin": true,
+  "order": 6,
+  "windows": [
+    {
+      "id": "main",
+      "root": {
+        "split": "h",
+        "sizes": [0.65, 0.35],
+        "children": [
+          {
+            "split": "v",
+            "sizes": [0.7, 0.3],
+            "children": [
+              { "panels": [ { "type": "preview" } ], "active": 0 },
+              { "panels": [ { "type": "timeline" } ], "active": 0 }
+            ]
+          },
+          {
+            "split": "v",
+            "sizes": [0.65, 0.35],
+            "children": [
+              { "panels": [ { "type": "agentLog" } ], "active": 0 },
+              { "panels": [ { "type": "undoHistory" } ], "active": 0 }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

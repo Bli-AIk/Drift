@@ -101,7 +101,7 @@ Column {
             title: qsTr("No effect templates")
             hint: qsTr("Install the Effect Templates pack from Extras to browse presets here.")
             actionText: qsTr("Get extras")
-            onActionTriggered: root.Window.window.openAddonManager()
+            onActionTriggered: ShellBridge.main.openAddonManager()
         }
 
         Text {

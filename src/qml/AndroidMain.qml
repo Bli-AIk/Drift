@@ -491,7 +491,7 @@ ApplicationWindow {
         }
     }
     // The phone view over LayoutPresets. Hosted here rather than in the editor because
-    // Settings → Video reaches it through Window.window.openLayoutChooser() too.
+    // Settings → Video reaches it through ShellBridge.main.openLayoutChooser() too.
     // Every marketplace download, whichever surface started it, gets a durable copy.
     //
     // Without this a download lives only in AppDataLocation — wiped by an uninstall or a "clear
@@ -671,7 +671,7 @@ ApplicationWindow {
     LazyLoader { id: fadeCurveWindowLoader; sourceComponent: Component { FadeCurveWindow { } } }
     LazyLoader { id: multicamWindowLoader; sourceComponent: Component { MulticamWindow { } } }
 
-    // Every inspector reaches these through Window.window.<name>() — the same contract
+    // Every inspector reaches these through ShellBridge.main.<name>() — the same contract
     // Main.qml offers on desktop. A missing one is a runtime TypeError, not a dead button.
     function openSegmentation(track, clip, startSeconds, durationSeconds) {
         segmentationWindowLoader.ensure().openFor(track, clip, startSeconds, durationSeconds)
@@ -836,8 +836,11 @@ ApplicationWindow {
         }
     }
 
+    Component.onDestruction: if (ShellBridge.main === window) ShellBridge.main = null
+
     Component.onCompleted: {
         WindowBackdrop.attach(window)
+        ShellBridge.main = window
         Theme.windowWidth = window.width
         // Independent of the language/recovery/launch-intent branching below — it
         // neither gates nor is gated by any of it.

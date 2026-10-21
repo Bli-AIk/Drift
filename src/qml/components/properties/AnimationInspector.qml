@@ -66,7 +66,7 @@ Item {
         const id = root.styleIds[index]
         if (id === "custom" || id === "bezier") {
             root.setAnim(which, { curve: id })
-            root.Window.window.openFadeCurve(EditorState.selectedTrack, EditorState.selectedClip)
+            ShellBridge.main.openFadeCurve(EditorState.selectedTrack, EditorState.selectedClip)
             return
         }
         root.setAnim(which, { curve: id })
@@ -168,7 +168,7 @@ Item {
                 if (id === "custom" || id === "bezier") {
                     EditorState.setClipFadeCurve(
                                 EditorState.selectedTrack, EditorState.selectedClip, id)
-                    root.Window.window.openFadeCurve(
+                    ShellBridge.main.openFadeCurve(
                                 EditorState.selectedTrack, EditorState.selectedClip)
                     return
                 }
@@ -295,7 +295,7 @@ Item {
             width: parent.width
             text: qsTr("Edit custom curve…")
             variant: "secondary"
-            onClicked: root.Window.window.openFadeCurve(
+            onClicked: ShellBridge.main.openFadeCurve(
                            EditorState.selectedTrack, EditorState.selectedClip)
         }
 

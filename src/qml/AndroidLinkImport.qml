@@ -321,7 +321,7 @@ AndroidBottomSheet {
                     onClicked: {
                         const assetId = root.importedAssetId
                         root.dismiss()
-                        Window.window.openDownloadedAsset(assetId)
+                        ShellBridge.main.openDownloadedAsset(assetId)
                     }
                 }
 

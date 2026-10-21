@@ -11,6 +11,8 @@ PanelFrame {
 
     property real zoom: 1.0
     property bool keyframesTab: false
+    // Set by PanelPool while the Audio Mixer panel is on screen; the built-in strip steps aside.
+    property bool externalMixerShown: false
 
     // Timeline tool mode (CapCut-style exclusive modes). One of:
     //   ""          Select — normal editing (toolbar pointer / V)
@@ -812,8 +814,8 @@ PanelFrame {
                 onPlaced()
         }
 
-        if (typeof Window !== "undefined" && Window.window && Window.window.configureAndAddAsset)
-            Window.window.configureAndAddAsset(assetIndex, runAdd)
+        if (ShellBridge.main && ShellBridge.main.configureAndAddAsset)
+            ShellBridge.main.configureAndAddAsset(assetIndex, runAdd)
         else
             runAdd()
     }
@@ -2069,6 +2071,7 @@ PanelFrame {
             AudioMixerStrip {
                 id: audioMixer
                 height: parent.height
+                visible: width > 0 && !root.externalMixerShown
             }
         }
         } // Column (keyframes + tracks)

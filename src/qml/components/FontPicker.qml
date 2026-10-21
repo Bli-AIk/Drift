@@ -219,7 +219,7 @@ Item {
                     shown: root.usingSystemFonts
                     onPackRequested: {
                         popup.close()
-                        root.Window.window.openAddonManager("fonts")
+                        ShellBridge.main.openAddonManager("fonts")
                     }
                 }
                 currentIndex: -1

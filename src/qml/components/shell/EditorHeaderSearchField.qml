@@ -81,7 +81,7 @@ Rectangle {
             { label: qsTr("Downloads"), keywords: "download link", run: () => searchBox.downloadsRequested() },
             { label: qsTr("Language…"), keywords: "translate locale", run: () => searchBox.languageRequested() },
             { label: qsTr("Video size and layout"), keywords: "canvas resolution aspect ratio", run: () => searchBox.videoSizeRequested() },
-            { label: qsTr("Switch to mobile layout…"), keywords: "phone shell", run: () => Window.window.switchShell("mobile") },
+            { label: qsTr("Switch to mobile layout…"), keywords: "phone shell", run: () => ShellBridge.main.switchShell("mobile") },
         ]
         onFinished: searchBox.searchFinished()
     }

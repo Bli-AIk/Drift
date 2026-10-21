@@ -1,0 +1,28 @@
+{
+  "id": "edit",
+  "name": "Edit",
+  "builtin": true,
+  "order": 0,
+  "portraitAlternative": "edit-portrait",
+  "windows": [
+    {
+      "id": "main",
+      "root": {
+        "split": "v",
+        "sizes": [0.5, 0.5],
+        "children": [
+          {
+            "split": "h",
+            "sizes": [0.25, 0.5, 0.25],
+            "children": [
+              { "panels": [ { "type": "assets", "tab": "media" } ], "active": 0 },
+              { "panels": [ { "type": "preview" } ], "active": 0 },
+              { "panels": [ { "type": "properties" } ], "active": 0 }
+            ]
+          },
+          { "panels": [ { "type": "timeline" } ], "active": 0 }
+        ]
+      }
+    }
+  ]
+}

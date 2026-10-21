@@ -135,7 +135,7 @@ Column {
               : qsTr("Install AI engine first")
         variant: "primary"
         // Inline components cannot see the file's ids, so not root.Window.
-        onClicked: panel.Window.window.openAddonManager(
+        onClicked: ShellBridge.main.openAddonManager(
             panel.runtimeReady ? "depth-model" : "onnxruntime")
     }
 }

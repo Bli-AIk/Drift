@@ -78,7 +78,7 @@ Column {
         title: qsTr("No effects")
         hint: qsTr("Install the Effects pack from Extras to browse presets here.")
         actionText: qsTr("Get extras")
-        onActionTriggered: root.Window.window.openAddonManager()
+        onActionTriggered: ShellBridge.main.openAddonManager()
     }
 
     Column {
@@ -115,7 +115,7 @@ Column {
                 variant: "ghost"
                 buttonSize: Theme.controlHeight
                 tooltip: qsTr("Install a custom effect or transition from a .driftfx file made in Drift Forge")
-                onClicked: root.Window.window.importUserPackage("")
+                onClicked: ShellBridge.main.importUserPackage("")
             }
         }
 
@@ -171,7 +171,7 @@ Column {
                 title: qsTr("%1 is empty").arg(qsTr("My Effects"))
                 hint: qsTr("Import a .driftfx file made in Drift Forge to add your own.")
                 actionText: qsTr("Import")
-                onActionTriggered: root.Window.window.importUserPackage("")
+                onActionTriggered: ShellBridge.main.importUserPackage("")
             }
 
             FontMetrics {

@@ -32,8 +32,8 @@ Column {
         tooltip: qsTr("Pick a platform template (YouTube, Instagram, TikTok, …) and quality")
         enabled: !EditorState.preview.canvasCropMode
         onClicked: {
-            if (typeof Window !== "undefined" && Window.window && Window.window.openLayoutChooser)
-                Window.window.openLayoutChooser()
+            if (ShellBridge.main && ShellBridge.main.openLayoutChooser)
+                ShellBridge.main.openLayoutChooser()
             root.layoutChooserOpened()
         }
     }

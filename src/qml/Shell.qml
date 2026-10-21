@@ -12,8 +12,10 @@ import Drift
 // a width breakpoint and swapped shells live; that was removed deliberately — see build().
 //
 // Both shells stay ApplicationWindows. That matters more than it looks: roughly twenty call
-// sites reach the root by name through Window.window.* (openSegmentation, configureAndAddAsset,
-// pushOverlayModal, openLayoutChooser, …). Demoting the shells to Items under one shared window
+// sites reach the root by name through ShellBridge.main.* (openSegmentation, configureAndAddAsset,
+// pushOverlayModal, openLayoutChooser, …). Each shell assigns itself to the ShellBridge singleton
+// in Component.onCompleted and clears it on destruction, so panels hosted in secondary windows
+// reach the editor window rather than their own. Demoting the shells to Items under one shared window
 // would route all of those through a forwarding layer, and a missed name is a runtime TypeError,
 // not a compile error.
 //

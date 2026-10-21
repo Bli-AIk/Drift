@@ -40,6 +40,7 @@ class McpController : public QObject
     // setEnabled(false) — a manual "turn access off" — clears this, so re-enabling
     // access always starts from an explicit, un-opted-in state rather than quietly
     // carrying an old intent to auto-start past the point the user turned access off.
+    Q_PROPERTY(QVariantList toolLog READ toolLog NOTIFY toolLogChanged)
     Q_PROPERTY(bool startOnLaunch READ startOnLaunch WRITE setStartOnLaunch NOTIFY startOnLaunchChanged)
 
 public:
@@ -73,6 +74,8 @@ public:
     // and starts the server itself from --mcp-port/--mcp-token/--mcp-stdio.
     Q_INVOKABLE void applyStartOnLaunch();
     QString agentGuide() const;
+    QVariantList toolLog() const { return m_toolLog; }
+    Q_INVOKABLE void clearToolLog();
 
     // Helpers (GUI thread). Used by src/app/mcp, not QML.
     QPair<int, int> locateClip(const QString &id) const;
@@ -234,6 +237,8 @@ signals:
     void runningChanged();
     void errorChanged();
     void startOnLaunchChanged();
+    void toolLogChanged();
+    void toolCallStarted(const QString &tool);
 
 private:
     void rebuildClipIndexIfNeeded() const;
@@ -251,6 +256,7 @@ private:
 #ifndef Q_OS_WASM
     std::unique_ptr<drift::mcp::McpServer> m_mcp;
 #endif
+    QVariantList m_toolLog;
     bool m_mcpStartOnLaunch = false;
     bool m_undoSuspended = false;
     int m_batchDepth = 0;

@@ -502,6 +502,61 @@
     </message>
 </context>
 <context>
+    <name>AgentLogPanel</name>
+    <message>
+        <source>%1 ms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Agent log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listening on %1</source>
+        <translation type="unfinished">Đang nghe trên %1</translation>
+    </message>
+    <message>
+        <source>Access is on</source>
+        <translation type="unfinished">Quyền truy cập đang bật</translation>
+    </message>
+    <message>
+        <source>Agent access is off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect an agent…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No tool calls yet. What a connected agent does will show up here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on agent access to let an assistant edit this project.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>running…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation type="unfinished">Hoàn tác</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation type="unfinished">Khôi phục</translation>
+    </message>
+</context>
+<context>
     <name>AndroidAddMenu</name>
     <message>
         <source>Add to timeline</source>
@@ -2331,8 +2386,64 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Restore Workspace Windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>System default</source>
         <translation>Mặc định hệ thống</translation>
+    </message>
+    <message>
+        <source>Select a clip to measure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip to normalize</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Clip added</source>
@@ -4926,6 +5037,69 @@
     </message>
 </context>
 <context>
+    <name>AudioMixerPanel</name>
+    <message>
+        <source>Loudness: not measured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loudness: %1 LUFS, true peak %2 dBTP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalized to %1 LUFS, but peaks clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalized to %1 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Mixer</source>
+        <translation type="unfinished">Bộ trộn âm thanh</translation>
+    </message>
+    <message>
+        <source>Analyze</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Measure loudness of the selected clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalize to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-14 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-16 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-23 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the selected clip&apos;s volume to the chosen loudness</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AudioMixerStrip</name>
     <message>
         <source>Audio Mixer</source>
@@ -5684,6 +5858,60 @@
     </message>
 </context>
 <context>
+    <name>DesignerSlot</name>
+    <message>
+        <source>Add as tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DesignerWorkspaceList</name>
+    <message>
+        <source>Built-in</source>
+        <translation type="unfinished">Tích hợp sẵn</translation>
+    </message>
+    <message>
+        <source>Modified</source>
+        <translation type="unfinished">Đã thay đổi</translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not saved yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate</source>
+        <translation type="unfinished">Nhân bản</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation type="unfinished">Đổi tên</translation>
+    </message>
+    <message>
+        <source>Confirm delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Xóa</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished">Đặt lại</translation>
+    </message>
+    <message>
+        <source>Set active</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DownloadFormat</name>
     <message>
         <source>%1 B</source>
@@ -6193,6 +6421,21 @@
     <message>
         <source>Settings</source>
         <translation type="unfinished">Cài đặt</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderWorkspaceButton</name>
+    <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit workspaces…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7918,6 +8161,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Transitions</source>
         <translation type="unfinished">Chuyển cảnh</translation>
     </message>
@@ -8094,6 +8341,10 @@
     </message>
     <message>
         <source>Theme: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8419,6 +8670,21 @@
     <message>
         <source>From project</source>
         <translation type="unfinished">Từ dự án</translation>
+    </message>
+</context>
+<context>
+    <name>HistoryPanel</name>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished">Bắt đầu</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing to undo yet. Your edits will be listed here.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9059,6 +9325,10 @@
     <message>
         <source>&amp;Window</source>
         <translation type="unfinished">&amp;Cửa sổ</translation>
+    </message>
+    <message>
+        <source>Edit Workspaces…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Landscape Workspace</source>
@@ -10041,82 +10311,34 @@
     </message>
 </context>
 <context>
-    <name>MediaPreviewWindow</name>
-    <message>
-        <source>Preview — %1</source>
-        <translation>Xem trước — %1</translation>
-    </message>
-    <message>
-        <source>Preview</source>
-        <translation>Xem trước</translation>
-    </message>
+    <name>MediaPreviewView</name>
     <message>
         <source>Play the clip and drag the ends to keep only the part you want. Save replaces this item in the media bin.</source>
-        <translation>Phát clip và kéo hai đầu để chọn đoạn cần giữ. Lưu thay thế mục này trong ngăn phương tiện.</translation>
-    </message>
-    <message>
-        <source>Pause</source>
-        <translation>Tạm dừng</translation>
-    </message>
-    <message>
-        <source>Play</source>
-        <translation>Phát</translation>
-    </message>
-    <message>
-        <source>Set In</source>
-        <translation>Đặt điểm vào</translation>
-    </message>
-    <message>
-        <source>Set Out</source>
-        <translation>Đặt điểm ra</translation>
-    </message>
-    <message>
-        <source>Rotate</source>
-        <translation>Xoay</translation>
-    </message>
-    <message>
-        <source>Reset</source>
-        <translation>Đặt lại</translation>
-    </message>
-    <message>
-        <source>Upscale this video?</source>
-        <translation>Nâng độ phân giải video này?</translation>
-    </message>
-    <message>
-        <source>Length %1</source>
-        <translation>Độ dài %1</translation>
-    </message>
-    <message>
-        <source>This video is under 700 pixels on its shorter side. Upscaling it with an AI model can make it look sharper.</source>
-        <translation>Video này có cạnh ngắn dưới 700 pixel. Nâng cấp bằng mô hình AI có thể làm nó nét hơn.</translation>
-    </message>
-    <message>
-        <source>This resolution is already good for most projects. You can still upscale it.</source>
-        <translation>Độ phân giải này đã tốt cho hầu hết các dự án. Bạn vẫn có thể nâng cấp nó.</translation>
-    </message>
-    <message>
-        <source>Saving…</source>
-        <translation>Đang lưu…</translation>
-    </message>
-    <message>
-        <source>Nothing to save — drag this item onto the timeline when you are ready.</source>
-        <translation>Không có gì để lưu — hãy kéo mục này vào dòng thời gian khi bạn sẵn sàng.</translation>
-    </message>
-    <message>
-        <source>Crop — %1</source>
-        <translation>Cắt cúp — %1</translation>
-    </message>
-    <message>
-        <source>Crop</source>
-        <translation>Cắt cúp</translation>
+        <translation type="unfinished">Phát clip và kéo hai đầu để chọn đoạn cần giữ. Lưu thay thế mục này trong ngăn phương tiện.</translation>
     </message>
     <message>
         <source>Drag the box to crop. The original image stays available, so the crop can be changed later.</source>
-        <translation>Kéo hộp để cắt cúp. Hình ảnh gốc vẫn được giữ, nên có thể thay đổi phần cắt cúp sau.</translation>
+        <translation type="unfinished">Kéo hộp để cắt cúp. Hình ảnh gốc vẫn được giữ, nên có thể thay đổi phần cắt cúp sau.</translation>
     </message>
     <message>
         <source>Drag the box to crop. The original video stays available, so the crop can be changed later.</source>
-        <translation>Kéo hộp để cắt cúp. Video gốc vẫn được giữ, nên có thể thay đổi phần cắt cúp sau.</translation>
+        <translation type="unfinished">Kéo hộp để cắt cúp. Video gốc vẫn được giữ, nên có thể thay đổi phần cắt cúp sau.</translation>
+    </message>
+    <message>
+        <source>Pause</source>
+        <translation type="unfinished">Tạm dừng</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">Phát</translation>
+    </message>
+    <message>
+        <source>Set In</source>
+        <translation type="unfinished">Đặt điểm vào</translation>
+    </message>
+    <message>
+        <source>Set Out</source>
+        <translation type="unfinished">Đặt điểm ra</translation>
     </message>
     <message>
         <source>Add sub-clip</source>
@@ -10127,64 +10349,115 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Rotate</source>
+        <translation type="unfinished">Xoay</translation>
+    </message>
+    <message>
         <source>Original: %1×%2 • Crop: %3×%4</source>
-        <translation>Gốc: %1×%2 • Cắt cúp: %3×%4</translation>
+        <translation type="unfinished">Gốc: %1×%2 • Cắt cúp: %3×%4</translation>
     </message>
     <message>
         <source>Unlock crop ratio</source>
-        <translation>Mở khóa tỷ lệ cắt cúp</translation>
+        <translation type="unfinished">Mở khóa tỷ lệ cắt cúp</translation>
     </message>
     <message>
         <source>Lock crop ratio</source>
-        <translation>Khóa tỷ lệ cắt cúp</translation>
+        <translation type="unfinished">Khóa tỷ lệ cắt cúp</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished">Đặt lại</translation>
+    </message>
+    <message>
+        <source>Upscale this video?</source>
+        <translation type="unfinished">Nâng độ phân giải video này?</translation>
+    </message>
+    <message>
+        <source>Length %1</source>
+        <translation type="unfinished">Độ dài %1</translation>
+    </message>
+    <message>
+        <source>This video is under 700 pixels on its shorter side. Upscaling it with an AI model can make it look sharper.</source>
+        <translation type="unfinished">Video này có cạnh ngắn dưới 700 pixel. Nâng cấp bằng mô hình AI có thể làm nó nét hơn.</translation>
+    </message>
+    <message>
+        <source>This resolution is already good for most projects. You can still upscale it.</source>
+        <translation type="unfinished">Độ phân giải này đã tốt cho hầu hết các dự án. Bạn vẫn có thể nâng cấp nó.</translation>
     </message>
     <message>
         <source>Done keeps the original video and stores this range and crop. Upscale renders them as a new video in the media bin, then opens it in the Enhance window.</source>
-        <translation>Xong sẽ giữ nguyên video gốc và lưu phạm vi cùng phần cắt cúp này. Nâng cấp sẽ kết xuất chúng thành video mới trong ngăn media, rồi mở nó trong cửa sổ Nâng cấp.</translation>
+        <translation type="unfinished">Xong sẽ giữ nguyên video gốc và lưu phạm vi cùng phần cắt cúp này. Nâng cấp sẽ kết xuất chúng thành video mới trong ngăn media, rồi mở nó trong cửa sổ Nâng cấp.</translation>
+    </message>
+    <message>
+        <source>Saving…</source>
+        <translation type="unfinished">Đang lưu…</translation>
     </message>
     <message>
         <source>Choose the part and crop to keep, then Next.</source>
-        <translation>Chọn phần và vùng cắt cúp cần giữ, rồi nhấn Kế tiếp.</translation>
+        <translation type="unfinished">Chọn phần và vùng cắt cúp cần giữ, rồi nhấn Kế tiếp.</translation>
     </message>
     <message>
         <source>Save keeps the original file and stores this crop.</source>
-        <translation>Lưu sẽ giữ nguyên tệp gốc và lưu phần cắt cúp này.</translation>
+        <translation type="unfinished">Lưu sẽ giữ nguyên tệp gốc và lưu phần cắt cúp này.</translation>
     </message>
     <message>
         <source>Save keeps the original file and stores this trim.</source>
-        <translation>Lưu sẽ giữ nguyên tệp gốc và lưu phần cắt này.</translation>
+        <translation type="unfinished">Lưu sẽ giữ nguyên tệp gốc và lưu phần cắt này.</translation>
     </message>
     <message>
         <source>Adjust the crop or Reset to restore the full picture.</source>
-        <translation>Điều chỉnh phần cắt cúp hoặc Đặt lại để khôi phục hình ảnh đầy đủ.</translation>
+        <translation type="unfinished">Điều chỉnh phần cắt cúp hoặc Đặt lại để khôi phục hình ảnh đầy đủ.</translation>
+    </message>
+    <message>
+        <source>Nothing to save — drag this item onto the timeline when you are ready.</source>
+        <translation type="unfinished">Không có gì để lưu — hãy kéo mục này vào dòng thời gian khi bạn sẵn sàng.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Hủy bỏ</translation>
+        <translation type="unfinished">Hủy bỏ</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation>Đóng</translation>
+        <translation type="unfinished">Đóng</translation>
     </message>
     <message>
         <source>Back</source>
-        <translation>Quay lại</translation>
+        <translation type="unfinished">Quay lại</translation>
     </message>
     <message>
         <source>Upscale…</source>
-        <translation>Nâng độ phân giải…</translation>
+        <translation type="unfinished">Nâng độ phân giải…</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Lưu</translation>
+        <translation type="unfinished">Lưu</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation>Tiếp theo</translation>
+        <translation type="unfinished">Tiếp theo</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation>Hoàn tất</translation>
+        <translation type="unfinished">Hoàn tất</translation>
+    </message>
+</context>
+<context>
+    <name>MediaPreviewWindow</name>
+    <message>
+        <source>Preview — %1</source>
+        <translation>Xem trước — %1</translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation>Xem trước</translation>
+    </message>
+    <message>
+        <source>Crop — %1</source>
+        <translation>Cắt cúp — %1</translation>
+    </message>
+    <message>
+        <source>Crop</source>
+        <translation>Cắt cúp</translation>
     </message>
 </context>
 <context>
@@ -12411,6 +12684,21 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     </message>
 </context>
 <context>
+    <name>RecorderPanel</name>
+    <message>
+        <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record a voiceover from your microphone onto an audio track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start recording</source>
+        <translation type="unfinished">Bắt đầu ghi</translation>
+    </message>
+</context>
+<context>
     <name>RecoveryDialog</name>
     <message>
         <source>Unsaved work from last session</source>
@@ -13744,6 +14032,10 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
         <translation type="unfinished">Ngoại hình</translation>
     </message>
     <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Timeline</source>
         <translation type="unfinished">Dòng thời gian</translation>
     </message>
@@ -14140,6 +14432,25 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     </message>
     <message>
         <source>Choose which actions appear on the toolbar above the timeline and which go in its overflow menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsWorkspacesPage</name>
+    <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Arrange panels into layouts, optionally across several windows. Drag a panel onto an edge of another block to split it, or onto its middle to add a tab. Nothing changes in the editor until you save.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout designer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Built-in presets keep a copy of the original, so Reset brings them back.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -14786,6 +15097,21 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     <message>
         <source>“%1” is already used by %2.</source>
         <translation>“%1” đã được %2 sử dụng.</translation>
+    </message>
+</context>
+<context>
+    <name>SourceViewerPanel</name>
+    <message>
+        <source>Source: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip in the media bin to preview it here.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -15783,6 +16109,21 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     <message>
         <source>This can take a few minutes on longer clips.</source>
         <translation>Việc này có thể mất vài phút đối với các đoạn video dài hơn.</translation>
+    </message>
+</context>
+<context>
+    <name>SubtitlesPanel</name>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">Phụ đề</translation>
+    </message>
+    <message>
+        <source>Select a subtitle clip, or generate subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate subtitles</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -19050,6 +19391,266 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     <message>
         <source>Cancel — discard recording</source>
         <translation type="unfinished">Hủy bỏ - hủy ghi</translation>
+    </message>
+</context>
+<context>
+    <name>WorkspaceDesigner</name>
+    <message>
+        <source>Media</source>
+        <translation type="unfinished">Phương tiện</translation>
+    </message>
+    <message>
+        <source>Market</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished">Văn bản</translation>
+    </message>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">Phụ đề</translation>
+    </message>
+    <message>
+        <source>Speech</source>
+        <translation type="unfinished">Giọng nói</translation>
+    </message>
+    <message>
+        <source>Stickers</source>
+        <translation type="unfinished">Nhãn dán</translation>
+    </message>
+    <message>
+        <source>Shapes</source>
+        <translation type="unfinished">Hình dạng</translation>
+    </message>
+    <message>
+        <source>Masks</source>
+        <translation type="unfinished">Mặt nạ</translation>
+    </message>
+    <message>
+        <source>Scenes</source>
+        <translation type="unfinished">Phân cảnh</translation>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation type="unfinished">Hiệu ứng</translation>
+    </message>
+    <message>
+        <source>Templates</source>
+        <translation type="unfinished">Mẫu</translation>
+    </message>
+    <message>
+        <source>Transitions</source>
+        <translation type="unfinished">Chuyển cảnh</translation>
+    </message>
+    <message>
+        <source>Audio FX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">Chung</translation>
+    </message>
+    <message>
+        <source>Transform</source>
+        <translation type="unfinished">Chuyển đổi</translation>
+    </message>
+    <message>
+        <source>Animation</source>
+        <translation type="unfinished">Hoạt ảnh</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">Âm thanh</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished">Tốc độ</translation>
+    </message>
+    <message>
+        <source>Blending</source>
+        <translation type="unfinished">Trộn</translation>
+    </message>
+    <message>
+        <source>New workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make active tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsaved changes</source>
+        <translation type="unfinished">Những thay đổi chưa được lưu</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Lưu</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep editing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fullscreen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a Preview-only fullscreen window as a second-monitor output.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every panel is placed. Drag one here to remove it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drag a panel here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes apply when you save.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No changes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Hủy bỏ</translation>
+    </message>
+</context>
+<context>
+    <name>WorkspacePlaceholderPanel</name>
+    <message>
+        <source>%1 — coming soon</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WorkspaceStore</name>
+    <message>
+        <source>Assets</source>
+        <translation type="unfinished">Tài nguyên</translation>
+    </message>
+    <message>
+        <source>Properties</source>
+        <translation type="unfinished">Thuộc tính</translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished">Xem trước</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">Dòng thời gian</translation>
+    </message>
+    <message>
+        <source>Audio Mixer</source>
+        <translation type="unfinished">Bộ trộn âm thanh</translation>
+    </message>
+    <message>
+        <source>Source Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">Phụ đề</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Agent Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A window has no panels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A split needs at least two sections.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A section needs at least one panel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A section&apos;s active tab is out of range.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown panel type &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The &quot;%1&quot; panel is used more than once.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A workspace needs at least one window.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The first window must be the main window.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation type="unfinished">Không gian làm việc</translation>
+    </message>
+    <message>
+        <source>%1 copy</source>
+        <translation type="unfinished">%1 sao chép</translation>
+    </message>
+</context>
+<context>
+    <name>WorkspaceWindow</name>
+    <message>
+        <source>Drift</source>
+        <translation type="unfinished">Drift</translation>
     </message>
 </context>
 <context>

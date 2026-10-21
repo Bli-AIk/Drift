@@ -195,7 +195,7 @@ Item {
                 variant: "primary"
                 glyph: Theme.icons.download
                 tooltip: qsTr("Needed for auto captions from speech")
-                onClicked: root.Window.window.openAddonManager(
+                onClicked: ShellBridge.main.openAddonManager(
                     root.runtimeReady ? "whisper-model" : "onnxruntime")
             }
         }

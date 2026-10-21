@@ -410,8 +410,8 @@ Item {
             }
             ThemedButton {
                 text: qsTr("Crop…")
-                visible: root.canCrop && !!root.Window.window.openCrop
-                onClicked: root.Window.window.openCrop(EditorState.selectedTrack, EditorState.selectedClip)
+                visible: root.canCrop && !!ShellBridge.main?.openCrop
+                onClicked: ShellBridge.main.openCrop(EditorState.selectedTrack, EditorState.selectedClip)
             }
         }
 

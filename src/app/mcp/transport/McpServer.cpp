@@ -4,6 +4,8 @@
 #include "app/mcp/transport/McpHttp.h"
 #include "app/mcp/protocol/McpJson.h"
 #include "app/mcp/protocol/McpProtocol.h"
+
+#include <QElapsedTimer>
 #include "app/mcp/protocol/McpSession.h"
 
 #include <QEventLoop>
@@ -201,7 +203,24 @@ void McpServer::stop()
 QJsonValue McpServer::handleRpc(const QString &toolbox, const QJsonValue &body)
 {
     return handleJsonRpc(body, toolbox, [this](const QString &name, const QJsonObject &args) {
-        return dispatchTool(name, args);
+        // Both transports reach here on this object's thread, so the log never needs a lock.
+        const int id = ++m_callSeq;
+        QString summary = QString::fromUtf8(QJsonDocument(args).toJson(QJsonDocument::Compact));
+        if (summary.size() > 120)
+            summary = summary.left(119) + QChar(0x2026);
+        emit toolCallStarted(id, name, summary);
+        QElapsedTimer timer;
+        timer.start();
+        const QJsonObject result = dispatchTool(name, args);
+        const bool failed = result.value(QStringLiteral("isError")).toBool();
+        QString error;
+        if (failed) {
+            const QJsonArray content = result.value(QStringLiteral("content")).toArray();
+            if (!content.isEmpty())
+                error = content.first().toObject().value(QStringLiteral("text")).toString().left(600);
+        }
+        emit toolCallFinished(id, !failed, error, timer.elapsed());
+        return result;
     });
 }
 

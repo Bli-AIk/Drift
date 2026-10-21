@@ -224,7 +224,7 @@ Item {
                 enabled: !EditorState.denoise.running
                 onClicked: {
                     const data = EditorState.selectedClipData
-                    root.Window.window.openDenoise(
+                    ShellBridge.main.openDenoise(
                         EditorState.selectedTrack, EditorState.selectedClip,
                         data.duration !== undefined ? data.duration : 0)
                 }
@@ -237,7 +237,7 @@ Item {
                       ? qsTr("Download noise removal (about 9 MB)")
                       : qsTr("Install AI engine first")
                 variant: "primary"
-                onClicked: root.Window.window.openAddonManager(
+                onClicked: ShellBridge.main.openAddonManager(
                     denoiseSection.runtimeReady ? "denoise-model" : "onnxruntime")
             }
         }
@@ -336,7 +336,7 @@ Item {
                   ? qsTr("Download speech recognition (about 670 MB)")
                   : qsTr("Install AI engine first")
             variant: "primary"
-            onClicked: root.Window.window.openAddonManager(
+            onClicked: ShellBridge.main.openAddonManager(
                 parent.runtimeReady ? "whisper-model" : "onnxruntime")
         }
     }

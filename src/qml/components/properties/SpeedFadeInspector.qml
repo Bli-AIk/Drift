@@ -54,7 +54,7 @@ Item {
                 visible: !root.nestedSource
                 text: qsTr("Custom speed…")
                 variant: "secondary"
-                onClicked: root.Window.window.openSpeedCurve(
+                onClicked: ShellBridge.main.openSpeedCurve(
                                EditorState.selectedTrack, EditorState.selectedClip)
             }
 

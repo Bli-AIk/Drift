@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Window
-import Drift 1.0
+import Drift
 
 // Cutout surface, for whichever backend is installed. Opened for one clip: pick a reference frame,
 // mark the subject if the backend takes prompts, then run the pass over the whole clip.

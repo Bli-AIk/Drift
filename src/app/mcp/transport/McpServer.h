@@ -48,10 +48,13 @@ signals:
     void runningChanged();
     void tokenChanged();
     void errorChanged();
+    void toolCallStarted(int id, const QString &tool, const QString &summary);
+    void toolCallFinished(int id, bool ok, const QString &error, qint64 ms);
 
 private:
     QString makeToken() const;
     QString persistedToken() const;
+    int m_callSeq = 0;
     QJsonObject dispatchTool(const QString &name, const QJsonObject &args);
 
     AppController *m_controller = nullptr;

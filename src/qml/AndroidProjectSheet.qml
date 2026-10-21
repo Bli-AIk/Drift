@@ -144,7 +144,7 @@ AndroidBottomSheet {
                 sideInset: root.safeLeft
                 sideInsetRight: root.safeRight
                 marked: (modelData.id === "save" && EditorState.projectFile.hasUnsavedChanges)
-                        || (modelData.id === "extras" && Window.window.addonAttentionNeeded)
+                        || (modelData.id === "extras" && ShellBridge.main?.addonAttentionNeeded)
                         || modelData.id === "update"
 
                 onClicked: {

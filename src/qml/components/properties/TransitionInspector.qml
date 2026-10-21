@@ -269,7 +269,7 @@ Item {
                             return
                         const id = transitionCurveBox.curveIds[index]
                         if (id === "custom" || id === "bezier") {
-                            root.Window.window.openTransitionCurve(
+                            ShellBridge.main.openTransitionCurve(
                                         root.transitionEditTrack, root.activeTransition.id)
                             return
                         }

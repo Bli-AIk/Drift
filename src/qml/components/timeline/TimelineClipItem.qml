@@ -111,7 +111,7 @@ Item {
     readonly property bool mediaEditFriendly: (AssetLibrary.badgeRevision,
                                                mediaAssetId.length > 0
                                                && AssetLibrary.isEditFriendly(mediaAssetId))
-    property string trackType: panel.tracks[trackIndex].type
+    property string trackType: panel.tracks[trackIndex]?.type ?? ""
     property var clipEffects: clipData.effects || []
     property var clipAudioEffects: clipData.audioEffects || []
     readonly property bool hasAnyEffects: clipEffects.length > 0 || clipAudioEffects.length > 0
@@ -119,7 +119,7 @@ Item {
                                             && clipData.adjustmentKind === "transform"
     // A transform layer moves this clip's track.
     readonly property bool hasTransformParent:
-        (panel.tracks[trackIndex].transformCoveredBy || []).length > 0
+        (panel.tracks[trackIndex]?.transformCoveredBy || []).length > 0
     // Named so tooling (and a screen reader) can address a clip by what the user sees on it
     // rather than by pixel position. The timeline is the app's main interaction surface and had
     // no accessible identity at all.

@@ -502,6 +502,61 @@
     </message>
 </context>
 <context>
+    <name>AgentLogPanel</name>
+    <message>
+        <source>%1 ms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 s</source>
+        <translation type="unfinished">%1 s</translation>
+    </message>
+    <message>
+        <source>Agent log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listening on %1</source>
+        <translation type="unfinished">Escutando em %1</translation>
+    </message>
+    <message>
+        <source>Access is on</source>
+        <translation type="unfinished">Acesso ativado</translation>
+    </message>
+    <message>
+        <source>Agent access is off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect an agent…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No tool calls yet. What a connected agent does will show up here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on agent access to let an assistant edit this project.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>running…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation type="unfinished">Desfazer</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation type="unfinished">Refazer</translation>
+    </message>
+</context>
+<context>
     <name>AndroidAddMenu</name>
     <message>
         <source>Add to timeline</source>
@@ -2333,8 +2388,64 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Restore Workspace Windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>System default</source>
         <translation>Padrão do sistema</translation>
+    </message>
+    <message>
+        <source>Select a clip to measure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip to normalize</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Clip added</source>
@@ -4947,6 +5058,69 @@
     </message>
 </context>
 <context>
+    <name>AudioMixerPanel</name>
+    <message>
+        <source>Loudness: not measured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loudness: %1 LUFS, true peak %2 dBTP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalized to %1 LUFS, but peaks clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalized to %1 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Mixer</source>
+        <translation type="unfinished">Mixer de áudio</translation>
+    </message>
+    <message>
+        <source>Analyze</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Measure loudness of the selected clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalize to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-14 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-16 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-23 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the selected clip&apos;s volume to the chosen loudness</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AudioMixerStrip</name>
     <message>
         <source>Audio Mixer</source>
@@ -5705,6 +5879,60 @@
     </message>
 </context>
 <context>
+    <name>DesignerSlot</name>
+    <message>
+        <source>Add as tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DesignerWorkspaceList</name>
+    <message>
+        <source>Built-in</source>
+        <translation type="unfinished">Integrados</translation>
+    </message>
+    <message>
+        <source>Modified</source>
+        <translation type="unfinished">Modificado em</translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not saved yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate</source>
+        <translation type="unfinished">Duplicar</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation type="unfinished">Renomear</translation>
+    </message>
+    <message>
+        <source>Confirm delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Eliminar</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished">Redefinir</translation>
+    </message>
+    <message>
+        <source>Set active</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DownloadFormat</name>
     <message>
         <source>%1 B</source>
@@ -6220,6 +6448,21 @@
     <message>
         <source>Settings</source>
         <translation type="unfinished">Definições</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderWorkspaceButton</name>
+    <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit workspaces…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7946,6 +8189,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Transitions</source>
         <translation type="unfinished">Transições</translation>
     </message>
@@ -8122,6 +8369,10 @@
     </message>
     <message>
         <source>Theme: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8447,6 +8698,21 @@
     <message>
         <source>From project</source>
         <translation type="unfinished">Do projeto</translation>
+    </message>
+</context>
+<context>
+    <name>HistoryPanel</name>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished">Início</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing to undo yet. Your edits will be listed here.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9090,6 +9356,10 @@
     </message>
     <message>
         <source>&amp;Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Workspaces…</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10083,38 +10353,62 @@
     </message>
 </context>
 <context>
-    <name>MediaPreviewWindow</name>
-    <message>
-        <source>Preview — %1</source>
-        <translation>Pré-visualização — %1</translation>
-    </message>
-    <message>
-        <source>Preview</source>
-        <translation>Pré-visualização</translation>
-    </message>
+    <name>MediaPreviewView</name>
     <message>
         <source>Play the clip and drag the ends to keep only the part you want. Save replaces this item in the media bin.</source>
-        <translation>Reproduza o clipe e arraste as extremidades para manter só a parte que você quer. Guardar substitui este item na biblioteca de mídia.</translation>
+        <translation type="unfinished">Reproduza o clipe e arraste as extremidades para manter só a parte que você quer. Guardar substitui este item na biblioteca de mídia.</translation>
+    </message>
+    <message>
+        <source>Drag the box to crop. The original image stays available, so the crop can be changed later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drag the box to crop. The original video stays available, so the crop can be changed later.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Pause</source>
-        <translation>Pausar</translation>
+        <translation type="unfinished">Pausar</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation>Reproduzir</translation>
+        <translation type="unfinished">Reproduzir</translation>
     </message>
     <message>
         <source>Set In</source>
-        <translation>Definir entrada</translation>
+        <translation type="unfinished">Definir entrada</translation>
     </message>
     <message>
         <source>Set Out</source>
-        <translation>Definir saída</translation>
+        <translation type="unfinished">Definir saída</translation>
+    </message>
+    <message>
+        <source>Add sub-clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub-clip added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotate</source>
+        <translation type="unfinished">Girar</translation>
+    </message>
+    <message>
+        <source>Original: %1×%2 • Crop: %3×%4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unlock crop ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock crop ratio</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Reset</source>
-        <translation>Redefinir</translation>
+        <translation type="unfinished">Redefinir</translation>
     </message>
     <message>
         <source>Upscale this video?</source>
@@ -10133,52 +10427,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Saving…</source>
-        <translation>Salvando…</translation>
-    </message>
-    <message>
-        <source>Nothing to save — drag this item onto the timeline when you are ready.</source>
-        <translation>Nada para guardar — arraste este item para a linha do tempo quando estiver pronto.</translation>
-    </message>
-    <message>
-        <source>Crop — %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop</source>
-        <translation type="unfinished">Recortar</translation>
-    </message>
-    <message>
-        <source>Drag the box to crop. The original image stays available, so the crop can be changed later.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Drag the box to crop. The original video stays available, so the crop can be changed later.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add sub-clip</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sub-clip added</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Original: %1×%2 • Crop: %3×%4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unlock crop ratio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lock crop ratio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Done keeps the original video and stores this range and crop. Upscale renders them as a new video in the media bin, then opens it in the Enhance window.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saving…</source>
+        <translation type="unfinished">Salvando…</translation>
     </message>
     <message>
         <source>Choose the part and crop to keep, then Next.</source>
@@ -10197,12 +10451,16 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Nothing to save — drag this item onto the timeline when you are ready.</source>
+        <translation type="unfinished">Nada para guardar — arraste este item para a linha do tempo quando estiver pronto.</translation>
+    </message>
+    <message>
         <source>Cancel</source>
-        <translation>Cancelar</translation>
+        <translation type="unfinished">Cancelar</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation>Fechar</translation>
+        <translation type="unfinished">Fechar</translation>
     </message>
     <message>
         <source>Back</source>
@@ -10214,7 +10472,7 @@
     </message>
     <message>
         <source>Save</source>
-        <translation>Guardar</translation>
+        <translation type="unfinished">Guardar</translation>
     </message>
     <message>
         <source>Next</source>
@@ -10224,9 +10482,24 @@
         <source>Done</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>MediaPreviewWindow</name>
     <message>
-        <source>Rotate</source>
-        <translation>Girar</translation>
+        <source>Preview — %1</source>
+        <translation>Pré-visualização — %1</translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation>Pré-visualização</translation>
+    </message>
+    <message>
+        <source>Crop — %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop</source>
+        <translation type="unfinished">Recortar</translation>
     </message>
 </context>
 <context>
@@ -12460,6 +12733,21 @@ Se a reprodução travar, experimente outro.</translation>
     </message>
 </context>
 <context>
+    <name>RecorderPanel</name>
+    <message>
+        <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record a voiceover from your microphone onto an audio track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RecoveryDialog</name>
     <message>
         <source>Unsaved work from last session</source>
@@ -13794,6 +14082,10 @@ Se a reprodução travar, experimente outro.</translation>
         <translation type="unfinished">Aparência</translation>
     </message>
     <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Timeline</source>
         <translation type="unfinished">Linha do tempo</translation>
     </message>
@@ -14190,6 +14482,25 @@ Se a reprodução travar, experimente outro.</translation>
     </message>
     <message>
         <source>Choose which actions appear on the toolbar above the timeline and which go in its overflow menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsWorkspacesPage</name>
+    <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Arrange panels into layouts, optionally across several windows. Drag a panel onto an edge of another block to split it, or onto its middle to add a tab. Nothing changes in the editor until you save.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout designer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Built-in presets keep a copy of the original, so Reset brings them back.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -14836,6 +15147,21 @@ Se a reprodução travar, experimente outro.</translation>
     <message>
         <source>“%1” is already used by %2.</source>
         <translation>“%1” já está em uso por %2.</translation>
+    </message>
+</context>
+<context>
+    <name>SourceViewerPanel</name>
+    <message>
+        <source>Source: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip in the media bin to preview it here.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -15836,6 +16162,21 @@ Se a reprodução travar, experimente outro.</translation>
     <message>
         <source>This can take a few minutes on longer clips.</source>
         <translation>Isso pode levar alguns minutos em clipes mais longos.</translation>
+    </message>
+</context>
+<context>
+    <name>SubtitlesPanel</name>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">Legendas</translation>
+    </message>
+    <message>
+        <source>Select a subtitle clip, or generate subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate subtitles</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -19111,6 +19452,266 @@ Se a reprodução travar, experimente outro.</translation>
     <message>
         <source>Cancel — discard recording</source>
         <translation type="unfinished">Cancelar — descartar a gravação</translation>
+    </message>
+</context>
+<context>
+    <name>WorkspaceDesigner</name>
+    <message>
+        <source>Media</source>
+        <translation type="unfinished">Mídia</translation>
+    </message>
+    <message>
+        <source>Market</source>
+        <translation type="unfinished">Mercado</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished">Texto</translation>
+    </message>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">Legendas</translation>
+    </message>
+    <message>
+        <source>Speech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stickers</source>
+        <translation type="unfinished">Adesivos</translation>
+    </message>
+    <message>
+        <source>Shapes</source>
+        <translation type="unfinished">Formas</translation>
+    </message>
+    <message>
+        <source>Masks</source>
+        <translation type="unfinished">Máscaras</translation>
+    </message>
+    <message>
+        <source>Scenes</source>
+        <translation type="unfinished">Cenas</translation>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation type="unfinished">Efeitos</translation>
+    </message>
+    <message>
+        <source>Templates</source>
+        <translation type="unfinished">Modelos</translation>
+    </message>
+    <message>
+        <source>Transitions</source>
+        <translation type="unfinished">Transições</translation>
+    </message>
+    <message>
+        <source>Audio FX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">Geral</translation>
+    </message>
+    <message>
+        <source>Transform</source>
+        <translation type="unfinished">Transformação</translation>
+    </message>
+    <message>
+        <source>Animation</source>
+        <translation type="unfinished">Animação</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">Áudio</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished">Velocidade</translation>
+    </message>
+    <message>
+        <source>Blending</source>
+        <translation type="unfinished">Mesclagem</translation>
+    </message>
+    <message>
+        <source>New workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make active tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsaved changes</source>
+        <translation type="unfinished">Alterações não guardadas</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep editing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fullscreen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a Preview-only fullscreen window as a second-monitor output.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every panel is placed. Drag one here to remove it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drag a panel here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes apply when you save.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No changes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
+    </message>
+</context>
+<context>
+    <name>WorkspacePlaceholderPanel</name>
+    <message>
+        <source>%1 — coming soon</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WorkspaceStore</name>
+    <message>
+        <source>Assets</source>
+        <translation type="unfinished">Recursos</translation>
+    </message>
+    <message>
+        <source>Properties</source>
+        <translation type="unfinished">Propriedades</translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished">Pré-visualização</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">Linha do tempo</translation>
+    </message>
+    <message>
+        <source>Audio Mixer</source>
+        <translation type="unfinished">Mixer de áudio</translation>
+    </message>
+    <message>
+        <source>Source Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">Legendas</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Agent Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A window has no panels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A split needs at least two sections.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A section needs at least one panel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A section&apos;s active tab is out of range.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown panel type &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The &quot;%1&quot; panel is used more than once.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A workspace needs at least one window.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The first window must be the main window.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation type="unfinished">Espaço de trabalho</translation>
+    </message>
+    <message>
+        <source>%1 copy</source>
+        <translation type="unfinished">Cópia de %1</translation>
+    </message>
+</context>
+<context>
+    <name>WorkspaceWindow</name>
+    <message>
+        <source>Drift</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

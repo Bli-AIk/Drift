@@ -789,8 +789,8 @@ Item {
                 EditorState.addClipFromAssetAt(assetIndex, target.track, atSeconds)
         }
 
-        if (typeof Window !== "undefined" && Window.window && Window.window.configureAndAddAsset)
-            Window.window.configureAndAddAsset(assetIndex, runAdd)
+        if (ShellBridge.main && ShellBridge.main.configureAndAddAsset)
+            ShellBridge.main.configureAndAddAsset(assetIndex, runAdd)
         else
             runAdd()
     }

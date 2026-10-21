@@ -26,7 +26,7 @@ Item {
     // uses for its input guard; TouchDrag is not an exception here: a lift is
     // meant for the timeline, not for a transform handle.
     readonly property bool overlayBlocksPreview: {
-        const w = root.Window.window
+        const w = ShellBridge.main
         return !!(w && w.overlayModalCount > 0)
     }
 

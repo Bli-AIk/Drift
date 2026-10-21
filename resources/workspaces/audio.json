@@ -1,0 +1,28 @@
+{
+  "id": "audio",
+  "name": "Audio",
+  "builtin": true,
+  "order": 3,
+  "windows": [
+    {
+      "id": "main",
+      "root": {
+        "split": "v",
+        "sizes": [0.5, 0.5],
+        "children": [
+          {
+            "split": "h",
+            "sizes": [0.22, 0.38, 0.2, 0.2],
+            "children": [
+              { "panels": [ { "type": "assets", "tab": "sounds" } ], "active": 0 },
+              { "panels": [ { "type": "preview" } ], "active": 0 },
+              { "panels": [ { "type": "properties" }, { "type": "undoHistory" } ], "active": 0 },
+              { "panels": [ { "type": "audioMixer" } ], "active": 0 }
+            ]
+          },
+          { "panels": [ { "type": "timeline" } ], "active": 0 }
+        ]
+      }
+    }
+  ]
+}

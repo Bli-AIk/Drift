@@ -17,6 +17,7 @@
 #include "app/platform/Haptics.h"
 #include "app/platform/PointerDevices.h"
 #include "app/editor/LayoutStore.h"
+#include "app/editor/WorkspaceStore.h"
 #include "app/online/market/MarketClient.h"
 #include "app/online/assets/DriftAssetStore.h"
 #include "app/online/assets/SfxLibrary.h"
@@ -695,6 +696,7 @@ int main(int argc, char *argv[])
     static MarketClient marketClient;
     static UpdateChecker updateChecker;
     static LayoutStore layoutStore;
+    static WorkspaceStore workspaceStore;
     static drift::Haptics haptics;
     static drift::PointerDevices pointerDevices;
     editorState.setAddonManager(&addonManager);
@@ -713,6 +715,7 @@ int main(int argc, char *argv[])
     qmlRegisterSingletonInstance("Drift", 1, 0, "Sfx", &sfxLibrary);
     qmlRegisterSingletonInstance("Drift", 1, 0, "Updates", &updateChecker);
     qmlRegisterSingletonInstance("Drift", 1, 0, "LayoutMemory", &layoutStore);
+    qmlRegisterSingletonInstance("Drift", 1, 0, "Workspaces", &workspaceStore);
     qmlRegisterSingletonInstance("Drift", 1, 0, "Haptics", &haptics);
     qmlRegisterSingletonInstance("Drift", 1, 0, "PointerDevices", &pointerDevices);
     // QML_ELEMENT on ThemeManager is recorded in qml_register_types_Drift(), and

@@ -275,9 +275,9 @@ Column {
                         variant: "secondary"
                         onClicked: {
                             dialog.close()
-                            if (typeof Window !== "undefined" && Window.window
-                                    && Window.window.openAddonManager)
-                                Window.window.openAddonManager("onnxruntime")
+                            if (ShellBridge.main
+                                    && ShellBridge.main.openAddonManager)
+                                ShellBridge.main.openAddonManager("onnxruntime")
                         }
                     }
                 }

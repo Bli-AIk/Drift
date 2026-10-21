@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
-import Drift 1.0
+import Drift
 // Marketplace downloads, plus the app update when one is downloading: what is running, what is waiting behind the concurrency cap, and
 // what this session already finished. A window rather than a dialog because a download
 // outlives the panel that started it — the Market tab can be closed, or the app switched to

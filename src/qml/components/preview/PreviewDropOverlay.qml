@@ -43,8 +43,8 @@ Item {
                 Toasts.info(result.message)
         }
         // Media goes through the same import checks a timeline drop does.
-        if (kind === "media" && Window.window && Window.window.configureAndAddAsset)
-            Window.window.configureAndAddAsset(Number(payload), run)
+        if (kind === "media" && ShellBridge.main && ShellBridge.main.configureAndAddAsset)
+            ShellBridge.main.configureAndAddAsset(Number(payload), run)
         else
             run()
         return true

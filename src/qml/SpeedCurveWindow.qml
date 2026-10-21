@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Window
-import Drift 1.0
+import Drift
 // Speed-ramp editor for one clip. The clip is auditioned on its own — raw decode, no effects,
 // no other tracks — so what the graph does to it is the only thing you are looking at.
 //

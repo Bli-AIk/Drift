@@ -9,6 +9,7 @@ PanelFrame {
     // When true (Android bottom sheet), hide the side tab rail — the phone
     // bottom rail already picks the active library tab.
     property bool sheetMode: false
+    readonly property var selectedMediaAssetIds: mediaBrowser.item?.selectedAssetIds ?? []
 
     // One of the click-to-add tabs (text, subtitles, stickers, shapes) put a clip
     // on the timeline. The phone shell closes the sheet on this; desktop, where
@@ -71,14 +72,14 @@ PanelFrame {
         // (resolution/orientation) — same flow as dragging onto the timeline (see
         // TimelinePanel.qml/AndroidTimeline.qml). For a multi-selection, offer it from the
         // first asset that actually needs it, not always assetIds[0].
-        if (typeof Window === "undefined" || !Window.window || !Window.window.configureAndAddAsset) {
+        if (!ShellBridge.main || !ShellBridge.main.configureAndAddAsset) {
             runAdd()
             return
         }
         for (const id of assetIds) {
             const index = AssetLibrary.indexOfId(id)
             if (index >= 0 && EditorState.shouldConfigureProjectForAsset(index)) {
-                Window.window.configureAndAddAsset(index, runAdd)
+                ShellBridge.main.configureAndAddAsset(index, runAdd)
                 return
             }
         }
@@ -888,7 +889,7 @@ PanelFrame {
                 // rather than running off-window when the panel is dragged narrow.
                 x: Math.max(-Theme.tabRailWidth, assetsContent.width - width - Theme.pagePadding)
                 y: assetsHeader.height + Theme.pagePadding + Theme.controlHeight + 4
-                onAddonManagerRequested: root.Window.window.openAddonManager("stickers")
+                onAddonManagerRequested: ShellBridge.main.openAddonManager("stickers")
                 onAdded: root.addCompleted()
             }
 
@@ -1067,6 +1068,7 @@ PanelFrame {
 
             // Shared media browser used by the Media tab.
             Loader {
+                id: mediaBrowser
                 active: root.kindsForTab(root.currentTabId).length > 0
                 visible: active
                 width: parent.width
@@ -1077,8 +1079,8 @@ PanelFrame {
                         importing: root.importing
                         assetVisibleFn: function(kind) { return root.assetVisible(kind) }
                         onPreviewRequested: (assetIndex) => {
-                            if (typeof Window !== "undefined" && Window.window && Window.window.openMediaPreview)
-                                Window.window.openMediaPreview(assetIndex)
+                            if (ShellBridge.main && ShellBridge.main.openMediaPreview)
+                                ShellBridge.main.openMediaPreview(assetIndex)
                         }
                         onAddToTimelineRequested: (assetIds) => root.requestAddToTimeline(assetIds)
                         onRemoveRequested: (assetIds) => root.requestRemoveAsset(assetIds)

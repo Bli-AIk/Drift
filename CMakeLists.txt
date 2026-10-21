@@ -1044,6 +1044,8 @@ qt_add_executable(drift
     src/app/editor/EditorState.h
     src/app/editor/LayoutStore.h
     src/app/editor/LayoutStore.cpp
+    src/app/editor/WorkspaceStore.h
+    src/app/editor/WorkspaceStore.cpp
     src/app/platform/FileDialogs.h
     src/app/platform/FileDialogs.cpp
     src/app/platform/Haptics.h
@@ -1272,6 +1274,22 @@ qt_add_resources(drift "drift_themes"
         resources/themes/theme.schema.json
 )
 
+# Built-in workspace presets. WorkspaceStore lists this directory, so a new preset is a
+# JSON file plus an entry here.
+qt_add_resources(drift "drift_workspaces"
+    PREFIX "/workspaces"
+    BASE resources/workspaces
+    FILES
+        resources/workspaces/edit.json
+        resources/workspaces/edit-portrait.json
+        resources/workspaces/cut-trim.json
+        resources/workspaces/audio.json
+        resources/workspaces/record.json
+        resources/workspaces/subtitles.json
+        resources/workspaces/ai.json
+        resources/workspaces/color.json
+)
+
 set_source_files_properties(src/qml/Theme.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
 # Canvas preset catalog + the (template, quality) -> pixels arithmetic, shared by the desktop
 # layout dialog and the phone layout sheet so the two cannot drift apart again.
@@ -1287,6 +1305,8 @@ set_source_files_properties(src/qml/Toasts.qml PROPERTIES QT_QML_SINGLETON_TYPE 
 # AndroidBottomSheet and the drop is performed by AndroidTimeline.
 set_source_files_properties(src/qml/TouchDrag.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
 set_source_files_properties(src/qml/AssetDrag.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
+# The editor main window, for panels that may live in a secondary window.
+set_source_files_properties(src/qml/ShellBridge.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
 
 # Lucide icons: use the original scalable SVG sources in QML.
 file(GLOB DRIFT_LUCIDE_ICONS RELATIVE "${CMAKE_SOURCE_DIR}" CONFIGURE_DEPENDS
@@ -1370,6 +1390,7 @@ qt_add_qml_module(drift
         src/qml/Toasts.qml
         src/qml/TouchDrag.qml
         src/qml/AssetDrag.qml
+        src/qml/ShellBridge.qml
         src/qml/EditorHeader.qml
         src/qml/AssetsPanel.qml
         src/qml/PreviewPanel.qml
@@ -1599,6 +1620,12 @@ qt_add_qml_module(drift
         src/qml/components/timeline/TransformCoverageOverlay.qml
         src/qml/components/timeline/VoiceoverControlBar.qml
         src/qml/components/timeline/AudioMixerStrip.qml
+        src/qml/components/panels/AudioMixerPanel.qml
+        src/qml/components/panels/SubtitlesPanel.qml
+        src/qml/components/panels/RecorderPanel.qml
+        src/qml/components/panels/HistoryPanel.qml
+        src/qml/components/panels/SourceViewerPanel.qml
+        src/qml/components/panels/AgentLogPanel.qml
         src/qml/components/timeline/TimelineClipItem.qml
         src/qml/components/timeline/PlayheadInterpolator.qml
         src/qml/components/timeline/TimelineTrackArea.qml
@@ -1825,6 +1852,7 @@ qt_add_qml_module(drift
         src/qml/components/preview/media/MediaPreviewCropGrip.qml
         src/qml/components/preview/media/MediaPreviewCropFrame.qml
         src/qml/components/preview/media/MediaPreviewAudioPlaceholder.qml
+        src/qml/components/preview/media/MediaPreviewView.qml
         src/qml/components/preview/mask/MaskOverlayVertexHandle.qml
         src/qml/components/preview/mask/MaskOverlayRotateHandle.qml
         src/qml/components/preview/mask/MaskOverlayResizeGrip.qml
@@ -2040,7 +2068,22 @@ qt_add_qml_module(drift
         src/qml/components/shell/MainAndroidMediaPreviewOverlay.qml
         src/qml/components/shell/GlobalSearchResultRow.qml
         src/qml/components/shell/EditorWorkspace.qml
+        src/qml/components/shell/workspaces/PanelPool.qml
+        src/qml/components/shell/workspaces/WorkspaceCell.qml
+        src/qml/components/shell/workspaces/WorkspaceHost.qml
+        src/qml/components/shell/workspaces/WorkspacePlaceholderPanel.qml
+        src/qml/components/shell/workspaces/WorkspaceSlot.qml
+        src/qml/components/shell/workspaces/WorkspaceSplit.qml
+        src/qml/components/shell/workspaces/WorkspaceWindow.qml
+        src/qml/components/shell/workspaces/designer/DesignerDragArea.qml
+        src/qml/components/shell/workspaces/designer/DesignerNode.qml
+        src/qml/components/shell/workspaces/designer/DesignerSlot.qml
+        src/qml/components/shell/workspaces/designer/DesignerTree.js
+        src/qml/components/shell/workspaces/designer/DesignerWorkspaceList.qml
+        src/qml/components/shell/workspaces/designer/WorkspaceDesigner.qml
+        src/qml/components/shell/SettingsWorkspacesPage.qml
         src/qml/components/shell/EditorHeaderSettingsButton.qml
+        src/qml/components/shell/EditorHeaderWorkspaceButton.qml
         src/qml/components/shell/AppSettingsMenu.qml
         src/qml/components/shell/EditorHeaderSeparator.qml
         src/qml/components/shell/EditorHeaderSearchField.qml

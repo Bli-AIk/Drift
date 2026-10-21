@@ -73,7 +73,7 @@ Popup {
 
     function buildIndex() {
         // Popup is not an Item, so the Window attached property has to come from its parent.
-        const win = root.parent.Window.window
+        const win = ShellBridge.main
         const c = root._controls
         const rows = []
         const selectClip = qsTr("Select a clip first")
@@ -112,6 +112,14 @@ Popup {
             const cmd = commands[i]
             rows.push({ kind: "command", label: cmd.label, sub: cmd.sub || "", keywords: cmd.keywords || "",
                         shortcut: "", enabled: true, run: cmd.run })
+        }
+
+        const workspaces = Workspaces.workspaces
+        for (let i = 0; i < workspaces.length; ++i) {
+            const ws = workspaces[i]
+            rows.push({ kind: "command", label: qsTr("Workspace: %1").arg(ws.name), sub: "",
+                        keywords: "workspace layout " + ws.id, shortcut: "", enabled: true,
+                        run: () => { Workspaces.activeId = ws.id } })
         }
 
         const tabs = ["media", "market", "text", "subtitles", "speech", "stickers", "shapes", "masks",

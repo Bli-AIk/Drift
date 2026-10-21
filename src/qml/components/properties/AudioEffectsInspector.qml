@@ -65,7 +65,7 @@ Item {
             width: parent.width
             text: qsTr("Install audio effects")
             variant: "primary"
-            onClicked: root.Window.window.openAddonManager("audio-effects")
+            onClicked: ShellBridge.main.openAddonManager("audio-effects")
         }
 
         EmptyState {

@@ -67,7 +67,7 @@ Item {
                 variant: "ghost"
                 buttonSize: Theme.controlHeight
                 tooltip: qsTr("Install a custom transition or effect from a .driftfx file made in Drift Forge")
-                onClicked: root.Window.window.importUserPackage("")
+                onClicked: ShellBridge.main.importUserPackage("")
             }
         }
 
@@ -99,7 +99,7 @@ Item {
                 title: qsTr("No transitions available")
                 hint: qsTr("Install a transitions pack to add more.")
                 actionText: qsTr("Get extras")
-                onActionTriggered: root.Window.window.openAddonManager()
+                onActionTriggered: ShellBridge.main.openAddonManager()
             }
 
             EmptyState {
@@ -125,7 +125,7 @@ Item {
                          : qsTr("Pick another category."))
                 actionText: root.activeCategory === root.mineId && root.query.length === 0
                             ? qsTr("Import") : ""
-                onActionTriggered: root.Window.window.importUserPackage("")
+                onActionTriggered: ShellBridge.main.importUserPackage("")
             }
 
             FontMetrics {

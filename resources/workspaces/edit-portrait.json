@@ -1,0 +1,33 @@
+{
+  "id": "edit-portrait",
+  "name": "Edit (Portrait)",
+  "builtin": true,
+  "order": 1,
+  "windows": [
+    {
+      "id": "main",
+      "root": {
+        "split": "h",
+        "sizes": [0.6, 0.4],
+        "children": [
+          {
+            "split": "v",
+            "sizes": [0.5, 0.5],
+            "children": [
+              {
+                "split": "h",
+                "sizes": [0.5, 0.5],
+                "children": [
+                  { "panels": [ { "type": "assets", "tab": "media" } ], "active": 0 },
+                  { "panels": [ { "type": "properties" } ], "active": 0 }
+                ]
+              },
+              { "panels": [ { "type": "timeline" } ], "active": 0 }
+            ]
+          },
+          { "panels": [ { "type": "preview" } ], "active": 0 }
+        ]
+      }
+    }
+  ]
+}

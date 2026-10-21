@@ -134,16 +134,16 @@ ThemedContextMenu {
         icon.name: Theme.icons.crop
         // Desktop only: AndroidMain has no crop window for timeline clips.
         visible: (owner.clipData.kind === "video" || owner.clipData.kind === "image")
-                 && typeof owner.Window.window.openCrop === "function"
-        onTriggered: owner.Window.window.openCrop(owner.trackIndex, owner.clipIndex)
+                 && typeof ShellBridge.main?.openCrop === "function"
+        onTriggered: ShellBridge.main.openCrop(owner.trackIndex, owner.clipIndex)
     }
     ThemedMenuItem {
         text: qsTr("Enhance video…")
         icon.name: Theme.icons.sparkles
         // Desktop only: AndroidMain has no restore window.
         visible: owner.clipData.kind === "video"
-                 && typeof owner.Window.window.openRestore === "function"
-        onTriggered: owner.Window.window.openRestore(owner.trackIndex, owner.clipIndex)
+                 && typeof ShellBridge.main?.openRestore === "function"
+        onTriggered: ShellBridge.main.openRestore(owner.trackIndex, owner.clipIndex)
     }
     ThemedMenuItem {
         text: qsTr("Unlink")

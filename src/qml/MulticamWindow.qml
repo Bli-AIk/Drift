@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Window
-import Drift 1.0
+import Drift
 
 // Multicam punching surface: every camera at the current time, side by side. Clicks and number
 // keys recut a staged copy of the selected clips; the live timeline is untouched until Save.

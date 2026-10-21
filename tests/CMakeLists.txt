@@ -322,3 +322,21 @@ qt_add_resources(tst_windowbackdrop "drift_themes"
 )
 add_test(NAME WindowBackdrop COMMAND tst_windowbackdrop)
 set_tests_properties(WindowBackdrop PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
+qt_add_executable(tst_workspacestore tst_workspacestore.cpp ../src/app/editor/WorkspaceStore.cpp)
+target_include_directories(tst_workspacestore PRIVATE ../src)
+target_link_libraries(tst_workspacestore PRIVATE Qt6::Test Qt6::Core)
+qt_add_resources(tst_workspacestore "workspace_presets"
+    PREFIX "/workspaces"
+    BASE ../resources/workspaces
+    FILES
+        ../resources/workspaces/edit.json
+        ../resources/workspaces/edit-portrait.json
+        ../resources/workspaces/cut-trim.json
+        ../resources/workspaces/audio.json
+        ../resources/workspaces/record.json
+        ../resources/workspaces/subtitles.json
+        ../resources/workspaces/ai.json
+        ../resources/workspaces/color.json
+)
+add_test(NAME WorkspaceStore COMMAND tst_workspacestore)

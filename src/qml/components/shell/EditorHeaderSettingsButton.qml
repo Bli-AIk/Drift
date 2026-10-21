@@ -25,8 +25,8 @@ Item {
 
     AppSettingsMenu {
         id: settingsMenu
-        onMobileLayoutRequested: settingsButton.Window.window.switchShell("mobile")
-        onMulticamRequested: settingsButton.Window.window.openMulticam()
-        onMoreSettingsRequested: settingsButton.Window.window.openSettings()
+        onMobileLayoutRequested: ShellBridge.main.switchShell("mobile")
+        onMulticamRequested: ShellBridge.main.openMulticam()
+        onMoreSettingsRequested: ShellBridge.main.openSettings()
     }
 }

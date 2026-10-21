@@ -104,7 +104,7 @@ Item {
                 variant: "primary"
                 glyph: Theme.icons.download
                 tooltip: qsTr("Needed to generate speech")
-                onClicked: root.Window.window.openAddonManager(
+                onClicked: ShellBridge.main.openAddonManager(
                     root.runtimeReady ? "tts-model" : "onnxruntime")
             }
 

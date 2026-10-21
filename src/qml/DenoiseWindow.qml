@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Window
 import QtMultimedia
-import Drift 1.0
+import Drift
 
 // Audition surface for noise removal. Opened for one clip: a short window of it is run through the
 // model, the original and the result are compared side by side, and only then is the whole clip

@@ -28,6 +28,9 @@ Rectangle {
     color: Theme.c.audioMixerStrip.background
 
     property bool resizing: false
+    // Hosted in a panel: the panel supplies the title and owns the size, so the header and
+    // the edge resize (which writes the timeline's audioMixerWidth preference) are dropped.
+    property bool embedded: false
 
     Behavior on width {
         enabled: !root.resizing
@@ -226,6 +229,7 @@ Rectangle {
                 // --- Header ----------------------------------------------------------------
                 Item {
                     id: topHeader
+                    visible: !root.embedded
                     width: parent.width
                     height: Theme.timelineRulerHeight + Theme.timelineBookmarkRowHeight
 
@@ -657,6 +661,7 @@ Rectangle {
             // Drag the left edge to resize; double-click returns to fitting the strips.
             MouseArea {
                 id: resizeHandle
+                visible: !root.embedded
                 anchors.left: parent.left
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom

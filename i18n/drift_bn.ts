@@ -502,6 +502,61 @@
     </message>
 </context>
 <context>
+    <name>AgentLogPanel</name>
+    <message>
+        <source>%1 ms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 s</source>
+        <translation type="unfinished">%1 সেকেন্ড</translation>
+    </message>
+    <message>
+        <source>Agent log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listening on %1</source>
+        <translation type="unfinished">%1-এ সংযোগের অপেক্ষায়</translation>
+    </message>
+    <message>
+        <source>Access is on</source>
+        <translation type="unfinished">অ্যাক্সেস চালু আছে</translation>
+    </message>
+    <message>
+        <source>Agent access is off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect an agent…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No tool calls yet. What a connected agent does will show up here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on agent access to let an assistant edit this project.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>running…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation type="unfinished">পূর্বাবস্থায় ফেরান</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation type="unfinished">আবার করুন</translation>
+    </message>
+</context>
+<context>
     <name>AndroidAddMenu</name>
     <message>
         <source>Add to timeline</source>
@@ -2333,8 +2388,64 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Restore Workspace Windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>System default</source>
         <translation>সিস্টেমের ডিফল্ট</translation>
+    </message>
+    <message>
+        <source>Select a clip to measure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip to normalize</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Clip added</source>
@@ -4947,6 +5058,69 @@
     </message>
 </context>
 <context>
+    <name>AudioMixerPanel</name>
+    <message>
+        <source>Loudness: not measured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loudness: %1 LUFS, true peak %2 dBTP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalized to %1 LUFS, but peaks clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalized to %1 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Mixer</source>
+        <translation type="unfinished">অডিও মিক্সার</translation>
+    </message>
+    <message>
+        <source>Analyze</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Measure loudness of the selected clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalize to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-14 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-16 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-23 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the selected clip&apos;s volume to the chosen loudness</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AudioMixerStrip</name>
     <message>
         <source>Audio Mixer</source>
@@ -5705,6 +5879,60 @@
     </message>
 </context>
 <context>
+    <name>DesignerSlot</name>
+    <message>
+        <source>Add as tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DesignerWorkspaceList</name>
+    <message>
+        <source>Built-in</source>
+        <translation type="unfinished">অন্তর্নির্মিত</translation>
+    </message>
+    <message>
+        <source>Modified</source>
+        <translation type="unfinished">পরিবর্তিত</translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not saved yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate</source>
+        <translation type="unfinished">অনুলিপি তৈরি করুন</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation type="unfinished">নাম পরিবর্তন করুন</translation>
+    </message>
+    <message>
+        <source>Confirm delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">মুছুন</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished">রিসেট করুন</translation>
+    </message>
+    <message>
+        <source>Set active</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DownloadFormat</name>
     <message>
         <source>%1 B</source>
@@ -6220,6 +6448,21 @@
     <message>
         <source>Settings</source>
         <translation type="unfinished">সেটিংস</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderWorkspaceButton</name>
+    <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit workspaces…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7946,6 +8189,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Transitions</source>
         <translation type="unfinished">ট্রানজিশন</translation>
     </message>
@@ -8122,6 +8369,10 @@
     </message>
     <message>
         <source>Theme: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8447,6 +8698,21 @@
     <message>
         <source>From project</source>
         <translation type="unfinished">প্রকল্প থেকে</translation>
+    </message>
+</context>
+<context>
+    <name>HistoryPanel</name>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished">শুরু করুন</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing to undo yet. Your edits will be listed here.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9091,6 +9357,10 @@
     <message>
         <source>&amp;Window</source>
         <translation type="unfinished">উইন্ডো (&amp;W)</translation>
+    </message>
+    <message>
+        <source>Edit Workspaces…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Landscape Workspace</source>
@@ -10083,26 +10353,26 @@
     </message>
 </context>
 <context>
-    <name>MediaPreviewWindow</name>
-    <message>
-        <source>Preview — %1</source>
-        <translation type="unfinished">পূর্বরূপ — %1</translation>
-    </message>
-    <message>
-        <source>Preview</source>
-        <translation type="unfinished">পূর্বরূপ</translation>
-    </message>
+    <name>MediaPreviewView</name>
     <message>
         <source>Play the clip and drag the ends to keep only the part you want. Save replaces this item in the media bin.</source>
         <translation type="unfinished">ক্লিপটি চালান এবং শুধুমাত্র আপনার পছন্দের অংশটি রাখতে প্রান্তগুলি টেনে আনুন। সংরক্ষণ মিডিয়া বিন এই আইটেম প্রতিস্থাপন.</translation>
     </message>
     <message>
+        <source>Drag the box to crop. The original image stays available, so the crop can be changed later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drag the box to crop. The original video stays available, so the crop can be changed later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Pause</source>
-        <translation>বিরতি দিন</translation>
+        <translation type="unfinished">বিরতি দিন</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation>চালান</translation>
+        <translation type="unfinished">চালান</translation>
     </message>
     <message>
         <source>Set In</source>
@@ -10113,8 +10383,32 @@
         <translation type="unfinished">সেট আউট</translation>
     </message>
     <message>
+        <source>Add sub-clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub-clip added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotate</source>
+        <translation type="unfinished">ঘোরান</translation>
+    </message>
+    <message>
+        <source>Original: %1×%2 • Crop: %3×%4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unlock crop ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock crop ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Reset</source>
-        <translation>রিসেট করুন</translation>
+        <translation type="unfinished">রিসেট করুন</translation>
     </message>
     <message>
         <source>Upscale this video?</source>
@@ -10133,52 +10427,12 @@
         <translation type="unfinished">এই রেজোলিউশনটি ইতিমধ্যেই বেশিরভাগ প্রকল্পের জন্য ভাল। আপনি এখনও এটি আপস্কেল করতে পারেন.</translation>
     </message>
     <message>
-        <source>Saving…</source>
-        <translation>সংরক্ষণ করা হচ্ছে…</translation>
-    </message>
-    <message>
-        <source>Nothing to save — drag this item onto the timeline when you are ready.</source>
-        <translation type="unfinished">সংরক্ষণ করার কিছু নেই — আপনি প্রস্তুত হলে এই আইটেমটিকে টাইমলাইনে টেনে আনুন.</translation>
-    </message>
-    <message>
-        <source>Crop — %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Crop</source>
-        <translation type="unfinished">ক্রপ</translation>
-    </message>
-    <message>
-        <source>Drag the box to crop. The original image stays available, so the crop can be changed later.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Drag the box to crop. The original video stays available, so the crop can be changed later.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add sub-clip</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sub-clip added</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Original: %1×%2 • Crop: %3×%4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unlock crop ratio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lock crop ratio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Done keeps the original video and stores this range and crop. Upscale renders them as a new video in the media bin, then opens it in the Enhance window.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saving…</source>
+        <translation type="unfinished">সংরক্ষণ করা হচ্ছে…</translation>
     </message>
     <message>
         <source>Choose the part and crop to keep, then Next.</source>
@@ -10197,16 +10451,20 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Nothing to save — drag this item onto the timeline when you are ready.</source>
+        <translation type="unfinished">সংরক্ষণ করার কিছু নেই — আপনি প্রস্তুত হলে এই আইটেমটিকে টাইমলাইনে টেনে আনুন.</translation>
+    </message>
+    <message>
         <source>Cancel</source>
-        <translation>বাতিল করুন</translation>
+        <translation type="unfinished">বাতিল করুন</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation>বন্ধ করুন</translation>
+        <translation type="unfinished">বন্ধ করুন</translation>
     </message>
     <message>
         <source>Back</source>
-        <translation>ফিরে যান</translation>
+        <translation type="unfinished">ফিরে যান</translation>
     </message>
     <message>
         <source>Upscale…</source>
@@ -10214,7 +10472,7 @@
     </message>
     <message>
         <source>Save</source>
-        <translation>সংরক্ষণ করুন</translation>
+        <translation type="unfinished">সংরক্ষণ করুন</translation>
     </message>
     <message>
         <source>Next</source>
@@ -10222,11 +10480,26 @@
     </message>
     <message>
         <source>Done</source>
-        <translation>সম্পন্ন</translation>
+        <translation type="unfinished">সম্পন্ন</translation>
+    </message>
+</context>
+<context>
+    <name>MediaPreviewWindow</name>
+    <message>
+        <source>Preview — %1</source>
+        <translation type="unfinished">পূর্বরূপ — %1</translation>
     </message>
     <message>
-        <source>Rotate</source>
-        <translation>ঘোরান</translation>
+        <source>Preview</source>
+        <translation type="unfinished">পূর্বরূপ</translation>
+    </message>
+    <message>
+        <source>Crop — %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop</source>
+        <translation type="unfinished">ক্রপ</translation>
     </message>
 </context>
 <context>
@@ -12460,6 +12733,21 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>RecorderPanel</name>
+    <message>
+        <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record a voiceover from your microphone onto an audio track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RecoveryDialog</name>
     <message>
         <source>Unsaved work from last session</source>
@@ -13794,6 +14082,10 @@ If playback stutters, try another.</source>
         <translation type="unfinished">চেহারা</translation>
     </message>
     <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Timeline</source>
         <translation type="unfinished">টাইমলাইন</translation>
     </message>
@@ -14190,6 +14482,25 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>Choose which actions appear on the toolbar above the timeline and which go in its overflow menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsWorkspacesPage</name>
+    <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Arrange panels into layouts, optionally across several windows. Drag a panel onto an edge of another block to split it, or onto its middle to add a tab. Nothing changes in the editor until you save.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout designer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Built-in presets keep a copy of the original, so Reset brings them back.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -14836,6 +15147,21 @@ If playback stutters, try another.</source>
     <message>
         <source>“%1” is already used by %2.</source>
         <translation>“%1” ইতিমধ্যেই %2-এর জন্য ব্যবহৃত হচ্ছে.</translation>
+    </message>
+</context>
+<context>
+    <name>SourceViewerPanel</name>
+    <message>
+        <source>Source: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip in the media bin to preview it here.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -15836,6 +16162,21 @@ If playback stutters, try another.</source>
     <message>
         <source>This can take a few minutes on longer clips.</source>
         <translation type="unfinished">দীর্ঘ ক্লিপগুলিতে এটি কয়েক মিনিট সময় নিতে পারে.</translation>
+    </message>
+</context>
+<context>
+    <name>SubtitlesPanel</name>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">সাবটাইটেল</translation>
+    </message>
+    <message>
+        <source>Select a subtitle clip, or generate subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate subtitles</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -19111,6 +19452,266 @@ If playback stutters, try another.</source>
     <message>
         <source>Cancel — discard recording</source>
         <translation type="unfinished">বাতিল — রেকর্ডিং ফেলে দিন</translation>
+    </message>
+</context>
+<context>
+    <name>WorkspaceDesigner</name>
+    <message>
+        <source>Media</source>
+        <translation type="unfinished">মিডিয়া</translation>
+    </message>
+    <message>
+        <source>Market</source>
+        <translation type="unfinished">মার্কেট</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished">টেক্সট</translation>
+    </message>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">সাবটাইটেল</translation>
+    </message>
+    <message>
+        <source>Speech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stickers</source>
+        <translation type="unfinished">স্টিকার</translation>
+    </message>
+    <message>
+        <source>Shapes</source>
+        <translation type="unfinished">আকৃতি</translation>
+    </message>
+    <message>
+        <source>Masks</source>
+        <translation type="unfinished">মাস্ক</translation>
+    </message>
+    <message>
+        <source>Scenes</source>
+        <translation type="unfinished">দৃশ্য</translation>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation type="unfinished">ইফেক্ট</translation>
+    </message>
+    <message>
+        <source>Templates</source>
+        <translation type="unfinished">টেমপ্লেট</translation>
+    </message>
+    <message>
+        <source>Transitions</source>
+        <translation type="unfinished">ট্রানজিশন</translation>
+    </message>
+    <message>
+        <source>Audio FX</source>
+        <translation type="unfinished">অডিও ইফেক্ট</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">সাধারণ</translation>
+    </message>
+    <message>
+        <source>Transform</source>
+        <translation type="unfinished">ট্রান্সফর্ম</translation>
+    </message>
+    <message>
+        <source>Animation</source>
+        <translation type="unfinished">অ্যানিমেশন</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">অডিও</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished">গতি</translation>
+    </message>
+    <message>
+        <source>Blending</source>
+        <translation type="unfinished">মিশ্রণ</translation>
+    </message>
+    <message>
+        <source>New workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make active tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsaved changes</source>
+        <translation type="unfinished">অসংরক্ষিত পরিবর্তন</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">সংরক্ষণ করুন</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep editing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fullscreen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a Preview-only fullscreen window as a second-monitor output.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every panel is placed. Drag one here to remove it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drag a panel here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes apply when you save.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No changes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">বাতিল করুন</translation>
+    </message>
+</context>
+<context>
+    <name>WorkspacePlaceholderPanel</name>
+    <message>
+        <source>%1 — coming soon</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WorkspaceStore</name>
+    <message>
+        <source>Assets</source>
+        <translation type="unfinished">সম্পদ</translation>
+    </message>
+    <message>
+        <source>Properties</source>
+        <translation type="unfinished">বৈশিষ্ট্য</translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished">পূর্বরূপ</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">টাইমলাইন</translation>
+    </message>
+    <message>
+        <source>Audio Mixer</source>
+        <translation type="unfinished">অডিও মিক্সার</translation>
+    </message>
+    <message>
+        <source>Source Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">সাবটাইটেল</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Agent Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A window has no panels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A split needs at least two sections.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A section needs at least one panel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A section&apos;s active tab is out of range.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown panel type &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The &quot;%1&quot; panel is used more than once.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A workspace needs at least one window.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The first window must be the main window.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation type="unfinished">কর্মক্ষেত্র</translation>
+    </message>
+    <message>
+        <source>%1 copy</source>
+        <translation type="unfinished">%1 অনুলিপি</translation>
+    </message>
+</context>
+<context>
+    <name>WorkspaceWindow</name>
+    <message>
+        <source>Drift</source>
+        <translation type="unfinished">Drift</translation>
     </message>
 </context>
 <context>

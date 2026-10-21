@@ -185,7 +185,7 @@ SettingsPage {
                          && EditorState.preferences.canRestart
                 variant: "secondary"
                 text: qsTr("Restart now")
-                onClicked: Window.window.restartToApplyShell()
+                onClicked: ShellBridge.main.restartToApplyShell()
             }
         }
     }

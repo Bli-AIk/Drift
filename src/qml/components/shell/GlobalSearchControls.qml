@@ -80,6 +80,7 @@ QtObject {
 
         setting("general", qsTr("General"), "language locale startup autosave recovery cache backup"),
         setting("appearance", qsTr("Appearance"), "theme dark light color workspace layout translucency"),
+        setting("workspaces", qsTr("Workspaces"), "workspace layout panel window monitor screen dock preset"),
         setting("timeline", qsTr("Timeline"), "scroll wheel horizontal vertical crossfade transition overview minimap"),
         setting("toolbar", qsTr("Timeline toolbar"), "toolbar buttons customize"),
         setting("keymap", qsTr("Keyboard shortcuts"), "keymap keys hotkeys bindings"),

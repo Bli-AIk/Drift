@@ -29,7 +29,7 @@ ThemedDialog {
     onAccepted: {
         EditorState.preferences.interfaceShell = target
         if (EditorState.preferences.canRestart)
-            root.contentItem.Window.window.restartToApplyShell()
+            ShellBridge.main.restartToApplyShell()
         else
             Toasts.info(qsTr("Restart Drift to switch layouts."))
     }

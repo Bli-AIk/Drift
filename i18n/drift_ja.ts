@@ -502,6 +502,61 @@
     </message>
 </context>
 <context>
+    <name>AgentLogPanel</name>
+    <message>
+        <source>%1 ms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 s</source>
+        <translation type="unfinished">%1 秒</translation>
+    </message>
+    <message>
+        <source>Agent log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listening on %1</source>
+        <translation type="unfinished">%1 で待機中</translation>
+    </message>
+    <message>
+        <source>Access is on</source>
+        <translation type="unfinished">アクセスがオンです</translation>
+    </message>
+    <message>
+        <source>Agent access is off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect an agent…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No tool calls yet. What a connected agent does will show up here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on agent access to let an assistant edit this project.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>running…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation type="unfinished">元に戻す</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation type="unfinished">やり直し</translation>
+    </message>
+</context>
+<context>
     <name>AndroidAddMenu</name>
     <message>
         <source>Add to timeline</source>
@@ -2707,6 +2762,62 @@
     <message>
         <source>Search…</source>
         <translation>検索…</translation>
+    </message>
+    <message>
+        <source>Restore Workspace Windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace 9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip to measure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip to normalize</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No audio track available for recording</source>
@@ -4926,6 +5037,69 @@
     </message>
 </context>
 <context>
+    <name>AudioMixerPanel</name>
+    <message>
+        <source>Loudness: not measured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loudness: %1 LUFS, true peak %2 dBTP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalized to %1 LUFS, but peaks clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalized to %1 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Mixer</source>
+        <translation type="unfinished">オーディオミキサー</translation>
+    </message>
+    <message>
+        <source>Analyze</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Measure loudness of the selected clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip first</source>
+        <translation type="unfinished">先にクリップを選択してください</translation>
+    </message>
+    <message>
+        <source>Normalize to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-14 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-16 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-23 LUFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the selected clip&apos;s volume to the chosen loudness</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AudioMixerStrip</name>
     <message>
         <source>Audio Mixer</source>
@@ -5684,6 +5858,60 @@
     </message>
 </context>
 <context>
+    <name>DesignerSlot</name>
+    <message>
+        <source>Add as tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DesignerWorkspaceList</name>
+    <message>
+        <source>Built-in</source>
+        <translation type="unfinished">組み込み</translation>
+    </message>
+    <message>
+        <source>Modified</source>
+        <translation type="unfinished">更新日</translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not saved yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate</source>
+        <translation type="unfinished">複製</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation type="unfinished">名前の変更</translation>
+    </message>
+    <message>
+        <source>Confirm delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">削除</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished">リセット</translation>
+    </message>
+    <message>
+        <source>Set active</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DownloadFormat</name>
     <message>
         <source>%1 B</source>
@@ -6193,6 +6421,21 @@
     <message>
         <source>Settings</source>
         <translation type="unfinished">設定</translation>
+    </message>
+</context>
+<context>
+    <name>EditorHeaderWorkspaceButton</name>
+    <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit workspaces…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7918,6 +8161,10 @@
         <translation>3D モデルクリップを選択</translation>
     </message>
     <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Transitions</source>
         <translation>トランジション</translation>
     </message>
@@ -8094,6 +8341,10 @@
     </message>
     <message>
         <source>Theme: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8419,6 +8670,21 @@
     <message>
         <source>From project</source>
         <translation type="unfinished">プロジェクトから</translation>
+    </message>
+</context>
+<context>
+    <name>HistoryPanel</name>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished">開始</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing to undo yet. Your edits will be listed here.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9059,6 +9325,10 @@
     <message>
         <source>&amp;Window</source>
         <translation type="unfinished">ウィンドウ(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Edit Workspaces…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Landscape Workspace</source>
@@ -10041,78 +10311,34 @@
     </message>
 </context>
 <context>
-    <name>MediaPreviewWindow</name>
-    <message>
-        <source>Preview — %1</source>
-        <translation>プレビュー — %1</translation>
-    </message>
-    <message>
-        <source>Preview</source>
-        <translation>プレビュー</translation>
-    </message>
+    <name>MediaPreviewView</name>
     <message>
         <source>Play the clip and drag the ends to keep only the part you want. Save replaces this item in the media bin.</source>
-        <translation>クリップを再生し、端をドラッグして必要な部分だけを保持します。保存すると、メディアビンのこの項目が置き換えられます。</translation>
-    </message>
-    <message>
-        <source>Pause</source>
-        <translation>一時停止</translation>
-    </message>
-    <message>
-        <source>Play</source>
-        <translation>再生</translation>
-    </message>
-    <message>
-        <source>Set In</source>
-        <translation>インを設定</translation>
-    </message>
-    <message>
-        <source>Set Out</source>
-        <translation>アウトを設定</translation>
-    </message>
-    <message>
-        <source>Reset</source>
-        <translation>リセット</translation>
-    </message>
-    <message>
-        <source>Upscale this video?</source>
-        <translation>このビデオをアップスケールしますか?</translation>
-    </message>
-    <message>
-        <source>Length %1</source>
-        <translation>長さ %1</translation>
-    </message>
-    <message>
-        <source>This video is under 700 pixels on its shorter side. Upscaling it with an AI model can make it look sharper.</source>
-        <translation>このビデオは短辺が 700 ピクセル未満です。AI モデルでアップスケールすると、より鮮明に見える場合があります。</translation>
-    </message>
-    <message>
-        <source>This resolution is already good for most projects. You can still upscale it.</source>
-        <translation>この解像度はほとんどのプロジェクトで十分です。それでもアップスケールすることは可能です。</translation>
-    </message>
-    <message>
-        <source>Saving…</source>
-        <translation>保存中…</translation>
-    </message>
-    <message>
-        <source>Nothing to save — drag this item onto the timeline when you are ready.</source>
-        <translation>保存するものはありません — 準備ができたらこの項目をタイムラインにドラッグしてください。</translation>
-    </message>
-    <message>
-        <source>Crop — %1</source>
-        <translation>切り抜き — %1</translation>
-    </message>
-    <message>
-        <source>Crop</source>
-        <translation>切り抜き</translation>
+        <translation type="unfinished">クリップを再生し、端をドラッグして必要な部分だけを保持します。保存すると、メディアビンのこの項目が置き換えられます。</translation>
     </message>
     <message>
         <source>Drag the box to crop. The original image stays available, so the crop can be changed later.</source>
-        <translation>ボックスをドラッグして切り抜きます。元の画像はそのまま残るため、後から切り抜きを変更できます。</translation>
+        <translation type="unfinished">ボックスをドラッグして切り抜きます。元の画像はそのまま残るため、後から切り抜きを変更できます。</translation>
     </message>
     <message>
         <source>Drag the box to crop. The original video stays available, so the crop can be changed later.</source>
-        <translation>ボックスをドラッグして切り抜きます。元のビデオはそのまま残るため、後から切り抜きを変更できます。</translation>
+        <translation type="unfinished">ボックスをドラッグして切り抜きます。元のビデオはそのまま残るため、後から切り抜きを変更できます。</translation>
+    </message>
+    <message>
+        <source>Pause</source>
+        <translation type="unfinished">一時停止</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">再生</translation>
+    </message>
+    <message>
+        <source>Set In</source>
+        <translation type="unfinished">インを設定</translation>
+    </message>
+    <message>
+        <source>Set Out</source>
+        <translation type="unfinished">アウトを設定</translation>
     </message>
     <message>
         <source>Add sub-clip</source>
@@ -10123,68 +10349,115 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Rotate</source>
+        <translation type="unfinished">回転</translation>
+    </message>
+    <message>
         <source>Original: %1×%2 • Crop: %3×%4</source>
-        <translation>元: %1×%2 • 切り抜き: %3×%4</translation>
+        <translation type="unfinished">元: %1×%2 • 切り抜き: %3×%4</translation>
     </message>
     <message>
         <source>Unlock crop ratio</source>
-        <translation>切り抜き比率のロックを解除</translation>
+        <translation type="unfinished">切り抜き比率のロックを解除</translation>
     </message>
     <message>
         <source>Lock crop ratio</source>
-        <translation>切り抜き比率をロック</translation>
+        <translation type="unfinished">切り抜き比率をロック</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished">リセット</translation>
+    </message>
+    <message>
+        <source>Upscale this video?</source>
+        <translation type="unfinished">このビデオをアップスケールしますか?</translation>
+    </message>
+    <message>
+        <source>Length %1</source>
+        <translation type="unfinished">長さ %1</translation>
+    </message>
+    <message>
+        <source>This video is under 700 pixels on its shorter side. Upscaling it with an AI model can make it look sharper.</source>
+        <translation type="unfinished">このビデオは短辺が 700 ピクセル未満です。AI モデルでアップスケールすると、より鮮明に見える場合があります。</translation>
+    </message>
+    <message>
+        <source>This resolution is already good for most projects. You can still upscale it.</source>
+        <translation type="unfinished">この解像度はほとんどのプロジェクトで十分です。それでもアップスケールすることは可能です。</translation>
     </message>
     <message>
         <source>Done keeps the original video and stores this range and crop. Upscale renders them as a new video in the media bin, then opens it in the Enhance window.</source>
-        <translation>完了すると元のビデオを保持したまま、この範囲と切り抜きを記録します。アップスケールはそれらを新しいビデオとしてメディアビンにレンダリングし、その後「エンハンス」ウィンドウで開きます。</translation>
+        <translation type="unfinished">完了すると元のビデオを保持したまま、この範囲と切り抜きを記録します。アップスケールはそれらを新しいビデオとしてメディアビンにレンダリングし、その後「エンハンス」ウィンドウで開きます。</translation>
+    </message>
+    <message>
+        <source>Saving…</source>
+        <translation type="unfinished">保存中…</translation>
     </message>
     <message>
         <source>Choose the part and crop to keep, then Next.</source>
-        <translation>残す範囲と切り抜きを選択し、「次へ」をクリックしてください。</translation>
+        <translation type="unfinished">残す範囲と切り抜きを選択し、「次へ」をクリックしてください。</translation>
     </message>
     <message>
         <source>Save keeps the original file and stores this crop.</source>
-        <translation>保存すると元のファイルを保持したまま、この切り抜きを記録します。</translation>
+        <translation type="unfinished">保存すると元のファイルを保持したまま、この切り抜きを記録します。</translation>
     </message>
     <message>
         <source>Save keeps the original file and stores this trim.</source>
-        <translation>保存すると元のファイルを保持したまま、このトリムを記録します。</translation>
+        <translation type="unfinished">保存すると元のファイルを保持したまま、このトリムを記録します。</translation>
     </message>
     <message>
         <source>Adjust the crop or Reset to restore the full picture.</source>
-        <translation>切り抜きを調整するか、リセットして全体を復元してください。</translation>
+        <translation type="unfinished">切り抜きを調整するか、リセットして全体を復元してください。</translation>
+    </message>
+    <message>
+        <source>Nothing to save — drag this item onto the timeline when you are ready.</source>
+        <translation type="unfinished">保存するものはありません — 準備ができたらこの項目をタイムラインにドラッグしてください。</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>キャンセル</translation>
+        <translation type="unfinished">キャンセル</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation>閉じる</translation>
+        <translation type="unfinished">閉じる</translation>
     </message>
     <message>
         <source>Back</source>
-        <translation>戻る</translation>
+        <translation type="unfinished">戻る</translation>
     </message>
     <message>
         <source>Upscale…</source>
-        <translation>アップスケール…</translation>
+        <translation type="unfinished">アップスケール…</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation type="unfinished">保存</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation>次へ</translation>
+        <translation type="unfinished">次へ</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation>完了</translation>
+        <translation type="unfinished">完了</translation>
+    </message>
+</context>
+<context>
+    <name>MediaPreviewWindow</name>
+    <message>
+        <source>Preview — %1</source>
+        <translation>プレビュー — %1</translation>
     </message>
     <message>
-        <source>Rotate</source>
-        <translation>回転</translation>
+        <source>Preview</source>
+        <translation>プレビュー</translation>
+    </message>
+    <message>
+        <source>Crop — %1</source>
+        <translation>切り抜き — %1</translation>
+    </message>
+    <message>
+        <source>Crop</source>
+        <translation>切り抜き</translation>
     </message>
 </context>
 <context>
@@ -12411,6 +12684,21 @@ If playback stutters, try another.</source>
     </message>
 </context>
 <context>
+    <name>RecorderPanel</name>
+    <message>
+        <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record a voiceover from your microphone onto an audio track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start recording</source>
+        <translation type="unfinished">録音を開始</translation>
+    </message>
+</context>
+<context>
     <name>RecoveryDialog</name>
     <message>
         <source>Unsaved work from last session</source>
@@ -13744,6 +14032,10 @@ If playback stutters, try another.</source>
         <translation type="unfinished">外観</translation>
     </message>
     <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Timeline</source>
         <translation type="unfinished">タイムライン</translation>
     </message>
@@ -14140,6 +14432,25 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>Choose which actions appear on the toolbar above the timeline and which go in its overflow menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsWorkspacesPage</name>
+    <message>
+        <source>Workspaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Arrange panels into layouts, optionally across several windows. Drag a panel onto an edge of another block to split it, or onto its middle to add a tab. Nothing changes in the editor until you save.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout designer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Built-in presets keep a copy of the original, so Reset brings them back.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -14786,6 +15097,21 @@ If playback stutters, try another.</source>
     <message>
         <source>“%1” is already used by %2.</source>
         <translation>「%1」は %2 ですでに使用されています。</translation>
+    </message>
+</context>
+<context>
+    <name>SourceViewerPanel</name>
+    <message>
+        <source>Source: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clip in the media bin to preview it here.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -15783,6 +16109,21 @@ If playback stutters, try another.</source>
     <message>
         <source>This can take a few minutes on longer clips.</source>
         <translation>長いクリップでは数分かかることがあります。</translation>
+    </message>
+</context>
+<context>
+    <name>SubtitlesPanel</name>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">字幕</translation>
+    </message>
+    <message>
+        <source>Select a subtitle clip, or generate subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate subtitles</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -19050,6 +19391,266 @@ If playback stutters, try another.</source>
     <message>
         <source>Cancel — discard recording</source>
         <translation type="unfinished">破棄 — 録音をキャンセル</translation>
+    </message>
+</context>
+<context>
+    <name>WorkspaceDesigner</name>
+    <message>
+        <source>Media</source>
+        <translation type="unfinished">メディア</translation>
+    </message>
+    <message>
+        <source>Market</source>
+        <translation type="unfinished">マーケット</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished">テキスト</translation>
+    </message>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">字幕</translation>
+    </message>
+    <message>
+        <source>Speech</source>
+        <translation type="unfinished">スピーチ</translation>
+    </message>
+    <message>
+        <source>Stickers</source>
+        <translation type="unfinished">スタンプ</translation>
+    </message>
+    <message>
+        <source>Shapes</source>
+        <translation type="unfinished">シェイプ</translation>
+    </message>
+    <message>
+        <source>Masks</source>
+        <translation type="unfinished">マスク</translation>
+    </message>
+    <message>
+        <source>Scenes</source>
+        <translation type="unfinished">シーン</translation>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation type="unfinished">エフェクト</translation>
+    </message>
+    <message>
+        <source>Templates</source>
+        <translation type="unfinished">テンプレート</translation>
+    </message>
+    <message>
+        <source>Transitions</source>
+        <translation type="unfinished">トランジション</translation>
+    </message>
+    <message>
+        <source>Audio FX</source>
+        <translation type="unfinished">オーディオ FX</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">全般</translation>
+    </message>
+    <message>
+        <source>Transform</source>
+        <translation type="unfinished">変形</translation>
+    </message>
+    <message>
+        <source>Animation</source>
+        <translation type="unfinished">アニメーション</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">オーディオ</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished">速度</translation>
+    </message>
+    <message>
+        <source>Blending</source>
+        <translation type="unfinished">ブレンド</translation>
+    </message>
+    <message>
+        <source>New workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make active tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsaved changes</source>
+        <translation type="unfinished">未保存の変更があります</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">保存</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep editing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fullscreen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a Preview-only fullscreen window as a second-monitor output.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every panel is placed. Drag one here to remove it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drag a panel here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes apply when you save.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No changes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">キャンセル</translation>
+    </message>
+</context>
+<context>
+    <name>WorkspacePlaceholderPanel</name>
+    <message>
+        <source>%1 — coming soon</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WorkspaceStore</name>
+    <message>
+        <source>Assets</source>
+        <translation type="unfinished">アセット</translation>
+    </message>
+    <message>
+        <source>Properties</source>
+        <translation type="unfinished">プロパティ</translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished">プレビュー</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished">タイムライン</translation>
+    </message>
+    <message>
+        <source>Audio Mixer</source>
+        <translation type="unfinished">オーディオミキサー</translation>
+    </message>
+    <message>
+        <source>Source Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitles</source>
+        <translation type="unfinished">字幕</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Agent Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A window has no panels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A split needs at least two sections.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A section needs at least one panel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A section&apos;s active tab is out of range.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown panel type &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The &quot;%1&quot; panel is used more than once.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A workspace needs at least one window.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The first window must be the main window.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation type="unfinished">ワークスペース</translation>
+    </message>
+    <message>
+        <source>%1 copy</source>
+        <translation type="unfinished">%1 をコピー</translation>
+    </message>
+</context>
+<context>
+    <name>WorkspaceWindow</name>
+    <message>
+        <source>Drift</source>
+        <translation type="unfinished">Drift</translation>
     </message>
 </context>
 <context>

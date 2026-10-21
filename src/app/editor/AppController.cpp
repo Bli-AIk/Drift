@@ -841,6 +841,9 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
 
     m_mcpController = new McpController(this, this);
     connect(&m_undoStack, &QUndoStack::indexChanged, this, &AppController::undoStackChanged);
+    connect(&m_undoStack, &QUndoStack::indexChanged, this, &AppController::undoHistoryChanged);
+    connect(&m_undoStack, &QUndoStack::undoTextChanged, this, &AppController::undoHistoryChanged);
+    connect(&m_undoStack, &QUndoStack::redoTextChanged, this, &AppController::undoHistoryChanged);
     connect(&m_undoStack, &QUndoStack::indexChanged, this, [this] {
         // Undo/redo swaps the whole project, including the asset table the
         // media bin reads through; without this an undone removal leaves the
@@ -4645,6 +4648,17 @@ QHash<QString, QString> defaultShortcuts()
         {QStringLiteral("multicam"), QStringLiteral("Ctrl+Shift+C")},
         {QStringLiteral("transformTogether"), QStringLiteral("Ctrl+G")},
         {QStringLiteral("selectTransformLayer"), QStringLiteral("Shift+G")},
+        {QStringLiteral("workspace.next"), QStringLiteral("Ctrl+Alt+Right")},
+        {QStringLiteral("workspace.prev"), QStringLiteral("Ctrl+Alt+Left")},
+        {QStringLiteral("workspace.1"), QStringLiteral("Alt+1")},
+        {QStringLiteral("workspace.2"), QStringLiteral("Alt+2")},
+        {QStringLiteral("workspace.3"), QStringLiteral("Alt+3")},
+        {QStringLiteral("workspace.4"), QStringLiteral("Alt+4")},
+        {QStringLiteral("workspace.5"), QStringLiteral("Alt+5")},
+        {QStringLiteral("workspace.6"), QStringLiteral("Alt+6")},
+        {QStringLiteral("workspace.7"), QStringLiteral("Alt+7")},
+        {QStringLiteral("workspace.8"), QStringLiteral("Alt+8")},
+        {QStringLiteral("workspace.9"), QStringLiteral("Alt+9")},
     };
 }
 
@@ -5460,6 +5474,18 @@ QVariantList AppController::actions() const
         action(QStringLiteral("zoomOut"), tr("Zoom out")),
         action(QStringLiteral("multicam"), tr("Multicam window")),
         action(QStringLiteral("search"), tr("Search…")),
+        action(QStringLiteral("workspace.restoreWindows"), tr("Restore Workspace Windows")),
+        action(QStringLiteral("workspace.next"), tr("Next workspace")),
+        action(QStringLiteral("workspace.prev"), tr("Previous workspace")),
+        action(QStringLiteral("workspace.1"), tr("Workspace 1")),
+        action(QStringLiteral("workspace.2"), tr("Workspace 2")),
+        action(QStringLiteral("workspace.3"), tr("Workspace 3")),
+        action(QStringLiteral("workspace.4"), tr("Workspace 4")),
+        action(QStringLiteral("workspace.5"), tr("Workspace 5")),
+        action(QStringLiteral("workspace.6"), tr("Workspace 6")),
+        action(QStringLiteral("workspace.7"), tr("Workspace 7")),
+        action(QStringLiteral("workspace.8"), tr("Workspace 8")),
+        action(QStringLiteral("workspace.9"), tr("Workspace 9")),
     };
 }
 
@@ -6104,6 +6130,20 @@ QString AppController::currentMicrophoneName() const
 void AppController::selectMicrophone(const QString &id)
 {
     m_audioRecorder.selectDevice(id);
+}
+
+QVariantMap AppController::analyzeFocusedClipLoudness() const
+{
+    if (m_selectedTrack < 0 || m_selectedClip < 0)
+        return {{QStringLiteral("ok"), false}, {QStringLiteral("detail"), tr("Select a clip to measure")}};
+    return m_mcpController->analyzeLoudness(m_selectedTrack, m_selectedClip, 0, 0).toVariantMap();
+}
+
+QVariantMap AppController::normalizeFocusedClipLoudness(double targetLufs)
+{
+    if (m_selectedTrack < 0 || m_selectedClip < 0)
+        return {{QStringLiteral("ok"), false}, {QStringLiteral("detail"), tr("Select a clip to normalize")}};
+    return m_mcpController->normalizeVolume(m_selectedTrack, m_selectedClip, targetLufs).toVariantMap();
 }
 
 bool AppController::isAudioRecordingPaused() const
@@ -20226,6 +20266,23 @@ void AppController::undo()
     m_mcpController->bumpEditRevision();
 }
 
+QStringList AppController::undoHistory() const
+{
+    QStringList texts;
+    for (int i = 0; i < m_undoStack.count(); ++i)
+        texts.append(m_undoStack.text(i));
+    return texts;
+}
+
+void AppController::setUndoIndex(int index)
+{
+    index = qBound(0, index, m_undoStack.count());
+    while (m_undoStack.index() > index && m_undoStack.canUndo())
+        undo();
+    while (m_undoStack.index() < index && m_undoStack.canRedo())
+        redo();
+}
+
 void AppController::redo()
 {
     if (!m_undoStack.canRedo())
@@ -21023,6 +21080,7 @@ void AppController::applyParsedProject(ParsedProject parsed)
     m_faces->ingestSwapSourcesInProject();
     m_playback.setProject(&m_project);
     m_undoStack.clear();
+    emit undoHistoryChanged();
     clearSelection();
     m_projectFile->setDirty(false);
     emit snapEnabledChanged();

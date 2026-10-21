@@ -1,0 +1,34 @@
+{
+  "id": "record",
+  "name": "Record",
+  "builtin": true,
+  "order": 4,
+  "windows": [
+    {
+      "id": "main",
+      "root": {
+        "split": "v",
+        "sizes": [0.6, 0.4],
+        "children": [
+          {
+            "split": "h",
+            "sizes": [0.25, 0.5, 0.25],
+            "children": [
+              { "panels": [ { "type": "assets", "tab": "media" } ], "active": 0 },
+              { "panels": [ { "type": "preview" } ], "active": 0 },
+              { "panels": [ { "type": "recorder" } ], "active": 0 }
+            ]
+          },
+          {
+            "split": "h",
+            "sizes": [0.75, 0.25],
+            "children": [
+              { "panels": [ { "type": "timeline" } ], "active": 0 },
+              { "panels": [ { "type": "audioMixer" } ], "active": 0 }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

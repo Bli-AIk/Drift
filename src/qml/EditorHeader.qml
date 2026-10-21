@@ -56,7 +56,7 @@ Item {
     // Clears the field and hands the keyboard back to the editor, so shortcuts work again.
     function endSearch() {
         searchField.dismiss()
-        root.Window.window.focusEditor()
+        ShellBridge.main.focusEditor()
     }
 
     function closeTopDialog() {
@@ -89,19 +89,19 @@ Item {
     // screen's show/hide bookkeeping, so Ctrl+N/Ctrl+O, this header's Projects
     // menu, and the start screen's own tiles can't drift out of sync.
     function openProject() {
-        root.Window.window.requestOpenProjectDialog()
+        ShellBridge.main.requestOpenProjectDialog()
     }
 
     function requestNewProject() {
-        root.Window.window.requestNewProject()
+        ShellBridge.main.requestNewProject()
     }
 
     function openRecent(path) {
-        root.Window.window.requestOpenRecentProject(path)
+        ShellBridge.main.requestOpenRecentProject(path)
     }
 
     function closeProject() {
-        root.Window.window.requestCloseProject()
+        ShellBridge.main.requestCloseProject()
     }
 
     // Returns true when the project is clean after the attempt. False if the write failed or is
@@ -156,7 +156,7 @@ Item {
     // flight (see AppController::beginProjectLoad), so this check only saves the user a
     // trip through the file dialog for a request the backend would refuse anyway.
     function openProjectJson() {
-        if (root.Window.window.rejectIfProjectOpenPending())
+        if (ShellBridge.main.rejectIfProjectOpenPending())
             return
         root.confirmIfDirty(function () {
             var url = FileDialogs.openFile(qsTr("Open Project JSON"),
@@ -415,6 +415,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: videoSizeDialogLoader.ensure().openDialog()
             }
+            EditorHeaderWorkspaceButton { }
         }
 
         // Absorbs leftover space so the groups stay apart but can compress.

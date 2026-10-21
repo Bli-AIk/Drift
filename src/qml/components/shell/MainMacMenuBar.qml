@@ -259,12 +259,32 @@ Platform.MenuBar {
     }
 
     Platform.Menu {
+        id: windowMenu
         title: qsTr("&Window")
 
+        Instantiator {
+            model: Workspaces.workspaces
+
+            Platform.MenuItem {
+                required property var modelData
+                text: modelData.name
+                checkable: true
+                checked: modelData.id === Workspaces.activeId
+                onTriggered: Workspaces.activeId = modelData.id
+            }
+
+            onObjectAdded: (index, object) => windowMenu.insertItem(index, object)
+            onObjectRemoved: (index, object) => windowMenu.removeItem(object)
+        }
+        Platform.MenuItem {
+            text: qsTr("Edit Workspaces…")
+            onTriggered: menuBar.appWindow.openSettings("workspaces")
+        }
+        Platform.MenuSeparator {}
         Platform.MenuItem {
             text: qsTr("Landscape Workspace")
             checkable: true
-            checked: !EditorState.preferences.workspaceLayoutOverridden || EditorState.preferences.workspaceLayoutPreferred === "landscape"
+            checked: EditorState.preferences.workspaceLayoutOverridden && EditorState.preferences.workspaceLayoutPreferred === "landscape"
             onTriggered: EditorState.preferences.setWorkspaceLayoutPreference("landscape")
         }
         Platform.MenuItem {

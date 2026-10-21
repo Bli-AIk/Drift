@@ -7,7 +7,7 @@ Item {
     property alias loader: androidMediaPreviewLoader
     anchors.fill: parent
     z: 10
-    visible: Window.window.mediaPreviewPage !== null
+    visible: ShellBridge.main?.mediaPreviewPage !== null
 
     MouseArea {
         anchors.fill: parent
@@ -21,7 +21,7 @@ Item {
         sourceComponent: Component {
             AndroidMediaPreview {
                 onClosed: {
-                    Window.window.mediaPreviewPage = null
+                    ShellBridge.main.mediaPreviewPage = null
                     Qt.callLater(function () { androidMediaPreviewLoader.active = false })
                 }
             }

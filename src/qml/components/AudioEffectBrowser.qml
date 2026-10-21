@@ -71,7 +71,7 @@ Column {
         title: qsTr("No audio effects")
         hint: qsTr("Install the Audio Effects pack from Extras to browse presets here.")
         actionText: qsTr("Install audio effects")
-        onActionTriggered: root.Window.window.openAddonManager("audio-effects")
+        onActionTriggered: ShellBridge.main.openAddonManager("audio-effects")
     }
 
     Column {
@@ -89,7 +89,7 @@ Column {
                 variant: "ghost"
                 buttonSize: Theme.controlHeight
                 tooltip: qsTr("Install a custom audio effect or effect from a .driftfx file made in Drift Forge")
-                onClicked: root.Window.window.importUserPackage("")
+                onClicked: ShellBridge.main.importUserPackage("")
             }
         }
 
@@ -145,7 +145,7 @@ Column {
                 title: qsTr("%1 is empty").arg(qsTr("My Audio Effects"))
                 hint: qsTr("Import a .driftfx file made in Drift Forge to add your own.")
                 actionText: qsTr("Import")
-                onActionTriggered: root.Window.window.importUserPackage("")
+                onActionTriggered: ShellBridge.main.importUserPackage("")
             }
 
             FontMetrics {

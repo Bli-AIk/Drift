@@ -1,0 +1,27 @@
+{
+  "id": "cut-trim",
+  "name": "Cut / Trim",
+  "builtin": true,
+  "order": 2,
+  "windows": [
+    {
+      "id": "main",
+      "root": {
+        "split": "v",
+        "sizes": [0.6, 0.4],
+        "children": [
+          {
+            "split": "h",
+            "sizes": [0.25, 0.45, 0.3],
+            "children": [
+              { "panels": [ { "type": "assets", "tab": "media" } ], "active": 0 },
+              { "panels": [ { "type": "sourceViewer" } ], "active": 0 },
+              { "panels": [ { "type": "preview" } ], "active": 0 }
+            ]
+          },
+          { "panels": [ { "type": "timeline" } ], "active": 0 }
+        ]
+      }
+    }
+  ]
+}

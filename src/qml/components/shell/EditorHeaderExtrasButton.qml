@@ -13,7 +13,7 @@ Item {
     anchors.verticalCenter: parent.verticalCenter
 
     readonly property bool attention: {
-        const win = Window.window
+        const win = ShellBridge.main
         return win && win.addonAttentionNeeded
     }
 
@@ -34,6 +34,6 @@ Item {
         tooltip: extrasButton.attention
                  ? qsTr("Recommended packs and updates")
                  : qsTr("Extras")
-        onClicked: Window.window.openExtras()
+        onClicked: ShellBridge.main.openExtras()
     }
 }

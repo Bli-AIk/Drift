@@ -105,7 +105,7 @@ Item {
                 text: qsTr("Install PDF Viewer")
                 variant: "primary"
                 glyph: Theme.icons.download
-                onClicked: root.Window.window.openAddonManager("pdfium")
+                onClicked: ShellBridge.main.openAddonManager("pdfium")
             }
         }
 

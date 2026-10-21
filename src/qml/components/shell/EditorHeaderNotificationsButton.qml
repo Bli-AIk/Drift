@@ -64,7 +64,7 @@ Item {
         id: notificationsPopup
         x: parent.width - width
         y: parent.height + Theme.spacingMd
-        onUpdateRequested: Window.window.openUpdateDialog()
+        onUpdateRequested: ShellBridge.main.openUpdateDialog()
     }
 
     Connections {

@@ -7,7 +7,7 @@ MouseArea {
     id: overlayInputGuard
     anchors.fill: parent
     z: 11
-    visible: Theme.touchInput && Window.window.overlayModalCount > 0
+    visible: Theme.touchInput && (ShellBridge.main?.overlayModalCount ?? 0) > 0
     acceptedButtons: Qt.AllButtons
     hoverEnabled: true
     preventStealing: true

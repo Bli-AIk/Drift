@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Window
-import Drift 1.0
+import Drift
 // Unit curve editor. X is always position through the effect; Y is what that position maps to.
 // Two modes share it: "fade" edits a clip's edge-fade gain (silent at the bottom, full at the
 // top) and "transition" edits a transition's progress curve. The geometry is identical, only the

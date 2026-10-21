@@ -134,15 +134,15 @@ Item {
             root.fadeRequested()
             break
         case "speed":
-            Window.window.openSpeedCurve(EditorState.selectedTrack, EditorState.selectedClip)
+            ShellBridge.main.openSpeedCurve(EditorState.selectedTrack, EditorState.selectedClip)
             break
         case "duplicate":
             EditorState.duplicateSelectedClip()
             break
         // The Transform tab of the properties sheet is where a transform clip is edited.
         case "transform":
-            if (Window.window.editorPage)
-                Window.window.editorPage.openPropertiesSheet()
+            if (ShellBridge.main.editorPage)
+                ShellBridge.main.editorPage.openPropertiesSheet()
             break
         case "transformTogether":
             EditorState.makeTransformLayerFromSelection()
@@ -153,16 +153,16 @@ Item {
         // Duration is a field, not a button: the transition inspector already owns it, and
         // the properties sheet is what shows the inspector for the current selection.
         case "transitionDuration":
-            if (Window.window.editorPage)
-                Window.window.editorPage.openPropertiesSheet()
+            if (ShellBridge.main.editorPage)
+                ShellBridge.main.editorPage.openPropertiesSheet()
             break
         case "transitionCurve":
-            Window.window.openTransitionCurve(EditorState.selectedTransitionTrack,
+            ShellBridge.main.openTransitionCurve(EditorState.selectedTransitionTrack,
                                               EditorState.selectedTransitionData.id)
             break
         case "transitionReplace":
-            if (Window.window.editorPage)
-                Window.window.editorPage.openAssetsTab("transitions")
+            if (ShellBridge.main.editorPage)
+                ShellBridge.main.editorPage.openAssetsTab("transitions")
             break
         case "transitionDelete":
             EditorState.removeTransition(EditorState.selectedTransitionTrack,

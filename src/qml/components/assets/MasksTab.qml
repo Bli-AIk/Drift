@@ -112,7 +112,7 @@ Item {
                          : qsTr("Select a video clip first")
                 onClicked: {
                     const data = EditorState.selectedClipData
-                    root.Window.window.openSegmentation(
+                    ShellBridge.main.openSegmentation(
                         EditorState.selectedTrack, EditorState.selectedClip,
                         data.start !== undefined ? data.start : 0,
                         data.duration !== undefined ? data.duration : 0)
@@ -126,7 +126,7 @@ Item {
                       ? qsTr("Download people cutout (about 20 MB)")
                       : qsTr("Install AI engine first")
                 variant: "primary"
-                onClicked: root.Window.window.openAddonManager(
+                onClicked: ShellBridge.main.openAddonManager(
                     segmentSection.runtimeReady ? "rvm-model" : "onnxruntime")
             }
 
@@ -139,7 +139,7 @@ Item {
                 width: parent.width
                 variant: "secondary"
                 text: qsTr("Add click-to-pick cutout (about 190 MB)")
-                onClicked: root.Window.window.openAddonManager("sam2-model")
+                onClicked: ShellBridge.main.openAddonManager("sam2-model")
             }
 
             ThemedButton {

@@ -222,6 +222,8 @@ class AppController : public QObject
                    NOTIFY selectedSubtitleCueChanged)
     Q_PROPERTY(bool undoAvailable READ undoAvailable NOTIFY undoStackChanged)
     Q_PROPERTY(bool redoAvailable READ redoAvailable NOTIFY undoStackChanged)
+    Q_PROPERTY(QStringList undoHistory READ undoHistory NOTIFY undoHistoryChanged)
+    Q_PROPERTY(int undoIndex READ undoIndex NOTIFY undoHistoryChanged)
     Q_PROPERTY(bool exportInProgress READ exportInProgress NOTIFY exportInProgressChanged)
     // True while (and after) an export an MCP agent started, until the next export begins.
     // The progress dialog closes itself when such an export ends: nobody at the desk asked for it.
@@ -353,6 +355,9 @@ public:
     Q_INVOKABLE void stopAudioRecording();
     Q_INVOKABLE void cancelAudioRecording();
     Q_INVOKABLE void selectMicrophone(const QString &id);
+    // Act on the focused clip, the same scope as the MCP analyze_loudness / normalize_volume tools.
+    Q_INVOKABLE QVariantMap analyzeFocusedClipLoudness() const;
+    Q_INVOKABLE QVariantMap normalizeFocusedClipLoudness(double targetLufs);
     // Handing out a mutable pointer is the point past which this object can no longer know what
     // happened to the project, so the derived caches are dropped here rather than trusted. Two
     // bool writes, and nothing in src/ takes this overload — it exists for tests and for code
@@ -406,6 +411,8 @@ public:
     int selectedSubtitleCue() const { return m_selectedSubtitleCue; }
     bool undoAvailable() const { return m_undoStack.canUndo(); }
     bool redoAvailable() const { return m_undoStack.canRedo(); }
+    QStringList undoHistory() const;
+    int undoIndex() const { return m_undoStack.index(); }
     bool exportInProgress() const { return m_exportInProgress; }
     bool exportByAgent() const { return m_exportByAgent; }
     // Set by the MCP dispatcher around the call that starts an export, so the start
@@ -1396,6 +1403,8 @@ public:
     Q_INVOKABLE int keyboardModifiers() const;
     Q_INVOKABLE void undo();
     Q_INVOKABLE void redo();
+    // Steps through undo()/redo() so each step does what the toolbar button would.
+    Q_INVOKABLE void setUndoIndex(int index);
     // `excludeClipId` keeps a clip from snapping to its own edges while it is being dragged —
     // the model still has it at its old position, so those two targets sit right under the
     // pointer at the start of every move.
@@ -1542,6 +1551,7 @@ signals:
     void subtitleEditingChanged();
     void selectedSubtitleCueChanged();
     void undoStackChanged();
+    void undoHistoryChanged();
     void exportInProgressChanged();
     void exportProgressChanged();
     void canShareExportChanged();

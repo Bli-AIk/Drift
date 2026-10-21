@@ -44,6 +44,7 @@
 
 #include <QBuffer>
 #include <QCryptographicHash>
+#include <QDateTime>
 #include <QDir>
 #include <QEventLoop>
 #include <QFile>
@@ -94,6 +95,37 @@ McpController::McpController(AppController *app, QObject *parent)
     connect(m_mcp.get(), &drift::mcp::McpServer::tokenChanged, this,
             &McpController::runningChanged);
     connect(m_mcp.get(), &drift::mcp::McpServer::errorChanged, this, &McpController::errorChanged);
+    connect(m_mcp.get(), &drift::mcp::McpServer::toolCallStarted, this,
+            [this](int id, const QString &tool, const QString &summary) {
+                constexpr int kMaxToolLog = 500;
+                m_toolLog.append(QVariantMap{{QStringLiteral("id"), id},
+                                             {QStringLiteral("time"), QDateTime::currentMSecsSinceEpoch()},
+                                             {QStringLiteral("tool"), tool},
+                                             {QStringLiteral("summary"), summary},
+                                             {QStringLiteral("pending"), true},
+                                             {QStringLiteral("ok"), true},
+                                             {QStringLiteral("error"), QString()},
+                                             {QStringLiteral("ms"), 0}});
+                while (m_toolLog.size() > kMaxToolLog)
+                    m_toolLog.removeFirst();
+                emit toolLogChanged();
+                emit toolCallStarted(tool);
+            });
+    connect(m_mcp.get(), &drift::mcp::McpServer::toolCallFinished, this,
+            [this](int id, bool ok, const QString &error, qint64 ms) {
+                for (int i = m_toolLog.size() - 1; i >= 0; --i) {
+                    QVariantMap entry = m_toolLog.at(i).toMap();
+                    if (entry.value(QStringLiteral("id")).toInt() != id)
+                        continue;
+                    entry[QStringLiteral("pending")] = false;
+                    entry[QStringLiteral("ok")] = ok;
+                    entry[QStringLiteral("error")] = error;
+                    entry[QStringLiteral("ms")] = ms;
+                    m_toolLog[i] = entry;
+                    emit toolLogChanged();
+                    break;
+                }
+            });
 #endif
     // Loaded here so the property already reads correctly for anything constructed on
     // this object, but NOT acted on here — headless mode constructs the same
@@ -112,6 +144,14 @@ McpController::~McpController()
     if (m_mcp)
         m_mcp->stop();
 #endif
+}
+
+void McpController::clearToolLog()
+{
+    if (m_toolLog.isEmpty())
+        return;
+    m_toolLog.clear();
+    emit toolLogChanged();
 }
 
 bool McpController::running() const

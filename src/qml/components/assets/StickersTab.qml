@@ -110,7 +110,7 @@ Item {
                 hint: qsTr("Install the emoji pack to add stickers.")
                 actionText: qsTr("Get extras")
                 actionVariant: "primary"
-                onActionTriggered: root.Window.window.openAddonManager("stickers")
+                onActionTriggered: ShellBridge.main.openAddonManager("stickers")
             }
 
             EmptyState {
