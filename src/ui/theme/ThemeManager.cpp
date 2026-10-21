@@ -89,7 +89,11 @@ QString fallbackName(const QString &path)
 
 QQmlPropertyMap *makeMap(QObject *parent)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 11, 0)
     QQmlPropertyMap *map = QQmlPropertyMap::create(parent);
+#else
+    QQmlPropertyMap *map = new QQmlPropertyMap(parent);
+#endif
     // The engine must not delete maps ThemeManager still owns. Bindings hold
     // the nested objects for the life of the theme manager.
     QQmlEngine::setObjectOwnership(map, QQmlEngine::CppOwnership);
