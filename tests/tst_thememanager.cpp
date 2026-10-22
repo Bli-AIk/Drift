@@ -33,6 +33,7 @@ private slots:
     void init();
 
     void builtinsLoadDarkAndLight();
+    void graphiteAndFrostAreBuiltins();
     void resolvesReferences();
     void extendsMergesOverBase();
     void referenceCycleDoesNotHang();
@@ -190,6 +191,51 @@ void ThemeManagerTest::builtinsLoadDarkAndLight()
     QCOMPARE(spy.count(), 1);
     manager.setVariant(QStringLiteral("nope"));
     QCOMPARE(manager.currentTheme(), QStringLiteral("light"));
+}
+
+void ThemeManagerTest::graphiteAndFrostAreBuiltins()
+{
+    QVERIFY(writeJson("graphite-copy/theme.json", R"({
+        "name": "graphite",
+        "extends": "dark"
+    })"));
+    ThemeManager manager;
+    const QStringList available = manager.availableThemes();
+    QCOMPARE(available.mid(0, 4), (QStringList{QStringLiteral("dark"), QStringLiteral("light"),
+                                               QStringLiteral("graphite"), QStringLiteral("frost")}));
+    QCOMPARE(available.count(QStringLiteral("graphite")), 1);
+
+    QStringList builtInIds;
+    for (const QVariant &row : manager.themes()) {
+        const QVariantMap map = row.toMap();
+        if (map.value(QStringLiteral("builtIn")).toBool())
+            builtInIds.append(map.value(QStringLiteral("id")).toString());
+        else
+            QVERIFY(map.value(QStringLiteral("id")).toString() != QLatin1String("graphite"));
+    }
+    QCOMPARE(builtInIds, (QStringList{QStringLiteral("dark"), QStringLiteral("light"),
+                                      QStringLiteral("graphite"), QStringLiteral("frost")}));
+
+    const struct {
+        const char *id;
+        const char *variant;
+        const char *primary;
+    } cases[] = {{"graphite", "dark", "#f2f2f2"}, {"frost", "light", "#111111"}};
+    for (const auto &c : cases) {
+        const QString id = QString::fromLatin1(c.id);
+        QVERIFY(manager.select(id));
+        QCOMPARE(manager.selection(), id);
+        QCOMPARE(manager.currentTheme(), id);
+        QCOMPARE(manager.effectiveVariant(), QString::fromLatin1(c.variant));
+        QCOMPARE(manager.token(QStringLiteral("window.translucent")).toBool(), true);
+        QCOMPARE(tokenColor(manager, "semantic.primary"), QColor(QString::fromLatin1(c.primary)));
+        QVERIFY(!manager.previewColors(id).isEmpty());
+        manager.setVariant(QStringLiteral("light"));
+        QCOMPARE(manager.currentTheme(), id);
+        manager.setVariant(QStringLiteral("dark"));
+        QCOMPARE(manager.currentTheme(), id);
+        QVERIFY(!manager.removeTheme(id));
+    }
 }
 
 void ThemeManagerTest::resolvesReferences()

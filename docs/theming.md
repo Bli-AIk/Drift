@@ -2,7 +2,7 @@
 
 Drift paints from a JSON theme. `ThemeManager` (a C++ singleton) loads the document, resolves references, and exposes the result as `QQmlPropertyMap`s. `Theme.qml` is the facade the rest of the QML already binds to (`Theme.appBackground`, `Theme.c.themedButton.background`, and so on).
 
-Built-in themes live in `resources/themes/dark.json` and `resources/themes/light.json`. The shape is `resources/themes/theme.schema.json`. User themes live in `QStandardPaths::AppDataLocation + "/themes"`.
+Built-in themes (`dark`, `light`, `graphite`, `frost`) live in `resources/themes/<id>.json`. `graphite` and `frost` extend `dark` and `light` and use a translucent window. The shape is `resources/themes/theme.schema.json`. User themes live in `QStandardPaths::AppDataLocation + "/themes"`.
 
 ## Layers
 
@@ -30,6 +30,7 @@ References are strings: `$palette.primary`, `$semantic.panel.border`, `$metrics.
 | --- | --- |
 | `system` (default) | Built-in dark or light, following `Theme.darkMode` (the appearance preference, otherwise the OS). |
 | `dark` / `light` | That built-in, pinned. `Theme.darkMode` follows the pin, so the header Light/Dark checkmarks match the theme on screen. The header toggle moves the pin to the other built-in. `setVariant` does not unpin it. |
+| `graphite` / `frost` | That built-in, pinned. `setVariant` does not unpin it. Built-in ids cannot be used by user themes. |
 | a user theme id | That theme. |
 
 An unknown saved id is logged and the selection falls back to `system`.

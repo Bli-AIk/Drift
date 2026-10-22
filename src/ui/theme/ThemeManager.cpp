@@ -29,6 +29,32 @@ namespace {
 constexpr auto kDarkResource = ":/themes/dark.json";
 constexpr auto kLightResource = ":/themes/light.json";
 
+struct BuiltinTheme {
+    const char *id;
+    const char *resource;
+};
+
+constexpr BuiltinTheme kBuiltinThemes[] = {
+    {"dark", kDarkResource},
+    {"light", kLightResource},
+    {"graphite", ":/themes/graphite.json"},
+    {"frost", ":/themes/frost.json"},
+};
+
+QString builtinResource(const QString &id)
+{
+    for (const BuiltinTheme &theme : kBuiltinThemes) {
+        if (id == QLatin1String(theme.id))
+            return QString::fromLatin1(theme.resource);
+    }
+    return {};
+}
+
+bool isBuiltinId(const QString &id)
+{
+    return !builtinResource(id).isEmpty();
+}
+
 // A theme document is ~140 KB. These caps leave headroom and stop a zip
 // entry from expanding without a bound the importer agreed to.
 constexpr qint64 kMaxThemeFileBytes = 2 * 1024 * 1024;
@@ -123,7 +149,11 @@ QString stagedThemeFileName(const QUrl &url, const QByteArray &data)
 
 bool isBuiltinPath(const QString &path)
 {
-    return path == QLatin1String(kDarkResource) || path == QLatin1String(kLightResource);
+    for (const BuiltinTheme &theme : kBuiltinThemes) {
+        if (path == QLatin1String(theme.resource))
+            return true;
+    }
+    return false;
 }
 
 QString fallbackName(const QString &path)
@@ -515,8 +545,7 @@ void stripOverlayMeta(QVariantMap *overlay)
 
 bool isSafeThemeId(const QString &name)
 {
-    if (name.isEmpty() || name == QLatin1String("dark") || name == QLatin1String("light")
-        || name == QLatin1String("system"))
+    if (name.isEmpty() || isBuiltinId(name) || name == QLatin1String("system"))
         return false;
     if (name.startsWith(QLatin1Char('.')))
         return false;
@@ -758,7 +787,9 @@ ThemeManager::ThemeManager(QObject *parent)
 
 QStringList ThemeManager::availableThemes() const
 {
-    QStringList names{QStringLiteral("dark"), QStringLiteral("light")};
+    QStringList names;
+    for (const BuiltinTheme &theme : kBuiltinThemes)
+        names.append(QString::fromLatin1(theme.id));
     QStringList user;
     const QDir dir(userThemesDirectory());
     if (!dir.exists())
@@ -780,7 +811,7 @@ QStringList ThemeManager::availableThemes() const
         QString name = readThemeName(path);
         if (name.isEmpty())
             name = info.isDir() ? info.fileName() : info.completeBaseName();
-        if (name == QLatin1String("dark") || name == QLatin1String("light")) {
+        if (isBuiltinId(name)) {
             qWarning("theme: user theme \"%s\" collides with a built-in (%s)", qPrintable(name),
                      qPrintable(path));
             continue;
@@ -871,7 +902,7 @@ void ThemeManager::setVariant(const QString &variant)
     }
     // A pinned built-in stays until select() changes it. Theme.qml still calls
     // setVariant on every darkMode change, including while that pin is set.
-    if (m_selection == QLatin1String("dark") || m_selection == QLatin1String("light"))
+    if (isBuiltinId(m_selection))
         return;
     // Session override (DRIFT_THEME). Theme.qml calls setVariant at startup and
     // on every darkMode change; that must not swap the override for a built-in.
@@ -1053,10 +1084,8 @@ QString ThemeManager::locate(const QString &nameOrPath, QString *error) const
     QString text = nameOrPath.trimmed();
     if (text.startsWith(QLatin1String("qrc:")))
         text.remove(0, 3);
-    if (text == QLatin1String("dark"))
-        return QString::fromLatin1(kDarkResource);
-    if (text == QLatin1String("light"))
-        return QString::fromLatin1(kLightResource);
+    if (const QString builtin = builtinResource(text); !builtin.isEmpty())
+        return builtin;
 
     const QFileInfo info(text);
     if (info.exists()) {
@@ -1084,10 +1113,8 @@ QString ThemeManager::locate(const QString &nameOrPath, QString *error) const
 
 QString ThemeManager::pathForThemeName(const QString &name, QString *error) const
 {
-    if (name == QLatin1String("dark"))
-        return QString::fromLatin1(kDarkResource);
-    if (name == QLatin1String("light"))
-        return QString::fromLatin1(kLightResource);
+    if (const QString builtin = builtinResource(name); !builtin.isEmpty())
+        return builtin;
 
     const QDir dir(userThemesDirectory());
     if (dir.exists()) {
@@ -1365,8 +1392,8 @@ void ThemeManager::onThemeFileChanged(const QString &path)
 QVariantList ThemeManager::themes() const
 {
     QVariantList list;
-    list.append(themeRecord(QStringLiteral("dark"), QString::fromLatin1(kDarkResource), true));
-    list.append(themeRecord(QStringLiteral("light"), QString::fromLatin1(kLightResource), true));
+    for (const BuiltinTheme &theme : kBuiltinThemes)
+        list.append(themeRecord(QString::fromLatin1(theme.id), QString::fromLatin1(theme.resource), true));
 
     const QDir dir(userThemesDirectory());
     if (!dir.exists())
@@ -1602,8 +1629,7 @@ bool ThemeManager::exportTheme(const QUrl &file)
 bool ThemeManager::removeTheme(const QString &id)
 {
     const QString theme = id.trimmed();
-    if (theme.isEmpty() || theme == QLatin1String("dark") || theme == QLatin1String("light")
-        || theme == QLatin1String("system")) {
+    if (theme.isEmpty() || isBuiltinId(theme) || theme == QLatin1String("system")) {
         setLastError(QStringLiteral("built-in themes cannot be removed"));
         return false;
     }

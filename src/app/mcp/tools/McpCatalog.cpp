@@ -1005,7 +1005,7 @@ const QList<Op> &ops()
                        {QStringLiteral("dark")}) },
         { "list_themes", "ui", "List installed UI themes",
           "Returns {themes:[{id, name, variant, builtIn, hasVariants, hasOverrides}], selection, current, "
-          "schemaVersion (theme format this build writes), themesFolder, warning?}. selection is system, dark, light or a user theme id; "
+          "schemaVersion (theme format this build writes), themesFolder, warning?}. selection is system, dark, light, graphite, frost or a user theme id; "
           "current is the theme on screen. To make a theme: export_theme a copy, edit the JSON file "
           "yourself, then import_theme it. There is no tool that edits theme tokens directly.",
           objectSchema({}), true, false, true },
@@ -1026,7 +1026,7 @@ const QList<Op> &ops()
           "both set to its id (mode copy), or re-edit your file, and import_theme with replace:true. "
           "Returns {path, name, from, mode}.",
           objectSchema({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute .json output path"))},
-                        {QStringLiteral("name"), stringProp(QStringLiteral("Name of the new theme; becomes its id on import. Not dark, light or system"))},
+                        {QStringLiteral("name"), stringProp(QStringLiteral("Name of the new theme; becomes its id on import. Not a built-in id (dark, light, graphite, frost) or system"))},
                         {QStringLiteral("theme"), stringProp(QStringLiteral("Theme id from list_themes to start from (default: current)"))},
                         {QStringLiteral("mode"), enumProp(QStringLiteral("copy = all tokens, starter = extends + core palette, metrics, typography, motion, window"),
                                                           {QStringLiteral("copy"), QStringLiteral("starter")})}},
@@ -1044,8 +1044,8 @@ const QList<Op> &ops()
                        {QStringLiteral("path")}) },
         { "select_theme", "ui", "Switch the UI theme",
           "Put a theme on screen and remember it. theme is system (follow light/dark preference), dark, "
-          "light, or a user theme id from list_themes. Returns {selection, current, warning?}. Not undoable.",
-          objectSchema({{QStringLiteral("theme"), stringProp(QStringLiteral("system, dark, light or a theme id"))}},
+          "light, graphite, frost, or a user theme id from list_themes. Returns {selection, current, warning?}. Not undoable.",
+          objectSchema({{QStringLiteral("theme"), stringProp(QStringLiteral("system, dark, light, graphite, frost or a theme id"))}},
                        {QStringLiteral("theme")}),
           false, false, true },
         { "list_shortcuts", "ui", "List action bindings",

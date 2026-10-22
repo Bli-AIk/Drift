@@ -1287,6 +1287,8 @@ qt_add_resources(drift "drift_themes"
     FILES
         resources/themes/dark.json
         resources/themes/light.json
+        resources/themes/graphite.json
+        resources/themes/frost.json
         resources/themes/theme.schema.json
 )
 
