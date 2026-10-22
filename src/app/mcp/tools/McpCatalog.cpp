@@ -1017,7 +1017,9 @@ const QList<Op> &ops()
           "option when recoloring; add semantic/components keys to override more, missing keys fall "
           "through to the base. Values: colors #RGB/#RRGGBB/#AARRGGBB (alpha first), numbers, or "
           "references like \"$palette.primary\". A dual-variant theme exports the side on screen. "
-          "Then call import_theme. Returns {path, name, from, mode}.",
+          "Then call import_theme. To fix a theme you already imported, export it with theme and name "
+          "both set to its id (mode copy), or re-edit your file, and import_theme with replace:true. "
+          "Returns {path, name, from, mode}.",
           objectSchema({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute .json output path"))},
                         {QStringLiteral("name"), stringProp(QStringLiteral("Name of the new theme; becomes its id on import. Not dark, light or system"))},
                         {QStringLiteral("theme"), stringProp(QStringLiteral("Theme id from list_themes to start from (default: current)"))},

@@ -3261,6 +3261,9 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
         const QString mode = argString(args, QStringLiteral("mode"));
         if (!mode.isEmpty() && mode != QLatin1String("copy") && mode != QLatin1String("starter"))
             return err("bad_args", QStringLiteral("mode must be copy or starter"));
+        if (mode == QLatin1String("starter") && name == source)
+            return err("bad_args", QStringLiteral("A starter cannot extend itself; use mode copy to edit "
+                                                  "an installed theme under the same name"));
         QString error;
         const QByteArray bytes = themes->themeTemplate(source, name, mode == QLatin1String("starter"), &error);
         if (bytes.isEmpty())
