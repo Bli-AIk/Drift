@@ -1003,6 +1003,44 @@ const QList<Op> &ops()
           "set_ui_preferences({followSystem:true}). Not undoable.",
           objectSchema({{QStringLiteral("dark"), boolProp(QStringLiteral("true = dark, false = light"))}},
                        {QStringLiteral("dark")}) },
+        { "list_themes", "ui", "List installed UI themes",
+          "Returns {themes:[{id, name, variant, builtIn, hasVariants, hasOverrides}], selection, current, "
+          "schemaVersion (theme format this build writes), themesFolder, warning?}. selection is system, dark, light or a user theme id; "
+          "current is the theme on screen. To make a theme: export_theme a copy, edit the JSON file "
+          "yourself, then import_theme it. There is no tool that edits theme tokens directly.",
+          objectSchema({}), true, false, true },
+        { "export_theme", "ui", "Write a theme JSON to edit outside Drift",
+          "Write theme `theme` (default: the one on screen) to `path` renamed to `name`. mode copy "
+          "(default) writes every resolved token (palette, semantic, components, metrics, typography, "
+          "motion, window), about 3800 lines — edit any value and drop the rest unchanged. mode "
+          "starter writes {name, schemaVersion, extends: theme, variant, palette} only — the small "
+          "option when recoloring; add semantic/components keys to override more, missing keys fall "
+          "through to the base. Values: colors #RGB/#RRGGBB/#AARRGGBB (alpha first), numbers, or "
+          "references like \"$palette.primary\". A dual-variant theme exports the side on screen. "
+          "Then call import_theme. Returns {path, name, from, mode}.",
+          objectSchema({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute .json output path"))},
+                        {QStringLiteral("name"), stringProp(QStringLiteral("Name of the new theme; becomes its id on import. Not dark, light or system"))},
+                        {QStringLiteral("theme"), stringProp(QStringLiteral("Theme id from list_themes to start from (default: current)"))},
+                        {QStringLiteral("mode"), enumProp(QStringLiteral("copy = all tokens, starter = extends + palette"),
+                                                          {QStringLiteral("copy"), QStringLiteral("starter")})}},
+                       {QStringLiteral("path"), QStringLiteral("name")}),
+          false, false, true },
+        { "import_theme", "ui", "Install a theme file",
+          "Validate and install a theme .json, a theme folder (theme.json, optional theme.dark.json / "
+          "theme.light.json) or a .zip into the user themes folder. The theme's name is its id. Fails "
+          "exists when that name is installed unless replace:true; replace also re-applies it if it "
+          "is on screen. select:true switches to it. On bad JSON or wrong value types the error says "
+          "where; fix the file and import again. Returns {id, selected?, warning?}. Not undoable.",
+          objectSchema({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute path to the .json, folder or .zip"))},
+                        {QStringLiteral("replace"), boolProp(QStringLiteral("Overwrite an installed theme with the same name"))},
+                        {QStringLiteral("select"), boolProp(QStringLiteral("Switch to the theme after installing"))}},
+                       {QStringLiteral("path")}) },
+        { "select_theme", "ui", "Switch the UI theme",
+          "Put a theme on screen and remember it. theme is system (follow light/dark preference), dark, "
+          "light, or a user theme id from list_themes. Returns {selection, current, warning?}. Not undoable.",
+          objectSchema({{QStringLiteral("theme"), stringProp(QStringLiteral("system, dark, light or a theme id"))}},
+                       {QStringLiteral("theme")}),
+          false, false, true },
         { "list_shortcuts", "ui", "List action bindings",
           "Returns {actions:[{id, label, shortcut}], n} for every editor action.",
           objectSchema({{QStringLiteral("q"), stringProp(QStringLiteral("Case-insensitive substring over id/label/shortcut"))}}),
@@ -1114,6 +1152,8 @@ QStringList undoExemptOps()
         QStringLiteral("export_video"),
         QStringLiteral("save_project"),        QStringLiteral("set_theme"),        QStringLiteral("set_preview_view"),
         QStringLiteral("set_shortcut"),        QStringLiteral("reset_shortcuts"),
+        QStringLiteral("export_theme"),        QStringLiteral("import_theme"),
+        QStringLiteral("select_theme"),
         QStringLiteral("set_beat_layers"),     QStringLiteral("detect_beats"),
         QStringLiteral("list_speed_curve"),    QStringLiteral("list_fade_curve"),
         QStringLiteral("install_addon"),       QStringLiteral("cancel_addon_install"),

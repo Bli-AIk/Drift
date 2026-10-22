@@ -50,6 +50,12 @@ class ThemeManager : public QObject
     Q_PROPERTY(bool hotReload READ hotReload WRITE setHotReload NOTIFY hotReloadChanged)
 
 public:
+    // Bump when a release adds tokens a theme author should know about or changes
+    // what an existing key means. A document without schemaVersion predates the
+    // field and reads as 0. Missing tokens are filled from the built-in of the
+    // theme's variant whatever the version, so older themes keep working.
+    static constexpr int kSchemaVersion = 1;
+
     explicit ThemeManager(QObject *parent = nullptr);
 
     // Process-wide instance QML binds to. main() publishes it with
@@ -98,12 +104,17 @@ public:
     // still follows the requested side. select() ends the override.
     bool applySessionOverride(const QString &nameOrPath);
     // Copies a .json file, a theme folder, or a .zip into the user themes
-    // directory. Returns the new id, or empty and sets lastError.
-    Q_INVOKABLE QString importTheme(const QUrl &fileOrFolderOrZip);
+    // directory. Returns the new id, or empty and sets lastError. With replace,
+    // an installed theme of the same name is overwritten and loses QML trust.
+    Q_INVOKABLE QString importTheme(const QUrl &fileOrFolderOrZip, bool replace = false);
     // User themes only. The current selection falls back to system.
     Q_INVOKABLE bool removeTheme(const QString &id);
     // Fully resolved current theme, extends omitted, as a standalone JSON file.
     Q_INVOKABLE bool exportTheme(const QUrl &file);
+    // JSON for theme `id` renamed to `name`, for editing outside Drift. Without
+    // starter: every resolved token, like exportTheme. With starter: extends
+    // `id` plus its resolved palette, a small file that tracks the base.
+    QByteArray themeTemplate(const QString &id, const QString &name, bool starter, QString *error) const;
     Q_INVOKABLE QUrl themesFolderUrl() const;
     // surface, panel, accent, foreground, primary for the swatch. Dual-variant
     // themes preview the side setVariant last requested.
@@ -142,9 +153,9 @@ private:
     void writeSelection() const;
     void restorePersisted();
     QVariantMap themeRecord(const QString &id, const QString &path, bool builtIn) const;
-    QString importLocal(const QString &path);
-    bool installDirectory(const QString &sourceDir, const QString &id, QString *error) const;
-    bool installJsonFile(const QString &sourceFile, const QString &id, QString *error) const;
+    QString importLocal(const QString &path, bool replace);
+    bool installDirectory(const QString &sourceDir, const QString &id, bool replace, QString *error) const;
+    bool installJsonFile(const QString &sourceFile, const QString &id, bool replace, QString *error) const;
     bool extractZipTheme(const QString &zipPath, const QString &destDir, QString *error) const;
     bool removeInstalled(const QString &path, QString *error) const;
 

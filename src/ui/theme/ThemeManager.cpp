@@ -35,11 +35,7 @@ constexpr qint64 kMaxThemeFileBytes = 2 * 1024 * 1024;
 constexpr qint64 kMaxThemeTotalBytes = 8 * 1024 * 1024;
 constexpr int kMaxZipEntries = 64;
 
-// Bump when a release adds tokens a theme author should know about or changes
-// what an existing key means. A document without schemaVersion predates the
-// field and reads as 0. Missing tokens are filled from the built-in of the
-// theme's variant whatever the version, so older themes keep working.
-constexpr int kThemeSchemaVersion = 1;
+constexpr int kThemeSchemaVersion = ThemeManager::kSchemaVersion;
 
 const QStringList kGroups = {
     QStringLiteral("palette"),
@@ -1469,6 +1465,31 @@ bool ThemeManager::select(const QString &id)
     return true;
 }
 
+QByteArray ThemeManager::themeTemplate(const QString &id, const QString &name, bool starter,
+                                       QString *error) const
+{
+    error->clear();
+    if (!isSafeThemeId(name)) {
+        *error = QStringLiteral("theme name \"%1\" cannot be installed").arg(name);
+        return {};
+    }
+    const std::optional<Loaded> loaded = readTheme(id, error);
+    if (!loaded)
+        return {};
+
+    QVariantMap doc;
+    if (starter) {
+        doc.insert(QStringLiteral("extends"), id);
+        doc.insert(QStringLiteral("variant"), loaded->variant);
+        doc.insert(QStringLiteral("palette"), loaded->document.value(QStringLiteral("palette")));
+    } else {
+        doc = loaded->document;
+    }
+    doc.insert(QStringLiteral("name"), name);
+    doc.insert(QStringLiteral("schemaVersion"), std::max(loaded->schemaVersion, kThemeSchemaVersion));
+    return QJsonDocument(variantToJson(doc).toObject()).toJson(QJsonDocument::Indented);
+}
+
 QUrl ThemeManager::themesFolderUrl() const
 {
     const QString dir = userThemesDirectory();
@@ -1589,7 +1610,7 @@ bool ThemeManager::removeInstalled(const QString &path, QString *error) const
     return true;
 }
 
-QString ThemeManager::importTheme(const QUrl &url)
+QString ThemeManager::importTheme(const QUrl &url, bool replace)
 {
     QTemporaryDir scratch;
     if (!scratch.isValid()) {
@@ -1628,13 +1649,19 @@ QString ThemeManager::importTheme(const QUrl &url)
         setLastError(QStringLiteral("no theme file"));
         return {};
     }
-    const QString id = importLocal(path);
-    if (!id.isEmpty())
-        emit availableThemesChanged();
+    const QString id = importLocal(path, replace);
+    if (id.isEmpty())
+        return id;
+    if (replace) {
+        setThemeTrusted(id, false);
+        if (m_currentTheme == id)
+            reload();
+    }
+    emit availableThemesChanged();
     return id;
 }
 
-QString ThemeManager::importLocal(const QString &path)
+QString ThemeManager::importLocal(const QString &path, bool replace)
 {
     const QFileInfo info(path);
     if (!info.exists()) {
@@ -1686,7 +1713,7 @@ QString ThemeManager::importLocal(const QString &path)
             setLastError(QStringLiteral("theme name \"%1\" cannot be installed").arg(loaded->name));
             return QString();
         }
-        if (!installDirectory(dir, loaded->name, &error)) {
+        if (!installDirectory(dir, loaded->name, replace, &error)) {
             setLastError(error);
             return QString();
         }
@@ -1730,7 +1757,7 @@ QString ThemeManager::importLocal(const QString &path)
         setLastError(QStringLiteral("theme name \"%1\" cannot be installed").arg(loaded->name));
         return {};
     }
-    if (!installJsonFile(info.absoluteFilePath(), loaded->name, &error)) {
+    if (!installJsonFile(info.absoluteFilePath(), loaded->name, replace, &error)) {
         setLastError(error);
         return {};
     }
@@ -1738,7 +1765,8 @@ QString ThemeManager::importLocal(const QString &path)
     return loaded->name;
 }
 
-bool ThemeManager::installJsonFile(const QString &sourceFile, const QString &id, QString *error) const
+bool ThemeManager::installJsonFile(const QString &sourceFile, const QString &id, bool replace,
+                                   QString *error) const
 {
     const QString root = userThemesDirectory();
     if (!QDir().mkpath(root)) {
@@ -1748,8 +1776,13 @@ bool ThemeManager::installJsonFile(const QString &sourceFile, const QString &id,
     const QString dest = QDir(root).filePath(id + QStringLiteral(".json"));
     const QString destDir = QDir(root).filePath(id);
     if (QFileInfo::exists(dest) || QFileInfo(destDir).exists()) {
-        *error = QStringLiteral("theme \"%1\" is already installed").arg(id);
-        return false;
+        if (!replace) {
+            *error = QStringLiteral("theme \"%1\" is already installed").arg(id);
+            return false;
+        }
+        const QString existing = QFileInfo::exists(dest) ? dest : QDir(destDir).filePath(QStringLiteral("theme.json"));
+        if (!removeInstalled(existing, error))
+            return false;
     }
     if (!pathIsInside(root, dest)) {
         *error = QStringLiteral("theme id escapes the themes directory");
@@ -1762,7 +1795,8 @@ bool ThemeManager::installJsonFile(const QString &sourceFile, const QString &id,
     return true;
 }
 
-bool ThemeManager::installDirectory(const QString &sourceDir, const QString &id, QString *error) const
+bool ThemeManager::installDirectory(const QString &sourceDir, const QString &id, bool replace,
+                                    QString *error) const
 {
     const QString root = userThemesDirectory();
     if (!QDir().mkpath(root)) {
@@ -1772,8 +1806,13 @@ bool ThemeManager::installDirectory(const QString &sourceDir, const QString &id,
     const QString dest = QDir(root).filePath(id);
     const QString destFile = QDir(root).filePath(id + QStringLiteral(".json"));
     if (QFileInfo::exists(dest) || QFileInfo::exists(destFile)) {
-        *error = QStringLiteral("theme \"%1\" is already installed").arg(id);
-        return false;
+        if (!replace) {
+            *error = QStringLiteral("theme \"%1\" is already installed").arg(id);
+            return false;
+        }
+        const QString existing = QFileInfo::exists(destFile) ? destFile : QDir(dest).filePath(QStringLiteral("theme.json"));
+        if (!removeInstalled(existing, error))
+            return false;
     }
     if (!pathIsInside(root, dest) || !QDir().mkpath(dest)) {
         *error = QStringLiteral("cannot create %1").arg(dest);

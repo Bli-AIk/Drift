@@ -68,6 +68,7 @@ qt_add_executable(tst_editorstate
     ../src/app/mcp/transport/McpHttp.cpp
     ../src/app/mcp/tools/McpDispatcher.cpp
     ../src/app/mcp/tools/McpDispatcherExtended.cpp
+    ../src/ui/theme/ThemeManager.cpp
     ../src/app/mcp/tools/McpEffectAuthoring.cpp
     ../src/app/mcp/protocol/McpValidate.cpp
     ../src/app/mcp/tools/McpMarket.cpp
@@ -247,6 +248,7 @@ qt_add_executable(tst_mcp
     ../src/playback/preview/ClipPreviewPlayer.cpp
     ../src/app/mcp/tools/McpDispatcher.cpp
     ../src/app/mcp/tools/McpDispatcherExtended.cpp
+    ../src/ui/theme/ThemeManager.cpp
     ../src/app/mcp/tools/McpEffectAuthoring.cpp
     ../src/app/mcp/protocol/McpValidate.cpp
     ../src/app/mcp/tools/McpMarket.cpp

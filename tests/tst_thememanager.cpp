@@ -54,6 +54,7 @@ private slots:
     void removeAndExportRoundTrip();
     void exampleThemesLoad();
     void schemaVersionMigratesAndWarns();
+    void templateExportAndReplaceImport();
     void sessionOverrideIsNotPersisted();
     void darkModeBindingDoesNotLoop();
 
@@ -1040,6 +1041,51 @@ void ThemeManagerTest::schemaVersionMigratesAndWarns()
     QVERIFY(exportedFile.open(QIODevice::ReadOnly));
     const QJsonObject object = QJsonDocument::fromJson(exportedFile.readAll()).object();
     QCOMPARE(object.value(QStringLiteral("schemaVersion")).toInt(), 1);
+}
+
+void ThemeManagerTest::templateExportAndReplaceImport()
+{
+    ThemeManager manager;
+    QString error;
+    QVERIFY(manager.themeTemplate(QStringLiteral("dark"), QStringLiteral("light"), false, &error).isEmpty());
+
+    QTemporaryDir outside;
+    QVERIFY(outside.isValid());
+    const QString starterPath = outside.filePath(QStringLiteral("ocean.json"));
+    const QByteArray starter = manager.themeTemplate(QStringLiteral("dark"), QStringLiteral("ocean"), true, &error);
+    QJsonObject object = QJsonDocument::fromJson(starter).object();
+    QCOMPARE(object.value(QStringLiteral("extends")).toString(), QStringLiteral("dark"));
+    QCOMPARE(object.value(QStringLiteral("name")).toString(), QStringLiteral("ocean"));
+    QVERIFY(object.value(QStringLiteral("palette")).toObject().contains(QStringLiteral("primary")));
+    QVERIFY(!object.contains(QStringLiteral("semantic")));
+
+    QJsonObject palette = object.value(QStringLiteral("palette")).toObject();
+    palette.insert(QStringLiteral("primary"), QStringLiteral("#00aaff"));
+    object.insert(QStringLiteral("palette"), palette);
+    QFile file(starterPath);
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.write(QJsonDocument(object).toJson());
+    file.close();
+    QCOMPARE(manager.importTheme(QUrl::fromLocalFile(starterPath)), QStringLiteral("ocean"));
+    QVERIFY(manager.select(QStringLiteral("ocean")));
+    QCOMPARE(tokenColor(manager, "semantic.primary"), QColor(QStringLiteral("#00aaff")));
+
+    palette.insert(QStringLiteral("primary"), QStringLiteral("#ff5500"));
+    object.insert(QStringLiteral("palette"), palette);
+    QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    file.write(QJsonDocument(object).toJson());
+    file.close();
+    QVERIFY(manager.importTheme(QUrl::fromLocalFile(starterPath)).isEmpty());
+    QCOMPARE(manager.importTheme(QUrl::fromLocalFile(starterPath), true), QStringLiteral("ocean"));
+    QCOMPARE(tokenColor(manager, "semantic.primary"), QColor(QStringLiteral("#ff5500")));
+
+    const QByteArray copy = manager.themeTemplate(QStringLiteral("ocean"), QStringLiteral("ocean2"), false, &error);
+    object = QJsonDocument::fromJson(copy).object();
+    QVERIFY(!object.contains(QStringLiteral("extends")));
+    QCOMPARE(object.value(QStringLiteral("schemaVersion")).toInt(), ThemeManager::kSchemaVersion);
+    QCOMPARE(object.value(QStringLiteral("palette")).toObject().value(QStringLiteral("primary")).toString().toLower(),
+             QStringLiteral("#ff5500"));
+    QVERIFY(object.contains(QStringLiteral("components")));
 }
 
 void ThemeManagerTest::sessionOverrideIsNotPersisted()

@@ -18,7 +18,7 @@ A document is deep-merged in this order, then references are resolved:
 
 After `extends` and variants are applied, the built-in theme of the document's variant is merged underneath once more, so a token added in a later Drift release is filled with its default instead of going missing. That is the migration path for older themes; the file on disk is not rewritten.
 
-`schemaVersion` is the theme format the document was written for (currently `1`; omitted means a theme from before versioning). A theme whose version is newer than the running build still loads, with unknown keys ignored, and `ThemeManager.lastWarning` asks the user to update Drift. Bump `kThemeSchemaVersion` in `ThemeManager.cpp` when a release adds tokens or changes what a key means. `exportTheme` writes the current version.
+`schemaVersion` is the theme format the document was written for (currently `1`; omitted means a theme from before versioning). A theme whose version is newer than the running build still loads, with unknown keys ignored, and `ThemeManager.lastWarning` asks the user to update Drift. Bump `ThemeManager::kSchemaVersion` in `ThemeManager.h` when a release adds tokens or changes what a key means. `exportTheme` writes the current version.
 
 References are strings: `$palette.primary`, `$semantic.panel.border`, `$metrics.radius.sm`. Cycles and unknown paths are left as the original string and logged. Colors are `#RGB`, `#RRGGBB`, or `#AARRGGBB`. Eight-digit colors are Qt order: alpha first, then red, green, blue.
 
