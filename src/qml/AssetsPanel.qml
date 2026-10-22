@@ -854,6 +854,7 @@ PanelFrame {
 
     Row {
         anchors.fill: parent
+        anchors.margins: root.sheetMode ? 0 : Theme.c.assetsPanel.borderWidth
         spacing: 0
 
         AssetsPanelTabRail {

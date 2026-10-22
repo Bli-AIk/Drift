@@ -21,6 +21,7 @@ Item {
         anchors.leftMargin: root.sideMargin
         anchors.rightMargin: root.sideMargin
         anchors.bottomMargin: root.sideMargin
+        anchors.topMargin: root.sideMargin
     }
 
     Component { id: splitC; WorkspaceSplit {} }

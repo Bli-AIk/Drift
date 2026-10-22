@@ -620,7 +620,7 @@
       "radius": "$metrics.radius.pill"
     },
     "editorHeaderExportButton": {
-      "radius": "$metrics.radius.md",
+      "radius": "$metrics.radius.sm",
       "glow": "$semantic.export.glow",
       "gradientTop": "$semantic.export.gradientTop",
       "gradientBottom": "$semantic.export.gradientBottom",
@@ -780,7 +780,7 @@
       "foregroundMuted": "$semantic.mutedForeground"
     },
     "editorHeaderProjectsButton": {
-      "radius": "$metrics.radius.pill",
+      "radius": "$metrics.radius.sm",
       "backgroundHover": "$semantic.popoverHover",
       "background": "$semantic.accent",
       "statusRadius": 4,
@@ -812,7 +812,7 @@
       "border": "$semantic.destructive"
     },
     "editorHeaderSearchField": {
-      "radius": "$metrics.radius.pill",
+      "radius": "$metrics.radius.sm",
       "background": "$semantic.panel.accent",
       "borderWidthFocus": "$metrics.borderWidthFocus",
       "borderWidth": 0,
@@ -2968,7 +2968,7 @@
       "foregroundMuted": "$semantic.mutedForeground",
       "formatsBorder": "$semantic.panel.border",
       "formatsBorderWidth": "$metrics.borderWidth",
-      "formatsRadius": "$metrics.radius.md",
+      "formatsRadius": "$metrics.radius.sm",
       "icon": "$semantic.mutedForeground",
       "iconBackground": "$semantic.panel.accent",
       "iconRadius": "$metrics.radius.md"
@@ -3708,7 +3708,7 @@
       "margin": 32
     },
     "headerHeight": 54.4,
-    "panelGap": 3,
+    "panelGap": 6,
     "pagePadding": 12,
     "panelHeaderHeight": {
       "pointer": 44,

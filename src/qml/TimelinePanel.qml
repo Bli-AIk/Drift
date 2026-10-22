@@ -1262,6 +1262,7 @@ PanelFrame {
 
     Column {
         anchors.fill: parent
+        anchors.margins: root.border.width
 
         // === toolbar =================================================================
         TimelineToolbar {

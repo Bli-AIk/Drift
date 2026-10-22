@@ -46,8 +46,10 @@ PanelFrame {
     Item {
         id: viewportOuter
         anchors.top: parent.top
-        width: parent.width
-        height: root.previewFullscreen ? parent.height : parent.height - bottomBar.height
+        anchors.topMargin: root.border.width
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width - root.border.width * 2
+        height: (root.previewFullscreen ? parent.height : parent.height - bottomBar.height) - root.border.width * 2
         clip: true
 
         PreviewViewport {
@@ -107,7 +109,9 @@ PanelFrame {
     Column {
         id: bottomBar
         anchors.bottom: parent.bottom
-        width: parent.width
+        anchors.bottomMargin: root.border.width
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width - root.border.width * 2
         z: 1
         opacity: !root.previewFullscreen || osd.shown ? 1 : 0
         visible: opacity > 0
