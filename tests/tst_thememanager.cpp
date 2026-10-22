@@ -1057,7 +1057,13 @@ void ThemeManagerTest::templateExportAndReplaceImport()
     QCOMPARE(object.value(QStringLiteral("extends")).toString(), QStringLiteral("dark"));
     QCOMPARE(object.value(QStringLiteral("name")).toString(), QStringLiteral("ocean"));
     QVERIFY(object.value(QStringLiteral("palette")).toObject().contains(QStringLiteral("primary")));
+    QVERIFY(!object.value(QStringLiteral("palette")).toObject().contains(QStringLiteral("curveX")));
     QVERIFY(!object.contains(QStringLiteral("semantic")));
+    QVERIFY(!object.contains(QStringLiteral("components")));
+    QVERIFY(object.contains(QStringLiteral("metrics")));
+    QVERIFY(object.contains(QStringLiteral("typography")));
+    QVERIFY(object.contains(QStringLiteral("motion")));
+    QCOMPARE(object.value(QStringLiteral("window")).toObject().value(QStringLiteral("translucent")).toBool(), false);
 
     QJsonObject palette = object.value(QStringLiteral("palette")).toObject();
     palette.insert(QStringLiteral("primary"), QStringLiteral("#00aaff"));

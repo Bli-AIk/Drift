@@ -1013,9 +1013,14 @@ const QList<Op> &ops()
           "Write theme `theme` (default: the one on screen) to `path` renamed to `name`. mode copy "
           "(default) writes every resolved token (palette, semantic, components, metrics, typography, "
           "motion, window), about 3800 lines — edit any value and drop the rest unchanged. mode "
-          "starter writes {name, schemaVersion, extends: theme, variant, palette} only — the small "
-          "option when recoloring; add semantic/components keys to override more, missing keys fall "
-          "through to the base. Values: colors #RGB/#RRGGBB/#AARRGGBB (alpha first), numbers, or "
+          "starter writes {name, schemaVersion, extends: theme, variant, palette, metrics, typography, "
+          "motion, window}, palette trimmed to ~40 core surface/text/accent/status keys — the small "
+          "option when restyling; add more palette, semantic or components keys to override them, "
+          "missing keys fall through to the base. window: translucent (bool, needs the user's "
+          "translucent-windows setting and a restart), backdrop (none, blur; mica or acrylic on "
+          "Windows), backgroundOpacity (0..1); surfaces that should show it need alpha "
+          "appBackground, panelBackground and accent. Values: colors #RGB/#RRGGBB/#AARRGGBB (alpha "
+          "first), numbers, or "
           "references like \"$palette.primary\". A dual-variant theme exports the side on screen. "
           "Then call import_theme. To fix a theme you already imported, export it with theme and name "
           "both set to its id (mode copy), or re-edit your file, and import_theme with replace:true. "
@@ -1023,7 +1028,7 @@ const QList<Op> &ops()
           objectSchema({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute .json output path"))},
                         {QStringLiteral("name"), stringProp(QStringLiteral("Name of the new theme; becomes its id on import. Not dark, light or system"))},
                         {QStringLiteral("theme"), stringProp(QStringLiteral("Theme id from list_themes to start from (default: current)"))},
-                        {QStringLiteral("mode"), enumProp(QStringLiteral("copy = all tokens, starter = extends + palette"),
+                        {QStringLiteral("mode"), enumProp(QStringLiteral("copy = all tokens, starter = extends + core palette, metrics, typography, motion, window"),
                                                           {QStringLiteral("copy"), QStringLiteral("starter")})}},
                        {QStringLiteral("path"), QStringLiteral("name")}),
           false, false, true },

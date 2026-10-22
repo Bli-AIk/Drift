@@ -47,6 +47,49 @@ const QStringList kGroups = {
     QStringLiteral("window"),
 };
 
+// Palette keys a starter export keeps: surfaces, text, accents and status colors,
+// which drive most of the UI. Clip, curve and gizmo colors fall through to the base.
+const QStringList kStarterPaletteKeys = {
+    QStringLiteral("appBackground"),
+    QStringLiteral("panelBackground"),
+    QStringLiteral("panelBorder"),
+    QStringLiteral("panelForeground"),
+    QStringLiteral("panelAccent"),
+    QStringLiteral("panelAccentForeground"),
+    QStringLiteral("panelMuted"),
+    QStringLiteral("panelSecondaryBg"),
+    QStringLiteral("panelSecondaryBorder"),
+    QStringLiteral("panelSecondaryForeground"),
+    QStringLiteral("border"),
+    QStringLiteral("foreground"),
+    QStringLiteral("mutedForeground"),
+    QStringLiteral("primary"),
+    QStringLiteral("primaryForeground"),
+    QStringLiteral("accent"),
+    QStringLiteral("accentForeground"),
+    QStringLiteral("accentOnPanel"),
+    QStringLiteral("popoverHover"),
+    QStringLiteral("constructive"),
+    QStringLiteral("destructive"),
+    QStringLiteral("warning"),
+    QStringLiteral("overlay"),
+    QStringLiteral("scrim"),
+    QStringLiteral("scrimStrong"),
+    QStringLiteral("skeleton"),
+    QStringLiteral("skeletonHighlight"),
+    QStringLiteral("scrollbarTrack"),
+    QStringLiteral("scrollbarHandle"),
+    QStringLiteral("scrollbarHandleHover"),
+    QStringLiteral("scrollbarHandlePressed"),
+    QStringLiteral("sliderTrack"),
+    QStringLiteral("sheetHandle"),
+    QStringLiteral("snapGuide"),
+    QStringLiteral("exportGradientTop"),
+    QStringLiteral("exportGradientBottom"),
+    QStringLiteral("exportGlow"),
+    QStringLiteral("previewLetterbox"),
+};
+
 // A reference chain longer than this is treated as a cycle even if the detector
 // missed it. Themes are a few dozen tokens deep at most.
 constexpr int kMaxReferenceDepth = 64;
@@ -1481,7 +1524,18 @@ QByteArray ThemeManager::themeTemplate(const QString &id, const QString &name, b
     if (starter) {
         doc.insert(QStringLiteral("extends"), id);
         doc.insert(QStringLiteral("variant"), loaded->variant);
-        doc.insert(QStringLiteral("palette"), loaded->document.value(QStringLiteral("palette")));
+        const QVariantMap palette = loaded->document.value(QStringLiteral("palette")).toMap();
+        QVariantMap core;
+        for (const QString &key : kStarterPaletteKeys) {
+            if (palette.contains(key))
+                core.insert(key, palette.value(key));
+        }
+        doc.insert(QStringLiteral("palette"), core);
+        for (const char *group : {"metrics", "typography", "motion", "window"}) {
+            const QString key = QLatin1String(group);
+            if (loaded->document.contains(key))
+                doc.insert(key, loaded->document.value(key));
+        }
     } else {
         doc = loaded->document;
     }

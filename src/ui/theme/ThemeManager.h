@@ -113,7 +113,8 @@ public:
     Q_INVOKABLE bool exportTheme(const QUrl &file);
     // JSON for theme `id` renamed to `name`, for editing outside Drift. Without
     // starter: every resolved token, like exportTheme. With starter: extends
-    // `id` plus its resolved palette, a small file that tracks the base.
+    // `id` plus its resolved core palette, metrics, typography, motion and
+    // window, a small file that tracks the base.
     QByteArray themeTemplate(const QString &id, const QString &name, bool starter, QString *error) const;
     Q_INVOKABLE QUrl themesFolderUrl() const;
     // surface, panel, accent, foreground, primary for the swatch. Dual-variant
