@@ -141,7 +141,7 @@ void ThemeManagerTest::builtinsLoadDarkAndLight()
     QVERIFY(manager.availableThemes().contains(QStringLiteral("light")));
     QCOMPARE(tokenColor(manager, "semantic.surface.app"), QColor(QStringLiteral("#0d0d0d")));
     QCOMPARE(tokenColor(manager, "semantic.primary"), QColor(QStringLiteral("#F8B81C")));
-    QCOMPARE(tokenColor(manager, "semantic.scrim"), QColor(QStringLiteral("#00000066")));
+    QCOMPARE(tokenColor(manager, "semantic.scrim"), QColor(QStringLiteral("#66000000")));
     QCOMPARE(tokenColor(manager, "semantic.clip.audio"), QColor(QStringLiteral("#8F5DBA")));
     QCOMPARE(tokenColor(manager, "semantic.gizmo.x"), QColor(QStringLiteral("#f0475a")));
     QCOMPARE(tokenColor(manager, "semantic.clip.waveform"), QColor(QStringLiteral("#ffffffb3")));
