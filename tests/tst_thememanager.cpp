@@ -53,6 +53,7 @@ private slots:
     void importJsonFolderZipAndRejectsTraversal();
     void removeAndExportRoundTrip();
     void exampleThemesLoad();
+    void schemaVersionMigratesAndWarns();
     void sessionOverrideIsNotPersisted();
     void darkModeBindingDoesNotLoop();
 
@@ -987,6 +988,58 @@ void ThemeManagerTest::exampleThemesLoad()
     QVERIFY(manager.overrideUrl(QStringLiteral("ThemedButtonBackground")).isEmpty());
     manager.setThemeTrusted(QStringLiteral("override-example"), true);
     QVERIFY(!manager.overrideUrl(QStringLiteral("ThemedButtonBackground")).isEmpty());
+}
+
+void ThemeManagerTest::schemaVersionMigratesAndWarns()
+{
+    // Pre-versioning standalone theme: no extends, no schemaVersion, most tokens missing.
+    QVERIFY(writeJson("legacy.json", R"({
+        "name": "legacy",
+        "variant": "light",
+        "palette": { "primary": "#123456" }
+    })"));
+    QVERIFY(writeJson("future.json", R"({
+        "name": "future",
+        "schemaVersion": 999,
+        "extends": "dark",
+        "somethingNew": { "x": 1 }
+    })"));
+    QVERIFY(writeJson("badversion.json", R"({
+        "name": "badversion",
+        "schemaVersion": "two"
+    })"));
+
+    ThemeManager manager;
+    QSignalSpy warnings(&manager, &ThemeManager::lastWarningChanged);
+    QVERIFY(manager.loadTheme(QStringLiteral("legacy")));
+    QVERIFY(manager.lastWarning().isEmpty());
+    QCOMPARE(tokenColor(manager, "semantic.primary"), QColor(QStringLiteral("#123456")));
+    QCOMPARE(manager.token(QStringLiteral("metrics.radius.sm")),
+             manager.builtinToken(QStringLiteral("light"), QStringLiteral("metrics.radius.sm")));
+    QCOMPARE(tokenColor(manager, "components.themedButton.background"),
+             manager.builtinToken(QStringLiteral("light"), QStringLiteral("components.themedButton.background"))
+                 .value<QColor>());
+    QCOMPARE(manager.token(QStringLiteral("schemaVersion")).toInt(), 1);
+
+    QVERIFY(manager.loadTheme(QStringLiteral("future")));
+    QCOMPARE(manager.currentTheme(), QStringLiteral("future"));
+    QVERIFY(!manager.lastWarning().isEmpty());
+    QCOMPARE(warnings.count(), 1);
+
+    QVERIFY(manager.loadTheme(QStringLiteral("legacy")));
+    QVERIFY(manager.lastWarning().isEmpty());
+    QCOMPARE(warnings.count(), 2);
+
+    QVERIFY(!manager.loadTheme(QStringLiteral("badversion")));
+
+    QTemporaryDir outside;
+    QVERIFY(outside.isValid());
+    const QString exported = outside.filePath(QStringLiteral("legacy-export.json"));
+    QVERIFY(manager.exportTheme(QUrl::fromLocalFile(exported)));
+    QFile exportedFile(exported);
+    QVERIFY(exportedFile.open(QIODevice::ReadOnly));
+    const QJsonObject object = QJsonDocument::fromJson(exportedFile.readAll()).object();
+    QCOMPARE(object.value(QStringLiteral("schemaVersion")).toInt(), 1);
 }
 
 void ThemeManagerTest::sessionOverrideIsNotPersisted()

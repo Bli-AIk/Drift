@@ -3,6 +3,8 @@
 #include "core/base/ZipArchive.h"
 #include "engine/platform/AndroidUri.h"
 
+#include <algorithm>
+#include <cmath>
 #include <memory>
 
 #include <QColor>
@@ -32,6 +34,12 @@ constexpr auto kLightResource = ":/themes/light.json";
 constexpr qint64 kMaxThemeFileBytes = 2 * 1024 * 1024;
 constexpr qint64 kMaxThemeTotalBytes = 8 * 1024 * 1024;
 constexpr int kMaxZipEntries = 64;
+
+// Bump when a release adds tokens a theme author should know about or changes
+// what an existing key means. A document without schemaVersion predates the
+// field and reads as 0. Missing tokens are filled from the built-in of the
+// theme's variant whatever the version, so older themes keep working.
+constexpr int kThemeSchemaVersion = 1;
 
 const QStringList kGroups = {
     QStringLiteral("palette"),
@@ -246,6 +254,14 @@ bool validateStructure(const QVariantMap &doc, const QString &path, QString *err
     };
     if (!requireString("name", true) || !requireString("extends", true))
         return false;
+    if (doc.contains(QStringLiteral("schemaVersion"))) {
+        const QVariant version = doc.value(QStringLiteral("schemaVersion"));
+        const int versionType = version.typeId();
+        if ((versionType != QMetaType::Double && versionType != QMetaType::Int
+             && versionType != QMetaType::LongLong)
+            || version.toDouble() < 1 || version.toDouble() != std::floor(version.toDouble()))
+            return fail(QStringLiteral("\"schemaVersion\" must be a positive integer"));
+    }
     if (doc.contains(QStringLiteral("variant"))) {
         const QString variant = doc.value(QStringLiteral("variant")).toString();
         if (variant != QLatin1String("dark") && variant != QLatin1String("light"))
@@ -255,7 +271,7 @@ bool validateStructure(const QVariantMap &doc, const QString &path, QString *err
     for (auto it = doc.cbegin(); it != doc.cend(); ++it) {
         if (it.key() == QLatin1String("name") || it.key() == QLatin1String("variant")
             || it.key() == QLatin1String("extends") || it.key() == QLatin1String("variants")
-            || kGroups.contains(it.key()))
+            || it.key() == QLatin1String("schemaVersion") || kGroups.contains(it.key()))
             continue;
         qWarning("theme: unknown key \"%s\" in %s", qPrintable(it.key()), qPrintable(path));
     }
@@ -1095,7 +1111,12 @@ QVariantMap ThemeManager::compose(const QString &path, QStringList *stack, QStri
             stack->removeLast();
             return {};
         }
+        // A newer base can carry keys this build does not understand either.
+        const int version = std::max(base.value(QStringLiteral("schemaVersion")).toInt(),
+                                     doc.value(QStringLiteral("schemaVersion")).toInt());
         doc = deepMerge(base, doc).toMap();
+        if (version > 0)
+            doc.insert(QStringLiteral("schemaVersion"), version);
     }
     stack->removeLast();
     return doc;
@@ -1176,6 +1197,16 @@ std::optional<ThemeManager::Loaded> ThemeManager::readTheme(const QString &nameO
     }
     merged.insert(QStringLiteral("variant"), declared);
 
+    const int schemaVersion = merged.value(QStringLiteral("schemaVersion")).toInt();
+    if (!isBuiltinPath(path)) {
+        QString defaultsError;
+        const QVariantMap defaults = readObject(
+            QString::fromLatin1(declared == QLatin1String("light") ? kLightResource : kDarkResource),
+            &defaultsError);
+        merged = deepMerge(defaults, merged).toMap();
+    }
+    merged.insert(QStringLiteral("schemaVersion"), std::max(schemaVersion, kThemeSchemaVersion));
+
     QString leafName = readThemeName(path);
     if (leafName.isEmpty())
         leafName = fallbackName(path);
@@ -1196,6 +1227,7 @@ std::optional<ThemeManager::Loaded> ThemeManager::readTheme(const QString &nameO
     loaded.name = loaded.document.value(QStringLiteral("name")).toString();
     loaded.variant = declared;
     loaded.hasVariants = hasVariants;
+    loaded.schemaVersion = schemaVersion;
     loaded.user = !isBuiltinPath(loaded.path);
     loaded.document.insert(QStringLiteral("variant"), declared);
     return loaded;
@@ -1212,6 +1244,18 @@ void ThemeManager::apply(const Loaded &loaded)
     m_hasVariants = loaded.hasVariants;
     m_effectiveVariant = loaded.variant.isEmpty() ? QStringLiteral("dark") : loaded.variant;
     m_resolved = loaded.document;
+    const QString warning = loaded.schemaVersion > kThemeSchemaVersion
+                                ? QStringLiteral("“%1” was made for a newer version of Drift. "
+                                                 "Some parts may look wrong until you update.")
+                                      .arg(loaded.name)
+                                : QString();
+    if (warning != m_lastWarning) {
+        m_lastWarning = warning;
+        if (!warning.isEmpty())
+            qWarning("theme: %s uses schemaVersion %d, this build reads %d", qPrintable(loaded.path),
+                     loaded.schemaVersion, kThemeSchemaVersion);
+        emit lastWarningChanged();
+    }
     if (loaded.path == QLatin1String(kDarkResource))
         m_builtinDark = loaded.document;
     else if (loaded.path == QLatin1String(kLightResource))

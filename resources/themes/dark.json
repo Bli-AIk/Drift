@@ -1,5 +1,6 @@
 {
   "name": "dark",
+  "schemaVersion": 1,
   "variant": "dark",
   "palette": {
     "appBackground": "#0d0d0d",

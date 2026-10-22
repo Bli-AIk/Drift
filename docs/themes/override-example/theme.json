@@ -1,5 +1,6 @@
 {
   "name": "override-example",
+  "schemaVersion": 1,
   "extends": "dark",
   "variant": "dark",
   "components": {

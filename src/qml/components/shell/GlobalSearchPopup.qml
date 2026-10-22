@@ -106,7 +106,10 @@ Popup {
         ].concat((ThemeManager.themes || []).filter((theme) => theme && !theme.builtIn).map((theme) => ({
             label: qsTr("Theme: %1").arg(theme.name),
             keywords: "appearance theme " + (theme.name || ""),
-            run: () => ThemeManager.select(theme.id)
+            run: () => {
+                if (ThemeManager.select(theme.id) && ThemeManager.lastWarning)
+                    Toasts.warning(ThemeManager.lastWarning)
+            }
         }))))
         for (let i = 0; i < commands.length; ++i) {
             const cmd = commands[i]

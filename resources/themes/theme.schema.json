@@ -9,6 +9,11 @@
       "type": "string",
       "minLength": 1
     },
+    "schemaVersion": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Theme format this document was written for. Omitted means a theme from before versioning. A theme newer than the running Drift still loads, with a warning. Tokens missing from an older theme are filled from the built-in dark or light theme."
+    },
     "variant": {
       "enum": ["dark", "light"]
     },
