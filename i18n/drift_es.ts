@@ -5494,6 +5494,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>HSL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Exposure</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5538,6 +5542,46 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Red</source>
+        <translation type="unfinished">Rojo</translation>
+    </message>
+    <message>
+        <source>Orange</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yellow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation type="unfinished">Verde</translation>
+    </message>
+    <message>
+        <source>Aqua</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation type="unfinished">Azul</translation>
+    </message>
+    <message>
+        <source>Purple</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Magenta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Luminance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Film Grain</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5562,6 +5606,10 @@
         <translation type="unfinished">Ninguno</translation>
     </message>
     <message>
+        <source>Missing look</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Reset %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5574,15 +5622,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hold to see the original (or hold the  key)</source>
+        <source>Click to toggle the original. Hold to see it while pressed ( key)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy this grade to every video, image and other visual clip on the timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This grade already applies to the whole timeline. Select a clip to copy its grade to the others.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Apply to all…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copy this grade to every clip on the timeline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5595,6 +5647,26 @@
     </message>
     <message>
         <source>Reset this tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Editing &quot;%1&quot; only. Use Apply to all to copy its grade to other clips.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The grade is turned off.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timeline grade also applies.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select it</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5619,6 +5691,14 @@
     </message>
     <message>
         <source>Adjust curves</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hue Curves</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust hue curves</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5682,6 +5762,10 @@
 <context>
     <name>ColorWheel</name>
     <message>
+        <source>Animated. Editing sets keyframes (needs Auto keyframes on).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Reset %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5730,6 +5814,18 @@
 </context>
 <context>
     <name>CurveEditor</name>
+    <message>
+        <source>Hue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lum</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Master</source>
         <translation type="unfinished">Maestro</translation>
@@ -7173,6 +7269,10 @@
 <context>
     <name>EffectsCurveParam</name>
     <message>
+        <source>Reset %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Edit %1</source>
         <translation type="unfinished">Editar %1</translation>
     </message>
@@ -8593,6 +8693,18 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Hue curves</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HSL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color grade</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Looks</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8833,6 +8945,13 @@
     </message>
     <message>
         <source>No matches</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GradeSlider</name>
+    <message>
+        <source>Animated. Editing sets keyframes (needs Auto keyframes on).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9604,6 +9723,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Missing look</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Remove</source>
         <translation type="unfinished">Eliminar</translation>
     </message>
@@ -9642,6 +9765,17 @@
     <message>
         <source>Select a clip to try looks on it</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove this look?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>“%1” is used by %n clip(s). They will show it as missing until it is imported again.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Rename look</source>
@@ -12193,6 +12327,10 @@ Si la reproducción se corta, prueba con otra opción.</translation>
 </context>
 <context>
     <name>PreviewPanel</name>
+    <message>
+        <source>Original</source>
+        <translation type="unfinished">Original</translation>
+    </message>
     <message>
         <source>Seek</source>
         <translation>Buscar posición</translation>
@@ -18031,6 +18169,10 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     <message>
         <source>Save effects as preset…</source>
         <translation type="unfinished">Guardar efectos como ajuste predeterminado…</translation>
+    </message>
+    <message>
+        <source>Color grade…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unlink from clip</source>

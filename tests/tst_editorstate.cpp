@@ -4603,15 +4603,15 @@ void EditorStateTest::multiSelectClipboardGuidesAndShortcuts()
     QVERIFY(!state.guideItems().isEmpty());
 
     // Shortcut/action layer wiring.
-    state.setShortcut(QStringLiteral("nudgeRight"), QStringLiteral("Ctrl+Alt+Right"));
-    QCOMPARE(state.shortcutFor(QStringLiteral("nudgeRight")), QStringLiteral("Ctrl+Alt+Right"));
+    state.setShortcut(QStringLiteral("nudgeRight"), QStringLiteral("Ctrl+Alt+Shift+Right"));
+    QCOMPARE(state.shortcutFor(QStringLiteral("nudgeRight")), QStringLiteral("Ctrl+Alt+Shift+Right"));
 
     bool found = false;
     for (const QVariant &entry : state.actions()) {
         const QVariantMap action = entry.toMap();
         if (action.value(QStringLiteral("id")).toString() != QStringLiteral("nudgeRight"))
             continue;
-        QCOMPARE(action.value(QStringLiteral("shortcut")).toString(), QStringLiteral("Ctrl+Alt+Right"));
+        QCOMPARE(action.value(QStringLiteral("shortcut")).toString(), QStringLiteral("Ctrl+Alt+Shift+Right"));
         found = true;
     }
     QVERIFY(found);
