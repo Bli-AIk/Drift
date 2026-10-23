@@ -99,6 +99,7 @@
 #include <QClipboard>
 #include <QColor>
 #include <QCoreApplication>
+#include <QPointer>
 #include <QCryptographicHash>
 #include <QCursor>
 #include <QDateTime>
@@ -4891,6 +4892,23 @@ TimelineClipsModel::Row AppController::clipRow(const drift::Clip &clip,
         }
     }
     row.effectsLabel = effectNames.join(QStringLiteral(" · "));
+    for (const auto &kv : clip.volume.keyframes().asKeyValueRange())
+        row.volumeKeys.append(QVariantMap{
+            {QStringLiteral("t"), drift::usToSeconds(kv.first)},
+            {QStringLiteral("v"), kv.second.value},
+        });
+    row.volumeTyped = clip.volume;
+    const bool carriesAudio = clip.type == drift::ClipType::Audio
+                              || (clip.type == drift::ClipType::Video && row.hasEmbeddedAudio);
+    if (carriesAudio && clip.volume.keyframes().size() <= 1) {
+        const double gain = clip.volume.isEmpty() ? 1.0 : clip.volume.keyframes().constBegin()->value;
+        if (gain <= 0.0) {
+            row.volumeLabel = tr("-inf dB");
+        } else if (const double db = 20.0 * std::log10(gain); std::abs(db) >= 0.05) {
+            row.volumeLabel = tr("%1 dB").arg((db > 0.0 ? QStringLiteral("+") : QString())
+                                              + QString::number(db, 'f', 1));
+        }
+    }
     return row;
 }
 
@@ -6146,18 +6164,93 @@ void AppController::selectMicrophone(const QString &id)
     m_audioRecorder.selectDevice(id);
 }
 
-QVariantMap AppController::analyzeFocusedClipLoudness() const
+void AppController::startFocusedClipLoudness(bool normalize, double targetLufs)
 {
-    if (m_selectedTrack < 0 || m_selectedClip < 0)
-        return {{QStringLiteral("ok"), false}, {QStringLiteral("detail"), tr("Select a clip to measure")}};
-    return m_mcpController->analyzeLoudness(m_selectedTrack, m_selectedClip, 0, 0).toVariantMap();
+    if (m_loudnessBusy)
+        return;
+    if (!isValidClipIndex(m_selectedTrack, m_selectedClip)) {
+        emit loudnessFinished({{QStringLiteral("ok"), false},
+                               {QStringLiteral("detail"),
+                                normalize ? tr("Select a clip to normalize")
+                                          : tr("Select a clip to measure")}});
+        return;
+    }
+    // The clip is tracked by id: the selection indices can move while the measurement runs.
+    const QString clipId = m_project.tracks().at(m_selectedTrack).clips.at(m_selectedClip).id;
+    auto job = std::make_shared<const McpController::LoudnessJob>(
+        m_mcpController->clipLoudnessJob(m_selectedTrack, m_selectedClip));
+    m_loudnessCancel = std::make_shared<std::atomic<bool>>(false);
+    m_loudnessBusy = true;
+    m_loudnessProgress = 0.0;
+    emit loudnessBusyChanged();
+    emit loudnessProgressChanged();
+
+    QPointer<AppController> self(this);
+    (void)QtConcurrent::run([self, job, cancel = m_loudnessCancel, clipId, normalize, targetLufs]() {
+        double reported = 0.0;
+        const drift::LoudnessResult measured = McpController::measureLoudnessJob(
+            *job, [&](double fraction) {
+                if (cancel->load())
+                    return false;
+                if (fraction - reported >= 0.01) {
+                    reported = fraction;
+                    QMetaObject::invokeMethod(
+                        QCoreApplication::instance(),
+                        [self, fraction]() {
+                            if (!self)
+                                return;
+                            self->m_loudnessProgress = fraction;
+                            emit self->loudnessProgressChanged();
+                        },
+                        Qt::QueuedConnection);
+                }
+                return true;
+            });
+        QMetaObject::invokeMethod(
+            QCoreApplication::instance(),
+            [self, cancel, clipId, normalize, targetLufs, measured]() {
+                if (!self)
+                    return;
+                self->m_loudnessBusy = false;
+                self->m_loudnessProgress = 0.0;
+                emit self->loudnessBusyChanged();
+                emit self->loudnessProgressChanged();
+                // A cancelled run stopped mid-file, so its numbers are partial and it reports nothing.
+                if (cancel->load())
+                    return;
+                QVariantMap result;
+                if (!measured.ok) {
+                    result = QVariantMap{{QStringLiteral("ok"), false},
+                                         {QStringLiteral("detail"), tr("No audio in range")}};
+                } else if (!normalize) {
+                    result = QVariantMap{{QStringLiteral("ok"), true},
+                                         {QStringLiteral("lufs"), measured.integratedLufs},
+                                         {QStringLiteral("true_peak_db"), measured.truePeakDb},
+                                         {QStringLiteral("duration"), measured.durationSeconds}};
+                } else {
+                    const QPair<int, int> at = self->m_mcpController->locateClip(clipId);
+                    if (at.first < 0) {
+                        result = QVariantMap{{QStringLiteral("ok"), false},
+                                             {QStringLiteral("detail"),
+                                              tr("The clip is no longer in the timeline")}};
+                    } else {
+                        result = self->m_mcpController
+                                     ->applyNormalizeGain(at.first, at.second,
+                                                          measured.integratedLufs,
+                                                          measured.truePeakDb, targetLufs)
+                                     .toVariantMap();
+                    }
+                }
+                emit self->loudnessFinished(result);
+            },
+            Qt::QueuedConnection);
+    });
 }
 
-QVariantMap AppController::normalizeFocusedClipLoudness(double targetLufs)
+void AppController::cancelFocusedClipLoudness()
 {
-    if (m_selectedTrack < 0 || m_selectedClip < 0)
-        return {{QStringLiteral("ok"), false}, {QStringLiteral("detail"), tr("Select a clip to normalize")}};
-    return m_mcpController->normalizeVolume(m_selectedTrack, m_selectedClip, targetLufs).toVariantMap();
+    if (m_loudnessBusy)
+        m_loudnessCancel->store(true);
 }
 
 bool AppController::isAudioRecordingPaused() const

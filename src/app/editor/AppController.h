@@ -240,6 +240,8 @@ class AppController : public QObject
     Q_PROPERTY(bool reverseRendering READ reverseRendering NOTIFY reverseRenderingChanged)
     Q_PROPERTY(double reverseRenderProgress READ reverseRenderProgress NOTIFY reverseRenderProgressChanged)
     Q_PROPERTY(QString reverseRenderStatus READ reverseRenderStatus NOTIFY reverseRenderStatusChanged)
+    Q_PROPERTY(bool loudnessBusy READ loudnessBusy NOTIFY loudnessBusyChanged)
+    Q_PROPERTY(double loudnessProgress READ loudnessProgress NOTIFY loudnessProgressChanged)
     // Multicam punching session. The live project is not touched until Save; switches rewrite a
     // staged copy that playback is pointed at so the program monitor shows the mix.
     Q_PROPERTY(bool multicamActive READ multicamActive NOTIFY multicamChanged)
@@ -361,8 +363,8 @@ public:
     Q_INVOKABLE void cancelAudioRecording();
     Q_INVOKABLE void selectMicrophone(const QString &id);
     // Act on the focused clip, the same scope as the MCP analyze_loudness / normalize_volume tools.
-    Q_INVOKABLE QVariantMap analyzeFocusedClipLoudness() const;
-    Q_INVOKABLE QVariantMap normalizeFocusedClipLoudness(double targetLufs);
+    Q_INVOKABLE void startFocusedClipLoudness(bool normalize, double targetLufs);
+    Q_INVOKABLE void cancelFocusedClipLoudness();
     // Handing out a mutable pointer is the point past which this object can no longer know what
     // happened to the project, so the derived caches are dropped here rather than trusted. Two
     // bool writes, and nothing in src/ takes this overload — it exists for tests and for code
@@ -431,6 +433,8 @@ public:
     bool reverseRendering() const { return m_reverseRendering; }
     double reverseRenderProgress() const { return m_reverseProgress; }
     QString reverseRenderStatus() const { return m_reverseStatus; }
+    bool loudnessBusy() const { return m_loudnessBusy; }
+    double loudnessProgress() const { return m_loudnessProgress; }
     int selectedTrack() const { return m_selectedTrack; }
     int selectedClip() const { return m_selectedClip; }
     QVariantList selection() const;
@@ -1577,6 +1581,9 @@ signals:
     void reverseRenderProgressChanged();
     void reverseRenderStatusChanged();
     void reverseRenderFinished(bool ok, const QString &message);
+    void loudnessBusyChanged();
+    void loudnessProgressChanged();
+    void loudnessFinished(const QVariantMap &result);
     void reverseConfirmRequested(int trackIndex, int clipIndex, double seconds);
     void multicamChanged();
     void multicamFramesChanged();
@@ -2033,6 +2040,10 @@ protected:
     double m_reverseProgress = 0.0;
     QString m_reverseStatus;
     QAtomicInt m_reverseCancel = 0;
+
+    bool m_loudnessBusy = false;
+    double m_loudnessProgress = 0.0;
+    std::shared_ptr<std::atomic<bool>> m_loudnessCancel;
 
     // Playhead per timeline, so switching tabs returns to where each was left. "" = main.
     QHash<QString, drift::TimeUs> m_sequencePlayheads;

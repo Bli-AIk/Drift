@@ -2615,28 +2615,12 @@ std::vector<float> blockingMixMono16k(const drift::Project &snap, double startSe
     return *mono;
 }
 
-drift::LoudnessResult blockingLoudness(const drift::Project &snap, double startSeconds,
-                                       double durSeconds)
+drift::LoudnessResult blockingLoudness(McpController::LoudnessJob job)
 {
-    const int rate = 48000;
-    const qint64 frames = static_cast<qint64>(durSeconds * rate);
-    if (frames <= 0)
-        return {};
-    const drift::TimeUs startUs = drift::secondsToUs(startSeconds);
     auto result = std::make_shared<drift::LoudnessResult>();
     QEventLoop loop;
-    (void)QtConcurrent::run([snap, startUs, frames, rate, result, &loop]() {
-        AudioMixer mixer;
-        mixer.setProject(&snap);
-        // Measure the mix as it is, not as the master clipper leaves it: softClip saturates to
-        // exactly 1.0f, so a peak read after it is 0.0 dBFS however hot the mix really is.
-        mixer.setMasterClipEnabled(false);
-        *result = drift::measureLoudness(
-            frames, rate, [&mixer, startUs, rate](float *out, qint64 frameOffset, int maxFrames) {
-                const drift::TimeUs at = startUs + frameOffset * drift::kUsPerSecond / rate;
-                mixer.mix(at, maxFrames, rate, out);
-                return maxFrames;
-            });
+    (void)QtConcurrent::run([job = std::move(job), result, &loop]() {
+        *result = McpController::measureLoudnessJob(job);
         QMetaObject::invokeMethod(&loop, &QEventLoop::quit, Qt::QueuedConnection);
     });
     loop.exec();
@@ -3085,26 +3069,59 @@ QJsonObject McpController::removeSilence(int trackIndex, int clipIndex, double t
                {QStringLiteral("n"), removed.size()}});
 }
 
+McpController::LoudnessJob McpController::clipLoudnessJob(int trackIndex, int clipIndex) const
+{
+    LoudnessJob job;
+    job.snap = m_app->m_project.detachedCopy();
+    const drift::Clip &clip = m_app->m_project.tracks().at(trackIndex).clips.at(clipIndex);
+    muteAllButClip(job.snap, clip.id);
+    job.startSeconds = drift::usToSeconds(clip.timelineStart);
+    job.durSeconds = drift::usToSeconds(clip.timelineDuration);
+    return job;
+}
+
+drift::LoudnessResult McpController::measureLoudnessJob(const LoudnessJob &job,
+                                                        const std::function<bool(double)> &keepGoing)
+{
+    const int rate = 48000;
+    const qint64 frames = static_cast<qint64>(job.durSeconds * rate);
+    if (frames <= 0)
+        return {};
+    const drift::TimeUs startUs = drift::secondsToUs(job.startSeconds);
+    AudioMixer mixer;
+    mixer.setProject(&job.snap);
+    // Measure the mix as it is, not as the master clipper leaves it: softClip saturates to
+    // exactly 1.0f, so a peak read after it is 0.0 dBFS however hot the mix really is.
+    mixer.setMasterClipEnabled(false);
+    return drift::measureLoudness(
+        frames, rate, [&](float *out, qint64 frameOffset, int maxFrames) {
+            if (keepGoing && !keepGoing(double(frameOffset) / double(frames)))
+                return 0;
+            const drift::TimeUs at = startUs + frameOffset * drift::kUsPerSecond / rate;
+            mixer.mix(at, maxFrames, rate, out);
+            return maxFrames;
+        });
+}
+
 QJsonObject McpController::analyzeLoudness(int trackIndex, int clipIndex, double startSeconds,
                                               double durSeconds) const
 {
     using namespace drift::mcp;
-    drift::Project snap = m_app->m_project.detachedCopy();
-    double start = startSeconds;
-    double dur = durSeconds;
+    LoudnessJob job;
     if (trackIndex >= 0 && clipIndex >= 0) {
         if (!m_app->isValidClipIndex(trackIndex, clipIndex))
             return err("not_found", QStringLiteral("Unknown clip"));
-        const drift::Clip &clip = m_app->m_project.tracks().at(trackIndex).clips.at(clipIndex);
-        muteAllButClip(snap, clip.id);
-        start = drift::usToSeconds(clip.timelineStart);
-        dur = drift::usToSeconds(clip.timelineDuration);
-    } else if (dur <= 0.0) {
+        job = clipLoudnessJob(trackIndex, clipIndex);
+    } else if (durSeconds <= 0.0) {
         return err("bad_args", QStringLiteral("clip, or start+duration, required"));
+    } else {
+        job.snap = m_app->m_project.detachedCopy();
+        job.startSeconds = startSeconds;
+        job.durSeconds = durSeconds;
     }
-    if (dur <= 0.0)
+    if (job.durSeconds <= 0.0)
         return err("bad_args", QStringLiteral("Nothing to measure"));
-    const drift::LoudnessResult measured = blockingLoudness(snap, start, dur);
+    const drift::LoudnessResult measured = blockingLoudness(std::move(job));
     if (!measured.ok)
         return err("bad_args", QStringLiteral("No audio in range"));
     return ok({{QStringLiteral("lufs"), measured.integratedLufs},
@@ -3120,8 +3137,15 @@ QJsonObject McpController::normalizeVolume(int trackIndex, int clipIndex, double
     const QJsonObject measured = analyzeLoudness(trackIndex, clipIndex, 0, 0);
     if (!measured.value(QStringLiteral("ok")).toBool())
         return measured;
-    const double lufs = measured.value(QStringLiteral("lufs")).toDouble();
-    const double peakDb = measured.value(QStringLiteral("true_peak_db")).toDouble();
+    return applyNormalizeGain(trackIndex, clipIndex,
+                              measured.value(QStringLiteral("lufs")).toDouble(),
+                              measured.value(QStringLiteral("true_peak_db")).toDouble(),
+                              targetLufs);
+}
+
+QJsonObject McpController::applyNormalizeGain(int trackIndex, int clipIndex, double lufs,
+                                              double peakDb, double targetLufs)
+{
     const double deltaDb = targetLufs - lufs;
     // The measurement was taken through the clip's current volume, so the correction is relative
     // to it. Writing the gain as an absolute value discards whatever level the clip was already

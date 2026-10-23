@@ -6,6 +6,7 @@
 #include <QVariantList>
 
 #include "core/animation/FadeShape.h"
+#include "core/animation/Keyframe.h"
 
 // One track's clips, exposed as roles.
 //
@@ -55,6 +56,7 @@ public:
         FadeHandlesRole,
         EffectsRole,
         AudioEffectsRole,
+        VolumeKeysRole,
     };
     Q_ENUM(Role)
 
@@ -85,13 +87,17 @@ public:
         QVariantList fadeHandles;
         QVariantList effects;
         QVariantList audioEffects;
+        QVariantList volumeKeys;
 
         // Not roles: typed copies for the scene-graph renderer, derived from the fields above so
         // any change to them already arrives as a changed row.
         drift::FadeCurve fadeCurveTyped = drift::FadeCurve::Smooth;
         drift::FadeShape fadeShapeTyped;
+        drift::KeyframeTrack<double> volumeTyped;
         // The effect stack as one line, "(off)" marks included; empty when there are none.
         QString effectsLabel;
+        // "-6.0 dB" for a constant gain off unity; empty when keyframed or at unity.
+        QString volumeLabel;
     };
 
     // Empty time between two clips, in seconds.
