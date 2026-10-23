@@ -2761,6 +2761,14 @@
         <translation>මෙම පරිගණකයේ GPU පෙරදසුන් රෙන්ඩර් කිරීම ලබාගත නොහැක. උදව් → දෝෂහරණ තොරතුරු බලන්න.</translation>
     </message>
     <message>
+        <source>-inf dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Media rotated</source>
         <translation>මාධ්‍ය කරකවන ලදී</translation>
     </message>
@@ -2831,6 +2839,14 @@
     <message>
         <source>Zoom out</source>
         <translation>කුඩා කරන්න</translation>
+    </message>
+    <message>
+        <source>No audio in range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The clip is no longer in the timeline</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No audio track available for recording</source>
@@ -5098,6 +5114,10 @@
     <message>
         <source>Audio Mixer</source>
         <translation type="unfinished">ශ්‍රව්‍ය මිශ්‍රකය (Audio Mixer)</translation>
+    </message>
+    <message>
+        <source>Measuring… %1%</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Analyze</source>

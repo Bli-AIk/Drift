@@ -2756,6 +2756,14 @@
         <translation>이 컴퓨터에서는 GPU 미리보기 렌더링을 사용할 수 없습니다. 도움말 → 디버그 정보를 참조하세요.</translation>
     </message>
     <message>
+        <source>-inf dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Media rotated</source>
         <translation>미디어가 회전됨</translation>
     </message>
@@ -2826,6 +2834,14 @@
     <message>
         <source>Zoom out</source>
         <translation>축소</translation>
+    </message>
+    <message>
+        <source>No audio in range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The clip is no longer in the timeline</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No audio track available for recording</source>
@@ -5077,6 +5093,10 @@
     <message>
         <source>Audio Mixer</source>
         <translation type="unfinished">오디오 믹서</translation>
+    </message>
+    <message>
+        <source>Measuring… %1%</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Analyze</source>

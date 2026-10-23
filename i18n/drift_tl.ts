@@ -2388,6 +2388,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>No audio in range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The clip is no longer in the timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Clip added</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2675,6 +2683,14 @@
     </message>
     <message>
         <source>GPU preview rendering is unavailable on this machine. See Help → Debug info.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-inf dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 dB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5097,6 +5113,10 @@
     </message>
     <message>
         <source>Audio Mixer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Measuring… %1%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

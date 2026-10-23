@@ -2386,6 +2386,14 @@
         <translation>システムデフォルト</translation>
     </message>
     <message>
+        <source>No audio in range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The clip is no longer in the timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Clip added</source>
         <translation>クリップを追加しました</translation>
     </message>
@@ -2672,6 +2680,14 @@
     <message>
         <source>GPU preview rendering is unavailable on this machine. See Help → Debug info.</source>
         <translation>このマシンでは GPU プレビューレンダリングを利用できません。「ヘルプ」→「デバッグ情報」を参照してください。</translation>
+    </message>
+    <message>
+        <source>-inf dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 dB</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Media and referenced clips removed</source>
@@ -5077,6 +5093,10 @@
     <message>
         <source>Audio Mixer</source>
         <translation type="unfinished">オーディオミキサー</translation>
+    </message>
+    <message>
+        <source>Measuring… %1%</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Analyze</source>
