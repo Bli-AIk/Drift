@@ -10571,6 +10571,13 @@
     </message>
 </context>
 <context>
+    <name>MediaAssetsGridFrame</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MediaAssetsGridNameRow</name>
     <message>
         <source>Linked proxy</source>
@@ -10743,6 +10750,13 @@
     <message>
         <source>Expand folder</source>
         <translation type="unfinished">توسيع المجلد</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsListThumb</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12715,6 +12729,17 @@ If playback stutters, try another.</source>
         <source>Couldn’t read %1: %2</source>
         <translation>تعذر قراءة %1: %2</translation>
     </message>
+    <message numerus="yes">
+        <source>Project JSON loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
         <source>Project JSON loaded</source>
         <translation>تم تحميل JSON المشروع</translation>
@@ -12829,6 +12854,17 @@ If playback stutters, try another.</source>
     <message>
         <source>That project location isn’t valid</source>
         <translation>موقع المشروع هذا غير صالح</translation>
+    </message>
+    <message numerus="yes">
+        <source>Project loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Project loaded</source>
@@ -18324,6 +18360,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Variable frame rate. This clip can drift out of sync with its audio. Right-click it and choose Convert to edit-friendly format.</source>
         <translation>معدل إطارات متغير. قد يفقد هذا المقطع مزامنته مع الصوت. انقر بزر الماوس الأيمن عليه واختر تحويل إلى تنسيق ملائم للتحرير.</translation>
+    </message>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Transform layer: moves, scales and turns every track its bracket covers</source>

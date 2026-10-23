@@ -118,6 +118,18 @@ Rectangle {
         visible: !root.isFolder && kind === "video" && host.vfrWarningOf(root.assetId)
     }
 
+    VfrWarning {
+        z: 3
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: Theme.spacingSm
+        background: Theme.c.missingMediaWarning.background
+        foreground: Theme.c.missingMediaWarning.foreground
+        cornerRadius: Theme.c.missingMediaWarning.radius
+        tip: qsTr("Media file not found. Use Replace media… on this item to point it at the file again.")
+        visible: !root.isFolder && host.missingOf(root.assetId)
+    }
+
     // Proxy build progress along the thumbnail's bottom edge; the pill beside the
     // name below says which state it is in.
     ThemedProgressBar {

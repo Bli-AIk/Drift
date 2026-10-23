@@ -10391,6 +10391,13 @@
     </message>
 </context>
 <context>
+    <name>MediaAssetsGridFrame</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MediaAssetsGridNameRow</name>
     <message>
         <source>Linked proxy</source>
@@ -10538,6 +10545,13 @@
     <message>
         <source>Expand folder</source>
         <translation type="unfinished">폴더 펼치기</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsListThumb</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12449,6 +12463,12 @@ If playback stutters, try another.</source>
         <source>Couldn’t read %1: %2</source>
         <translation>%1을(를) 읽을 수 없습니다: %2</translation>
     </message>
+    <message numerus="yes">
+        <source>Project JSON loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
         <source>Project JSON loaded</source>
         <translation>프로젝트 JSON이 로드됨</translation>
@@ -12558,6 +12578,12 @@ If playback stutters, try another.</source>
     <message>
         <source>That project location isn’t valid</source>
         <translation>해당 프로젝트 위치가 올바르지 않습니다</translation>
+    </message>
+    <message numerus="yes">
+        <source>Project loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Project loaded</source>
@@ -18031,6 +18057,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Variable frame rate. This clip can drift out of sync with its audio. Right-click it and choose Convert to edit-friendly format.</source>
         <translation>가변 프레임 속도입니다. 이 클립은 오디오와 동기화가 어긋날 수 있습니다. 마우스 오른쪽 버튼으로 클릭하고 편집하기 좋은 형식으로 변환을 선택하세요.</translation>
+    </message>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Transform layer: moves, scales and turns every track its bracket covers</source>

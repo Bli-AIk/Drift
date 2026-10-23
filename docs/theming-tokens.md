@@ -46,8 +46,8 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | exportGradientTop | #ffcf4a | #ffcf4a |
 | exportGradientBottom | #f59e0b | #f59e0b |
 | exportGlow | #fbbf24 | #fbbf24 |
-| scrim | #00000066 | #00000066 |
-| scrimStrong | #000000b3 | #000000b3 |
+| scrim | #66000000 | #66000000 |
+| scrimStrong | #b3000000 | #b3000000 |
 | overlay | #000000 | #000000 |
 | guideStrong | #99ffffff | #99ffffff |
 | guideMedium | #80ffffff | #80ffffff |
@@ -516,7 +516,7 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | navRailButton | backgroundSelected | $semantic.panel.secondary.background | $semantic.panel.secondary.background |
 | navRailButton | backgroundPressed | $semantic.panel.accent | $semantic.panel.accent |
 | navRailButton | radius | $metrics.radius.pill | $metrics.radius.pill |
-| editorHeaderExportButton | radius | $metrics.radius.md | $metrics.radius.md |
+| editorHeaderExportButton | radius | $metrics.radius.sm | $metrics.radius.sm |
 | editorHeaderExportButton | glow | $semantic.export.glow | $semantic.export.glow |
 | editorHeaderExportButton | gradientTop | $semantic.export.gradientTop | $semantic.export.gradientTop |
 | editorHeaderExportButton | gradientBottom | $semantic.export.gradientBottom | $semantic.export.gradientBottom |
@@ -630,7 +630,7 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | globalSearchPopup | border | $semantic.panel.border | $semantic.panel.border |
 | globalSearchPopup | radius | $metrics.radius.md | $metrics.radius.md |
 | globalSearchPopup | foregroundMuted | $semantic.mutedForeground | $semantic.mutedForeground |
-| editorHeaderProjectsButton | radius | $metrics.radius.pill | $metrics.radius.pill |
+| editorHeaderProjectsButton | radius | $metrics.radius.sm | $metrics.radius.sm |
 | editorHeaderProjectsButton | backgroundHover | $semantic.popoverHover | $semantic.popoverHover |
 | editorHeaderProjectsButton | background | $semantic.accent | $semantic.accent |
 | editorHeaderProjectsButton | statusRadius | 4 | 4 |
@@ -652,7 +652,7 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | editorHeaderExtrasWave | radius | $metrics.radius.pill | $metrics.radius.pill |
 | editorHeaderExtrasWave | borderWidth | $metrics.borderWidthFocus | $metrics.borderWidthFocus |
 | editorHeaderExtrasWave | border | $semantic.destructive | $semantic.destructive |
-| editorHeaderSearchField | radius | $metrics.radius.pill | $metrics.radius.pill |
+| editorHeaderSearchField | radius | $metrics.radius.sm | $metrics.radius.sm |
 | editorHeaderSearchField | background | $semantic.panel.accent | $semantic.panel.accent |
 | editorHeaderSearchField | borderWidthFocus | $metrics.borderWidthFocus | $metrics.borderWidthFocus |
 | editorHeaderSearchField | borderWidth | 0 | 0 |
@@ -718,6 +718,9 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | vfrWarning | radius | $metrics.radius.pill | $metrics.radius.pill |
 | vfrWarning | background | $semantic.warning | $semantic.warning |
 | vfrWarning | foreground | $semantic.onMedia | $semantic.onMedia |
+| missingMediaWarning | radius | $metrics.radius.pill | $metrics.radius.pill |
+| missingMediaWarning | background | $semantic.destructive | $semantic.destructive |
+| missingMediaWarning | foreground | $semantic.onMedia | $semantic.onMedia |
 | shortcutCaptureField | radius | $metrics.radius.sm | $metrics.radius.sm |
 | shortcutCaptureField | backgroundCapturing | $semantic.panel.secondary.background | $semantic.panel.secondary.background |
 | shortcutCaptureField | backgroundHover | $semantic.popoverHover | $semantic.popoverHover |
@@ -988,6 +991,7 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | timelineClipItem | editFriendlyBackground | $semantic.clip.editFriendly | $semantic.clip.editFriendly |
 | timelineClipItem | editFriendlyForeground | $semantic.clip.editFriendlyForeground | $semantic.clip.editFriendlyForeground |
 | timelineClipItem | warning | $semantic.warning | $semantic.warning |
+| timelineClipItem | missing | $semantic.destructive | $semantic.destructive |
 | timelineClipItem | radius | $metrics.radius.sm | $metrics.radius.sm |
 | timelineClipItem | radiusXs | $metrics.radius.xs | $metrics.radius.xs |
 | timelineClipItem | selectionBorderWidth | $metrics.timeline.clipSelectionRingWidth | $metrics.timeline.clipSelectionRingWidth |
@@ -2050,7 +2054,7 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | mediaAssetsEmptyState | foregroundMuted | $semantic.mutedForeground | $semantic.mutedForeground |
 | mediaAssetsEmptyState | formatsBorder | $semantic.panel.border | $semantic.panel.border |
 | mediaAssetsEmptyState | formatsBorderWidth | $metrics.borderWidth | $metrics.borderWidth |
-| mediaAssetsEmptyState | formatsRadius | $metrics.radius.md | $metrics.radius.md |
+| mediaAssetsEmptyState | formatsRadius | $metrics.radius.sm | $metrics.radius.sm |
 | mediaAssetsEmptyState | icon | $semantic.mutedForeground | $semantic.mutedForeground |
 | mediaAssetsEmptyState | iconBackground | $semantic.panel.accent | $semantic.panel.accent |
 | mediaAssetsEmptyState | iconRadius | $metrics.radius.md | $metrics.radius.md |
@@ -2578,7 +2582,7 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | dialog.widthLg | 660 | 660 |
 | dialog.margin | 32 | 32 |
 | headerHeight | 54.4 | 54.4 |
-| panelGap | 3 | 3 |
+| panelGap | 6 | 6 |
 | pagePadding | 12 | 12 |
 | panelHeaderHeight.pointer | 44 | 44 |
 | panelHeaderHeight.touch | 52 | 52 |

@@ -10427,6 +10427,13 @@
     </message>
 </context>
 <context>
+    <name>MediaAssetsGridFrame</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MediaAssetsGridNameRow</name>
     <message>
         <source>Linked proxy</source>
@@ -10579,6 +10586,13 @@
     <message>
         <source>Expand folder</source>
         <translation type="unfinished">Espandi cartella</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsListThumb</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12507,6 +12521,13 @@ Se la riproduzione va a scatti, prova un&apos;altra opzione.</translation>
         <source>Couldn’t read %1: %2</source>
         <translation>Impossibile leggere %1: %2</translation>
     </message>
+    <message numerus="yes">
+        <source>Project JSON loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
         <source>Project JSON loaded</source>
         <translation>JSON del progetto caricato</translation>
@@ -12617,6 +12638,13 @@ Se la riproduzione va a scatti, prova un&apos;altra opzione.</translation>
     <message>
         <source>That project location isn’t valid</source>
         <translation>Il percorso del progetto non è valido</translation>
+    </message>
+    <message numerus="yes">
+        <source>Project loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Project loaded</source>
@@ -18096,6 +18124,10 @@ Se la riproduzione va a scatti, prova un&apos;altra opzione.</translation>
     <message>
         <source>Variable frame rate. This clip can drift out of sync with its audio. Right-click it and choose Convert to edit-friendly format.</source>
         <translation>Frequenza dei fotogrammi variabile. Questa clip può perdere la sincronizzazione con l&apos;audio. Fai clic con il tasto destro su di essa e scegli Converti in un formato ottimizzato per la modifica.</translation>
+    </message>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Transform layer: moves, scales and turns every track its bracket covers</source>

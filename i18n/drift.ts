@@ -10427,6 +10427,13 @@
     </message>
 </context>
 <context>
+    <name>MediaAssetsGridFrame</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MediaAssetsGridNameRow</name>
     <message>
         <source>Linked proxy</source>
@@ -10578,6 +10585,13 @@
     </message>
     <message>
         <source>Expand folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsListThumb</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -12501,6 +12515,13 @@ If playback stutters, try another.</source>
         <source>Couldn’t read %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <source>Project JSON loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
         <source>Project JSON loaded</source>
         <translation type="unfinished"></translation>
@@ -12611,6 +12632,13 @@ If playback stutters, try another.</source>
     <message>
         <source>That project location isn’t valid</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Project loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Project loaded</source>
@@ -18087,6 +18115,10 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>Variable frame rate. This clip can drift out of sync with its audio. Right-click it and choose Convert to edit-friendly format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

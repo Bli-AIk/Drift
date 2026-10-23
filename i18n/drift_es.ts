@@ -10427,6 +10427,13 @@
     </message>
 </context>
 <context>
+    <name>MediaAssetsGridFrame</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MediaAssetsGridNameRow</name>
     <message>
         <source>Linked proxy</source>
@@ -10579,6 +10586,13 @@
     <message>
         <source>Expand folder</source>
         <translation type="unfinished">Expandir carpeta</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsListThumb</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12507,6 +12521,13 @@ Si la reproducción se corta, prueba con otra opción.</translation>
         <source>Couldn’t read %1: %2</source>
         <translation>No se pudo leer %1: %2</translation>
     </message>
+    <message numerus="yes">
+        <source>Project JSON loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
         <source>Project JSON loaded</source>
         <translation>JSON del proyecto cargado</translation>
@@ -12617,6 +12638,13 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     <message>
         <source>That project location isn’t valid</source>
         <translation>Esa ubicación de proyecto no es válida</translation>
+    </message>
+    <message numerus="yes">
+        <source>Project loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Project loaded</source>
@@ -18096,6 +18124,10 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     <message>
         <source>Variable frame rate. This clip can drift out of sync with its audio. Right-click it and choose Convert to edit-friendly format.</source>
         <translation>Velocidad de fotogramas variable. Este clip puede desincronizarse de su audio. Haz clic derecho en él y elige Convertir a formato optimizado para edición.</translation>
+    </message>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Transform layer: moves, scales and turns every track its bracket covers</source>

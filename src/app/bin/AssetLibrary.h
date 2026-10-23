@@ -34,8 +34,8 @@ class AssetLibrary : public QAbstractListModel
     Q_PROPERTY(QString proxyCurrentName READ proxyCurrentName NOTIFY proxyJobsChanged)
     Q_PROPERTY(int proxyQueuedCount READ proxyQueuedCount NOTIFY proxyJobsChanged)
     // Bumped whenever anything the bin and timeline badges show changes for any asset: proxy
-    // state, the variable-frame-rate check, the edit-friendly mark. The badge queries are function
-    // calls QML can't track, so bindings name this alongside them to re-read.
+    // state, the variable-frame-rate check, the edit-friendly mark, the missing-file check. The badge
+    // queries are function calls QML can't track, so bindings name this alongside them to re-read.
     Q_PROPERTY(int badgeRevision READ badgeRevision NOTIFY badgeRevisionChanged)
 
 public:
@@ -199,6 +199,9 @@ public:
     // never checked starts the check in the background and answers false until it lands.
     Q_INVOKABLE bool isVariableFrameRate(const QString &assetId);
     Q_INVOKABLE bool isEditFriendly(const QString &assetId) const;
+    // The asset's file is gone from disk. Checked when the project is set or changes, not on each ask.
+    Q_INVOKABLE bool isMissing(const QString &assetId) const;
+    int missingCount() const { return int(m_missing.size()); }
     Q_INVOKABLE void createProxies(const QStringList &assetIds);
     // Drops queued jobs and deletes built proxies. Not undoable, and doesn't need to be: a
     // proxy is a cache, not project content.
@@ -282,6 +285,7 @@ private:
                            bool suggestProxy = false, bool variableFrameRate = false);
     void startNextProxy();
     void bumpBadges();
+    void refreshMissing();
     // `sourcePath` is the file the job actually read. It is compared against the asset's current
     // path on landing so a result for media that has since been replaced is dropped.
     void applyThumbResult(const QString &assetId, const QString &sourcePath, const QString &thumb,
@@ -344,6 +348,8 @@ private:
     QString m_proxyBuilding;
     double m_proxyProgress = 0.0;
     int m_badgeRevision = 0;
+    // Asset ids whose file is absent from disk. Image sequences and composites are never in it.
+    QSet<QString> m_missing;
     QAtomicInt m_proxyCancel;
     // Its own single-thread pool: a proxy render runs for minutes and must not hold up the
     // probe and thumbnail jobs on m_jobs.

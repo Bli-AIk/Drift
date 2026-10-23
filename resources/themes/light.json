@@ -903,6 +903,11 @@
       "background": "$semantic.warning",
       "foreground": "$semantic.onMedia"
     },
+    "missingMediaWarning": {
+      "radius": "$metrics.radius.pill",
+      "background": "$semantic.destructive",
+      "foreground": "$semantic.onMedia"
+    },
     "shortcutCaptureField": {
       "radius": "$metrics.radius.sm",
       "backgroundCapturing": "$semantic.panel.secondary.background",
@@ -1276,6 +1281,7 @@
       "editFriendlyBackground": "$semantic.clip.editFriendly",
       "editFriendlyForeground": "$semantic.clip.editFriendlyForeground",
       "warning": "$semantic.warning",
+      "missing": "$semantic.destructive",
       "radius": "$metrics.radius.sm",
       "radiusXs": "$metrics.radius.xs",
       "selectionBorderWidth": "$metrics.timeline.clipSelectionRingWidth",

@@ -119,6 +119,7 @@ void ProjectFileController::sweepExtractionDirs()
 
     QSet<QString> live;
     QSet<QString> liveFiles; // files outside any bundle that a known project still points at
+    bool unreadableRecent = false;
 
     // A project's own id is not the only directory it depends on: a Save As copy gets a fresh id
     // but inherits the original's freeze frames, captures and media edits, which stay where they
@@ -140,8 +141,10 @@ void ProjectFileController::sweepExtractionDirs()
         const QString path = entry.toMap().value(QStringLiteral("path")).toString();
         QString error;
         const auto info = drift::bundle::readManifest(path, &error);
-        if (!info)
+        if (!info) {
+            unreadableRecent = true;
             continue;
+        }
         live.insert(info->projectId);
         for (const drift::bundle::MediaEntry &media : info->media) {
             // Only referencing entries name a path on this machine; an embedded one records where
@@ -173,8 +176,11 @@ void ProjectFileController::sweepExtractionDirs()
     live.insert(m_app->m_project.id());
 #endif
 
+    // A recent project whose manifest can't be read right now (a Flatpak document-portal path
+    // after a reboot, say) may still reference media under projects, so nothing is reclaimed
+    // until every recent can be read.
     QDir root(QDir(base).filePath(QStringLiteral("projects")));
-    if (root.exists()) {
+    if (root.exists() && !unreadableRecent) {
         const QFileInfoList dirs = root.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
         for (const QFileInfo &dir : dirs) {
             if (!live.contains(dir.fileName()))
@@ -1331,8 +1337,11 @@ void ProjectFileController::finishLoad(int generation, const QUrl &url,
         setDirty(true);
         deleteRecoveryFile();
         m_app->setProjectLayoutChosen(true);
-        const QString message = tr("Project JSON loaded");
-        m_app->setLastMessage(message, QStringLiteral("success"));
+        const int missing = m_app->m_assetLibrary->missingCount();
+        const QString message = missing > 0
+            ? tr("Project JSON loaded, but %n media file(s) could not be found", nullptr, missing)
+            : tr("Project JSON loaded");
+        m_app->setLastMessage(message, missing > 0 ? QStringLiteral("warning") : QStringLiteral("success"));
         finishProjectLoad(true, message);
         return;
     }
@@ -1357,8 +1366,11 @@ void ProjectFileController::finishLoad(int generation, const QUrl &url,
     addRecentProject(location);
     deleteRecoveryFile();
     m_app->setProjectLayoutChosen(true);
-    const QString message = tr("Project loaded");
-    m_app->setLastMessage(message, QStringLiteral("success"));
+    const int missing = m_app->m_assetLibrary->missingCount();
+    const QString message = missing > 0
+        ? tr("Project loaded, but %n media file(s) could not be found", nullptr, missing)
+        : tr("Project loaded");
+    m_app->setLastMessage(message, missing > 0 ? QStringLiteral("warning") : QStringLiteral("success"));
     reportMissingAddons(bundle.addons);
     finishProjectLoad(true, message);
 }

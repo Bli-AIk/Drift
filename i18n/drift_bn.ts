@@ -10427,6 +10427,13 @@
     </message>
 </context>
 <context>
+    <name>MediaAssetsGridFrame</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MediaAssetsGridNameRow</name>
     <message>
         <source>Linked proxy</source>
@@ -10579,6 +10586,13 @@
     <message>
         <source>Expand folder</source>
         <translation type="unfinished">ফোল্ডার প্রসারিত করুন</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsListThumb</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12507,6 +12521,13 @@ If playback stutters, try another.</source>
         <source>Couldn’t read %1: %2</source>
         <translation type="unfinished">পড়া যায়নি %1 : %2</translation>
     </message>
+    <message numerus="yes">
+        <source>Project JSON loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
         <source>Project JSON loaded</source>
         <translation type="unfinished">প্রকল্প JSON লোড হয়েছে।</translation>
@@ -12617,6 +12638,13 @@ If playback stutters, try another.</source>
     <message>
         <source>That project location isn’t valid</source>
         <translation type="unfinished">প্রকল্পের অবস্থানটি বৈধ নয়।</translation>
+    </message>
+    <message numerus="yes">
+        <source>Project loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Project loaded</source>
@@ -18096,6 +18124,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Variable frame rate. This clip can drift out of sync with its audio. Right-click it and choose Convert to edit-friendly format.</source>
         <translation>পরিবর্তনশীল ফ্রেম রেট। এই ক্লিপের অডিওর সঙ্গে সিঙ্ক নষ্ট হতে পারে। ক্লিপে রাইট-ক্লিক করে সম্পাদনার উপযোগী ফরম্যাটে রূপান্তরের বিকল্পটি বেছে নিন.</translation>
+    </message>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Transform layer: moves, scales and turns every track its bracket covers</source>

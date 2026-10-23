@@ -187,6 +187,7 @@ PanelFrame {
             "editFriendlyPill": Theme.c.timelineClipItem.editFriendlyBackground,
             "editFriendlyPillForeground": Theme.c.timelineClipItem.editFriendlyForeground,
             "warning": Theme.c.timelineClipItem.warning,
+            "missing": Theme.c.timelineClipItem.missing,
             "fontFamily": Theme.fontFamily,
             "fontSizeTiny": Theme.fontSizeTiny,
             "fontSizeXs": Theme.fontSizeXs,
@@ -208,6 +209,7 @@ PanelFrame {
             "editFriendlyLabel": qsTr("Edit-friendly"),
             "editFriendlyTooltip": qsTr("Converted to a constant frame rate for smooth editing"),
             "vfrTooltip": qsTr("Variable frame rate. This clip can drift out of sync with its audio. Right-click it and choose Convert to edit-friendly format."),
+            "missingTooltip": qsTr("Media file not found. Use Replace media… on this item to point it at the file again."),
             "spanToolTip": qsTr("Transform layer: moves, scales and turns every track its bracket covers")
         })
     }

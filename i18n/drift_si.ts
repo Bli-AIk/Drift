@@ -10427,6 +10427,13 @@
     </message>
 </context>
 <context>
+    <name>MediaAssetsGridFrame</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MediaAssetsGridNameRow</name>
     <message>
         <source>Linked proxy</source>
@@ -10579,6 +10586,13 @@
     <message>
         <source>Expand folder</source>
         <translation type="unfinished">ෆෝල්ඩරය විහිදන්න</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsListThumb</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12507,6 +12521,13 @@ If playback stutters, try another.</source>
         <source>Couldn’t read %1: %2</source>
         <translation>%1 කියවීමට නොහැකි විය: %2</translation>
     </message>
+    <message numerus="yes">
+        <source>Project JSON loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
         <source>Project JSON loaded</source>
         <translation>ව්‍යාපෘති JSON පූරණය විය</translation>
@@ -12617,6 +12638,13 @@ If playback stutters, try another.</source>
     <message>
         <source>That project location isn’t valid</source>
         <translation>එම ව්‍යාපෘති ස්ථානය වලංගු නැත</translation>
+    </message>
+    <message numerus="yes">
+        <source>Project loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Project loaded</source>
@@ -18096,6 +18124,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Variable frame rate. This clip can drift out of sync with its audio. Right-click it and choose Convert to edit-friendly format.</source>
         <translation>විචල්‍ය රාමු අනුපාතය. මෙම ක්ලිපය එහි ශ්‍රව්‍ය සමඟ අසමමුහුර්ත විය හැක. එය මත දකුණු ක්ලික් කර &apos;සංස්කරණයට පහසු ආකෘතියකට පරිවර්තනය කරන්න&apos; තෝරන්න.</translation>
+    </message>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Transform layer: moves, scales and turns every track its bracket covers</source>

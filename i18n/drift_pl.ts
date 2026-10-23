@@ -10463,6 +10463,13 @@
     </message>
 </context>
 <context>
+    <name>MediaAssetsGridFrame</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MediaAssetsGridNameRow</name>
     <message>
         <source>Linked proxy</source>
@@ -10620,6 +10627,13 @@
     <message>
         <source>Expand folder</source>
         <translation type="unfinished">Rozwiń folder</translation>
+    </message>
+</context>
+<context>
+    <name>MediaAssetsListThumb</name>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12559,6 +12573,14 @@ Jeśli odtwarzanie się zacina, spróbuj innego.</translation>
         <source>Couldn’t read %1: %2</source>
         <translation>Nie udało się odczytać %1: %2</translation>
     </message>
+    <message numerus="yes">
+        <source>Project JSON loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
         <source>Project JSON loaded</source>
         <translation>Załadowano JSON projektu</translation>
@@ -12670,6 +12692,14 @@ Jeśli odtwarzanie się zacina, spróbuj innego.</translation>
     <message>
         <source>That project location isn’t valid</source>
         <translation>Ta lokalizacja projektu jest nieprawidłowa</translation>
+    </message>
+    <message numerus="yes">
+        <source>Project loaded, but %n media file(s) could not be found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Project loaded</source>
@@ -18153,6 +18183,10 @@ Jeśli odtwarzanie się zacina, spróbuj innego.</translation>
     <message>
         <source>Variable frame rate. This clip can drift out of sync with its audio. Right-click it and choose Convert to edit-friendly format.</source>
         <translation>Zmienna liczba klatek. Ten klip może wyjść z synchronizacji z audio. Kliknij prawym przyciskiem i wybierz Konwertuj do formatu przyjaznego edycji.</translation>
+    </message>
+    <message>
+        <source>Media file not found. Use Replace media… on this item to point it at the file again.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Transform layer: moves, scales and turns every track its bracket covers</source>

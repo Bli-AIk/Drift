@@ -894,12 +894,15 @@ void TimelineTrackItem::appendClip(int index, const QRectF &baseRect, bool selec
         appendRect(m_over, bandRect, proxy ? s.proxyBand : s.scrim, ox);
 
         QString assetId;
+        if (m_assets && !row.path.isEmpty())
+            assetId = m_assets->assetIdForPath(row.path);
+        const bool missing = !assetId.isEmpty() && m_assets->isMissing(assetId);
         bool editFriendly = false;
         bool vfr = false;
         if (m_assets && row.kind == QLatin1String("video")) {
-            assetId = m_assets->assetIdForPath(row.path);
             editFriendly = !assetId.isEmpty() && m_assets->isEditFriendly(assetId);
-            vfr = !assetId.isEmpty() && !editFriendly && m_assets->isVariableFrameRate(assetId);
+            vfr = !assetId.isEmpty() && !editFriendly && !missing
+                  && m_assets->isVariableFrameRate(assetId);
         }
 
         const double rowLeft = rect.left() + 6.0;
@@ -923,19 +926,23 @@ void TimelineTrackItem::appendClip(int index, const QRectF &baseRect, bool selec
                                   + (showEditPill ? editSize.width() + spacing : 0.0);
 
         double x = rowLeft;
-        if (vfr) {
+        const auto drawBadge = [&](const QColor &fill, const QString &tip) {
             const double size = std::min(s.iconSizeSm, band - 2.0);
             const QRectF badge(x, centerY - size / 2.0, size, size);
-            appendRoundedRect(m_over, badge, size / 2.0, s.warning, ox);
+            appendRoundedRect(m_over, badge, size / 2.0, fill, ox);
             const QFont bangFont = labelFont(m_fontFamily, size * 0.75, true);
             const QFontMetricsF bangMetrics(bangFont);
             m_labels.append({QStringLiteral("!"),
                              QPointF(badge.center().x() - bangMetrics.horizontalAdvance(QLatin1Char('!')) / 2.0 - ox,
                                      badge.center().y() - bangMetrics.height() / 2.0),
                              size * 0.75, s.onMedia, true});
-            visual.toolTips.append({badge, s.vfrTooltip});
+            visual.toolTips.append({badge, tip});
             x += size + spacing;
-        }
+        };
+        if (vfr)
+            drawBadge(s.warning, s.vfrTooltip);
+        if (missing)
+            drawBadge(s.missing, s.missingTooltip);
 
         const double nameRoom = std::max(0.0, rowLeft + rowWidth - x - pillsWidth);
         const QString name = tinyMetrics.elidedText(row.name, Qt::ElideRight, nameRoom);

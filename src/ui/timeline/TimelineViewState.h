@@ -76,6 +76,7 @@ public:
         QColor editFriendlyPill{"#5AA9E6"};
         QColor editFriendlyPillForeground{"#06203A"};
         QColor warning{"#f97316"};
+        QColor missing;
         QString fontFamily;
         double fontSizeTiny = 9.6;
         double fontSizeXs = 11.52;
@@ -97,6 +98,7 @@ public:
         QString editFriendlyLabel;
         QString editFriendlyTooltip;
         QString vfrTooltip;
+        QString missingTooltip;
         // Hovering a transform clip: what it does to the tracks under it.
         QString spanToolTip;
     };
