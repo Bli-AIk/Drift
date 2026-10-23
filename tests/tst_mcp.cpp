@@ -154,6 +154,7 @@ private slots:
     void setVolumeRoundTrips();
     void writingAtAKeyframeReadbackTimeReusesTheKey();
     void keyframeWritesStayInsideTheClip();
+    void keyframeEasingThroughMcp();
     void normalizeVolumeIsRelativeAndIdempotent();
     void duckUnderIsIdempotentAndKeepsTheEnvelope();
     void audioReadOpsAreNotUndoable();
@@ -312,7 +313,7 @@ void McpTest::catalogOpsIncludeWhen()
     // Budgets, not targets: ~270 ops with one-line "when" hints. Raise only with new ops.
     QVERIFY(QJsonDocument(compact).toJson(QJsonDocument::Compact).size() < 21400);
     QVERIFY(QJsonDocument(drift::mcp::catalogPayload({{QStringLiteral("brief"), true}}))
-                .toJson(QJsonDocument::Compact).size() < 10700);
+                .toJson(QJsonDocument::Compact).size() < 10800);
 
     const QJsonObject cat = drift::mcp::catalogPayload(
         {{QStringLiteral("guide"), true}, {QStringLiteral("endpoints"), true}});
@@ -2210,6 +2211,85 @@ void McpTest::writingAtAKeyframeReadbackTimeReusesTheKey()
         QStringLiteral("list_keyframes"),
         {{QStringLiteral("clip"), clip}, {QStringLiteral("prop"), QStringLiteral("opacity")}});
     QCOMPARE(distinct.value(QStringLiteral("keys")).toArray().size(), 2);
+}
+
+void McpTest::keyframeEasingThroughMcp()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    drift::mcp::McpDispatcher dispatcher(&state);
+
+    const QJsonObject text = dispatcher.applyOne(
+        QStringLiteral("add_text"),
+        {{QStringLiteral("text"), QStringLiteral("A")}, {QStringLiteral("at"), 0.0}});
+    QVERIFY(text.value(QStringLiteral("ok")).toBool());
+    const QString clip = text.value(QStringLiteral("id")).toString();
+    for (const double at : {0.0, 1.0, 2.0}) {
+        QVERIFY(dispatcher
+                    .applyOne(QStringLiteral("set_keyframe"),
+                              {{QStringLiteral("clip"), clip}, {QStringLiteral("prop"), QStringLiteral("opacity")},
+                               {QStringLiteral("at"), at}, {QStringLiteral("value"), 0.2 * (at + 1.0)}})
+                    .value(QStringLiteral("ok"))
+                    .toBool());
+    }
+
+    const QJsonObject presets = dispatcher.applyOne(QStringLiteral("list_easing_presets"), {});
+    QVERIFY(presets.value(QStringLiteral("ok")).toBool());
+    QStringList ids;
+    for (const QJsonValue &v : presets.value(QStringLiteral("presets")).toArray()) {
+        ids.append(v.toObject().value(QStringLiteral("id")).toString());
+        QVERIFY(!v.toObject().contains(QStringLiteral("samples")));
+    }
+    QVERIFY(ids.contains(QStringLiteral("elasticOut")));
+    QVERIFY(ids.contains(QStringLiteral("linear")));
+
+    auto keysOf = [&]() {
+        return dispatcher
+            .applyOne(QStringLiteral("list_keyframes"),
+                      {{QStringLiteral("clip"), clip}, {QStringLiteral("prop"), QStringLiteral("opacity")}})
+            .value(QStringLiteral("keys"))
+            .toArray();
+    };
+    auto setEasing = [&](QJsonObject extra) {
+        extra.insert(QStringLiteral("clip"), clip);
+        extra.insert(QStringLiteral("prop"), QStringLiteral("opacity"));
+        return dispatcher.applyOne(QStringLiteral("set_keyframe_easing"), extra);
+    };
+
+    QVERIFY(setEasing({{QStringLiteral("at"), 0.0}, {QStringLiteral("preset"), QStringLiteral("cubicOut")}})
+                .value(QStringLiteral("ok"))
+                .toBool());
+    QCOMPARE(keysOf().at(0).toObject().value(QStringLiteral("segmentEasing")).toString(), QStringLiteral("cubicOut"));
+    QVERIFY(!keysOf().at(2).toObject().contains(QStringLiteral("segmentEasing")));
+
+    QVERIFY(setEasing({{QStringLiteral("at"), 1.0},
+                       {QStringLiteral("bezier"), QJsonArray{0.1, 0.7, 0.2, 1.0}}})
+                .value(QStringLiteral("ok"))
+                .toBool());
+    const QJsonObject bezier = keysOf().at(1).toObject().value(QStringLiteral("segmentEasing")).toObject();
+    QCOMPARE(bezier.value(QStringLiteral("kind")).toString(), QStringLiteral("bezier"));
+    QCOMPARE(bezier.value(QStringLiteral("x1")).toDouble(), 0.1);
+
+    QVERIFY(setEasing({{QStringLiteral("at"), 0.0}, {QStringLiteral("fn"), QStringLiteral("bounceOut")}})
+                .value(QStringLiteral("ok"))
+                .toBool());
+    // bounceOut at the default amplitude and period is the built-in preset, so the readback names it.
+    QCOMPARE(keysOf().at(0).toObject().value(QStringLiteral("segmentEasing")).toString(), QStringLiteral("bounceOut"));
+
+    QVERIFY(setEasing({{QStringLiteral("all"), true}, {QStringLiteral("preset"), QStringLiteral("expoIn")}})
+                .value(QStringLiteral("ok"))
+                .toBool());
+    QCOMPARE(keysOf().at(0).toObject().value(QStringLiteral("segmentEasing")).toString(), QStringLiteral("expoIn"));
+    QCOMPARE(keysOf().at(1).toObject().value(QStringLiteral("segmentEasing")).toString(), QStringLiteral("expoIn"));
+
+    const QJsonObject unknown = setEasing({{QStringLiteral("at"), 0.0}, {QStringLiteral("preset"), QStringLiteral("noSuchCurve")}});
+    QVERIFY(!unknown.value(QStringLiteral("ok")).toBool());
+    QCOMPARE(unknown.value(QStringLiteral("error")).toString(), QStringLiteral("bad_args"));
+
+    const QJsonObject twoShapes = setEasing({{QStringLiteral("at"), 0.0}, {QStringLiteral("preset"), QStringLiteral("linear")},
+                                             {QStringLiteral("fn"), QStringLiteral("elasticIn")}});
+    QVERIFY(!twoShapes.value(QStringLiteral("ok")).toBool());
+    QCOMPARE(twoShapes.value(QStringLiteral("error")).toString(), QStringLiteral("bad_args"));
 }
 
 void McpTest::setVolumeRoundTrips()

@@ -1188,6 +1188,24 @@ public:
                                               const QString &mode);
     Q_INVOKABLE void setKeyframeEasingAt(int trackIndex, int clipIndex, const QString &prop,
                                          double atSeconds, const QString &mode);
+    // Curve-editor easing, addressed by key time. A spec is an EasingSpec::toJson() map. The
+    // `preview` variant skips the undo entry; the QML wraps it in begin/commitPreviewDrag.
+    Q_INVOKABLE QVariantList easingPresets() const;
+    Q_INVOKABLE QVariantList easingSamples(const QVariantMap &spec, int n) const;
+    Q_INVOKABLE QVariantMap keyframeSegmentEasing(int trackIndex, int clipIndex, const QString &prop,
+                                                  double atSeconds) const;
+    Q_INVOKABLE void setKeyframeSegmentEasing(int trackIndex, int clipIndex, const QString &prop,
+                                              double atSeconds, const QVariantMap &spec);
+    Q_INVOKABLE void previewSetKeyframeSegmentEasing(int trackIndex, int clipIndex,
+                                                     const QString &prop, double atSeconds,
+                                                     const QVariantMap &spec);
+    Q_INVOKABLE void applyEasingToAllSegments(int trackIndex, int clipIndex, const QString &prop,
+                                              const QVariantMap &spec);
+    Q_INVOKABLE QString saveEasingPreset(const QString &label, const QVariantMap &spec);
+    Q_INVOKABLE bool renameEasingPreset(const QString &id, const QString &label);
+    Q_INVOKABLE bool deleteEasingPreset(const QString &id);
+    Q_INVOKABLE void copyEasingToClipboard(const QVariantMap &spec) const;
+    Q_INVOKABLE QVariantMap easingFromClipboard() const;
     Q_INVOKABLE void resetClipTransform(int trackIndex, int clipIndex);
     Q_INVOKABLE QVariantList effectCatalog() const;
     Q_INVOKABLE QVariantList effectCategories() const;
@@ -1522,6 +1540,7 @@ public:
 
 signals:
     void userTextAnimationPresetsChanged();
+    void easingPresetsChanged();
 
     // A text clip was added with no text; the preview should open its inline
     // editor so the user can type straight onto the canvas.
@@ -1716,6 +1735,8 @@ protected:
                               double outDy, bool corner);
     void syncLinkedTangents(int trackIndex, int clipIndex, const QString &prop, double atSeconds,
                             double inDx, double inDy, double outDx, double outDy, bool corner);
+    bool shapeKeyframeSegments(int trackIndex, int clipIndex, const QString &prop, double atSeconds,
+                               const drift::EasingSpec &spec, bool allSegments);
     // Recollects m_beatSnapTargets from whichever layers are currently visible.
     void rebuildBeatSnapTargets();
     // Beat onsets plus project bookmarks — anything clips should magnet to when snap is on.

@@ -5,6 +5,8 @@
 
 #include "core/text/TextStyle.h"
 #include "core/base/Time.h"
+#include "core/animation/Easing.h"
+#include "core/animation/EasingPresetStore.h"
 #include "app/editor/AppController.h"
 #include "app/bin/AssetLibrary.h"
 #include "app/bin/MediaBinController.h"
@@ -827,6 +829,10 @@ QJsonObject McpDispatcher::applyOneUnchecked(const QString &tool, const QJsonObj
         return opSetKeyframeTangents(args);
     if (tool == QLatin1String("set_keyframe_hold"))
         return opSetKeyframeHold(args);
+    if (tool == QLatin1String("set_keyframe_easing"))
+        return opSetKeyframeEasing(args);
+    if (tool == QLatin1String("list_easing_presets"))
+        return opListEasingPresets();
     if (tool == QLatin1String("set_property_keyframes_enabled"))
         return opSetPropertyKeyframesEnabled(args);
     if (tool == QLatin1String("list_speed_curve"))
@@ -2022,10 +2028,11 @@ QJsonObject McpDispatcher::opListKeyframes(const QJsonObject &args) const
         return err("bad_args", QStringLiteral("prop required"));
     const QVariantList keys = m_controller->clipKeyframes(ref.track, ref.clip, prop);
     QJsonArray points;
-    for (const QVariant &entry : keys) {
-        const QVariantMap map = entry.toMap();
-        points.append(QJsonObject{
-            {QStringLiteral("seconds"), map.value(QStringLiteral("seconds")).toDouble()},
+    for (qsizetype i = 0; i < keys.size(); ++i) {
+        const QVariantMap map = keys.at(i).toMap();
+        const double seconds = map.value(QStringLiteral("seconds")).toDouble();
+        QJsonObject point{
+            {QStringLiteral("seconds"), seconds},
             {QStringLiteral("value"), map.value(QStringLiteral("value")).toDouble()},
             {QStringLiteral("inDx"), map.value(QStringLiteral("inDx")).toDouble()},
             {QStringLiteral("inDy"), map.value(QStringLiteral("inDy")).toDouble()},
@@ -2035,7 +2042,16 @@ QJsonObject McpDispatcher::opListKeyframes(const QJsonObject &args) const
             {QStringLiteral("hold"), map.value(QStringLiteral("hold")).toBool()},
             {QStringLiteral("easing"), map.value(QStringLiteral("easing")).toString()},
             {QStringLiteral("custom"), map.value(QStringLiteral("custom")).toBool()},
-        });
+        };
+        if (i + 1 < keys.size()) {
+            const QVariantMap segment = m_controller->keyframeSegmentEasing(ref.track, ref.clip, prop, seconds);
+            const QString presetId = segment.value(QStringLiteral("presetId")).toString();
+            point.insert(QStringLiteral("segmentEasing"),
+                         presetId.isEmpty()
+                             ? QJsonValue(QJsonObject::fromVariantMap(segment.value(QStringLiteral("spec")).toMap()))
+                             : QJsonValue(presetId));
+        }
+        points.append(point);
     }
     const bool enabled = m_controller->clipPropertyKeyframesEnabled(ref.track, ref.clip, prop);
     return ok({{QStringLiteral("prop"), prop}, {QStringLiteral("enabled"), enabled}, {QStringLiteral("keys"), points}});
@@ -2112,6 +2128,93 @@ QJsonObject McpDispatcher::opSetKeyframeTangents(const QJsonObject &args)
                                     jsonNumber(args.value(QStringLiteral("outDy")), 0),
                                     jsonBool(args.value(QStringLiteral("corner"))));
     return ok({{QStringLiteral("prop"), prop}, {QStringLiteral("at"), at}});
+}
+
+QJsonObject McpDispatcher::opListEasingPresets() const
+{
+    QJsonArray presets;
+    for (const QVariant &entry : m_controller->easingPresets()) {
+        QVariantMap map = entry.toMap();
+        map.remove(QStringLiteral("samples"));
+        presets.append(QJsonObject::fromVariantMap(map));
+    }
+    return ok({{QStringLiteral("presets"), presets}});
+}
+
+QJsonObject McpDispatcher::opSetKeyframeEasing(const QJsonObject &args)
+{
+    const ClipRef ref = resolveClip(args);
+    if (!ref.valid())
+        return clipRefError(args);
+    const QString prop = args.value(QStringLiteral("prop")).toString().trimmed();
+    const bool all = jsonBool(args.value(QStringLiteral("all")));
+    if (prop.isEmpty() || (!all && !args.contains(QStringLiteral("at"))))
+        return err("bad_args", QStringLiteral("prop and at required (or all:true)"));
+    const QVariantList keys = m_controller->clipKeyframes(ref.track, ref.clip, prop);
+    if (keys.isEmpty())
+        return err("not_found", QStringLiteral("%1 has no keyframes on \"%2\"").arg(ref.id, prop));
+
+    auto given = [&](const char *key) {
+        const QJsonValue v = args.value(QLatin1String(key));
+        return !v.isUndefined() && !v.isNull();
+    };
+    const int shapes = int(given("preset")) + int(given("bezier")) + int(given("fn"));
+    if (shapes != 1)
+        return err("bad_args", QStringLiteral("give exactly one of preset, bezier, or fn"));
+
+    drift::EasingSpec spec;
+    if (given("preset")) {
+        const QString id = args.value(QStringLiteral("preset")).toString().trimmed();
+        if (const drift::EasingPreset *builtin = drift::findBuiltinEasingPreset(id)) {
+            spec = builtin->spec;
+        } else if (const std::optional<drift::UserEasingPreset> user = drift::EasingPresetStore::instance().find(id)) {
+            spec = user->spec;
+        } else {
+            return err("bad_args", QStringLiteral("unknown easing preset \"%1\"; list_easing_presets lists the ids").arg(id));
+        }
+    } else if (given("bezier")) {
+        const QJsonArray points = args.value(QStringLiteral("bezier")).toArray();
+        if (points.size() != 4)
+            return err("bad_args", QStringLiteral("bezier needs four numbers: x1, y1, x2, y2"));
+        const double x1 = jsonNumber(points.at(0), -1.0);
+        const double x2 = jsonNumber(points.at(2), -1.0);
+        if (x1 < 0.0 || x1 > 1.0 || x2 < 0.0 || x2 > 1.0)
+            return err("bad_args", QStringLiteral("bezier x values must be in 0..1"));
+        spec.kind = drift::EasingSpec::Kind::Bezier;
+        spec.x1 = x1;
+        spec.y1 = jsonNumber(points.at(1), 0.0);
+        spec.x2 = x2;
+        spec.y2 = jsonNumber(points.at(3), 1.0);
+    } else {
+        const drift::EasingFn fn = drift::easingFnFromString(args.value(QStringLiteral("fn")).toString());
+        if (fn == drift::EasingFn::None)
+            return err("bad_args", QStringLiteral("fn must be elasticIn, elasticOut, elasticInOut, bounceIn, bounceOut or bounceInOut"));
+        const double period = jsonNumber(args.value(QStringLiteral("period")), 0.3);
+        if (period <= 0.0)
+            return err("bad_args", QStringLiteral("period must be above 0"));
+        spec.kind = drift::EasingSpec::Kind::Function;
+        spec.fn = fn;
+        spec.amplitude = jsonNumber(args.value(QStringLiteral("amplitude")), 1.0);
+        spec.period = period;
+    }
+
+    const QVariantMap specMap = spec.toJson().toVariantMap();
+    double shown = 0.0;
+    if (all) {
+        m_controller->applyEasingToAllSegments(ref.track, ref.clip, prop, specMap);
+        shown = keys.first().toMap().value(QStringLiteral("seconds")).toDouble();
+    } else {
+        shown = jsonNumber(args.value(QStringLiteral("at")), 0);
+        if (m_controller->keyframeSegmentEasing(ref.track, ref.clip, prop, shown).isEmpty())
+            return err("not_found", QStringLiteral("%1 has no key near %2 on \"%3\"").arg(ref.id).arg(shown).arg(prop));
+        m_controller->setKeyframeSegmentEasing(ref.track, ref.clip, prop, shown, specMap);
+    }
+
+    const QVariantMap after = m_controller->keyframeSegmentEasing(ref.track, ref.clip, prop, shown);
+    return ok({{QStringLiteral("prop"), prop},
+               {QStringLiteral("at"), shown},
+               {QStringLiteral("presetId"), after.value(QStringLiteral("presetId")).toString()},
+               {QStringLiteral("spec"), QJsonObject::fromVariantMap(after.value(QStringLiteral("spec")).toMap())}});
 }
 
 QJsonObject McpDispatcher::opSetKeyframeHold(const QJsonObject &args)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/animation/Easing.h"
 #include "core/base/Bezier.h"
 #include "core/base/Time.h"
 
@@ -52,6 +53,10 @@ struct Keyframe
     double outDy = 0.0;
     bool corner = false; // when false the editor holds the two tangents collinear
     bool hold = false;   // step: keep this value until the next key
+    // Function easing shapes the outgoing segment the way `hold` does: it replaces the handles.
+    EasingFn fn = EasingFn::None;
+    double fnAmplitude = 1.0;
+    double fnPeriod = 0.3;
 
     bool operator==(const Keyframe &other) const
     {
@@ -59,7 +64,9 @@ struct Keyframe
             && qFuzzyCompare(inDy + 1.0, other.inDy + 1.0)
             && qFuzzyCompare(outDx + 1.0, other.outDx + 1.0)
             && qFuzzyCompare(outDy + 1.0, other.outDy + 1.0) && corner == other.corner
-            && hold == other.hold;
+            && hold == other.hold && fn == other.fn
+            && qFuzzyCompare(fnAmplitude + 1.0, other.fnAmplitude + 1.0)
+            && qFuzzyCompare(fnPeriod + 1.0, other.fnPeriod + 1.0);
     }
 };
 
@@ -152,6 +159,7 @@ public:
             return;
 
         it->hold = mode == Interpolation::Hold;
+        it->fn = EasingFn::None;
         it->corner = false;
         if (mode == Interpolation::Ease) {
             const TimeUs toPrev = it == m_values.begin() ? 0 : time - std::prev(it).key();
@@ -167,6 +175,113 @@ public:
             it->outDx = 0.0;
             it->outDy = 0.0;
         }
+    }
+
+    // Writes an easing onto the segment that starts at `keyTime`. The last key has no outgoing
+    // segment, so its incoming one is targeted instead. Inserting a key inside a function segment
+    // (a cut through pinValueAt, say) compresses the shape, as it already does for beziers.
+    void setSegmentEasing(TimeUs keyTime, const EasingSpec &spec)
+    {
+        auto a = m_values.find(keyTime);
+        if (a == m_values.end())
+            return;
+        auto b = std::next(a);
+        if (b == m_values.end()) {
+            if (a == m_values.begin())
+                return;
+            b = a;
+            a = std::prev(a);
+        }
+
+        const double span = static_cast<double>(b.key() - a.key());
+        const double dv = static_cast<double>(b->value) - static_cast<double>(a->value);
+        switch (spec.kind) {
+        case EasingSpec::Kind::Linear:
+            a->hold = false;
+            a->fn = EasingFn::None;
+            a->outDx = 0.0;
+            a->outDy = 0.0;
+            b->inDx = 0.0;
+            b->inDy = 0.0;
+            break;
+        case EasingSpec::Kind::Hold:
+            a->hold = true;
+            a->fn = EasingFn::None;
+            break;
+        case EasingSpec::Kind::Bezier:
+            a->hold = false;
+            a->fn = EasingFn::None;
+            a->outDx = spec.x1 * span;
+            a->outDy = spec.y1 * dv;
+            b->inDx = (spec.x2 - 1.0) * span;
+            b->inDy = (spec.y2 - 1.0) * dv;
+            a->corner = true;
+            b->corner = true;
+            break;
+        case EasingSpec::Kind::Function:
+            a->hold = false;
+            a->fn = spec.fn;
+            a->fnAmplitude = spec.amplitude;
+            a->fnPeriod = spec.period;
+            a->outDx = 0.0;
+            a->outDy = 0.0;
+            b->inDx = 0.0;
+            b->inDy = 0.0;
+            break;
+        }
+    }
+
+    // Reads back what setSegmentEasing wrote, or the nearest equivalent for hand-dragged handles.
+    EasingSpec segmentEasing(TimeUs keyTime) const
+    {
+        auto a = m_values.constFind(keyTime);
+        if (a == m_values.constEnd())
+            return {};
+        auto b = std::next(a);
+        if (b == m_values.constEnd()) {
+            if (a == m_values.constBegin())
+                return {};
+            b = a;
+            a = std::prev(a);
+        }
+
+        EasingSpec spec;
+        if (a->hold) {
+            spec.kind = EasingSpec::Kind::Hold;
+            return spec;
+        }
+        if (a->fn != EasingFn::None) {
+            spec.kind = EasingSpec::Kind::Function;
+            spec.fn = a->fn;
+            spec.amplitude = a->fnAmplitude;
+            spec.period = a->fnPeriod;
+            return spec;
+        }
+        if (qFuzzyIsNull(a->outDx) && qFuzzyIsNull(a->outDy) && qFuzzyIsNull(b->inDx)
+            && qFuzzyIsNull(b->inDy)) {
+            return spec;
+        }
+
+        const double span = static_cast<double>(b.key() - a.key());
+        const double dv = static_cast<double>(b->value) - static_cast<double>(a->value);
+        spec.kind = EasingSpec::Kind::Bezier;
+        spec.x1 = qBound(0.0, a->outDx / span, 1.0);
+        spec.x2 = qBound(0.0, 1.0 + b->inDx / span, 1.0);
+        if (qAbs(dv) < 1e-12) {
+            spec.y1 = 0.0;
+            spec.y2 = 1.0;
+        } else {
+            spec.y1 = a->outDy / dv;
+            spec.y2 = 1.0 + b->inDy / dv;
+        }
+        return spec;
+    }
+
+    void setSegmentEasingAll(const EasingSpec &spec)
+    {
+        const QList<TimeUs> times = m_values.keys();
+        for (qsizetype i = 0; i + 1 < times.size(); ++i)
+            setSegmentEasing(times[i], spec);
     }
 
     // Best-effort classification for highlighting the preset chips. Hand-dragged tangents
@@ -235,6 +350,12 @@ public:
 
         const double v0 = static_cast<double>(prev->value);
         const double v1 = static_cast<double>(it->value);
+
+        if (prev->fn != EasingFn::None) {
+            const double u = (static_cast<double>(time) - t0) / span;
+            return static_cast<T>(
+                v0 + (v1 - v0) * evaluateEasingFn(prev->fn, u, prev->fnAmplitude, prev->fnPeriod));
+        }
 
         // Straight segment: skip the solve entirely. This is the common case.
         if (qFuzzyIsNull(prev->outDx) && qFuzzyIsNull(prev->outDy) && qFuzzyIsNull(it->inDx)

@@ -10,4 +10,10 @@ QtObject {
     // Set to {tab: n} to point the Color panel at a tab. A fresh object each time, so a repeat
     // request still lands; read on creation too, since the panel may not exist yet.
     property var colorTabRequest: null
+
+    // The phone shell (AndroidMain) is the one that hosts AndroidEditor's sheets. Touch sizing
+    // alone does not decide this: a tablet can run the desktop shell.
+    readonly property bool phoneShell: EditorState.preferences.appliedShell === "mobile"
+    // Deep inspector controls ask the phone editor for the easing sheet through here.
+    signal easingSheetRequested(int track, int clip, string prop, string label, real seconds)
 }

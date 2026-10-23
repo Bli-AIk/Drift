@@ -549,6 +549,10 @@ add_library(driftcore STATIC
     src/core/animation/SpeedCurve.cpp
     src/core/animation/FadeShape.h
     src/core/animation/FadeShape.cpp
+    src/core/animation/Easing.h
+    src/core/animation/Easing.cpp
+    src/core/animation/EasingPresetStore.h
+    src/core/animation/EasingPresetStore.cpp
     src/core/animation/ClipAnimation.h
     src/core/animation/ClipAnimation.cpp
     src/core/project/SubtitleCue.h
@@ -1404,6 +1408,7 @@ qt_add_qml_module(drift
         src/qml/AndroidMain.qml
         src/qml/AndroidMoreToolsSheet.qml
         src/qml/AndroidFadeSheet.qml
+        src/qml/AndroidEasingSheet.qml
         src/qml/AndroidProjectSheet.qml
         src/qml/AndroidHome.qml
         src/qml/AndroidEditor.qml
@@ -1801,6 +1806,10 @@ qt_add_qml_module(drift
         src/qml/components/ChannelKeyButton.qml
         src/qml/components/Vec2Param.qml
         src/qml/components/PropertyKeyframeRow.qml
+        src/qml/components/EasingPicker.qml
+        src/qml/components/EasingPickerPopup.qml
+        src/qml/components/EasingThumb.qml
+        src/qml/components/EasingTile.qml
         src/qml/components/KeyframeGraph.qml
         src/qml/components/SubtitleCueLane.qml
         src/qml/components/shell/ShortcutCaptureField.qml

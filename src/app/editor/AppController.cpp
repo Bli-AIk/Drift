@@ -11,6 +11,7 @@
 #include "core/project/clip/Clip.h"
 #include "core/effects/Mask.h"
 #include "core/animation/SpeedCurve.h"
+#include "core/animation/EasingPresetStore.h"
 #include "core/interchange/premiere/PrprojReader.h"
 #include "core/interchange/premiere/MogrtReader.h"
 #include "core/interchange/KdenliveReader.h"
@@ -3382,6 +3383,24 @@ bool writeClipPropValue(drift::Clip &clip, const QString &prop, drift::TimeUs re
     return true;
 }
 
+static drift::EasingSpec easingSpecFromVariant(const QVariantMap &spec)
+{
+    return drift::EasingSpec::fromJson(QJsonObject::fromVariantMap(spec));
+}
+
+static QVariantMap easingSpecToVariant(const drift::EasingSpec &spec)
+{
+    return spec.toJson().toVariantMap();
+}
+
+static QVariantList easingSamplesToVariant(const drift::EasingSpec &spec, int n)
+{
+    QVariantList out;
+    for (const QPointF &point : drift::sampleEasing(spec, n))
+        out.append(point);
+    return out;
+}
+
 QVariantList keyframeListToVariant(const drift::KeyframeTrack<double> &track, drift::TimeUs timelineStart)
 {
     QVariantList out;
@@ -3400,6 +3419,9 @@ QVariantList keyframeListToVariant(const drift::KeyframeTrack<double> &track, dr
             {QStringLiteral("hold"), key.hold},
             {QStringLiteral("easing"), drift::interpolationToString(track.easingAt(it.key()))},
             {QStringLiteral("custom"), track.hasCustomTangents(it.key())},
+            {QStringLiteral("fn"), drift::easingFnToString(key.fn)},
+            {QStringLiteral("fnAmp"), key.fnAmplitude},
+            {QStringLiteral("fnPeriod"), key.fnPeriod},
         });
     }
     return out;
@@ -16418,6 +16440,197 @@ void AppController::setKeyframeEasingAt(int trackIndex, int clipIndex, const QSt
 
     pushProjectEdit(before, tr("Keyframe easing changed"));
     finishEdit(tr("Keyframe easing updated"));
+}
+
+QVariantList AppController::easingPresets() const
+{
+    constexpr int kSamples = 24;
+    QVariantList out;
+    for (const drift::EasingPreset &preset : drift::builtinEasingPresets()) {
+        out.append(QVariantMap{
+            {QStringLiteral("id"), preset.id},
+            {QStringLiteral("label"),
+             QCoreApplication::translate("EasingPresets", preset.label.toUtf8().constData())},
+            {QStringLiteral("family"), preset.family},
+            {QStringLiteral("user"), false},
+            {QStringLiteral("spec"), easingSpecToVariant(preset.spec)},
+            {QStringLiteral("samples"), easingSamplesToVariant(preset.spec, kSamples)},
+        });
+    }
+    for (const drift::UserEasingPreset &preset : drift::EasingPresetStore::instance().all()) {
+        out.append(QVariantMap{
+            {QStringLiteral("id"), preset.id},
+            {QStringLiteral("label"), preset.label},
+            {QStringLiteral("family"), QStringLiteral("user")},
+            {QStringLiteral("user"), true},
+            {QStringLiteral("spec"), easingSpecToVariant(preset.spec)},
+            {QStringLiteral("samples"), easingSamplesToVariant(preset.spec, kSamples)},
+        });
+    }
+    return out;
+}
+
+QVariantList AppController::easingSamples(const QVariantMap &spec, int n) const
+{
+    return easingSamplesToVariant(easingSpecFromVariant(spec), n);
+}
+
+QVariantMap AppController::keyframeSegmentEasing(int trackIndex, int clipIndex, const QString &prop,
+                                                 double atSeconds) const
+{
+    if (trackIndex < 0 || trackIndex >= m_project.tracks().size())
+        return {};
+    redirectToKeyframeHost(&trackIndex, &clipIndex, prop);
+
+    const drift::Track &track = m_project.tracks().at(trackIndex);
+    if (clipIndex < 0 || clipIndex >= track.clips.size())
+        return {};
+
+    const drift::Clip &clip = track.clips.at(clipIndex);
+    const drift::KeyframeTrack<double> *kt = keyframeTrackForProp(clip, prop);
+    if (!kt || kt->isEmpty())
+        return {};
+
+    const drift::TimeUs local = drift::secondsToUs(atSeconds) - clip.timelineStart;
+    const drift::TimeUs at = kt->nearestKeyframe(local, drift::kUsPerSecond / 60);
+    if (at < 0)
+        return {};
+
+    const drift::EasingSpec spec = kt->segmentEasing(at);
+    QString presetId = drift::matchBuiltinEasingPreset(spec);
+    if (presetId.isEmpty()) {
+        for (const drift::UserEasingPreset &preset : drift::EasingPresetStore::instance().all()) {
+            if (preset.spec.approxEquals(spec)) {
+                presetId = preset.id;
+                break;
+            }
+        }
+    }
+
+    return {
+        {QStringLiteral("spec"), easingSpecToVariant(spec)},
+        {QStringLiteral("presetId"), presetId},
+        {QStringLiteral("samples"), easingSamplesToVariant(spec, 24)},
+        {QStringLiteral("hasSegment"), kt->keyframes().size() >= 2},
+    };
+}
+
+bool AppController::shapeKeyframeSegments(int trackIndex, int clipIndex, const QString &prop,
+                                          double atSeconds, const drift::EasingSpec &spec,
+                                          bool allSegments)
+{
+    if (trackIndex < 0 || trackIndex >= m_project.tracks().size())
+        return false;
+    redirectToKeyframeHost(&trackIndex, &clipIndex, prop);
+
+    drift::Track &track = m_project.tracks()[trackIndex];
+    if (clipIndex < 0 || clipIndex >= track.clips.size())
+        return false;
+
+    drift::Clip &clip = track.clips[clipIndex];
+    drift::KeyframeTrack<double> *kt = keyframeTrackForProp(clip, prop, /*createIfMissing=*/false);
+    if (!kt || kt->isEmpty())
+        return false;
+
+    const drift::TimeUs local = drift::secondsToUs(atSeconds) - clip.timelineStart;
+    drift::TimeUs at = -1;
+    if (!allSegments) {
+        at = kt->nearestKeyframe(local, drift::kUsPerSecond / 60);
+        if (at < 0)
+            return false;
+    }
+
+    auto shape = [&](drift::KeyframeTrack<double> *target) {
+        if (allSegments)
+            target->setSegmentEasingAll(spec);
+        else
+            target->setSegmentEasing(at, spec);
+    };
+    shape(kt);
+
+    if (m_positionLinked && (prop == QLatin1String("x") || prop == QLatin1String("y"))) {
+        const QString otherProp = (prop == QLatin1String("x")) ? QStringLiteral("y") : QStringLiteral("x");
+        drift::KeyframeTrack<double> *otherKt = keyframeTrackForProp(clip, otherProp, /*createIfMissing=*/false);
+        if (otherKt && !otherKt->isEmpty()) {
+            if (allSegments) {
+                shape(otherKt);
+            } else {
+                const drift::TimeUs otherAt = otherKt->nearestKeyframe(local, drift::kUsPerSecond / 60);
+                if (otherAt >= 0)
+                    otherKt->setSegmentEasing(otherAt, spec);
+            }
+        }
+    }
+    return true;
+}
+
+void AppController::setKeyframeSegmentEasing(int trackIndex, int clipIndex, const QString &prop,
+                                             double atSeconds, const QVariantMap &spec)
+{
+    // Snapshot first, for the same reason as setKeyframeTangents.
+    const drift::Project before = m_project;
+    if (!shapeKeyframeSegments(trackIndex, clipIndex, prop, atSeconds, easingSpecFromVariant(spec), false))
+        return;
+    pushProjectEdit(before, tr("Keyframe easing changed"));
+    finishEdit(tr("Keyframe easing updated"));
+}
+
+void AppController::previewSetKeyframeSegmentEasing(int trackIndex, int clipIndex, const QString &prop,
+                                                    double atSeconds, const QVariantMap &spec)
+{
+    if (!shapeKeyframeSegments(trackIndex, clipIndex, prop, atSeconds, easingSpecFromVariant(spec), false))
+        return;
+    notifyTracksChanged();
+    emit selectedClipDataChanged();
+    emit projectMutated();
+}
+
+void AppController::applyEasingToAllSegments(int trackIndex, int clipIndex, const QString &prop,
+                                             const QVariantMap &spec)
+{
+    const drift::Project before = m_project;
+    if (!shapeKeyframeSegments(trackIndex, clipIndex, prop, 0.0, easingSpecFromVariant(spec), true))
+        return;
+    pushProjectEdit(before, tr("Keyframe easing changed"));
+    finishEdit(tr("Keyframe easing updated"));
+}
+
+QString AppController::saveEasingPreset(const QString &label, const QVariantMap &spec)
+{
+    const QString id = drift::EasingPresetStore::instance().add(label, easingSpecFromVariant(spec));
+    if (!id.isEmpty())
+        emit easingPresetsChanged();
+    return id;
+}
+
+bool AppController::renameEasingPreset(const QString &id, const QString &label)
+{
+    if (!drift::EasingPresetStore::instance().rename(id, label))
+        return false;
+    emit easingPresetsChanged();
+    return true;
+}
+
+bool AppController::deleteEasingPreset(const QString &id)
+{
+    if (!drift::EasingPresetStore::instance().remove(id))
+        return false;
+    emit easingPresetsChanged();
+    return true;
+}
+
+void AppController::copyEasingToClipboard(const QVariantMap &spec) const
+{
+    QGuiApplication::clipboard()->setText(easingSpecFromVariant(spec).toCssString());
+}
+
+QVariantMap AppController::easingFromClipboard() const
+{
+    const std::optional<drift::EasingSpec> spec =
+        drift::EasingSpec::parseCss(QGuiApplication::clipboard()->text());
+    if (!spec)
+        return {};
+    return easingSpecToVariant(*spec);
 }
 
 void AppController::syncLinkedTangents(int trackIndex, int clipIndex, const QString &prop,

@@ -1190,6 +1190,8 @@ Project Project::fromJson(const QJsonObject &object, QString *errorOut)
     // Version 15 replaced a model clip's one directional key light with four point/spot lights.
     // Model3dSource::fromJson turns the old key light into light 1. The bump is a gate: an older
     // build would drop the lights and fall back to its default key light.
+    // Version 16 added function-eased keyframe segments (elastic/bounce). Nothing to migrate; the
+    // bump is a gate, as for versions 6 and 9. An older build would play them as straight lines.
 
     project.m_bookmarks.clear();
     const QJsonArray bookmarksArray = object.value(QStringLiteral("bookmarks")).toArray();

@@ -53,6 +53,7 @@
 #include "ui/imageproviders/multicam/MulticamImageStore.h"
 
 #include "core/project/clip/Clip.h"
+#include "core/animation/EasingPresetStore.h"
 #include "core/effects/EffectStackStore.h"
 #include "core/interchange/premiere/MogrtReader.h"
 #include "core/interchange/KdenliveReader.h"
@@ -252,6 +253,10 @@ private slots:
     void keyframeGraphPropertySelection();
     void keyframesCanBeDisabledPerProperty();
     void linkedPositionKeyframesAndTangents();
+    void segmentEasingAppliesAndUndoes();
+    void segmentEasingFunctionRoundTrip();
+    void segmentEasingMirrorsLinkedPosition();
+    void easingPresetStoreSaveRenameDelete();
     void effectParamKeyframes();
     void depthEffectEditorStateResolvesHandles();
     void behindSubjectTargetsAChosenClip();
@@ -6333,6 +6338,123 @@ void EditorStateTest::linkedPositionKeyframesAndTangents()
             foundYAt0_5 = true;
     }
     QVERIFY(!foundYAt0_5);
+}
+
+// Segment easings are written through the curve editor's entry points and read back by the same
+// preset id, so these pin the whole round trip: write, classify, and undo.
+void EditorStateTest::segmentEasingAppliesAndUndoes()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Easing"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    state.setPositionLinked(false);
+    const QString prop = QStringLiteral("x");
+    state.setClipKeyframe(track, clip, prop, 0.0, 0.0);
+    state.setClipKeyframe(track, clip, prop, 2.0, 100.0);
+
+    QCOMPARE(state.keyframeSegmentEasing(track, clip, prop, 0.0).value(QStringLiteral("presetId")).toString(),
+             QStringLiteral("linear"));
+
+    const QVariantMap cubicOut = drift::findBuiltinEasingPreset(QStringLiteral("cubicOut"))->spec.toJson().toVariantMap();
+    state.setKeyframeSegmentEasing(track, clip, prop, 0.0, cubicOut);
+    const QVariantMap segment = state.keyframeSegmentEasing(track, clip, prop, 0.0);
+    QCOMPARE(segment.value(QStringLiteral("presetId")).toString(), QStringLiteral("cubicOut"));
+    QVERIFY(segment.value(QStringLiteral("hasSegment")).toBool());
+    QCOMPARE(segment.value(QStringLiteral("samples")).toList().size(), 25);
+
+    state.undo();
+    QCOMPARE(state.keyframeSegmentEasing(track, clip, prop, 0.0).value(QStringLiteral("presetId")).toString(),
+             QStringLiteral("linear"));
+}
+
+void EditorStateTest::segmentEasingFunctionRoundTrip()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Bounce"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    state.setPositionLinked(false);
+    const QString prop = QStringLiteral("x");
+    state.setClipKeyframe(track, clip, prop, 0.0, 0.0);
+    state.setClipKeyframe(track, clip, prop, 2.0, 100.0);
+
+    const QVariantMap bounce = drift::findBuiltinEasingPreset(QStringLiteral("bounceOut"))->spec.toJson().toVariantMap();
+    state.setKeyframeSegmentEasing(track, clip, prop, 0.0, bounce);
+    QCOMPARE(state.keyframeSegmentEasing(track, clip, prop, 0.0).value(QStringLiteral("presetId")).toString(),
+             QStringLiteral("bounceOut"));
+    // Bounce Out is well ahead of the straight line at the midpoint, so the value must move.
+    QVERIFY(std::abs(state.propertyValueAt(track, clip, prop, 1.0, 0.0) - 50.0) > 1.0);
+    QVERIFY(std::abs(state.propertyValueAt(track, clip, prop, 0.0, 0.0)) < 1e-6);
+    QVERIFY(std::abs(state.propertyValueAt(track, clip, prop, 2.0, 0.0) - 100.0) < 1e-6);
+}
+
+void EditorStateTest::segmentEasingMirrorsLinkedPosition()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Linked"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    state.setPositionLinked(true);
+    state.setClipKeyframe(track, clip, QStringLiteral("x"), 0.0, 0.0);
+    state.setClipKeyframe(track, clip, QStringLiteral("x"), 2.0, 100.0);
+    state.setClipKeyframe(track, clip, QStringLiteral("y"), 0.0, 0.0);
+    state.setClipKeyframe(track, clip, QStringLiteral("y"), 2.0, 50.0);
+
+    const QVariantMap cubicOut = drift::findBuiltinEasingPreset(QStringLiteral("cubicOut"))->spec.toJson().toVariantMap();
+    state.setKeyframeSegmentEasing(track, clip, QStringLiteral("x"), 0.0, cubicOut);
+    QCOMPARE(state.keyframeSegmentEasing(track, clip, QStringLiteral("y"), 0.0).value(QStringLiteral("presetId")).toString(),
+             QStringLiteral("cubicOut"));
+}
+
+void EditorStateTest::easingPresetStoreSaveRenameDelete()
+{
+    const QString org = QCoreApplication::organizationName();
+    const QString app = QCoreApplication::applicationName();
+    QStandardPaths::setTestModeEnabled(true);
+    QCoreApplication::setOrganizationName(QStringLiteral("DriftTest"));
+    QCoreApplication::setApplicationName(QStringLiteral("DriftTestEasingPresets"));
+    QFile::remove(drift::EasingPresetStore::storePath());
+    drift::EasingPresetStore::instance().reload();
+
+    AssetLibrary library;
+    AppController state(&library);
+    auto userPresets = [&state] {
+        QVariantList out;
+        for (const QVariant &preset : state.easingPresets()) {
+            if (preset.toMap().value(QStringLiteral("user")).toBool())
+                out.append(preset);
+        }
+        return out;
+    };
+    QSignalSpy changed(&state, &AppController::easingPresetsChanged);
+
+    const QVariantMap spec = drift::findBuiltinEasingPreset(QStringLiteral("cubicOut"))->spec.toJson().toVariantMap();
+    const QString id = state.saveEasingPreset(QStringLiteral("Punchy"), spec);
+    QVERIFY(!id.isEmpty());
+    QCOMPARE(changed.count(), 1);
+    QCOMPARE(userPresets().size(), 1);
+    QCOMPARE(userPresets().first().toMap().value(QStringLiteral("label")).toString(), QStringLiteral("Punchy"));
+    QCOMPARE(userPresets().first().toMap().value(QStringLiteral("family")).toString(), QStringLiteral("user"));
+
+    QVERIFY(state.renameEasingPreset(id, QStringLiteral("Snappy")));
+    QCOMPARE(changed.count(), 2);
+    QCOMPARE(userPresets().first().toMap().value(QStringLiteral("label")).toString(), QStringLiteral("Snappy"));
+
+    QVERIFY(state.deleteEasingPreset(id));
+    QCOMPARE(changed.count(), 3);
+    QCOMPARE(userPresets().size(), 0);
+    QVERIFY(!state.deleteEasingPreset(id));
+    QCOMPARE(changed.count(), 3);
+
+    QFile::remove(drift::EasingPresetStore::storePath());
+    drift::EasingPresetStore::instance().reload();
+    QCoreApplication::setOrganizationName(org);
+    QCoreApplication::setApplicationName(app);
+    QStandardPaths::setTestModeEnabled(false);
 }
 
 // End-to-end noise removal through the controller: the whole clip is rendered on a worker thread

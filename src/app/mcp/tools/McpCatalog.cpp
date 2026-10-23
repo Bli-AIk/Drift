@@ -934,7 +934,8 @@ const QList<Op> &ops()
         { "set_keyframe_interpolation", "keyframes", "Set linear/hold/ease on a key",
           "Set the easing preset on the key nearest `at`. SIDE EFFECT: this moves the playhead to `at`, "
           "which changes the default time of later ops in the same apply batch and the target of "
-          "set_transform — seek back if that matters.",
+          "set_transform — seek back if that matters. For custom beziers, elastic or bounce curves, "
+          "or saved presets, use set_keyframe_easing.",
           objectSchema(mergeProps(
               {{QStringLiteral("prop"), animPropProp()},
                {QStringLiteral("at"), numberProp(QStringLiteral("Timeline seconds; the playhead is moved here"))},
@@ -943,6 +944,30 @@ const QList<Op> &ops()
                                                  QStringLiteral("ease")})}},
               clipRefProps()),
                        {QStringLiteral("prop"), QStringLiteral("at"), QStringLiteral("mode")}) },
+        { "list_easing_presets", "keyframes", "See the easing presets",
+          "List built-in and saved easing presets for keyframe segments.",
+          objectSchema({}), true, false, true },
+        { "set_keyframe_easing", "keyframes", "Ease a segment with a preset or custom curve",
+          "Shape the segment that leaves the key at `at` (on the last key, the segment that arrives "
+          "there). Give exactly one of `preset` (an id from list_easing_presets; linear and hold are "
+          "presets too), `bezier` [x1, y1, x2, y2] with x in 0..1, or `fn` (elastic or bounce, with "
+          "optional amplitude and period). `all:true` applies the curve to every segment of the "
+          "property and `at` is then not needed. Does NOT move the playhead.",
+          objectSchema(mergeProps(
+              {{QStringLiteral("prop"), animPropProp()},
+               {QStringLiteral("at"), numberProp(QStringLiteral("Timeline seconds of the key whose outgoing segment is shaped"))},
+               {QStringLiteral("preset"), stringProp(QStringLiteral("Easing preset id from list_easing_presets, e.g. cubicOut"))},
+               {QStringLiteral("bezier"), arrayProp({{QStringLiteral("type"), QStringLiteral("number")}},
+                                                    QStringLiteral("Four numbers x1, y1, x2, y2; x in 0..1, y may overshoot"))},
+               {QStringLiteral("fn"), enumProp(QStringLiteral("Penner curve"),
+                                               {QStringLiteral("elasticIn"), QStringLiteral("elasticOut"),
+                                                QStringLiteral("elasticInOut"), QStringLiteral("bounceIn"),
+                                                QStringLiteral("bounceOut"), QStringLiteral("bounceInOut")})},
+               {QStringLiteral("amplitude"), numberProp(QStringLiteral("Elastic amplitude (defaults to 1)"))},
+               {QStringLiteral("period"), numberProp(QStringLiteral("Elastic period, above 0 (defaults to 0.3)"))},
+               {QStringLiteral("all"), boolProp(QStringLiteral("Apply to every segment of the property; at is ignored"))}},
+              clipRefProps()),
+                       {QStringLiteral("prop")}) },
         { "set_keyframe_tangents", "keyframes", "Shape bezier handles",
           "Set tangent handles on the key at `at`, relative to it. Omitted handle fields are sent as 0, "
           "not left alone — pass all four to avoid flattening the ones you skip.",

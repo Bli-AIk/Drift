@@ -71,6 +71,12 @@ private slots:
     void keyframeHoldInterpolation();
     void keyframeLinearInterpolation();
     void keyframeEaseInterpolation();
+    void easingBezierPresetRoundTrips();
+    void easingBackOvershoots();
+    void easingFunctionEndpointsExact();
+    void easingFunctionSerializationRoundTrip();
+    void easingCssRoundTrip();
+    void easingSetSegmentOnLastKeyTargetsIncomingSegment();
     void keyframeBezierTangents();
     void disabledKeyframesFreezeAtFirstKey();
     void legacyTrackInterpolationMigratesLosslessly();
@@ -400,6 +406,120 @@ void CoreTest::keyframeEaseInterpolation()
     linear.setKeyframe(0, 0.0);
     linear.setKeyframe(drift::secondsToUs(1.0), 10.0);
     QCOMPARE(linear.evaluateAt(drift::secondsToUs(0.25)), 2.5);
+}
+
+void CoreTest::easingBezierPresetRoundTrips()
+{
+    for (const drift::EasingPreset &preset : drift::builtinEasingPresets()) {
+        if (preset.spec.kind != drift::EasingSpec::Kind::Bezier)
+            continue;
+        drift::KeyframeTrack<double> track;
+        track.setKeyframe(0, 0.0);
+        track.setKeyframe(drift::secondsToUs(1.0), 10.0);
+        track.setSegmentEasing(0, preset.spec);
+        QVERIFY2(track.segmentEasing(0).approxEquals(preset.spec), qPrintable(preset.id));
+    }
+
+    drift::KeyframeTrack<double> track;
+    track.setKeyframe(0, 0.0);
+    track.setKeyframe(drift::secondsToUs(1.0), 10.0);
+    track.setSegmentEasing(0, drift::findBuiltinEasingPreset(QStringLiteral("cubicOut"))->spec);
+    QCOMPARE(drift::matchBuiltinEasingPreset(track.segmentEasing(0)), QStringLiteral("cubicOut"));
+}
+
+void CoreTest::easingBackOvershoots()
+{
+    drift::KeyframeTrack<double> track;
+    track.setKeyframe(0, 0.0);
+    track.setKeyframe(drift::secondsToUs(1.0), 10.0);
+    track.setSegmentEasing(0, drift::findBuiltinEasingPreset(QStringLiteral("backOut"))->spec);
+
+    bool overshot = false;
+    for (int i = 1; i < 50; ++i) {
+        if (track.evaluateAt(drift::secondsToUs(i / 50.0)) > 10.0)
+            overshot = true;
+    }
+    QVERIFY(overshot);
+}
+
+void CoreTest::easingFunctionEndpointsExact()
+{
+    for (const drift::EasingPreset &preset : drift::builtinEasingPresets()) {
+        if (preset.spec.kind != drift::EasingSpec::Kind::Function)
+            continue;
+        const drift::EasingSpec &spec = preset.spec;
+        QCOMPARE(drift::evaluateEasingFn(spec.fn, 0.0, spec.amplitude, spec.period), 0.0);
+        QCOMPARE(drift::evaluateEasingFn(spec.fn, 1.0, spec.amplitude, spec.period), 1.0);
+
+        drift::KeyframeTrack<double> track;
+        track.setKeyframe(0, 0.0);
+        track.setKeyframe(drift::secondsToUs(1.0), 10.0);
+        track.setSegmentEasing(0, spec);
+        QCOMPARE(track.evaluateAt(0), 0.0);
+        QCOMPARE(track.evaluateAt(drift::secondsToUs(1.0)), 10.0);
+    }
+
+    drift::KeyframeTrack<double> bounce;
+    bounce.setKeyframe(0, 0.0);
+    bounce.setKeyframe(drift::secondsToUs(1.0), 10.0);
+    bounce.setSegmentEasing(0, drift::findBuiltinEasingPreset(QStringLiteral("bounceOut"))->spec);
+    QVERIFY(std::abs(bounce.evaluateAt(drift::secondsToUs(0.25)) - 2.5) > 0.01);
+}
+
+void CoreTest::easingFunctionSerializationRoundTrip()
+{
+    drift::KeyframeTrack<double> track;
+    track.setKeyframe(0, 0.0);
+    track.setKeyframe(drift::secondsToUs(1.0), 10.0);
+    drift::EasingSpec spec = drift::findBuiltinEasingPreset(QStringLiteral("elasticOut"))->spec;
+    spec.amplitude = 1.5;
+    spec.period = 0.4;
+    track.setSegmentEasing(0, spec);
+
+    const drift::KeyframeTrack<double> loaded =
+        drift::keyframesFromJson(drift::keyframesToJson(track));
+    QVERIFY(loaded.keyframes() == track.keyframes());
+    QCOMPARE(loaded.keyframes().value(0).fn, drift::EasingFn::ElasticOut);
+    QCOMPARE(loaded.keyframes().value(0).fnAmplitude, 1.5);
+    QCOMPARE(loaded.keyframes().value(0).fnPeriod, 0.4);
+}
+
+void CoreTest::easingCssRoundTrip()
+{
+    drift::EasingSpec hold;
+    hold.kind = drift::EasingSpec::Kind::Hold;
+    drift::EasingSpec elastic = drift::findBuiltinEasingPreset(QStringLiteral("elasticOut"))->spec;
+    elastic.amplitude = 1.5;
+    elastic.period = 0.4;
+    const drift::EasingSpec specs[] = {
+        drift::findBuiltinEasingPreset(QStringLiteral("backOut"))->spec,
+        drift::EasingSpec{},
+        hold,
+        elastic,
+    };
+    for (const drift::EasingSpec &spec : specs) {
+        const auto parsed = drift::EasingSpec::parseCss(spec.toCssString());
+        QVERIFY(parsed.has_value());
+        QVERIFY(parsed->approxEquals(spec));
+    }
+
+    QVERIFY(!drift::EasingSpec::parseCss(QStringLiteral("cubic-bezier(1.2,0,0,1)")).has_value());
+    const auto bare = drift::EasingSpec::parseCss(QStringLiteral("0.25, 0.1, 0.25, 1"));
+    QVERIFY(bare.has_value());
+    QVERIFY(bare->approxEquals(drift::findBuiltinEasingPreset(QStringLiteral("ease"))->spec));
+}
+
+void CoreTest::easingSetSegmentOnLastKeyTargetsIncomingSegment()
+{
+    drift::KeyframeTrack<double> track;
+    track.setKeyframe(0, 0.0);
+    track.setKeyframe(drift::secondsToUs(1.0), 5.0);
+    track.setKeyframe(drift::secondsToUs(2.0), 10.0);
+    const drift::EasingSpec cubicIn = drift::findBuiltinEasingPreset(QStringLiteral("cubicIn"))->spec;
+    track.setSegmentEasing(drift::secondsToUs(2.0), cubicIn);
+
+    QVERIFY(track.segmentEasing(drift::secondsToUs(1.0)).approxEquals(cubicIn));
+    QCOMPARE(track.segmentEasing(0).kind, drift::EasingSpec::Kind::Linear);
 }
 
 void CoreTest::keyframeNearestQuery()

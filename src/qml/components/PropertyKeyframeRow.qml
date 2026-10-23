@@ -11,10 +11,8 @@ Column {
     required property var propDef       // {key, label, def, decimals}
     required property var keyframeList  // [{seconds, value}, ...] for this property
     property string linkedPropKey: ""   // partner property whose keyframes stay in lockstep (e.g. x with y)
-    // Easing is a property of the key at the playhead, not of the whole track. Hand-dragged
-    // tangents match no preset, which is what leaves every chip unlit.
-    readonly property string interpolationMode:
-        (activeKey && !activeKey.custom) ? (activeKey.easing || "linear") : ""
+    // The phone shell opens easing in a bottom sheet instead of the popup.
+    property bool useSheet: ShellBridge.phoneShell
 
     // When true, the value is edited through a slider + readout instead of a
     // numeric text field. Drags are coalesced into a single undo entry via
@@ -171,14 +169,38 @@ Column {
             EditorState.playheadSeconds, v)
     }
 
-    function setInterpolation(mode) {
-        EditorState.showKeyframeGraphProperty(root.propDef.key)
-        EditorState.setKeyframeInterpolation(
-            EditorState.selectedTrack, EditorState.selectedClip, root.propDef.key, mode)
-        if (root.linkedPropKey.length > 0 && EditorState.positionLinked) {
-            EditorState.setKeyframeInterpolation(
-                EditorState.selectedTrack, EditorState.selectedClip, root.linkedPropKey, mode)
+    // Read from the engine: the segment's easing is not a field on the key, and the preset
+    // match is what the button's tooltip names.
+    readonly property var easingState: {
+        void valueRevision
+        if (!activeKey || keyframeList.length < 2)
+            return ({})
+        return EditorState.keyframeSegmentEasing(EditorState.selectedTrack, EditorState.selectedClip,
+                                                 propDef.key, activeKey.seconds)
+    }
+    readonly property string easingLabel: {
+        void valueRevision
+        const id = easingState.presetId
+        if (!id)
+            return qsTr("Custom")
+        const presets = EditorState.easingPresets()
+        for (let i = 0; i < presets.length; ++i) {
+            if (presets[i].id === id)
+                return presets[i].label
         }
+        return qsTr("Custom")
+    }
+
+    function openEasingPicker() {
+        EditorState.showKeyframeGraphProperty(root.propDef.key)
+        if (root.useSheet) {
+            ShellBridge.easingSheetRequested(EditorState.selectedTrack, EditorState.selectedClip,
+                                             root.propDef.key, root.propDef.label, activeKey.seconds)
+            return
+        }
+        easingPopupLoader.active = true
+        easingPopupLoader.item.openFor(EditorState.selectedTrack, EditorState.selectedClip,
+                                       root.propDef.key, activeKey.seconds)
     }
 
     readonly property bool hasPrevKeyframe: {
@@ -245,6 +267,7 @@ Column {
         target: EditorState
         function onSelectedClipDataChanged() { root.bumpValue() }
         function onTracksChanged() { root.bumpValue() }
+        function onEasingPresetsChanged() { root.valueRevision++ }
         function onClipPropertiesPreviewed(trackIndex, clipIndex, keys) {
             if (root.editing || !root.matchesKey(keys))
                 return
@@ -292,8 +315,9 @@ Column {
                 id: labelZone
                 anchors.verticalCenter: parent.verticalCenter
                 height: labelText.implicitHeight
-                width: Math.max(24, parent.width - diamond.width - linChip.width - easeChip.width
-                                      - holdChip.width - parent.spacing * 4)
+                width: Math.max(24, parent.width - diamond.width
+                                      - (easingButton.visible ? easingButton.width + parent.spacing : 0)
+                                      - parent.spacing)
 
                 Text {
                     id: labelText
@@ -310,43 +334,56 @@ Column {
                 }
             }
 
-            ThemedChip {
-                id: linChip
-                text: qsTr("Straight")
-                tooltip: qsTr("Straight — changes at a steady rate between keyframes")
-                selected: root.interpolationMode === "linear"
-                enabled: root.activeKey !== null
-                chipHeight: 18
-                horizontalPadding: Theme.spacingSm
-                width: 28
+            Item {
+                id: easingButton
+                readonly property real buttonSize: Theme.touchInput ? 28 : 22
+                visible: root.activeKey !== null && root.keyframeList.length >= 2
                 anchors.verticalCenter: parent.verticalCenter
-                onClicked: root.setInterpolation("linear")
-            }
+                width: buttonSize
+                height: buttonSize
 
-            ThemedChip {
-                id: easeChip
-                text: qsTr("Ease")
-                tooltip: qsTr("Ease — accelerates out and decelerates in")
-                selected: root.interpolationMode === "ease"
-                enabled: root.activeKey !== null
-                chipHeight: 18
-                horizontalPadding: Theme.spacingSm
-                width: 36
-                anchors.verticalCenter: parent.verticalCenter
-                onClicked: root.setInterpolation("ease")
-            }
+                Rectangle {
+                    anchors.fill: parent
+                    radius: Theme.c.propertyKeyframeRow.radius
+                    color: easingArea.containsMouse ? Theme.c.propertyKeyframeRow.backgroundHover
+                                                    : "transparent"
 
-            ThemedChip {
-                id: holdChip
-                text: qsTr("Jump")
-                tooltip: qsTr("Jump — holds the value until the next keyframe")
-                selected: root.interpolationMode === "hold"
-                enabled: root.activeKey !== null
-                chipHeight: 18
-                horizontalPadding: Theme.spacingSm
-                width: 34
-                anchors.verticalCenter: parent.verticalCenter
-                onClicked: root.setInterpolation("hold")
+                    Behavior on color {
+                        ColorAnimation { duration: Theme.durationFast; easing.type: Theme.easing }
+                    }
+                }
+
+                EasingThumb {
+                    anchors.centerIn: parent
+                    width: easingButton.buttonSize - 4
+                    height: easingButton.buttonSize - 4
+                    showBackground: false
+                    samples: root.easingState.samples ? root.easingState.samples : []
+                    curveColor: root.graphColor
+                }
+
+                MouseArea {
+                    id: easingArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.openEasingPicker()
+                    onWheel: (wheel) => { wheel.accepted = false }
+                }
+
+                ThemedToolTip {
+                    text: qsTr("Easing: %1 — click to change").arg(root.easingLabel)
+                    visible: easingArea.containsMouse
+                }
+
+                Loader {
+                    id: easingPopupLoader
+                    active: false
+                    sourceComponent: EasingPickerPopup {
+                        anchorItem: easingButton
+                        propLabel: root.propDef.label
+                    }
+                }
             }
         }
     }

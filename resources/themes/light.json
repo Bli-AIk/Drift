@@ -621,6 +621,25 @@
     "toolWindow": {
       "background": "$semantic.surface.app"
     },
+    "easingPicker": {
+      "background": "$semantic.surface.panel",
+      "border": "$semantic.panel.border",
+      "borderWidth": "$metrics.borderWidth",
+      "curve": "$semantic.primary",
+      "curveMuted": "$semantic.mutedForeground",
+      "curveWidth": "$metrics.borderWidthFocus",
+      "foreground": "$semantic.panel.foreground",
+      "foregroundMuted": "$semantic.mutedForeground",
+      "gridLine": "$semantic.panel.border",
+      "handle": "$semantic.primary",
+      "handleLine": "$semantic.mutedForeground",
+      "radius": "$metrics.radius.sm",
+      "radiusPopup": "$metrics.radius.md",
+      "tileBackground": "$semantic.panel.secondary.background",
+      "tileBackgroundHover": "$semantic.panel.accent",
+      "tileBackgroundSelected": "$semantic.panel.accent",
+      "tileBorderSelected": "$semantic.primary"
+    },
     "editorHeader": {
       "background": "$semantic.surface.app"
     },
