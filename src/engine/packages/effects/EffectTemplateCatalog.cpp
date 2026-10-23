@@ -215,7 +215,11 @@ std::optional<EffectTemplateEntry> loadManifest(const QString &packageDir, QStri
 
     entry.packageDir = packageDir;
     entry.thumbnailPath =
-        GpuPackageParse::resolvePackageAsset(packageDir, QStringLiteral("thumbnail.png"));
+        GpuPackageParse::resolvePackageAsset(packageDir, QStringLiteral("thumbnail.webp"));
+    if (entry.thumbnailPath.isEmpty()) {
+        entry.thumbnailPath =
+            GpuPackageParse::resolvePackageAsset(packageDir, QStringLiteral("thumbnail.png"));
+    }
     return entry;
 }
 

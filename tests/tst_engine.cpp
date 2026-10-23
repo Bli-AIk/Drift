@@ -13355,7 +13355,8 @@ void EngineTest::audioEffectCatalogLoadsPackages()
     QCOMPARE(telephone->category, QStringLiteral("transmission"));
     QCOMPARE(telephone->processorId, QStringLiteral("bandlimit"));
     QCOMPARE(telephone->icon, QStringLiteral("phone"));
-    QVERIFY2(!telephone->thumbnailPath.isEmpty(), "telephone package should ship thumbnail.png");
+    QVERIFY2(!telephone->thumbnailPath.isEmpty(), "telephone package should ship thumbnail.webp");
+    QCOMPARE(QFileInfo(telephone->thumbnailPath).fileName(), QStringLiteral("thumbnail.webp"));
     QVERIFY(QFileInfo::exists(telephone->thumbnailPath));
 
     const AudioEffectEntry *chipmunk = audioEffectDefForId(QStringLiteral("voice.chipmunk"));

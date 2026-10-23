@@ -93,6 +93,7 @@ if [[ $SKIP_BUILD -eq 0 ]]; then
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_PREFIX_PATH="$QT_PREFIX;$BREW_PREFIX/opt/openssl@3;$BREW_PREFIX" \
     -DDRIFT_BUNDLE_ONNXRUNTIME=OFF \
+    -DDRIFT_BUNDLE_CORE_PACKAGES_ONLY=ON \
     -DDRIFT_CHANNEL="$CHANNEL" \
     -DDRIFT_BUILD_ID="$BUILD_ID"
   cmake --build "$BUILD_DIR" --target drift --parallel "$(sysctl -n hw.ncpu)"

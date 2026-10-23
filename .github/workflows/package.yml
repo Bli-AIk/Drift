@@ -342,6 +342,7 @@ jobs:
             -DCMAKE_PREFIX_PATH="${QT_ROOT_DIR};${GITHUB_WORKSPACE}/.deps/ffmpeg" \
             -DFETCHCONTENT_BASE_DIR="${FETCHCONTENT_BASE_DIR}" \
             -DDRIFT_BUNDLE_ONNXRUNTIME=OFF \
+            -DDRIFT_BUNDLE_CORE_PACKAGES_ONLY=ON \
             -DDRIFT_WITH_SKIA=ON \
             -DDRIFT_DISTRIBUTION=appimage \
             ${DRIFT_CHANNEL_ARGS}
@@ -665,6 +666,7 @@ jobs:
             -DZLIB_INCLUDE_DIR=${{ github.workspace }}\vcpkg\installed\${{ matrix.arch }}-windows-static-md\include `
             -DZLIB_LIBRARY=${{ github.workspace }}\vcpkg\installed\${{ matrix.arch }}-windows-static-md\lib\zs.lib `
             -DDRIFT_BUNDLE_ONNXRUNTIME=OFF `
+            -DDRIFT_BUNDLE_CORE_PACKAGES_ONLY=ON `
             -DDRIFT_WITH_SKIA=ON `
             -DDRIFT_DISTRIBUTION=windows `
             ${{ env.DRIFT_CHANNEL_ARGS }}
@@ -986,6 +988,7 @@ jobs:
             -DCMAKE_PREFIX_PATH="$(brew --prefix qt);$(brew --prefix openssl@3);$(brew --prefix)" \
             -DFETCHCONTENT_BASE_DIR="${FETCHCONTENT_BASE_DIR}" \
             -DDRIFT_BUNDLE_ONNXRUNTIME=OFF \
+            -DDRIFT_BUNDLE_CORE_PACKAGES_ONLY=ON \
             -DDRIFT_WITH_SKIA=ON \
             -DDRIFT_DISTRIBUTION=macos \
             ${DRIFT_CHANNEL_ARGS}

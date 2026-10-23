@@ -93,11 +93,18 @@ EffectPresetEntry EffectPackageLoader::loadPackage(const QString &packageDir, QS
         return entry;
     }
 
-    // Optional thumbnail: explicit relative/absolute path, else thumbnail.png in the package.
+    // Optional thumbnail: explicit relative/absolute path, else thumbnail.webp, then thumbnail.png, in the package.
     QString thumbRel = root.value(QStringLiteral("thumbnail")).toString();
-    if (thumbRel.isEmpty())
-        thumbRel = QStringLiteral("thumbnail.png");
-    entry.thumbnailPath = GpuPackageParse::resolvePackageAsset(packageDir, thumbRel);
+    if (!thumbRel.isEmpty()) {
+        entry.thumbnailPath = GpuPackageParse::resolvePackageAsset(packageDir, thumbRel);
+    } else {
+        entry.thumbnailPath =
+            GpuPackageParse::resolvePackageAsset(packageDir, QStringLiteral("thumbnail.webp"));
+        if (entry.thumbnailPath.isEmpty()) {
+            entry.thumbnailPath =
+                GpuPackageParse::resolvePackageAsset(packageDir, QStringLiteral("thumbnail.png"));
+        }
+    }
 
     QString error;
     if (!GpuPackageParse::checkNextFeatures(root, &error)) {
