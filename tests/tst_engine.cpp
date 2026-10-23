@@ -344,6 +344,7 @@ private slots:
     void bloomGlowZeroIntensityPassthrough();
     void bloomGlowDarkFrameUnchanged();
     void bloomGlowBrightSpotBleedsToNeighbors();
+    void bloomGlowKeepsPremultipliedAlpha();
     void rippleWaterZeroAmplitudePassthrough();
     void rippleWaterNonzeroDisplacementChangesOutput();
     void edgeNeonZeroIntensityUnchanged();
@@ -496,6 +497,7 @@ private slots:
     void limitedPreviewGpusAreRecognised();
     void scopeAnalysisHistogramCounts();
     void cubeLutParsesSizeDomainAndComments();
+    void cubeLutToleratesBomCrlfTabsAndTrailingComments();
     void cubeLutRejectsMalformed();
     void cubeLutResampleKeepsIdentity();
     void cubeLutDomainMapsInput();
@@ -8768,8 +8770,9 @@ void EngineTest::gpuMultiPassPreservesVerticalOrientation()
     QVERIFY2(qBlue(blurred.pixel(16, 27)) > qRed(blurred.pixel(16, 27)),
              "blur: bottom should stay predominantly blue");
 
-    // Bloom composites an FBO blur buffer with the source texture — both must share Y.
-    QImage bloomSrc(32, 32, QImage::Format_RGBA8888);
+    // Bloom composites an FBO blur buffer with the source texture — both must share Y. 1080 lines
+    // tall, as bloom's radius is in pixels of a 1080-line frame.
+    QImage bloomSrc(32, 1080, QImage::Format_RGBA8888);
     bloomSrc.fill(QColor(0, 0, 0));
     for (int x = 8; x < 24; ++x)
         bloomSrc.setPixel(x, 4, qRgba(255, 255, 255, 255)); // bright bar near top only
@@ -8784,8 +8787,8 @@ void EngineTest::gpuMultiPassPreservesVerticalOrientation()
     QCOMPARE(bloomed.size(), bloomSrc.size());
     const int topGlow = qRed(bloomed.pixel(16, 6)) + qGreen(bloomed.pixel(16, 6))
                         + qBlue(bloomed.pixel(16, 6));
-    const int bottomGlow = qRed(bloomed.pixel(16, 28)) + qGreen(bloomed.pixel(16, 28))
-                           + qBlue(bloomed.pixel(16, 28));
+    const int bottomGlow = qRed(bloomed.pixel(16, 1073)) + qGreen(bloomed.pixel(16, 1073))
+                           + qBlue(bloomed.pixel(16, 1073));
     QVERIFY2(topGlow > bottomGlow + 20,
              qPrintable(QStringLiteral(
                  "bloom glow should stay near the bright top bar, not mirrored to the bottom "
@@ -9251,7 +9254,8 @@ void EngineTest::bloomGlowBrightSpotBleedsToNeighbors()
     if (!GpuEffectExecutor::instance().isAvailable())
         QSKIP("OpenGL offscreen context unavailable");
 
-    QImage image(32, 32, QImage::Format_RGBA8888);
+    // 1080 lines tall: bloom's radius is in pixels of a 1080-line frame.
+    QImage image(64, 1080, QImage::Format_RGBA8888);
     image.fill(QColor(10, 10, 10));
     // A small bright block (not a single pixel) so separable blur keeps
     // measurable energy after H+V dilution in 8-bit.
@@ -9288,6 +9292,38 @@ void EngineTest::bloomGlowBrightSpotBleedsToNeighbors()
     QVERIFY(def);
     QVERIFY(def->isGpu);
     QCOMPARE(buildFilterGraphForEffect({.catalogId = QStringLiteral("bloom_glow")}), QString());
+}
+
+void EngineTest::bloomGlowKeepsPremultipliedAlpha()
+{
+    if (!GpuEffectExecutor::instance().isAvailable())
+        QSKIP("OpenGL offscreen context unavailable");
+
+    QImage image(64, 1080, QImage::Format_RGBA8888_Premultiplied);
+    image.fill(Qt::transparent);
+    for (int y = 10; y <= 22; ++y) {
+        for (int x = 10; x <= 22; ++x)
+            image.setPixel(x, y, qRgba(128, 128, 128, 128));
+    }
+    for (int y = 14; y <= 18; ++y) {
+        for (int x = 14; x <= 18; ++x)
+            image.setPixel(x, y, qRgba(128, 128, 128, 128));
+    }
+
+    const QImage out = EffectProcessor::applyEffects(image, {makeBloomGlowEffect()})
+                           .convertToFormat(QImage::Format_RGBA8888_Premultiplied);
+    bool bled = false;
+    for (int y = 0; y < out.height(); ++y) {
+        const QRgb *row = reinterpret_cast<const QRgb *>(out.constScanLine(y));
+        for (int x = 0; x < out.width(); ++x) {
+            const int a = qAlpha(row[x]);
+            QVERIFY2(qRed(row[x]) <= a && qGreen(row[x]) <= a && qBlue(row[x]) <= a,
+                     "premultiplied rgb must not exceed alpha");
+            if (y < 10 && a > 0)
+                bled = true;
+        }
+    }
+    QVERIFY2(bled, "glow should extend past the shape's edge");
 }
 
 static drift::Effect makeRippleWaterEffect()
@@ -16276,6 +16312,18 @@ LUT_3D_SIZE 2
     }
 }
 
+void EngineTest::cubeLutToleratesBomCrlfTabsAndTrailingComments()
+{
+    const QByteArray text = "\xEF\xBB\xBFTITLE \"Bom # Look\"\r\nLUT_3D_SIZE 2 # size\r\n"
+                            "0\t0\t0\r\n1 0 0 # red\r\n0 1 0\r\n1 1 0\r\n0 0 1\r\n1 0 1\r\n0 1 1\r\n1 1 1\r\n";
+    drift::CubeLut lut;
+    QString error;
+    QVERIFY2(drift::parseCube(text, &lut, &error), qPrintable(error));
+    QCOMPARE(lut.size, 2);
+    QCOMPARE(lut.title, QStringLiteral("Bom # Look"));
+    QCOMPARE(lut.rgb.size(), size_t(24));
+}
+
 void EngineTest::cubeLutRejectsMalformed()
 {
     const auto rejects = [](const QByteArray &text) {
@@ -16453,8 +16501,7 @@ void EngineTest::colorGradeDefaultsAreIdentity()
         for (int x = 0; x < frame.width(); ++x) {
             const QColor in = frame.pixelColor(x, y);
             const QColor got = out.pixelColor(x, y);
-            QVERIFY2(std::abs(got.red() - in.red()) <= 2 && std::abs(got.green() - in.green()) <= 2
-                         && std::abs(got.blue() - in.blue()) <= 2,
+            QVERIFY2(got.red() == in.red() && got.green() == in.green() && got.blue() == in.blue(),
                      qPrintable(QStringLiteral("(%1,%2) in %3,%4,%5 out %6,%7,%8").arg(x).arg(y)
                                     .arg(in.red()).arg(in.green()).arg(in.blue())
                                     .arg(got.red()).arg(got.green()).arg(got.blue())));
@@ -16548,28 +16595,36 @@ void EngineTest::lookCatalogFindsPacksAndUserLooks()
     const QString userRoot = tmp.filePath(QStringLiteral("user"));
     const drift::LookImportResult first = drift::importCubeFiles(
         {incoming + "/My Look.cube", incoming + "/broken.cube"}, userRoot);
-    QCOMPARE(first.importedIds, (QStringList{QStringLiteral("user.my-look")}));
+    QCOMPARE(first.importedIds.size(), 1);
+    const QString myLookId = first.importedIds.first();
+    QVERIFY(myLookId.startsWith(QStringLiteral("user.my-look-")));
     QCOMPARE(first.errors.size(), 1);
-    QVERIFY(QFileInfo::exists(userRoot + "/user.my-look/look.cube"));
-    QFile manifest(userRoot + "/user.my-look/look.json");
+    QVERIFY(QFileInfo::exists(userRoot + "/" + myLookId + "/look.cube"));
+    QFile manifest(userRoot + "/" + myLookId + "/look.json");
     QVERIFY(manifest.open(QIODevice::ReadOnly));
     QCOMPARE(QJsonDocument::fromJson(manifest.readAll()).object().value(QStringLiteral("name")).toString(),
              QStringLiteral("My Look"));
 
     const drift::LookImportResult second = drift::importCubeFiles({incoming + "/My Look.cube"}, userRoot);
-    QCOMPARE(second.importedIds, (QStringList{QStringLiteral("user.my-look-2")}));
+    QCOMPARE(second.importedIds, (QStringList{myLookId}));
     QVERIFY(second.errors.isEmpty());
 
+    put(incoming + "/Other.cube", cube + "\n# different bytes\n");
+    const drift::LookImportResult third = drift::importCubeFiles({incoming + "/Other.cube"}, userRoot);
+    QCOMPARE(third.importedIds.size(), 1);
+    QVERIFY(third.importedIds.first() != myLookId);
+
     drift::reloadLookCatalog({userRoot});
-    QCOMPARE(drift::lookCubePathForId(QStringLiteral("user.my-look")), userRoot + "/user.my-look/look.cube");
-    QVERIFY(drift::lookForId(QStringLiteral("user.my-look-2")));
+    QCOMPARE(drift::lookCubePathForId(myLookId), userRoot + "/" + myLookId + "/look.cube");
+    QVERIFY(drift::lookForId(third.importedIds.first()));
 
     // Only user.* folders under the user root can be removed.
     QVERIFY(!drift::removeUserLook(QStringLiteral("warm_tone"), builtin));
     QVERIFY(QFileInfo::exists(builtin + "/warm_tone/look.cube"));
     QVERIFY(!drift::removeUserLook(QStringLiteral("user."), userRoot));
-    QVERIFY(drift::removeUserLook(QStringLiteral("user.my-look"), userRoot));
-    QVERIFY(!QFileInfo::exists(userRoot + "/user.my-look"));
+    QVERIFY(drift::removeUserLook(myLookId, userRoot));
+    QVERIFY(!QFileInfo::exists(userRoot + "/" + myLookId));
+    QCOMPARE(drift::importCubeFiles({incoming + "/My Look.cube"}, userRoot).importedIds, (QStringList{myLookId}));
 
     drift::reloadLookCatalog();
 }

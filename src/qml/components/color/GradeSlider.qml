@@ -13,6 +13,12 @@ Item {
     property int decimals: 2
     property bool bipolar: true
     property var gradient: []
+    property bool animated: false
+    property int dragMoves: 0
+    // Handle travel is warped by |p|^curvePower around defaultValue; only for symmetric ranges.
+    property real curvePower: 1
+    property real _pointerValue: 0
+    property real _fineValue: 0
 
     signal began()
     signal moved(real value)
@@ -21,12 +27,33 @@ Item {
 
     readonly property bool gradientActive: gradient && gradient.length >= 2
     readonly property real span: Math.max(1e-9, to - from)
+    readonly property bool curved: curvePower !== 1 && Math.abs(from + to - 2 * defaultValue) < 1e-9
+
+    function toSliderValue(v) {
+        if (!curved)
+            return v
+        const p = Math.max(-1, Math.min(1, (v - defaultValue) / (span / 2)))
+        return Math.sign(p) * Math.pow(Math.abs(p), 1 / curvePower)
+    }
+
+    function fromSliderValue(p) {
+        if (!curved)
+            return p
+        return defaultValue + Math.sign(p) * Math.pow(Math.abs(p), curvePower) * (span / 2)
+    }
 
     function resetToDefault() {
+        commitTimer.stop()
         began()
         moved(defaultValue)
         ended()
         reset()
+    }
+
+    Timer {
+        id: commitTimer
+        interval: Qt.styleHints.mouseDoubleClickInterval + 50
+        onTriggered: root.ended()
     }
 
     implicitWidth: 200
@@ -39,7 +66,7 @@ Item {
 
         Text {
             anchors.left: parent.left
-            anchors.right: field.left
+            anchors.right: keyMark.visible ? keyMark.left : field.left
             anchors.rightMargin: Theme.spacingSm
             anchors.verticalCenter: parent.verticalCenter
             elide: Text.ElideRight
@@ -51,6 +78,16 @@ Item {
             TapHandler {
                 onDoubleTapped: root.resetToDefault()
             }
+        }
+
+        KeyframeDiamond {
+            id: keyMark
+            anchors.right: field.left
+            anchors.rightMargin: Theme.spacingSm
+            anchors.verticalCenter: parent.verticalCenter
+            visible: root.animated
+            animated: true
+            tooltip: qsTr("Animated. Editing sets keyframes (needs Auto keyframes on).")
         }
 
         ThemedNumberField {
@@ -76,30 +113,49 @@ Item {
         y: header.height + Theme.spacingXs
         width: parent.width
         label: root.label
-        from: root.from
-        to: root.to
+        from: root.curved ? -1 : root.from
+        to: root.curved ? 1 : root.to
         stepSize: root.stepSize
         showValueTooltip: false
+        lockWhilePlaying: root.animated
         valueFormatter: v => Number(v).toFixed(root.decimals)
 
         Binding on value {
             when: !slider.pressed
-            value: root.value
+            value: root.toSliderValue(root.value)
         }
 
         onPressedChanged: {
-            if (pressed)
-                root.began()
-            else
+            if (pressed) {
+                root.dragMoves = 0
+                root._pointerValue = value
+                root._fineValue = value
+                if (commitTimer.running)
+                    commitTimer.stop()
+                else
+                    root.began()
+            } else if (root.dragMoves <= 1) {
+                commitTimer.restart()
+            } else {
                 root.ended()
+            }
         }
         onMoved: {
             if (pressed) {
-                root.moved(value)
+                root.dragMoves++
+                // Shift drags at a tenth of the pointer's speed; the handle follows the fine value.
+                const fine = (EditorState.keyboardModifiers() & Qt.ShiftModifier) !== 0
+                root._fineValue = fine
+                    ? Math.max(slider.from, Math.min(slider.to, root._fineValue + (value - root._pointerValue) * 0.1))
+                    : value
+                root._pointerValue = value
+                if (fine)
+                    value = root._fineValue
+                root.moved(root.fromSliderValue(root._fineValue))
                 return
             }
             root.began()
-            root.moved(value)
+            root.moved(root.fromSliderValue(value))
             root.ended()
         }
 

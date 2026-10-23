@@ -225,7 +225,8 @@ public:
                         std::shared_ptr<const BlockGeometry> geometry, const Bend &bend, double bleedPx)
         : m_size(size), m_key(key == 0 ? 0 : (key | 1)), m_style(request.style), m_scale(request.renderScale),
           m_set(request.set), m_geometry(std::move(geometry)), m_frame(request.frame), m_bend(bend),
-          m_bleed(bleedPx), m_timeSec(request.timeSec), m_grouping(request.anchorGrouping),
+          m_bleed(bleedPx), m_timeSec(request.timeSec), m_frameRate(request.frameRate),
+          m_grouping(request.anchorGrouping),
           m_alignment(request.anchorAlignment)
     {
         m_style.keyframes.clear();
@@ -448,7 +449,7 @@ private:
         }
         const TextPaint &tp = layer.paint;
         const QRectF box = paintBoxFor(tp.kind == TextPaintKind::Gradient ? tp.gradient.space : TextGradientSpace::Block, i);
-        applyShadingPaint(paint, tp, box, m_timeSec, alpha, m_frame.block.wipeProgress);
+        applyShadingPaint(paint, tp, box, m_timeSec, alpha, m_frame.block.wipeProgress, m_frameRate);
     }
 
     void applyFragmentWipe(SkPaint &paint, int i) const
@@ -673,6 +674,7 @@ private:
     Bend m_bend;
     double m_bleed;
     double m_timeSec;
+    double m_frameRate;
     TextAnchorGrouping m_grouping;
     QPointF m_alignment;
     QList<Piece> m_pieces;

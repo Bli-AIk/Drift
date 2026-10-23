@@ -26,8 +26,8 @@ QtObject {
         return { label: label, path: [settings], hint: "", keywords: keywords, page: pageId }
     }
 
-    function color(label, hint, keywords) {
-        return { label: label, path: [grading], hint: hint, keywords: keywords, workspace: "color" }
+    function color(label, hint, keywords, tab) {
+        return { label: label, path: [grading], hint: hint, keywords: keywords, workspace: "color", colorTab: tab }
     }
 
     readonly property var entries: [
@@ -83,25 +83,28 @@ QtObject {
         prop(qsTr("PDF"), qsTr("PDF page"), qsTr("Select a PDF clip"), "scroll"),
         prop(qsTr("3D Model"), qsTr("3D model"), qsTr("Select a 3D model clip"), "mesh"),
 
-        color(qsTr("Exposure"), anyClip, "light brightness"),
-        color(qsTr("Contrast"), anyClip, "light"),
-        color(qsTr("Highlights"), anyClip, "light bright"),
-        color(qsTr("Shadows"), anyClip, "light dark"),
-        color(qsTr("Whites"), anyClip, "light"),
-        color(qsTr("Blacks"), anyClip, "light"),
-        color(qsTr("Temperature"), anyClip, "white balance warm cool kelvin"),
-        color(qsTr("Tint"), anyClip, "white balance green magenta"),
-        color(qsTr("Saturation"), anyClip, "color intensity"),
-        color(qsTr("Vibrance"), anyClip, "color saturation"),
-        color(qsTr("Color wheels"), anyClip, "lift gamma gain shadows midtones highlights"),
-        color(qsTr("Curves"), anyClip, "rgb curve"),
+        color(qsTr("Exposure"), anyClip, "light brightness", 0),
+        color(qsTr("Contrast"), anyClip, "light", 0),
+        color(qsTr("Highlights"), anyClip, "light bright", 0),
+        color(qsTr("Shadows"), anyClip, "light dark", 0),
+        color(qsTr("Whites"), anyClip, "light", 0),
+        color(qsTr("Blacks"), anyClip, "light", 0),
+        color(qsTr("Temperature"), anyClip, "white balance warm cool kelvin", 0),
+        color(qsTr("Tint"), anyClip, "white balance green magenta", 0),
+        color(qsTr("Saturation"), anyClip, "color intensity", 0),
+        color(qsTr("Vibrance"), anyClip, "color saturation", 0),
+        color(qsTr("Color wheels"), anyClip, "lift gamma gain shadows midtones highlights", 1),
+        color(qsTr("Curves"), anyClip, "rgb curve", 2),
+        color(qsTr("Hue curves"), anyClip, "hue vs hue saturation luminance curve", 2),
+        color(qsTr("HSL"), anyClip, "hsl hue saturation luminance color band red orange yellow green aqua blue purple magenta", 3),
+        color(qsTr("Color grade"), visualClip, "grade color workspace open"),
         color(qsTr("Looks"), anyClip, "lut filter preset cube"),
         color(qsTr("Import looks"), anyClip, "import cube lut look"),
         color(qsTr("Scopes"), qsTr("Open the Color workspace"), "histogram waveform vectorscope parade"),
-        color(qsTr("Film Grain"), anyClip, "grain noise film"),
-        color(qsTr("Glow"), anyClip, "bloom glow halation"),
-        color(qsTr("Vignette"), anyClip, "dark corners edges"),
-        color(qsTr("Chromatic Aberration"), anyClip, "color fringe lens"),
+        color(qsTr("Film Grain"), anyClip, "grain noise film", 4),
+        color(qsTr("Glow"), anyClip, "bloom glow halation", 4),
+        color(qsTr("Vignette"), anyClip, "dark corners edges", 4),
+        color(qsTr("Chromatic Aberration"), anyClip, "color fringe lens", 4),
         color(qsTr("Compare"), anyClip, "before after bypass original"),
         color(qsTr("Apply to all clips"), anyClip, "grade timeline all clips copy"),
 

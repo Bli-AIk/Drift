@@ -88,6 +88,22 @@
     "rampSky": "#38bdf8",
     "rampGreen": "#4ade80",
     "rampViolet": "#c084fc",
+    "gradeHslRed": "#e5484d",
+    "gradeHslOrange": "#f76b15",
+    "gradeHslYellow": "#f5d90a",
+    "gradeHslGreen": "#30a46c",
+    "gradeHslAqua": "#12a594",
+    "gradeHslBlue": "#3e63dd",
+    "gradeHslPurple": "#8e4ec6",
+    "gradeHslMagenta": "#d6409f",
+    "gradeHue": "#f59e0b",
+    "gradeSat": "#22d3ee",
+    "gradeLum": "#e5e7eb",
+    "gradeCurveRed": "#ef5350",
+    "gradeCurveGreen": "#66bb6a",
+    "gradeCurveBlue": "#42a5f5",
+    "scopesBackground": "#101114",
+    "scopesLabel": "#8a8d94",
     "rampRose": "#fb7185",
     "rampIndigo": "#818cf8",
     "categoryAmber": "#f59e0b",
@@ -1771,6 +1787,29 @@
       "icon": "$semantic.mutedForeground",
       "radius": "$metrics.radius.sm"
     },
+    "scopes": {
+      "background": "$palette.scopesBackground",
+      "label": "$palette.scopesLabel"
+    },
+    "colorGradeBands": {
+      "red": "$palette.gradeHslRed",
+      "orange": "$palette.gradeHslOrange",
+      "yellow": "$palette.gradeHslYellow",
+      "green": "$palette.gradeHslGreen",
+      "aqua": "$palette.gradeHslAqua",
+      "blue": "$palette.gradeHslBlue",
+      "purple": "$palette.gradeHslPurple",
+      "magenta": "$palette.gradeHslMagenta"
+    },
+    "colorGradeCurveChannels": {
+      "master": "$palette.panelForeground",
+      "r": "$palette.gradeCurveRed",
+      "g": "$palette.gradeCurveGreen",
+      "b": "$palette.gradeCurveBlue",
+      "hue": "$palette.gradeHue",
+      "sat": "$palette.gradeSat",
+      "lum": "$palette.gradeLum"
+    },
     "fadeCurveCanvas": {
       "curve": "$semantic.primary",
       "curveLineWidth": "$metrics.borderWidthFocus",
@@ -2611,6 +2650,12 @@
     },
     "previewOptionsRowLabel": {
       "foreground": "$semantic.mutedForeground"
+    },
+    "previewOriginalBadge": {
+      "background": "$semantic.surface.panel",
+      "border": "$semantic.primary",
+      "borderWidth": "$metrics.borderWidth",
+      "foreground": "$semantic.panel.foreground"
     },
     "previewOsdCluster": {
       "background": "$semantic.surface.panel",

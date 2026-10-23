@@ -14,16 +14,19 @@ PanelFrame {
     readonly property bool hasTarget: !!target.hasTarget
     readonly property var params: target.params || ({})
     readonly property var finishing: target.finishing || ([])
+    readonly property var animatedKeys: target.animatedKeys || ([])
     property int tab: 0
     property var live: ({})
     property var expanded: ({})
     property var finishingSpecs: ({})
     property string applyStatus: ""
     property bool includeFinishing: false
+    property bool compareWasOn: false
+    property real compareDownAt: 0
 
-    readonly property var tabs: [qsTr("Basic"), qsTr("Wheels"), qsTr("Curves"), qsTr("Finishing")]
+    readonly property var tabs: [qsTr("Basic"), qsTr("Wheels"), qsTr("Curves"), qsTr("HSL"), qsTr("Finishing")]
     readonly property var lightSliders: [
-        { key: "exposure", label: qsTr("Exposure"), from: -4, to: 4, def: 0 },
+        { key: "exposure", label: qsTr("Exposure"), from: -4, to: 4, def: 0, curvePower: 2 },
         { key: "contrast", label: qsTr("Contrast"), from: -1, to: 1, def: 0 },
         { key: "highlights", label: qsTr("Highlights"), from: -1, to: 1, def: 0 },
         { key: "shadows", label: qsTr("Shadows"), from: -1, to: 1, def: 0 },
@@ -44,6 +47,23 @@ PanelFrame {
         { label: qsTr("Highlights"), key: "gain" }
     ]
     readonly property var curveKeys: ({ master: "curveMaster", r: "curveR", g: "curveG", b: "curveB" })
+    readonly property var hueCurveKeys: ({ hue: "curveHueHue", sat: "curveHueSat", lum: "curveHueLum" })
+    readonly property var hslBands: [
+        { name: "red", param: "Red", label: qsTr("Red"), hue: 0 },
+        { name: "orange", param: "Orange", label: qsTr("Orange"), hue: 30 },
+        { name: "yellow", param: "Yellow", label: qsTr("Yellow"), hue: 60 },
+        { name: "green", param: "Green", label: qsTr("Green"), hue: 120 },
+        { name: "aqua", param: "Aqua", label: qsTr("Aqua"), hue: 180 },
+        { name: "blue", param: "Blue", label: qsTr("Blue"), hue: 225 },
+        { name: "purple", param: "Purple", label: qsTr("Purple"), hue: 270 },
+        { name: "magenta", param: "Magenta", label: qsTr("Magenta"), hue: 300 }
+    ]
+    readonly property var hslSliders: [
+        { suffix: "Hue", label: qsTr("Hue") },
+        { suffix: "Sat", label: qsTr("Saturation") },
+        { suffix: "Lum", label: qsTr("Luminance") }
+    ]
+    property int hslBand: 0
     readonly property var finishingNames: ({
         "film_grain": qsTr("Film Grain"),
         "bloom_glow": qsTr("Glow"),
@@ -59,17 +79,22 @@ PanelFrame {
             if (list[i].id === id)
                 return list[i].label
         }
-        return qsTr("None")
+        return id === "" ? qsTr("None") : qsTr("Missing look")
     }
 
     readonly property var curves: ({
-        master: parseCurve(params.curveMaster),
-        r: parseCurve(params.curveR),
-        g: parseCurve(params.curveG),
-        b: parseCurve(params.curveB)
+        master: parseCurve(params.curveMaster, false),
+        r: parseCurve(params.curveR, false),
+        g: parseCurve(params.curveG, false),
+        b: parseCurve(params.curveB, false)
+    })
+    readonly property var hueCurves: ({
+        hue: parseCurve(params.curveHueHue, true),
+        sat: parseCurve(params.curveHueSat, true),
+        lum: parseCurve(params.curveHueLum, true)
     })
 
-    function parseCurve(v) {
+    function parseCurve(v, hue) {
         let out = v
         if (typeof v === "string") {
             try {
@@ -78,8 +103,18 @@ PanelFrame {
                 out = null
             }
         }
+        const flat = hue ? 0.5 : 0
+        const top = hue ? 0.5 : 1
         return Array.isArray(out) && out.length >= 2
-            ? out : [{x: 0, y: 0, ease: "spline"}, {x: 1, y: 1, ease: "spline"}]
+            ? out : [{x: 0, y: flat, ease: "spline"}, {x: 1, y: top, ease: "spline"}]
+    }
+
+    function isAnimated(key) {
+        return animatedKeys.indexOf(key) >= 0
+    }
+
+    function finishingAnimated(entry, key) {
+        return (entry.animatedKeys || []).indexOf(key) >= 0
     }
 
     function setLive(key, v) {
@@ -121,38 +156,71 @@ PanelFrame {
             colorState.bypass = on
     }
 
+    function hslBandModified(param) {
+        return hslSliders.some(s => Number(params["hsl" + param + s.suffix] ?? 0) !== 0)
+    }
+
+    function resetHslBand() {
+        const band = hslBands[hslBand]
+        colorState.beginEdit(qsTr("Reset %1").arg(band.label))
+        hslSliders.forEach(s => colorState.setParam("hsl" + band.param + s.suffix, 0))
+        colorState.commitEdit()
+    }
+
+    function selectHslBand(i) {
+        hslBand = i
+        bandRepeater.itemAt(i).forceActiveFocus()
+    }
+
+    function hslTrackGradient(suffix) {
+        const hue = hslBands[hslBand].hue
+        const shade = d => Qt.hsla((((hue + d) % 360) + 360) % 360 / 360, 1, 0.5, 1)
+        if (suffix === "Hue")
+            return [shade(-30), shade(0), shade(30)]
+        if (suffix === "Sat")
+            return [Qt.hsla(0, 0, 0.5, 1), shade(0)]
+        return ["#000000", shade(0), "#ffffff"]
+    }
+
     function resetCurrentTab() {
         if (tab === 0) {
-            colorState.resetGroup("Light")
-            colorState.resetGroup("Color")
-            colorState.resetGroup("Look")
+            colorState.resetGroups(["Light", "Color", "Look"])
         } else if (tab === 1) {
             colorState.resetGroup("Wheels")
         } else if (tab === 2) {
-            colorState.resetGroup("Curves")
+            colorState.resetGroups(["Curves", "Hue Curves"])
+        } else if (tab === 3) {
+            colorState.resetGroup("HSL")
         }
     }
 
     focus: true
     activeFocusOnTab: true
-    Keys.onPressed: event => {
-        if (event.key === Qt.Key_Backslash && !event.isAutoRepeat) {
-            root.setBypass(true)
-            event.accepted = true
-        }
-    }
-    Keys.onReleased: event => {
-        if (event.key === Qt.Key_Backslash && !event.isAutoRepeat) {
-            root.setBypass(false)
-            event.accepted = true
-        }
+    Shortcut {
+        sequence: "\\"
+        context: Qt.WindowShortcut
+        enabled: root.visible
+        onActivated: root.setBypass(!root.colorState.bypass)
     }
 
     onShownChanged: {
         if (!root.shown)
             root.setBypass(false)
     }
+    function applyTabRequest() {
+        const request = ShellBridge.colorTabRequest
+        if (!request)
+            return
+        ShellBridge.colorTabRequest = null
+        if (request.tab >= 0)
+            root.tab = request.tab
+    }
+    Connections {
+        target: ShellBridge
+        function onColorTabRequestChanged() { root.applyTabRequest() }
+    }
     Component.onCompleted: {
+        applyTabRequest()
         const specs = {}
         const catalog = colorState.finishingCatalog()
         for (let i = 0; i < catalog.length; ++i)
@@ -164,7 +232,10 @@ PanelFrame {
     TapHandler {
         acceptedButtons: Qt.LeftButton
         gesturePolicy: TapHandler.ReleaseWithinBounds
-        onTapped: root.forceActiveFocus()
+        onTapped: {
+            if (!content.activeFocus)
+                root.forceActiveFocus()
+        }
     }
 
     Timer {
@@ -219,16 +290,28 @@ PanelFrame {
         ThemedButton {
             id: compareButton
             text: qsTr("Compare")
-            tooltip: qsTr("Hold to see the original (or hold the \\ key)")
+            variant: root.colorState.bypass ? "primary" : "secondary"
+            tooltip: qsTr("Click to toggle the original. Hold to see it while pressed (\\ key)")
             glyph: Theme.icons.eye
-            onPressed: root.setBypass(true)
-            onReleased: root.setBypass(false)
-            onCanceled: root.setBypass(false)
+            // A short press flips the latch; a long press is a peek that ends on release.
+            onPressed: {
+                root.compareWasOn = root.colorState.bypass
+                root.compareDownAt = Date.now()
+                root.setBypass(true)
+            }
+            onReleased: {
+                const held = Date.now() - root.compareDownAt
+                root.setBypass(held > 300 ? root.compareWasOn : !root.compareWasOn)
+            }
+            onCanceled: root.setBypass(root.compareWasOn)
         }
 
         ThemedButton {
             text: qsTr("Apply to all…")
-            tooltip: qsTr("Copy this grade to every clip on the timeline")
+            enabled: !!root.target.canApplyToAll
+            tooltip: root.target.canApplyToAll
+                     ? qsTr("Copy this grade to every video, image and other visual clip on the timeline")
+                     : qsTr("This grade already applies to the whole timeline. Select a clip to copy its grade to the others.")
             onClicked: applyDialog.open()
         }
 
@@ -245,7 +328,7 @@ PanelFrame {
                     onTriggered: root.colorState.resetAll()
                 }
                 ThemedMenuItem {
-                    visible: root.tab < 3
+                    visible: root.tab < 4
                     height: visible ? implicitHeight : 0
                     text: qsTr("Reset this tab")
                     onTriggered: root.resetCurrentTab()
@@ -264,9 +347,69 @@ PanelFrame {
         }
     }
 
+    Column {
+        id: notes
+        anchors.top: actions.visible ? actions.bottom : header.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.leftMargin: Theme.spacingMd
+        anchors.rightMargin: Theme.spacingMd
+        anchors.topMargin: height > 0 ? Theme.spacingMd : 0
+        spacing: Theme.spacingSm
+        visible: root.hasTarget
+
+        Text {
+            width: parent.width
+            visible: (root.target.selectionCount ?? 0) > 1
+            wrapMode: Text.WordWrap
+            text: qsTr("Editing \"%1\" only. Use Apply to all to copy its grade to other clips.").arg(root.target.label)
+            color: Theme.mutedForeground
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeXs
+        }
+
+        RowLayout {
+            width: parent.width
+            visible: !!root.target.hasGrade && root.target.gradeEnabled === false
+            spacing: Theme.spacingMd
+
+            Text {
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+                text: qsTr("The grade is turned off.")
+                color: Theme.mutedForeground
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSizeXs
+            }
+            ThemedButton {
+                text: qsTr("Turn on")
+                onClicked: root.colorState.enableGrade()
+            }
+        }
+
+        RowLayout {
+            width: parent.width
+            visible: !!root.target.timelineGradeId
+            spacing: Theme.spacingMd
+
+            Text {
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+                text: qsTr("Timeline grade also applies.")
+                color: Theme.mutedForeground
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSizeXs
+            }
+            ThemedButton {
+                text: qsTr("Select it")
+                onClicked: root.colorState.selectTimelineGrade()
+            }
+        }
+    }
+
     Row {
         id: tabRow
-        anchors.top: actions.visible ? actions.bottom : header.bottom
+        anchors.top: notes.bottom
         anchors.left: parent.left
         anchors.margins: Theme.spacingMd
         spacing: Theme.spacingSm
@@ -298,11 +441,11 @@ PanelFrame {
         boundsBehavior: Flickable.StopAtBounds
         ScrollBar.vertical: AppScrollBar { policy: ScrollBar.AsNeeded }
 
-        Item {
+        FocusScope {
             id: content
             x: Theme.spacingMd
             width: body.width - Theme.spacingMd * 2
-            height: Math.max(basicTab.height, wheelsTab.height, curvesTab.height, finishingTab.height)
+            height: Math.max(basicTab.height, wheelsTab.height, curvesTab.height, hslTab.height, finishingTab.height)
             opacity: root.colorState.bypass ? 0.5 : 1
 
             Column {
@@ -326,6 +469,8 @@ PanelFrame {
                         from: modelData.from
                         to: modelData.to
                         defaultValue: modelData.def
+                        curvePower: modelData.curvePower ?? 1
+                        animated: root.isAnimated(modelData.key)
                         value: root.liveOr(modelData.key, root.params[modelData.key] ?? modelData.def)
                         onBegan: root.colorState.beginEdit(qsTr("Adjust %1").arg(label))
                         onMoved: v => {
@@ -353,6 +498,7 @@ PanelFrame {
                         to: modelData.to
                         defaultValue: modelData.def
                         gradient: modelData.gradient || []
+                        animated: root.isAnimated(modelData.key)
                         value: root.liveOr(modelData.key, root.params[modelData.key] ?? modelData.def)
                         onBegan: root.colorState.beginEdit(qsTr("Adjust %1").arg(label))
                         onMoved: v => {
@@ -385,6 +531,7 @@ PanelFrame {
                     to: 1
                     defaultValue: 1
                     bipolar: false
+                    animated: root.isAnimated("lookAmount")
                     value: root.liveOr("lookAmount", root.params.lookAmount ?? 1)
                     onBegan: root.colorState.beginEdit(qsTr("Adjust %1").arg(label))
                     onMoved: v => {
@@ -420,6 +567,7 @@ PanelFrame {
                             readonly property var vec: root.params[modelData.key] || [0, 0]
                             size: Math.min(160, wheelsTab.width)
                             label: modelData.label
+                            animated: root.isAnimated(modelData.key) || root.isAnimated(modelData.key + "Luma")
                             offset: Qt.point(vec[0], vec[1])
                             luma: root.liveOr(modelData.key + "Luma", root.params[modelData.key + "Luma"] ?? 0)
                             onBegan: root.colorState.beginEdit(qsTr("Adjust %1").arg(label))
@@ -458,13 +606,167 @@ PanelFrame {
                     onChanged: (channel, json) => root.colorState.setText(root.curveKeys[channel], json)
                     onEnded: root.colorState.commitEdit()
                 }
+
+                SectionHeader {
+                    title: qsTr("Hue Curves")
+                    onResetRequested: root.colorState.resetGroup("Hue Curves")
+                }
+                CurveEditor {
+                    width: Math.min(parent.width, 320)
+                    height: implicitHeight
+                    hueMode: true
+                    curves: root.hueCurves
+                    onBegan: root.colorState.beginEdit(qsTr("Adjust hue curves"))
+                    onChanged: (channel, json) => root.colorState.setText(root.hueCurveKeys[channel], json)
+                    onEnded: root.colorState.commitEdit()
+                }
+            }
+
+            Column {
+                id: hslTab
+                width: parent.width
+                spacing: Theme.spacingMd
+                visible: root.tab === 3
+                height: visible ? implicitHeight : 0
+
+                SectionHeader {
+                    title: qsTr("HSL")
+                    onResetRequested: root.colorState.resetGroup("HSL")
+                }
+                Row {
+                    spacing: Theme.spacingSm
+                    Repeater {
+                        id: bandRepeater
+                        model: root.hslBands
+                        delegate: Item {
+                            id: swatch
+                            required property var modelData
+                            required property int index
+                            readonly property real inset: 4
+                            readonly property bool selected: root.hslBand === index
+                            width: Theme.controlHeightSm + inset * 2
+                            height: width + 7
+                            activeFocusOnTab: true
+                            Accessible.role: Accessible.RadioButton
+                            Accessible.name: modelData.label
+                            Accessible.checkable: true
+                            Accessible.checked: selected
+
+                            Rectangle {
+                                width: swatch.width
+                                height: width
+                                radius: width / 2
+                                color: "transparent"
+                                border.width: 2
+                                border.color: Theme.focusRing
+                                visible: swatch.selected || swatch.activeFocus
+                            }
+
+                            Rectangle {
+                                x: swatch.inset
+                                y: swatch.inset
+                                width: Theme.controlHeightSm
+                                height: width
+                                radius: width / 2
+                                color: Theme.c.colorGradeBands[swatch.modelData.name]
+                            }
+
+                            Rectangle {
+                                x: (swatch.width - width) / 2
+                                y: swatch.width + 1
+                                width: 5
+                                height: width
+                                radius: width / 2
+                                color: Theme.accentOnPanel
+                                visible: root.hslBandModified(swatch.modelData.param)
+                            }
+
+                            HoverHandler {
+                                id: swatchHover
+                            }
+
+                            ThemedToolTip {
+                                visible: swatchHover.hovered
+                                text: swatch.modelData.label
+                            }
+
+                            TapHandler {
+                                onTapped: root.selectHslBand(swatch.index)
+                            }
+
+                            Keys.onPressed: event => {
+                                if (event.key === Qt.Key_Left)
+                                    root.selectHslBand(Math.max(0, swatch.index - 1))
+                                else if (event.key === Qt.Key_Right)
+                                    root.selectHslBand(Math.min(root.hslBands.length - 1, swatch.index + 1))
+                                else if (event.key === Qt.Key_Space || event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
+                                    root.hslBand = swatch.index
+                                else
+                                    return
+                                event.accepted = true
+                            }
+                        }
+                    }
+                }
+                Item {
+                    width: parent.width
+                    height: Theme.controlHeightSm
+
+                    Text {
+                        anchors.left: parent.left
+                        anchors.right: bandReset.left
+                        anchors.rightMargin: Theme.spacingSm
+                        anchors.verticalCenter: parent.verticalCenter
+                        elide: Text.ElideRight
+                        text: root.hslBands[root.hslBand].label
+                        color: Theme.mutedForeground
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeXs
+                    }
+
+                    IconButton {
+                        id: bandReset
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        glyph: Theme.icons.reset
+                        tooltip: qsTr("Reset %1").arg(root.hslBands[root.hslBand].label)
+                        buttonSize: Theme.controlHeightSm
+                        enabled: root.hslBandModified(root.hslBands[root.hslBand].param)
+                        onClicked: root.resetHslBand()
+                    }
+                }
+                Repeater {
+                    model: root.hslSliders
+                    delegate: GradeSlider {
+                        id: hslSlider
+                        required property var modelData
+                        readonly property string paramKey: "hsl" + root.hslBands[root.hslBand].param + modelData.suffix
+                        width: hslTab.width
+                        label: modelData.label
+                        from: -1
+                        to: 1
+                        defaultValue: 0
+                        gradient: root.hslTrackGradient(modelData.suffix)
+                        animated: root.isAnimated(paramKey)
+                        value: root.liveOr(paramKey, root.params[paramKey] ?? 0)
+                        onBegan: root.colorState.beginEdit(qsTr("Adjust %1").arg(label))
+                        onMoved: v => {
+                            root.setLive(hslSlider.paramKey, v)
+                            root.colorState.setParam(hslSlider.paramKey, v)
+                        }
+                        onEnded: {
+                            root.colorState.commitEdit()
+                            root.clearLive(hslSlider.paramKey)
+                        }
+                    }
+                }
             }
 
             Column {
                 id: finishingTab
                 width: parent.width
                 spacing: Theme.spacingMd
-                visible: root.tab === 3
+                visible: root.tab === 4
                 height: visible ? implicitHeight : 0
 
                 Repeater {
@@ -549,6 +851,7 @@ PanelFrame {
                                     id: paramLoader
                                     required property var modelData
                                     readonly property var spec: modelData
+                                    readonly property var cardEntry: card.entry
                                     readonly property string fxId: card.modelData
                                     readonly property string liveKey: card.modelData + ":" + spec.key
                                     readonly property var current: card.entry.params[spec.key]
@@ -575,6 +878,7 @@ PanelFrame {
             to: loader.spec.max
             defaultValue: Number(loader.spec.default)
             bipolar: false
+            animated: root.finishingAnimated(loader.cardEntry, loader.spec.key)
             stepSize: loader.spec.step > 0 ? loader.spec.step : (to - from) / 100
             value: root.liveOr(loader.liveKey, loader.current ?? defaultValue)
             onBegan: root.colorState.beginFinishingEdit(

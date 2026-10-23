@@ -159,33 +159,62 @@ QByteArray bakeGradient(const QString &json)
     return out;
 }
 
-QByteArray bakeCurve(const QString &json)
+namespace {
+
+struct CurveKey
+{
+    double x;
+    double y;
+    QString ease;
+};
+
+std::vector<CurveKey> parseCurveKeys(const QString &json)
 {
     QJsonParseError error;
     const QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &error);
     if (error.error != QJsonParseError::NoError || !doc.isArray())
         return {};
-
-    struct Key
-    {
-        double x;
-        double y;
-        QString ease;
-    };
-    std::vector<Key> keys;
+    std::vector<CurveKey> keys;
     for (const QJsonValue &value : doc.array()) {
         const QJsonObject key = value.toObject();
         keys.push_back({key.value(QStringLiteral("x")).toDouble(),
                         key.value(QStringLiteral("y")).toDouble(),
                         key.value(QStringLiteral("ease")).toString(QStringLiteral("linear"))});
     }
+    std::stable_sort(keys.begin(), keys.end(), [](const CurveKey &a, const CurveKey &b) { return a.x < b.x; });
+    return keys;
+}
+
+} // namespace
+
+QByteArray bakeCurve(const QString &json, bool periodic)
+{
+    std::vector<CurveKey> keys = parseCurveKeys(json);
     if (keys.empty())
         return {};
-    std::stable_sort(keys.begin(), keys.end(), [](const Key &a, const Key &b) { return a.x < b.x; });
+
+    // A hue curve is evaluated over copies of its keys one period either side, so the spline's
+    // tangents at red see the keys across the wrap. A key at 1 tied to the one at 0 is the same
+    // key, and keeping both would flatten the tangent there.
+    if (periodic) {
+        if (keys.size() > 1 && keys.front().x <= 0.0 && keys.back().x >= 1.0
+            && std::abs(keys.back().y - keys.front().y) < 1e-9) {
+            keys.pop_back();
+        }
+        std::vector<CurveKey> extended;
+        extended.reserve(keys.size() * 3);
+        for (const double shift : {-1.0, 0.0, 1.0}) {
+            for (const CurveKey &key : keys)
+                extended.push_back({key.x + shift, key.y, key.ease});
+        }
+        std::stable_sort(extended.begin(), extended.end(),
+                         [](const CurveKey &a, const CurveKey &b) { return a.x < b.x; });
+        keys = std::move(extended);
+    }
 
     std::vector<QPointF> points;
     points.reserve(keys.size());
-    for (const Key &key : keys)
+    for (const CurveKey &key : keys)
         points.emplace_back(key.x, key.y);
 
     QByteArray out(kTexels * 4, Qt::Uninitialized);
@@ -198,13 +227,15 @@ QByteArray bakeCurve(const QString &json)
             y = keys.back().y;
         } else {
             const auto right = std::lower_bound(keys.begin(), keys.end(), t,
-                                                [](const Key &k, double v) { return k.x < v; });
-            const Key &left = *(right - 1);
+                                                [](const CurveKey &k, double v) { return k.x < v; });
+            const CurveKey &left = *(right - 1);
             if (left.ease == QLatin1String("spline")) {
                 y = evalMonotoneSpline(points, t);
-            } else {
+            } else if (right->x > left.x) {
                 const double k = (t - left.x) / (right->x - left.x);
                 y = left.y + (right->y - left.y) * applyEase(left.ease, k);
+            } else {
+                y = right->y;
             }
         }
         const char value = char(toByte(y));
@@ -214,6 +245,23 @@ QByteArray bakeCurve(const QString &json)
         out[i * 4 + 3] = char(255);
     }
     return out;
+}
+
+bool curveIsIdentity(const QString &json, bool hue)
+{
+    const std::vector<CurveKey> keys = parseCurveKeys(json);
+    if (keys.empty())
+        return false;
+    for (size_t i = 0; i < keys.size(); ++i) {
+        const CurveKey &key = keys[i];
+        if (std::abs(key.y - (hue ? 0.5 : key.x)) > 1e-9)
+            return false;
+        if (hue)
+            continue;
+        if (i + 1 < keys.size() && key.ease != QLatin1String("linear") && key.ease != QLatin1String("spline"))
+            return false;
+    }
+    return hue || (keys.front().x <= 0.0 && keys.back().x >= 1.0);
 }
 
 } // namespace drift

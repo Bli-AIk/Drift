@@ -29,6 +29,7 @@ inline bool isEngineBoundGpuUniform(const QString &name)
 {
     if (name == QLatin1String("u_resolution") || name == QLatin1String("u_time")
         || name == QLatin1String("u_timeUs") || name == QLatin1String("u_frameIndex")
+        || name == QLatin1String("u_frameRate")
         || name == QLatin1String("u_currentTexture") || name == QLatin1String("u_progress")
         || name == QLatin1String("u_fromTexture") || name == QLatin1String("u_toTexture")
         || name == QLatin1String("u_hasDepth") || name == QLatin1String("u_templateBounds")
@@ -105,6 +106,7 @@ struct GpuSamplerParam
 {
     QString key;
     EffectParamType type = EffectParamType::Image;
+    bool hueCurve = false; // a curve with "curveMode": "hue"
 };
 
 // Parsed, validated GPU package pipeline (effect.json / transition.json + shaders).

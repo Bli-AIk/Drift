@@ -615,6 +615,8 @@ struct PipelineAux
     QHash<QString, std::array<float, 3>> audioScalars;
     // The Timeline mix's level, bass and beat for u_audioLevel, u_audioBass and u_audioBeat.
     std::array<float, 3> globalAudio{};
+    // The project frame rate for u_frameIndex and u_frameRate; 0 reads as 30.
+    int frameRate = 0;
 };
 
 // Upload an audio param's 512x2 RGBA8 analysis (AudioFrame::rgba) into the texture kept under `key`.

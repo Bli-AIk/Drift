@@ -34,7 +34,8 @@ public:
     // intermediate results in GPU framebuffers. Applying effects one at a time
     // costs an upload plus a blocking glReadPixels per effect, which is what made
     // stacked effects collapse playback.
-    QImage applyChain(const QList<ChainStep> &steps, const QImage &input, drift::TimeUs timeUs);
+    QImage applyChain(const QList<ChainStep> &steps, const QImage &input, drift::TimeUs timeUs,
+                      int frameRate = 0);
 
     // Run a GPU pipeline over N source images. sources[i] is bound wherever a pass declares
     // a source_texture with index i; sources[0] is also u_currentTexture / u_fromTexture and

@@ -84,6 +84,8 @@ struct EffectParamSpec
     QString regionShape = QStringLiteral("rect");
     // Colour params: carries opacity, so the stored hex is #rrggbbaa and the uniform is a vec4.
     bool alpha = false;
+    // Curve params: "hue" for a curve over hue, which wraps at red and rests flat at y = 0.5.
+    QString curveMode;
 
     bool isBoolean() const { return type == EffectParamType::Bool; }
     bool isColor() const { return type == EffectParamType::Color; }

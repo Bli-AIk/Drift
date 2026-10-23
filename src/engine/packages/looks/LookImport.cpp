@@ -2,6 +2,7 @@
 
 #include "engine/color/CubeLut.h"
 
+#include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -33,12 +34,12 @@ QString slugFor(const QString &stem)
     return slug.isEmpty() ? QStringLiteral("look") : slug;
 }
 
-QString uniqueUserId(const QString &slug, const QString &destRoot)
+// The id carries a hash of the file, so removing a look never frees its id for a different file
+// and importing the same file again lands on the same id.
+QString userIdFor(const QString &slug, const QByteArray &contents)
 {
-    QString id = QLatin1String(kUserPrefix) + slug;
-    for (int n = 2; QFileInfo::exists(QDir(destRoot).filePath(id)); ++n)
-        id = QLatin1String(kUserPrefix) + slug + QLatin1Char('-') + QString::number(n);
-    return id;
+    const QByteArray hash = QCryptographicHash::hash(contents, QCryptographicHash::Sha1).toHex().left(8);
+    return QLatin1String(kUserPrefix) + slug + QLatin1Char('-') + QString::fromLatin1(hash);
 }
 
 bool writeManifest(const QString &path, const QJsonObject &object)
@@ -73,7 +74,17 @@ LookImportResult importCubeFiles(const QStringList &paths, const QString &destRo
             continue;
         }
 
-        const QString id = uniqueUserId(slugFor(stem), destRoot);
+        QFile source(path);
+        if (!source.open(QIODevice::ReadOnly)) {
+            result.errors << QStringLiteral("%1: could not read the file").arg(info.fileName());
+            continue;
+        }
+        const QString id = userIdFor(slugFor(stem), source.readAll());
+        source.close();
+        if (QFileInfo::exists(QDir(destRoot).filePath(id))) {
+            result.importedIds << id;
+            continue;
+        }
         QTemporaryDir staging(QDir(destRoot).filePath(QStringLiteral(".importing-XXXXXX")));
         if (!staging.isValid()) {
             result.errors << QStringLiteral("%1: could not create a staging folder").arg(info.fileName());

@@ -8,6 +8,7 @@ Item {
     property point offset: Qt.point(0, 0)
     property real luma: 0
     property real size: 140
+    property bool animated: false
 
     signal began()
     signal offsetMoved(real x, real y)
@@ -36,13 +37,22 @@ Item {
 
         Text {
             anchors.left: parent.left
-            anchors.right: resetButton.left
+            anchors.right: keyMark.visible ? keyMark.left : resetButton.left
             anchors.verticalCenter: parent.verticalCenter
             elide: Text.ElideRight
             text: root.label
             color: Theme.mutedForeground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeXs
+        }
+
+        KeyframeDiamond {
+            id: keyMark
+            anchors.right: resetButton.left
+            anchors.verticalCenter: parent.verticalCenter
+            visible: root.animated
+            animated: true
+            tooltip: qsTr("Animated. Editing sets keyframes (needs Auto keyframes on).")
         }
 
         IconButton {
@@ -147,6 +157,7 @@ Item {
             property real lastX: 0
             property real lastY: 0
             property var lockedFlickable: null
+            property bool begun: false
 
             function lockFlickable() {
                 if (lockedFlickable)
@@ -169,7 +180,10 @@ Item {
             }
             function finish() {
                 unlockFlickable()
-                root.ended()
+                if (begun) {
+                    begun = false
+                    root.ended()
+                }
             }
 
             Component.onDestruction: unlockFlickable()
@@ -179,12 +193,15 @@ Item {
                 lastX = mouse.x
                 lastY = mouse.y
                 root.liveOffset = root.offset
-                root.began()
             }
             onPositionChanged: mouse => {
                 if (!pressed)
                     return
-                const fine = (mouse.modifiers & Qt.ShiftModifier) ? 0.25 : 1
+                if (!begun) {
+                    begun = true
+                    root.began()
+                }
+                const fine = (mouse.modifiers & Qt.ShiftModifier) ? 0.1 : 1
                 let nx = root.liveOffset.x + (mouse.x - lastX) / root.radius * fine
                 let ny = root.liveOffset.y - (mouse.y - lastY) / root.radius * fine
                 lastX = mouse.x

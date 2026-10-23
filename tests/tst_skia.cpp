@@ -298,6 +298,7 @@ private slots:
     void keyframedShapeStrokeGrowsOverTime();
     void compositorDrawsShapeThroughSkia();
     void textPainterCacheKeys();
+    void neonFlickerIsAnimated();
     void keyframedTextGrowsOverTime();
     void userFontImportResolvesAndRemoves();
     void systemFontFamiliesAreListed();
@@ -2036,6 +2037,18 @@ void SkiaTest::inlineDecorRendersAndExportNeverCarriesIt()
     const QImage emptyCaret = compositor.compositeAt(0, options);
     QVERIFY(emptyCaret != emptyPlain);
     QVERIFY(bright(emptyCaret) > 10);
+}
+
+// Neon flicker is time-driven even at speed 0, so it must count as animated.
+void SkiaTest::neonFlickerIsAnimated()
+{
+    TextShaderEffect neon;
+    neon.id = QStringLiteral("neon-pulse");
+    neon.params.insert(QStringLiteral("speed"), VectorSlotValue::fromScalar(0.0));
+    neon.params.insert(QStringLiteral("flicker"), VectorSlotValue::fromScalar(0.3));
+    QVERIFY(skia::textEffectIsAnimated(neon));
+    neon.params.insert(QStringLiteral("flicker"), VectorSlotValue::fromScalar(0.0));
+    QVERIFY(!skia::textEffectIsAnimated(neon));
 }
 
 // Every SkSL effect compiles, and a shine layer renders as ink over its base.

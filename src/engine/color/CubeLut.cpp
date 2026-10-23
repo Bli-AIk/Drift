@@ -1,5 +1,6 @@
 #include "engine/color/CubeLut.h"
 
+#include <QDateTime>
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
@@ -108,6 +109,21 @@ struct CachedLut
     std::shared_ptr<const QByteArray> baked;
 };
 
+constexpr qint64 kResolveTrustMs = 1000;
+
+struct ResolvedLook
+{
+    qint64 checkedMs = 0;
+    QString path;
+    CachedLut entry;
+};
+
+QHash<QString, ResolvedLook> &resolvedSlot()
+{
+    static QHash<QString, ResolvedLook> resolved;
+    return resolved;
+}
+
 QMutex &cacheMutex()
 {
     static QMutex mutex;
@@ -139,8 +155,14 @@ bool parseCube(const QByteArray &data, CubeLut *out, QString *error)
     double domainMax[3] = {1.0, 1.0, 1.0};
     std::vector<double> rows;
 
-    for (const QByteArray &rawLine : data.split('\n')) {
-        const QString line = QString::fromUtf8(rawLine).trimmed();
+    const QByteArray body = data.startsWith("\xEF\xBB\xBF") ? data.mid(3) : data;
+    for (const QByteArray &rawLine : body.split('\n')) {
+        QString line = QString::fromUtf8(rawLine).trimmed();
+        if (!line.startsWith(QLatin1String("TITLE"))) {
+            const int comment = line.indexOf(QLatin1Char('#'));
+            if (comment >= 0)
+                line = line.left(comment).trimmed();
+        }
         if (line.isEmpty() || line.startsWith(QLatin1Char('#')))
             continue;
 
@@ -334,9 +356,8 @@ QString resolveLutPath(const QString &lookId)
 
 namespace {
 
-CachedLut cachedLutForId(const QString &lookId)
+CachedLut loadLutForPath(const QString &lookId, const QString &path)
 {
-    const QString path = resolveLutPath(lookId);
     if (path.isEmpty())
         return {};
     const QFileInfo info(path);
@@ -367,11 +388,41 @@ CachedLut cachedLutForId(const QString &lookId)
     return entry;
 }
 
+CachedLut cachedLutForId(const QString &lookId, QString *outPath = nullptr)
+{
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    {
+        QMutexLocker lock(&cacheMutex());
+        const auto it = resolvedSlot().constFind(lookId);
+        if (it != resolvedSlot().constEnd() && now - it->checkedMs < kResolveTrustMs) {
+            if (outPath)
+                *outPath = it->path;
+            return it->entry;
+        }
+    }
+
+    ResolvedLook resolved;
+    resolved.checkedMs = now;
+    resolved.path = resolveLutPath(lookId);
+    resolved.entry = loadLutForPath(lookId, resolved.path);
+    if (outPath)
+        *outPath = resolved.path;
+    QMutexLocker lock(&cacheMutex());
+    resolvedSlot().insert(lookId, resolved);
+    return resolved.entry;
+}
+
 } // namespace
 
-std::shared_ptr<const QByteArray> bakedLutForId(const QString &lookId)
+void invalidateLutLookups()
 {
-    return cachedLutForId(lookId).baked;
+    QMutexLocker lock(&cacheMutex());
+    resolvedSlot().clear();
+}
+
+std::shared_ptr<const QByteArray> bakedLutForId(const QString &lookId, QString *outPath)
+{
+    return cachedLutForId(lookId, outPath).baked;
 }
 
 std::shared_ptr<const CubeLut> resampledLutForId(const QString &lookId)

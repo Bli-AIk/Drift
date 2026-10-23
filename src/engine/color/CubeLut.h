@@ -37,7 +37,11 @@ QString resolveLutPath(const QString &lookId);
 
 // The look's .cube file resampled to 33^3 and baked, cached by path and mtime. Null when the look
 // does not resolve or its file does not parse.
-std::shared_ptr<const QByteArray> bakedLutForId(const QString &lookId);
+// A resolved id is trusted for about a second, or until invalidateLutLookups(), before the catalog
+// and the file's mtime are consulted again. outPath, when given, receives the resolved path.
+std::shared_ptr<const QByteArray> bakedLutForId(const QString &lookId, QString *outPath = nullptr);
+// Forget every resolved id; call when the look catalog changes.
+void invalidateLutLookups();
 // The same look resampled to 33^3, for CPU previews. Shares bakedLutForId's cache.
 std::shared_ptr<const CubeLut> resampledLutForId(const QString &lookId);
 

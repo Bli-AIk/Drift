@@ -5,6 +5,7 @@
 #include <QList>
 #include <QObject>
 #include <QString>
+#include <QStringList>
 #include <QUrl>
 #include <QVariantList>
 #include <QVariantMap>
@@ -46,9 +47,11 @@ public:
     Q_INVOKABLE void cancelEdit();
 
     Q_INVOKABLE void resetGroup(const QString &group);
+    Q_INVOKABLE void resetGroups(const QStringList &groups);
     Q_INVOKABLE void resetAll();
     Q_INVOKABLE void setLook(const QString &id);
     Q_INVOKABLE void importLooks(const QList<QUrl> &urls);
+    Q_INVOKABLE int clipsUsingLook(const QString &id) const;
     Q_INVOKABLE void removeLook(const QString &id);
     Q_INVOKABLE void renameLook(const QString &id, const QString &name);
 
@@ -62,6 +65,8 @@ public:
 
     Q_INVOKABLE int applyToAll(bool includeFinishing);
     Q_INVOKABLE void gradeWholeTimeline();
+    Q_INVOKABLE void enableGrade();
+    Q_INVOKABLE void selectTimelineGrade();
     Q_INVOKABLE void requestThumbnails();
 
     // AddonManager::kindChanged. Looks are the only kind this controller shows.
@@ -76,9 +81,11 @@ signals:
 
 private:
     void refreshTarget();
+    void publishTarget();
     void rebuildLooks();
+    static void warmLook(const QString &id);
     void applyBypass();
-    void resetParams(const QString &group, const QString &undoText);
+    void resetParams(const QStringList &groups, const QString &undoText);
 
     bool locate(const QString &clipId, int *trackIndex, int *clipIndex) const;
     QString hostIdFor(const QString &clipId) const;
@@ -95,6 +102,7 @@ private:
     ScopesController *m_scopes = nullptr;
     QString m_sourceClipId;
     QVariantMap m_target;
+    bool m_targetAnimated = false;
     QVariantList m_looks;
     bool m_bypass = false;
     QString m_bypassedHostId;

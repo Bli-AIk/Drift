@@ -3477,6 +3477,8 @@ QVariantMap effectToMap(const drift::Effect &effect, int effectIndex, drift::Tim
                 param.insert(QStringLiteral("step"), paramDef.step);
             if (paramDef.isColor())
                 param.insert(QStringLiteral("alpha"), paramDef.alpha);
+            if (paramDef.type == drift::EffectParamType::Curve)
+                param.insert(QStringLiteral("curveMode"), paramDef.curveMode);
             if (paramDef.isFilePath()) {
                 param.insert(QStringLiteral("fileFilters"), paramDef.fileFilters);
                 const QString path = value.toString();

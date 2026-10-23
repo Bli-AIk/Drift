@@ -53,7 +53,8 @@ The engine binds:
 | `u_currentTexture`, `u_texture1`, … | sampler | Pass inputs, in order |
 | `u_resolution` | `vec2` | Pixels |
 | `u_time`, `u_timeUs` | `float` | Seconds and microseconds |
-| `u_frameIndex` | `int` | Frame index |
+| `u_frameIndex` | `int` | Frame index at the project frame rate |
+| `u_frameRate` | `float` | Project frame rate in frames per second |
 
 Transitions also get `u_fromTexture`, `u_toTexture` and `u_progress`, and they must follow the
 [determinism rule](gpu-transitions.md#the-determinism-rule).

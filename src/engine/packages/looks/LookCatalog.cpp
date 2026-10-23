@@ -139,8 +139,11 @@ std::optional<LookEntry> lookForId(const QString &id)
 
 void reloadLookCatalog(const QStringList &roots)
 {
-    QMutexLocker lock(&g_mutex);
-    rebuildLocked(roots);
+    {
+        QMutexLocker lock(&g_mutex);
+        rebuildLocked(roots);
+    }
+    invalidateLutLookups();
 }
 
 QString lookCubePathForId(const QString &id)

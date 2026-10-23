@@ -60,8 +60,9 @@ double widestOutwardStroke(const ShapeStyle &style)
 class ShapePainter final : public VectorPainter
 {
 public:
-    ShapePainter(const ShapeStyle &style, int width, int height, double renderScale, double timeSec, double bleedPx)
-        : m_style(style), m_scale(renderScale), m_timeSec(timeSec), m_bleed(bleedPx),
+    ShapePainter(const ShapeStyle &style, int width, int height, double renderScale, double timeSec,
+                 double frameRate, double bleedPx)
+        : m_style(style), m_scale(renderScale), m_timeSec(timeSec), m_frameRate(frameRate), m_bleed(bleedPx),
           m_size(qMax(1, qRound(width + bleedPx * 2.0)), qMax(1, qRound(height + bleedPx * 2.0)))
     {
         m_style.keyframes.clear();
@@ -111,7 +112,7 @@ private:
         paint.setAntiAlias(true);
         switch (layer.kind) {
         case TextLayerKind::Fill:
-            applyShadingPaint(paint, layer.paint, box, m_timeSec, 1.0);
+            applyShadingPaint(paint, layer.paint, box, m_timeSec, 1.0, -1.0, m_frameRate);
             paint.setPathEffect(fillPathEffectFor(layer, m_scale));
             canvas.drawPath(m_path, paint);
             break;
@@ -119,7 +120,7 @@ private:
             const double width = layer.width * m_scale;
             if (width <= 0.0)
                 break;
-            applyShadingPaint(paint, layer.paint, box, m_timeSec, 1.0);
+            applyShadingPaint(paint, layer.paint, box, m_timeSec, 1.0, -1.0, m_frameRate);
             paint.setStyle(SkPaint::kStroke_Style);
             paint.setStrokeJoin(SkPaint::kRound_Join);
             paint.setStrokeCap(SkPaint::kRound_Cap);
@@ -171,6 +172,7 @@ private:
     ShapeStyle m_style;
     double m_scale;
     double m_timeSec;
+    double m_frameRate;
     double m_bleed;
     QSize m_size;
     quint64 m_key = 0;
@@ -215,7 +217,8 @@ ShapePainterResult makeShapePainter(const ShapePaintRequest &request)
     const double bleed = std::ceil(shapeBleedFor(request.style) * request.renderScale);
     const int w = qMax(1, qRound(request.layoutRect.width()));
     const int h = qMax(1, qRound(request.layoutRect.height()));
-    auto painter = std::make_shared<ShapePainter>(request.style, w, h, request.renderScale, request.timeSec, bleed);
+    auto painter = std::make_shared<ShapePainter>(request.style, w, h, request.renderScale, request.timeSec,
+                                                                 request.frameRate, bleed);
     result.rect = QRectF(request.layoutRect.x() - bleed, request.layoutRect.y() - bleed, painter->size().width(),
                          painter->size().height());
     result.painter = std::move(painter);

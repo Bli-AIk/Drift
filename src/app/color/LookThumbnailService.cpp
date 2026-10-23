@@ -43,11 +43,13 @@ LookThumbnailService::LookThumbnailService(std::function<drift::Project()> proje
 
 LookThumbnailService::~LookThumbnailService() = default;
 
-void LookThumbnailService::request(qint64 timeUs, const QString &gradeHostClipId, int gradeEffectIndex)
+void LookThumbnailService::request(qint64 playheadUs, const QString &sourceClipId,
+                                   const QString &gradeHostClipId, int gradeEffectIndex)
 {
     if (!m_active)
         return;
-    m_timeUs = timeUs;
+    m_playheadUs = playheadUs;
+    m_sourceClipId = sourceClipId;
     m_gradeHostClipId = gradeHostClipId;
     m_gradeEffectIndex = gradeEffectIndex;
     m_debounce->start();
@@ -77,14 +79,27 @@ void LookThumbnailService::startRender()
     const int serial = ++m_serial;
 
     drift::Project project = m_projectSnapshot();
-    if (!m_gradeHostClipId.isEmpty()) {
-        for (drift::Track &track : project.tracks()) {
-            for (drift::Clip &clip : track.clips) {
-                if (clip.id != m_gradeHostClipId)
-                    continue;
-                if (m_gradeEffectIndex >= 0 && m_gradeEffectIndex < clip.effects.size())
-                    clip.effects[m_gradeEffectIndex].parameters.insert(QStringLiteral("look"), QString());
+    qint64 timeUs = m_playheadUs;
+    for (drift::Track &track : project.tracks()) {
+        for (drift::Clip &clip : track.clips) {
+            if (clip.id == m_sourceClipId) {
+                if (timeUs < clip.timelineStart || timeUs >= clip.timelineEnd())
+                    timeUs = clip.timelineStart + clip.timelineDuration / 2;
             }
+            if (clip.id == m_gradeHostClipId && m_gradeEffectIndex >= 0
+                && m_gradeEffectIndex < clip.effects.size())
+                clip.effects[m_gradeEffectIndex].parameters.insert(QStringLiteral("look"), QString());
+        }
+    }
+    if (!m_sourceClipId.isEmpty()) {
+        for (drift::Track &track : project.tracks()) {
+            track.clips.erase(std::remove_if(track.clips.begin(), track.clips.end(),
+                                             [&](const drift::Clip &clip) {
+                                                 return clip.id != m_sourceClipId
+                                                     && clip.id != m_gradeHostClipId;
+                                             }),
+                              track.clips.end());
+            track.transitions.clear();
         }
     }
     const auto snapshot = std::make_shared<const drift::Project>(std::move(project));
@@ -94,7 +109,7 @@ void LookThumbnailService::startRender()
         watcher->deleteLater();
         onRenderFinished(serial);
     });
-    watcher->setFuture(QtConcurrent::run(renderLookBase, snapshot, m_timeUs));
+    watcher->setFuture(QtConcurrent::run(renderLookBase, snapshot, timeUs));
 }
 
 void LookThumbnailService::onRenderFinished(int serial)

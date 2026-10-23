@@ -12,27 +12,86 @@ Item {
         g: [{x: 0, y: 0, ease: "spline"}, {x: 1, y: 1, ease: "spline"}],
         b: [{x: 0, y: 0, ease: "spline"}, {x: 1, y: 1, ease: "spline"}]
     })
-    property string channel: "master"
+    property string channel: hueMode ? "hue" : "master"
     property string histogram: ""
     property bool showTabs: true
+    // Hue curves: x is hue around the wheel, the ends share one y so the curve wraps, and the
+    // channels are hue/sat/lum instead of master/R/G/B.
+    property bool hueMode: false
 
     signal began()
     signal changed(string channel, string json)
     signal ended()
 
-    readonly property var channels: ["master", "r", "g", "b"]
-    readonly property var channelNames: ({ master: qsTr("Master"), r: "R", g: "G", b: "B" })
-    readonly property var channelColors: ({
-        master: Theme.panelForeground, r: "#ef5350", g: "#66bb6a", b: "#42a5f5"
-    })
+    readonly property var channels: hueMode ? ["hue", "sat", "lum"] : ["master", "r", "g", "b"]
+    readonly property var channelNames: hueMode
+        ? ({ hue: qsTr("Hue"), sat: qsTr("Sat"), lum: qsTr("Lum") })
+        : ({ master: qsTr("Master"), r: "R", g: "G", b: "B" })
+    readonly property var channelColors: hueMode
+        ? ({ hue: Theme.c.colorGradeCurveChannels.hue,
+             sat: Theme.c.colorGradeCurveChannels.sat,
+             lum: Theme.c.colorGradeCurveChannels.lum })
+        : ({ master: Theme.c.colorGradeCurveChannels.master,
+             r: Theme.c.colorGradeCurveChannels.r,
+             g: Theme.c.colorGradeCurveChannels.g,
+             b: Theme.c.colorGradeCurveChannels.b })
     readonly property real handleRadius: Theme.touchInput ? 8 : 5
     // Points live here while dragging so the curve tracks the pointer without waiting for the
     // owner to push `curves` back. Null the rest of the time.
     property var livePoints: null
     property int selected: -1
+    // One undo step per gesture: began is raised by the first real change, not by the press.
+    property bool gestureBegun: false
+    property real clickAddedAt: 0
+    property int clickAddedIndex: -1
+
+    function openGesture() {
+        if (gestureBegun)
+            return
+        gestureBegun = true
+        began()
+    }
+
+    function recentlyAdded(idx) {
+        return idx >= 0 && idx === clickAddedIndex
+            && Date.now() - clickAddedAt < Qt.styleHints.mouseDoubleClickInterval
+    }
+
+    function commitPoints(pts) {
+        began()
+        emitPoints(pts)
+        livePoints = null
+        ended()
+    }
+
+    function nudgeSelected(dx, dy) {
+        const src = pointsOf(channel)
+        const idx = selected
+        if (idx < 0 || idx >= src.length)
+            return
+        const pts = src.map(p => ({x: p.x, y: p.y, ease: p.ease || "spline"}))
+        const last = pts.length - 1
+        let x = pts[idx].x
+        if (idx > 0 && idx < last)
+            x = Math.min(pts[idx + 1].x - CurveMath.MIN_GAP,
+                         Math.max(pts[idx - 1].x + CurveMath.MIN_GAP, CurveMath.clamp01(x + dx)))
+        pts[idx] = {x: x, y: CurveMath.clamp01(pts[idx].y + dy), ease: pts[idx].ease || "spline"}
+        commitPoints(tieHueEnds(pts, idx))
+    }
+
+    function removePoint(idx) {
+        const pts = pointsOf(channel)
+        if (idx <= 0 || idx >= pts.length - 1)
+            return
+        const next = pts.slice()
+        next.splice(idx, 1)
+        commitPoints(next)
+        selected = -1
+    }
 
     function defaultPoints() {
-        return [{x: 0, y: 0, ease: "spline"}, {x: 1, y: 1, ease: "spline"}]
+        const y = hueMode ? 0.5 : 1
+        return [{x: 0, y: hueMode ? 0.5 : 0, ease: "spline"}, {x: 1, y: y, ease: "spline"}]
     }
 
     function pointsOf(ch) {
@@ -40,6 +99,15 @@ Item {
             return livePoints
         const p = curves && curves[ch]
         return p && p.length >= 2 ? p : defaultPoints()
+    }
+
+    function tieHueEnds(pts, idx) {
+        const last = pts.length - 1
+        if (!hueMode || last < 1 || (idx !== 0 && idx !== last))
+            return pts
+        const other = idx === 0 ? last : 0
+        pts[other] = {x: pts[other].x, y: pts[idx].y, ease: pts[other].ease || "spline"}
+        return pts
     }
 
     function emitPoints(pts) {
@@ -58,6 +126,25 @@ Item {
 
     implicitWidth: 240
     implicitHeight: tabs.height + (showTabs ? Theme.spacingMd : 0) + width
+    activeFocusOnTab: true
+
+    Keys.onPressed: event => {
+        const step = ((event.modifiers & Qt.ShiftModifier) ? 10 : 1) / 255
+        if (event.key === Qt.Key_Delete || event.key === Qt.Key_Backspace) {
+            removePoint(selected)
+        } else if (event.key === Qt.Key_Left) {
+            nudgeSelected(-step, 0)
+        } else if (event.key === Qt.Key_Right) {
+            nudgeSelected(step, 0)
+        } else if (event.key === Qt.Key_Up) {
+            nudgeSelected(0, step)
+        } else if (event.key === Qt.Key_Down) {
+            nudgeSelected(0, -step)
+        } else {
+            return
+        }
+        event.accepted = true
+    }
 
     onCurvesChanged: canvas.requestPaint()
     onChannelChanged: {
@@ -145,6 +232,15 @@ Item {
                 if (w < 2 || h < 2)
                     return
 
+                if (root.hueMode) {
+                    const hueGradient = ctx.createLinearGradient(0, 0, w, 0)
+                    for (let i = 0; i <= 6; ++i)
+                        hueGradient.addColorStop(i / 6, "hsl(" + (i * 60) + ", 80%, 55%)")
+                    ctx.globalAlpha = 0.18
+                    ctx.fillStyle = hueGradient
+                    ctx.fillRect(0, 0, w, h)
+                }
+
                 ctx.strokeStyle = String(Theme.c.fadeCurveCanvas.grid)
                 ctx.lineWidth = Theme.c.fadeCurveCanvas.gridLineWidth
                 ctx.globalAlpha = Theme.c.fadeCurveCanvas.gridOpacity
@@ -157,11 +253,13 @@ Item {
                     ctx.stroke()
                 }
 
-                ctx.globalAlpha = 0.5
-                ctx.beginPath()
-                ctx.moveTo(0, h)
-                ctx.lineTo(w, 0)
-                ctx.stroke()
+                if (!root.hueMode) {
+                    ctx.globalAlpha = 0.5
+                    ctx.beginPath()
+                    ctx.moveTo(0, h)
+                    ctx.lineTo(w, 0)
+                    ctx.stroke()
+                }
 
                 const steps = Math.max(32, Math.floor(w / 2))
                 const drawCurve = (ch, alpha, lineWidth) => {
@@ -261,14 +359,20 @@ Item {
                 dragIndex = -1
                 unlockFlickable()
                 root.livePoints = null
-                root.ended()
+                if (root.gestureBegun) {
+                    root.gestureBegun = false
+                    root.ended()
+                }
             }
 
             onPressed: mouse => {
-                lockFlickable()
-                let pts = root.pointsOf(root.channel).map(p => ({x: p.x, y: p.y, ease: p.ease || "spline"}))
                 let idx = hit(mouse.x, mouse.y)
-                root.began()
+                // The second press of a double-click on a point just added would drag it; skip it.
+                if (root.recentlyAdded(idx))
+                    return
+                lockFlickable()
+                root.forceActiveFocus()
+                let pts = root.pointsOf(root.channel).map(p => ({x: p.x, y: p.y, ease: p.ease || "spline"}))
                 dragging = true
                 if (idx < 0) {
                     if (pts.length >= CurveMath.MAX_POINTS) {
@@ -277,7 +381,6 @@ Item {
                         return
                     }
                     const x = CurveMath.clamp01(mouse.x / width)
-                    const y = CurveMath.clamp01(1 - mouse.y / height)
                     const lo = x - CurveMath.MIN_GAP
                     const hi = x + CurveMath.MIN_GAP
                     if (pts.some(p => p.x > lo && p.x < hi)) {
@@ -285,10 +388,14 @@ Item {
                         root.selected = -1
                         return
                     }
+                    const y = CurveMath.clamp01(CurveMath.evaluate(pts, x, CurveMath.tangents(pts)))
                     pts.push({x: x, y: y, ease: "spline"})
                     pts = CurveMath.sortedPoints(pts)
                     idx = pts.findIndex(p => p.x === x)
+                    root.openGesture()
                     root.emitPoints(pts)
+                    root.clickAddedAt = Date.now()
+                    root.clickAddedIndex = idx
                 } else {
                     root.livePoints = pts
                 }
@@ -299,6 +406,7 @@ Item {
             onPositionChanged: mouse => {
                 if (!dragging || dragIndex < 0)
                     return
+                root.openGesture()
                 const pts = root.livePoints.slice()
                 const last = pts.length - 1
                 const outside = mouse.x < -width * 0.25 || mouse.x > width * 1.25
@@ -317,26 +425,20 @@ Item {
                                  Math.max(pts[dragIndex - 1].x + CurveMath.MIN_GAP, mouse.x / width))
                 }
                 pts[dragIndex] = {x: x, y: y, ease: pts[dragIndex].ease || "spline"}
-                root.emitPoints(pts)
+                root.emitPoints(root.tieHueEnds(pts, dragIndex))
             }
 
             onReleased: finish()
             onCanceled: finish()
 
             onDoubleClicked: mouse => {
-                const pts = root.pointsOf(root.channel)
                 const idx = hit(mouse.x, mouse.y)
-                if (idx <= 0 || idx >= pts.length - 1)
+                if (root.recentlyAdded(idx))
                     return
                 dragging = false
                 dragIndex = -1
                 unlockFlickable()
-                const next = pts.slice()
-                next.splice(idx, 1)
-                root.emitPoints(next)
-                root.livePoints = null
-                root.selected = -1
-                root.ended()
+                root.removePoint(idx)
             }
         }
     }

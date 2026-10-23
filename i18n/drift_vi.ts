@@ -12465,10 +12465,6 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
         <source>Still opening a project — try again in a moment.</source>
         <translation>Vẫn đang mở một dự án — hãy thử lại sau giây lát.</translation>
     </message>
-    <message>
-        <source>Couldn’t read %1: %2</source>
-        <translation>Không thể đọc %1: %2</translation>
-    </message>
     <message numerus="yes">
         <source>Project JSON loaded, but %n media file(s) could not be found</source>
         <translation type="unfinished">
@@ -12482,6 +12478,14 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     <message>
         <source>Failed to open Premiere Pro project</source>
         <translation>Không mở được dự án Premiere Pro</translation>
+    </message>
+    <message>
+        <source>Couldn’t write %1</source>
+        <translation type="unfinished">Không thể ghi %1</translation>
+    </message>
+    <message>
+        <source>Couldn’t read %1</source>
+        <translation type="unfinished">Không thể đọc %1</translation>
     </message>
     <message>
         <source>Premiere Pro project imported: %1</source>

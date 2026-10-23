@@ -12517,10 +12517,6 @@ If playback stutters, try another.</source>
         <source>Still opening a project — try again in a moment.</source>
         <translation type="unfinished">এখনও একটি প্রকল্প খোলা হচ্ছে — কিছুক্ষণের মধ্যে আবার চেষ্টা করুন.</translation>
     </message>
-    <message>
-        <source>Couldn’t read %1: %2</source>
-        <translation type="unfinished">পড়া যায়নি %1 : %2</translation>
-    </message>
     <message numerus="yes">
         <source>Project JSON loaded, but %n media file(s) could not be found</source>
         <translation type="unfinished">
@@ -12535,6 +12531,14 @@ If playback stutters, try another.</source>
     <message>
         <source>Failed to open Premiere Pro project</source>
         <translation type="unfinished">প্রিমিয়ার প্রো প্রোজেক্ট খুলতে ব্যর্থ হয়েছে</translation>
+    </message>
+    <message>
+        <source>Couldn’t write %1</source>
+        <translation type="unfinished">লিখতে পারিনি %1</translation>
+    </message>
+    <message>
+        <source>Couldn’t read %1</source>
+        <translation type="unfinished">পড়া যায়নি %1</translation>
     </message>
     <message>
         <source>Premiere Pro project imported: %1</source>

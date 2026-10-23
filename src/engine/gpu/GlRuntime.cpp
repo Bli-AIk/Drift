@@ -3626,7 +3626,10 @@ void setPackageUniforms(QOpenGLShaderProgram *program, const drift::GpuEffectDef
                              QVector2D(float(resolution.width()), float(resolution.height())));
     const float timeSec = float(timeUs) / 1'000'000.f;
     program->setUniformValue("u_time", timeSec);
-    program->setUniformValue("u_frameIndex", int(std::floor(timeSec * 30.f)));
+    const float frameRate = aux && aux->frameRate > 0 ? float(aux->frameRate) : 30.f;
+    program->setUniformValue("u_frameRate", frameRate);
+    // Rounded, so a time a hair under k / fps still lands on frame k.
+    program->setUniformValue("u_frameIndex", int(std::floor(double(timeUs) * frameRate / 1'000'000.0 + 0.5)));
     // Integer microseconds for hash-stable glitch effects that mirror CPU seeding.
     program->setUniformValue("u_timeUs", float(timeUs));
     program->setUniformValue("u_progress", float(qBound(0.0, progress, 1.0)));
@@ -3845,16 +3848,19 @@ GLuint paramImageTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString
 }
 
 // A gradient or curve value baked to 256x1, most recently used first.
-GLuint bakedLookupTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl, bool curve, const QString &json)
+GLuint bakedLookupTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl, bool curve, const QString &json,
+                          bool periodic = false)
 {
-    const QString key = (curve ? QStringLiteral("curve|") : QStringLiteral("gradient|")) + json;
+    const QString key = (curve ? (periodic ? QStringLiteral("hue|") : QStringLiteral("curve|"))
+                               : QStringLiteral("gradient|"))
+        + json;
     const auto it = std::find_if(rt.bakedLookups.begin(), rt.bakedLookups.end(),
                                  [&key](const GlRuntime::BakedLookup &entry) { return entry.key == key; });
     if (it != rt.bakedLookups.end()) {
         rt.bakedLookups.splice(rt.bakedLookups.begin(), rt.bakedLookups, it);
         return it->texture;
     }
-    const QByteArray rgba = curve ? drift::bakeCurve(json) : drift::bakeGradient(json);
+    const QByteArray rgba = curve ? drift::bakeCurve(json, periodic) : drift::bakeGradient(json);
     if (rgba.isEmpty())
         return transparentTexture(rt, gl);
     rt.bakedLookups.push_front({key, uploadRgba8(gl, 256, 1, rgba.constData())});
@@ -3867,12 +3873,14 @@ GLuint bakedLookupTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl, bool curve, 
 
 // A look's .cube file baked to 1089x33, most recently used first. A look that does not resolve or
 // does not parse shows the identity.
-GLuint lutTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString &lookId)
+GLuint lutTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString &lookId, bool *isIdentity)
 {
     static const std::shared_ptr<const QByteArray> identity =
         std::make_shared<const QByteArray>(drift::bakeTiledRgba8(drift::identityLut(33)));
-    std::shared_ptr<const QByteArray> source = drift::bakedLutForId(lookId);
-    const QString key = source ? drift::resolveLutPath(lookId) : QStringLiteral("identity");
+    QString path;
+    std::shared_ptr<const QByteArray> source = drift::bakedLutForId(lookId, &path);
+    *isIdentity = !source;
+    const QString key = source ? path : QStringLiteral("identity");
     if (!source)
         source = identity;
 
@@ -3946,10 +3954,14 @@ GlTarget runPipeline(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString &ca
     // the compositor rendered for them; audio has no input until its analysis lands.
     GLint maxUnits = 0;
     std::vector<GLuint> paramTextures;
+    // "<key>_identity" is 1 for a curve that maps to itself or a look that does not resolve, so
+    // the shader can skip the 8-bit lookup and defaults stay bit-exact.
+    std::vector<float> paramIdentity;
     if (!gpu.samplerParams.isEmpty()) {
         gl->glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxUnits);
         for (const drift::GpuSamplerParam &sampler : gpu.samplerParams) {
             const QVariant value = parameters.value(sampler.key);
+            paramIdentity.push_back(0.f);
             switch (sampler.type) {
             case drift::EffectParamType::Image:
                 paramTextures.push_back(paramImageTexture(rt, gl, value.toString()));
@@ -3958,11 +3970,15 @@ GlTarget runPipeline(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString &ca
                 paramTextures.push_back(bakedLookupTexture(rt, gl, false, value.toString()));
                 break;
             case drift::EffectParamType::Curve:
-                paramTextures.push_back(bakedLookupTexture(rt, gl, true, value.toString()));
+                paramTextures.push_back(bakedLookupTexture(rt, gl, true, value.toString(), sampler.hueCurve));
+                paramIdentity.back() = drift::curveIsIdentity(value.toString(), sampler.hueCurve) ? 1.f : 0.f;
                 break;
-            case drift::EffectParamType::Lut:
-                paramTextures.push_back(lutTexture(rt, gl, value.toString()));
+            case drift::EffectParamType::Lut: {
+                bool identity = false;
+                paramTextures.push_back(lutTexture(rt, gl, value.toString(), &identity));
+                paramIdentity.back() = identity ? 1.f : 0.f;
                 break;
+            }
             case drift::EffectParamType::Track:
             case drift::EffectParamType::TrackMask:
             case drift::EffectParamType::Audio: {
@@ -4104,6 +4120,10 @@ GlTarget runPipeline(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QString &ca
                 const int loc = program->uniformLocation(gpu.samplerParams[p].key);
                 if (loc < 0)
                     continue;
+                const int identityLoc =
+                    program->uniformLocation(gpu.samplerParams[p].key + QLatin1String("_identity"));
+                if (identityLoc >= 0)
+                    program->setUniformValue(identityLoc, paramIdentity[size_t(p)]);
                 const int unit = paramSamplerUnit(int(inputs.size()), samplerIndex++);
                 if (unit >= maxUnits) {
                     static bool warned = false;

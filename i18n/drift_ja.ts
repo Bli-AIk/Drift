@@ -12465,10 +12465,6 @@ If playback stutters, try another.</source>
         <source>Still opening a project — try again in a moment.</source>
         <translation>プロジェクトの読み込み中です — しばらくしてからもう一度試してください。</translation>
     </message>
-    <message>
-        <source>Couldn’t read %1: %2</source>
-        <translation>%1 を読み取れませんでした : %2</translation>
-    </message>
     <message numerus="yes">
         <source>Project JSON loaded, but %n media file(s) could not be found</source>
         <translation type="unfinished">
@@ -12482,6 +12478,14 @@ If playback stutters, try another.</source>
     <message>
         <source>Failed to open Premiere Pro project</source>
         <translation>Premiere Pro プロジェクトを開けません</translation>
+    </message>
+    <message>
+        <source>Couldn’t write %1</source>
+        <translation type="unfinished">%1 を書き込めませんでした</translation>
+    </message>
+    <message>
+        <source>Couldn’t read %1</source>
+        <translation type="unfinished">%1 を読み込めませんでした</translation>
     </message>
     <message>
         <source>Premiere Pro project imported: %1</source>

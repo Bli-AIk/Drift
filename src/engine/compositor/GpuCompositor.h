@@ -110,6 +110,7 @@ struct GpuLayer
     bool screenSpace = false;
     double opacity = 1.0;
     drift::TimeUs clipTimeUs = 0; // effect time base (relative to clip start)
+    int frameRate = 0;            // the project's, for u_frameIndex; 0 reads as 30
     // This frame's baked face anchors, one per tracked slot, sampled by FrameCompositor. Carried
     // by value: the scene outlives the cache lookup that produced them.
     QList<drift::FaceAnchors> faceSlots;

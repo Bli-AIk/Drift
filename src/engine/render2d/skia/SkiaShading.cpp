@@ -51,7 +51,7 @@ QColor withAlpha(const QColor &c, double factor)
 } // namespace
 
 void applyShadingPaint(SkPaint &paint, const TextPaint &tp, const QRectF &box, double timeSec, double alpha,
-                       double progress)
+                       double progress, double frameRate)
 {
     paint.setShader(nullptr);
     paint.setColorFilter(nullptr);
@@ -72,7 +72,7 @@ void applyShadingPaint(SkPaint &paint, const TextPaint &tp, const QRectF &box, d
     case TextPaintKind::Effect: {
         paint.setColor(SkColorSetARGB(qRound(alpha * 255.0), 0, 0, 0));
         sk_sp<SkShader> base = SkShaders::Color(toSkColor(tp.color));
-        paint.setShader(effectShaderFor(tp.effect, std::move(base), box, timeSec, progress));
+        paint.setShader(effectShaderFor(tp.effect, std::move(base), box, timeSec, progress, frameRate));
         if (!paint.getShader())
             paint.setColor(toSkColor(withAlpha(tp.color, alpha)));
         break;

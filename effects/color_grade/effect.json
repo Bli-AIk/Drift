@@ -29,6 +29,41 @@
     { "identifier": "curveG", "displayName": "Green Curve", "type": "curve", "group": "Curves", "groupCollapsed": true, "defaultValue": [{"x": 0, "y": 0, "ease": "spline"}, {"x": 1, "y": 1, "ease": "spline"}] },
     { "identifier": "curveB", "displayName": "Blue Curve", "type": "curve", "group": "Curves", "groupCollapsed": true, "defaultValue": [{"x": 0, "y": 0, "ease": "spline"}, {"x": 1, "y": 1, "ease": "spline"}] },
 
+    { "identifier": "curveHueHue", "displayName": "Hue vs Hue", "type": "curve", "group": "Hue Curves", "groupCollapsed": true, "curveMode": "hue", "defaultValue": [{"x": 0, "y": 0.5, "ease": "spline"}, {"x": 1, "y": 0.5, "ease": "spline"}] },
+    { "identifier": "curveHueSat", "displayName": "Hue vs Saturation", "type": "curve", "group": "Hue Curves", "groupCollapsed": true, "curveMode": "hue", "defaultValue": [{"x": 0, "y": 0.5, "ease": "spline"}, {"x": 1, "y": 0.5, "ease": "spline"}] },
+    { "identifier": "curveHueLum", "displayName": "Hue vs Luminance", "type": "curve", "group": "Hue Curves", "groupCollapsed": true, "curveMode": "hue", "defaultValue": [{"x": 0, "y": 0.5, "ease": "spline"}, {"x": 1, "y": 0.5, "ease": "spline"}] },
+
+    { "identifier": "hslRedHue", "displayName": "Red Hue", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslRedSat", "displayName": "Red Saturation", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslRedLum", "displayName": "Red Luminance", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+
+    { "identifier": "hslOrangeHue", "displayName": "Orange Hue", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslOrangeSat", "displayName": "Orange Saturation", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslOrangeLum", "displayName": "Orange Luminance", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+
+    { "identifier": "hslYellowHue", "displayName": "Yellow Hue", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslYellowSat", "displayName": "Yellow Saturation", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslYellowLum", "displayName": "Yellow Luminance", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+
+    { "identifier": "hslGreenHue", "displayName": "Green Hue", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslGreenSat", "displayName": "Green Saturation", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslGreenLum", "displayName": "Green Luminance", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+
+    { "identifier": "hslAquaHue", "displayName": "Aqua Hue", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslAquaSat", "displayName": "Aqua Saturation", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslAquaLum", "displayName": "Aqua Luminance", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+
+    { "identifier": "hslBlueHue", "displayName": "Blue Hue", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslBlueSat", "displayName": "Blue Saturation", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslBlueLum", "displayName": "Blue Luminance", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+
+    { "identifier": "hslPurpleHue", "displayName": "Purple Hue", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslPurpleSat", "displayName": "Purple Saturation", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslPurpleLum", "displayName": "Purple Luminance", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+
+    { "identifier": "hslMagentaHue", "displayName": "Magenta Hue", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslMagentaSat", "displayName": "Magenta Saturation", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
+    { "identifier": "hslMagentaLum", "displayName": "Magenta Luminance", "type": "float", "group": "HSL", "groupCollapsed": true, "minValue": -1, "maxValue": 1, "defaultValue": 0 },
     { "identifier": "look", "displayName": "Look", "type": "lut", "group": "Look", "defaultValue": "" },
     { "identifier": "lookAmount", "displayName": "Look Intensity", "type": "float", "group": "Look", "minValue": 0, "maxValue": 1, "defaultValue": 1 }
   ],

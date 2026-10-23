@@ -12520,10 +12520,6 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
         <source>Still opening a project — try again in a moment.</source>
         <translation>Ouverture d&apos;un projet en cours — réessayez dans un instant.</translation>
     </message>
-    <message>
-        <source>Couldn’t read %1: %2</source>
-        <translation>Échec de la lecture de %1&#xa0;: %2</translation>
-    </message>
     <message numerus="yes">
         <source>Project JSON loaded, but %n media file(s) could not be found</source>
         <translation type="unfinished">
@@ -12538,6 +12534,14 @@ En cas de saccades à la lecture, essayez un autre mode.</translation>
     <message>
         <source>Failed to open Premiere Pro project</source>
         <translation>Échec de l&apos;ouverture du projet Premiere Pro</translation>
+    </message>
+    <message>
+        <source>Couldn’t write %1</source>
+        <translation type="unfinished">Impossible d&apos;écrire %1</translation>
+    </message>
+    <message>
+        <source>Couldn’t read %1</source>
+        <translation type="unfinished">Impossible de lire %1</translation>
     </message>
     <message>
         <source>Premiere Pro project imported: %1</source>

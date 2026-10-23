@@ -12,5 +12,7 @@ void main() {
         return;
     }
     vec3 glow = texture(u_currentTexture, v_texCoord).rgb * tint;
-    fragColor = vec4(clamp(src.rgb + glow * amt, 0.0, 1.0), src.a);
+    // Premultiplied additive light: alpha rises to cover the glow, so rgb never exceeds a.
+    vec3 rgb = clamp(src.rgb + glow * amt, 0.0, 1.0);
+    fragColor = vec4(rgb, max(src.a, max(rgb.r, max(rgb.g, rgb.b))));
 }

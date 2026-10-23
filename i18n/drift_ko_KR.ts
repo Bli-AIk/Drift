@@ -12459,10 +12459,6 @@ If playback stutters, try another.</source>
         <source>Still opening a project — try again in a moment.</source>
         <translation>아직 프로젝트를 여는 중입니다 — 잠시 후 다시 시도하세요.</translation>
     </message>
-    <message>
-        <source>Couldn’t read %1: %2</source>
-        <translation>%1을(를) 읽을 수 없습니다: %2</translation>
-    </message>
     <message numerus="yes">
         <source>Project JSON loaded, but %n media file(s) could not be found</source>
         <translation type="unfinished">
@@ -12476,6 +12472,14 @@ If playback stutters, try another.</source>
     <message>
         <source>Failed to open Premiere Pro project</source>
         <translation>Premiere Pro 프로젝트를 열지 못했습니다</translation>
+    </message>
+    <message>
+        <source>Couldn’t write %1</source>
+        <translation type="unfinished">%1에 쓸 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Couldn’t read %1</source>
+        <translation type="unfinished">%1을(를) 읽을 수 없습니다</translation>
     </message>
     <message>
         <source>Premiere Pro project imported: %1</source>

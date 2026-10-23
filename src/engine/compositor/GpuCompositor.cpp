@@ -665,6 +665,7 @@ GlTarget buildLayerTarget(GlRuntime &rt, QOpenGLExtraFunctions *gl, const GpuLay
         // Audio goes after the track inputs: rendering one can run a layer that uploads its own
         // analysis under the same key.
         PipelineAux aux{layer.depth, clipMask.isValid() ? clipMask.texture() : 0u};
+        aux.frameRate = layer.frameRate;
         std::vector<GlTarget> inputTargets;
         bindTrackInputs(rt, gl, layer, effectIndex, def->gpu, canvasSize, aux.paramTextures, inputTargets);
         bindAudioInputs(rt, gl, layer, effectIndex, def->gpu, aux);
@@ -1735,7 +1736,8 @@ void composeOnGlThread(GlRuntime &rt, const GpuScene &scene, GlTarget &outCanvas
         GlTarget mixed;
         if (item.transitionGpu && item.transitionGpu->valid) {
             const std::vector<const GlTarget *> sources{&fromTarget, &toTarget};
-            const PipelineAux aux{nullptr, fromMask.isValid() ? fromMask.texture() : 0u};
+            PipelineAux aux{nullptr, fromMask.isValid() ? fromMask.texture() : 0u};
+            aux.frameRate = item.from.frameRate;
             mixed = runPipeline(rt, gl, item.transitionKey, *item.transitionGpu, sources,
                                 item.transitionParams, item.transitionTimeUs, item.progress, canvasSize,
                                 &aux);

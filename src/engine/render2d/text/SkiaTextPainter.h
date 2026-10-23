@@ -35,6 +35,7 @@ struct TextPaintRequest
     QRectF layoutRect;
     double renderScale = 1.0;
     double timeSec = 0.0; // since the window start; drives time-based paints
+    double frameRate = 0.0; // the project's, for frame-stepped paints; 0 reads as 30
     textanim::Bounds envelope;
     TextAnchorGrouping anchorGrouping = TextAnchorGrouping::Character;
     QPointF anchorAlignment;

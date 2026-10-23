@@ -14,6 +14,16 @@ PanelFrame {
     readonly property bool hasTarget: !!target.hasTarget
     readonly property var params: target.params || ({})
     readonly property string currentLook: params.look || ""
+    readonly property bool lookMissing: {
+        if (currentLook === "")
+            return false
+        const list = colorState.looks
+        for (let i = 0; i < list.length; ++i) {
+            if (list[i].id === currentLook)
+                return false
+        }
+        return true
+    }
     property string query: ""
     property var live: undefined
     property string pendingId: ""
@@ -76,6 +86,18 @@ PanelFrame {
     }
 
     property var menuLook: ({})
+    property int menuLookUses: 0
+
+    function requestRemove(look) {
+        const uses = colorState.clipsUsingLook(look.id)
+        if (uses > 0) {
+            menuLook = look
+            menuLookUses = uses
+            confirmRemoveLook.open()
+        } else {
+            colorState.removeLook(look.id)
+        }
+    }
 
     function importLooks() {
         const urls = FileDialogs.openFiles(qsTr("Import looks"), [qsTr("LUT files (*.cube)")])
@@ -152,6 +174,14 @@ PanelFrame {
         Item {
             width: 1
             height: Theme.spacingSm
+        }
+
+        ThemedChip {
+            x: Theme.pagePadding
+            visible: root.hasTarget && root.lookMissing
+            selected: false
+            variant: "outline"
+            text: qsTr("Missing look")
         }
 
         GradeSlider {
@@ -303,7 +333,7 @@ PanelFrame {
         ThemedMenuItem {
             text: qsTr("Remove")
             icon.name: Theme.icons.trash
-            onTriggered: root.colorState.removeLook(root.menuLook.id)
+            onTriggered: root.requestRemove(root.menuLook)
         }
     }
 
@@ -311,7 +341,7 @@ PanelFrame {
         x: Theme.pagePadding
         y: grid.y + Theme.spacingMd
         width: parent.width - Theme.pagePadding * 2
-        visible: root.visibleLooks.length === 0 && !root.nothingInstalled
+        visible: root.hasTarget && root.visibleLooks.length === 0 && !root.nothingInstalled
                  && !(root.activeCategory === root.mineId && root.trimmedQuery.length === 0)
         text: root.trimmedQuery.length > 0
               ? qsTr("No looks match “%1”.").arg(root.trimmedQuery)
@@ -328,7 +358,7 @@ PanelFrame {
         anchors.horizontalCenter: parent.horizontalCenter
         y: grid.y + (grid.height - height) / 2
         width: Math.min(parent.width - Theme.spacing3xl, 260)
-        visible: root.activeCategory === root.mineId && root.visibleLooks.length === 0
+        visible: root.hasTarget && root.activeCategory === root.mineId && root.visibleLooks.length === 0
                  && root.trimmedQuery.length === 0 && !root.nothingInstalled
         compact: true
         glyph: Theme.icons.download
@@ -342,7 +372,7 @@ PanelFrame {
         anchors.horizontalCenter: parent.horizontalCenter
         y: grid.y + (grid.height - height) / 2
         width: Math.min(parent.width - Theme.spacing3xl, 260)
-        visible: root.nothingInstalled
+        visible: root.hasTarget && root.nothingInstalled
         compact: true
         glyph: Theme.icons.sparkles
         title: qsTr("No looks")
@@ -357,6 +387,28 @@ PanelFrame {
         glyph: Theme.icons.sparkles
         title: qsTr("Select a clip to try looks on it")
         compact: true
+    }
+
+    ThemedDialog {
+        id: confirmRemoveLook
+        title: qsTr("Remove this look?")
+        acceptText: qsTr("Remove")
+        acceptVariant: "destructive"
+        preferredWidth: Theme.dialogWidthSm
+        acceptOnReturn: false
+
+        contentItem: ThemedLabel {
+            width: parent ? parent.width : Theme.dialogWidthSm
+            wrapMode: Text.WordWrap
+            size: "sm"
+            text: qsTr("“%1” is used by %n clip(s). They will show it as missing until it is imported again.",
+                       "", root.menuLookUses).arg(root.menuLook.label)
+        }
+
+        onAccepted: {
+            const id = root.menuLook.id
+            Qt.callLater(() => root.colorState.removeLook(id))
+        }
     }
 
     ThemedDialog {

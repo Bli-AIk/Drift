@@ -12,7 +12,9 @@ namespace drift {
 class Project;
 }
 
-// Publishes look/none: the current timeline frame with the grade applied but no look.
+// Publishes look/none: the target clip alone (plus the clip hosting its grade, when that is a
+// separate adjustment) with the grade applied but no look. The frame is at the playhead when it is
+// inside the clip, else the clip's midpoint.
 // ColorImageProvider derives each look's thumbnail from it on demand. Requests are debounced, and
 // a request that arrives mid-render is run once the render finishes.
 class LookThumbnailService : public QObject
@@ -25,7 +27,8 @@ public:
                                   QObject *parent = nullptr);
     ~LookThumbnailService() override;
 
-    void request(qint64 timeUs, const QString &gradeHostClipId, int gradeEffectIndex);
+    void request(qint64 playheadUs, const QString &sourceClipId, const QString &gradeHostClipId,
+                 int gradeEffectIndex);
     void setActive(bool active);
 
 signals:
@@ -38,7 +41,8 @@ private:
 
     std::function<drift::Project()> m_projectSnapshot;
     QTimer *m_debounce = nullptr;
-    qint64 m_timeUs = 0;
+    qint64 m_playheadUs = 0;
+    QString m_sourceClipId;
     QString m_gradeHostClipId;
     int m_gradeEffectIndex = -1;
     bool m_active = false;

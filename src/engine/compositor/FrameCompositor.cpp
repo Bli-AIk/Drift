@@ -942,7 +942,7 @@ QImage imageForClip(const drift::Clip &clip, const QList<drift::Mask> &laneMasks
         // compositor thread, and preview and export read the same numbers.
         image = EffectProcessor::applyEffects(image, otherEffects, clipTimeUs,
                                               faceSlotsForClip(clip, otherEffects, timelineUs),
-                                              depthFrameForClip(clip, otherEffects, timelineUs));
+                                              depthFrameForClip(clip, otherEffects, timelineUs), projectFps);
     }
     if (!drift::masksAreInert(laneMasks))
         image = drift::applyMask(image, laneMasks, image.width(), image.height());
@@ -1205,7 +1205,7 @@ std::shared_ptr<const drift::text::FragmentSet> textFragments(const drift::TextS
 QRectF fillTextLayer(GpuLayer &layer, const drift::TextStyle &style, const QString &text,
                      const QRectF &layoutRect, double renderScale, int activeWordIndex,
                      drift::TimeUs windowStartUs, drift::TimeUs windowDurationUs, drift::TimeUs timelineUs,
-                     drift::textanim::BlockProps *block, bool atRest = false)
+                     int projectFps, drift::textanim::BlockProps *block, bool atRest = false)
 {
     *block = drift::textanim::BlockProps{};
 #ifdef DRIFT_WITH_SKIA
@@ -1227,6 +1227,7 @@ QRectF fillTextLayer(GpuLayer &layer, const drift::TextStyle &style, const QStri
     request.layoutRect = layoutRect;
     request.renderScale = renderScale;
     request.timeSec = drift::usToSeconds(qMax<drift::TimeUs>(0, timelineUs - windowStartUs));
+    request.frameRate = projectFps;
     request.anchorGrouping = anim.set.anchorGrouping;
     request.anchorAlignment = anim.set.anchorAlignment;
     *block = request.frame.block;
@@ -1347,7 +1348,7 @@ GpuLayer buildGpuLayer(const drift::Project &project, const drift::Clip &clip,
             fillTextLayer(layer, textClip->textStyle,
                           editingText || !clip.textContent.isEmpty() ? clip.textContent : clip.name, layoutRect,
                           renderScale, karaokeWordIndex(clip, timelineUs), clip.timelineStart,
-                          clip.timelineDuration, timelineUs, &block, editingText);
+                          clip.timelineDuration, timelineUs, projectFps, &block, editingText);
         if (editingText && !layer.hasPixels()) {
             // Empty or blank text paints nothing, but the layer must exist for the caret's.
             layer.vector = std::make_shared<BlankPainter>(QSize(layoutW, layoutH));
@@ -1367,7 +1368,7 @@ GpuLayer buildGpuLayer(const drift::Project &project, const drift::Clip &clip,
         const QRectF rasterRect =
             fillTextLayer(layer, textClip->textStyle, cue->text, layoutRect, renderScale,
                           karaokeWordIndex(clip, *cue, localUs), clip.timelineStart + cue->startUs,
-                          cue->endUs - cue->startUs, timelineUs, &block);
+                          cue->endUs - cue->startUs, timelineUs, projectFps, &block);
         if (!layer.hasPixels())
             return layer;
         layer.effects = resolvedClipEffects(clip, clipTimeUs);
@@ -1382,6 +1383,7 @@ GpuLayer buildGpuLayer(const drift::Project &project, const drift::Clip &clip,
         request.layoutRect = layoutRect;
         request.renderScale = renderScale;
         request.timeSec = drift::usToSeconds(qMax<drift::TimeUs>(0, clipTimeUs));
+        request.frameRate = projectFps;
         const drift::skia::ShapePainterResult painted = drift::skia::makeShapePainter(request);
         layer.vector = painted.painter;
         destRect = painted.rect;
@@ -1475,6 +1477,7 @@ GpuLayer buildGpuLayer(const drift::Project &project, const drift::Clip &clip,
     layer.flipV = clip.flipV;
     layer.opacity = opacity;
     layer.clipTimeUs = timelineUs - clip.timelineStart;
+    layer.frameRate = projectFps;
     // After the clip's own chain: a lane sits above the clip in the timeline, so it reads as the
     // later treatment. Derived face slots come after, so a lane's face effect binds too.
     layer.effects.append(laneChain);
@@ -1870,6 +1873,7 @@ GpuScene buildGpuScene(const drift::Project &project, drift::TimeUs timelineUs, 
                 item.layer.rect = QRectF(0, 0, width, height);
                 item.layer.opacity = opacityForClip(clip, timelineUs);
                 item.layer.clipTimeUs = timelineUs - clip.timelineStart;
+                item.layer.frameRate = fps;
                 item.layer.faceSlots = faceSlotsForClip(clip, item.layer.effects, timelineUs);
                 scene.items.append(item);
                 continue;

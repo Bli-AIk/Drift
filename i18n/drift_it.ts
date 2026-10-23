@@ -12517,10 +12517,6 @@ Se la riproduzione va a scatti, prova un&apos;altra opzione.</translation>
         <source>Still opening a project — try again in a moment.</source>
         <translation>Apertura di un progetto ancora in corso — riprova tra qualche istante.</translation>
     </message>
-    <message>
-        <source>Couldn’t read %1: %2</source>
-        <translation>Impossibile leggere %1: %2</translation>
-    </message>
     <message numerus="yes">
         <source>Project JSON loaded, but %n media file(s) could not be found</source>
         <translation type="unfinished">
@@ -12535,6 +12531,14 @@ Se la riproduzione va a scatti, prova un&apos;altra opzione.</translation>
     <message>
         <source>Failed to open Premiere Pro project</source>
         <translation>Impossibile aprire il progetto Premiere Pro</translation>
+    </message>
+    <message>
+        <source>Couldn’t write %1</source>
+        <translation type="unfinished">Impossibile scrivere %1</translation>
+    </message>
+    <message>
+        <source>Couldn’t read %1</source>
+        <translation type="unfinished">Impossibile leggere %1</translation>
     </message>
     <message>
         <source>Premiere Pro project imported: %1</source>

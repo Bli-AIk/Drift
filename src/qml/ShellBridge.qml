@@ -7,4 +7,7 @@ import QtQuick
 // Component.onCompleted, so bindings must tolerate it.
 QtObject {
     property var main: null
+    // Set to {tab: n} to point the Color panel at a tab. A fresh object each time, so a repeat
+    // request still lands; read on creation too, since the panel may not exist yet.
+    property var colorTabRequest: null
 }

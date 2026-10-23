@@ -84,22 +84,55 @@ QStringList animatedKeysOf(const drift::Effect *effect, const EffectPresetEntry 
     return keys;
 }
 
-QVariantMap paramValuesOf(const drift::Effect *effect, const EffectPresetEntry &def)
+QVariantMap paramValuesOf(const drift::Effect *effect, const EffectPresetEntry &def, drift::TimeUs clipTimeUs)
 {
     QVariantMap values;
     for (const drift::EffectParamSpec &spec : def.meta.parameters) {
         if (spec.isVec2()) {
-            const double x = effect ? effect->parameters.value(spec.key + QStringLiteral(".x"), spec.defaultX).toDouble()
-                                    : spec.defaultX;
-            const double y = effect ? effect->parameters.value(spec.key + QStringLiteral(".y"), spec.defaultY).toDouble()
-                                    : spec.defaultY;
-            values.insert(spec.key, QVariantList{x, y});
+            const QVariant vx = effect ? effect->valueAt(spec.key + QStringLiteral(".x"), clipTimeUs) : QVariant();
+            const QVariant vy = effect ? effect->valueAt(spec.key + QStringLiteral(".y"), clipTimeUs) : QVariant();
+            values.insert(spec.key, QVariantList{vx.isValid() ? vx.toDouble() : spec.defaultX,
+                                                 vy.isValid() ? vy.toDouble() : spec.defaultY});
         } else {
-            const QVariant value = effect ? effect->parameters.value(spec.key) : QVariant();
+            const QVariant value = effect ? effect->valueAt(spec.key, clipTimeUs) : QVariant();
             values.insert(spec.key, value.isValid() ? value : spec.defaultVariant());
         }
     }
     return values;
+}
+
+bool isStandaloneAdjustmentTrack(const drift::Track &track)
+{
+    return track.isAdjustment() && !track.isAdjustmentLane() && !track.isTransformLayer();
+}
+
+bool isGradeTarget(const drift::Clip &clip)
+{
+    switch (clip.type) {
+    case drift::ClipType::Video:
+    case drift::ClipType::Image:
+    case drift::ClipType::Composite:
+    case drift::ClipType::Pdf:
+    case drift::ClipType::Model3d:
+        return true;
+    default:
+        return false;
+    }
+}
+
+const drift::Clip *standaloneGradeOverlapping(const drift::Project &project, drift::TimeUs start, drift::TimeUs end)
+{
+    for (const drift::Track &track : project.tracks()) {
+        if (!isStandaloneAdjustmentTrack(track))
+            continue;
+        for (const drift::Clip &clip : track.clips) {
+            if (clip.type == drift::ClipType::Adjustment && clip.adjustmentKind == drift::AdjustmentKind::VideoEffects
+                && clip.timelineStart < end && clip.timelineEnd() > start
+                && effectIndexOf(&clip, kGradeId) >= 0)
+                return &clip;
+        }
+    }
+    return nullptr;
 }
 
 drift::Effect effectFromCatalog(const EffectPresetEntry &def)
@@ -130,6 +163,10 @@ ColorController::ColorController(AppController *app, QObject *parent)
     connect(app, &AppController::selectedClipDataChanged, this, &ColorController::refreshTarget);
     connect(app, &AppController::tracksChanged, this, &ColorController::refreshTarget);
     connect(app, &AppController::undoStackChanged, this, &ColorController::refreshTarget);
+    connect(app, &AppController::inspectorPlayheadChanged, this, [this]() {
+        if (m_targetAnimated)
+            publishTarget();
+    });
     connect(app, &AppController::playheadSecondsChanged, this, [this]() {
         if (m_thumbnailsActive && !m_app->playing())
             requestThumbnails();
@@ -167,14 +204,25 @@ QVariantMap ColorController::buildTarget() const
     const int gradeIndex = effectIndexOf(host, kGradeId);
     const drift::Effect *grade = gradeIndex >= 0 ? &host->effects.at(gradeIndex) : nullptr;
 
+    const drift::TimeUs relUs = host ? qMax<drift::TimeUs>(0, m_app->playheadUs() - host->timelineStart) : 0;
+    const bool standalone = source && source->type == drift::ClipType::Adjustment;
+    const drift::Clip *timelineGrade = nullptr;
+    if (source && !standalone)
+        timelineGrade = standaloneGradeOverlapping(m_app->m_project, source->timelineStart, source->timelineEnd());
+
     QVariantMap out;
     out.insert(QStringLiteral("hasTarget"), gradable);
+    out.insert(QStringLiteral("selectionCount"), m_app->selectionCount());
+    out.insert(QStringLiteral("canApplyToAll"), gradable && !standalone);
+    out.insert(QStringLiteral("timelineGradeId"), timelineGrade ? timelineGrade->id : QString());
+    out.insert(QStringLiteral("timelineGradeName"), timelineGrade ? timelineGrade->name : QString());
+    out.insert(QStringLiteral("gradeEnabled"), grade ? grade->enabled : true);
     out.insert(QStringLiteral("label"), source ? source->name : QString());
     out.insert(QStringLiteral("sourceClipId"), m_sourceClipId);
     out.insert(QStringLiteral("hasGrade"), grade != nullptr);
     out.insert(QStringLiteral("gradeIndex"), gradeIndex);
     if (const EffectPresetEntry *def = effectDefForId(kGradeId)) {
-        out.insert(QStringLiteral("params"), paramValuesOf(grade, *def));
+        out.insert(QStringLiteral("params"), paramValuesOf(grade, *def, relUs));
         out.insert(QStringLiteral("animatedKeys"), animatedKeysOf(grade, *def));
     }
 
@@ -191,7 +239,7 @@ QVariantMap ColorController::buildTarget() const
         entry.insert(QStringLiteral("present"), effect != nullptr);
         entry.insert(QStringLiteral("index"), index);
         entry.insert(QStringLiteral("enabled"), effect ? effect->enabled : false);
-        entry.insert(QStringLiteral("params"), paramValuesOf(effect, *def));
+        entry.insert(QStringLiteral("params"), paramValuesOf(effect, *def, relUs));
         entry.insert(QStringLiteral("animatedKeys"), animatedKeysOf(effect, *def));
         finishing.append(entry);
     }
@@ -210,13 +258,23 @@ void ColorController::refreshTarget()
     }
     m_sourceClipId = selected;
 
+    publishTarget();
+    warmLook(m_target.value(QStringLiteral("params")).toMap().value(QStringLiteral("look")).toString());
+    applyBypass();
+    requestThumbnails();
+}
+
+void ColorController::publishTarget()
+{
     QVariantMap next = buildTarget();
+    bool animated = !next.value(QStringLiteral("animatedKeys")).toStringList().isEmpty();
+    for (const QVariant &entry : next.value(QStringLiteral("finishing")).toList())
+        animated = animated || !entry.toMap().value(QStringLiteral("animatedKeys")).toStringList().isEmpty();
+    m_targetAnimated = animated;
     if (next != m_target) {
         m_target = next;
         emit targetChanged();
     }
-    applyBypass();
-    requestThumbnails();
 }
 
 void ColorController::rebuildLooks()
@@ -416,11 +474,16 @@ void ColorController::setLook(const QString &id)
     writeText(QStringLiteral("look"), id);
     if (implicit)
         commitEdit();
+    warmLook(id);
+}
+
+void ColorController::warmLook(const QString &id)
+{
     if (!id.isEmpty())
         (void)QtConcurrent::run([id]() { drift::bakedLutForId(id); });
 }
 
-void ColorController::resetParams(const QString &group, const QString &undoText)
+void ColorController::resetParams(const QStringList &groups, const QString &undoText)
 {
     int t = -1;
     int c = -1;
@@ -430,35 +493,45 @@ void ColorController::resetParams(const QString &group, const QString &undoText)
     if (!def)
         return;
 
-    const drift::Project before = m_app->m_project;
     const drift::ClipRef ref = m_app->effectHostRef(t, c, drift::AdjustmentKind::VideoEffects, /*create=*/false);
     if (ref.trackIndex < 0)
         return;
+    const drift::Project before = m_app->m_project;
     drift::Clip &host = m_app->m_project.tracks()[ref.trackIndex].clips[ref.clipIndex];
     const int index = effectIndexOf(&host, kGradeId);
     if (index < 0)
         return;
 
     drift::Effect &grade = host.effects[index];
+    const QMap<QString, QVariant> oldParameters = grade.parameters;
+    bool removedKeys = false;
     for (const drift::EffectParamSpec &spec : def->meta.parameters) {
-        if (!group.isEmpty() && spec.group != group)
+        if (!groups.isEmpty() && !groups.contains(spec.group))
             continue;
         spec.insertDefault(grade.parameters);
         for (const QString &trackKey : {spec.key, spec.key + QStringLiteral(".x"), spec.key + QStringLiteral(".y")})
-            grade.paramKeyframes.remove(trackKey);
+            removedKeys = grade.paramKeyframes.remove(trackKey) > 0 || removedKeys;
     }
+    if (!removedKeys && grade.parameters == oldParameters)
+        return;
     m_app->pushProjectEdit(before, undoText);
     m_app->finishEdit(undoText);
 }
 
 void ColorController::resetGroup(const QString &group)
 {
-    resetParams(group, tr("Reset %1").arg(group));
+    resetParams({group}, tr("Reset %1").arg(group));
+}
+
+void ColorController::resetGroups(const QStringList &groups)
+{
+    if (!groups.isEmpty())
+        resetParams(groups, tr("Reset %1").arg(groups.join(QStringLiteral(", "))));
 }
 
 void ColorController::resetAll()
 {
-    resetParams(QString(), tr("Reset grade"));
+    resetParams({}, tr("Reset grade"));
 }
 
 // ---- Looks -------------------------------------------------------------------------------
@@ -483,6 +556,22 @@ void ColorController::importLooks(const QList<QUrl> &urls)
     else
         m_app->setLastMessage(tr("Imported %n look(s), %1 failed", "", imported).arg(failed),
                               QStringLiteral("warning"));
+}
+
+int ColorController::clipsUsingLook(const QString &id) const
+{
+    int count = 0;
+    for (const drift::Track &track : m_app->m_project.tracks()) {
+        for (const drift::Clip &clip : track.clips) {
+            for (const drift::Effect &effect : clip.effects) {
+                if (effect.catalogId == kGradeId && effect.parameters.value(QStringLiteral("look")).toString() == id) {
+                    ++count;
+                    break;
+                }
+            }
+        }
+    }
+    return count;
 }
 
 void ColorController::removeLook(const QString &id)
@@ -610,6 +699,8 @@ int ColorController::applyToAll(bool includeFinishing)
     int c = -1;
     if (!locate(m_sourceClipId, &t, &c))
         return 0;
+    if (m_app->m_project.tracks().at(t).clips.at(c).type == drift::ClipType::Adjustment)
+        return 0;
     const drift::Clip *sourceHost = m_app->effectHostClip(t, c, drift::AdjustmentKind::VideoEffects);
     const int gradeIndex = effectIndexOf(sourceHost, kGradeId);
     if (gradeIndex < 0) {
@@ -631,7 +722,7 @@ int ColorController::applyToAll(bool includeFinishing)
     QStringList targets;
     for (const drift::Track &track : m_app->m_project.tracks()) {
         for (const drift::Clip &clip : track.clips) {
-            if (clip.id != m_sourceClipId && isVisualClip(clip))
+            if (clip.id != m_sourceClipId && isGradeTarget(clip))
                 targets.append(clip.id);
         }
     }
@@ -677,7 +768,41 @@ int ColorController::applyToAll(bool includeFinishing)
 
 void ColorController::gradeWholeTimeline()
 {
+    const drift::TimeUs durationUs = drift::secondsToUs(m_app->durationSeconds());
+    for (int t = 0; t < m_app->m_project.tracks().size(); ++t) {
+        const drift::Track &track = m_app->m_project.tracks().at(t);
+        if (!isStandaloneAdjustmentTrack(track))
+            continue;
+        for (int c = 0; c < track.clips.size(); ++c) {
+            const drift::Clip &clip = track.clips.at(c);
+            if (clip.type == drift::ClipType::Adjustment && clip.adjustmentKind == drift::AdjustmentKind::VideoEffects
+                && clip.timelineStart <= 0 && clip.timelineEnd() >= durationUs - 1000
+                && effectIndexOf(&clip, kGradeId) >= 0) {
+                m_app->selectClip(t, c);
+                return;
+            }
+        }
+    }
     m_app->addAdjustmentClipWithEffect(kGradeId, -1, 0.0, m_app->durationSeconds());
+}
+
+void ColorController::enableGrade()
+{
+    int t = -1;
+    int c = -1;
+    if (!locate(m_sourceClipId, &t, &c))
+        return;
+    const int index = effectIndexOf(m_app->effectHostClip(t, c, drift::AdjustmentKind::VideoEffects), kGradeId);
+    if (index >= 0)
+        m_app->setEffectEnabled(t, c, index, true);
+}
+
+void ColorController::selectTimelineGrade()
+{
+    int t = -1;
+    int c = -1;
+    if (locate(m_target.value(QStringLiteral("timelineGradeId")).toString(), &t, &c))
+        m_app->selectClip(t, c);
 }
 
 // ---- Bypass and thumbnails -------------------------------------------------------------
@@ -735,5 +860,5 @@ void ColorController::requestThumbnails()
         if (gradeIndex >= 0)
             hostId = host->id;
     }
-    m_thumbs->request(m_app->playheadUs(), hostId, gradeIndex);
+    m_thumbs->request(m_app->playheadUs(), m_sourceClipId, hostId, gradeIndex);
 }

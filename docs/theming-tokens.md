@@ -93,6 +93,22 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | rampSky | #38bdf8 | #38bdf8 |
 | rampGreen | #4ade80 | #4ade80 |
 | rampViolet | #c084fc | #c084fc |
+| gradeHslRed | #e5484d | #e5484d |
+| gradeHslOrange | #f76b15 | #f76b15 |
+| gradeHslYellow | #f5d90a | #f5d90a |
+| gradeHslGreen | #30a46c | #30a46c |
+| gradeHslAqua | #12a594 | #12a594 |
+| gradeHslBlue | #3e63dd | #3e63dd |
+| gradeHslPurple | #8e4ec6 | #8e4ec6 |
+| gradeHslMagenta | #d6409f | #d6409f |
+| gradeHue | #f59e0b | #f59e0b |
+| gradeSat | #22d3ee | #22d3ee |
+| gradeLum | #e5e7eb | #374151 |
+| gradeCurveRed | #ef5350 | #ef5350 |
+| gradeCurveGreen | #66bb6a | #66bb6a |
+| gradeCurveBlue | #42a5f5 | #42a5f5 |
+| scopesBackground | #101114 | #101114 |
+| scopesLabel | #8a8d94 | #8a8d94 |
 | rampRose | #fb7185 | #fb7185 |
 | rampIndigo | #818cf8 | #818cf8 |
 | categoryAmber | #f59e0b | #f59e0b |
@@ -1270,6 +1286,23 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | facePropTile | foregroundMuted | $semantic.mutedForeground | $semantic.mutedForeground |
 | facePropTile | icon | $semantic.mutedForeground | $semantic.mutedForeground |
 | facePropTile | radius | $metrics.radius.sm | $metrics.radius.sm |
+| scopes | background | $palette.scopesBackground | $palette.scopesBackground |
+| scopes | label | $palette.scopesLabel | $palette.scopesLabel |
+| colorGradeBands | red | $palette.gradeHslRed | $palette.gradeHslRed |
+| colorGradeBands | orange | $palette.gradeHslOrange | $palette.gradeHslOrange |
+| colorGradeBands | yellow | $palette.gradeHslYellow | $palette.gradeHslYellow |
+| colorGradeBands | green | $palette.gradeHslGreen | $palette.gradeHslGreen |
+| colorGradeBands | aqua | $palette.gradeHslAqua | $palette.gradeHslAqua |
+| colorGradeBands | blue | $palette.gradeHslBlue | $palette.gradeHslBlue |
+| colorGradeBands | purple | $palette.gradeHslPurple | $palette.gradeHslPurple |
+| colorGradeBands | magenta | $palette.gradeHslMagenta | $palette.gradeHslMagenta |
+| colorGradeCurveChannels | master | $palette.panelForeground | $palette.panelForeground |
+| colorGradeCurveChannels | r | $palette.gradeCurveRed | $palette.gradeCurveRed |
+| colorGradeCurveChannels | g | $palette.gradeCurveGreen | $palette.gradeCurveGreen |
+| colorGradeCurveChannels | b | $palette.gradeCurveBlue | $palette.gradeCurveBlue |
+| colorGradeCurveChannels | hue | $palette.gradeHue | $palette.gradeHue |
+| colorGradeCurveChannels | sat | $palette.gradeSat | $palette.gradeSat |
+| colorGradeCurveChannels | lum | $palette.gradeLum | $palette.gradeLum |
 | fadeCurveCanvas | curve | $semantic.primary | $semantic.primary |
 | fadeCurveCanvas | curveLineWidth | $metrics.borderWidthFocus | $metrics.borderWidthFocus |
 | fadeCurveCanvas | fill | $semantic.primary | $semantic.primary |
@@ -1799,6 +1832,10 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | previewOptionsMenu | borderWidth | $metrics.borderWidth | $metrics.borderWidth |
 | previewOptionsMenu | radius | $metrics.radius.md | $metrics.radius.md |
 | previewOptionsRowLabel | foreground | $semantic.mutedForeground | $semantic.mutedForeground |
+| previewOriginalBadge | background | $semantic.surface.panel | $semantic.surface.panel |
+| previewOriginalBadge | border | $semantic.primary | $semantic.primary |
+| previewOriginalBadge | borderWidth | $metrics.borderWidth | $metrics.borderWidth |
+| previewOriginalBadge | foreground | $semantic.panel.foreground | $semantic.panel.foreground |
 | previewOsdCluster | background | $semantic.surface.panel | $semantic.surface.panel |
 | previewOsdCluster | border | $semantic.panel.border | $semantic.panel.border |
 | previewOsdCluster | borderWidth | $metrics.borderWidth | $metrics.borderWidth |

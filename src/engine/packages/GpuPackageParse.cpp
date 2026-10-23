@@ -254,6 +254,8 @@ bool parseParameters(const QJsonArray &params, QList<drift::EffectParamSpec> *ou
         spec.desktopGlOnly = p.value(QStringLiteral("desktopGlOnly")).toBool(false);
         spec.group = p.value(QStringLiteral("group")).toString();
         spec.groupCollapsed = p.value(QStringLiteral("groupCollapsed")).toBool(false);
+        if (spec.type == drift::EffectParamType::Curve)
+            spec.curveMode = p.value(QStringLiteral("curveMode")).toString();
 
         if (spec.key.isEmpty()) {
             fail(errorOut, QStringLiteral("parameter missing identifier"));
@@ -418,7 +420,7 @@ void collectRuntimeParams(const QList<drift::EffectParamSpec> &params, drift::Gp
     out->regionParams.clear();
     for (const drift::EffectParamSpec &spec : params) {
         if (spec.isSampler())
-            out->samplerParams.append({spec.key, spec.type});
+            out->samplerParams.append({spec.key, spec.type, spec.curveMode == QLatin1String("hue")});
         else if (spec.isRegion())
             out->regionParams.append(spec.key);
     }

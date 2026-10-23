@@ -12517,10 +12517,6 @@ If playback stutters, try another.</source>
         <source>Still opening a project — try again in a moment.</source>
         <translation>තවමත් ව්‍යාපෘතියක් විවෘත වෙමින් පවතී — මොහොතකින් නැවත උත්සාහ කරන්න.</translation>
     </message>
-    <message>
-        <source>Couldn’t read %1: %2</source>
-        <translation>%1 කියවීමට නොහැකි විය: %2</translation>
-    </message>
     <message numerus="yes">
         <source>Project JSON loaded, but %n media file(s) could not be found</source>
         <translation type="unfinished">
@@ -12535,6 +12531,14 @@ If playback stutters, try another.</source>
     <message>
         <source>Failed to open Premiere Pro project</source>
         <translation>Premiere Pro ව්‍යාපෘතිය විවෘත කිරීමට අසමත් විය</translation>
+    </message>
+    <message>
+        <source>Couldn’t write %1</source>
+        <translation type="unfinished">%1 ලිවීමට නොහැකි විය</translation>
+    </message>
+    <message>
+        <source>Couldn’t read %1</source>
+        <translation type="unfinished">%1 කියවීමට නොහැකි විය</translation>
     </message>
     <message>
         <source>Premiere Pro project imported: %1</source>

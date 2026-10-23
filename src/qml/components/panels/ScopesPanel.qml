@@ -94,7 +94,7 @@ PanelFrame {
                 Layout.fillHeight: true
                 Layout.minimumHeight: 60
                 radius: Theme.radiusMd
-                color: "#101114"
+                color: Theme.c.scopes.background
                 clip: true
 
                 Image {
@@ -114,7 +114,7 @@ PanelFrame {
                     visible: root.mode === "all"
                     text: tile.modelData === "histogram" ? qsTr("Histogram")
                           : tile.modelData === "waveform" ? qsTr("Waveform") : qsTr("Vectorscope")
-                    color: "#8a8d94"
+                    color: Theme.c.scopes.label
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeXs
                 }
