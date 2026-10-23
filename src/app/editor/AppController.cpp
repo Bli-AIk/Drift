@@ -779,6 +779,7 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
     m_depth = new DepthController(this, this);
     m_denoise = new DenoiseController(this, this);
     m_color = new ColorController(this, this);
+    m_keyframes = new KeyframeController(this, this);
     m_restore = new RestoreController(this, this);
     m_faces = new FaceTrackingController(this, this);
     m_stabilize = new StabilizeController(this, this);
@@ -2894,6 +2895,33 @@ bool parseAudioEffectProp(const QString &prop, int *effectIndex, QString *paramK
     return parseIndexedProp(prop, QLatin1String("afx."), effectIndex, paramKey);
 }
 
+// A colour animates as "<key>.r/.g/.b/.a" in 0..1, but its static value is one "#rrggbb[aa]" hex
+// on the base key. This is the static channel the unkeyed curve starts from.
+bool staticColorChannel(const QMap<QString, QVariant> &params, const QString &paramKey, double *out)
+{
+    if (paramKey.size() < 3 || paramKey.at(paramKey.size() - 2) != QLatin1Char('.'))
+        return false;
+    const QString hex = params.value(paramKey.chopped(2)).toString();
+    if (!hex.startsWith(QLatin1Char('#')) || (hex.size() != 7 && hex.size() != 9))
+        return false;
+    const QColor color(hex.left(7));
+    switch (paramKey.back().toLatin1()) {
+    case 'r':
+        *out = color.redF();
+        return true;
+    case 'g':
+        *out = color.greenF();
+        return true;
+    case 'b':
+        *out = color.blueF();
+        return true;
+    case 'a':
+        *out = hex.size() == 9 ? hex.right(2).toInt(nullptr, 16) / 255.0 : 1.0;
+        return true;
+    }
+    return false;
+}
+
 // A mask scalar is addressed as "mask.<key>" — no index, because a Mask adjustment carries
 // exactly one mask. The prop resolves against the adjustment clip itself; redirectToKeyframeHost
 // is what walks there from the media clip the user actually has selected.
@@ -3801,6 +3829,33 @@ bool AppController::writeClipProp(drift::Clip &clip, const QString &prop, drift:
 drift::KeyframeTrack<double> *AppController::transformTrack(drift::Clip &clip, const QString &prop)
 {
     return transformTrackForProp(clip, prop);
+}
+
+drift::KeyframeTrack<double> *AppController::propKeyframeTrack(drift::Clip &clip, const QString &prop,
+                                                               bool create)
+{
+    return keyframeTrackForProp(clip, prop, create);
+}
+
+const drift::KeyframeTrack<double> *AppController::propKeyframeTrack(const drift::Clip &clip,
+                                                                     const QString &prop) const
+{
+    return keyframeTrackForProp(clip, prop);
+}
+
+drift::TimeUs AppController::keyframeToleranceUs()
+{
+    return kKeyframeToleranceUs;
+}
+
+drift::TimeUs AppController::keyframeWriteSnapUs()
+{
+    return kKeyframeWriteSnapUs;
+}
+
+drift::EasingSpec AppController::easingSpecFromMap(const QVariantMap &spec)
+{
+    return easingSpecFromVariant(spec);
 }
 
 void AppController::clearPose3d(drift::Clip &clip)
@@ -5710,6 +5765,14 @@ void AppController::setPositionLinked(bool linked)
         return;
     m_positionLinked = linked;
     emit positionLinkedChanged();
+}
+
+void AppController::setSizeLinked(bool linked)
+{
+    if (m_sizeLinked == linked)
+        return;
+    m_sizeLinked = linked;
+    emit sizeLinkedChanged();
 }
 
 double AppController::masterVolume() const
@@ -16121,15 +16184,29 @@ double AppController::propertyBaseValue(int trackIndex, int clipIndex, const QSt
             QString paramKey;
             if (parseEffectProp(prop, &effectIndex, &paramKey)
                 && effectIndex >= 0 && effectIndex < clip.effects.size()) {
-                const QVariant value = clip.effects.at(effectIndex).parameters.value(paramKey);
+                const drift::Effect &effect = clip.effects.at(effectIndex);
+                const QVariant value = effect.parameters.value(paramKey);
                 if (value.isValid())
                     return value.toDouble();
+                // Channel and vec2 keys have no stored entry of their own, so read the catalog-resolved
+                // map that the compositor builds for the same effect.
+                const EffectPresetEntry *def = effectDefForId(effect.catalogId);
+                const QMap<QString, QVariant> params = def ? resolvedEffectParameters(effect, *def) : effect.parameters;
+                if (params.value(paramKey).isValid())
+                    return params.value(paramKey).toDouble();
+                double channel = 0.0;
+                if (staticColorChannel(params, paramKey, &channel))
+                    return channel;
             }
             if (parseAudioEffectProp(prop, &effectIndex, &paramKey)
                 && effectIndex >= 0 && effectIndex < clip.audioEffects.size()) {
-                const QVariant value = clip.audioEffects.at(effectIndex).parameters.value(paramKey);
+                const drift::Effect &effect = clip.audioEffects.at(effectIndex);
+                const QVariant value = effect.parameters.value(paramKey);
                 if (value.isValid())
                     return value.toDouble();
+                double channel = 0.0;
+                if (staticColorChannel(effect.parameters, paramKey, &channel))
+                    return channel;
             }
             // Same rule for a mask scalar: the static member is what the rasterizer reads when
             // the track is empty, so it is the curve's baseline.

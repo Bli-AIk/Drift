@@ -18,6 +18,7 @@ Item {
     property var colorPanel: null
     property var looksPanel: null
     property var scopesPanel: null
+    property var keyframesPanel: null
 
     property var _created: ({})
 
@@ -48,6 +49,10 @@ Item {
                                         && root.scopesPanel.visible
                                         && root.scopesPanel.parent !== root
 
+    readonly property bool keyframesShown: !!root.keyframesPanel
+                                           && root.keyframesPanel.visible
+                                           && root.keyframesPanel.parent !== root
+
     // One line per panel type. A type missing from here gets a placeholder.
     // "assets.<tab>" and "properties.<tab>" are handled by prefix in panel(): the full panels
     // pinned to one tab.
@@ -63,6 +68,7 @@ Item {
         "color": colorC,
         "looks": looksC,
         "scopes": scopesC,
+        "keyframes": keyframesC,
         "undoHistory": historyC,
         "sourceViewer": sourceViewerC,
         "agentLog": agentLogC
@@ -79,6 +85,7 @@ Item {
     Component { id: colorC; ColorPanel {} }
     Component { id: looksC; LooksPanel {} }
     Component { id: scopesC; ScopesPanel {} }
+    Component { id: keyframesC; KeyframesPanel {} }
     Component { id: historyC; HistoryPanel {} }
     Component { id: sourceViewerC; SourceViewerPanel {} }
     Component { id: agentLogC; AgentLogPanel {} }
@@ -128,7 +135,7 @@ Item {
             break
         case "timeline":
             root.timelinePanel = item
-            item.keyframesTab = Qt.binding(() => root.propertiesPanel?.keyframesTab ?? false)
+            item.keyframesTab = Qt.binding(() => (root.propertiesPanel?.keyframesTab ?? false) && !root.keyframesShown)
             item.externalMixerShown = Qt.binding(() => root.audioMixerShown)
             break
         case "audioMixer":
@@ -153,6 +160,10 @@ Item {
         case "scopes":
             root.scopesPanel = item
             item.shown = Qt.binding(() => root.scopesShown)
+            break
+        case "keyframes":
+            root.keyframesPanel = item
+            item.shown = Qt.binding(() => root.keyframesShown)
             break
         }
         return item

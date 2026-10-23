@@ -1304,6 +1304,8 @@ ApplicationWindow {
     // Escape (clearSelection): CapCut-style — if a timeline cut tool is active,
     // first press returns to Select; only then does Escape clear the selection.
     function dispatchAction(id) {
+        if (ShellBridge.keyframesActionHandler && ShellBridge.keyframesActionHandler.handleAction(id))
+            return
         if (id === "workspace.restoreWindows") {
             window.restoreWindows()
             return

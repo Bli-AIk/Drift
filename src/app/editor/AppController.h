@@ -63,6 +63,7 @@ struct MediaEditSpec;
 #include "ui/preview/PreviewController.h"
 #include "app/bin/AssetPreviewController.h"
 #include "app/editor/sessions/CurveEditorController.h"
+#include "app/editor/sessions/KeyframeController.h"
 #include "app/color/ColorController.h"
 #include "app/jobs/audio/DenoiseController.h"
 #include "app/jobs/vision/DepthController.h"
@@ -98,6 +99,7 @@ class AppController : public QObject
     friend class DepthController;
     friend class DenoiseController;
     friend class ColorController;
+    friend class KeyframeController;
     friend class RestoreController;
     friend class FaceTrackingController;
     friend class StabilizeController;
@@ -133,6 +135,8 @@ class AppController : public QObject
     Q_PROPERTY(DenoiseController *denoise READ denoise CONSTANT)
     // Colour grade, finishing effects and looks. QML: EditorState.color.
     Q_PROPERTY(ColorController *color READ color CONSTANT)
+    // Keyframe panel editing and clip property rows. QML: EditorState.keyframes.
+    Q_PROPERTY(KeyframeController *keyframes READ keyframes CONSTANT)
     // Video restore and enhance (decompression, upscaling). QML: EditorState.restore.
     Q_PROPERTY(RestoreController *restore READ restore CONSTANT)
     // Face landmark tracking and Face Swap source ingest. QML: EditorState.faces.
@@ -198,6 +202,7 @@ class AppController : public QObject
     Q_PROPERTY(bool projectPortrait READ projectPortrait NOTIFY tracksChanged)
     Q_PROPERTY(bool autoKeyEnabled READ autoKeyEnabled WRITE setAutoKeyEnabled NOTIFY autoKeyEnabledChanged)
     Q_PROPERTY(bool positionLinked READ positionLinked WRITE setPositionLinked NOTIFY positionLinkedChanged)
+    Q_PROPERTY(bool sizeLinked READ sizeLinked WRITE setSizeLinked NOTIFY sizeLinkedChanged)
     Q_PROPERTY(double masterVolume READ masterVolume
                    WRITE setMasterVolume NOTIFY masterVolumeChanged)
     Q_PROPERTY(bool masterMuted READ masterMuted
@@ -334,6 +339,7 @@ public:
     DepthController *depth() const { return m_depth; }
     DenoiseController *denoise() const { return m_denoise; }
     ColorController *color() const { return m_color; }
+    KeyframeController *keyframes() const { return m_keyframes; }
     RestoreController *restore() const { return m_restore; }
     FaceTrackingController *faces() const { return m_faces; }
     StabilizeController *stabilize() const { return m_stabilize; }
@@ -402,6 +408,8 @@ public:
     bool autoKeyEnabled() const { return m_autoKeyEnabled; }
     bool positionLinked() const { return m_positionLinked; }
     void setPositionLinked(bool linked);
+    bool sizeLinked() const { return m_sizeLinked; }
+    void setSizeLinked(bool linked);
     double masterVolume() const;
     void setMasterVolume(double volume);
     bool masterMuted() const;
@@ -1576,6 +1584,7 @@ signals:
     void mediaViewModeChanged();
     void autoKeyEnabledChanged();
     void positionLinkedChanged();
+    void sizeLinkedChanged();
     void masterVolumeChanged();
     void masterMutedChanged();
     // Carries the finished benchmark, merged into whatever the dialog already collected.
@@ -2006,6 +2015,7 @@ protected:
     QString m_mediaViewMode = QStringLiteral("grid");
     bool m_autoKeyEnabled = false;
     bool m_positionLinked = true;
+    bool m_sizeLinked = true;
     // One benchmark at a time: it drives the shared decoders and the GL thread, and two
     // sweeps interleaved would measure each other rather than the pipeline.
     std::atomic<bool> m_benchmarkRunning{false};
@@ -2094,6 +2104,7 @@ protected:
     DepthController *m_depth = nullptr;
     DenoiseController *m_denoise = nullptr;
     ColorController *m_color = nullptr;
+    KeyframeController *m_keyframes = nullptr;
     RestoreController *m_restore = nullptr;
     FaceTrackingController *m_faces = nullptr;
     StabilizeController *m_stabilize = nullptr;
@@ -2213,10 +2224,17 @@ protected:
     bool m_projectLayoutChosen = false;
 
     McpController *m_mcpController = nullptr;
-    // Protected wrappers for this TU's file-local clip writers. McpController calls them.
+    // Protected wrappers for this TU's file-local clip writers. McpController and KeyframeController call them.
     bool writeClipProp(drift::Clip &clip, const QString &prop, drift::TimeUs relative, double value,
                        bool autoKey, bool force);
     drift::KeyframeTrack<double> *transformTrack(drift::Clip &clip, const QString &prop);
+    drift::KeyframeTrack<double> *propKeyframeTrack(drift::Clip &clip, const QString &prop,
+                                                    bool create);
+    const drift::KeyframeTrack<double> *propKeyframeTrack(const drift::Clip &clip,
+                                                          const QString &prop) const;
+    static drift::TimeUs keyframeToleranceUs();
+    static drift::TimeUs keyframeWriteSnapUs();
+    static drift::EasingSpec easingSpecFromMap(const QVariantMap &spec);
     void clearPose3d(drift::Clip &clip);
     // Freeze frames and full-size MCP captures share one media path.
     static QString newFreezeFramePath(const QString &projectId);

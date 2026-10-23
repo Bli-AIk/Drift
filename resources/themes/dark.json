@@ -1988,6 +1988,88 @@
       "border": "$semantic.panel.border",
       "borderWidth": "$metrics.borderWidth"
     },
+    "keyframesCurves": {
+      "background": "$semantic.surface.panel",
+      "grid": "$semantic.panel.border",
+      "opacityGrid": 0.6,
+      "clipSpan": "$semantic.panel.accent",
+      "opacityClipSpan": 0.25,
+      "label": "$semantic.mutedForeground",
+      "opacityContext": 0.55
+    },
+    "keyframesKeyDot": {
+      "border": "$semantic.onMedia",
+      "borderWidth": "$metrics.borderWidth",
+      "borderSelected": "$semantic.primary",
+      "borderWidthSelected": 2,
+      "size": 10,
+      "radius": 1,
+      "scaleHover": 1.15,
+      "scaleSelected": 1.3,
+      "summary": "$semantic.mutedForeground",
+      "opacityDisabled": 0.35
+    },
+    "keyframesLane": {
+      "backgroundAlt": "$semantic.panel.muted",
+      "opacityAlt": 0.3,
+      "clipSpan": "$semantic.panel.accent",
+      "opacityClipSpan": 0.35,
+      "groupBackground": "$semantic.panel.secondary.background",
+      "border": "$semantic.panel.border"
+    },
+    "keyframesMarquee": {
+      "background": "$semantic.primary",
+      "backgroundOpacity": 0.12,
+      "border": "$semantic.primary",
+      "borderWidth": "$metrics.borderWidth"
+    },
+    "keyframesRuler": {
+      "background": "$semantic.surface.panel",
+      "border": "$semantic.panel.border",
+      "borderWidth": "$metrics.borderWidth",
+      "outside": "$semantic.panel.border",
+      "opacityOutside": 0.4
+    },
+    "keyframesStretchBox": {
+      "background": "$semantic.primary",
+      "backgroundOpacity": 0.06,
+      "border": "$semantic.primary",
+      "borderWidth": "$metrics.borderWidth",
+      "grip": "$semantic.primary",
+      "gripBorder": "$semantic.primaryForeground",
+      "gripWidth": 8,
+      "gripHeight": 28,
+      "radius": 2
+    },
+    "keyframesPanel": {
+      "splitter": "$semantic.panel.border",
+      "splitterHover": "$semantic.primary",
+      "foregroundMuted": "$semantic.mutedForeground"
+    },
+    "keyframesScrubber": {
+      "background": "$semantic.panel.accent",
+      "backgroundHover": "$semantic.panel.muted",
+      "border": "$semantic.focusRing",
+      "borderWidth": "$metrics.borderWidthFocus",
+      "fill": "$semantic.primary",
+      "foreground": "$semantic.panel.foreground",
+      "foregroundMuted": "$semantic.mutedForeground",
+      "radius": "$metrics.radius.sm"
+    },
+    "keyframesToolbar": {
+      "border": "$semantic.panel.border",
+      "separator": "$semantic.panel.border"
+    },
+    "keyframesTreeRow": {
+      "backgroundFocused": "$semantic.panel.accent",
+      "backgroundHover": "$semantic.panel.accent",
+      "border": "$semantic.panel.border",
+      "foreground": "$semantic.panel.foreground",
+      "foregroundMuted": "$semantic.mutedForeground",
+      "groupBackground": "$semantic.panel.secondary.background",
+      "groupForeground": "$semantic.panel.secondary.foreground",
+      "radius": "$metrics.radius.sm"
+    },
     "masksInspector": {
       "foregroundMuted": "$semantic.mutedForeground"
     },

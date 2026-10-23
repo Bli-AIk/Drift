@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
+import "../keyframes/ScaleMath.js" as ScaleMath
 Item {
     id: root
 
@@ -52,7 +53,7 @@ Item {
 
     // One slider that scales width and height together about the box centre; the link button
     // swaps it for the separate Width/Height rows.
-    property bool sizeLinked: true
+    property bool sizeLinked: EditorState.sizeLinked
     readonly property bool isText: clipKind === "text" || clipKind === "subtitle"
 
     // 100% is the box that fills the canvas on its tighter axis — what Reset and a fitted
@@ -65,7 +66,7 @@ Item {
             return 1
         const w = transformAt("width", canvasW)
         const h = transformAt("height", canvasH)
-        return Math.max(w / canvasW, h / canvasH)
+        return ScaleMath.scaleOf(w, h, canvasW, canvasH)
     }
 
     property var scaleDragStart: null
@@ -76,6 +77,15 @@ Item {
         return EditorState.propertyValueAt(EditorState.selectedTrack, EditorState.selectedClip,
                                            key, EditorState.inspectorPlayheadSeconds, def)
     }
+
+    function keyedAtPlayhead(key) {
+        const points = (clipData.keyframes && clipData.keyframes[key] && clipData.keyframes[key].points) || []
+        const t = EditorState.inspectorPlayheadSeconds
+        return points.some(p => Math.abs(p.seconds - t) <= 1 / 30)
+    }
+
+    readonly property bool widthKeyed: keyedAtPlayhead("width")
+    readonly property bool heightKeyed: keyedAtPlayhead("height")
 
     function beginScaleDrag() {
         scaleDragStart = {
@@ -93,16 +103,12 @@ Item {
         const s = scaleDragStart
         if (!s || s.scale <= 0)
             return
-        const k = scale / s.scale
-        const w = Math.max(1, s.w * k)
-        const h = Math.max(1, s.h * k)
-        // The anchor's offset from the centre turns with the clip, so the centre moves by the rotated delta.
-        const ex = (scaleAnchor.x - 0.5) * (s.w - w)
-        const ey = (scaleAnchor.y - 0.5) * (s.h - h)
-        const cx = s.x + s.w / 2 + ex * Math.cos(s.rot) - ey * Math.sin(s.rot)
-        const cy = s.y + s.h / 2 + ex * Math.sin(s.rot) + ey * Math.cos(s.rot)
-        const x = cx - w / 2
-        const y = cy - h / 2
+        const r = ScaleMath.scaledRect(s, scale, scaleAnchor)
+        const k = r.k
+        const x = r.x
+        const y = r.y
+        const w = r.w
+        const h = r.h
         if (isText) {
             EditorState.previewSetTextRect(EditorState.selectedTrack, EditorState.selectedClip,
                                            x, y, w, h, Math.round(s.pixelSize * k))
@@ -262,7 +268,7 @@ Item {
                     active: root.sizeLinked
                     tooltip: root.sizeLinked ? qsTr("Edit width and height separately")
                                              : qsTr("Scale width and height together")
-                    onClicked: root.sizeLinked = !root.sizeLinked
+                    onClicked: EditorState.sizeLinked = !EditorState.sizeLinked
                 }
             }
 
@@ -275,7 +281,7 @@ Item {
                     id: scaleSlider
                     lockWhilePlaying: true
                     label: qsTr("Scale")
-                    width: parent.width - scaleReadout.width - parent.spacing
+                    width: parent.width - scaleReadout.width - scaleKey.width - 2 * parent.spacing
                     anchors.verticalCenter: parent.verticalCenter
                     from: 0.05
                     to: 4
@@ -304,6 +310,27 @@ Item {
                     color: Theme.c.transformInspector.foreground
                     font.family: Theme.monoFontFamily
                     font.pixelSize: Theme.fontSizeSm
+                }
+
+                IconButton {
+                    id: scaleKey
+                    anchors.verticalCenter: parent.verticalCenter
+                    buttonSize: 24
+                    iconSize: 16
+                    // Half-ghosted when only one of the two axes has a key here.
+                    opacity: root.widthKeyed !== root.heightKeyed ? 0.5 : 1
+                    glyph: root.widthKeyed && root.heightKeyed ? Theme.icons.diamondMinus : Theme.icons.diamondPlus
+                    active: root.widthKeyed && root.heightKeyed
+                    tooltip: active ? qsTr("Remove scale keyframe") : qsTr("Add scale keyframe")
+                    onClicked: {
+                        if (active) {
+                            EditorState.keyframes.removeKeysAt(EditorState.selectedTrack, EditorState.selectedClip,
+                                                               ["width", "height"], EditorState.inspectorPlayheadSeconds)
+                        } else {
+                            EditorState.keyframes.addKeysAt(EditorState.selectedTrack, EditorState.selectedClip,
+                                                            ["width", "height"], EditorState.inspectorPlayheadSeconds)
+                        }
+                    }
                 }
             }
 

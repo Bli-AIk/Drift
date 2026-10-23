@@ -79,7 +79,7 @@ void WorkspaceStoreTest::presetsLoadAndValidate()
 {
     WorkspaceStore store;
     const QVariantList list = store.workspaces();
-    QCOMPARE(list.size(), 8);
+    QCOMPARE(list.size(), 9);
     QCOMPARE(list.at(0).toMap().value("id").toString(), QStringLiteral("edit"));
     QCOMPARE(list.at(1).toMap().value("id").toString(), QStringLiteral("edit-portrait"));
     for (const QVariant &v : list)
@@ -98,7 +98,7 @@ void WorkspaceStoreTest::everyBuiltinPresetValidates()
         ++builtins;
         QCOMPARE(store.validate(ws), QString());
     }
-    QCOMPARE(builtins, 8);
+    QCOMPARE(builtins, 9);
 }
 
 void WorkspaceStoreTest::roundTripAndOverride()
@@ -115,7 +115,7 @@ void WorkspaceStoreTest::roundTripAndOverride()
     QCOMPARE(again.value("name").toString(), QStringLiteral("Mine"));
     QVERIFY(again.value("modified").toBool());
     QVERIFY(again.value("builtin").toBool());
-    QCOMPARE(reloaded.workspaces().size(), 8);
+    QCOMPARE(reloaded.workspaces().size(), 9);
 
     reloaded.resetPreset("edit");
     QCOMPARE(reloaded.workspace("edit").value("name").toString(), QStringLiteral("Edit"));
@@ -128,7 +128,7 @@ void WorkspaceStoreTest::rejectsDuplicatePanels()
                            {"children", QVariantList{slot("preview"), slot("preview")}}};
     QVERIFY(!store.saveWorkspace(workspaceWith(root)).isEmpty());
     QVERIFY(!store.saveWorkspace(workspaceWith(slot("bogus"))).isEmpty());
-    QCOMPARE(store.workspaces().size(), 8);
+    QCOMPARE(store.workspaces().size(), 9);
 }
 
 void WorkspaceStoreTest::acceptsTabPanelTypes()

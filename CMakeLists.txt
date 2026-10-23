@@ -1050,6 +1050,8 @@ qt_add_executable(drift
     src/app/editor/sessions/SpeedCurveController.cpp
     src/app/editor/sessions/CurveEditorController.h
     src/app/editor/sessions/CurveEditorController.cpp
+    src/app/editor/sessions/KeyframeController.h
+    src/app/editor/sessions/KeyframeController.cpp
     src/app/jobs/vision/SegmentationController.h
     src/app/jobs/vision/SegmentationController.cpp
     src/app/jobs/vision/SceneDetectController.h
@@ -1321,6 +1323,7 @@ qt_add_resources(drift "drift_workspaces"
         resources/workspaces/subtitles.json
         resources/workspaces/ai.json
         resources/workspaces/color.json
+        resources/workspaces/keyframes.json
 )
 
 set_source_files_properties(src/qml/Theme.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
@@ -1664,6 +1667,24 @@ qt_add_qml_module(drift
         src/qml/components/panels/ColorPanel.qml
         src/qml/components/panels/LooksPanel.qml
         src/qml/components/panels/ScopesPanel.qml
+        src/qml/components/panels/KeyframesPanel.qml
+        src/qml/components/keyframes/KeyframesModel.js
+        src/qml/components/keyframes/KeyframesContextMenu.qml
+        src/qml/components/keyframes/KeyframesCurvesInteraction.qml
+        src/qml/components/keyframes/KeyframesCurvesView.qml
+        src/qml/components/keyframes/KeyframesInteractionSurface.qml
+        src/qml/components/keyframes/KeyframesKeyDot.qml
+        src/qml/components/keyframes/KeyframesLanesView.qml
+        src/qml/components/keyframes/KeyframesMarquee.qml
+        src/qml/components/keyframes/KeyframesPlayheadLine.qml
+        src/qml/components/keyframes/KeyframesRuler.qml
+        src/qml/components/keyframes/KeyframesStretchBox.qml
+        src/qml/components/keyframes/KeyframesTimeView.qml
+        src/qml/components/keyframes/KeyframesSelection.qml
+        src/qml/components/keyframes/KeyframesToolbar.qml
+        src/qml/components/keyframes/KeyframesTreeRow.qml
+        src/qml/components/keyframes/KeyframesValueScrubber.qml
+        src/qml/components/keyframes/ScaleMath.js
         src/qml/components/color/GradeSlider.qml
         src/qml/components/color/ColorWheel.qml
         src/qml/components/color/CurveEditor.qml

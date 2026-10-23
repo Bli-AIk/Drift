@@ -258,6 +258,16 @@ private slots:
     void segmentEasingMirrorsLinkedPosition();
     void easingPresetStoreSaveRenameDelete();
     void effectParamKeyframes();
+    void keyframeRowsListEffectParamsAndChannels();
+    void keyframeStaticChannelsReadTheStoredValue();
+    void keyframeBatchOpsAreOneUndoStep();
+    void keyframeAddMirrorsPositionAndPinsScale();
+    void keyframeClearRestoresStaticHome();
+    void keyframeMoveKeepsTangentsAndHold();
+    void keyframePreviewMoveRoundTripKeepsKeys();
+    void keyframePreviewMoveIsOneUndoStep();
+    void keyframePreviewStretchScalesOffsetAndTangent();
+    void keyframeCopyPasteRemapsEffectsAndSkipsOutOfRange();
     void depthEffectEditorStateResolvesHandles();
     void behindSubjectTargetsAChosenClip();
     void effectRemovalRemapsGraphSelection();
@@ -4282,6 +4292,389 @@ void EditorStateTest::effectParamKeyframes()
 
     // An out-of-range effect index resolves to nothing rather than crashing.
     QCOMPARE(state.clipKeyframes(track, clip, QStringLiteral("fx.9.contrast")).size(), 0);
+}
+
+void EditorStateTest::keyframeRowsListEffectParamsAndChannels()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Rows"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+
+    auto findRow = [](const QVariantList &rows, const QString &prop) {
+        for (const QVariant &row : rows) {
+            if (row.toMap().value(QStringLiteral("prop")).toString() == prop)
+                return row.toMap();
+        }
+        return QVariantMap{};
+    };
+
+    // A fresh clip offers the transform group, unanimated.
+    const QVariantList fresh = state.keyframes()->animatableProperties(track, clip);
+    const QVariantMap x = findRow(fresh, QStringLiteral("x"));
+    QCOMPARE(x.value(QStringLiteral("group")).toString(), QStringLiteral("transform"));
+    QCOMPARE(x.value(QStringLiteral("animated")).toBool(), false);
+    QVERIFY(state.keyframes()->animatableProperties(track, 99).isEmpty());
+
+    // An un-keyed effect param is listed under its effect's group, and a colour expands to four channels.
+    state.addEffect(track, clip, QStringLiteral("adjust.contrast"));
+    state.addEffect(track, clip, QStringLiteral("stylize.vignette"));
+    const QVariantList rows = state.keyframes()->animatableProperties(track, clip);
+    const QVariantMap contrast = findRow(rows, QStringLiteral("fx.0.contrast"));
+    QCOMPARE(contrast.value(QStringLiteral("group")).toString(), QStringLiteral("fx.0"));
+    QCOMPARE(contrast.value(QStringLiteral("kind")).toString(), QStringLiteral("scalar"));
+    QCOMPARE(contrast.value(QStringLiteral("animated")).toBool(), false);
+    QCOMPARE(contrast.value(QStringLiteral("keyProp")).toString(), QStringLiteral("fx.0.contrast"));
+
+    const QVariantMap color = findRow(rows, QStringLiteral("fx.1.color"));
+    QCOMPARE(color.value(QStringLiteral("kind")).toString(), QStringLiteral("color"));
+    QCOMPARE(color.value(QStringLiteral("tracks")).toStringList(),
+             (QStringList{QStringLiteral("fx.1.color.r"), QStringLiteral("fx.1.color.g"),
+                          QStringLiteral("fx.1.color.b"), QStringLiteral("fx.1.color.a")}));
+}
+
+void EditorStateTest::keyframeStaticChannelsReadTheStoredValue()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Channels"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    // The vignette has a colour param (fx.0.color) and a vec2 param (fx.0.center).
+    state.addEffect(track, clip, QStringLiteral("stylize.vignette"));
+    QVERIFY(state.setEffectColorParam(track, clip, 0, QStringLiteral("color"), QStringLiteral("#3366cc")));
+    QVERIFY(state.setEffectVec2Param(track, clip, 0, QStringLiteral("center"), 0.25, 0.75));
+
+    const QStringList colorProps{QStringLiteral("fx.0.color.r"), QStringLiteral("fx.0.color.g"),
+                                 QStringLiteral("fx.0.color.b"), QStringLiteral("fx.0.color.a")};
+    QVERIFY(qAbs(state.propertyBaseValue(track, clip, QStringLiteral("fx.0.color.r"), -1.0) - 0x33 / 255.0) < 1e-6);
+    state.keyframes()->addKeysAt(track, clip, colorProps, 1.0);
+    const double expected[4] = {0x33 / 255.0, 0x66 / 255.0, 0xcc / 255.0, 1.0};
+    for (int i = 0; i < colorProps.size(); ++i) {
+        const double value = state.propertyValueAt(track, clip, colorProps.at(i), 1.0, -1.0);
+        QVERIFY2(qAbs(value - expected[i]) < 1e-6, qPrintable(colorProps.at(i)));
+    }
+
+    state.keyframes()->addKeysAt(track, clip, {QStringLiteral("fx.0.center.x"), QStringLiteral("fx.0.center.y")}, 2.0);
+    QVERIFY(qAbs(state.propertyValueAt(track, clip, QStringLiteral("fx.0.center.x"), 2.0, -1.0) - 0.25) < 1e-6);
+    QVERIFY(qAbs(state.propertyValueAt(track, clip, QStringLiteral("fx.0.center.y"), 2.0, -1.0) - 0.75) < 1e-6);
+}
+
+void EditorStateTest::keyframeBatchOpsAreOneUndoStep()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Batch"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString x = QStringLiteral("x");
+    const QString rotation = QStringLiteral("rotation");
+    state.setPositionLinked(false);
+    state.setClipKeyframe(track, clip, x, 1.0, 10.0);
+    state.setClipKeyframe(track, clip, rotation, 1.0, 5.0);
+    const int xCount = state.clipKeyframes(track, clip, x).size();
+    const int rotationCount = state.clipKeyframes(track, clip, rotation).size();
+
+    QVariantList refs;
+    refs << QVariantMap{{QStringLiteral("prop"), x}, {QStringLiteral("seconds"), 1.0}};
+    refs << QVariantMap{{QStringLiteral("prop"), rotation}, {QStringLiteral("seconds"), 1.0}};
+    state.keyframes()->removeKeys(track, clip, refs);
+    QCOMPARE(state.clipKeyframes(track, clip, x).size(), xCount - 1);
+    QCOMPARE(state.clipKeyframes(track, clip, rotation).size(), rotationCount - 1);
+
+    state.undo();
+    QCOMPARE(state.clipKeyframes(track, clip, x).size(), xCount);
+    QCOMPARE(state.clipKeyframes(track, clip, rotation).size(), rotationCount);
+}
+
+void EditorStateTest::keyframeAddMirrorsPositionAndPinsScale()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Linked keys"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString x = QStringLiteral("x");
+    const QString y = QStringLiteral("y");
+    const QString width = QStringLiteral("width");
+    const QString height = QStringLiteral("height");
+
+    const auto keyAt = [](const QVariantList &keys, double seconds) {
+        for (const QVariant &key : keys) {
+            if (qAbs(key.toMap().value(QStringLiteral("seconds")).toDouble() - seconds) < 1e-3)
+                return key.toMap();
+        }
+        return QVariantMap{};
+    };
+
+    state.setPositionLinked(true);
+    state.keyframes()->addKeysAt(track, clip, {x}, 1.0);
+    QVERIFY(!keyAt(state.clipKeyframes(track, clip, x), 1.0).isEmpty());
+    QVERIFY(!keyAt(state.clipKeyframes(track, clip, y), 1.0).isEmpty());
+
+    const double xNow = state.propertyValueAt(track, clip, x, 2.0, 0.0);
+    state.keyframes()->addKeysAt(track, clip, {width, height}, 2.0);
+    QVERIFY(!keyAt(state.clipKeyframes(track, clip, width), 2.0).isEmpty());
+    QVERIFY(!keyAt(state.clipKeyframes(track, clip, height), 2.0).isEmpty());
+    const QVariantMap pinnedX = keyAt(state.clipKeyframes(track, clip, x), 2.0);
+    QVERIFY(!pinnedX.isEmpty());
+    QVERIFY(qAbs(pinnedX.value(QStringLiteral("value")).toDouble() - xNow) < 1e-6);
+    QVERIFY(!keyAt(state.clipKeyframes(track, clip, y), 2.0).isEmpty());
+
+    state.keyframes()->removeKeysAt(track, clip, {width, height}, 2.0);
+    QVERIFY(keyAt(state.clipKeyframes(track, clip, width), 2.0).isEmpty());
+    QVERIFY(!keyAt(state.clipKeyframes(track, clip, x), 2.0).isEmpty());
+}
+
+void EditorStateTest::keyframeClearRestoresStaticHome()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Clear"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString x = QStringLiteral("x");
+    const QString contrast = QStringLiteral("fx.0.contrast");
+
+    state.setPositionLinked(false);
+    state.setClipKeyframe(track, clip, x, 0.0, 0.0);
+    state.setClipKeyframe(track, clip, x, 2.0, 100.0);
+    state.setPlayheadSeconds(1.0);
+    state.keyframes()->clearProperties(track, clip, {x});
+    const QVariantList xKeys = state.clipKeyframes(track, clip, x);
+    QCOMPARE(xKeys.size(), 1);
+    QCOMPARE(xKeys.first().toMap().value(QStringLiteral("seconds")).toDouble(), 0.0);
+    QVERIFY(qAbs(xKeys.first().toMap().value(QStringLiteral("value")).toDouble() - 50.0) < 1e-6);
+
+    state.addEffect(track, clip, QStringLiteral("adjust.contrast"));
+    state.setClipKeyframe(track, clip, contrast, 0.0, 0.2);
+    state.setClipKeyframe(track, clip, contrast, 2.0, 0.8);
+    state.keyframes()->clearProperties(track, clip, {contrast});
+    QCOMPARE(state.clipKeyframes(track, clip, contrast).size(), 0);
+    const QVariantList params = state.selectedClipData().value(QStringLiteral("effects")).toList()
+                                    .first().toMap().value(QStringLiteral("params")).toList();
+    QVERIFY(qAbs(params.first().toMap().value(QStringLiteral("value")).toDouble() - 0.5) < 1e-6);
+}
+
+void EditorStateTest::keyframeMoveKeepsTangentsAndHold()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Move"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString rotation = QStringLiteral("rotation");
+
+    const auto keyAt = [](const QVariantList &keys, double seconds) {
+        for (const QVariant &key : keys) {
+            if (qAbs(key.toMap().value(QStringLiteral("seconds")).toDouble() - seconds) < 1e-3)
+                return key.toMap();
+        }
+        return QVariantMap{};
+    };
+
+    state.setPositionLinked(false);
+    state.setClipKeyframe(track, clip, rotation, 1.0, 10.0);
+    state.setClipKeyframe(track, clip, rotation, 2.0, 20.0);
+    state.setKeyframeTangents(track, clip, rotation, 1.0, 0.1, 2.0, 0.3, 4.0, false);
+    state.setKeyframeHold(track, clip, rotation, 1.0, true);
+    const QVariantMap before = keyAt(state.clipKeyframes(track, clip, rotation), 1.0);
+    QVERIFY(!before.isEmpty());
+
+    const QVariantList refs = state.keyframes()->moveKeys(
+        track, clip, {QVariantMap{{QStringLiteral("prop"), rotation}, {QStringLiteral("seconds"), 1.0}}}, 0.25);
+    QCOMPARE(refs.size(), 1);
+    QCOMPARE(refs.first().toMap().value(QStringLiteral("seconds")).toDouble(), 1.25);
+
+    const QVariantList keys = state.clipKeyframes(track, clip, rotation);
+    QVERIFY(keyAt(keys, 1.0).isEmpty());
+    const QVariantMap after = keyAt(keys, 1.25);
+    QVERIFY(!after.isEmpty());
+    for (const char *field : {"value", "inDx", "inDy", "outDx", "outDy"})
+        QCOMPARE(after.value(QString::fromLatin1(field)).toDouble(), before.value(QString::fromLatin1(field)).toDouble());
+    QCOMPARE(after.value(QStringLiteral("hold")).toBool(), true);
+}
+
+void EditorStateTest::keyframePreviewMoveRoundTripKeepsKeys()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Round trip"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString rotation = QStringLiteral("rotation");
+
+    const auto keyAt = [](const QVariantList &keys, double seconds) {
+        for (const QVariant &key : keys) {
+            if (qAbs(key.toMap().value(QStringLiteral("seconds")).toDouble() - seconds) < 1e-3)
+                return key.toMap();
+        }
+        return QVariantMap{};
+    };
+
+    state.setPositionLinked(false);
+    state.setClipKeyframe(track, clip, rotation, 1.0, 10.0);
+    state.setClipKeyframe(track, clip, rotation, 2.0, 20.0);
+    state.setKeyframeTangents(track, clip, rotation, 1.0, 0.1, 2.0, 0.3, 4.0, false);
+    state.setKeyframeHold(track, clip, rotation, 1.0, true);
+    const QVariantMap first = keyAt(state.clipKeyframes(track, clip, rotation), 1.0);
+    const QVariantMap second = keyAt(state.clipKeyframes(track, clip, rotation), 2.0);
+    QVERIFY(!first.isEmpty());
+    QVERIFY(!second.isEmpty());
+
+    const QVariantList press{QVariantMap{{QStringLiteral("prop"), rotation}, {QStringLiteral("seconds"), 1.0}}};
+    // Landing on the key at 2.0 overwrites it while the drag is live.
+    state.keyframes()->previewMoveKeys(track, clip, press, 1.0);
+    QVERIFY(keyAt(state.clipKeyframes(track, clip, rotation), 1.0).isEmpty());
+    state.keyframes()->previewMoveKeys(track, clip, press, 0.0);
+    state.commitPreviewDrag();
+
+    const QVariantList keys = state.clipKeyframes(track, clip, rotation);
+    QCOMPARE(keys.size(), 2);
+    const QVariantMap restored = keyAt(keys, 1.0);
+    for (const char *field : {"value", "inDx", "inDy", "outDx", "outDy"})
+        QCOMPARE(restored.value(QString::fromLatin1(field)).toDouble(), first.value(QString::fromLatin1(field)).toDouble());
+    QCOMPARE(restored.value(QStringLiteral("hold")).toBool(), true);
+    QCOMPARE(keyAt(keys, 2.0).value(QStringLiteral("value")).toDouble(), second.value(QStringLiteral("value")).toDouble());
+}
+
+void EditorStateTest::keyframePreviewMoveIsOneUndoStep()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Drag undo"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString rotation = QStringLiteral("rotation");
+
+    const auto keyAt = [](const QVariantList &keys, double seconds) {
+        for (const QVariant &key : keys) {
+            if (qAbs(key.toMap().value(QStringLiteral("seconds")).toDouble() - seconds) < 1e-3)
+                return key.toMap();
+        }
+        return QVariantMap{};
+    };
+
+    state.setPositionLinked(false);
+    state.setClipKeyframe(track, clip, rotation, 1.0, 10.0);
+    state.setClipKeyframe(track, clip, rotation, 3.0, 30.0);
+    const int count = state.clipKeyframes(track, clip, rotation).size();
+
+    const QVariantList press{QVariantMap{{QStringLiteral("prop"), rotation}, {QStringLiteral("seconds"), 1.0}}};
+    state.keyframes()->previewMoveKeys(track, clip, press, 0.25);
+    state.keyframes()->previewMoveKeys(track, clip, press, 0.5);
+    state.keyframes()->previewMoveKeys(track, clip, press, 0.75);
+    state.commitPreviewDrag();
+    QVERIFY(!keyAt(state.clipKeyframes(track, clip, rotation), 1.75).isEmpty());
+
+    state.undo();
+    const QVariantList undone = state.clipKeyframes(track, clip, rotation);
+    QCOMPARE(undone.size(), count);
+    QVERIFY(!keyAt(undone, 1.0).isEmpty());
+    QVERIFY(keyAt(undone, 1.75).isEmpty());
+}
+
+void EditorStateTest::keyframePreviewStretchScalesOffsetAndTangent()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Stretch"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString rotation = QStringLiteral("rotation");
+
+    const auto keyAt = [](const QVariantList &keys, double seconds) {
+        for (const QVariant &key : keys) {
+            if (qAbs(key.toMap().value(QStringLiteral("seconds")).toDouble() - seconds) < 1e-3)
+                return key.toMap();
+        }
+        return QVariantMap{};
+    };
+
+    state.setPositionLinked(false);
+    state.setClipKeyframe(track, clip, rotation, 1.0, 10.0);
+    state.setClipKeyframe(track, clip, rotation, 2.0, 20.0);
+    state.setKeyframeTangents(track, clip, rotation, 2.0, -0.1, 0.0, 0.3, 0.0, false);
+    const QVariantMap second = keyAt(state.clipKeyframes(track, clip, rotation), 2.0);
+    QVERIFY(second.value(QStringLiteral("outDx")).toDouble() > 0.0);
+
+    const auto ref = [&rotation](double seconds) {
+        return QVariantMap{{QStringLiteral("prop"), rotation}, {QStringLiteral("seconds"), seconds}};
+    };
+    state.keyframes()->previewStretchKeys(track, clip, {ref(1.0), ref(2.0)}, 1.0, 2.0);
+    state.commitPreviewDrag();
+
+    const QVariantList keys = state.clipKeyframes(track, clip, rotation);
+    QVERIFY(!keyAt(keys, 1.0).isEmpty());
+    QVERIFY(keyAt(keys, 2.0).isEmpty());
+    const QVariantMap moved = keyAt(keys, 3.0);
+    QVERIFY(!moved.isEmpty());
+    QCOMPARE(moved.value(QStringLiteral("value")).toDouble(), 20.0);
+    QCOMPARE(moved.value(QStringLiteral("inDx")).toDouble(), 2.0 * second.value(QStringLiteral("inDx")).toDouble());
+    QCOMPARE(moved.value(QStringLiteral("outDx")).toDouble(), 2.0 * second.value(QStringLiteral("outDx")).toDouble());
+}
+
+void EditorStateTest::keyframeCopyPasteRemapsEffectsAndSkipsOutOfRange()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.setPositionLinked(false);
+    state.addTextClip(QStringLiteral("Source"), 0.0);
+    const int track = state.selectedTrack();
+    const int source = state.selectedClip();
+    state.addEffect(track, source, QStringLiteral("adjust.contrast"));
+    const QString x = QStringLiteral("x");
+    const QString contrast = QStringLiteral("fx.0.contrast");
+    state.setClipKeyframe(track, source, x, 1.0, 10.0);
+    state.setClipKeyframe(track, source, contrast, 1.5, 0.7);
+
+    const auto ref = [](const QString &prop, double seconds) {
+        return QVariantMap{{QStringLiteral("prop"), prop}, {QStringLiteral("seconds"), seconds}};
+    };
+    QCOMPARE(state.keyframes()->copyKeys(track, source, {ref(x, 1.0), ref(contrast, 1.5)}), 2);
+    QCOMPARE(state.keyframes()->clipboardCount(), 2);
+
+    // The target's contrast lands on fx.1: its vignette comes first, so the catalogId index differs.
+    state.addTextClip(QStringLiteral("Target"), 10.0, QString(), track);
+    const int target = state.selectedClip();
+    state.addEffect(track, target, QStringLiteral("stylize.vignette"));
+    state.addEffect(track, target, QStringLiteral("adjust.contrast"));
+    const QString remappedContrast = QStringLiteral("fx.1.contrast");
+    const drift::Clip &targetClip = state.project()->tracks().at(track).clips.at(target);
+    const double start = drift::usToSeconds(targetClip.timelineStart);
+    const double end = drift::usToSeconds(targetClip.timelineStart + targetClip.timelineDuration);
+
+    const auto keyAt = [](const QVariantList &keys, double seconds) {
+        for (const QVariant &key : keys) {
+            if (qAbs(key.toMap().value(QStringLiteral("seconds")).toDouble() - seconds) < 1e-3)
+                return key.toMap();
+        }
+        return QVariantMap{};
+    };
+    const int xBefore = state.clipKeyframes(track, target, x).size();
+    const int contrastBefore = state.clipKeyframes(track, target, remappedContrast).size();
+
+    const QVariantList pasted = state.keyframes()->pasteKeys(track, target, start + 0.5);
+    QCOMPARE(pasted.size(), 2);
+    const QVariantMap xKey = keyAt(state.clipKeyframes(track, target, x), start + 0.5);
+    QVERIFY(!xKey.isEmpty());
+    QCOMPARE(xKey.value(QStringLiteral("value")).toDouble(), 10.0);
+    const QVariantMap contrastKey = keyAt(state.clipKeyframes(track, target, remappedContrast), start + 1.0);
+    QVERIFY(!contrastKey.isEmpty());
+    QCOMPARE(contrastKey.value(QStringLiteral("value")).toDouble(), 0.7);
+    QCOMPARE(state.clipKeyframes(track, target, QStringLiteral("fx.0.contrast")).size(), 0);
+
+    state.undo();
+    QCOMPARE(state.clipKeyframes(track, target, x).size(), xBefore);
+    QCOMPARE(state.clipKeyframes(track, target, remappedContrast).size(), contrastBefore);
+
+    // Only x fits before the clip's end, so the contrast key is skipped and nothing else is written.
+    const QVariantList partial = state.keyframes()->pasteKeys(track, target, end - 0.25);
+    QCOMPARE(partial.size(), 1);
+    QCOMPARE(partial.first().toMap().value(QStringLiteral("prop")).toString(), x);
+    QVERIFY(!keyAt(state.clipKeyframes(track, target, x), end - 0.25).isEmpty());
+    QCOMPARE(state.clipKeyframes(track, target, remappedContrast).size(), contrastBefore);
 }
 
 void EditorStateTest::depthEffectEditorStateResolvesHandles()

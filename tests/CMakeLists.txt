@@ -29,6 +29,7 @@ qt_add_executable(tst_editorstate
     ../src/app/bin/AssetPreviewController.cpp
     ../src/app/editor/sessions/SpeedCurveController.cpp
     ../src/app/editor/sessions/CurveEditorController.cpp
+    ../src/app/editor/sessions/KeyframeController.cpp
     ../src/app/jobs/vision/SegmentationController.cpp
     ../src/app/jobs/vision/SceneDetectController.cpp
     ../src/app/jobs/vision/DepthController.cpp
@@ -216,6 +217,7 @@ qt_add_executable(tst_mcp
     ../src/app/bin/AssetPreviewController.cpp
     ../src/app/editor/sessions/SpeedCurveController.cpp
     ../src/app/editor/sessions/CurveEditorController.cpp
+    ../src/app/editor/sessions/KeyframeController.cpp
     ../src/app/jobs/vision/SegmentationController.cpp
     ../src/app/jobs/vision/SceneDetectController.cpp
     ../src/app/jobs/vision/DepthController.cpp
@@ -352,5 +354,6 @@ qt_add_resources(tst_workspacestore "workspace_presets"
         ../resources/workspaces/subtitles.json
         ../resources/workspaces/ai.json
         ../resources/workspaces/color.json
+        ../resources/workspaces/keyframes.json
 )
 add_test(NAME WorkspaceStore COMMAND tst_workspacestore)

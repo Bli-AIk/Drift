@@ -108,6 +108,9 @@ QtObject {
         color(qsTr("Compare"), anyClip, "before after bypass original"),
         color(qsTr("Apply to all clips"), anyClip, "grade timeline all clips copy"),
 
+        { label: qsTr("Keyframe editor"), path: [qsTr("Animation")], hint: qsTr("Open the Keyframes workspace"),
+          keywords: "keyframes animation curves graph editor dope sheet", workspace: "keyframes" },
+
         setting("general", qsTr("General"), "language locale startup autosave recovery cache backup"),
         setting("appearance", qsTr("Appearance"), "theme dark light color workspace layout translucency"),
         setting("workspaces", qsTr("Workspaces"), "workspace layout panel window monitor screen dock preset"),

@@ -244,6 +244,15 @@ ThemedContextMenu {
             Workspaces.activeId = "color"
         }
     }
+    ThemedMenuItem {
+        text: qsTr("Edit keyframes…")
+        icon.name: Theme.icons.diamondPlus
+        onTriggered: {
+            if (!owner.selected)
+                EditorState.selectClip(owner.trackIndex, owner.clipIndex)
+            Workspaces.activeId = "keyframes"
+        }
+    }
     ThemedMenuSeparator { visible: owner.clipData.kind === "adjustment" && !owner.isTransformClip }
     ThemedMenuItem {
         text: qsTr("Unlink from clip")

@@ -41,6 +41,7 @@ const PanelType kPanelTypes[] = {
     {"color", QT_TRANSLATE_NOOP("WorkspaceStore", "Color")},
     {"looks", QT_TRANSLATE_NOOP("WorkspaceStore", "Looks")},
     {"scopes", QT_TRANSLATE_NOOP("WorkspaceStore", "Scopes")},
+    {"keyframes", QT_TRANSLATE_NOOP("WorkspaceStore", "Keyframes")},
 };
 
 // Tab ids and labels mirror AssetsPanel.qml / PropertiesPanel.qml.
