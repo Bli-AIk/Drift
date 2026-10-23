@@ -383,6 +383,8 @@ void AddonManager::refresh(bool force)
     setRefreshing(true);
     QNetworkRequest request{QUrl(kIndexUrl)};
     request.setRawHeader("X-Drift-Client", kClientToken.toUtf8());
+    // The index can hold several builds of one addon; the Worker picks the one this version installs.
+    request.setRawHeader("X-Drift-Version", QByteArrayLiteral(DRIFT_VERSION));
     request.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
                          QNetworkRequest::NoLessSafeRedirectPolicy);
 
