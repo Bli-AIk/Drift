@@ -9,6 +9,7 @@
 #include <QtCore/qcoreapplication_platform.h>
 
 #include <atomic>
+#include <unistd.h>
 #endif
 
 namespace {
@@ -38,6 +39,44 @@ QJniObject javaUri(const QUrl &url)
     return QJniObject::callStaticObjectMethod(
         "android/net/Uri", "parse", "(Ljava/lang/String;)Landroid/net/Uri;",
         QJniObject::fromString(url.toString(QUrl::FullyEncoded)).object<jstring>());
+}
+
+// Qt's content file engine re-encodes the document id, so "test(1).mp3" becomes "test%281%29.mp3"
+// and the provider rejects it. Opening the descriptor here keeps the URI string exactly as granted.
+std::unique_ptr<QFile> openContentUri(const QUrl &url, QIODevice::OpenMode mode)
+{
+    QJniObject resolver = contentResolver();
+    QJniObject uri = javaUri(url);
+    if (!resolver.isValid() || !uri.isValid())
+        return {};
+
+    QJniEnvironment env;
+    auto openFd = [&](const QString &fdMode) {
+        QJniObject pfd = resolver.callObjectMethod(
+            "openFileDescriptor",
+            "(Landroid/net/Uri;Ljava/lang/String;)Landroid/os/ParcelFileDescriptor;",
+            uri.object(), QJniObject::fromString(fdMode).object<jstring>());
+        if (env.checkAndClearExceptions())
+            return QJniObject();
+        return pfd;
+    };
+    const bool write = mode & QIODevice::WriteOnly;
+    // "wt" truncates; some providers only accept "w".
+    QJniObject pfd = openFd(write ? QStringLiteral("wt") : QStringLiteral("r"));
+    if (!pfd.isValid() && write)
+        pfd = openFd(QStringLiteral("w"));
+    if (!pfd.isValid())
+        return {};
+
+    const int fd = pfd.callMethod<jint>("detachFd", "()I");
+    if (env.checkAndClearExceptions() || fd < 0)
+        return {};
+    auto file = std::make_unique<QFile>();
+    if (!file->open(fd, mode, QFileDevice::AutoCloseHandle)) {
+        ::close(fd);
+        return {};
+    }
+    return file;
 }
 
 std::atomic<int> g_keepScreenOnHolders{0};
@@ -86,11 +125,19 @@ QString AndroidUri::localPath(const QUrl &url)
 
 std::unique_ptr<QFile> AndroidUri::openForRead(const QUrl &url)
 {
+#ifdef Q_OS_ANDROID
+    if (isContentUri(url))
+        return openContentUri(url, QIODevice::ReadOnly);
+#endif
     return openTarget(filePath(url), QIODevice::ReadOnly);
 }
 
 std::unique_ptr<QFile> AndroidUri::openForWrite(const QUrl &url)
 {
+#ifdef Q_OS_ANDROID
+    if (isContentUri(url))
+        return openContentUri(url, QIODevice::WriteOnly | QIODevice::Truncate);
+#endif
     return openTarget(filePath(url), QIODevice::WriteOnly | QIODevice::Truncate);
 }
 

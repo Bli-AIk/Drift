@@ -1704,16 +1704,15 @@ QString ThemeManager::importTheme(const QUrl &url, bool replace)
     else if (url.scheme().isEmpty())
         path = url.toString();
     else {
-        // content:// (and any other non-file URL Qt can open). The fully encoded
-        // form is what Android's content file engine accepts; the display name
-        // keeps the .json/.zip suffix importLocal switches on.
-        const QString openPath = AndroidUri::filePath(url);
-        QFile input(openPath.isEmpty() ? url.toString(QUrl::FullyEncoded) : openPath);
-        if (!input.open(QIODevice::ReadOnly)) {
+        // content:// (and any other non-file URL Qt can open). The bytes are read
+        // here and staged under a name that keeps the .json/.zip suffix importLocal
+        // switches on.
+        const std::unique_ptr<QFile> input = AndroidUri::openForRead(url);
+        if (!input) {
             setLastError(QStringLiteral("cannot open %1").arg(url.toString()));
             return {};
         }
-        const QByteArray data = input.read(kMaxThemeTotalBytes + 1);
+        const QByteArray data = input->read(kMaxThemeTotalBytes + 1);
         if (data.size() > kMaxThemeTotalBytes) {
             setLastError(QStringLiteral("theme file is too large"));
             return {};

@@ -241,7 +241,7 @@ QString readTargetPath(const QUrl &url)
         if (!dst.open(QIODevice::WriteOnly | QIODevice::Truncate))
             return {};
         constexpr qint64 kChunk = 1024 * 1024;
-        while (!src->atEnd()) {
+        for (;;) {
             const QByteArray chunk = src->read(kChunk);
             if (chunk.isEmpty())
                 break;
@@ -17754,8 +17754,11 @@ QVariantMap AppController::importFaceProps(const QUrl &url)
             setLastMessage(tr("Could not read the selected file"), QStringLiteral("error"));
             return {};
         }
-        while (!src->atEnd()) {
-            if (copy.write(src->read(1 << 20)) < 0) {
+        for (;;) {
+            const QByteArray chunk = src->read(1 << 20);
+            if (chunk.isEmpty())
+                break;
+            if (copy.write(chunk) != chunk.size()) {
                 setLastMessage(tr("Could not read the selected file"), QStringLiteral("error"));
                 return {};
             }

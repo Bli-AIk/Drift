@@ -2657,9 +2657,11 @@ QUrl Exporter::publishToGallery(const QUrl &source, const QString &displayName, 
         jbyteArray chunk = env->NewByteArray(kChunk);
         std::vector<char> buffer(kChunk);
         ok = true;
-        while (!encoded->atEnd()) {
+        for (;;) {
             const qint64 read = encoded->read(buffer.data(), kChunk);
-            if (read <= 0) {
+            if (read == 0)
+                break;
+            if (read < 0) {
                 ok = false;
                 break;
             }

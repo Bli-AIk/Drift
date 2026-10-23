@@ -627,25 +627,24 @@ void ProjectFileController::writeProjectBundle(const QUrl &url, const std::optio
 
 void ProjectFileController::saveProjectJson(const QUrl &url)
 {
-    // Not toLocalFile: Qt's Android content file engine opens the encoded URI directly, so the
-    // plain QFile below works on a SAF document with no staging copy in between.
+    // Not toLocalFile: a content:// URI has no local path, so the write goes through AndroidUri,
+    // which opens the SAF document itself (Qt's engine mangles some document ids).
     const QString path = AndroidUri::filePath(url);
     if (path.isEmpty()) {
         m_app->setLastMessage(tr("That save location isn’t valid"), QStringLiteral("error"));
         return;
     }
 
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        m_app->setLastMessage(tr("Couldn’t write %1: %2").arg(QFileInfo(path).fileName(),
-                                                       file.errorString()),
+    std::unique_ptr<QFile> file = AndroidUri::openForWrite(url);
+    if (!file) {
+        m_app->setLastMessage(tr("Couldn’t write %1").arg(QFileInfo(path).fileName()),
                        QStringLiteral("error"));
         return;
     }
     const QByteArray json = m_app->serializeProjectJson();
-    if (file.write(json) != json.size() || !file.flush()) {
+    if (file->write(json) != json.size() || !file->flush()) {
         m_app->setLastMessage(tr("Couldn’t write %1: %2").arg(QFileInfo(path).fileName(),
-                                                       file.errorString()),
+                                                       file->errorString()),
                        QStringLiteral("error"));
         return;
     }
@@ -654,14 +653,26 @@ void ProjectFileController::saveProjectJson(const QUrl &url)
 
 namespace {
 
+// Qt's content file engine re-encodes some SAF document ids, so content:// paths go through AndroidUri.
+std::unique_ptr<QFile> openProjectFile(const QString &path)
+{
+    const QUrl url(path);
+    if (AndroidUri::isContentUri(url))
+        return AndroidUri::openForRead(url);
+    auto file = std::make_unique<QFile>(path);
+    if (!file->open(QIODevice::ReadOnly))
+        return {};
+    return file;
+}
+
 // saveProjectJson writes a JSON object; a .drift bundle starts with the "DRIFTPRJ" magic.
 // Peeking lets loadProject accept a dropped / CLI / MCP JSON path without relying on the suffix.
 bool fileStartsWithJsonObject(const QString &path)
 {
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly))
+    const std::unique_ptr<QFile> file = openProjectFile(path);
+    if (!file)
         return false;
-    QByteArray head = file.read(64);
+    QByteArray head = file->read(64);
     if (head.startsWith("\xEF\xBB\xBF"))
         head.remove(0, 3);
     for (int i = 0; i < head.size(); ++i) {
@@ -676,13 +687,13 @@ bool fileStartsWithJsonObject(const QString &path)
 // Thread-safe: runs on the load worker.
 std::optional<AppController::ParsedProject> readProjectJsonFile(const QString &path, QString *error)
 {
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly)) {
-        *error = QCoreApplication::translate("ProjectFileController", "Couldn’t read %1: %2")
-                     .arg(QFileInfo(path).fileName(), file.errorString());
+    const std::unique_ptr<QFile> file = openProjectFile(path);
+    if (!file) {
+        *error = QCoreApplication::translate("ProjectFileController", "Couldn’t read %1")
+                     .arg(QFileInfo(path).fileName());
         return std::nullopt;
     }
-    return AppController::parseProjectJson(file.readAll(), error);
+    return AppController::parseProjectJson(file->readAll(), error);
 }
 
 } // namespace
