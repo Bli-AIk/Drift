@@ -216,9 +216,21 @@ ThemedDialog {
         audioCodecId = firstAvailableId(audioCodecs, src.audioCodecId || defaults.audioCodecId || "aac")
         rateControl = src.rateControl || defaults.rateControl || "crf"
         crf = (src.crf !== undefined && src.crf !== null) ? src.crf : (defaults.crf || 18)
+        if (videoCodecId === "h264")
+            crf = Math.max(1, crf)
         videoBitrateKbps = src.videoBitrateKbps || defaults.videoBitrateKbps || 12000
         videoPreset = src.videoPreset || defaults.videoPreset || "medium"
         audioBitrateKbps = src.audioBitrateKbps || defaults.audioBitrateKbps || 192
+
+        // Older builds saved x264 CRF 0 with a prohibitively slow preset.
+        // Some builds already clamped that value to 1, so migrate both legacy
+        // combinations to the fast, usable default encoder and quality.
+        if (hasRemembered && src.videoCodecId === "h264"
+                && src.rateControl === "crf" && Number(src.crf) <= 1
+                && (src.videoPreset === "veryslow" || src.videoPreset === "placebo")) {
+            videoCodecId = firstAvailableId(videoCodecs, defaults.videoCodecId)
+            applyVideoCodecDefaults(codecById(videoCodecs, videoCodecId))
+        }
         syncAudioBitrateChoice()
 
         var restoredNum = (src.fpsNum !== undefined && src.fpsNum !== null) ? src.fpsNum : 0
