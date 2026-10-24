@@ -933,6 +933,29 @@ PanelFrame {
         return { "newTrack": true, "insertIndex": tracks.length }
     }
 
+    // The toolbar's + button picks files and places them at the playhead as soon as
+    // their metadata is ready. Keep the original time/track while the dialog is open
+    // and while asynchronous media probing runs.
+    function importMediaDirectlyToTimeline() {
+        if (MediaImport.importing)
+            return
+
+        const atSeconds = Math.max(0, playheadSeconds)
+        const selectedTrack = EditorState.selectedTrack
+        MediaImport.browseAndImport(function (added) {
+            if (added <= 0)
+                return
+
+            const firstIndex = AssetLibrary.count - added
+            const kind = root.assetKind(firstIndex)
+            const target = selectedTrack >= 0 && selectedTrack < root.tracks.length
+                           && EditorState.trackAcceptsKind(selectedTrack, kind)
+                           ? { "newTrack": false, "track": selectedTrack }
+                           : root.targetForFollowOnKind(kind)
+            root.placeImportedAssets(firstIndex, added, atSeconds, target)
+        })
+    }
+
     // Places the rows a drop just imported: the first at the spot the drag promised, the rest
     // back to back after it. One at a time rather than a loop, because placing the first can
     // block on the canvas setup dialog and the rest have to queue behind that answer.

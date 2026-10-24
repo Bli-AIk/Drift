@@ -1,14 +1,14 @@
 import QtQuick
 import Drift
 
-// Duration chip painted on the bottom-right of a media thumbnail.
+// Duration chip painted on the bottom-left of a media thumbnail.
 Rectangle {
     id: root
 
     property string label: ""
 
     visible: label.length > 0
-    anchors.right: parent.right
+    anchors.left: parent.left
     anchors.bottom: parent.bottom
     anchors.margins: Theme.spacingSm
     color: Theme.c.mediaAssetsDurationBadge.background

@@ -20,10 +20,19 @@ Rectangle {
     required property real cardSize
     required property bool selected
     required property bool hovered
-    required property MediaAssetsTab host
+    // Avoid a QML type-resolution cycle: MediaAssetsTab instantiates
+    // MediaAssetsGridCard, which in turn instantiates this frame.
+    required property var host
 
     readonly property alias dragActive: assetDrag.active
     readonly property bool menusVisible: cardMenu.visible || folderMenu.visible
+    // tracksRevision is the lightweight change notification; clipCountForAsset()
+    // is a query, so by itself it would not update when clips are removed or undone.
+    readonly property bool alreadyOnTimeline: {
+        void EditorState.tracksRevision
+        return !root.isFolder && root.assetIndex >= 0
+               && EditorState.clipCountForAsset(root.assetIndex) > 0
+    }
 
     function closeMenus() {
         cardMenu.close()
@@ -92,7 +101,7 @@ Rectangle {
         // Also covers Image.Error, so a missing
         // thumbnail file falls back to the kind icon
         // instead of staying blank forever.
-        visible: !root.isFolder
+        visible: !root.isFolder && root.hovered
                  && (root.liveThumbnailPath.length === 0 || gridThumb.status === Image.Error)
         glyph: kind === "audio" ? Theme.icons.music
                 : kind === "image" ? Theme.icons.image
@@ -106,6 +115,7 @@ Rectangle {
     }
 
     MediaAssetsGridBusyOverlay {
+        id: busyOverlay
         folder: root.isFolder
         assetIndex: assetIndex
     }
@@ -136,6 +146,75 @@ Rectangle {
         label: !root.isFolder ? duration : ""
     }
 
+    // Like CapCut's media bin: the label reflects actual clip references rather
+    // than only the last click. The + stays available to insert another instance.
+    Rectangle {
+        z: 4
+        visible: root.alreadyOnTimeline
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.margins: 4
+        width: addedLabel.implicitWidth + 10
+        height: addedLabel.implicitHeight + 4
+        radius: 3
+        color: "#D9000000"
+
+        Text {
+            id: addedLabel
+            anchors.centerIn: parent
+            text: qsTr("Adicionado")
+            color: "white"
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeTiny
+            font.weight: Font.Medium
+        }
+    }
+
+    Button {
+        id: addToTimelineButton
+        z: 5
+        visible: !root.isFolder && root.hovered
+        enabled: !busyOverlay.busy && root.assetIndex >= 0
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.margins: 4
+        width: 24
+        height: 24
+        padding: 0
+        hoverEnabled: true
+        focusPolicy: Qt.StrongFocus
+        Accessible.name: qsTr("Adicionar à timeline")
+        onClicked: root.host.addToTimelineRequested([root.assetId])
+
+        background: Rectangle {
+            radius: width / 2
+            color: !addToTimelineButton.enabled ? Qt.darker(Theme.c.themedButton.primaryBackground, 1.5)
+                   : addToTimelineButton.down ? Qt.darker(Theme.c.themedButton.primaryBackground, 1.12)
+                   : addToTimelineButton.hovered ? Qt.lighter(Theme.c.themedButton.primaryBackground, 1.08)
+                                                 : Theme.c.themedButton.primaryBackground
+        }
+        contentItem: Item {
+            // Draw the cross geometrically: a font glyph can have uneven
+            // side bearings and look off-centre inside a small circle.
+            Rectangle {
+                anchors.centerIn: parent
+                width: 12
+                height: 2
+                color: Theme.c.themedButton.primaryForeground
+            }
+            Rectangle {
+                anchors.centerIn: parent
+                width: 2
+                height: 12
+                color: Theme.c.themedButton.primaryForeground
+            }
+        }
+        ThemedToolTip {
+            text: qsTr("Adicionar à timeline")
+            visible: addToTimelineButton.hovered || addToTimelineButton.visualFocus
+        }
+    }
+
     MediaAssetsSelectionRing {
         selected: root.selected
     }
@@ -157,6 +236,12 @@ Rectangle {
         enabled: !assetDrag.active
         onTapped: {
             if (root.isFolder)
+                return
+
+            // A click on the + is a one-file timeline action, not a selection
+            // gesture on the underlying tile.
+            if (leftTap.point.position.x >= addToTimelineButton.x
+                    && leftTap.point.position.y >= addToTimelineButton.y)
                 return
 
             // The most recently interacted editing surface owns Delete.

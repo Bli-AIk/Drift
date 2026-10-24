@@ -369,7 +369,8 @@ void fillAudioPresence(drift::MediaAsset &asset, const MediaInfo &info)
     asset.hasAudioKnown = true;
 }
 
-drift::MediaAsset buildProbedAsset(const QString &absolutePath, const QString &name, const MediaInfo &info)
+drift::MediaAsset buildProbedAsset(const QString &absolutePath, const QString &name, const MediaInfo &info,
+                                  bool generateThumbnails)
 {
     drift::MediaAsset asset;
     asset.name = name;
@@ -390,11 +391,13 @@ drift::MediaAsset buildProbedAsset(const QString &absolutePath, const QString &n
     }
     fillAudioPresence(asset, info);
 
-    const QString kindString = drift::mediaKindToString(asset.kind);
-    asset.thumbnailPath = MediaThumbnail::generate(absolutePath, kindString);
-    asset.filmstripPath = asset.kind == drift::MediaKind::Video
-                              ? MediaThumbnail::generateFilmstrip(absolutePath, kindString)
-                              : asset.thumbnailPath;
+    if (generateThumbnails) {
+        const QString kindString = drift::mediaKindToString(asset.kind);
+        asset.thumbnailPath = MediaThumbnail::generate(absolutePath, kindString);
+        asset.filmstripPath = asset.kind == drift::MediaKind::Video
+                                  ? MediaThumbnail::generateFilmstrip(absolutePath, kindString)
+                                  : asset.thumbnailPath;
+    }
     return asset;
 }
 
@@ -523,7 +526,7 @@ std::optional<drift::MediaAsset> buildModelAsset(const QString &absolutePath, co
 // Reads everything the bin needs about a file. Blocking, so it only ever runs on a worker
 // thread — shared by the import path and the replace path.
 std::optional<drift::MediaAsset> probeAsset(const QString &absolutePath, bool imageOnly,
-                                            MediaInfo *infoOut = nullptr)
+                                            MediaInfo *infoOut = nullptr, bool generateThumbnails = true)
 {
     // A sequence path's file name is the whole pattern plus "#start=..."; the bin shows the
     // range instead.
@@ -545,7 +548,7 @@ std::optional<drift::MediaAsset> probeAsset(const QString &absolutePath, bool im
         return std::nullopt;
     if (infoOut)
         *infoOut = info;
-    return buildProbedAsset(absolutePath, name, info);
+    return buildProbedAsset(absolutePath, name, info, generateThumbnails);
 }
 
 // Footage whose decode, not its composite, is what makes live preview stutter. The preview
@@ -728,6 +731,9 @@ AssetLibrary::AssetLibrary(QObject *parent)
     connect(this, &QAbstractItemModel::rowsRemoved, this, &AssetLibrary::snapshotAssets);
     connect(this, &QAbstractItemModel::modelReset, this, &AssetLibrary::snapshotAssets);
 
+    // Probe and thumbnail jobs can each open a decoder and spawn FFmpeg threads.
+    // Bound simultaneous imports so they do not compete with playback for every CPU core.
+    m_jobs.setMaxThreadCount(qBound(1, QThread::idealThreadCount() / 4, 3));
     m_proxyPool.setMaxThreadCount(1);
     connect(this, &AssetLibrary::proxyStateChanged, this, &AssetLibrary::bumpBadges);
     // Path changes: a replace, a conversion landing, or an undo of either, each of which can
@@ -1112,7 +1118,7 @@ void AssetLibrary::startImportJob(const QString &assetId, const QString &absolut
         fingerprint.path = absolutePath;
         drift::stampSourceFingerprint(fingerprint);
         MediaInfo info;
-        const std::optional<drift::MediaAsset> probed = probeAsset(absolutePath, imageOnly, &info);
+        const std::optional<drift::MediaAsset> probed = probeAsset(absolutePath, imageOnly, &info, false);
         drift::MediaAsset filled = probed.value_or(drift::MediaAsset{});
         filled.path = absolutePath;
         filled.sourceSize = fingerprint.sourceSize;
@@ -1120,12 +1126,10 @@ void AssetLibrary::startImportJob(const QString &assetId, const QString &absolut
         const bool ok = probed.has_value();
         const bool video = ok && filled.kind == drift::MediaKind::Video;
         const bool suggestProxy = video && wantsPreviewProxy(info);
-        const bool variableFrameRate = video && MediaProbe::isVariableFrameRate(absolutePath);
-
         QMetaObject::invokeMethod(
             this,
-            [this, assetId, filled, ok, suggestProxy, variableFrameRate]() {
-                applyImportResult(assetId, filled, ok, suggestProxy, variableFrameRate);
+            [this, assetId, filled, ok, suggestProxy]() {
+                applyImportResult(assetId, filled, ok, suggestProxy);
             },
             Qt::QueuedConnection);
     });
@@ -1231,7 +1235,7 @@ bool AssetLibrary::applyProbedSource(const QString &assetId, const drift::MediaA
 }
 
 void AssetLibrary::applyImportResult(const QString &assetId, const drift::MediaAsset &filled, bool ok,
-                                     bool suggestProxy, bool variableFrameRate)
+                                     bool suggestProxy)
 {
     m_importPending.remove(assetId);
     // Flushed on every way out below, so a failed or withdrawn last probe still delivers the
@@ -1292,11 +1296,9 @@ void AssetLibrary::applyImportResult(const QString &assetId, const drift::MediaA
                .isEmpty())
         m_suggestProxyIds.append(assetId);
     if (asset->kind == drift::MediaKind::Video) {
-        asset->frameRateKnown = true;
-        asset->variableFrameRate = variableFrameRate;
+        asset->frameRateKnown = false;
+        asset->variableFrameRate = false;
     }
-    if (variableFrameRate)
-        m_suggestVfrIds.append(assetId);
 
     emitAssetRowChanged(index,
                         {NameRole, KindRole, DurationRole, DurationSecondsRole, PathRole,
@@ -1304,6 +1306,11 @@ void AssetLibrary::applyImportResult(const QString &assetId, const drift::MediaA
     emit assetMetadataChanged(assetId);
     emit assetCardChanged(assetId);
     refreshSidecars({assetId});
+    // The bin/timeline can use the file as soon as its metadata is ready. Generating
+    // thumbnails and scanning packets for VFR now happen independently in the job pool.
+    startThumbJob(assetId);
+    if (asset->kind == drift::MediaKind::Video)
+        isVariableFrameRate(assetId);
 }
 
 QString AssetLibrary::proxyCurrentName() const
@@ -1374,8 +1381,10 @@ bool AssetLibrary::isVariableFrameRate(const QString &assetId)
                     return;
                 asset->frameRateKnown = true;
                 asset->variableFrameRate = variable;
-                if (variable)
+                if (variable) {
                     bumpBadges();
+                    emit importSuggestions({}, {assetId});
+                }
             },
             Qt::QueuedConnection);
     });

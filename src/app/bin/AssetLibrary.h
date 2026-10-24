@@ -279,7 +279,7 @@ private:
     void startImportJob(const QString &assetId, const QString &absolutePath, bool imageOnly);
     void startThumbJob(const QString &assetId);
     void applyImportResult(const QString &assetId, const drift::MediaAsset &filled, bool ok,
-                           bool suggestProxy = false, bool variableFrameRate = false);
+                           bool suggestProxy = false);
     void startNextProxy();
     void bumpBadges();
     // `sourcePath` is the file the job actually read. It is compared against the asset's current
