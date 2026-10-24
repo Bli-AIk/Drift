@@ -433,9 +433,7 @@ Item {
                         required property int modelData
                         text: modelData + "°"
                         selected: {
-                            void root.clipDataRevision
-                            void EditorState.inspectorPlayheadSeconds
-                            const cur = Number(root.clipData.rotationAtPlayhead || 0)
+                            const cur = EditorState.selectedClipRotationAtPlayhead
                             return Math.abs(cur - modelData) < 0.5
                         }
                         onClicked: EditorState.setClipRotationSnap(

@@ -7,6 +7,8 @@
 #include "core/interchange/subtitles/VttIO.h"
 #include "core/project/SubtitleTiming.h"
 
+#include <QSet>
+
 #include <algorithm>
 #include <cmath>
 
@@ -211,6 +213,65 @@ QVariantList SubtitleController::cues(int track, int clip) const
 double SubtitleController::projectFps() const
 {
     return m_app->m_project.fps();
+}
+
+QVariantMap SubtitleController::cueHitAt(double localSec, double pxPerSecond, double slopPx) const
+{
+    const drift::Clip *clip = selectedSubtitleClip();
+    if (!clip || pxPerSecond <= 0)
+        return {};
+    const QList<drift::SubtitleCue> &cues = clip->subtitleCues;
+    const auto next = std::upper_bound(cues.begin(), cues.end(), localSec,
+                                       [](double sec, const drift::SubtitleCue &cue) {
+                                           return sec < drift::usToSeconds(cue.startUs);
+                                       });
+    for (int i = static_cast<int>(next - cues.begin()) - 1; i >= 0; --i) {
+        const double start = drift::usToSeconds(cues.at(i).startUs);
+        const double end = drift::usToSeconds(cues.at(i).endUs);
+        if (localSec > end)
+            continue;
+        const double edge = std::min(slopPx / pxPerSecond, (end - start) / 3);
+        return {
+            {QStringLiteral("index"), i},
+            {QStringLiteral("part"),
+             localSec < start + edge ? QStringLiteral("trimStart")
+                                     : (localSec > end - edge ? QStringLiteral("trimEnd")
+                                                              : QStringLiteral("move"))},
+        };
+    }
+    return {};
+}
+
+double SubtitleController::snapCueTime(double value, double threshold, double playhead,
+                                       double clipDuration, const QVariantList &excluded) const
+{
+    double best = value;
+    double bestD = threshold;
+    const auto consider = [&](double target) {
+        const double d = std::abs(value - target);
+        if (d < bestD) {
+            bestD = d;
+            best = target;
+        }
+    };
+    if (playhead >= 0)
+        consider(playhead);
+    consider(0);
+    if (clipDuration > 0)
+        consider(clipDuration);
+    if (const drift::Clip *clip = selectedSubtitleClip()) {
+        QSet<int> skip;
+        for (const QVariant &index : excluded)
+            skip.insert(index.toInt());
+        const QList<drift::SubtitleCue> &cues = clip->subtitleCues;
+        for (int i = 0; i < cues.size(); ++i) {
+            if (skip.contains(i))
+                continue;
+            consider(drift::usToSeconds(cues.at(i).startUs));
+            consider(drift::usToSeconds(cues.at(i).endUs));
+        }
+    }
+    return best;
 }
 
 QString SubtitleController::cuesText(int track, int clip, const QString &format, bool timelineTimes) const

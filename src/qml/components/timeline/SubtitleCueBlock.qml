@@ -58,9 +58,8 @@ Rectangle {
     function moveBy(dx) {
         const d = editEnd - editStart
         const raw = editStart + dx / lane.pxPerSecond
-        const targets = lane.snapTargets(index)
-        const snS = lane.snap(raw, targets)
-        const snE = lane.snap(raw + d, targets) - d
+        const snS = lane.snap(raw, index)
+        const snE = lane.snap(raw + d, index) - d
         let ns = Math.abs(snS - raw) <= Math.abs(snE - raw) ? snS : snE
         ns = lane.clampVal(ns, lane.loBound(index), lane.hiBound(index) - d)
         dragX = lane.xForSeconds(ns)

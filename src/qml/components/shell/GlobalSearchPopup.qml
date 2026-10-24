@@ -247,12 +247,21 @@ Popup {
                                        } : null) })
         }
 
+        // Lowercased once here so each keystroke only scores; _h is the whole-row haystack for the word pass.
+        for (let i = 0; i < rows.length; ++i) {
+            const r = rows[i]
+            r._l = (r.label || "").toLowerCase()
+            r._k = (r.keywords || "").toLowerCase()
+            r._s = (r.sub || "").toLowerCase()
+            r._h = (r.label + " " + r.keywords + " " + r.sub).toLowerCase()
+        }
+
         root._index = rows
     }
 
     // Exact > prefix > word start > substring > in-order letters. -1 is no match.
-    function _score(text, q) {
-        const s = (text || "").toLowerCase()
+    // "s" is already lowercased (see buildIndex) and "q" is the lowercased query.
+    function _score(s, q) {
         if (s.length === 0)
             return -1
         if (s === q)
@@ -287,13 +296,12 @@ Popup {
         const scored = []
         for (let i = 0; i < _index.length; ++i) {
             const row = _index[i]
-            let score = Math.max(_score(row.label, q),
-                                 _score(row.keywords, q) * 0.5,
-                                 _score(row.sub, q) * 0.4)
+            let score = Math.max(_score(row._l, q),
+                                 _score(row._k, q) * 0.5,
+                                 _score(row._s, q) * 0.4)
             // "blur gaussian" or "transform opacity": every word somewhere in the row.
             if (score < 0 && words.length > 1) {
-                const hay = (row.label + " " + row.keywords + " " + row.sub).toLowerCase()
-                if (words.every(w => hay.indexOf(w) >= 0))
+                if (words.every(w => row._h.indexOf(w) >= 0))
                     score = 300
             }
             if (score < 0)

@@ -805,6 +805,10 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
     // WYSIWYG preview drag emits only tracksChanged). This keeps the Clip
     // Properties panel in sync with the preview in both directions.
     connect(this, &AppController::selectionChanged, this, &AppController::selectedClipDataChanged);
+    connect(this, &AppController::selectedClipDataChanged, this,
+            &AppController::selectedClipRotationAtPlayheadChanged);
+    connect(this, &AppController::inspectorPlayheadChanged, this,
+            &AppController::selectedClipRotationAtPlayheadChanged);
     connect(this, &AppController::selectionChanged, this, &AppController::editCapabilitiesChanged);
     connect(this, &AppController::tracksChanged, this, &AppController::editCapabilitiesChanged);
     connect(this, &AppController::tracksChanged, this, &AppController::selectedClipDataChanged);
@@ -5469,9 +5473,6 @@ QVariantMap AppController::selectedClipData() const
         if (data.isEmpty() || !isValidClipIndex(trackIndex, clipIndex))
             return data;
         const drift::Clip &clip = m_project.tracks().at(trackIndex).clips.at(clipIndex);
-        const drift::TimeUs relative = qMax<drift::TimeUs>(0, m_playheadUs - clip.timelineStart);
-        data.insert(QStringLiteral("rotationAtPlayhead"),
-                    clipTransformValue(clip.rotation, relative, 0.0));
         data.insert(QStringLiteral("caps"),
                     inspectorCaps(clip, m_project.tracks().at(trackIndex).type));
         return data;
@@ -5488,6 +5489,22 @@ QVariantMap AppController::selectedClipData() const
             return data;
     }
     return {};
+}
+
+double AppController::selectedClipRotationAtPlayhead() const
+{
+    auto rotation = [this](int trackIndex, int clipIndex) {
+        const drift::Clip &clip = m_project.tracks().at(trackIndex).clips.at(clipIndex);
+        const drift::TimeUs relative = qMax<drift::TimeUs>(0, m_playheadUs - clip.timelineStart);
+        return clipTransformValue(clip.rotation, relative, 0.0);
+    };
+    if (isValidClipIndex(m_selectedTrack, m_selectedClip))
+        return rotation(m_selectedTrack, m_selectedClip);
+    for (const QPair<int, int> &pair : m_selection) {
+        if (isValidClipIndex(pair.first, pair.second))
+            return rotation(pair.first, pair.second);
+    }
+    return 0.0;
 }
 
 QVariantList AppController::selectedClipEffects() const
@@ -21032,6 +21049,28 @@ int AppController::trackMaxChannelCount(int trackIndex) const
             widest = qMax(widest, streams.at(clip.audioStreamIndex).channels);
     }
     return widest;
+}
+
+QList<float> AppController::subtitleWaveformColumns(double startSeconds, double durSeconds,
+                                                    int sampleCount, int columns) const
+{
+    const QVariantList peaks = subtitleWaveformPeaks(startSeconds, durSeconds, sampleCount);
+    const int n = static_cast<int>(peaks.size());
+    if (n == 0 || columns <= 0)
+        return {};
+    QList<float> out;
+    out.reserve(columns);
+    for (int x = 0; x < columns; ++x) {
+        const int i0 = static_cast<int>(static_cast<qint64>(x) * n / columns);
+        int i1 = static_cast<int>(static_cast<qint64>(x + 1) * n / columns);
+        if (i1 <= i0)
+            i1 = qMin(n, i0 + 1);
+        float peak = 0.0f;
+        for (int i = i0; i < i1; ++i)
+            peak = qMax(peak, peaks.at(i).toFloat());
+        out.append(peak);
+    }
+    return out;
 }
 
 QVariantList AppController::subtitleWaveformPeaks(double startSeconds, double durSeconds,

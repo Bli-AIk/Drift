@@ -26,7 +26,8 @@ Canvas {
         void EditorState.tracksRevision
         void waveformRevision
         return (visible && waveDuration > 0)
-            ? EditorState.subtitleWaveformPeaks(waveStart, waveDuration, peakCount)
+            ? EditorState.subtitleWaveformColumns(waveStart, waveDuration, peakCount,
+                                                  Math.max(1, Math.floor(width)))
             : []
     }
 
@@ -57,19 +58,8 @@ Canvas {
             return
         ctx.fillStyle = wave
         const mid = height / 2
-        const w = Math.max(1, Math.floor(width))
-        const n = peaks.length
-        for (let x = 0; x < w; x++) {
-            const i0 = Math.floor(x * n / w)
-            let i1 = Math.floor((x + 1) * n / w)
-            if (i1 <= i0)
-                i1 = Math.min(n, i0 + 1)
-            let peak = 0
-            for (let i = i0; i < i1; i++) {
-                if (peaks[i] > peak)
-                    peak = peaks[i]
-            }
-            const amp = peak * mid * 0.9
+        for (let x = 0; x < peaks.length; x++) {
+            const amp = peaks[x] * mid * 0.9
             if (amp > 0.5)
                 ctx.fillRect(x, mid - amp, 1, amp * 2)
         }

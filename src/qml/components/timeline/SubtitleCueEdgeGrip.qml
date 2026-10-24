@@ -43,7 +43,7 @@ Item {
             onTranslationChanged: {
                 if (grip.edge < 0) {
                     let ns = grip.cue.editStart + translation.x / grip.lane.pxPerSecond
-                    ns = grip.lane.snap(ns, grip.lane.snapTargets(grip.cue.index))
+                    ns = grip.lane.snap(ns, grip.cue.index)
                     ns = grip.lane.clampVal(ns, grip.lane.loBound(grip.cue.index),
                                             grip.cue.editEnd - grip.lane.minCueDur)
                     grip.cue.dragX = grip.lane.xForSeconds(ns)
@@ -51,7 +51,7 @@ Item {
                     grip.lane.commitCue(grip.cue.index, ns, grip.cue.editEnd)
                 } else {
                     let ne = grip.cue.editEnd + translation.x / grip.lane.pxPerSecond
-                    ne = grip.lane.snap(ne, grip.lane.snapTargets(grip.cue.index))
+                    ne = grip.lane.snap(ne, grip.cue.index)
                     ne = grip.lane.clampVal(ne, grip.cue.editStart + grip.lane.minCueDur,
                                             grip.lane.hiBound(grip.cue.index))
                     grip.cue.dragW = (ne - grip.cue.editStart) * grip.lane.pxPerSecond

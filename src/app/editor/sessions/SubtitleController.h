@@ -51,6 +51,10 @@ public:
     Q_INVOKABLE QVariantList cues(int track, int clip) const;
     Q_INVOKABLE double projectFps() const;
 
+    Q_INVOKABLE QVariantMap cueHitAt(double localSec, double pxPerSecond, double slopPx) const;
+    Q_INVOKABLE double snapCueTime(double value, double threshold, double playhead,
+                                   double clipDuration, const QVariantList &excluded) const;
+
     Q_INVOKABLE QString cuesText(int track, int clip, const QString &format, bool timelineTimes) const;
     Q_INVOKABLE QVariantMap parseText(const QString &text, const QString &format) const;
     Q_INVOKABLE bool applyText(int track, int clip, const QString &text, const QString &format,

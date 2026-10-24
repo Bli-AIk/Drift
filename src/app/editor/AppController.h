@@ -275,6 +275,7 @@ class AppController : public QObject
     Q_PROPERTY(int selectionRevision READ selectionRevision NOTIFY selectionChanged)
     Q_PROPERTY(int selectionCount READ selectionCount NOTIFY selectionChanged)
     Q_PROPERTY(QVariantMap selectedClipData READ selectedClipData NOTIFY selectedClipDataChanged)
+    Q_PROPERTY(double selectedClipRotationAtPlayhead READ selectedClipRotationAtPlayhead NOTIFY selectedClipRotationAtPlayheadChanged)
     Q_PROPERTY(QVariantList selectedClipEffects READ selectedClipEffects NOTIFY selectedClipDataChanged)
     Q_PROPERTY(QVariantList selectedClipAudioEffects READ selectedClipAudioEffects NOTIFY selectedClipDataChanged)
     Q_PROPERTY(QVariantMap selectedTransitionData READ selectedTransitionData NOTIFY selectedTransitionDataChanged)
@@ -462,6 +463,7 @@ public:
     QString filmstripTilePath(const QString &path, int level, qint64 index,
                               int rotationCorrection) const;
     QVariantMap selectedClipData() const;
+    double selectedClipRotationAtPlayhead() const;
     QVariantList selectedClipEffects() const;
     QVariantList selectedClipAudioEffects() const;
     QVariantMap selectedTransitionData() const;
@@ -1484,6 +1486,9 @@ public:
     Q_INVOKABLE int trackMaxChannelCount(int trackIndex) const;
     Q_INVOKABLE QVariantList subtitleWaveformPeaks(double startSeconds, double durSeconds,
                                                    int sampleCount = 240) const;
+    // subtitleWaveformPeaks reduced to one max-peak per drawn column, so QML only draws.
+    Q_INVOKABLE QList<float> subtitleWaveformColumns(double startSeconds, double durSeconds,
+                                                     int sampleCount, int columns) const;
     // Beat / onset detection over the mixed timeline audio in [startSeconds, +durSeconds).
     // Explicitly triggered from the keyframe strip: it renders the mix, so it must never
     // fire off a mere selection change. Result lands in `beatAnalysis`.
@@ -1626,6 +1631,7 @@ signals:
     void editCapabilitiesChanged();
     void sequenceTabsChanged();
     void selectedClipDataChanged();
+    void selectedClipRotationAtPlayheadChanged();
     void selectedTransitionDataChanged();
     void bookmarksChanged();
     void workAreaChanged();

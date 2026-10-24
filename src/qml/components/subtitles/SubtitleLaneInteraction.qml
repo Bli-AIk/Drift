@@ -39,48 +39,13 @@ Item {
     function hitTest(x, y) {
         if (y > panel.cueAreaHeight)
             return null
-        const cues = panel.liveCues
-        const slop = touch ? 14 : 6
-        for (let i = cues.length - 1; i >= 0; --i) {
-            const x0 = timeView.xFor(panel.clipStart + cues[i].start)
-            const x1 = timeView.xFor(panel.clipStart + cues[i].end)
-            if (x < x0 || x > x1)
-                continue
-            const edge = Math.min(slop, (x1 - x0) / 3)
-            return {
-                "index": i,
-                "part": x < x0 + edge ? "trimStart" : (x > x1 - edge ? "trimEnd" : "move")
-            }
-        }
-        return null
+        const hit = EditorState.subtitles.cueHitAt(localSec(x), timeView.pxPerSecond, touch ? 14 : 6)
+        return hit.part ? hit : null
     }
 
-    function snapTargets(excluded) {
-        const out = [0]
+    function snapValue(v, excluded) {
         const ph = EditorState.playheadSeconds - panel.clipStart
-        if (ph >= 0)
-            out.push(ph)
-        if (panel.clipDuration > 0)
-            out.push(panel.clipDuration)
-        for (let i = 0; i < base.length; ++i) {
-            if (excluded.indexOf(i) >= 0)
-                continue
-            out.push(base[i].start, base[i].end)
-        }
-        return out
-    }
-
-    function snapValue(v, targets) {
-        let best = v
-        let bestD = snapThreshold
-        for (let i = 0; i < targets.length; ++i) {
-            const d = Math.abs(v - targets[i])
-            if (d < bestD) {
-                bestD = d
-                best = targets[i]
-            }
-        }
-        return best
+        return EditorState.subtitles.snapCueTime(v, snapThreshold, ph, panel.clipDuration, excluded)
     }
 
     function startDrag() {
@@ -113,9 +78,8 @@ Item {
             }
             let d = raw
             if (snapping) {
-                const targets = snapTargets(moving)
-                const s = snapValue(base[i0].start + raw, targets)
-                const e = snapValue(base[i0].end + raw, targets)
+                const s = snapValue(base[i0].start + raw, moving)
+                const e = snapValue(base[i0].end + raw, moving)
                 const ds = s - (base[i0].start + raw)
                 const de = e - (base[i0].end + raw)
                 if (ds !== 0 || de !== 0)
@@ -131,7 +95,7 @@ Item {
             const hi = base[i0].end - minDuration
             let v = base[i0].start + raw
             if (snapping)
-                v = snapValue(v, snapTargets([i0]))
+                v = snapValue(v, [i0])
             if (lo <= hi)
                 list[i0].start = Math.max(lo, Math.min(hi, v))
         } else if (mode === "trimEnd") {
@@ -139,7 +103,7 @@ Item {
             const hi = i0 === n - 1 ? end : base[i0 + 1].start
             let v = base[i0].end + raw
             if (snapping)
-                v = snapValue(v, snapTargets([i0]))
+                v = snapValue(v, [i0])
             if (lo <= hi)
                 list[i0].end = Math.max(lo, Math.min(hi, v))
         }

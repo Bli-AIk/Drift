@@ -16,6 +16,7 @@ PanelFrame {
     property var curveShown: ({})
     property string focusedProp: ""
     property var rows: []
+    readonly property alias rowKeys: rowKeysModel
 
     readonly property alias timeView: timeViewObject
     readonly property alias selection: selectionObject
@@ -77,9 +78,27 @@ PanelFrame {
         return entryCache.list
     }
 
+    function rowKey(r) {
+        return r.type === "group" ? "g:" + r.group : "p:" + r.group + ":" + r.prop
+    }
+
+    function applyRows(built) {
+        const keys = built.map(rowKey)
+        const wanted = new Set(keys)
+        for (let i = rowKeysModel.count - 1; i >= 0; --i) {
+            if (!wanted.has(rowKeysModel.get(i).key))
+                rowKeysModel.remove(i)
+        }
+        rows = built
+        for (let i = 0; i < keys.length; ++i) {
+            if (i >= rowKeysModel.count || rowKeysModel.get(i).key !== keys[i])
+                rowKeysModel.insert(i, { "key": keys[i] })
+        }
+    }
+
     function rebuild() {
         if (!shown || !hasClip) {
-            rows = []
+            applyRows([])
             return
         }
         const built = Model.buildRows(entries(), {
@@ -91,7 +110,7 @@ PanelFrame {
             "keysFor": prop => EditorState.clipKeyframes(track, clip, prop)
         })
         const keepY = treeList.contentY
-        rows = built
+        applyRows(built)
         if (keepY > 0)
             Qt.callLater(() => { treeList.contentY = keepY })
         let shownNow = curveShown
@@ -288,6 +307,8 @@ PanelFrame {
         }
     }
 
+    ListModel { id: rowKeysModel }
+
     HoverHandler { id: hover }
 
     TapHandler {
@@ -361,28 +382,28 @@ PanelFrame {
             width: root.treeWidth
             height: parent.height - y
             clip: true
-            model: root.rows
+            model: root.rowKeys
             boundsBehavior: Flickable.StopAtBounds
             ScrollBar.vertical: AppScrollBar { }
 
             delegate: KeyframesTreeRow {
                 id: delegate
-                required property var modelData
+                required property int index
                 width: treeList.width
-                row: modelData
+                row: root.rows[index]
                 track: root.track
                 clip: root.clip
                 playhead: root.playhead
                 displayPlayhead: EditorState.inspectorPlayheadSeconds
                 curvesMode: root.mode === "curves"
-                curveShown: !!root.curveShown[modelData.keyProp]
-                focused: modelData.type !== "group" && root.focusedProp === modelData.prop
+                curveShown: !!root.curveShown[delegate.row.keyProp]
+                focused: delegate.row.type !== "group" && root.focusedProp === delegate.row.prop
                 onFocusRequested: {
-                    root.focusedProp = modelData.prop
+                    root.focusedProp = delegate.row.prop
                     root.forceActiveFocus()
                 }
-                onGroupToggled: root.toggleCollapsed(modelData.group)
-                onCurveShownToggled: (on) => root.setCurveShown(modelData.keyProp, on)
+                onGroupToggled: root.toggleCollapsed(delegate.row.group)
+                onCurveShownToggled: (on) => root.setCurveShown(delegate.row.keyProp, on)
             }
         }
 

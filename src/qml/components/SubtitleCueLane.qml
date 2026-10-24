@@ -98,35 +98,11 @@ Item {
     function clampVal(v, lo, hi) {
         return Math.max(lo, Math.min(hi, v))
     }
-    function snapTargets(excludeIndex) {
-        const arr = []
+    function snap(v, excludeIndex) {
         const ph = EditorState.playheadSeconds - clipStart
-        if (ph >= 0 && (clipDuration <= 0 || ph <= clipDuration))
-            arr.push(ph)
-        arr.push(0)
-        if (clipDuration > 0)
-            arr.push(clipDuration)
-        const b = baseCues()
-        for (let i = 0; i < b.length; i++) {
-            if (i === excludeIndex)
-                continue
-            arr.push(b[i].start)
-            arr.push(b[i].end)
-        }
-        return arr
-    }
-    function snap(v, targets) {
+        const inRange = ph >= 0 && (clipDuration <= 0 || ph <= clipDuration)
         const thr = 6 / Math.max(1e-6, pxPerSecond)
-        let best = v
-        let bestD = thr
-        for (let i = 0; i < targets.length; i++) {
-            const d = Math.abs(v - targets[i])
-            if (d < bestD) {
-                bestD = d
-                best = targets[i]
-            }
-        }
-        return best
+        return EditorState.subtitles.snapCueTime(v, thr, inRange ? ph : -1, clipDuration, [excludeIndex])
     }
     function commitCue(index, newStart, newEnd) {
         const b = baseCues()

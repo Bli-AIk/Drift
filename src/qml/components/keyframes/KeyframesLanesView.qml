@@ -37,7 +37,7 @@ Item {
         anchors.fill: parent
         clip: true
         interactive: false
-        model: root.panel.rows
+        model: root.panel.rowKeys
         boundsBehavior: Flickable.StopAtBounds
 
         onContentYChanged: {
@@ -48,9 +48,9 @@ Item {
         delegate: Item {
             id: lane
 
-            required property var modelData
             required property int index
 
+            readonly property var modelData: root.panel.rows[index]
             readonly property bool isGroup: modelData.type === "group"
             readonly property var dots: Model.laneDots(root.panel.rows, index)
             readonly property color dotColor: isGroup ? Theme.c.keyframesKeyDot.summary
