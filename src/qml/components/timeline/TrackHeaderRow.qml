@@ -5,7 +5,7 @@ import Drift
 Item {
     id: trackLabelRow
 
-    property TrackHeaderColumn column
+    property var column
     property var renameDialog
     property var deleteDialog
     required property int index
@@ -321,16 +321,15 @@ Item {
         }
     }
 
-    // DAW-style lane zoom: wheel over this header grows/shrinks only
-    // this track, so a music track can be made tall for waveform work
-    // without zooming the whole timeline. NoButton keeps clicks, the
-    // reorder drag and the context menu working underneath.
+    // Wheel over track headers should scroll the same track list as the
+    // timeline. Alt+wheel retains DAW-style per-lane height adjustment.
+    // NoButton keeps clicks, reorder drag and the context menu available.
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.NoButton
         z: 40
         onWheel: (wheel) => {
-            // Modified wheel belongs to the timeline's zoom/pan.
+            // Ctrl/Shift wheel belongs to the timeline's zoom/pan gestures.
             if (wheel.modifiers & (Qt.ControlModifier | Qt.ShiftModifier)) {
                 wheel.accepted = false
                 return
@@ -339,7 +338,10 @@ Item {
                                                 : wheel.pixelDelta.y
             if (dy === 0)
                 return
-            EditorState.nudgeTrackHeightScale(index, dy > 0 ? 1 : -1)
+            if (wheel.modifiers & Qt.AltModifier)
+                EditorState.nudgeTrackHeightScale(index, dy > 0 ? 1 : -1)
+            else
+                column.scrollRequested(-dy)
         }
     }
 }

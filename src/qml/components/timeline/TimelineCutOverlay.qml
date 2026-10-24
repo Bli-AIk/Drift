@@ -5,7 +5,7 @@ import Drift
 Item {
     id: cutOverlay
 
-    property TimelinePanel panel
+    property var panel
     visible: panel.timelineTool !== ""
     enabled: panel.timelineTool !== ""
     x: 0
@@ -16,6 +16,7 @@ Item {
 
     readonly property bool trimMode: panel.timelineTool === "trimStart"
                                      || panel.timelineTool === "trimEnd"
+    property real alignedSeconds: -1
     readonly property var hoverClip: (panel.cutHoverTrack >= 0 && panel.cutHoverClip >= 0
         && panel.cutHoverTrack < panel.tracks.length
         && panel.cutHoverClip < panel.tracks[panel.cutHoverTrack].clips.length)
@@ -27,7 +28,11 @@ Item {
     }
 
     function updateHover(mx, my) {
-        panel.cutHoverSeconds = seconds(mx)
+        const raw = Math.max(0, mx) / panel.pxPerSecond
+        const snapped = seconds(mx)
+        panel.cutHoverSeconds = snapped
+        alignedSeconds = EditorState.snapEnabled && Math.abs(snapped - raw) > 0.0005
+                         ? snapped : -1
         const trackIdx = panel.trackIndexAtY(my)
         panel.cutHoverTrack = trackIdx
         panel.cutHoverClip = trackIdx >= 0
@@ -47,6 +52,7 @@ Item {
             panel.cutHoverSeconds = -1
             panel.cutHoverTrack = -1
             panel.cutHoverClip = -1
+            cutOverlay.alignedSeconds = -1
         }
         onClicked: (mouse) => {
             const atSeconds = cutOverlay.seconds(mouse.x)
@@ -71,6 +77,17 @@ Item {
     TimelineCutDoomGradient {
         host: cutOverlay
         panel: cutOverlay.panel
+    }
+
+    // A full-height alignment ruler makes an edge on another audio/video lane
+    // visible when splitting or trimming with the cut tool.
+    Rectangle {
+        visible: cutOverlay.alignedSeconds >= 0
+        x: cutOverlay.alignedSeconds * panel.pxPerSecond
+        width: Math.max(1, Theme.c.timelineSnapGuide.borderWidth)
+        height: parent.height
+        color: Theme.c.timelineSnapGuide.foreground
+        z: 1
     }
 
     // Red dashed virtual playhead. A column of dashes reflows

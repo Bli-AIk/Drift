@@ -6,7 +6,7 @@ import Drift
 Rectangle {
     id: handle
 
-    required property TimelineClipItem owner
+    required property var owner
     property int edge: -1
 
     readonly property bool areaContainsMouse: trimMouse.containsMouse
@@ -102,6 +102,7 @@ Rectangle {
             EditorState.beginTrimGesture(owner.trackIndex, owner.clipIndex, handle.edge)
             lastTrimPx = -2147483647
             lastTrimSeconds = -1
+            owner.panel.snapGuideSeconds = -1
             trimming = true
         }
         onPositionChanged: (mouse) => {
@@ -128,6 +129,12 @@ Rectangle {
             const p = handle.edge < 0
                     ? EditorState.previewTrimLeft(owner.trackIndex, owner.clipIndex, target)
                     : EditorState.previewTrimRight(owner.trackIndex, owner.clipIndex, target)
+            // The engine applies the same snap target to audio and video edges. Show the
+            // vertical ruler across every track while this edge is magnetically aligned.
+            const edgeSeconds = handle.edge < 0 ? p.start : p.start + p.duration
+            owner.panel.snapGuideSeconds = p.ok && EditorState.snapEnabled
+                    && p.outcome === 2 && Math.abs(edgeSeconds - target) > 0.0005
+                    ? edgeSeconds : -1
             if (p.ok && p.changed) {
                 owner.trimPreviewStart = p.start
                 owner.trimPreviewDuration = p.duration
@@ -142,6 +149,7 @@ Rectangle {
         }
         onReleased: {
             Haptics.reset()
+            owner.panel.snapGuideSeconds = -1
             if (trimming) {
                 trimming = false
                 // The one and only edit of the gesture. Dropping the preview first so the
@@ -156,6 +164,7 @@ Rectangle {
         }
         onCanceled: {
             Haptics.reset()
+            owner.panel.snapGuideSeconds = -1
             if (trimming) {
                 trimming = false
                 owner.trimPreviewActive = false
