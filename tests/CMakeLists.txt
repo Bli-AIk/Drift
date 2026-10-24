@@ -30,6 +30,9 @@ qt_add_executable(tst_editorstate
     ../src/app/editor/sessions/SpeedCurveController.cpp
     ../src/app/editor/sessions/CurveEditorController.cpp
     ../src/app/editor/sessions/KeyframeController.cpp
+    ../src/app/editor/sessions/SubtitleController.cpp
+    ../src/app/editor/sessions/SubtitleCueModel.cpp
+    ../src/app/editor/sessions/SubtitleCueFilterModel.cpp
     ../src/app/jobs/vision/SegmentationController.cpp
     ../src/app/jobs/vision/SceneDetectController.cpp
     ../src/app/jobs/vision/DepthController.cpp
@@ -218,6 +221,9 @@ qt_add_executable(tst_mcp
     ../src/app/editor/sessions/SpeedCurveController.cpp
     ../src/app/editor/sessions/CurveEditorController.cpp
     ../src/app/editor/sessions/KeyframeController.cpp
+    ../src/app/editor/sessions/SubtitleController.cpp
+    ../src/app/editor/sessions/SubtitleCueModel.cpp
+    ../src/app/editor/sessions/SubtitleCueFilterModel.cpp
     ../src/app/jobs/vision/SegmentationController.cpp
     ../src/app/jobs/vision/SceneDetectController.cpp
     ../src/app/jobs/vision/DepthController.cpp

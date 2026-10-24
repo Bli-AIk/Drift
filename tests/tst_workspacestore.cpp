@@ -23,6 +23,7 @@ private slots:
     void duplicateAndRemove();
     void migratesOldFractions();
     void colorPresetHasGradingPanels();
+    void subtitlesPresetHasSubtitlePanels();
 
 private:
     QString m_org;
@@ -229,6 +230,21 @@ void WorkspaceStoreTest::colorPresetHasGradingPanels()
     QVERIFY(types.contains("color"));
     QVERIFY(types.contains("looks"));
     QVERIFY(types.contains("scopes"));
+}
+
+void WorkspaceStoreTest::subtitlesPresetHasSubtitlePanels()
+{
+    WorkspaceStore store;
+    QStringList types;
+    collectPanelTypes(mainRoot(store.workspace("subtitles")), types);
+    for (const char *type : {"subtitles", "subtitleLane", "subtitleText", "subtitleTiming", "timeline"})
+        QVERIFY2(types.contains(QLatin1String(type)), type);
+
+    QStringList known;
+    for (const QVariant &v : store.panelTypes())
+        known << v.toMap().value("type").toString();
+    for (const QString &type : types)
+        QVERIFY2(known.contains(type), qPrintable(type));
 }
 
 QTEST_MAIN(WorkspaceStoreTest)

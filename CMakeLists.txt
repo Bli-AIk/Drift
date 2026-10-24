@@ -557,12 +557,17 @@ add_library(driftcore STATIC
     src/core/animation/ClipAnimation.cpp
     src/core/project/SubtitleCue.h
     src/core/project/SubtitleCue.cpp
+    src/core/project/SubtitleTiming.h
+    src/core/project/SubtitleTiming.cpp
     src/core/project/Transcript.h
     src/core/project/Transcript.cpp
     src/core/project/GuideSet.h
     src/core/project/GuideSet.cpp
+    src/core/interchange/subtitles/SubtitleParse.h
     src/core/interchange/subtitles/SrtIO.h
     src/core/interchange/subtitles/SrtIO.cpp
+    src/core/interchange/subtitles/VttIO.h
+    src/core/interchange/subtitles/VttIO.cpp
     src/core/effects/Mask.h
     src/core/effects/Mask.cpp
     src/core/project/Transition.h
@@ -1052,6 +1057,12 @@ qt_add_executable(drift
     src/app/editor/sessions/CurveEditorController.cpp
     src/app/editor/sessions/KeyframeController.h
     src/app/editor/sessions/KeyframeController.cpp
+    src/app/editor/sessions/SubtitleController.h
+    src/app/editor/sessions/SubtitleController.cpp
+    src/app/editor/sessions/SubtitleCueModel.h
+    src/app/editor/sessions/SubtitleCueModel.cpp
+    src/app/editor/sessions/SubtitleCueFilterModel.h
+    src/app/editor/sessions/SubtitleCueFilterModel.cpp
     src/app/jobs/vision/SegmentationController.h
     src/app/jobs/vision/SegmentationController.cpp
     src/app/jobs/vision/SceneDetectController.h
@@ -1668,6 +1679,18 @@ qt_add_qml_module(drift
         src/qml/components/panels/LooksPanel.qml
         src/qml/components/panels/ScopesPanel.qml
         src/qml/components/panels/KeyframesPanel.qml
+        src/qml/components/panels/SubtitleLanePanel.qml
+        src/qml/components/panels/SubtitleTextPanel.qml
+        src/qml/components/subtitles/SubtitleLaneToolbar.qml
+        src/qml/components/subtitles/SubtitleLaneWaveform.qml
+        src/qml/components/subtitles/SubtitleLaneCueBlock.qml
+        src/qml/components/subtitles/SubtitleLaneView.qml
+        src/qml/components/subtitles/SubtitleLaneInteraction.qml
+        src/qml/components/subtitles/SubtitleCueGridToolbar.qml
+        src/qml/components/subtitles/SubtitleCueGridHeader.qml
+        src/qml/components/subtitles/SubtitleCueGridRow.qml
+        src/qml/components/subtitles/SubtitleTime.js
+        src/qml/components/panels/SubtitleTimingPanel.qml
         src/qml/components/keyframes/KeyframesModel.js
         src/qml/components/keyframes/KeyframesContextMenu.qml
         src/qml/components/keyframes/KeyframesCurvesInteraction.qml
@@ -2354,6 +2377,7 @@ if(Qt6LinguistTools_FOUND)
             src/core/project/Transcript.cpp
             src/core/project/GuideSet.cpp
             src/core/interchange/subtitles/SrtIO.cpp
+            src/core/interchange/subtitles/VttIO.cpp
             src/core/shapes/ShapeStyle.cpp
             src/core/text/TextStyle.cpp
             src/core/project/SubtitleCue.cpp

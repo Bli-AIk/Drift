@@ -1306,6 +1306,8 @@ ApplicationWindow {
     function dispatchAction(id) {
         if (ShellBridge.keyframesActionHandler && ShellBridge.keyframesActionHandler.handleAction(id))
             return
+        if (ShellBridge.subtitleActionHandler && ShellBridge.subtitleActionHandler.handleAction(id))
+            return
         if (id === "workspace.restoreWindows") {
             window.restoreWindows()
             return

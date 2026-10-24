@@ -21,6 +21,7 @@
 #include "core/shapes/ShapePath.h"
 #include "core/project/SubtitleCue.h"
 #include "core/interchange/subtitles/SrtIO.h"
+#include "core/interchange/subtitles/VttIO.h"
 #include "core/project/sources/DotLottie.h"
 #include "core/text/animation/LottieTextImport.h"
 #include "core/text/animation/TextAnimationPreset.h"
@@ -780,6 +781,7 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
     m_denoise = new DenoiseController(this, this);
     m_color = new ColorController(this, this);
     m_keyframes = new KeyframeController(this, this);
+    m_subtitles = new SubtitleController(this, this);
     m_restore = new RestoreController(this, this);
     m_faces = new FaceTrackingController(this, this);
     m_stabilize = new StabilizeController(this, this);
@@ -8700,6 +8702,11 @@ void AppController::addSubtitleClip(double atSeconds)
 
 namespace {
 
+bool isVttPath(const QString &path)
+{
+    return path.endsWith(QLatin1String(".vtt"), Qt::CaseInsensitive);
+}
+
 drift::TimeUs subtitleClipDurationForCues(const QList<drift::SubtitleCue> &cues)
 {
     drift::TimeUs duration = drift::kSubtitleClipDurationUs;
@@ -8720,7 +8727,8 @@ bool AppController::importSubtitleFile(const QUrl &url, double atSeconds)
 
     QList<drift::SubtitleCue> cues;
     QString error;
-    if (!drift::parseSrtFile(path, &cues, &error)) {
+    if (!(isVttPath(path) ? drift::parseVttFile(path, &cues, &error)
+                              : drift::parseSrtFile(path, &cues, &error))) {
         setLastMessage(error.isEmpty() ? tr("Could not read subtitle file") : error, QStringLiteral("error"));
         return false;
     }
@@ -8783,7 +8791,8 @@ bool AppController::importSubtitleFileIntoClip(int trackIndex, int clipIndex, co
 
     QList<drift::SubtitleCue> cues;
     QString error;
-    if (!drift::parseSrtFile(path, &cues, &error)) {
+    if (!(isVttPath(path) ? drift::parseVttFile(path, &cues, &error)
+                              : drift::parseSrtFile(path, &cues, &error))) {
         setLastMessage(error.isEmpty() ? tr("Could not read subtitle file") : error, QStringLiteral("error"));
         return false;
     }
@@ -8836,7 +8845,8 @@ bool AppController::exportSubtitleFile(int trackIndex, int clipIndex, const QUrl
     }
 
     QString error;
-    if (!drift::writeSrtFile(path, cues, &error)) {
+    if (!(isVttPath(path) ? drift::writeVttFile(path, cues, &error)
+                         : drift::writeSrtFile(path, cues, &error))) {
         setLastMessage(error.isEmpty() ? tr("Could not write subtitle file") : error, QStringLiteral("error"));
         return false;
     }
@@ -12062,6 +12072,12 @@ int AppController::inlineLineEdge(int pos, bool toEnd) const
 
 void AppController::setSubtitleCues(int trackIndex, int clipIndex, const QVariantList &cues)
 {
+    commitSubtitleCues(trackIndex, clipIndex, subtitleCuesFromMap(cues), tr("Subtitles updated"));
+}
+
+void AppController::commitSubtitleCues(int trackIndex, int clipIndex, QList<drift::SubtitleCue> cues,
+                                       const QString &undoText)
+{
     if (trackIndex < 0 || trackIndex >= m_project.tracks().size())
         return;
 
@@ -12074,10 +12090,10 @@ void AppController::setSubtitleCues(int trackIndex, int clipIndex, const QVarian
         return;
 
     const drift::Project before = m_project;
-    clip.subtitleCues = subtitleCuesFromMap(cues);
+    clip.subtitleCues = std::move(cues);
     clip.name = drift::subtitleClipName(clip.subtitleCues);
-    pushProjectEdit(before, tr("Subtitles updated"));
-    finishEdit(tr("Subtitles updated"));
+    pushProjectEdit(before, undoText);
+    finishEdit(undoText);
 }
 
 void AppController::previewSetSubtitleCues(int trackIndex, int clipIndex, const QVariantList &cues)

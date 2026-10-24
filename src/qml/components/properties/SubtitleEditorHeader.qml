@@ -56,13 +56,13 @@ Column {
             text: qsTr("Import")
             variant: "secondary"
             glyph: Theme.icons.upload
-            tooltip: qsTr("Replace these captions from a .srt file")
+            tooltip: qsTr("Replace these captions from a .srt or .vtt file")
             onClicked: {
                 const url = FileDialogs.openFile(
                     qsTr("Import Subtitles"),
-                    [qsTr("SubRip subtitles (*.srt)"), qsTr("All files (*)")])
+                    [qsTr("Subtitles (*.srt *.vtt)"), qsTr("All files (*)")])
                 if (url != "")
-                    EditorState.importSubtitleFileIntoClip(
+                    EditorState.subtitles.importFile(
                         editor.trackIndex, editor.clipIndex, url)
             }
         }
@@ -72,16 +72,16 @@ Column {
             text: qsTr("Export")
             variant: "secondary"
             glyph: Theme.icons.save
-            tooltip: qsTr("Save captions as a .srt file")
+            tooltip: qsTr("Save captions as a .srt or .vtt file")
             enabled: editor.cues.length > 0
             onClicked: {
                 const url = FileDialogs.saveFile(
                     qsTr("Export Subtitles"),
-                    [qsTr("SubRip subtitles (*.srt)")],
+                    [qsTr("SubRip subtitles (*.srt)"), qsTr("WebVTT subtitles (*.vtt)")],
                     (editor.clip && editor.clip.name) ? editor.clip.name : EditorState.projectFile.projectName,
                     "srt")
                 if (url != "")
-                    EditorState.exportSubtitleFile(
+                    EditorState.subtitles.exportFile(
                         editor.trackIndex, editor.clipIndex, url, timelineTimesBox.checked)
             }
         }

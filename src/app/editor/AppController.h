@@ -64,6 +64,7 @@ struct MediaEditSpec;
 #include "app/bin/AssetPreviewController.h"
 #include "app/editor/sessions/CurveEditorController.h"
 #include "app/editor/sessions/KeyframeController.h"
+#include "app/editor/sessions/SubtitleController.h"
 #include "app/color/ColorController.h"
 #include "app/jobs/audio/DenoiseController.h"
 #include "app/jobs/vision/DepthController.h"
@@ -100,6 +101,7 @@ class AppController : public QObject
     friend class DenoiseController;
     friend class ColorController;
     friend class KeyframeController;
+    friend class SubtitleController;
     friend class RestoreController;
     friend class FaceTrackingController;
     friend class StabilizeController;
@@ -137,6 +139,7 @@ class AppController : public QObject
     Q_PROPERTY(ColorController *color READ color CONSTANT)
     // Keyframe panel editing and clip property rows. QML: EditorState.keyframes.
     Q_PROPERTY(KeyframeController *keyframes READ keyframes CONSTANT)
+    Q_PROPERTY(SubtitleController *subtitles READ subtitles CONSTANT)
     // Video restore and enhance (decompression, upscaling). QML: EditorState.restore.
     Q_PROPERTY(RestoreController *restore READ restore CONSTANT)
     // Face landmark tracking and Face Swap source ingest. QML: EditorState.faces.
@@ -340,6 +343,7 @@ public:
     DenoiseController *denoise() const { return m_denoise; }
     ColorController *color() const { return m_color; }
     KeyframeController *keyframes() const { return m_keyframes; }
+    SubtitleController *subtitles() const { return m_subtitles; }
     RestoreController *restore() const { return m_restore; }
     FaceTrackingController *faces() const { return m_faces; }
     StabilizeController *stabilize() const { return m_stabilize; }
@@ -1787,6 +1791,8 @@ protected:
     std::optional<QList<drift::SubtitleCue>> cuesFromStoredTranscripts(const QList<SubtitleSource> &sources,
                                                                        drift::TimeUs rangeStart,
                                                                        int maxWordsPerCue) const;
+    void commitSubtitleCues(int trackIndex, int clipIndex, QList<drift::SubtitleCue> cues,
+                            const QString &undoText);
     bool generateSubtitlesForSources(QList<SubtitleSource> sources, const QString &language,
                                      int maxWordsPerCue);
     void finalizeGeneratedSubtitles(drift::TimeUs timelineStart, drift::TimeUs timelineDuration,
@@ -2105,6 +2111,7 @@ protected:
     DenoiseController *m_denoise = nullptr;
     ColorController *m_color = nullptr;
     KeyframeController *m_keyframes = nullptr;
+    SubtitleController *m_subtitles = nullptr;
     RestoreController *m_restore = nullptr;
     FaceTrackingController *m_faces = nullptr;
     StabilizeController *m_stabilize = nullptr;

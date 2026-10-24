@@ -19,6 +19,10 @@ Item {
     property var looksPanel: null
     property var scopesPanel: null
     property var keyframesPanel: null
+    property var subtitlesPanel: null
+    property var subtitleLanePanel: null
+    property var subtitleTextPanel: null
+    property var subtitleTimingPanel: null
 
     property var _created: ({})
 
@@ -53,6 +57,22 @@ Item {
                                            && root.keyframesPanel.visible
                                            && root.keyframesPanel.parent !== root
 
+    readonly property bool subtitlesShown: !!root.subtitlesPanel
+                                           && root.subtitlesPanel.visible
+                                           && root.subtitlesPanel.parent !== root
+
+    readonly property bool subtitleLaneShown: !!root.subtitleLanePanel
+                                              && root.subtitleLanePanel.visible
+                                              && root.subtitleLanePanel.parent !== root
+
+    readonly property bool subtitleTextShown: !!root.subtitleTextPanel
+                                              && root.subtitleTextPanel.visible
+                                              && root.subtitleTextPanel.parent !== root
+
+    readonly property bool subtitleTimingShown: !!root.subtitleTimingPanel
+                                                && root.subtitleTimingPanel.visible
+                                                && root.subtitleTimingPanel.parent !== root
+
     // One line per panel type. A type missing from here gets a placeholder.
     // "assets.<tab>" and "properties.<tab>" are handled by prefix in panel(): the full panels
     // pinned to one tab.
@@ -63,6 +83,9 @@ Item {
         "timeline": timelineC,
         "audioMixer": audioMixerC,
         "subtitles": subtitlesC,
+        "subtitleLane": subtitleLaneC,
+        "subtitleText": subtitleTextC,
+        "subtitleTiming": subtitleTimingC,
         "recorder": recorderC,
         "denoise": denoiseC,
         "color": colorC,
@@ -79,7 +102,10 @@ Item {
     Component { id: previewC; PreviewPanel {} }
     Component { id: timelineC; TimelinePanel {} }
     Component { id: audioMixerC; AudioMixerPanel {} }
-    Component { id: subtitlesC; SubtitlesPanel {} }
+    Component { id: subtitlesC; LazyPanel { panel: SubtitlesPanel {} } }
+    Component { id: subtitleLaneC; LazyPanel { panel: SubtitleLanePanel {} } }
+    Component { id: subtitleTextC; LazyPanel { panel: SubtitleTextPanel {} } }
+    Component { id: subtitleTimingC; LazyPanel { panel: SubtitleTimingPanel {} } }
     Component { id: recorderC; RecorderPanel {} }
     Component { id: denoiseC; DenoisePanel {} }
     Component { id: colorC; ColorPanel {} }
@@ -90,6 +116,22 @@ Item {
     Component { id: sourceViewerC; SourceViewerPanel {} }
     Component { id: agentLogC; AgentLogPanel {} }
     Component { id: placeholderC; WorkspacePlaceholderPanel {} }
+
+    // Stays in the pool like any panel, but its content only exists while shown: a parked or
+    // background-tab panel keeps no bindings alive.
+    component LazyPanel: Item {
+        id: lazy
+
+        property bool shown: false
+        property Component panel: null
+
+        Loader {
+            anchors.fill: parent
+            active: lazy.shown
+            sourceComponent: lazy.panel
+            onLoaded: item.shown = Qt.binding(() => lazy.shown)
+        }
+    }
 
     function label(type) {
         const types = Workspaces.panelTypes
@@ -165,8 +207,33 @@ Item {
             root.keyframesPanel = item
             item.shown = Qt.binding(() => root.keyframesShown)
             break
+        case "subtitles":
+            root.subtitlesPanel = item
+            item.shown = Qt.binding(() => root.subtitlesShown)
+            break
+        case "subtitleLane":
+            root.subtitleLanePanel = item
+            item.shown = Qt.binding(() => root.subtitleLaneShown)
+            break
+        case "subtitleText":
+            root.subtitleTextPanel = item
+            item.shown = Qt.binding(() => root.subtitleTextShown)
+            break
+        case "subtitleTiming":
+            root.subtitleTimingPanel = item
+            item.shown = Qt.binding(() => root.subtitleTimingShown)
+            break
         }
         return item
+    }
+
+    // Turns on the timeline's cue lane (SubtitleCueLane) while any subtitle panel is on screen.
+    Binding {
+        target: EditorState
+        property: "subtitleEditing"
+        value: true
+        when: root.subtitlesShown || root.subtitleLaneShown || root.subtitleTextShown || root.subtitleTimingShown
+        restoreMode: Binding.RestoreBindingOrValue
     }
 
     function parkAll() {

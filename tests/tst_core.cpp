@@ -17,7 +17,9 @@
 #include "core/project/clip/Stabilize.h"
 #include "core/shapes/ShapePath.h"
 #include "core/interchange/subtitles/SrtIO.h"
+#include "core/interchange/subtitles/VttIO.h"
 #include "core/project/SubtitleCue.h"
+#include "core/project/SubtitleTiming.h"
 #include "core/project/Transcript.h"
 #include "core/edit/commands/ProjectCommands.h"
 #include "core/text/animation/LottieTextImport.h"
@@ -101,8 +103,18 @@ private slots:
     void subtitleCueSerialization();
     void subtitleCueLookup();
     void subtitleCuePacking();
+    void subtitleShiftEdges();
+    void subtitleLinearResyncAndScale();
+    void subtitleBridgeAndMinGap();
+    void subtitleLeadInOutAndDurations();
+    void subtitleScopeIndexList();
     void srtRoundTrip();
     void srtParseEdgeCases();
+    void srtDetailedKeepsValidBlocks();
+    void srtDetailedEndBeforeStartError();
+    void vttRoundTrip();
+    void vttParseFeatures();
+    void vttMissingHeaderError();
     void insertTrackAtTopAllowsDuplicateTypes();
     void multiTrackSerializationRoundTrip();
     void textStyleAndBlendModeSerialization();
@@ -1268,6 +1280,197 @@ void CoreTest::subtitleCuePacking()
     QCOMPARE(uncapped.size(), packed.size());
 }
 
+namespace {
+
+QList<drift::SubtitleCue>
+timedCues(std::initializer_list<std::pair<drift::TimeUs, drift::TimeUs>> spans)
+{
+    QList<drift::SubtitleCue> cues;
+    for (const auto &span : spans)
+        cues.append({span.first, span.second, QStringLiteral("x")});
+    return cues;
+}
+
+} // namespace
+
+void CoreTest::subtitleShiftEdges()
+{
+    // Both edges move together.
+    QList<drift::SubtitleCue> cues = timedCues({{1000000, 2000000}, {3000000, 4000000}});
+    QCOMPARE(drift::shiftCues(cues, {0, 1}, 500000), 2);
+    QCOMPARE(cues.at(0).startUs, drift::TimeUs(1500000));
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(2500000));
+    QCOMPARE(cues.at(1).startUs, drift::TimeUs(3500000));
+
+    // A negative shift past zero pins the start at 0 and keeps the duration.
+    cues = timedCues({{500000, 1500000}, {3000000, 4000000}});
+    QCOMPARE(drift::shiftCues(cues, {0, 1}, -1000000), 2);
+    QCOMPARE(cues.at(0).startUs, drift::TimeUs(0));
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(1000000));
+    QCOMPARE(cues.at(1).startUs, drift::TimeUs(2000000));
+
+    // Start-only: the end stays put, and the start cannot reach the end.
+    cues = timedCues({{1000000, 2000000}});
+    QCOMPARE(drift::shiftCues(cues, {0}, 1500000, drift::SubtitleEdges::Start), 1);
+    QCOMPARE(cues.at(0).startUs, drift::TimeUs(2000000 - drift::kUsPerMs));
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(2000000));
+    QCOMPARE(drift::shiftCues(cues, {0}, -5000000, drift::SubtitleEdges::Start), 1);
+    QCOMPARE(cues.at(0).startUs, drift::TimeUs(0));
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(2000000));
+
+    // End-only: the end cannot drop below start plus 1 ms.
+    cues = timedCues({{1000000, 2000000}});
+    QCOMPARE(drift::shiftCues(cues, {0}, -1500000, drift::SubtitleEdges::End), 1);
+    QCOMPARE(cues.at(0).startUs, drift::TimeUs(1000000));
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(1000000 + drift::kUsPerMs));
+    QCOMPARE(drift::shiftCues(cues, {0}, 1000000, drift::SubtitleEdges::End), 1);
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(2000000 + drift::kUsPerMs));
+
+    // Cues outside idx move only as neighbours: untouched but never edited.
+    cues = timedCues({{0, 1000000}, {2000000, 3000000}});
+    QCOMPARE(drift::shiftCues(cues, {1}, 1000000), 1);
+    QCOMPARE(cues.at(0).startUs, drift::TimeUs(0));
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(1000000));
+    QCOMPARE(cues.at(1).startUs, drift::TimeUs(3000000));
+
+    // Zero-delta shift changes nothing.
+    QCOMPARE(drift::shiftCues(cues, {0, 1}, 0), 0);
+}
+
+void CoreTest::subtitleLinearResyncAndScale()
+{
+    // Doubling: t -> 2t.
+    QList<drift::SubtitleCue> cues = timedCues({{1000000, 2000000}, {3000000, 4000000}});
+    QCOMPARE(drift::linearResync(cues, {0, 1}, {0, 0}, {10000000, 20000000}), 2);
+    QCOMPARE(cues.at(0).startUs, drift::TimeUs(2000000));
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(4000000));
+    QCOMPARE(cues.at(1).startUs, drift::TimeUs(6000000));
+    QCOMPARE(cues.at(1).endUs, drift::TimeUs(8000000));
+
+    // Equal source points fall back to a pure offset of a.to - a.from.
+    cues = timedCues({{1000000, 2000000}});
+    QCOMPARE(drift::linearResync(cues, {0}, {1000000, 3000000}, {1000000, 5000000}), 1);
+    QCOMPARE(cues.at(0).startUs, drift::TimeUs(3000000));
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(4000000));
+
+    // Results below zero clamp to 0 and keep the 1 ms minimum duration.
+    cues = timedCues({{1000000, 2000000}});
+    QCOMPARE(drift::linearResync(cues, {0}, {2000000, 0}, {4000000, 2000000}), 1);
+    QCOMPARE(cues.at(0).startUs, drift::TimeUs(0));
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(drift::kUsPerMs));
+
+    // 25 fps -> 23.976 fps: factor = 25 / 23.976.
+    cues = timedCues({{10000000, 12000000}});
+    QCOMPARE(drift::scaleCues(cues, {0}, 25.0 / 23.976), 1);
+    QCOMPARE(cues.at(0).startUs, drift::TimeUs(10427094));
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(12512513));
+
+    // Origin is the fixed point; a non-positive factor is rejected.
+    cues = timedCues({{1000000, 2000000}, {2000000, 3000000}});
+    QCOMPARE(drift::scaleCues(cues, {0, 1}, 2.0, 1000000), 2);
+    QCOMPARE(cues.at(0).startUs, drift::TimeUs(1000000));
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(3000000));
+    QCOMPARE(cues.at(1).startUs, drift::TimeUs(3000000));
+    QCOMPARE(cues.at(1).endUs, drift::TimeUs(5000000));
+    QCOMPARE(drift::scaleCues(cues, {0, 1}, 0.0), 0);
+    QCOMPARE(drift::scaleCues(cues, {0, 1}, -2.0), 0);
+    QCOMPARE(cues.at(1).endUs, drift::TimeUs(5000000));
+}
+
+void CoreTest::subtitleBridgeAndMinGap()
+{
+    // Gap of 1 s closed to 0.2 s; the 0.8 s removed splits 50/50.
+    QList<drift::SubtitleCue> cues = timedCues({{0, 2000000}, {3000000, 5000000}});
+    QCOMPARE(drift::bridgeGaps(cues, {0, 1}, 2000000, 200000, 0.5), 2);
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(2400000));
+    QCOMPARE(cues.at(1).startUs, drift::TimeUs(2600000));
+    QCOMPARE(cues.at(1).endUs, drift::TimeUs(5000000));
+
+    // Next cue outside idx: the previous cue takes the whole removed amount.
+    cues = timedCues({{0, 2000000}, {3000000, 5000000}});
+    QCOMPARE(drift::bridgeGaps(cues, {0}, 2000000, 200000, 0.5), 1);
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(2800000));
+    QCOMPARE(cues.at(1).startUs, drift::TimeUs(3000000));
+
+    // Gaps at or above maxGap are left alone.
+    cues = timedCues({{0, 2000000}, {5000000, 6000000}});
+    QCOMPARE(drift::bridgeGaps(cues, {0}, 2000000, 200000, 0.5), 0);
+
+    // Overlap: enforceMinGap pulls the previous end back to leave minGap.
+    cues = timedCues({{0, 5000000}, {4000000, 8000000}});
+    QCOMPARE(drift::enforceMinGap(cues, {0, 1}, 500000), 1);
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(3500000));
+    QCOMPARE(cues.at(1).endUs, drift::TimeUs(8000000));
+
+    // Cues outside idx are not pulled back.
+    cues = timedCues({{0, 5000000}, {4000000, 8000000}});
+    QCOMPARE(drift::enforceMinGap(cues, {1}, 500000), 0);
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(5000000));
+}
+
+void CoreTest::subtitleLeadInOutAndDurations()
+{
+    // Lead-in wins a shared gap: B's lead-in takes it all, A's lead-out stops at B's new start.
+    QList<drift::SubtitleCue> cues = timedCues({{1000000, 2000000}, {2500000, 4000000}});
+    QCOMPARE(drift::addLeadInOut(cues, {0, 1}, 600000, 600000), 2);
+    QCOMPARE(cues.at(0).startUs, drift::TimeUs(400000));
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(2000000));
+    QCOMPARE(cues.at(1).startUs, drift::TimeUs(2000000));
+    QCOMPARE(cues.at(1).endUs, drift::TimeUs(4600000));
+
+    // A wider gap gives both edges room without touching.
+    cues = timedCues({{1000000, 2000000}, {3000000, 4000000}});
+    QCOMPARE(drift::addLeadInOut(cues, {0, 1}, 600000, 600000), 2);
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(2400000));
+    QCOMPARE(cues.at(1).startUs, drift::TimeUs(2400000));
+
+    // Lead-in never goes below 0.
+    cues = timedCues({{200000, 1000000}});
+    QCOMPARE(drift::addLeadInOut(cues, {0}, 500000, 0), 1);
+    QCOMPARE(cues.at(0).startUs, drift::TimeUs(0));
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(1000000));
+
+    // Min duration: end is limited by the next cue's start.
+    cues = timedCues({{0, 1000000}, {1500000, 3000000}});
+    QCOMPARE(drift::clampDurations(cues, {0}, 2000000, 0), 1);
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(1500000));
+    QCOMPARE(cues.at(1).endUs, drift::TimeUs(3000000));
+
+    // Min duration without a next cue extends fully.
+    cues = timedCues({{0, 1000000}});
+    QCOMPARE(drift::clampDurations(cues, {0}, 2000000, 0), 1);
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(2000000));
+
+    // Max duration trims the end; durations inside the bounds are left alone.
+    cues = timedCues({{0, 10000000}, {12000000, 13000000}});
+    QCOMPARE(drift::clampDurations(cues, {0, 1}, 0, 4000000), 1);
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(4000000));
+    QCOMPARE(cues.at(1).endUs, drift::TimeUs(13000000));
+
+    // Overlap: the previous end moves to the next start.
+    cues = timedCues({{0, 5000000}, {4000000, 8000000}});
+    QCOMPARE(drift::fixOverlaps(cues, {0, 1}), 1);
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(4000000));
+
+    // Overlap that would leave under 1 ms keeps the 1 ms minimum and stays overlapped.
+    cues = timedCues({{2000000, 5000000}, {2000500, 6000000}});
+    QCOMPARE(drift::fixOverlaps(cues, {0}), 1);
+    QCOMPARE(cues.at(0).endUs, drift::TimeUs(2000000 + drift::kUsPerMs));
+    QCOMPARE(cues.at(1).startUs, drift::TimeUs(2000500));
+}
+
+void CoreTest::subtitleScopeIndexList()
+{
+    QList<drift::SubtitleCue> cues;
+    for (int s = 0; s < 5; ++s)
+        cues.append({drift::secondsToUs(s), drift::secondsToUs(s + 0.5), QStringLiteral("x")});
+
+    QCOMPARE(drift::subtitleScopeIndices(cues, 0, {}, 0), QList<int>({0, 1, 2, 3, 4}));
+    QCOMPARE(drift::subtitleScopeIndices(cues, 1, {4, 1, 1, 9, -1}, 0), QList<int>({1, 4}));
+    QCOMPARE(drift::subtitleScopeIndices(cues, 2, {}, drift::secondsToUs(2.0)),
+             QList<int>({2, 3, 4}));
+}
+
 void CoreTest::srtRoundTrip()
 {
     QList<drift::SubtitleCue> cues;
@@ -1306,6 +1509,101 @@ void CoreTest::srtParseEdgeCases()
     QCOMPARE(cues[0].endUs, drift::secondsToUs(2.0));
 
     QVERIFY(!drift::parseSrt(QString(), &cues, &error));
+    QVERIFY(!error.isEmpty());
+}
+
+void CoreTest::srtDetailedKeepsValidBlocks()
+{
+    const QString srt = QStringLiteral(
+        "1\r\n00:00:02,000 --> 00:00:03,000\r\nSecond\r\n\r\n"
+        "\r\n"
+        "2\n00:00:00.500 --> 00:00:01.000\nFirst\n\n"
+        "3\n00:00:05,000 --> nope\nBroken\n\n"
+        "4\n00:00:06,000 --> 00:00:07,000\nLast\n");
+    const drift::SubtitleParseResult result = drift::parseSrtDetailed(srt);
+
+    QCOMPARE(result.cues.size(), 3);
+    QCOMPARE(result.cues[0].text, QStringLiteral("First"));
+    QCOMPARE(result.cues[0].startUs, drift::secondsToUs(0.5));
+    QCOMPARE(result.cues[1].text, QStringLiteral("Second"));
+    QCOMPARE(result.cues[1].startUs, drift::secondsToUs(2.0));
+    QCOMPARE(result.cues[2].text, QStringLiteral("Last"));
+    QCOMPARE(result.cues[2].startUs, drift::secondsToUs(6.0));
+
+    QCOMPARE(result.errors.size(), 1);
+    QCOMPARE(result.errors[0].line, 10);
+}
+
+void CoreTest::srtDetailedEndBeforeStartError()
+{
+    const QString srt = QStringLiteral("1\n00:00:05,000 --> 00:00:04,000\nBackwards\n");
+    const drift::SubtitleParseResult result = drift::parseSrtDetailed(srt);
+
+    QVERIFY(result.cues.isEmpty());
+    QCOMPARE(result.errors.size(), 1);
+    QCOMPARE(result.errors[0].line, 1);
+    QVERIFY(!result.errors[0].message.isEmpty());
+}
+
+void CoreTest::vttRoundTrip()
+{
+    QList<drift::SubtitleCue> cues;
+    cues.append({drift::secondsToUs(1.0), drift::secondsToUs(4.0), QStringLiteral("Hello")});
+    cues.append({drift::secondsToUs(65.5), drift::secondsToUs(70.25),
+                 QStringLiteral("Line one\nLine two")});
+
+    const QString vtt = drift::writeVtt(cues);
+    QVERIFY(vtt.startsWith(QStringLiteral("WEBVTT\n\n")));
+    QVERIFY(vtt.contains(QStringLiteral("00:00:01.000 --> 00:00:04.000\nHello\n\n")));
+    QVERIFY(vtt.contains(QStringLiteral("00:01:05.500 --> 00:01:10.250")));
+
+    QList<drift::SubtitleCue> loaded;
+    QString error;
+    QVERIFY(drift::parseVtt(vtt, &loaded, &error));
+    QVERIFY(error.isEmpty());
+    QCOMPARE(loaded.size(), 2);
+    QCOMPARE(loaded[0].text, QStringLiteral("Hello"));
+    QCOMPARE(loaded[0].startUs, drift::secondsToUs(1.0));
+    QCOMPARE(loaded[0].endUs, drift::secondsToUs(4.0));
+    QCOMPARE(loaded[1].text, QStringLiteral("Line one\nLine two"));
+    QCOMPARE(loaded[1].startUs, drift::secondsToUs(65.5));
+    QCOMPARE(loaded[1].endUs, drift::secondsToUs(70.25));
+}
+
+void CoreTest::vttParseFeatures()
+{
+    const QString vtt = QStringLiteral(
+        "\uFEFFWEBVTT - Test file\r\nKind: captions\r\n\r\n"
+        "NOTE This block is ignored\n00:00:09.000 --> 00:00:10.000\n\n"
+        "STYLE\n::cue { color: yellow }\n\n"
+        "REGION\nid:fred\n\n"
+        "intro\n00:01.000 --> 00:03.500 align:start line:90%\nHi there\n\n"
+        "00:01:00.000 --> 00:01:02.000\nLater\n");
+    QList<drift::SubtitleCue> cues;
+    QString error;
+    QVERIFY(drift::parseVtt(vtt, &cues, &error));
+    QCOMPARE(cues.size(), 2);
+    QCOMPARE(cues[0].text, QStringLiteral("Hi there"));
+    QCOMPARE(cues[0].startUs, drift::secondsToUs(1.0));
+    QCOMPARE(cues[0].endUs, drift::secondsToUs(3.5));
+    QCOMPARE(cues[1].text, QStringLiteral("Later"));
+    QCOMPARE(cues[1].startUs, drift::secondsToUs(60.0));
+    QCOMPARE(cues[1].endUs, drift::secondsToUs(62.0));
+}
+
+void CoreTest::vttMissingHeaderError()
+{
+    const QString vtt = QStringLiteral("00:00:01.000 --> 00:00:02.000\nNo header\n");
+
+    const drift::SubtitleParseResult result = drift::parseVttDetailed(vtt);
+    QCOMPARE(result.cues.size(), 1);
+    QCOMPARE(result.cues[0].text, QStringLiteral("No header"));
+    QCOMPARE(result.errors.size(), 1);
+    QCOMPARE(result.errors[0].line, 1);
+
+    QList<drift::SubtitleCue> cues;
+    QString error;
+    QVERIFY(!drift::parseVtt(vtt, &cues, &error));
     QVERIFY(!error.isEmpty());
 }
 

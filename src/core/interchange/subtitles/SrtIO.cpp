@@ -61,6 +61,13 @@ QString normalizeNewlines(QString text)
     return text;
 }
 
+const QRegularExpression &srtTimingRegex()
+{
+    static const QRegularExpression re(
+        QStringLiteral(R"(^\s*(.+?)\s*-->\s*(.+?)\s*(?:X1:.*)?$)"));
+    return re;
+}
+
 bool isIndexLine(const QString &line)
 {
     if (line.isEmpty())
@@ -70,6 +77,41 @@ bool isIndexLine(const QString &line)
             return false;
     }
     return true;
+}
+
+void appendSrtBlock(const QStringList &lines, int firstLine, SubtitleParseResult *result)
+{
+    const int timingLine = (isIndexLine(lines.first().trimmed()) && lines.size() >= 2) ? 1 : 0;
+
+    const auto match = srtTimingRegex().match(lines.at(timingLine).trimmed());
+    if (!match.hasMatch()) {
+        result->errors.append({firstLine, QCoreApplication::translate("SrtIO", "Invalid subtitle timing line")});
+        return;
+    }
+
+    TimeUs startUs = 0;
+    TimeUs endUs = 0;
+    if (!parseSrtTimestamp(match.capturedView(1), &startUs)
+        || !parseSrtTimestamp(match.capturedView(2), &endUs)) {
+        result->errors.append({firstLine, QCoreApplication::translate("SrtIO", "Invalid subtitle timestamp")});
+        return;
+    }
+    if (endUs < startUs) {
+        result->errors.append({firstLine, QCoreApplication::translate("SrtIO", "Subtitle ends before it starts")});
+        return;
+    }
+
+    const QStringList body = lines.mid(timingLine + 1);
+    if (body.isEmpty()) {
+        result->errors.append({firstLine, QCoreApplication::translate("SrtIO", "Subtitle cue has no text")});
+        return;
+    }
+
+    SubtitleCue cue;
+    cue.startUs = startUs;
+    cue.endUs = endUs;
+    cue.text = body.join(QLatin1Char('\n'));
+    result->cues.append(cue);
 }
 
 } // namespace
@@ -89,9 +131,6 @@ bool parseSrt(const QString &content, QList<SubtitleCue> *outCues, QString *erro
         return false;
     }
 
-    static const QRegularExpression timingRe(
-        QStringLiteral(R"(^\s*(.+?)\s*-->\s*(.+?)\s*(?:X1:.*)?$)"));
-
     QList<SubtitleCue> cues;
     const QStringList blocks = text.split(QStringLiteral("\n\n"), Qt::SkipEmptyParts);
     for (const QString &rawBlock : blocks) {
@@ -107,7 +146,7 @@ bool parseSrt(const QString &content, QList<SubtitleCue> *outCues, QString *erro
         if (isIndexLine(lines.first().trimmed()) && lines.size() >= 2)
             timingLine = 1;
 
-        const auto match = timingRe.match(lines.at(timingLine).trimmed());
+        const auto match = srtTimingRegex().match(lines.at(timingLine).trimmed());
         if (!match.hasMatch()) {
             if (error)
                 *error = QCoreApplication::translate("SrtIO", "Invalid subtitle timing line");
@@ -150,6 +189,26 @@ bool parseSrt(const QString &content, QList<SubtitleCue> *outCues, QString *erro
     sortSubtitleCues(cues);
     *outCues = std::move(cues);
     return true;
+}
+
+SubtitleParseResult parseSrtDetailed(const QString &content)
+{
+    SubtitleParseResult result;
+    const QStringList lines = normalizeNewlines(content).split(QLatin1Char('\n'));
+    int i = 0;
+    while (i < lines.size()) {
+        if (lines.at(i).trimmed().isEmpty()) {
+            ++i;
+            continue;
+        }
+        const int firstLine = i + 1;
+        QStringList block;
+        while (i < lines.size() && !lines.at(i).trimmed().isEmpty())
+            block.append(lines.at(i++));
+        appendSrtBlock(block, firstLine, &result);
+    }
+    sortSubtitleCues(result.cues);
+    return result;
 }
 
 bool parseSrtFile(const QString &path, QList<SubtitleCue> *outCues, QString *error)

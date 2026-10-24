@@ -11,6 +11,7 @@ QtObject {
     // request still lands; read on creation too, since the panel may not exist yet.
     property var colorTabRequest: null
     property var keyframesActionHandler: null
+    property var subtitleActionHandler: null
 
     // The phone shell (AndroidMain) is the one that hosts AndroidEditor's sheets. Touch sizing
     // alone does not decide this: a tablet can run the desktop shell.

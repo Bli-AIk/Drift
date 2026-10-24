@@ -31,16 +31,7 @@ Item {
     }
     readonly property double clipDuration: (clip && clip.duration) ? clip.duration : 0
     readonly property var cues: (clip && clip.subtitleCues) ? clip.subtitleCues : []
-    readonly property int activeCueIndex: {
-        const t = localPlayhead
-        if (t < 0)
-            return -1
-        for (let i = 0; i < cues.length; i++) {
-            if (t >= cues[i].start && t < cues[i].end)
-                return i
-        }
-        return -1
-    }
+    readonly property int activeCueIndex: EditorState.subtitles.activeCue
     readonly property var selectedCue: (selectedCueIndex >= 0 && selectedCueIndex < cues.length)
                                        ? cues[selectedCueIndex] : null
 
@@ -285,7 +276,7 @@ Item {
         anchors.rightMargin: 6
         clip: true
         spacing: 2
-        model: root.cues
+        model: EditorState.subtitles.cueModel
 
         currentIndex: root.activeCueIndex
         highlightFollowsCurrentItem: true

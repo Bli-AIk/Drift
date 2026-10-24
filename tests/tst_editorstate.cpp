@@ -44,6 +44,7 @@
 #include "engine/decode/readers/ClipReaderPool.h"
 #include "app/editor/AppController.h"
 #include "app/editor/TimelineClipsModel.h"
+#include "app/editor/sessions/SubtitleCueFilterModel.h"
 #include "ui/timeline/TimelineLayout.h"
 #include "ui/timeline/TimelineTrackItem.h"
 #include "ui/timeline/TimelineViewState.h"
@@ -240,6 +241,15 @@ private slots:
     void mergeAllSubtitlesOnTrackIgnoresSelection();
     void mergeTwoMediaClipsUnchanged();
     void exportSubtitleFileTimelineTimes();
+    void subtitleApplyTextIsOneUndoStep();
+    void subtitleApplyTextKeepsSourceWhenStartMatches();
+    void subtitleApplyTextExtendsClipDuration();
+    void subtitleToolsScopePreviewAndUndo();
+    void subtitleSelectionModes();
+    void subtitleActiveCueFollowsPlayhead();
+    void subtitleCueModelNotifications();
+    void subtitleCueFilterModel();
+    void subtitleFileRoundTripVtt();
     void generateSubtitlesRefusesOverlappingSources();
     void separatedAudioTracksMirrorVideoHierarchy();
     void linkedAudioUnlinkAndMove();
@@ -5231,6 +5241,296 @@ void EditorStateTest::exportSubtitleFileTimelineTimes()
     };
     QVERIFY(read(local).contains(QStringLiteral("00:00:00,000 --> 00:00:01,000")));
     QVERIFY(read(absolute).contains(QStringLiteral("00:01:30,000 --> 00:01:31,000")));
+}
+
+static void fillCues(drift::Project &project, int count)
+{
+    appendSubtitleLane(project);
+    drift::Clip &clip = project.tracks()[0].clips[0];
+    clip.timelineDuration = drift::secondsToUs(60.0);
+    clip.subtitleCues.clear();
+    for (int i = 0; i < count; ++i) {
+        clip.subtitleCues.append(drift::SubtitleCue{drift::secondsToUs(i * 2.0), drift::secondsToUs(i * 2.0 + 1.0),
+                                                    QStringLiteral("cue %1").arg(i)});
+    }
+}
+
+void EditorStateTest::subtitleApplyTextIsOneUndoStep()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 3);
+    SubtitleController *subs = state.subtitles();
+
+    const QString srt = QStringLiteral("1\n00:00:00,000 --> 00:00:01,500\nhello\n\n2\n00:00:03,000 --> 00:00:04,000\nworld\n");
+    QCOMPARE(subs->detectFormat(srt), QStringLiteral("srt"));
+    QCOMPARE(subs->parseText(srt, QStringLiteral("srt")).value(QStringLiteral("count")).toInt(), 2);
+    QVERIFY(subs->applyText(0, 0, srt, QStringLiteral("srt"), false));
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.size(), 2);
+    QCOMPARE(subs->cues(0, 0).size(), 2);
+    state.undo();
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.size(), 3);
+
+    const QString vtt = QStringLiteral("WEBVTT\n\n00:00.000 --> 00:01.000\nonly\n");
+    QCOMPARE(subs->detectFormat(QStringLiteral("\n  WEBVTT\n")), QStringLiteral("vtt"));
+    QVERIFY(subs->applyText(0, 0, vtt, QStringLiteral("vtt"), false));
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.size(), 1);
+    state.undo();
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.size(), 3);
+
+    QVERIFY(!subs->applyText(0, 0, QStringLiteral("garbage"), QStringLiteral("srt"), false));
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.size(), 3);
+
+    const QString text = subs->cuesText(0, 0, QStringLiteral("srt"), false);
+    QVERIFY(subs->applyText(0, 0, text, QStringLiteral("srt"), false));
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.size(), 3);
+}
+
+void EditorStateTest::subtitleApplyTextExtendsClipDuration()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 2);
+    const drift::TimeUs before = state.project()->tracks()[0].clips[0].timelineDuration;
+
+    const QString srt = QStringLiteral("1\n00:00:00,000 --> 00:01:30,000\nlong\n");
+    QVERIFY(state.subtitles()->applyText(0, 0, srt, QStringLiteral("srt"), false));
+    QCOMPARE(state.project()->tracks()[0].clips[0].timelineDuration, drift::secondsToUs(90.0));
+    QCOMPARE(state.project()->tracks()[0].clips[0].srcOut, drift::secondsToUs(90.0));
+    state.undo();
+    QCOMPARE(state.project()->tracks()[0].clips[0].timelineDuration, before);
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.size(), 2);
+}
+
+void EditorStateTest::subtitleApplyTextKeepsSourceWhenStartMatches()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 2);
+    auto &cues = state.project()->tracks()[0].clips[0].subtitleCues;
+    cues[0].source = QStringLiteral("a");
+    cues[1].source = QStringLiteral("b");
+
+    const QString srt = QStringLiteral("1\n00:00:00,010 --> 00:00:01,000\nx\n\n2\n00:00:05,000 --> 00:00:06,000\ny\n");
+    QVERIFY(state.subtitles()->applyText(0, 0, srt, QStringLiteral("srt"), false));
+    const auto &after = state.project()->tracks()[0].clips[0].subtitleCues;
+    QCOMPARE(after.at(0).source, QStringLiteral("a"));
+    QVERIFY(after.at(1).source.isEmpty());
+}
+
+void EditorStateTest::subtitleToolsScopePreviewAndUndo()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 4);
+    SubtitleController *subs = state.subtitles();
+    state.selectClip(0, 0);
+
+    subs->setSelectedCues({1, 2});
+    QCOMPARE(subs->previewShift(0, 0, 1, 0.5, 0), 2);
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.at(1).startUs, drift::secondsToUs(2.0));
+    QCOMPARE(subs->applyShift(0, 0, 1, 0.5, 0), 2);
+    const auto &cues = state.project()->tracks()[0].clips[0].subtitleCues;
+    QCOMPARE(cues.at(0).startUs, drift::secondsToUs(0.0));
+    QCOMPARE(cues.at(1).startUs, drift::secondsToUs(2.5));
+    QCOMPARE(cues.at(2).startUs, drift::secondsToUs(4.5));
+    state.undo();
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.at(1).startUs, drift::secondsToUs(2.0));
+
+    QCOMPARE(subs->applyShift(0, 0, 0, 0.0, 0), 0);
+    QCOMPARE(subs->previewShift(0, 0, 0, 1.0, 0), 4);
+    QCOMPARE(subs->previewShift(0, 0, 0, 1.0, 0), subs->applyShift(0, 0, 0, 1.0, 0));
+}
+
+void EditorStateTest::subtitleSelectionModes()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 6);
+    SubtitleController *subs = state.subtitles();
+    state.selectClip(0, 0);
+
+    subs->selectCue(2, 0);
+    QCOMPARE(subs->selectedCues(), QVariantList{2});
+    QCOMPARE(state.selectedSubtitleCue(), 2);
+    subs->selectCue(4, 1);
+    QCOMPARE(subs->selectedCues(), (QVariantList{2, 4}));
+    subs->selectCue(2, 1);
+    QCOMPARE(subs->selectedCues(), QVariantList{4});
+    subs->selectCue(1, 0);
+    subs->selectCue(3, 2);
+    QCOMPARE(subs->selectedCues(), (QVariantList{1, 2, 3}));
+    QCOMPARE(subs->anchorCue(), 1);
+    subs->selectAll(0, 0);
+    QCOMPARE(subs->selectedCues().size(), 6);
+
+    state.setSelectedSubtitleCue(5);
+    QCOMPARE(subs->selectedCues(), QVariantList{5});
+
+    state.selectClip(0, 1);
+    QVERIFY(subs->selectedCues().isEmpty());
+    QCOMPARE(state.selectedSubtitleCue(), -1);
+}
+
+void EditorStateTest::subtitleActiveCueFollowsPlayhead()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 3);
+    SubtitleController *subs = state.subtitles();
+    QSignalSpy changed(subs, &SubtitleController::activeCueChanged);
+
+    QCOMPARE(subs->activeCue(), -1);
+    state.selectClip(0, 0);
+    state.setPlayheadSeconds(0.5);
+    QCOMPARE(subs->activeCue(), 0);
+    QCOMPARE(changed.count(), 1);
+    state.setPlayheadSeconds(0.75);
+    QCOMPARE(changed.count(), 1);
+    state.setPlayheadSeconds(1.5);
+    QCOMPARE(subs->activeCue(), -1);
+    state.setPlayheadSeconds(2.5);
+    QCOMPARE(subs->activeCue(), 1);
+    state.setPlayheadSeconds(3.0);
+    QCOMPARE(subs->activeCue(), -1);
+
+    state.setPlayheadSeconds(4.5);
+    QCOMPARE(subs->activeCue(), 2);
+    const QString srt = QStringLiteral("1\n00:00:04,000 --> 00:00:06,000\nonly\n");
+    QVERIFY(subs->applyText(0, 0, srt, QStringLiteral("srt"), false));
+    QCOMPARE(subs->activeCue(), 0);
+
+    state.clearSelection();
+    QCOMPARE(subs->activeCue(), -1);
+}
+
+void EditorStateTest::subtitleCueModelNotifications()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 3);
+    SubtitleController *subs = state.subtitles();
+    auto *model = qobject_cast<QAbstractItemModel *>(subs->cueModel());
+    QVERIFY(model);
+    QCOMPARE(model->rowCount(), 0);
+
+    state.selectClip(0, 0);
+    QCOMPARE(model->rowCount(), 3);
+    QCOMPARE(subs->count(), 3);
+    const QHash<int, QByteArray> roles = model->roleNames();
+    const int textRole = roles.key("text");
+    const int endRole = roles.key("end");
+    QCOMPARE(model->data(model->index(1, 0), textRole).toString(), QStringLiteral("cue 1"));
+    QCOMPARE(model->data(model->index(1, 0), endRole).toDouble(), 3.0);
+
+    QSignalSpy dataChanged(model, &QAbstractItemModel::dataChanged);
+    QSignalSpy reset(model, &QAbstractItemModel::modelReset);
+    QSignalSpy countChanged(subs, &SubtitleController::countChanged);
+
+    state.setPlayheadSeconds(1.0);
+    emit state.tracksChanged();
+    QCOMPARE(dataChanged.count(), 0);
+    QCOMPARE(reset.count(), 0);
+
+    const QString srt = QStringLiteral("1\n00:00:00,000 --> 00:00:01,000\ncue 0\n\n2\n00:00:02,000 --> 00:00:03,000\nchanged\n\n3\n00:00:04,000 --> 00:00:05,000\ncue 2\n");
+    QVERIFY(subs->applyText(0, 0, srt, QStringLiteral("srt"), false));
+    QCOMPARE(reset.count(), 0);
+    QCOMPARE(dataChanged.count(), 1);
+    QCOMPARE(dataChanged.first().at(0).toModelIndex().row(), 1);
+    QCOMPARE(model->data(model->index(1, 0), textRole).toString(), QStringLiteral("changed"));
+
+    state.undo();
+    QCOMPARE(dataChanged.count(), 2);
+    QCOMPARE(reset.count(), 0);
+
+    QVERIFY(subs->applyText(0, 0, QStringLiteral("1\n00:00:00,000 --> 00:00:01,000\nonly\n"),
+                            QStringLiteral("srt"), false));
+    QCOMPARE(reset.count(), 1);
+    QCOMPARE(model->rowCount(), 1);
+    QCOMPARE(subs->count(), 1);
+    QVERIFY(countChanged.count() >= 1);
+
+    state.clearSelection();
+    QCOMPARE(model->rowCount(), 0);
+}
+
+void EditorStateTest::subtitleCueFilterModel()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 4);
+    SubtitleController *subs = state.subtitles();
+    auto *filtered = qobject_cast<SubtitleCueFilterModel *>(subs->filteredCueModel());
+    QVERIFY(filtered);
+    QCOMPARE(filtered->count(), 0);
+
+    state.selectClip(0, 0);
+    QCOMPARE(filtered->rowCount(), 4);
+    QCOMPARE(filtered->count(), 4);
+
+    const int cueIndexRole = filtered->roleNames().key("cueIndex");
+    const int textRole = filtered->roleNames().key("text");
+    QSignalSpy countChanged(filtered, &SubtitleCueFilterModel::countChanged);
+
+    filtered->setFilterText(QStringLiteral("CUE 2"));
+    QCOMPARE(filtered->count(), 1);
+    QVERIFY(countChanged.count() >= 1);
+    QCOMPARE(filtered->data(filtered->index(0, 0), cueIndexRole).toInt(), 2);
+    QCOMPARE(filtered->rowForCue(2), 0);
+    QCOMPARE(filtered->rowForCue(1), -1);
+    QCOMPARE(filtered->cueAt(0), 2);
+    QCOMPARE(filtered->cueAt(1), -1);
+
+    filtered->setFilterText(QStringLiteral(" 3 "));
+    QCOMPARE(filtered->count(), 1);
+    QCOMPARE(filtered->cueAt(0), 3);
+
+    filtered->setFilterText(QStringLiteral("nothing"));
+    QCOMPARE(filtered->count(), 0);
+
+    filtered->setFilterText(QStringLiteral("cue"));
+    QCOMPARE(filtered->count(), 4);
+    QCOMPARE(filtered->rowForCue(3), 3);
+
+    const QString srt = QStringLiteral("1\n00:00:00,000 --> 00:00:01,000\ncue 0\n\n2\n00:00:02,000 --> 00:00:03,000\ncue 1\n\n3\n00:00:04,000 --> 00:00:05,000\nother\n\n4\n00:00:06,000 --> 00:00:07,000\ncue 3\n");
+    QVERIFY(subs->applyText(0, 0, srt, QStringLiteral("srt"), false));
+    QCOMPARE(filtered->count(), 3);
+    QCOMPARE(filtered->rowForCue(2), -1);
+    QCOMPARE(filtered->rowForCue(3), 2);
+    QCOMPARE(filtered->cueAt(2), 3);
+    QCOMPARE(filtered->data(filtered->index(2, 0), textRole).toString(), QStringLiteral("cue 3"));
+
+    filtered->setFilterText(QStringLiteral("other"));
+    QCOMPARE(filtered->count(), 1);
+    QCOMPARE(filtered->cueAt(0), 2);
+
+    filtered->setFilterText({});
+    QCOMPARE(filtered->count(), 4);
+}
+
+void EditorStateTest::subtitleFileRoundTripVtt()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 3);
+    SubtitleController *subs = state.subtitles();
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QUrl vtt = QUrl::fromLocalFile(dir.filePath(QStringLiteral("a.vtt")));
+    QVERIFY(subs->exportFile(0, 0, vtt, false));
+    QFile file(vtt.toLocalFile());
+    QVERIFY(file.open(QIODevice::ReadOnly));
+    QVERIFY(file.readAll().startsWith("WEBVTT"));
+    file.close();
+
+    state.project()->tracks()[0].clips[0].subtitleCues.clear();
+    state.project()->tracks()[0].clips[0].subtitleCues.append(drift::SubtitleCue{0, 1000, QStringLiteral("x")});
+    QVERIFY(subs->importFile(0, 0, vtt));
+    const auto &cues = state.project()->tracks()[0].clips[0].subtitleCues;
+    QCOMPARE(cues.size(), 3);
+    QCOMPARE(cues.at(2).text, QStringLiteral("cue 2"));
+    QCOMPARE(cues.at(2).startUs, drift::secondsToUs(4.0));
 }
 
 void EditorStateTest::generateSubtitlesRefusesOverlappingSources()

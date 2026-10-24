@@ -7,6 +7,7 @@ QtObject {
     readonly property string assets: qsTr("Assets")
     readonly property string settings: qsTr("Settings")
     readonly property string grading: qsTr("Color")
+    readonly property string subtitles: qsTr("Subtitles")
 
     readonly property string anyClip: qsTr("Select a clip")
     readonly property string visualClip: qsTr("Select a video, image, text or shape clip")
@@ -28,6 +29,10 @@ QtObject {
 
     function color(label, hint, keywords, tab) {
         return { label: label, path: [grading], hint: hint, keywords: keywords, workspace: "color", colorTab: tab }
+    }
+
+    function subtitle(label, keywords) {
+        return { label: label, path: [subtitles], hint: qsTr("Open the Subtitles workspace"), keywords: keywords, workspace: "subtitles" }
     }
 
     readonly property var entries: [
@@ -110,6 +115,14 @@ QtObject {
 
         { label: qsTr("Keyframe editor"), path: [qsTr("Animation")], hint: qsTr("Open the Keyframes workspace"),
           keywords: "keyframes animation curves graph editor dope sheet", workspace: "keyframes" },
+
+        subtitle(qsTr("Subtitle lane"), "captions cues timeline drag waveform zoom"),
+        subtitle(qsTr("Subtitle timing"), "captions tools shift offset sync frame rate speed gaps durations"),
+        subtitle(qsTr("Shift times"), "captions offset delay early late move"),
+        subtitle(qsTr("Two-point sync"), "captions resync stretch scale align drift"),
+        subtitle(qsTr("Frame rate conversion"), "captions fps 23.976 24 25 29.97 30 speed"),
+        subtitle(qsTr("Bridge gaps"), "captions minimum gap lead in out duration overlap"),
+        subtitle(qsTr("Subtitle text editor"), "captions srt vtt paste edit import export source"),
 
         setting("general", qsTr("General"), "language locale startup autosave recovery cache backup"),
         setting("appearance", qsTr("Appearance"), "theme dark light color workspace layout translucency"),
