@@ -1697,6 +1697,10 @@ void SkiaTest::complexScriptsShapeWithoutMissingGlyphs()
 // An imported font file is matched by family until it is removed again.
 void SkiaTest::userFontImportResolvesAndRemoves()
 {
+    const QString source = QString::fromUtf8(DRIFT_TEST_FONTS_DIR) + QStringLiteral("/anton/Anton-400.ttf");
+    if (!QFile::exists(source))
+        QSKIP("font bundle not present — see recipes/fetch-fonts.py in drift-addons");
+
     QStandardPaths::setTestModeEnabled(true);
     QTemporaryDir emptyRoot;
     QVERIFY(emptyRoot.isValid());
@@ -1705,7 +1709,6 @@ void SkiaTest::userFontImportResolvesAndRemoves()
     for (const QString &family : userFontFamilies())
         removeUserFont(family);
 
-    const QString source = QString::fromUtf8(DRIFT_TEST_FONTS_DIR) + QStringLiteral("/anton/Anton-400.ttf");
     QTemporaryDir staging;
     QVERIFY(staging.isValid());
     const QString copy = staging.filePath(QStringLiteral("picked.ttf"));
