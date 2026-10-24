@@ -149,7 +149,7 @@ Item {
             row: root.row
             track: root.track
             clip: root.clip
-            playhead: root.playhead
+            playhead: root.displayPlayhead
             onActiveFocusChanged: if (activeFocus) root.focusRequested()
         }
 
