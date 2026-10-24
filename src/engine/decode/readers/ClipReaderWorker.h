@@ -33,10 +33,9 @@ class ClipReaderWorker : public QObject
 public:
     explicit ClipReaderWorker(QObject *parent = nullptr);
 
-    // Callable from any thread. Queues one read-ahead step for this stream if none is pending;
-    // that step re-arms itself until the reader has readAheadUs of decoded source buffered.
-    // Keeping a single step in flight per stream is what bounds a decode request's wait to one
-    // frame — a queue of them would serialize ahead of it.
+    // Callable from any thread. Queues at most one read-ahead step per actual preview read.
+    // Re-arming from the worker itself kept the decoder busy filling the entire buffer while
+    // playback's urgent frame requests waited behind speculative work at adjacent cuts.
     void requestPrefetchPreview(quint64 streamId, int maxWidth, int maxHeight, drift::TimeUs readAheadUs);
 
     // Callable from any thread. Marks every audio reader here as unpositioned, so the next decode

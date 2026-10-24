@@ -39,6 +39,7 @@ constexpr double kWaveformWindowMax = 4096.0;
 constexpr double kFilmstripTileWidth = 120.0;
 constexpr int kFilmstripFrameCount = 8;
 constexpr int kMaxCachedTextures = 160;
+constexpr qsizetype kMaxCachedTextureBytes = 64ll * 1024 * 1024;
 
 Vertex vertex(double x, double y, const QColor &c, double alphaScale = 1.0)
 {
@@ -275,6 +276,8 @@ public:
     QSGNode *texts = nullptr;
     QHash<QString, QSGTexture *> textures;
     QHash<QString, int> textureStamps;
+    QHash<QString, qsizetype> textureBytes;
+    qsizetype cachedTextureBytes = 0;
     QList<QSGImageNode *> images;
     // Several clips can carry the same label (a split clip keeps its name), so each look maps to
     // a list of placed nodes. The transform owns its text node.
@@ -1036,6 +1039,11 @@ void TimelineTrackItem::appendClip(int index, const QRectF &baseRect, bool selec
     appendFade(rect.left(), fadeInW, false);
     appendFade(rect.right() - fadeOutW, fadeOutW, true);
 
+    // Give adjacent clips a visible edge even when neither is selected.
+    QColor clipEdge = s.scrim;
+    clipEdge.setAlpha(185);
+    appendOutline(m_over, rect, s.radiusSm, 1.25, clipEdge, ox);
+
     // --- effect drop and selection -----------------------------------------------------------
     const bool dropTarget = m_viewState->effectDropTrack() == m_trackIndex
                             && m_viewState->effectDropClip() == index;
@@ -1105,6 +1113,15 @@ void TimelineTrackItem::buildWaveform(int index, const QRectF &area, double clip
     const double left = area.left() + span.left;
     const int w = std::max(1, int(std::floor(span.width)));
     const QColor color = s.waveform;
+    // Use clip-relative time: source peaks remain cached even when volume keys
+    // change, while the visible envelope follows the gain heard during playback.
+    const auto gainAt = [&row, clipWidth, &span](int x) {
+        if (row.volumeCurve.isEmpty())
+            return 1.0;
+        const double withinClip = std::clamp((span.left + x + 0.5) / clipWidth, 0.0, 1.0);
+        const drift::TimeUs relativeUs = drift::secondsToUs(withinClip * row.duration);
+        return qBound(0.0, row.volumeCurve.evaluateAt(relativeUs), 2.0);
+    };
     const auto columnPeak = [w](const QVector<float> &values, int x) {
         const int n = values.size();
         int i0 = int(qint64(x) * n / w);
@@ -1126,7 +1143,7 @@ void TimelineTrackItem::buildWaveform(int index, const QRectF &area, double clip
             const double mid = area.top() + c * laneH + laneH / 2.0;
             const double half = (laneH / 2.0) * 0.85;
             for (int x = 0; x < w; ++x) {
-                const double amp = std::max(0.5, columnPeak(values, x) * half);
+                const double amp = std::max(0.5, columnPeak(values, x) * gainAt(x) * half);
                 const double x0 = left + x - ox;
                 appendQuad(m_over, vertex(x0, mid - amp, color), vertex(x0 + 1.0, mid - amp, color),
                            vertex(x0 + 1.0, mid + amp, color), vertex(x0, mid + amp, color));
@@ -1156,7 +1173,7 @@ void TimelineTrackItem::buildWaveform(int index, const QRectF &area, double clip
     const double mid = area.top() + area.height() / 2.0;
     const double halfHeight = area.height() / 2.0;
     for (int x = 0; x < w; ++x) {
-        const double amp = columnPeak(cached.peaks, x) * halfHeight * 0.9;
+        const double amp = columnPeak(cached.peaks, x) * gainAt(x) * halfHeight * 0.9;
         if (amp <= 0.5)
             continue;
         const double x0 = left + x - ox;
@@ -1256,6 +1273,11 @@ QSGNode *TimelineTrackItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDat
                 continue;
             texture->setFiltering(QSGTexture::Linear);
             root->textures.insert(tile.key, texture);
+            // Approximate the backing upload size using the source image. A count
+            // alone keeps an excessive amount of texture memory for tall filmstrips.
+            const qsizetype bytes = tile.image.sizeInBytes();
+            root->textureBytes.insert(tile.key, bytes);
+            root->cachedTextureBytes += bytes;
         }
         if (!texture)
             continue;
@@ -1274,10 +1296,12 @@ QSGNode *TimelineTrackItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDat
         node->setRect(tile.target);
         node->setSourceRect(tile.source);
     }
-    if (root->textures.size() > kMaxCachedTextures) {
+    if (root->textures.size() > kMaxCachedTextures
+        || root->cachedTextureBytes > kMaxCachedTextureBytes) {
         for (auto it = root->textures.begin(); it != root->textures.end();) {
             if (root->textureStamps.value(it.key()) != m_frameCounter) {
                 root->textureStamps.remove(it.key());
+                root->cachedTextureBytes -= root->textureBytes.take(it.key());
                 delete it.value();
                 it = root->textures.erase(it);
             } else {

@@ -511,12 +511,14 @@ QList<ClipReaderPool::VideoRequest> collectVideoRequests(const drift::Project *p
         const QSet<QString> transitionClipIds = activeTransitionClipIds(track, timelineUs);
         for (const drift::Clip &clip : track.clips) {
             drift::TimeUs readUs = timelineUs;
+            bool upcoming = false;
             if (!clip.containsTime(timelineUs) && !transitionClipIds.contains(clip.id)) {
                 if (lookaheadUs <= 0 || clip.type != drift::ClipType::Video || clip.path.isEmpty())
                     continue;
                 readUs = firstDrawnUs(track, clip);
                 if (readUs <= timelineUs || readUs - timelineUs > lookaheadUs)
                     continue;
+                upcoming = true;
             }
 
             if (clip.type == drift::ClipType::Composite) {
@@ -537,7 +539,7 @@ QList<ClipReaderPool::VideoRequest> collectVideoRequests(const drift::Project *p
                                                         read.sourceUs,
                                                         qCeil(maxWidth / clip.sourceFrame.width()),
                                                         qCeil(maxHeight / clip.sourceFrame.height()),
-                                                        clip.rotationCorrection});
+                                                        clip.rotationCorrection, upcoming});
         }
     }
     return requests;

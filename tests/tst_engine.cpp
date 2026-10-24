@@ -302,6 +302,10 @@ private slots:
     void approximatePreviewBackwardHitsCache();
     void approximatePreviewForwardStepIsBounded();
     void readerHandoffKeepsDecoderPosition();
+    void upcomingClipWarmsFirstFrameAcrossRepeatedCuts();
+    void activePreviewWarmDoesNotQueueObsoleteFrames();
+    void previewReadAheadYieldsToPlayback();
+    void sequentialVideoCutsBuildPreviewScenes();
     void compositorFramesOriginalVideoBeforeScaling();
     void compositorDefaultRenderStaysFullResolution();
     void compositorPreviewScaleRendersLowerResolution();
@@ -7488,6 +7492,144 @@ void EngineTest::readerHandoffKeepsDecoderPosition()
     const quint64 decoded = ClipReader::videoFramesDecoded() - before;
     // A fresh reader would seek to the keyframe at 0 and decode ~27 frames to get here.
     QVERIFY2(decoded <= 6, qPrintable(QStringLiteral("decoded %1 frames").arg(decoded)));
+}
+
+// Playback prewarms the incoming clip before the cut. Exercise alternating sources repeatedly,
+// including the same source with a new stream id, to catch corrupt requests and reader handoffs.
+void EngineTest::upcomingClipWarmsFirstFrameAcrossRepeatedCuts()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString path = makeLongGopVideo(dir);
+    if (path.isEmpty())
+        QSKIP("ffmpeg not available to generate a test clip");
+    const QString secondPath = dir.filePath(QStringLiteral("second-clip.mp4"));
+    QVERIFY(QFile::copy(path, secondPath));
+    ClipReaderPool &pool = ClipReaderPool::instance();
+    pool.setReadAheadUs(0);
+    constexpr quint64 kOutgoing = 9122;
+    constexpr quint64 kIncoming = 9123;
+    for (int cut = 0; cut < 40; ++cut) {
+        const QString &incomingPath = (cut % 2 == 0) ? secondPath : path;
+        const QString &outgoingPath = (cut % 2 == 0) ? path : secondPath;
+        const drift::TimeUs outgoingUs = 1'000'000 + (cut % 5) * 40'000;
+        pool.warmVideoFrames({
+            ClipReaderPool::VideoRequest{outgoingPath, kOutgoing, outgoingUs, 640, 360, 0},
+            ClipReaderPool::VideoRequest{incomingPath, kIncoming, 0, 640, 360, 0, true}});
+        // Playback asks for the same upcoming first frame on successive ticks.
+        // Repeated scheduling must not starve the outgoing clip's next frame.
+        for (int tick = 0; tick < 8; ++tick)
+            pool.warmVideoFrames({
+                ClipReaderPool::VideoRequest{outgoingPath, kOutgoing, outgoingUs + tick * 1'000,
+                                             640, 360, 0},
+                ClipReaderPool::VideoRequest{incomingPath, kIncoming, 0, 640, 360, 0, true}});
+        QVERIFY(pool.readPreviewVideoFrame(outgoingPath, kOutgoing, outgoingUs, 640, 360).isValid());
+        QVERIFY2(pool.readPreviewVideoFrame(incomingPath, kIncoming, 0, 640, 360).isValid(),
+                 qPrintable(QStringLiteral("Incoming frame unavailable at cut %1").arg(cut)));
+        pool.warmVideoFrames({
+            ClipReaderPool::VideoRequest{incomingPath, kIncoming, 40'000, 640, 360, 0}});
+        QVERIFY(pool.readPreviewVideoFrame(incomingPath, kIncoming, 40'000, 640, 360).isValid());
+    }
+}
+
+// The compositor calls warmVideoFrames before reading its current frame. If each warm queues an
+// active-frame decode, a run of frames requested while the decoder is busy forces the blocking
+// read to wait behind obsolete work. Exercise backward jumps to expose this queue amplification.
+void EngineTest::activePreviewWarmDoesNotQueueObsoleteFrames()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString path = makeLongGopVideo(dir);
+    if (path.isEmpty())
+        QSKIP("ffmpeg not available to generate a test clip");
+
+    ClipReaderPool &pool = ClipReaderPool::instance();
+    pool.setReadAheadUs(0);
+    constexpr quint64 kStream = 92871;
+    const quint64 decodedBefore = ClipReader::videoFramesDecoded();
+    for (int i = 0; i < 24; ++i) {
+        const drift::TimeUs sourceUs = i % 2 ? 1'800'000 : 200'000;
+        pool.warmVideoFrames({ClipReaderPool::VideoRequest{path, kStream, sourceUs, 640, 360, 0}});
+    }
+    QVERIFY(pool.readPreviewVideoFrame(path, kStream, 1'800'000, 640, 360).isValid());
+    const quint64 decoded = ClipReader::videoFramesDecoded() - decodedBefore;
+    // A single 1.8 s read needs <60 frames, whereas the obsolete warm queue makes repeated
+    // backward seeks and decodes several hundred frames before this read can complete.
+    QVERIFY2(decoded < 100, qPrintable(QStringLiteral("obsolete frames decoded: %1").arg(decoded)));
+}
+
+// A single on-screen frame may schedule one background read-ahead step. Letting that
+// step recursively fill the full 350 ms lookahead consumed a dozen frames of decode
+// without another playback request and made a cut's outgoing frame wait in line.
+void EngineTest::previewReadAheadYieldsToPlayback()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString path = makeLongGopVideo(dir);
+    if (path.isEmpty())
+        QSKIP("ffmpeg not available to generate a test clip");
+
+    ClipReaderPool &pool = ClipReaderPool::instance();
+    pool.setReadAheadUs(350'000);
+    constexpr quint64 kStream = 92872;
+    pool.warmVideoFrames({ClipReaderPool::VideoRequest{path, kStream, 1'000'000, 640, 360, 0}});
+    QVERIFY(pool.readPreviewVideoFrame(path, kStream, 1'000'000, 640, 360).isValid());
+    const quint64 decodedBefore = ClipReader::videoFramesDecoded();
+    QTest::qWait(250);
+    const quint64 speculativeFrames = ClipReader::videoFramesDecoded() - decodedBefore;
+    QVERIFY2(speculativeFrames <= 3,
+             qPrintable(QStringLiteral("read-ahead decoded %1 unsolicited frames").arg(speculativeFrames)));
+
+    // A further on-screen read still advances the source normally after yielding.
+    QVERIFY(pool.readPreviewVideoFrame(path, kStream, 1'040'000, 640, 360).isValid());
+    pool.setReadAheadUs(0);
+}
+
+// Drive the compositor's own request collector and decode path on both sides of many cuts.
+// This reproduces the playback route that crashed in ClipReaderPool::warmVideoFrames.
+void EngineTest::sequentialVideoCutsBuildPreviewScenes()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString firstPath = makeLongGopVideo(dir);
+    if (firstPath.isEmpty())
+        QSKIP("ffmpeg not available to generate a test clip");
+    const QString secondPath = dir.filePath(QStringLiteral("next-clip.mp4"));
+    QVERIFY(QFile::copy(firstPath, secondPath));
+
+    constexpr drift::TimeUs kClipUs = 400'000;
+    constexpr int kClips = 32;
+    drift::Project project;
+    project.setResolution(128, 72);
+    project.setFps(25);
+    project.tracks().clear();
+    project.tracks().append(drift::Track{.type = drift::TrackType::Video});
+    for (int i = 0; i < kClips; ++i) {
+        drift::Clip clip;
+        clip.id = QStringLiteral("cut-%1").arg(i);
+        clip.type = drift::ClipType::Video;
+        clip.path = i % 2 ? secondPath : firstPath;
+        clip.timelineStart = drift::TimeUs(i) * kClipUs;
+        clip.timelineDuration = kClipUs;
+        project.tracks()[0].clips.append(clip);
+    }
+
+    FrameCompositor compositor;
+    compositor.setProject(&project);
+    FrameCompositor::RenderOptions playback;
+    playback.previewScale = 0.5;
+    playback.readAheadUs = 250'000;
+
+    for (int i = 1; i < kClips; ++i) {
+        for (const drift::TimeUs offset : {-40'000LL, 0LL, 40'000LL}) {
+            GpuScene scene;
+            const drift::TimeUs time = drift::TimeUs(i) * kClipUs + offset;
+            QVERIFY2(compositor.buildSceneAt(time, playback, &scene),
+                     qPrintable(QStringLiteral("preview build failed at %1 us").arg(time)));
+            QVERIFY2(!scene.items.isEmpty(),
+                     qPrintable(QStringLiteral("missing preview scene at %1 us").arg(time)));
+        }
+    }
 }
 
 // Two clips cut from one file and overlapping on the timeline interleave reads at positions

@@ -155,6 +155,8 @@ void ClipReaderWorker::prefetchNextVideo(quint64 streamId, int maxWidth, int max
 void ClipReaderWorker::requestPrefetchPreview(quint64 streamId, int maxWidth, int maxHeight,
                                               drift::TimeUs readAheadUs)
 {
+    if (readAheadUs <= 0)
+        return;
     {
         QMutexLocker lock(&m_prefetchMutex);
         if (m_prefetchPending.contains(streamId))
@@ -175,16 +177,14 @@ void ClipReaderWorker::prefetchNextPreviewVideo(quint64 streamId, int maxWidth, 
         m_prefetchPending.remove(streamId);
     }
 
-    bool more = false;
-    {
-        QMutexLocker lock(&m_mutex);
-        auto it = m_readers.find(streamId);
-        if (it != m_readers.end())
-            more = it->second.reader->prefetchNextPreviewVideoFrame(maxWidth, maxHeight, readAheadUs);
-    }
-
-    if (more)
-        requestPrefetchPreview(streamId, maxWidth, maxHeight, readAheadUs);
+    // Spend no more than one frame of decoder time on speculative work for each
+    // on-screen read. The next on-screen frame will request another step. Recursively
+    // re-queuing this job saturated the decode worker for up to readAheadUs of video,
+    // delaying blocking preview reads and making the outgoing clip crawl near a cut.
+    QMutexLocker lock(&m_mutex);
+    auto it = m_readers.find(streamId);
+    if (it != m_readers.end())
+        it->second.reader->prefetchNextPreviewVideoFrame(maxWidth, maxHeight, readAheadUs);
 }
 
 void ClipReaderWorker::resetVideoDecoders()

@@ -1385,6 +1385,7 @@ void GlRuntime::releaseCaches()
         destroyExportNv12State();
         m_targetPool.clear();
         m_pooledTargets = 0;
+        m_pooledTargetBytes = 0;
         if (auto *gl = functions()) {
             destroyGlModels(*this, gl);
             destroyGlSplats(*this, gl);
@@ -1428,6 +1429,7 @@ void GlRuntime::shutdown()
             m_retiredPresent.clear();
             m_targetPool.clear();
             m_pooledTargets = 0;
+            m_pooledTargetBytes = 0;
             programs.clear();
             copyProgram.reset();
             if (auto *gl = context->extraFunctions()) {
@@ -1510,6 +1512,8 @@ GlTarget GlRuntime::acquireTarget(int width, int height, bool wantDepth)
         target.fbo = std::move(it->second);
         m_targetPool.erase(it);
         --m_pooledTargets;
+        m_pooledTargetBytes -= size_t(target.width) * size_t(target.height)
+                               * (wantDepth ? 8u : 4u);
         return target;
     }
 
@@ -1524,12 +1528,29 @@ void GlRuntime::releaseTarget(GlTarget &&target)
 {
     if (!target.isValid())
         return;
-    if (m_pooledTargets >= kMaxPooledTargets)
-        return; // let it drop
+
+    // Count both the color texture and (when present) the depth attachment.
+    // An entry-count limit alone can retain over a gigabyte of idle 4K targets.
+    const size_t bytes = size_t(target.width) * size_t(target.height)
+                         * (target.hasDepth ? 8u : 4u);
+    if (bytes > kMaxPooledTargetBytes)
+        return;
+    while (!m_targetPool.empty()
+           && (m_pooledTargets >= kMaxPooledTargets
+               || m_pooledTargetBytes + bytes > kMaxPooledTargetBytes)) {
+        const auto old = std::prev(m_targetPool.end());
+        const QOpenGLFramebufferObject *fbo = old->second.get();
+        const bool depth = fbo->format().attachment() != QOpenGLFramebufferObject::NoAttachment;
+        m_pooledTargetBytes -= size_t(fbo->width()) * size_t(fbo->height())
+                               * (depth ? 8u : 4u);
+        m_targetPool.erase(old);
+        --m_pooledTargets;
+    }
 
     const uint64_t key = targetPoolKey(target.width, target.height, target.hasDepth);
     m_targetPool.emplace(key, std::move(target.fbo));
     ++m_pooledTargets;
+    m_pooledTargetBytes += bytes;
 }
 
 QImage GlRuntime::readTarget(const GlTarget &target)
@@ -1939,6 +1960,7 @@ void GlRuntime::destroyImageUploadCache()
     }
     m_imageUploadLru.clear();
     m_imageUploadIndex.clear();
+    m_imageUploadBytes = 0;
 }
 
 #if defined(DRIFT_ANDROID_AHB_IMPORT)
@@ -3251,16 +3273,23 @@ GLuint cachedUploadTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QImag
     if (!tex)
         return 0;
 
-    while (rt.m_imageUploadLru.size() >= GlRuntime::kMaxCachedUploads) {
+    const size_t bytes = size_t(rgba.width()) * size_t(rgba.height()) * 4u;
+    // Cache size must be measured in bytes: 48 uploads of 4K frames took ~1.5 GiB of VRAM.
+    // Keep even a single oversize texture cached so the caller can use the returned handle.
+    while (!rt.m_imageUploadLru.empty()
+           && (rt.m_imageUploadLru.size() >= GlRuntime::kMaxCachedUploads
+               || rt.m_imageUploadBytes + bytes > GlRuntime::kMaxCachedUploadBytes)) {
         GlRuntime::CachedUpload &old = rt.m_imageUploadLru.back();
         rt.m_imageUploadIndex.erase(old.cacheKey);
         if (old.texture)
             gl->glDeleteTextures(1, &old.texture);
+        rt.m_imageUploadBytes -= size_t(old.width) * size_t(old.height) * 4u;
         rt.m_imageUploadLru.pop_back();
     }
 
     rt.m_imageUploadLru.push_front(GlRuntime::CachedUpload{key, tex, rgba.width(), rgba.height()});
     rt.m_imageUploadIndex[key] = rt.m_imageUploadLru.begin();
+    rt.m_imageUploadBytes += bytes;
     return tex;
 }
 

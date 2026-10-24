@@ -93,7 +93,10 @@ constexpr int kGpuProbeMaxAttempts = 20;
 // seek (two 1080p30 software streams dropped from ~15 to ~12 fps), because the prefetch then
 // competes with the frames playback actually needs. Every edit or seek discards the part of the
 // buffer past the change.
-constexpr drift::TimeUs kReadAheadUs = 2 * drift::kUsPerSecond;
+// Buffer a few imminent frames while leaving decoder time for the on-screen clip.
+// Two seconds of eager decoding saturated the machine as an adjacent clip was
+// opened, making the outgoing clip appear to play in slow motion near cuts.
+constexpr drift::TimeUs kReadAheadUs = 350'000;
 
 // The rates the preview transport offers. All sit inside the stretcher's own clamp
 // (kMinCurveSpeed..kMaxCurveSpeed), and nothing outside this list is accepted.

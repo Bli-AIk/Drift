@@ -35,7 +35,10 @@ ClipThumbnailStore::ClipThumbnailStore(QObject *parent)
 {
     // Thumbnails are the least urgent work in the process; a scroll that outruns them just
     // shows the placeholder a little longer.
-    m_pool.setMaxThreadCount(qMax(1, QThread::idealThreadCount() / 4));
+    // A 24-thread desktop otherwise runs six image decoders at once while the
+    // preview is decoding its own footage. Keep timeline thumbnails responsive
+    // without letting background image work monopolize playback cores.
+    m_pool.setMaxThreadCount(qBound(1, QThread::idealThreadCount() / 4, 3));
     m_pool.setThreadPriority(QThread::LowPriority);
 }
 
