@@ -1,0 +1,17 @@
+{
+  "id": "directional_motion_blur",
+  "displayName": "Directional Motion Blur",
+  "category": "blur",
+  "order": 185,
+  "backend": "gpu",
+  "parameters": [
+    { "identifier": "strength", "displayName": "Distance (px)", "type": "float", "minValue": 0, "maxValue": 80, "defaultValue": 16 },
+    { "identifier": "angle", "displayName": "Angle (degrees)", "type": "float", "minValue": 0, "maxValue": 360, "defaultValue": 0 }
+  ],
+  "pipeline": {
+    "intermediateBuffers": [],
+    "passes": [
+      { "passIndex": 0, "fragmentShader": "main.frag", "inputs": [ { "type": "source_texture" } ], "output": { "type": "canvas" } }
+    ]
+  }
+}
