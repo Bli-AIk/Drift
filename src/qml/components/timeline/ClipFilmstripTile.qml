@@ -3,7 +3,7 @@ import Drift
 
 // One filmstrip tile: coarse strip frame, then the on-demand frame for its timestamp.
 Item {
-    property ClipFilmstrip strip
+    property var strip
     id: tile
     required property int index
     readonly property int tileIndex: strip.firstVisibleTile + index

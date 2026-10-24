@@ -5,7 +5,7 @@ import Drift
 Rectangle {
     id: marqueeRect
 
-    property TimelinePanel panel
+    property var panel
     visible: panel.marqueeActive
              && (panel.marqueeWidth > 2 || panel.marqueeHeight > 2)
     x: panel.marqueeLeft

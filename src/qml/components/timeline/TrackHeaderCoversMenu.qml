@@ -5,7 +5,7 @@ import Drift
 ThemedContextMenu {
     id: coversMenu
 
-    property TrackHeaderColumn column
+    property var column
     property int trackIndex: -1
     property bool transformLayer: false
 

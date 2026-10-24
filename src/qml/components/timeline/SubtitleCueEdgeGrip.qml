@@ -5,7 +5,7 @@ import Drift
 Item {
     id: grip
 
-    property SubtitleCueLane lane
+    property var lane
     property var cue
     property int edge: -1
 

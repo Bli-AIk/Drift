@@ -6,7 +6,7 @@ ThemedContextMenu {
     id: trackContextMenu
 
     property var header
-    property TrackHeaderColumn column
+    property var column
     property var renameDialog
     property var deleteDialog
     signal coversRequested()

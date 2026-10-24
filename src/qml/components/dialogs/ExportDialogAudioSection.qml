@@ -4,7 +4,7 @@ import Drift
 // ---- Audio mode ----
 Column {
     id: section
-    required property ExportDialog dialog
+    required property var dialog
     property alias audioOnlyCodecCombo: audioOnlyCodecCombo
     property alias audioOnlyBitrateCombo: audioOnlyBitrateCombo
     property alias tagTitleField: tagTitleField

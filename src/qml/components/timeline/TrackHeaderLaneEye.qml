@@ -5,7 +5,7 @@ import Drift
 Item {
     id: laneEye
 
-    property TrackHeaderColumn column
+    property var column
     required property var modelData
     readonly property bool laneHidden: !!column.tracks[modelData] && column.tracks[modelData].hidden === true
 

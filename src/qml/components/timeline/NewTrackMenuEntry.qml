@@ -3,7 +3,7 @@ import Drift
 
 // One track-type row in the new-track menu.
 Rectangle {
-    property NewTrackMenu menu
+    property var menu
     id: trackTypeRow
     required property var modelData
     required property int index

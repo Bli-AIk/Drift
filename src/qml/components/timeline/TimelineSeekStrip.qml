@@ -7,7 +7,7 @@ import Drift
 Item {
     id: seekStrip
 
-    property TimelinePanel panel
+    property var panel
     property Flickable view
     property bool playheadDragging: false
     property var renameDialog

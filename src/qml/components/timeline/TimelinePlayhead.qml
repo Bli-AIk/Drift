@@ -5,7 +5,7 @@ import Drift
 Item {
     id: playhead
 
-    property TimelinePanel panel
+    property var panel
     property Flickable view
     property var interpolator
     readonly property bool headDragging: playheadDragArea.drag.active

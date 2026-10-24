@@ -5,7 +5,7 @@ import QtQuick.Layouts
 // ---- GIF mode ----
 Column {
     id: section
-    required property ExportDialog dialog
+    required property var dialog
     property alias gifFrameRateCombo: gifFrameRateCombo
 
     width: parent.width

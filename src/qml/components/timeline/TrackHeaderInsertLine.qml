@@ -3,7 +3,7 @@ import Drift
 
 // Insertion line while reordering tracks.
 Rectangle {
-    property TrackHeaderColumn column
+    property var column
     visible: column.draggingTrackSlot >= 0 && column.draggingTrackTo >= 0
              && column.draggingTrackFrom !== column.draggingTrackTo
     width: parent.width - 8

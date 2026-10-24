@@ -3,7 +3,7 @@ import QtQuick.Controls.Basic
 import Drift
 
 ItemDelegate {
-    required property LayoutChooserDialog dialog
+    required property var dialog
     id: row
     required property var modelData
     required property int index

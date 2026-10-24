@@ -5,7 +5,7 @@ import Drift
 Item {
     id: newTrackIndicator
 
-    property TimelinePanel panel
+    property var panel
     // Not also gated on the drag being active: dropCreatesNewTrack
     // is only ever set during one, and is cleared on exit, drop
     // and abandon — an extra condition here is one more way for

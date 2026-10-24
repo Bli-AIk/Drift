@@ -4,7 +4,7 @@ import Drift
 ThemedContextMenu {
     id: root
 
-    required property MediaAssetsTab host
+    required property var host
     required property string folderId
     required property string folderName
 

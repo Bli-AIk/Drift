@@ -8,7 +8,7 @@ Item {
     id: mode
 
     // The PreviewViewport this view navigates.
-    property PreviewViewport viewport
+    property var viewport
 
     readonly property Item canvas: viewport ? viewport.canvas : null
     readonly property real perCanvas: (canvas ? canvas.width : 0) / Math.max(1, EditorState.projectFile.projectWidth())

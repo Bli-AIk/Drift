@@ -3,7 +3,7 @@ import Drift
 
 // Where a dragged transition would land.
 Rectangle {
-    property TimelinePanel panel
+    property var panel
     property int trackIndex: -1
     visible: panel.transitionDropTrackIndex === trackIndex
     x: panel.transitionDropStart * panel.pxPerSecond

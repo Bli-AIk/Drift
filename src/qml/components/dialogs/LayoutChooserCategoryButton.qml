@@ -3,7 +3,7 @@ import QtQuick.Controls.Basic
 import Drift
 
 AbstractButton {
-    required property LayoutChooserDialog dialog
+    required property var dialog
     id: catBtn
     required property var modelData
 

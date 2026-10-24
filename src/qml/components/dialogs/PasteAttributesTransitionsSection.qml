@@ -3,7 +3,7 @@ import Drift
 
 // Transitions Section
 Column {
-    required property PasteAttributesDialog dialog
+    required property var dialog
     width: parent.width
     spacing: Theme.spacingSm
     visible: (dialog.clipAttrs.transitionCount || 0) > 0

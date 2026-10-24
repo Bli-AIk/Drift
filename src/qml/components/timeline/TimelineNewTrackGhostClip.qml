@@ -3,7 +3,7 @@ import Drift
 
 // Clip that would land in the ghost lane, including the importing hold.
 Rectangle {
-    property TimelinePanel panel
+    property var panel
     x: panel.dropStartSeconds * panel.pxPerSecond
     width: Math.max(2, panel.dropDurationSeconds * panel.pxPerSecond)
     anchors.top: parent.top

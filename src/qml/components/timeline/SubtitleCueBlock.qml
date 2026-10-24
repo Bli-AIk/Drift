@@ -3,7 +3,7 @@ import Drift
 
 // One subtitle cue: drag the body to move, the edges to resize.
 Rectangle {
-    property SubtitleCueLane lane
+    property var lane
     id: block
     required property int index
     required property var modelData

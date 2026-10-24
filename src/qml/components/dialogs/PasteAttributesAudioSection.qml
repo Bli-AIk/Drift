@@ -3,7 +3,7 @@ import Drift
 
 // Audio Attributes Section
 Column {
-    required property PasteAttributesDialog dialog
+    required property var dialog
     width: parent.width
     spacing: Theme.spacingSm
 

@@ -3,7 +3,7 @@ import Drift
 
 // Faint wash on a transform layer's row.
 Rectangle {
-    property TimelinePanel panel
+    property var panel
     property int trackIndex: -1
     anchors.fill: parent
     visible: panel.tracks[trackIndex].isTransformLayer === true

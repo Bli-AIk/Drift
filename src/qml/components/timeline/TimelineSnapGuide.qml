@@ -5,7 +5,7 @@ import Drift
 Rectangle {
     id: guide
 
-    property TimelinePanel panel
+    property var panel
     visible: opacity > 0
     opacity: panel.snapGuideSeconds >= 0 ? 1 : 0
     x: panel.snapGuideSeconds * panel.pxPerSecond

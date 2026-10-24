@@ -4,7 +4,7 @@ import Drift
 // One transition overlap: body, hatch, label, drop target, and edge handles.
 Item {
     id: transitionRegion
-    property TimelinePanel panel
+    property var panel
     property int trackIndex: -1
     required property var modelData
     readonly property int leftClipIndex: modelData.leftClip

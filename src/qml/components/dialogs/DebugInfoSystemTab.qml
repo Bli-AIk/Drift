@@ -3,7 +3,7 @@ import Drift
 import QtQuick.Window
 
 Column {
-    required property DebugInfoDialog dialog
+    required property var dialog
     id: systemTab
     width: parent.width
     spacing: Theme.spacingXl

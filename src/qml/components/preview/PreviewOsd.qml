@@ -8,7 +8,7 @@ Item {
     id: osd
 
     // The PreviewViewport whose zoom the chip reports and resets.
-    property PreviewViewport viewport
+    property var viewport
     property bool interacting: false
     // Controls outside this item that fade with it (the fullscreen transport), and are in use.
     property bool held: false

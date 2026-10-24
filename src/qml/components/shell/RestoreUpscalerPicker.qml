@@ -4,7 +4,7 @@ import Drift
 
 Rectangle {
     id: picker
-    required property RestoreWindow tool
+    required property var tool
     property real sidebarWidth
     visible: false
     x: Theme.spacingLg

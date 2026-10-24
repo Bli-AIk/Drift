@@ -3,7 +3,7 @@ import Drift
 
 // ----- Frame + prompt overlay ------------------------------------------------------
 Column {
-    required property SegmentationWindow tool
+    required property var tool
     property real sidebarWidth
     property alias frameSlider: frameSlider
     width: parent.width - sidebarWidth - Theme.spacingLg
