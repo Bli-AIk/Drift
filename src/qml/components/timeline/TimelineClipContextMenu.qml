@@ -5,7 +5,7 @@ import Drift
 ThemedContextMenu {
     id: clipContextMenu
 
-    required property TimelineClipItem owner
+    required property var owner
     signal unloadRequested()
 
     property bool canPasteEffects: false
@@ -112,13 +112,15 @@ ThemedContextMenu {
         text: qsTr("Separate audio")
         icon.name: Theme.icons.audioLines
         // CapCut: only offer extract when the clip still has embedded audio.
-        visible: owner.trackType === "video" && EditorState.separateAudioAvailable
-        onTriggered: EditorState.separateAudioFromSelection()
+        visible: owner.trackType === "video"
+                 && EditorState.canSeparateAudioClip(owner.trackIndex, owner.clipIndex)
+        onTriggered: EditorState.separateAudioFromClip(owner.trackIndex, owner.clipIndex)
     }
     ThemedMenuItem {
         text: qsTr("Separate all audio tracks")
         icon.name: Theme.icons.audioLines
-        visible: owner.trackType === "video" && EditorState.separateAudioAvailable
+        visible: owner.trackType === "video"
+                 && EditorState.canSeparateAudioClip(owner.trackIndex, owner.clipIndex)
                  && EditorState.clipAudioStreamCount(owner.trackIndex, owner.clipIndex) > 1
         onTriggered: EditorState.separateAllAudioTracks(owner.trackIndex, owner.clipIndex)
     }

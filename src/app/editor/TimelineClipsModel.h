@@ -6,6 +6,7 @@
 #include <QVariantList>
 
 #include "core/animation/FadeShape.h"
+#include "core/animation/Keyframe.h"
 
 // One track's clips, exposed as roles.
 //
@@ -55,6 +56,7 @@ public:
         FadeHandlesRole,
         EffectsRole,
         AudioEffectsRole,
+        VolumeRole,
     };
     Q_ENUM(Role)
 
@@ -85,6 +87,10 @@ public:
         QVariantList fadeHandles;
         QVariantList effects;
         QVariantList audioEffects;
+
+        // Clip-relative audio gain, including its animation and interpolation.
+        // The native waveform renderer uses the same curve as audio playback.
+        drift::KeyframeTrack<double> volumeCurve;
 
         // Not roles: typed copies for the scene-graph renderer, derived from the fields above so
         // any change to them already arrives as a changed row.

@@ -4032,6 +4032,7 @@ drift::Clip makeAudioCompanionFromVideo(const drift::Clip &videoClip, const QStr
     drift::Clip audio;
     audio.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
     audio.linkId = linkId;
+    audio.sourceVideoClipId = videoClip.id;
     audio.assetId = videoClip.assetId;
     audio.type = drift::ClipType::Audio;
     audio.audioStreamIndex = audioStreamIndex;
@@ -4131,10 +4132,8 @@ int videoTrackOrdinal(const drift::Project &project, int trackIndex)
     return ordinal;
 }
 
-// Returns the video-track ordinal associated with a linked audio track.
-//
-// Detached A/V companions already carry the same linkId, so there is no need to
-// add persistent track metadata merely to determine their visual hierarchy.
+// Returns the source video-track ordinal of an extracted audio track, without making
+// its clip editing behavior depend on the source. Older linked companions still work.
 int ownerVideoOrdinalForAudioTrack(const drift::Project &project, int audioTrackIndex)
 {
     if (audioTrackIndex < 0 || audioTrackIndex >= project.tracks().size())
@@ -4145,7 +4144,7 @@ int ownerVideoOrdinalForAudioTrack(const drift::Project &project, int audioTrack
         return -1;
 
     for (const drift::Clip &audioClip : audioTrack.clips) {
-        if (audioClip.linkId.isEmpty())
+        if (audioClip.sourceVideoClipId.isEmpty() && audioClip.linkId.isEmpty())
             continue;
 
         for (int t = 0; t < project.tracks().size(); ++t) {
@@ -4154,8 +4153,10 @@ int ownerVideoOrdinalForAudioTrack(const drift::Project &project, int audioTrack
                 continue;
 
             for (const drift::Clip &videoClip : videoTrack.clips) {
-                if (!videoClip.linkId.isEmpty()
-                    && videoClip.linkId == audioClip.linkId) {
+                if ((!audioClip.sourceVideoClipId.isEmpty()
+                     && videoClip.id == audioClip.sourceVideoClipId)
+                    || (!audioClip.linkId.isEmpty() && !videoClip.linkId.isEmpty()
+                        && videoClip.linkId == audioClip.linkId)) {
                     return videoTrackOrdinal(project, t);
                 }
             }
@@ -4224,8 +4225,8 @@ int audioTrackInsertIndexForVideoTrack(const drift::Project &project,
 
 // Split embedded audio onto its own audio track (video keeps picture only).
 //
-// The new audio clip remains linked to the video, but receives a dedicated
-// track whose relative position mirrors the source video track.
+// The audio clip is independently editable and receives a dedicated track
+// whose relative position mirrors the source video track.
 bool detachEmbeddedAudioFromVideo(drift::Project &project,
                                   AssetLibrary *library,
                                   int videoTrackIndex,
@@ -4245,12 +4246,6 @@ bool detachEmbeddedAudioFromVideo(drift::Project &project,
     if (!clipHasEmbeddedAudio(project, library, videoClip))
         return false;
 
-    const QString linkId =
-        videoClip.linkId.isEmpty()
-            ? QUuid::createUuid().toString(QUuid::WithoutBraces)
-            : videoClip.linkId;
-
-    videoClip.linkId = linkId;
     videoClip.suppressEmbeddedAudio = true;
 
     // Build the companion before inserting into project.tracks(); QList insertion
@@ -4258,7 +4253,7 @@ bool detachEmbeddedAudioFromVideo(drift::Project &project,
     const drift::Clip audioClip =
         makeAudioCompanionFromVideo(
             videoClip,
-            linkId,
+            {},
             videoClip.audioStreamIndex);
     const QString videoClipId = videoClip.id;
 
@@ -4312,12 +4307,6 @@ bool detachAllAudioTracksFromVideo(drift::Project &project,
             videoClipIndex);
     }
 
-    const QString linkId =
-        videoClip.linkId.isEmpty()
-            ? QUuid::createUuid().toString(QUuid::WithoutBraces)
-            : videoClip.linkId;
-
-    videoClip.linkId = linkId;
     videoClip.suppressEmbeddedAudio = true;
 
     const QString videoClipId = videoClip.id;
@@ -4347,7 +4336,7 @@ bool detachAllAudioTracksFromVideo(drift::Project &project,
         companions.append(
             makeAudioCompanionFromVideo(
                 videoClip,
-                linkId,
+                {},
                 i,
                 trackName));
     }
@@ -4839,6 +4828,7 @@ TimelineClipsModel::Row AppController::clipRow(const drift::Clip &clip,
     row.outPoint = drift::usToSeconds(clip.srcOut);
     row.sourceDuration = sourceAsset ? drift::usToSeconds(sourceAsset->durationUs) : 0.0;
     row.audioStreamIndex = clip.audioStreamIndex;
+    row.volumeCurve = clip.volume;
     // For the waveform bar: not once the audio has been separated, nor when the source has no
     // audio stream. An unprobed source gets the benefit of the doubt; its waveform stays empty.
     row.hasEmbeddedAudio = clip.type == drift::ClipType::Video && !clip.suppressEmbeddedAudio
@@ -13307,6 +13297,33 @@ bool AppController::canSeparateAudioSelection() const
     return false;
 }
 
+bool AppController::canSeparateAudioClip(int trackIndex, int clipIndex) const
+{
+    return isValidClipIndex(trackIndex, clipIndex)
+           && clipHasEmbeddedAudio(m_project, m_assetLibrary,
+                                   m_project.tracks().at(trackIndex).clips.at(clipIndex));
+}
+
+void AppController::separateAudioFromClip(int trackIndex, int clipIndex)
+{
+    if (!canSeparateAudioClip(trackIndex, clipIndex))
+        return;
+
+    const QString videoId = m_project.tracks().at(trackIndex).clips.at(clipIndex).id;
+    const drift::Project before = m_project;
+    if (!detachEmbeddedAudioFromVideo(m_project, m_assetLibrary, trackIndex, clipIndex))
+        return;
+
+    // Inserting an audio track can shift indexes; restore selection by identity.
+    if (findClipById(m_project, videoId, &trackIndex, &clipIndex)) {
+        m_selectedTrack = trackIndex;
+        m_selectedClip = clipIndex;
+        m_selection = selectionWithLinkedPartners(m_project, trackIndex, clipIndex);
+    }
+    pushProjectEdit(before, tr("Audio separated"));
+    finishEdit(tr("Audio separated"));
+}
+
 bool AppController::canUnlinkSelection() const
 {
     QList<QPair<int, int>> pairs = m_selection;
@@ -13330,25 +13347,33 @@ void AppController::separateAudioFromSelection()
     if (pairs.isEmpty())
         return;
 
-    const drift::Project before = m_project;
-    bool changed = false;
-    QSet<QString> detachedVideoIds;
+    QStringList videoIds;
     for (const QPair<int, int> &pair : pairs) {
         if (!isValidClipIndex(pair.first, pair.second))
             continue;
+        const drift::Clip &clip = m_project.tracks().at(pair.first).clips.at(pair.second);
+        if (clip.type == drift::ClipType::Video || clip.type == drift::ClipType::Composite)
+            videoIds.append(clip.id);
+    }
+    QString selectedId;
+    if (isValidClipIndex(m_selectedTrack, m_selectedClip))
+        selectedId = m_project.tracks().at(m_selectedTrack).clips.at(m_selectedClip).id;
 
-        drift::Clip &clip = m_project.tracks()[pair.first].clips[pair.second];
-        if ((clip.type != drift::ClipType::Video && clip.type != drift::ClipType::Composite)
-            || detachedVideoIds.contains(clip.id))
+    const drift::Project before = m_project;
+    bool changed = false;
+    QSet<QString> detachedVideoIds;
+    for (const QString &videoId : videoIds) {
+        if (detachedVideoIds.contains(videoId))
             continue;
-
-        const QString videoId = clip.id;
-
+        int trackIndex = -1;
+        int clipIndex = -1;
+        if (!findClipById(m_project, videoId, &trackIndex, &clipIndex))
+            continue;
         if (detachEmbeddedAudioFromVideo(
                 m_project,
                 m_assetLibrary,
-                pair.first,
-                pair.second)) {
+                trackIndex,
+                clipIndex)) {
             detachedVideoIds.insert(videoId);
             changed = true;
         }
@@ -13357,7 +13382,8 @@ void AppController::separateAudioFromSelection()
     if (!changed)
         return;
 
-    if (m_selectedTrack >= 0 && m_selectedClip >= 0)
+    if (!selectedId.isEmpty()
+        && findClipById(m_project, selectedId, &m_selectedTrack, &m_selectedClip))
         m_selection = selectionWithLinkedPartners(m_project, m_selectedTrack, m_selectedClip);
 
     pushProjectEdit(before, tr("Audio separated"));
@@ -14198,6 +14224,7 @@ void AppController::separateAllAudioTracks(int trackIndex, int clipIndex)
     drift::Clip &clip = m_project.tracks()[trackIndex].clips[clipIndex];
     if (clip.type != drift::ClipType::Video)
         return;
+    const QString videoId = clip.id;
 
     if (!detachAllAudioTracksFromVideo(
             m_project,
@@ -14206,7 +14233,12 @@ void AppController::separateAllAudioTracks(int trackIndex, int clipIndex)
             clipIndex))
         return;
 
-    m_selection = selectionWithLinkedPartners(m_project, trackIndex, clipIndex);
+    // New companion tracks can shift the original indexes, so resolve by id.
+    if (findClipById(m_project, videoId, &trackIndex, &clipIndex)) {
+        m_selectedTrack = trackIndex;
+        m_selectedClip = clipIndex;
+        m_selection = selectionWithLinkedPartners(m_project, trackIndex, clipIndex);
+    }
     pushProjectEdit(before, tr("All audio tracks separated"));
     finishEdit(tr("All audio tracks separated"));
 }
@@ -14219,24 +14251,33 @@ void AppController::separateAllAudioTracksFromSelection()
     if (pairs.isEmpty())
         return;
 
-    const drift::Project before = m_project;
-    bool changed = false;
-    QSet<QString> detachedVideoIds;
+    QStringList videoIds;
     for (const QPair<int, int> &pair : pairs) {
         if (!isValidClipIndex(pair.first, pair.second))
             continue;
+        const drift::Clip &clip = m_project.tracks().at(pair.first).clips.at(pair.second);
+        if (clip.type == drift::ClipType::Video)
+            videoIds.append(clip.id);
+    }
+    QString selectedId;
+    if (isValidClipIndex(m_selectedTrack, m_selectedClip))
+        selectedId = m_project.tracks().at(m_selectedTrack).clips.at(m_selectedClip).id;
 
-        drift::Clip &clip = m_project.tracks()[pair.first].clips[pair.second];
-        if (clip.type != drift::ClipType::Video || detachedVideoIds.contains(clip.id))
+    const drift::Project before = m_project;
+    bool changed = false;
+    QSet<QString> detachedVideoIds;
+    for (const QString &videoId : videoIds) {
+        if (detachedVideoIds.contains(videoId))
             continue;
-
-        const QString videoId = clip.id;
-
+        int trackIndex = -1;
+        int clipIndex = -1;
+        if (!findClipById(m_project, videoId, &trackIndex, &clipIndex))
+            continue;
         if (detachAllAudioTracksFromVideo(
                 m_project,
                 m_assetLibrary,
-                pair.first,
-                pair.second)) {
+                trackIndex,
+                clipIndex)) {
             detachedVideoIds.insert(videoId);
             changed = true;
         }
@@ -14245,7 +14286,8 @@ void AppController::separateAllAudioTracksFromSelection()
     if (!changed)
         return;
 
-    if (m_selectedTrack >= 0 && m_selectedClip >= 0)
+    if (!selectedId.isEmpty()
+        && findClipById(m_project, selectedId, &m_selectedTrack, &m_selectedClip))
         m_selection = selectionWithLinkedPartners(m_project, m_selectedTrack, m_selectedClip);
 
     pushProjectEdit(before, tr("All audio tracks separated"));
@@ -15743,6 +15785,87 @@ void AppController::setClipKeyframe(int trackIndex, int clipIndex, const QString
     }
     pushProjectEdit(before, tr("Add keyframe"));
     finishEdit(tr("Keyframe set"));
+}
+
+void AppController::setClipScaleKeyframe(int trackIndex, int clipIndex, double atSeconds,
+                                         double width, double height)
+{
+    if (!isValidClipIndex(trackIndex, clipIndex))
+        return;
+
+    drift::Clip &clip = m_project.tracks()[trackIndex].clips[clipIndex];
+    const drift::Project before = m_project;
+    const drift::TimeUs rel = qBound<drift::TimeUs>(
+        0, drift::secondsToUs(atSeconds) - clip.timelineStart, clip.timelineDuration);
+    const bool wroteWidth = writeClipPropValue(clip, QStringLiteral("width"), rel, width,
+                                                m_autoKeyEnabled, /*force=*/true);
+    const bool wroteHeight = writeClipPropValue(clip, QStringLiteral("height"), rel, height,
+                                                 m_autoKeyEnabled, /*force=*/true);
+    if (!wroteWidth && !wroteHeight)
+        return;
+
+    pushProjectEdit(before, tr("Add scale keyframe"));
+    finishEdit(tr("Scale keyframe set"));
+}
+
+void AppController::removeClipScaleKeyframe(int trackIndex, int clipIndex, double atSeconds)
+{
+    if (!isValidClipIndex(trackIndex, clipIndex))
+        return;
+
+    drift::Clip &clip = m_project.tracks()[trackIndex].clips[clipIndex];
+    const drift::Project before = m_project;
+    const drift::TimeUs rel = qMax<drift::TimeUs>(0, drift::secondsToUs(atSeconds) - clip.timelineStart);
+    bool removed = false;
+    for (const QString &prop : {QStringLiteral("width"), QStringLiteral("height")}) {
+        drift::KeyframeTrack<double> *kt = keyframeTrackForProp(clip, prop, /*createIfMissing=*/false);
+        if (!kt)
+            continue;
+        const drift::TimeUs nearest = kt->nearestKeyframe(rel, kKeyframeToleranceUs);
+        if (nearest >= 0) {
+            kt->removeKeyframe(nearest);
+            removed = true;
+        }
+    }
+    if (!removed)
+        return;
+
+    pushProjectEdit(before, tr("Remove scale keyframe"));
+    finishEdit(tr("Scale keyframe removed"));
+}
+
+void AppController::clearClipScaleKeyframes(int trackIndex, int clipIndex, double atSeconds)
+{
+    if (!isValidClipIndex(trackIndex, clipIndex))
+        return;
+
+    drift::Clip &clip = m_project.tracks()[trackIndex].clips[clipIndex];
+    const drift::TimeUs rel = qBound<drift::TimeUs>(
+        0, drift::secondsToUs(atSeconds) - clip.timelineStart, clip.timelineDuration);
+    const drift::Project before = m_project;
+    bool changed = false;
+    for (const QString &prop : {QStringLiteral("width"), QStringLiteral("height")}) {
+        drift::KeyframeTrack<double> *kt = keyframeTrackForProp(clip, prop, /*createIfMissing=*/false);
+        if (!kt || kt->isEmpty())
+            continue;
+
+        // Keep the visible scale at the playhead while removing the animation.
+        // A single key at zero is the static layout value for this property.
+        const double current = kt->evaluateAt(rel);
+        if (kt->keyframes().size() == 1 && kt->keyframes().firstKey() == 0
+            && qFuzzyCompare(kt->keyframes().first().value, current))
+            continue;
+
+        drift::KeyframeTrack<double> staticTrack;
+        staticTrack.setKeyframe(0, current);
+        *kt = staticTrack;
+        changed = true;
+    }
+    if (!changed)
+        return;
+
+    pushProjectEdit(before, tr("Clear scale keyframes"));
+    finishEdit(tr("Scale animation cleared"));
 }
 
 void AppController::setClipColorKeyframe(int trackIndex, int clipIndex, const QString &prop,
@@ -19540,11 +19663,17 @@ void AppController::goToPreviousEdit()
 
 void AppController::toggleBookmarkAtPlayhead()
 {
-    const int near = nearestBookmarkIndex(m_project.bookmarks(), m_playheadUs,
-                                          drift::kSnapThresholdUs);
-    if (near >= 0) {
-        removeBookmark(near);
-        return;
+    // The timeline's 150 ms snapping radius is much wider than a frame. Using it here
+    // deletes a nearby, distinct bookmark when the user is trying to add another one.
+    // Toggle only a bookmark on the same project frame as the playhead.
+    const int fps = m_projectFile->projectFps();
+    const qint64 playheadFrame = qRound64(drift::usToSeconds(m_playheadUs) * fps);
+    const auto &marks = m_project.bookmarks();
+    for (int i = 0; i < marks.size(); ++i) {
+        if (qRound64(drift::usToSeconds(marks.at(i).timeUs) * fps) == playheadFrame) {
+            removeBookmark(i);
+            return;
+        }
     }
 
     const int markNumber = m_project.bookmarks().size() + 1;
