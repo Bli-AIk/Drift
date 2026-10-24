@@ -138,7 +138,7 @@ private:
 
     void setStatus(const QString &status);
     void setRefreshing(bool refreshing);
-    void applyIndex(const QByteArray &json, bool fromCache);
+    bool applyIndex(const QByteArray &json, bool fromCache);
     void startDownload(const QString &id);
     void finishDownload(const QString &id);
     void beginExtract(const QString &id, const QString &packagePath);
