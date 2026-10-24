@@ -1,9 +1,10 @@
 import QtQuick
 import Drift
 
-// Every panel instance lives here for the whole session. A layout rebuild only moves
-// them between slots and this hidden holder; destroying one would take the preview's
-// video sink and GL renderer with it.
+// Every panel wrapper lives here for the whole session. A layout rebuild only moves
+// them between slots and this hidden holder. Preview is a plain instance (destroying it would
+// take its video sink and GL renderer along); every other panel sits inside a LazyPanel that
+// creates it on demand and destroys it a few seconds after it leaves the screen.
 Item {
     id: root
     visible: false
@@ -26,52 +27,35 @@ Item {
 
     property var _created: ({})
 
-    // Parked panels keep visible=true but sit under the hidden holder, so parent is the test.
-    readonly property bool audioMixerShown: !!root.audioMixerPanel
-                                            && root.audioMixerPanel.visible
-                                            && root.audioMixerPanel.parent !== root
+    // Parked wrappers sit under the hidden holder, so parent is part of the test.
+    function _shownOf(type) {
+        const w = root._created[type]
+        return !!w && w.visible && w.parent !== root
+    }
 
-    readonly property bool sourceViewerShown: !!root.sourceViewerPanel
-                                              && root.sourceViewerPanel.visible
-                                              && root.sourceViewerPanel.parent !== root
+    readonly property bool denoiseInLayout: !!root._created["denoise"] && root._created["denoise"].parent !== root
 
-    readonly property bool denoiseInLayout: !!root.denoisePanel && root.denoisePanel.parent !== root
+    readonly property bool audioMixerShown: root._shownOf("audioMixer")
 
-    readonly property bool denoiseShown: !!root.denoisePanel
-                                         && root.denoisePanel.visible
-                                         && root.denoisePanel.parent !== root
+    readonly property bool sourceViewerShown: root._shownOf("sourceViewer")
 
-    readonly property bool colorShown: !!root.colorPanel
-                                       && root.colorPanel.visible
-                                       && root.colorPanel.parent !== root
+    readonly property bool denoiseShown: root._shownOf("denoise")
 
-    readonly property bool looksShown: !!root.looksPanel
-                                       && root.looksPanel.visible
-                                       && root.looksPanel.parent !== root
+    readonly property bool colorShown: root._shownOf("color")
 
-    readonly property bool scopesShown: !!root.scopesPanel
-                                        && root.scopesPanel.visible
-                                        && root.scopesPanel.parent !== root
+    readonly property bool looksShown: root._shownOf("looks")
 
-    readonly property bool keyframesShown: !!root.keyframesPanel
-                                           && root.keyframesPanel.visible
-                                           && root.keyframesPanel.parent !== root
+    readonly property bool scopesShown: root._shownOf("scopes")
 
-    readonly property bool subtitlesShown: !!root.subtitlesPanel
-                                           && root.subtitlesPanel.visible
-                                           && root.subtitlesPanel.parent !== root
+    readonly property bool keyframesShown: root._shownOf("keyframes")
 
-    readonly property bool subtitleLaneShown: !!root.subtitleLanePanel
-                                              && root.subtitleLanePanel.visible
-                                              && root.subtitleLanePanel.parent !== root
+    readonly property bool subtitlesShown: root._shownOf("subtitles")
 
-    readonly property bool subtitleTextShown: !!root.subtitleTextPanel
-                                              && root.subtitleTextPanel.visible
-                                              && root.subtitleTextPanel.parent !== root
+    readonly property bool subtitleLaneShown: root._shownOf("subtitleLane")
 
-    readonly property bool subtitleTimingShown: !!root.subtitleTimingPanel
-                                                && root.subtitleTimingPanel.visible
-                                                && root.subtitleTimingPanel.parent !== root
+    readonly property bool subtitleTextShown: root._shownOf("subtitleText")
+
+    readonly property bool subtitleTimingShown: root._shownOf("subtitleTiming")
 
     // One line per panel type. A type missing from here gets a placeholder.
     // "assets.<tab>" and "properties.<tab>" are handled by prefix in panel(): the full panels
@@ -97,39 +81,86 @@ Item {
         "agentLog": agentLogC
     })
 
-    Component { id: assetsC; AssetsPanel {} }
-    Component { id: propertiesC; PropertiesPanel {} }
+    Component { id: assetsC; LazyPanel { panel: AssetsPanel {} } }
+    Component { id: propertiesC; LazyPanel { panel: PropertiesPanel {} } }
     Component { id: previewC; PreviewPanel {} }
-    Component { id: timelineC; TimelinePanel {} }
-    Component { id: audioMixerC; AudioMixerPanel {} }
+    Component { id: timelineC; LazyPanel { panel: TimelinePanel {} } }
+    Component { id: audioMixerC; LazyPanel { panel: AudioMixerPanel {} } }
     Component { id: subtitlesC; LazyPanel { panel: SubtitlesPanel {} } }
     Component { id: subtitleLaneC; LazyPanel { panel: SubtitleLanePanel {} } }
     Component { id: subtitleTextC; LazyPanel { panel: SubtitleTextPanel {} } }
     Component { id: subtitleTimingC; LazyPanel { panel: SubtitleTimingPanel {} } }
-    Component { id: recorderC; RecorderPanel {} }
-    Component { id: denoiseC; DenoisePanel {} }
-    Component { id: colorC; ColorPanel {} }
-    Component { id: looksC; LooksPanel {} }
-    Component { id: scopesC; ScopesPanel {} }
-    Component { id: keyframesC; KeyframesPanel {} }
-    Component { id: historyC; HistoryPanel {} }
-    Component { id: sourceViewerC; SourceViewerPanel {} }
-    Component { id: agentLogC; AgentLogPanel {} }
+    Component { id: recorderC; LazyPanel { panel: RecorderPanel {} } }
+    Component { id: denoiseC; LazyPanel { panel: DenoisePanel {} } }
+    Component { id: colorC; LazyPanel { panel: ColorPanel {} } }
+    Component { id: looksC; LazyPanel { panel: LooksPanel {} } }
+    Component { id: scopesC; LazyPanel { panel: ScopesPanel {} } }
+    Component { id: keyframesC; LazyPanel { panel: KeyframesPanel {} } }
+    Component { id: historyC; LazyPanel { panel: HistoryPanel {} } }
+    Component { id: sourceViewerC; LazyPanel { panel: SourceViewerPanel {} } }
+    Component { id: agentLogC; LazyPanel { panel: AgentLogPanel {} } }
     Component { id: placeholderC; WorkspacePlaceholderPanel {} }
 
-    // Stays in the pool like any panel, but its content only exists while shown: a parked or
-    // background-tab panel keeps no bindings alive.
+    // Stays in the pool like any panel, but the panel inside only exists while shown (plus a
+    // grace period): a parked or background-tab panel keeps no bindings alive.
     component LazyPanel: Item {
         id: lazy
 
         property bool shown: false
         property Component panel: null
+        property var props: ({})
+        property string tab: ""
+        property var setup: null
+        property var _item: null
+        readonly property var item: lazy._item
 
-        Loader {
-            anchors.fill: parent
-            active: lazy.shown
-            sourceComponent: lazy.panel
-            onLoaded: item.shown = Qt.binding(() => lazy.shown)
+        function refresh() {
+            const wanted = lazy.shown || grace.running
+            if (wanted && !lazy._item) {
+                const inner = lazy.panel.createObject(lazy, lazy.props)
+                inner.anchors.fill = lazy
+                if ("shown" in inner)
+                    inner.shown = Qt.binding(() => lazy.shown)
+                lazy.applyTab(inner)
+                if (lazy.setup)
+                    lazy.setup(inner)
+                lazy._item = inner
+            } else if (!wanted && lazy._item) {
+                const old = lazy._item
+                lazy._item = null
+                old.destroy()
+            }
+        }
+
+        function applyTab(inner) {
+            if (!lazy.tab)
+                return
+            if (typeof inner.showTab === "function") {
+                inner.showTab(lazy.tab)
+            } else if (typeof inner.tabIndexOf === "function") {
+                const index = inner.tabIndexOf(lazy.tab)
+                if (index >= 0)
+                    inner.activeTab = index
+            }
+        }
+
+        onShownChanged: {
+            if (lazy.shown)
+                grace.stop()
+            else
+                grace.restart()
+            lazy.refresh()
+        }
+
+        onTabChanged: {
+            if (lazy._item)
+                lazy.applyTab(lazy._item)
+        }
+
+        Timer {
+            id: grace
+            interval: 5000
+            onTriggered: lazy.refresh()
         }
     }
 
@@ -144,87 +175,90 @@ Item {
 
     function create(type) {
         if (type.startsWith("assets."))
-            return assetsC.createObject(root, { lockedTab: type.slice(7) })
+            return assetsC.createObject(root, { props: { lockedTab: type.slice(7) } })
         if (type.startsWith("properties.")) {
-            const pane = propertiesC.createObject(root, { lockedTab: type.slice(11) })
-            pane.browseEffectsRequested.connect(root.browseEffects)
-            pane.browseAudioEffectsRequested.connect(root.browseAudioEffects)
-            return pane
+            const wrapper = propertiesC.createObject(root, { props: { lockedTab: type.slice(11) } })
+            wrapper.setup = pane => {
+                pane.browseEffectsRequested.connect(root.browseEffects)
+                pane.browseAudioEffectsRequested.connect(root.browseAudioEffects)
+            }
+            return wrapper
         }
         const factory = root.factories[type]
         return factory ? factory.createObject(root)
                        : placeholderC.createObject(root, { label: root.label(type) })
     }
 
-    function browseEffects() { root.assetsPanel?.showTab("effects") }
-    function browseAudioEffects() { root.assetsPanel?.showTab("sounds") }
+    function showAssetsTab(tab) {
+        if (root.assetsPanel)
+            root.assetsPanel.showTab(tab)
+        else
+            root.panel("assets").tab = tab
+    }
+
+    function browseEffects() { root.showAssetsTab("effects") }
+    function browseAudioEffects() { root.showAssetsTab("sounds") }
 
     function panel(type) {
         if (root._created[type])
             return root._created[type]
-        const item = root.create(type)
-        root._created[type] = item
+        const w = root.create(type)
+        root._created = Object.assign({}, root._created, { [type]: w })
+        if ("setup" in w)
+            w.shown = Qt.binding(() => root._shownOf(type))
         switch (type) {
         case "assets":
-            root.assetsPanel = item
+            root.assetsPanel = Qt.binding(() => w.item)
             break
         case "properties":
-            root.propertiesPanel = item
+            root.propertiesPanel = Qt.binding(() => w.item)
             break
         case "preview":
-            root.previewPanel = item
-            item.previewFullscreen = Qt.binding(() => ShellBridge.main?.previewFullscreen ?? false)
+            root.previewPanel = w
+            w.previewFullscreen = Qt.binding(() => ShellBridge.main?.previewFullscreen ?? false)
             break
         case "timeline":
-            root.timelinePanel = item
-            item.keyframesTab = Qt.binding(() => (root.propertiesPanel?.keyframesTab ?? false) && !root.keyframesShown)
-            item.externalMixerShown = Qt.binding(() => root.audioMixerShown)
+            root.timelinePanel = Qt.binding(() => w.item)
+            w.setup = item => {
+                item.keyframesTab = Qt.binding(() => (root.propertiesPanel?.keyframesTab ?? false) && !root.keyframesShown)
+                item.externalMixerShown = Qt.binding(() => root.audioMixerShown)
+            }
             break
         case "audioMixer":
-            root.audioMixerPanel = item
+            root.audioMixerPanel = Qt.binding(() => w.item)
             break
         case "sourceViewer":
-            root.sourceViewerPanel = item
-            item.shown = Qt.binding(() => root.sourceViewerShown)
+            root.sourceViewerPanel = Qt.binding(() => w.item)
             break
         case "denoise":
-            root.denoisePanel = item
-            item.shown = Qt.binding(() => root.denoiseShown)
+            root.denoisePanel = Qt.binding(() => w.item)
             break
         case "color":
-            root.colorPanel = item
-            item.shown = Qt.binding(() => root.colorShown)
+            root.colorPanel = Qt.binding(() => w.item)
             break
         case "looks":
-            root.looksPanel = item
-            item.shown = Qt.binding(() => root.looksShown)
+            root.looksPanel = Qt.binding(() => w.item)
             break
         case "scopes":
-            root.scopesPanel = item
-            item.shown = Qt.binding(() => root.scopesShown)
+            root.scopesPanel = Qt.binding(() => w.item)
             break
         case "keyframes":
-            root.keyframesPanel = item
-            item.shown = Qt.binding(() => root.keyframesShown)
+            root.keyframesPanel = Qt.binding(() => w.item)
             break
         case "subtitles":
-            root.subtitlesPanel = item
-            item.shown = Qt.binding(() => root.subtitlesShown)
+            root.subtitlesPanel = Qt.binding(() => w.item)
             break
         case "subtitleLane":
-            root.subtitleLanePanel = item
-            item.shown = Qt.binding(() => root.subtitleLaneShown)
+            root.subtitleLanePanel = Qt.binding(() => w.item)
             break
         case "subtitleText":
-            root.subtitleTextPanel = item
-            item.shown = Qt.binding(() => root.subtitleTextShown)
+            root.subtitleTextPanel = Qt.binding(() => w.item)
             break
         case "subtitleTiming":
-            root.subtitleTimingPanel = item
-            item.shown = Qt.binding(() => root.subtitleTimingShown)
+            root.subtitleTimingPanel = Qt.binding(() => w.item)
             break
         }
-        return item
+        return w
     }
 
     // Turns on the timeline's cue lane (SubtitleCueLane) while any subtitle panel is on screen.

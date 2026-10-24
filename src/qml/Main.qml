@@ -685,10 +685,12 @@ ApplicationWindow {
 
     function openDenoise(track, clip, durationSeconds) {
         if (workspace.pool.denoiseInLayout && !denoiseWindowLoader.shown) {
+            workspace.pool.panel("denoise").parent?.parent?.activate?.("denoise")
             const panel = workspace.pool.denoisePanel
-            panel.parent?.parent?.activate?.("denoise")
-            panel.openFor(track, clip, durationSeconds)
-            return
+            if (panel) {
+                panel.openFor(track, clip, durationSeconds)
+                return
+            }
         }
         denoiseWindowLoader.ensure().openFor(track, clip, durationSeconds)
     }
@@ -748,7 +750,7 @@ ApplicationWindow {
             return
         }
         if (workspace.pool.sourceViewerShown)
-            workspace.pool.sourceViewerPanel.release()
+            workspace.pool.sourceViewerPanel?.release()
         mediaPreviewWindowLoader.ensure().openClip(track, clip)
     }
 
@@ -925,7 +927,7 @@ ApplicationWindow {
     function showAssetsTab(tabId) {
         if (window.previewFullscreen)
             window.togglePreviewFullscreen()
-        assetsPanel?.showTab(tabId)
+        workspace.pool.showAssetsTab(tabId)
     }
 
     function assetsTabLabel(tabId) {
