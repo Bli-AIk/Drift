@@ -161,7 +161,7 @@ class AppController : public QObject
     Q_PROPERTY(float audioRecordLevel READ audioRecordLevel NOTIFY audioRecordLevelChanged)
     Q_PROPERTY(float audioRecordGain READ audioRecordGain WRITE setAudioRecordGain NOTIFY audioRecordGainChanged)
     Q_PROPERTY(double audioRecordSeconds READ audioRecordSeconds NOTIFY audioRecordSecondsChanged)
-    Q_PROPERTY(QVariantList audioRecordLivePeaks READ audioRecordLivePeaks NOTIFY audioRecordLivePeaksChanged)
+    Q_PROPERTY(int audioRecordLivePeakCount READ audioRecordLivePeakCount NOTIFY audioRecordLivePeaksChanged)
     Q_PROPERTY(QVariantList availableMicrophones READ availableMicrophones NOTIFY availableMicrophonesChanged)
     Q_PROPERTY(QString currentMicrophoneName READ currentMicrophoneName NOTIFY currentMicrophoneChanged)
     Q_PROPERTY(QVariantList tracks READ tracks NOTIFY tracksChanged)
@@ -361,7 +361,8 @@ public:
     float audioRecordGain() const;
     Q_INVOKABLE void setAudioRecordGain(float gain);
     double audioRecordSeconds() const;
-    QVariantList audioRecordLivePeaks() const;
+    int audioRecordLivePeakCount() const;
+    Q_INVOKABLE QVariantList audioRecordLivePeakColumns(double first, double count, int columns) const;
     QVariantList availableMicrophones() const;
     QString currentMicrophoneName() const;
 

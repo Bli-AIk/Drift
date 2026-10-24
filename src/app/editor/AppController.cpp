@@ -6355,9 +6355,14 @@ void AppController::setAudioRecordGain(float gain)
     m_audioRecorder.setGain(gain);
 }
 
-QVariantList AppController::audioRecordLivePeaks() const
+int AppController::audioRecordLivePeakCount() const
 {
-    return m_audioRecorder.livePeaks();
+    return m_audioRecorder.livePeakCount();
+}
+
+QVariantList AppController::audioRecordLivePeakColumns(double first, double count, int columns) const
+{
+    return m_audioRecorder.livePeakColumns(first, count, columns);
 }
 
 void AppController::pauseAudioRecording()
@@ -21180,8 +21185,12 @@ void AppController::applyBeatAnalysis(const AudioBeatAnalysis &analysis, double 
 
     QVariantList onsets;
     for (const AudioOnset &o : analysis.onsets) {
+        const auto next = std::lower_bound(analysis.beats.cbegin(), analysis.beats.cend(),
+                                           o.seconds - 0.06);
+        const bool nearBeat = next != analysis.beats.cend() && std::abs(*next - o.seconds) < 0.06;
         onsets.append(QVariantMap{{QStringLiteral("seconds"), o.seconds},
-                                  {QStringLiteral("strength"), o.strength}});
+                                  {QStringLiteral("strength"), o.strength},
+                                  {QStringLiteral("nearBeat"), nearBeat}});
     }
 
     m_beatAnalysis = QVariantMap{

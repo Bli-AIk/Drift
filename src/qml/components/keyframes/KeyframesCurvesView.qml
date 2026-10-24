@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Drift
 import "KeyframesModel.js" as Model
+import "EasingCache.js" as EasingCache
 
 Item {
     id: root
@@ -105,7 +106,7 @@ Item {
             hi = Math.max(hi, v)
             if (pts[i].fn && i + 1 < pts.length) {
                 const span = Number(pts[i + 1].value) - v
-                const samples = EditorState.easingSamples(easingFnSpec(pts[i]), 48)
+                const samples = EasingCache.samples(easingFnSpec(pts[i]), 48, (s, n) => EditorState.easingSamples(s, n))
                 for (let k = 0; k < samples.length; ++k) {
                     const w = v + span * samples[k].y
                     lo = Math.min(lo, w)

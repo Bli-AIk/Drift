@@ -40,14 +40,14 @@ Rectangle {
         onPaint: {
             var ctx = getContext("2d");
             ctx.clearRect(0, 0, width, height);
-            var peaks = EditorState.audioRecordLivePeaks;
-            if (!peaks || peaks.length === 0)
+            var n = EditorState.audioRecordLivePeakCount;
+            if (n === 0)
                 return;
 
             var mid = height / 2;
             var half = mid * 0.85;
             var w = Math.max(1, Math.floor(width));
-            var n = peaks.length;
+            var cols = EditorState.audioRecordLivePeakColumns(0, n, w);
 
             // Centerline guideline
             ctx.strokeStyle = Theme.c.androidTimelineLiveRecording.waveStroke;
@@ -61,27 +61,13 @@ Rectangle {
             ctx.fillStyle = Theme.c.androidTimelineLiveRecording.waveFill;
             ctx.beginPath();
             for (var x = 0; x < w; x++) {
-                var i0 = Math.floor(x * n / w);
-                var i1 = Math.floor((x + 1) * n / w);
-                if (i1 <= i0) i1 = Math.min(n, i0 + 1);
-                var peak = 0;
-                for (var i = i0; i < i1; i++) {
-                    if (peaks[i] > peak) peak = peaks[i];
-                }
-                var amp = Math.max(1.0, peak * half);
+                var amp = Math.max(1.0, cols[x] * half);
                 if (x === 0) ctx.moveTo(x, mid - amp);
                 else ctx.lineTo(x, mid - amp);
                 ctx.lineTo(x + 1, mid - amp);
             }
             for (var xb = w - 1; xb >= 0; xb--) {
-                var j0 = Math.floor(xb * n / w);
-                var j1 = Math.floor((xb + 1) * n / w);
-                if (j1 <= j0) j1 = Math.min(n, j0 + 1);
-                var peakB = 0;
-                for (var j = j0; j < j1; j++) {
-                    if (peaks[j] > peakB) peakB = peaks[j];
-                }
-                var ampB = Math.max(1.0, peakB * half);
+                var ampB = Math.max(1.0, cols[xb] * half);
                 ctx.lineTo(xb + 1, mid + ampB);
                 ctx.lineTo(xb, mid + ampB);
             }

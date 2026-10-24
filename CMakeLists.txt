@@ -1708,6 +1708,7 @@ qt_add_qml_module(drift
         src/qml/components/keyframes/KeyframesTreeRow.qml
         src/qml/components/keyframes/KeyframesValueScrubber.qml
         src/qml/components/keyframes/ScaleMath.js
+        src/qml/components/keyframes/EasingCache.js
         src/qml/components/color/GradeSlider.qml
         src/qml/components/color/ColorWheel.qml
         src/qml/components/color/CurveEditor.qml

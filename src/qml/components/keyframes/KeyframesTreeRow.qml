@@ -10,6 +10,7 @@ Item {
     required property int track
     required property int clip
     required property real playhead
+    required property real displayPlayhead
     required property bool curvesMode
     required property bool curveShown
     required property bool focused
@@ -18,17 +19,17 @@ Item {
     readonly property bool isGroup: row.type === "group"
     readonly property color accent: Theme.keyframeCurveColor(isGroup ? "" : row.keyProp)
     readonly property bool hasKeys: !isGroup && !!row.keys && row.keys.length > 0
-    readonly property var keysHere: isGroup ? [] : Model.refsForRowAt(row, playhead)
+    readonly property var keysHere: isGroup ? [] : Model.refsForRowAt(row, displayPlayhead)
     readonly property bool keyHere: keysHere.length > 0
-    readonly property bool hasPrev: hasKeys && Model.prevKeyTime([row], playhead) !== null
-    readonly property bool hasNext: hasKeys && Model.nextKeyTime([row], playhead) !== null
+    readonly property bool hasPrev: hasKeys && Model.prevKeyTime([row], displayPlayhead) !== null
+    readonly property bool hasNext: hasKeys && Model.nextKeyTime([row], displayPlayhead) !== null
 
     signal focusRequested()
     signal groupToggled()
     signal curveShownToggled(bool shown)
 
     function toggleKeyHere() {
-        if (keyHere)
+        if (!isGroup && Model.refsForRowAt(row, playhead).length > 0)
             EditorState.keyframes.removeKeysAt(track, clip, row.tracks, playhead)
         else
             EditorState.keyframes.addKeysAt(track, clip, row.tracks, playhead)

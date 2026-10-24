@@ -1,5 +1,6 @@
 import QtQuick
 import Drift
+import "../keyframes/EasingCache.js" as EasingCache
 
 Canvas {
     property var host
@@ -38,7 +39,8 @@ Canvas {
             const isLinkedPartner = EditorState.positionLinked
                 && ((host.dragProp === "x" && entry.prop === "y") || (host.dragProp === "y" && entry.prop === "x"))
 
-            const live = entry.points.map(function (p, i) {
+            const affected = entry.prop === host.dragProp || isLinkedPartner
+            const live = !affected ? null : entry.points.map(function (p, i) {
                 if (entry.prop === host.dragProp) {
                     if (i === host.dragTangentIndex) {
                         // Handle being dragged: same key, reshaped.
@@ -96,7 +98,7 @@ Canvas {
                 }
                 return p
             })
-            const sorted = live.sort((a, b) => a.seconds - b.seconds)
+            const sorted = affected ? live.sort((a, b) => a.seconds - b.seconds) : EasingCache.sortedPoints(entry)
 
             // The focused series is the one being edited; the rest are
             // context and are drawn thinner and faded. A series whose
@@ -145,7 +147,7 @@ Canvas {
                 }
                 if (a.fn) {
                     // A Penner function ignores the handles; the engine's samples are the curve.
-                    const samples = EditorState.easingSamples(host.easingFnSpec(a), 48)
+                    const samples = EasingCache.samples(host.easingFnSpec(a), 48, (s, n) => EditorState.easingSamples(s, n))
                     for (let k = 0; k < samples.length; ++k) {
                         const u = samples[k].x
                         const f = samples[k].y

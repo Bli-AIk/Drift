@@ -34,10 +34,15 @@ Canvas {
         // tick onto a half-pixel and smear it across two columns.
         const localX = t => Math.round(host.xForSeconds(t) - host.paintOriginX)
 
+        const t0 = host.secondsForX(host.paintOriginX - 3)
+        const t1 = host.secondsForX(host.paintOriginX + width + 3)
+
         if (host.hasGrid) {
             const perBar = a.beatsPerBar || 4
             const first = a.firstDownbeat || 0
-            for (let i = 0; i < a.beats.length; ++i) {
+            for (let i = Math.max(0, host.lowerBound(a.beats, t0) - 1); i < a.beats.length; ++i) {
+                if (a.beats[i] > t1)
+                    break
                 const isBar = ((i - first) % perBar + perBar) % perBar === 0
                 const px = localX(a.beats[i])
                 if (px < -2 || px > width + 2)
@@ -55,8 +60,10 @@ Canvas {
         // just double-draw lines already there. Height tracks strength.
         ctx.fillStyle = String(root.beatOnsetColor)
         const onsets = a.onsets || []
-        for (let j = 0; j < onsets.length; ++j) {
-            if (host.hasGrid && host.nearAnyBeat(onsets[j].seconds))
+        for (let j = Math.max(0, host.lowerBound(onsets, t0, "seconds") - 1); j < onsets.length; ++j) {
+            if (onsets[j].seconds > t1)
+                break
+            if (host.hasGrid && onsets[j].nearBeat)
                 continue
             const ox = localX(onsets[j].seconds)
             if (ox < -2 || ox > width + 2)

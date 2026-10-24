@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
+import "keyframes/EasingCache.js" as EasingCache
 
 // Keyframe strip aligned with the timeline: left gutter matches track labels,
 // graph scroll + playhead share the timeline's contentX / pxPerSecond.
@@ -165,7 +166,7 @@ Item {
             // A Penner function overshoots its endpoints, so the lane has to make room for its peak.
             if (pts[i].fn && i + 1 < pts.length) {
                 const span = Number(pts[i + 1].value) - v
-                const samples = EditorState.easingSamples(root.easingFnSpec(pts[i]), 48)
+                const samples = EasingCache.samples(root.easingFnSpec(pts[i]), 48, (s, n) => EditorState.easingSamples(s, n))
                 for (let k = 0; k < samples.length; ++k) {
                     const w = v + span * samples[k].y
                     lo = Math.min(lo, w)
@@ -331,16 +332,17 @@ Item {
         EditorState.analyzeBeats(root.clipStart, root.clipDuration)
     }
 
-    // An onset this close to a grid line is already represented by it — drawing both
-    // would just thicken the same line.
-    function nearAnyBeat(seconds) {
-        if (!beats || !beats.beats)
-            return false
-        for (let i = 0; i < beats.beats.length; ++i) {
-            if (Math.abs(beats.beats[i] - seconds) < 0.06)
-                return true
+    function lowerBound(list, value, key) {
+        let lo = 0
+        let hi = list.length
+        while (lo < hi) {
+            const mid = (lo + hi) >> 1
+            if ((key ? list[mid][key] : list[mid]) < value)
+                lo = mid + 1
+            else
+                hi = mid
         }
-        return false
+        return lo
     }
 
     // Drag the bottom edge or wheel over the header to grow the lane.

@@ -373,6 +373,7 @@ PanelFrame {
                 track: root.track
                 clip: root.clip
                 playhead: root.playhead
+                displayPlayhead: EditorState.inspectorPlayheadSeconds
                 curvesMode: root.mode === "curves"
                 curveShown: !!root.curveShown[modelData.keyProp]
                 focused: modelData.type !== "group" && root.focusedProp === modelData.prop

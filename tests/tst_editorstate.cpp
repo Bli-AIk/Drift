@@ -7244,7 +7244,7 @@ void EditorStateTest::audioRecordingVoiceoverWorkflow()
     QCOMPARE(state.audioRecordLevel(), 0.0f);
     QCOMPARE(state.audioRecordSeconds(), 0.0);
     QCOMPARE(state.audioRecordGain(), 1.0f);
-    QVERIFY(state.audioRecordLivePeaks().isEmpty());
+    QCOMPARE(state.audioRecordLivePeakCount(), 0);
 
     // Gain adjustment
     state.setAudioRecordGain(1.25f);
@@ -7296,7 +7296,7 @@ void EditorStateTest::audioRecordingVoiceoverWorkflow()
         QCOMPARE(state.playing(), false);
         QCOMPARE(state.playheadSeconds(), 2.5);
         QCOMPARE(project.tracks().at(0).clips.size(), 1);
-        QVERIFY(state.audioRecordLivePeaks().isEmpty());
+        QCOMPARE(state.audioRecordLivePeakCount(), 0);
 
         // Start recording again to test commit and undo/redo
         state.setPlayheadSeconds(3.0);
@@ -7313,7 +7313,7 @@ void EditorStateTest::audioRecordingVoiceoverWorkflow()
         QCOMPARE(state.isAudioRecordingPaused(), false);
         QCOMPARE(state.playing(), false);
         QCOMPARE(project.tracks().at(0).clips.size(), 2);
-        QVERIFY(state.audioRecordLivePeaks().isEmpty());
+        QCOMPARE(state.audioRecordLivePeakCount(), 0);
 
         const drift::Clip &newClip = project.tracks().at(0).clips.at(1);
         QCOMPARE(newClip.type, drift::ClipType::Audio);
