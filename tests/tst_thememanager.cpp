@@ -960,7 +960,10 @@ void ThemeManagerTest::importJsonFolderZipAndRejectsTraversal()
     const QString link = outside.filePath(QStringLiteral("linked.json"));
     QVERIFY(QFile::link(jsonPath, link));
     QCOMPARE(manager.importTheme(QUrl::fromLocalFile(link)), QString());
+#ifndef Q_OS_WIN
+    // On Windows QFile::link makes a .lnk shortcut, which the import reads as (invalid) JSON.
     QVERIFY(manager.lastError().contains(QStringLiteral("symlink")));
+#endif
 }
 
 void ThemeManagerTest::removeAndExportRoundTrip()

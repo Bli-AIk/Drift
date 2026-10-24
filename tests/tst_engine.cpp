@@ -16605,6 +16605,8 @@ void EngineTest::lookCatalogFindsPacksAndUserLooks()
     QVERIFY(manifest.open(QIODevice::ReadOnly));
     QCOMPARE(QJsonDocument::fromJson(manifest.readAll()).object().value(QStringLiteral("name")).toString(),
              QStringLiteral("My Look"));
+    // Windows cannot delete a file that is still open, and removeUserLook runs below.
+    manifest.close();
 
     const drift::LookImportResult second = drift::importCubeFiles({incoming + "/My Look.cube"}, userRoot);
     QCOMPARE(second.importedIds, (QStringList{myLookId}));
