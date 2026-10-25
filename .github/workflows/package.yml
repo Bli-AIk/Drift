@@ -897,12 +897,13 @@ jobs:
           # Homebrew no longer bottles anything for Intel macOS, so its Qt would be built from
           # source (past the 6 h job limit). Intel takes the official Qt and the pinned FFmpeg
           # instead, the way the Windows job does.
-          - arch: x86_64
-            runner: macos-15-intel
-            skia_target: mac-x64
-            ort_pkg: onnxruntime.cpu.osx-x64-1.0.0.driftpkg
-            homebrew_qt: false
-            ffmpeg_platform: macos64
+          # Disabled: the FFmpeg-Builds n7.1 release has no macos64 asset yet.
+          # - arch: x86_64
+          #   runner: macos-15-intel
+          #   skia_target: mac-x64
+          #   ort_pkg: onnxruntime.cpu.osx-x64-1.0.0.driftpkg
+          #   homebrew_qt: false
+          #   ffmpeg_platform: macos64
     steps:
       - uses: actions/checkout@v4
 
