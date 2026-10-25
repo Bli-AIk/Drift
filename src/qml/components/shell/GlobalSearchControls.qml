@@ -131,6 +131,7 @@ QtObject {
         setting("toolbar", qsTr("Timeline toolbar"), "toolbar buttons customize"),
         setting("keymap", qsTr("Keyboard shortcuts"), "keymap keys hotkeys bindings"),
         setting("preview", qsTr("Preview"), "quality resolution decode proxies guides background graphics gpu"),
+        setting("performance", qsTr("Performance"), "advanced tuning cache memory ram vram read-ahead buffer drop frames hardware encoder export pool"),
         setting("audio", qsTr("Audio"), "sound speakers microphone output input"),
         setting("ai", qsTr("AI & Cloud"), "agent mcp claude cursor api key elevenlabs voice scene detection"),
         setting("network", qsTr("Network"), "proxy http socks internet firewall"),

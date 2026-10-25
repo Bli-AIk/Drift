@@ -1,5 +1,6 @@
 #include "app/editor/PreferencesController.h"
 #include "engine/encode/proxies/ProxyNaming.h"
+#include "engine/EngineTuning.h"
 
 #include "engine/gpu/device/GpuPreference.h"
 #include "engine/decode/hw/HwAccel.h"
@@ -46,6 +47,12 @@ namespace {
 QTranslator g_appTranslator;
 QTranslator g_qtTranslator;
 QString g_appliedShell;
+
+// 0 means automatic; anything else is at least the 128 MiB floor.
+int normalizedFrameCacheMiB(int mib)
+{
+    return mib <= 0 ? 0 : qBound(128, mib, 8192);
+}
 // QT_SCALE_FACTOR came from ui/scale rather than the user's environment.
 bool g_uiScaleFromSettings = false;
 
@@ -267,6 +274,7 @@ PreferencesController::PreferencesController(QObject *parent)
     m_stillDurationSeconds = qBound(0.5,
         settings.value(QStringLiteral("timeline/stillDurationSeconds"), 5.0).toDouble(), 60.0);
     drift::setImageClipDurationUs(drift::secondsToUs(m_stillDurationSeconds));
+    loadPerformanceSettings();
     m_transitionDurationSeconds = qBound(0.1,
         settings.value(QStringLiteral("timeline/transitionDurationSeconds"), 0.5).toDouble(), 5.0);
     applyNetworkProxy(m_networkProxyMode, m_networkProxyHost, m_networkProxyPort, m_networkProxyUser,
@@ -584,6 +592,190 @@ void PreferencesController::setTransitionDurationSeconds(double seconds)
     m_transitionDurationSeconds = seconds;
     QSettings().setValue(QStringLiteral("timeline/transitionDurationSeconds"), m_transitionDurationSeconds);
     emit transitionDurationSecondsChanged();
+}
+
+namespace {
+
+void storePerformance(const char *key, int value)
+{
+    QSettings().setValue(QStringLiteral("performance/") + QLatin1String(key), value);
+}
+
+}
+
+void PreferencesController::loadPerformanceSettings()
+{
+    namespace t = drift::tuning;
+    const QSettings settings;
+    const auto read = [&settings](const char *key, int fallback) {
+        return settings.value(QStringLiteral("performance/") + QLatin1String(key), fallback).toInt();
+    };
+    t::staleFrameLagMs.store(qBound(0, read("staleFrameLagMs", t::Defaults::staleFrameLagMs), 1000), std::memory_order_relaxed);
+    t::readAheadMs.store(qBound(0, read("readAheadMs", t::Defaults::readAheadMs), 5000), std::memory_order_relaxed);
+    t::targetPoolMax.store(qBound(4, read("targetPoolMax", t::Defaults::targetPoolMax), 64), std::memory_order_relaxed);
+    t::targetPoolMiB.store(qBound(0, read("targetPoolMiB", t::Defaults::targetPoolMiB), 4096), std::memory_order_relaxed);
+    t::uploadCacheMax.store(qBound(8, read("uploadCacheMax", t::Defaults::uploadCacheMax), 96), std::memory_order_relaxed);
+    t::uploadCacheMiB.store(qBound(0, read("uploadCacheMiB", t::Defaults::uploadCacheMiB), 4096), std::memory_order_relaxed);
+    t::readerHistoryMiB.store(qBound(0, read("readerHistoryMiB", t::Defaults::readerHistoryMiB), 1024), std::memory_order_relaxed);
+    t::frameCacheMiB.store(normalizedFrameCacheMiB(read("frameCacheMiB", t::Defaults::frameCacheMiB)), std::memory_order_relaxed);
+    t::continuousReadAhead.store(read("continuousReadAhead", t::Defaults::continuousReadAhead ? 1 : 0) != 0, std::memory_order_relaxed);
+    t::preferHardwareExport.store(read("preferHardwareExport", t::Defaults::preferHardwareExport ? 1 : 0) != 0, std::memory_order_relaxed);
+}
+
+int PreferencesController::staleFrameLagMs() const
+{
+    return drift::tuning::staleFrameLagMs.load(std::memory_order_relaxed);
+}
+
+void PreferencesController::setStaleFrameLagMs(int value)
+{
+    value = qBound(0, value, 1000);
+    if (drift::tuning::staleFrameLagMs.exchange(value, std::memory_order_relaxed) == value)
+        return;
+    storePerformance("staleFrameLagMs", value);
+    emit performanceChanged();
+}
+
+int PreferencesController::readAheadMs() const
+{
+    return drift::tuning::readAheadMs.load(std::memory_order_relaxed);
+}
+
+void PreferencesController::setReadAheadMs(int value)
+{
+    value = qBound(0, value, 5000);
+    if (drift::tuning::readAheadMs.exchange(value, std::memory_order_relaxed) == value)
+        return;
+    storePerformance("readAheadMs", value);
+    emit performanceChanged();
+}
+
+int PreferencesController::targetPoolMax() const
+{
+    return drift::tuning::targetPoolMax.load(std::memory_order_relaxed);
+}
+
+void PreferencesController::setTargetPoolMax(int value)
+{
+    value = qBound(4, value, 64);
+    if (drift::tuning::targetPoolMax.exchange(value, std::memory_order_relaxed) == value)
+        return;
+    storePerformance("targetPoolMax", value);
+    emit performanceChanged();
+}
+
+int PreferencesController::targetPoolMiB() const
+{
+    return drift::tuning::targetPoolMiB.load(std::memory_order_relaxed);
+}
+
+void PreferencesController::setTargetPoolMiB(int value)
+{
+    value = qBound(0, value, 4096);
+    if (drift::tuning::targetPoolMiB.exchange(value, std::memory_order_relaxed) == value)
+        return;
+    storePerformance("targetPoolMiB", value);
+    emit performanceChanged();
+}
+
+int PreferencesController::uploadCacheMax() const
+{
+    return drift::tuning::uploadCacheMax.load(std::memory_order_relaxed);
+}
+
+void PreferencesController::setUploadCacheMax(int value)
+{
+    value = qBound(8, value, 96);
+    if (drift::tuning::uploadCacheMax.exchange(value, std::memory_order_relaxed) == value)
+        return;
+    storePerformance("uploadCacheMax", value);
+    emit performanceChanged();
+}
+
+int PreferencesController::uploadCacheMiB() const
+{
+    return drift::tuning::uploadCacheMiB.load(std::memory_order_relaxed);
+}
+
+void PreferencesController::setUploadCacheMiB(int value)
+{
+    value = qBound(0, value, 4096);
+    if (drift::tuning::uploadCacheMiB.exchange(value, std::memory_order_relaxed) == value)
+        return;
+    storePerformance("uploadCacheMiB", value);
+    emit performanceChanged();
+}
+
+int PreferencesController::readerHistoryMiB() const
+{
+    return drift::tuning::readerHistoryMiB.load(std::memory_order_relaxed);
+}
+
+void PreferencesController::setReaderHistoryMiB(int value)
+{
+    value = qBound(0, value, 1024);
+    if (drift::tuning::readerHistoryMiB.exchange(value, std::memory_order_relaxed) == value)
+        return;
+    storePerformance("readerHistoryMiB", value);
+    emit performanceChanged();
+}
+
+int PreferencesController::frameCacheMiB() const
+{
+    return drift::tuning::frameCacheMiB.load(std::memory_order_relaxed);
+}
+
+void PreferencesController::setFrameCacheMiB(int value)
+{
+    value = normalizedFrameCacheMiB(value);
+    if (drift::tuning::frameCacheMiB.exchange(value, std::memory_order_relaxed) == value)
+        return;
+    storePerformance("frameCacheMiB", value);
+    emit performanceChanged();
+}
+
+bool PreferencesController::continuousReadAhead() const
+{
+    return drift::tuning::continuousReadAhead.load(std::memory_order_relaxed);
+}
+
+void PreferencesController::setContinuousReadAhead(bool enabled)
+{
+    if (drift::tuning::continuousReadAhead.exchange(enabled, std::memory_order_relaxed) == enabled)
+        return;
+    storePerformance("continuousReadAhead", enabled ? 1 : 0);
+    emit performanceChanged();
+}
+
+bool PreferencesController::preferHardwareExport() const
+{
+    return drift::tuning::preferHardwareExport.load(std::memory_order_relaxed);
+}
+
+void PreferencesController::setPreferHardwareExport(bool enabled)
+{
+    if (drift::tuning::preferHardwareExport.exchange(enabled, std::memory_order_relaxed) == enabled)
+        return;
+    storePerformance("preferHardwareExport", enabled ? 1 : 0);
+    emit performanceChanged();
+}
+
+void PreferencesController::resetPerformanceDefaults()
+{
+    namespace t = drift::tuning;
+    QSettings settings;
+    settings.remove(QStringLiteral("performance"));
+    t::staleFrameLagMs.store(t::Defaults::staleFrameLagMs, std::memory_order_relaxed);
+    t::readAheadMs.store(t::Defaults::readAheadMs, std::memory_order_relaxed);
+    t::targetPoolMax.store(t::Defaults::targetPoolMax, std::memory_order_relaxed);
+    t::targetPoolMiB.store(t::Defaults::targetPoolMiB, std::memory_order_relaxed);
+    t::uploadCacheMax.store(t::Defaults::uploadCacheMax, std::memory_order_relaxed);
+    t::uploadCacheMiB.store(t::Defaults::uploadCacheMiB, std::memory_order_relaxed);
+    t::readerHistoryMiB.store(t::Defaults::readerHistoryMiB, std::memory_order_relaxed);
+    t::frameCacheMiB.store(t::Defaults::frameCacheMiB, std::memory_order_relaxed);
+    t::continuousReadAhead.store(t::Defaults::continuousReadAhead, std::memory_order_relaxed);
+    t::preferHardwareExport.store(t::Defaults::preferHardwareExport, std::memory_order_relaxed);
+    emit performanceChanged();
 }
 
 QString PreferencesController::cacheLocation() const

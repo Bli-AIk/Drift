@@ -1,4 +1,5 @@
 #include "engine/decode/readers/ClipReader.h"
+#include "engine/EngineTuning.h"
 
 #include "engine/gpu/GlRuntime.h"
 #include "engine/compositor/GpuCompositor.h"
@@ -59,9 +60,6 @@ extern "C" {
 }
 
 namespace {
-
-// Also used by the CPU-side frame history earlier in this translation unit.
-std::atomic<int> g_activeVideoStreams{1};
 
 bool isHardwarePixelFormat(AVPixelFormat fmt)
 {
@@ -623,17 +621,18 @@ void ClipReader::storeCachedFrame(drift::TimeUs ptsUs, const QImage &image)
     while (m_videoCache.size() > kMaxCachedFrames)
         m_videoCache.removeLast();
 
-    // A fixed frame count can retain half a gigabyte per 4K reader. Preserve at
-    // least the newest frame while bounding CPU-side history across open clips.
-    constexpr qsizetype kMiB = 1024 * 1024;
-    const int streams = qMax(1, g_activeVideoStreams.load(std::memory_order_relaxed));
-    const qsizetype budget = qBound<qsizetype>(96 * kMiB, (384 * kMiB) / streams, 128 * kMiB);
-    qsizetype used = 0;
-    for (const CachedFrame &cached : std::as_const(m_videoCache))
-        used += cached.image.sizeInBytes();
-    while (used > budget && m_videoCache.size() > 1) {
-        used -= m_videoCache.constLast().image.sizeInBytes();
-        m_videoCache.removeLast();
+    // Optional byte cap on CPU-side history; a 4K reader can otherwise hold half a gigabyte.
+    // Always keeps the newest frame.
+    const qsizetype budget = qsizetype(drift::tuning::readerHistoryMiB.load(std::memory_order_relaxed))
+                             * qsizetype(drift::tuning::kMiB);
+    if (budget > 0) {
+        qsizetype used = 0;
+        for (const CachedFrame &cached : std::as_const(m_videoCache))
+            used += cached.image.sizeInBytes();
+        while (used > budget && m_videoCache.size() > 1) {
+            used -= m_videoCache.constLast().image.sizeInBytes();
+            m_videoCache.removeLast();
+        }
     }
 }
 
@@ -660,6 +659,7 @@ namespace {
 
 // Readers currently holding read-ahead. The preview cache budget is split between them.
 std::atomic<int> g_readAheadReaders{0};
+std::atomic<int> g_activeVideoStreams{1};
 
 qint64 physicalMemoryBytes()
 {
@@ -682,21 +682,24 @@ qint64 physicalMemoryBytes()
     return 0;
 }
 
-// Decoded frames held for preview, across every reader. A large machine must not dedicate
-// gigabytes to read-ahead: other decoded frames, audio, Qt and GPU uploads need room too.
-// Keep a 4K-friendly floor, with a bounded share of physical RAM across active readers.
+// Decoded frames held for preview, across every reader. Automatic is an eighth of physical memory
+// (a sixteenth on Android, which shares it with the GPU and everything else on the phone), never
+// less than the old fixed 128 MB: that figure was ~10 frames of 4K and left no read-ahead at all.
+// The automatic figure is computed once; the tunable is re-read so a change applies live.
 qsizetype previewCacheBudgetBytes()
 {
+    const int overrideMiB = drift::tuning::frameCacheMiB.load(std::memory_order_relaxed);
+    if (overrideMiB > 0)
+        return qsizetype(overrideMiB) * qsizetype(drift::tuning::kMiB);
+
     static const qsizetype budget = [] {
         constexpr qsizetype floor = 128ll * 1024 * 1024;
 #ifdef Q_OS_ANDROID
-        constexpr qsizetype ceiling = 192ll * 1024 * 1024;
-        constexpr int divisor = 64;
+        constexpr int divisor = 16;
 #else
-        constexpr qsizetype ceiling = 512ll * 1024 * 1024;
-        constexpr int divisor = 32;
+        constexpr int divisor = 8;
 #endif
-        return qBound(floor, qsizetype(physicalMemoryBytes() / divisor), ceiling);
+        return qMax<qsizetype>(floor, physicalMemoryBytes() / divisor);
     }();
     return budget;
 }

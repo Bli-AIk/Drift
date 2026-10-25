@@ -1,6 +1,7 @@
 #include "playback/preview/CompositorService.h"
 
 #include "playback/stats/PerfLog.h"
+#include "engine/EngineTuning.h"
 #include "playback/PlaybackClock.h"
 #include "playback/stats/PlaybackStats.h"
 #include "engine/decode/readers/ClipReaderPool.h"
@@ -333,13 +334,13 @@ void CompositorService::onWorkerFrameReady(const GpuFrameTexture &frame, drift::
     if (m_adaptiveQuality && m_dropLateFrames && m_playbackActive)
         noteFrameLate(timing.compositeMs > double(m_lateFrameBudgetMs));
 
-    // Never step backwards or display a frame from a timestamp the running clock
-    // passed a long time ago. Slow/cold decoder opens are common at clip cuts;
-    // painting their obsolete results makes the outgoing clip look like slow motion.
-    // Allow a few frames of normal jitter so a busy machine can still make progress.
+    // Present unless something newer already got there. Optionally also drop a frame that finished
+    // far behind the playhead (a slow decoder open at a cut can otherwise show the outgoing clip
+    // in slow motion). Off by default: a late frame is usually better than none.
     const bool overtaken = sequence <= m_lastPresentedSequence;
-    const drift::TimeUs allowedLagUs = qMax<drift::TimeUs>(150'000, m_lateFrameBudgetMs * 3'000LL);
-    const bool stale = m_playbackActive && m_dropLateFrames
+    const drift::TimeUs allowedLagUs =
+        drift::TimeUs(drift::tuning::staleFrameLagMs.load(std::memory_order_relaxed)) * 1000;
+    const bool stale = allowedLagUs > 0 && m_playbackActive && m_dropLateFrames
         && m_pendingTimeUs > timeUs && m_pendingTimeUs - timeUs > allowedLagUs;
     if (drift::perf::enabled()) {
         const qint64 dispatchedNs = m_perfDispatchNs.take(sequence);

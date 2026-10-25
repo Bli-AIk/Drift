@@ -28,6 +28,7 @@ Item {
         { id: "toolbar", title: qsTr("Timeline toolbar") },
         { id: "keymap", title: qsTr("Keyboard shortcuts") },
         { id: "preview", title: qsTr("Preview") },
+        { id: "performance", title: qsTr("Performance") },
         { id: "audio", title: qsTr("Audio") },
         { id: "ai", title: qsTr("AI & Cloud") },
         { id: "network", title: qsTr("Network") },
@@ -39,7 +40,7 @@ Item {
 
     readonly property bool searchHasMatches: generalPage.hasMatches || appearancePage.hasMatches
         || workspacesPage.hasMatches        || timelinePage.hasMatches || toolbarPage.hasMatches || keymapPage.hasMatches
-        || previewPage.hasMatches || audioPage.hasMatches || aiPage.hasMatches
+        || previewPage.hasMatches || performancePage.hasMatches || audioPage.hasMatches || aiPage.hasMatches
         || networkPage.hasMatches || marketplacePage.hasMatches || aboutPage.hasMatches
 
     onCurrentPageChanged: flick.contentY = 0
@@ -201,6 +202,12 @@ Item {
 
             SettingsPreviewPage {
                 id: previewPage
+                query: root.query
+                visible: root.query.length > 0 ? hasMatches : pageId === root.currentPage
+            }
+
+            SettingsPerformancePage {
+                id: performancePage
                 query: root.query
                 visible: root.query.length > 0 ? hasMatches : pageId === root.currentPage
             }

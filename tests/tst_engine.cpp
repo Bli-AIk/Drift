@@ -2,6 +2,7 @@
 #include <QBuffer>
 #include <QMap>
 #include <array>
+#include "engine/EngineTuning.h"
 #include "engine/ml/speech/transcription/SileroVad.h"
 #include "engine/ml/speech/tts/ChatterboxTokenizer.h"
 #include "engine/ml/speech/tts/ChatterboxTts.h"
@@ -7575,11 +7576,14 @@ void EngineTest::activePreviewWarmDoesNotQueueObsoleteFrames()
     QVERIFY2(decoded < 100, qPrintable(QStringLiteral("obsolete frames decoded: %1").arg(decoded)));
 }
 
-// A single on-screen frame may schedule one background read-ahead step. Letting that
-// step recursively fill the full 350 ms lookahead consumed a dozen frames of decode
-// without another playback request and made a cut's outgoing frame wait in line.
+// With continuous read-ahead off, a single on-screen frame schedules one background step
+// instead of recursively filling the whole lookahead.
 void EngineTest::previewReadAheadYieldsToPlayback()
 {
+    drift::tuning::continuousReadAhead.store(false);
+    const auto restore = qScopeGuard([] {
+        drift::tuning::continuousReadAhead.store(drift::tuning::Defaults::continuousReadAhead);
+    });
     QTemporaryDir dir;
     QVERIFY(dir.isValid());
     const QString path = makeLongGopVideo(dir);

@@ -1,4 +1,5 @@
 #include "engine/gpu/GlRuntime.h"
+#include "engine/EngineTuning.h"
 #include "engine/gpu/effects/LookupTextures.h"
 #include "engine/color/CubeLut.h"
 
@@ -1534,24 +1535,42 @@ void GlRuntime::releaseTarget(GlTarget &&target)
         return;
 
     // Count both the color texture and (when present) the depth attachment.
-    // An entry-count limit alone can retain over a gigabyte of idle 4K targets.
     const size_t bytes = size_t(target.width) * size_t(target.height)
                          * (target.hasDepth ? 8u : 4u);
-    if (bytes > kMaxPooledTargetBytes)
+    const size_t maxTargets = size_t(qMax(1, drift::tuning::targetPoolMax.load(std::memory_order_relaxed)));
+    const size_t maxBytes = size_t(qMax(0, drift::tuning::targetPoolMiB.load(std::memory_order_relaxed)))
+                            * size_t(drift::tuning::kMiB);
+    if (maxBytes > 0 && bytes > maxBytes)
         return;
-    while (!m_targetPool.empty()
-           && (m_pooledTargets >= kMaxPooledTargets
-               || m_pooledTargetBytes + bytes > kMaxPooledTargetBytes)) {
-        const auto old = std::prev(m_targetPool.end());
-        const QOpenGLFramebufferObject *fbo = old->second.get();
+
+    const uint64_t key = targetPoolKey(target.width, target.height, target.hasDepth);
+    const auto entryBytes = [](const QOpenGLFramebufferObject *fbo) {
         const bool depth = fbo->format().attachment() != QOpenGLFramebufferObject::NoAttachment;
-        m_pooledTargetBytes -= size_t(fbo->width()) * size_t(fbo->height())
-                               * (depth ? 8u : 4u);
-        m_targetPool.erase(old);
+        return size_t(fbo->width()) * size_t(fbo->height()) * (depth ? 8u : 4u);
+    };
+    while (!m_targetPool.empty()
+           && (m_pooledTargets >= maxTargets
+               || (maxBytes > 0 && m_pooledTargetBytes + bytes > maxBytes))) {
+        // Idle targets of other sizes are the likeliest to be dead weight (the preview resized or
+        // the canvas changed), so drop the largest of those first; otherwise one of our own size.
+        auto victim = m_targetPool.end();
+        size_t victimBytes = 0;
+        for (auto it = m_targetPool.begin(); it != m_targetPool.end(); ++it) {
+            if (it->first == key)
+                continue;
+            const size_t b = entryBytes(it->second.get());
+            if (victim == m_targetPool.end() || b > victimBytes) {
+                victim = it;
+                victimBytes = b;
+            }
+        }
+        if (victim == m_targetPool.end())
+            victim = m_targetPool.find(key);
+        m_pooledTargetBytes -= entryBytes(victim->second.get());
+        m_targetPool.erase(victim);
         --m_pooledTargets;
     }
 
-    const uint64_t key = targetPoolKey(target.width, target.height, target.hasDepth);
     m_targetPool.emplace(key, std::move(target.fbo));
     ++m_pooledTargets;
     m_pooledTargetBytes += bytes;
@@ -3278,11 +3297,13 @@ GLuint cachedUploadTexture(GlRuntime &rt, QOpenGLExtraFunctions *gl, const QImag
         return 0;
 
     const size_t bytes = size_t(rgba.width()) * size_t(rgba.height()) * 4u;
-    // Cache size must be measured in bytes: 48 uploads of 4K frames took ~1.5 GiB of VRAM.
+    const size_t maxUploads = size_t(qMax(1, drift::tuning::uploadCacheMax.load(std::memory_order_relaxed)));
+    const size_t maxBytes = size_t(qMax(0, drift::tuning::uploadCacheMiB.load(std::memory_order_relaxed)))
+                            * size_t(drift::tuning::kMiB);
     // Keep even a single oversize texture cached so the caller can use the returned handle.
     while (!rt.m_imageUploadLru.empty()
-           && (rt.m_imageUploadLru.size() >= GlRuntime::kMaxCachedUploads
-               || rt.m_imageUploadBytes + bytes > GlRuntime::kMaxCachedUploadBytes)) {
+           && (rt.m_imageUploadLru.size() >= maxUploads
+               || (maxBytes > 0 && rt.m_imageUploadBytes + bytes > maxBytes))) {
         GlRuntime::CachedUpload &old = rt.m_imageUploadLru.back();
         rt.m_imageUploadIndex.erase(old.cacheKey);
         if (old.texture)

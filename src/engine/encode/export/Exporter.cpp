@@ -1,4 +1,5 @@
 #include "engine/encode/export/Exporter.h"
+#include "engine/EngineTuning.h"
 
 #include "engine/audio/AudioMixer.h"
 #include "engine/decode/readers/ClipReaderPool.h"
@@ -1918,13 +1919,15 @@ bool Exporter::gifAvailable()
 ExportSettings Exporter::defaultSettings()
 {
     ExportSettings s;
-    // Prefer a supported hardware H.264 encoder for interactive export speed.
-    // Keep software H.264 as a dependable fallback on machines without a GPU encoder.
-    const QStringList prefer = {QStringLiteral("h264_nvenc"), QStringLiteral("h264_qsv"),
-                                QStringLiteral("h264_amf"), QStringLiteral("h264_videotoolbox"),
-                                QStringLiteral("h264_vaapi"), QStringLiteral("h264_mediacodec"),
-                                QStringLiteral("h264"), QStringLiteral("h265"),
-                                QStringLiteral("vp9"), QStringLiteral("av1_svt")};
+    // Software H.264 first by default. "Prefer hardware encoder" puts a supported GPU H.264
+    // encoder ahead of it, falling back to the software list on machines without one.
+    QStringList prefer;
+    if (drift::tuning::preferHardwareExport.load(std::memory_order_relaxed))
+        prefer = {QStringLiteral("h264_nvenc"), QStringLiteral("h264_qsv"), QStringLiteral("h264_amf"),
+                  QStringLiteral("h264_videotoolbox"), QStringLiteral("h264_vaapi"),
+                  QStringLiteral("h264_mediacodec")};
+    prefer += {QStringLiteral("h264"), QStringLiteral("h265"), QStringLiteral("vp9"),
+               QStringLiteral("av1_svt")};
     for (const QString &id : prefer) {
         const QVariantMap m = videoCodecById(id);
         if (m.value(QStringLiteral("available")).toBool()) {

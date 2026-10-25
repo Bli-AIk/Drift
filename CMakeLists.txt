@@ -786,6 +786,7 @@ add_library(driftengine STATIC
     src/engine/gpu/effects/GpuEffectDefinition.h
     src/engine/compositor/GpuCompositor.h
     src/engine/compositor/GpuCompositor.cpp
+    src/engine/EngineTuning.h
     src/engine/gpu/GlRuntime.h
     src/engine/gpu/GlRuntime.cpp
     src/engine/gpu/device/GpuStatus.h
@@ -2142,6 +2143,7 @@ qt_add_qml_module(drift
         src/qml/components/shell/SettingsMarketplacePage.qml
         src/qml/components/shell/SettingsNetworkPage.qml
         src/qml/components/shell/SettingsPage.qml
+        src/qml/components/shell/SettingsPerformancePage.qml
         src/qml/components/shell/SettingsPreviewPage.qml
         src/qml/components/shell/SettingsRow.qml
         src/qml/components/shell/SettingsThemeEntry.qml
