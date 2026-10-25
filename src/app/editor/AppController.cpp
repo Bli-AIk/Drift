@@ -4344,6 +4344,12 @@ bool detachEmbeddedAudioFromVideo(drift::Project &project,
     if (!clipHasEmbeddedAudio(project, library, videoClip))
         return false;
 
+    const QString linkId =
+        videoClip.linkId.isEmpty()
+            ? QUuid::createUuid().toString(QUuid::WithoutBraces)
+            : videoClip.linkId;
+
+    videoClip.linkId = linkId;
     videoClip.suppressEmbeddedAudio = true;
 
     // Build the companion before inserting into project.tracks(); QList insertion
@@ -4351,7 +4357,7 @@ bool detachEmbeddedAudioFromVideo(drift::Project &project,
     const drift::Clip audioClip =
         makeAudioCompanionFromVideo(
             videoClip,
-            {},
+            linkId,
             videoClip.audioStreamIndex);
     const QString videoClipId = videoClip.id;
 
@@ -4405,6 +4411,12 @@ bool detachAllAudioTracksFromVideo(drift::Project &project,
             videoClipIndex);
     }
 
+    const QString linkId =
+        videoClip.linkId.isEmpty()
+            ? QUuid::createUuid().toString(QUuid::WithoutBraces)
+            : videoClip.linkId;
+
+    videoClip.linkId = linkId;
     videoClip.suppressEmbeddedAudio = true;
 
     const QString videoClipId = videoClip.id;
@@ -4434,7 +4446,7 @@ bool detachAllAudioTracksFromVideo(drift::Project &project,
         companions.append(
             makeAudioCompanionFromVideo(
                 videoClip,
-                {},
+                linkId,
                 i,
                 trackName));
     }

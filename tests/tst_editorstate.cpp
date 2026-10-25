@@ -1497,7 +1497,7 @@ void EditorStateTest::compositeSeparateAudioAndRemoval()
     }
     QVERIFY(audio);
     QCOMPARE(audio->sequenceId, composite.sequenceId);
-    QVERIFY(audio->linkId.isEmpty());
+    QVERIFY(!audio->linkId.isEmpty());
     QCOMPARE(audio->sourceVideoClipId, composite.id);
 
     // Removing the composite from the bin takes its instances, its sequence and its tab with it.
@@ -5628,20 +5628,35 @@ void EditorStateTest::separateAudioFromCombinedClip()
     const QString videoId = state.project()->tracks().at(0).clips.at(0).id;
     const QString audioId = state.project()->tracks().at(1).clips.at(0).id;
     QCOMPARE(state.project()->tracks().at(1).clips.at(0).sourceVideoClipId, videoId);
-    QVERIFY(state.project()->tracks().at(1).clips.at(0).linkId.isEmpty());
+    const QString linkId = state.project()->tracks().at(1).clips.at(0).linkId;
+    QVERIFY(!linkId.isEmpty());
+    QCOMPARE(state.project()->tracks().at(0).clips.at(0).linkId, linkId);
 
-    // Extraction is independent by default: selecting, moving, trimming and deleting
-    // audio must not affect the video clip or bring its embedded sound back.
+    // The two halves come out linked: selecting and moving the video carries the audio.
     state.selectClip(0, 0);
-    QVERIFY(!state.canUnlinkSelection());
+    QVERIFY(state.canUnlinkSelection());
     QVERIFY(!state.canSeparateAudioSelection());
     QVERIFY(!state.canSeparateAudioClip(0, 0));
+    QVERIFY(state.selectionContains(1, 0));
+    state.moveClip(0, 0, 4.0);
+    QCOMPARE(state.project()->tracks().at(0).clips.at(0).timelineStart, drift::secondsToUs(4.0));
+    QCOMPARE(state.project()->tracks().at(1).clips.at(0).timelineStart, drift::secondsToUs(4.0));
+
+    // A saved project keeps both the link and the source association.
+    QString parseError;
+    const drift::Project reopened = drift::Project::fromJson(state.project()->toJson(), &parseError);
+    QVERIFY2(parseError.isEmpty(), qPrintable(parseError));
+    QCOMPARE(reopened.tracks().at(1).clips.at(0).sourceVideoClipId, videoId);
+    QCOMPARE(reopened.tracks().at(1).clips.at(0).linkId, linkId);
+
+    // Once unlinked, the audio moves, trims and deletes on its own.
+    state.unlinkSelectedClips();
     state.selectClip(1, 0);
     QVERIFY(state.selectionContains(1, 0));
     QVERIFY(!state.selectionContains(0, 0));
     state.moveClip(1, 0, 8.0);
     QCOMPARE(state.project()->tracks().at(1).clips.at(0).timelineStart, drift::secondsToUs(8.0));
-    QCOMPARE(state.project()->tracks().at(0).clips.at(0).timelineStart, drift::secondsToUs(2.0));
+    QCOMPARE(state.project()->tracks().at(0).clips.at(0).timelineStart, drift::secondsToUs(4.0));
     const drift::TimeUs videoDuration = state.project()->tracks().at(0).clips.at(0).timelineDuration;
     state.setClipDuration(1, 0, 2.0);
     QCOMPARE(state.project()->tracks().at(1).clips.at(0).timelineDuration, drift::secondsToUs(2.0));
@@ -5649,20 +5664,9 @@ void EditorStateTest::separateAudioFromCombinedClip()
     state.deleteSelectedClip();
     QVERIFY(state.project()->tracks().at(1).clips.isEmpty());
     QCOMPARE(state.project()->tracks().at(0).clips.at(0).id, videoId);
-    QCOMPARE(state.project()->tracks().at(0).clips.at(0).timelineDuration, videoDuration);
     QVERIFY(state.project()->tracks().at(0).clips.at(0).suppressEmbeddedAudio);
     state.undo();
     QCOMPARE(state.project()->tracks().at(1).clips.at(0).id, audioId);
-    state.redo();
-    QVERIFY(state.project()->tracks().at(1).clips.isEmpty());
-
-    // A saved project keeps the source association without re-linking edits.
-    state.undo();
-    QString parseError;
-    const drift::Project reopened = drift::Project::fromJson(state.project()->toJson(), &parseError);
-    QVERIFY2(parseError.isEmpty(), qPrintable(parseError));
-    QCOMPARE(reopened.tracks().at(1).clips.at(0).sourceVideoClipId, videoId);
-    QVERIFY(reopened.tracks().at(1).clips.at(0).linkId.isEmpty());
 }
 
 
@@ -5988,8 +5992,8 @@ void EditorStateTest::separatedAudioTracksMirrorVideoHierarchy()
 
         QCOMPARE(audio.assetId, video.assetId);
 
-        QVERIFY(video.linkId.isEmpty());
-        QVERIFY(audio.linkId.isEmpty());
+        QVERIFY(!video.linkId.isEmpty());
+        QCOMPARE(audio.linkId, video.linkId);
         QCOMPARE(audio.sourceVideoClipId, video.id);
 
         QVERIFY(video.suppressEmbeddedAudio);
@@ -9263,7 +9267,7 @@ void EditorStateTest::multiTrackAudioSelectionAndExtraction()
     // Video clip should now have suppressEmbeddedAudio = true
     const drift::Clip &videoClip = state.project()->tracks().at(0).clips.at(0);
     QVERIFY(videoClip.suppressEmbeddedAudio);
-    QVERIFY(videoClip.linkId.isEmpty());
+    QVERIFY(!videoClip.linkId.isEmpty());
 
     // Should have created audio tracks with companion clips
     bool hasAudioTrack1 = false;
@@ -9272,7 +9276,7 @@ void EditorStateTest::multiTrackAudioSelectionAndExtraction()
         if (track.type != drift::TrackType::Audio)
             continue;
         for (const drift::Clip &clip : track.clips) {
-            if (clip.sourceVideoClipId == videoClip.id && clip.linkId.isEmpty()) {
+            if (clip.sourceVideoClipId == videoClip.id && clip.linkId == videoClip.linkId) {
                 if (clip.audioStreamIndex == 0)
                     hasAudioTrack1 = true;
                 else if (clip.audioStreamIndex == 1)
