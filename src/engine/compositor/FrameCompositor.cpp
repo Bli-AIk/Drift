@@ -456,6 +456,33 @@ void collectActivePaths(const drift::Project *project, drift::TimeUs timelineUs,
     }
 }
 
+double maxTrackValue(const drift::KeyframeTrack<double> &track, double defaultValue)
+{
+    if (track.isEmpty())
+        return defaultValue;
+    double value = 0.0;
+    for (const drift::Keyframe<double> &key : track.keyframes())
+        value = qMax(value, key.value);
+    return value;
+}
+
+// Media bounded by the canvas alone goes soft once a scale key zooms past it (#384). Bound it by
+// the largest rect the clip ever reaches instead: a function of the keys, not the time, so the
+// still cache and the decoder's frame cache keep one size across the zoom. The edge cap keeps the
+// upload under the texture limits that are common on each platform.
+QSize decodeBoundForClip(const drift::Clip &clip, int projectWidth, int projectHeight, double renderScale,
+                       int canvasWidth, int canvasHeight)
+{
+#ifdef Q_OS_ANDROID
+    constexpr int kMaxEdge = 4096;
+#else
+    constexpr int kMaxEdge = 16384;
+#endif
+    const int w = qCeil(maxTrackValue(clip.transformW, projectWidth) * renderScale);
+    const int h = qCeil(maxTrackValue(clip.transformH, projectHeight) * renderScale);
+    return QSize(qMax(canvasWidth, qMin(w, kMaxEdge)), qMax(canvasHeight, qMin(h, kMaxEdge)));
+}
+
 // Every video frame this composite will need, so the readers can decode them
 // concurrently on their own threads instead of one clip at a time on ours.
 //
@@ -464,11 +491,17 @@ void collectActivePaths(const drift::Project *project, drift::TimeUs timelineUs,
 // and seek of a 4K file stalls playback for a few hundred ms at every cut and transition.
 QList<ClipReaderPool::VideoRequest> collectVideoRequests(const drift::Project *project,
                                                          drift::TimeUs timelineUs, int maxWidth,
-                                                         int maxHeight, drift::TimeUs lookaheadUs)
+                                                         int maxHeight, double renderScale,
+                                                         drift::TimeUs lookaheadUs)
 {
     QList<ClipReaderPool::VideoRequest> requests;
     if (!project)
         return requests;
+    // Same bound buildGpuLayer decodes at, or the warmed frame would be the wrong size.
+    const auto boundFor = [&](const drift::Clip &clip) {
+        return decodeBoundForClip(clip, project->width(), project->height(), renderScale, maxWidth,
+                                  maxHeight);
+    };
 
     // Mask media decodes like any other video, so warm it alongside the sources rather than
     // stalling the composite on a serial read later.
@@ -495,9 +528,10 @@ QList<ClipReaderPool::VideoRequest> collectVideoRequests(const drift::Project *p
         const drift::Clip &source = *read.input.clip;
         if (source.type == drift::ClipType::Video && !source.path.isEmpty()) {
             const drift::VideoRead video = drift::resolveVideoRead(source, timelineUs, t_allowProxies);
+            const QSize bound = boundFor(source);
             requests.append(ClipReaderPool::VideoRequest{video.path, streamIdFor(source.id), video.sourceUs,
-                                                         qCeil(maxWidth / source.sourceFrame.width()),
-                                                         qCeil(maxHeight / source.sourceFrame.height()),
+                                                         qCeil(bound.width() / source.sourceFrame.width()),
+                                                         qCeil(bound.height() / source.sourceFrame.height()),
                                                          source.rotationCorrection});
         }
         if (read.mask)
@@ -525,7 +559,7 @@ QList<ClipReaderPool::VideoRequest> collectVideoRequests(const drift::Project *p
                 if (const drift::Project *nested = nestedProject(*project, clip)) {
                     const NestedScope scope(clip);
                     requests.append(collectVideoRequests(nested, clip.timelineToSourceUs(timelineUs),
-                                                         maxWidth, maxHeight, lookaheadUs));
+                                                         maxWidth, maxHeight, renderScale, lookaheadUs));
                 }
                 continue;
             }
@@ -534,11 +568,12 @@ QList<ClipReaderPool::VideoRequest> collectVideoRequests(const drift::Project *p
                 continue;
 
             const drift::VideoRead read = drift::resolveVideoRead(clip, readUs, t_allowProxies);
+            const QSize bound = boundFor(clip);
             requests.append(ClipReaderPool::VideoRequest{read.path,
                                                         streamIdFor(clip.id),
                                                         read.sourceUs,
-                                                        qCeil(maxWidth / clip.sourceFrame.width()),
-                                                        qCeil(maxHeight / clip.sourceFrame.height()),
+                                                        qCeil(bound.width() / clip.sourceFrame.width()),
+                                                        qCeil(bound.height() / clip.sourceFrame.height()),
                                                         clip.rotationCorrection, upcoming});
         }
     }
@@ -1448,7 +1483,9 @@ GpuLayer buildGpuLayer(const drift::Project &project, const drift::Clip &clip,
         layer.effects = resolvedClipEffects(clip, clipTimeUs);
     } else {
         // Bounded by the canvas, not the layout rect — see decodeClipMediaFrame.
-        fillGpuLayerPixels(layer, clip, timelineUs, canvasWidth, canvasHeight, projectFps,
+        const QSize bound =
+            decodeBoundForClip(clip, projectWidth, projectHeight, renderScale, canvasWidth, canvasHeight);
+        fillGpuLayerPixels(layer, clip, timelineUs, bound.width(), bound.height(), projectFps,
                            maxTimeEchoHistoryFrames, timeEcho);
         layer.effects = resolvedClipEffects(clip, clipTimeUs);
     }
@@ -1983,7 +2020,7 @@ bool FrameCompositor::prepare(drift::TimeUs timelineUs, const RenderOptions &opt
     // parallel across the per-path worker threads rather than serially below.
     // Only while frames have a deadline: playback and export set read-ahead, a paused seek does not.
     const drift::TimeUs lookaheadUs = options.readAheadUs > 0 ? kClipLookaheadUs : 0;
-    const auto videoRequests = collectVideoRequests(m_project, timelineUs, width, height, lookaheadUs);
+    const auto videoRequests = collectVideoRequests(m_project, timelineUs, width, height, renderScale, lookaheadUs);
     ClipReader::setActiveVideoStreams(int(videoRequests.size()));
     ClipReaderPool::instance().warmVideoFrames(videoRequests);
 
