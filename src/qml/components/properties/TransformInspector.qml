@@ -77,8 +77,7 @@ Item {
     readonly property var scaleHeightKeys: (clipData && clipData.keyframes && clipData.keyframes.height
                                             && clipData.keyframes.height.points) || []
     readonly property var scaleKeyTimes: {
-        const keys = scaleWidthKeys.concat(scaleHeightKeys)
-        const times = keys.map(k => Number(k.seconds)).filter(t => isFinite(t))
+        const times = scaleWidthKeys.concat(scaleHeightKeys).map(k => Number(k.seconds)).filter(t => isFinite(t))
         times.sort((a, b) => a - b)
         return times.filter((t, i) => i === 0 || t - times[i - 1] > 1 / 30)
     }
@@ -332,11 +331,11 @@ Item {
                     iconSize: 12
                     anchors.verticalCenter: parent.verticalCenter
                     glyph: Theme.icons.trash
-                    enabled: root.scaleKeyTimes.some(t => t > 1 / 30)
+                    enabled: root.scaleKeyTimes.length > 0
                     tooltip: qsTr("Clear all scale keyframes, keeping the current scale")
-                    onClicked: EditorState.clearClipScaleKeyframes(
+                    onClicked: EditorState.keyframes.clearProperties(
                                    EditorState.selectedTrack, EditorState.selectedClip,
-                                   EditorState.playheadSeconds)
+                                   ["width", "height"])
                 }
 
                 ThemedSlider {

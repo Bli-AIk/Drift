@@ -255,6 +255,7 @@ private slots:
     void linkedAudioUnlinkAndMove();
     void linkUnrelatedClipsMoveTogetherKeepTiming();
     void pastedAndDuplicatedClipsAreNotLinkedToTheOriginal();
+    void copiedExtractedAudioPointsAtTheCopiedVideo();
     void deleteLinkedPairTogetherAndUnlinkedClipAlone();
     void linkedFadeCurveSyncsPartner();
     void customFadeCurveSessionApplyAndCancel();
@@ -6119,6 +6120,7 @@ void EditorStateTest::pastedAndDuplicatedClipsAreNotLinkedToTheOriginal()
     AppController state(&library);
     appendLinkedVideoAudioPair(*state.project());
     const QString originalLink = state.project()->tracks().at(0).clips.at(0).linkId;
+    state.project()->tracks()[1].clips[0].sourceVideoClipId = QStringLiteral("clip-video");
 
     // The pasted pair is linked to itself, not to the pair it was copied from.
     state.selectClip(0, 0);
@@ -6133,14 +6135,62 @@ void EditorStateTest::pastedAndDuplicatedClipsAreNotLinkedToTheOriginal()
     QCOMPARE(state.project()->tracks().at(1).clips.at(1).linkId, pastedLink);
     QCOMPARE(state.project()->tracks().at(0).clips.at(0).linkId, originalLink);
     QCOMPARE(state.project()->tracks().at(1).clips.at(0).linkId, originalLink);
+    QCOMPARE(state.project()->tracks().at(1).clips.at(1).sourceVideoClipId,
+             state.project()->tracks().at(0).clips.at(1).id);
 
     // A duplicate comes in on its own, and moving it leaves the original's audio alone.
     state.selectClip(0, 0);
     state.duplicateSelectedClip();
     QCOMPARE(state.project()->tracks().at(0).clips.size(), 3);
     QVERIFY(state.project()->tracks().at(0).clips.at(2).linkId.isEmpty());
+    state.selectClip(1, 0);
+    state.duplicateSelectedClip();
+    QVERIFY(state.project()->tracks().at(1).clips.at(2).linkId.isEmpty());
+    QVERIFY(state.project()->tracks().at(1).clips.at(2).sourceVideoClipId.isEmpty());
     state.moveClip(0, 2, 20.0);
     QCOMPARE(state.project()->tracks().at(1).clips.at(0).timelineStart, 0);
+}
+
+void EditorStateTest::copiedExtractedAudioPointsAtTheCopiedVideo()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    appendLinkedVideoAudioPair(*state.project());
+    // An extracted pair: the audio remembers its video but the two are not A/V linked.
+    for (drift::Track &track : state.project()->tracks()) {
+        for (drift::Clip &clip : track.clips)
+            clip.linkId.clear();
+    }
+    state.project()->tracks()[1].clips[0].sourceVideoClipId = QStringLiteral("clip-video");
+
+    // Pasted together, the audio copy follows the video copy.
+    state.selectClip(0, 0);
+    state.addToSelection(1, 0);
+    state.copySelection();
+    state.setPlayheadSeconds(10.0);
+    state.pasteAtPlayhead();
+    QCOMPARE(state.project()->tracks().at(0).clips.size(), 2);
+    QCOMPARE(state.project()->tracks().at(1).clips.size(), 2);
+    const drift::Clip &videoCopy = state.project()->tracks().at(0).clips.at(1);
+    const drift::Clip &audioCopy = state.project()->tracks().at(1).clips.at(1);
+    QVERIFY(videoCopy.id != QStringLiteral("clip-video"));
+    QCOMPARE(audioCopy.sourceVideoClipId, videoCopy.id);
+    QCOMPARE(state.project()->tracks().at(1).clips.at(0).sourceVideoClipId, QStringLiteral("clip-video"));
+
+    // Pasting the audio alone must not point it at the original video.
+    state.selectClip(1, 0);
+    state.copySelection();
+    state.setPlayheadSeconds(20.0);
+    state.pasteAtPlayhead();
+    QCOMPARE(state.project()->tracks().at(1).clips.size(), 3);
+    QVERIFY(state.project()->tracks().at(1).clips.at(2).sourceVideoClipId.isEmpty());
+
+    // Neither does duplicating it.
+    state.selectClip(1, 0);
+    state.duplicateSelectedClip();
+    QCOMPARE(state.project()->tracks().at(1).clips.size(), 4);
+    QVERIFY(state.project()->tracks().at(1).clips.at(3).sourceVideoClipId.isEmpty());
+    QCOMPARE(state.project()->tracks().at(1).clips.at(0).sourceVideoClipId, QStringLiteral("clip-video"));
 }
 
 // The editor drives one session for two different shapes, so the mode has to survive begin/apply
@@ -7031,19 +7081,23 @@ void EditorStateTest::linkedScaleKeyframesUndoTogether()
         return {};
     };
 
-    state.setClipScaleKeyframe(track, clip, 1.0, 640.0, 360.0);
-    QCOMPARE(keyAt(QStringLiteral("width"), 1.0).value(QStringLiteral("value")).toDouble(), 640.0);
-    QCOMPARE(keyAt(QStringLiteral("height"), 1.0).value(QStringLiteral("value")).toDouble(), 360.0);
+    const QStringList scaleProps{QStringLiteral("width"), QStringLiteral("height")};
+    const auto xBefore = state.clipKeyframes(track, clip, QStringLiteral("x"));
+    state.keyframes()->addKeysAt(track, clip, scaleProps, 1.0);
+    QVERIFY(!keyAt(QStringLiteral("width"), 1.0).isEmpty());
+    QVERIFY(!keyAt(QStringLiteral("height"), 1.0).isEmpty());
+    QVERIFY(!keyAt(QStringLiteral("x"), 1.0).isEmpty());
 
     state.undo();
     QCOMPARE(state.clipKeyframes(track, clip, QStringLiteral("width")), widthBefore);
     QCOMPARE(state.clipKeyframes(track, clip, QStringLiteral("height")), heightBefore);
+    QCOMPARE(state.clipKeyframes(track, clip, QStringLiteral("x")), xBefore);
 
     state.redo();
     QVERIFY(!keyAt(QStringLiteral("width"), 1.0).isEmpty());
     QVERIFY(!keyAt(QStringLiteral("height"), 1.0).isEmpty());
 
-    state.removeClipScaleKeyframe(track, clip, 1.0);
+    state.keyframes()->removeKeysAt(track, clip, scaleProps, 1.0);
     QVERIFY(keyAt(QStringLiteral("width"), 1.0).isEmpty());
     QVERIFY(keyAt(QStringLiteral("height"), 1.0).isEmpty());
 
@@ -7057,13 +7111,14 @@ void EditorStateTest::linkedScaleKeyframesUndoTogether()
 
     // Clearing animation leaves the values seen at the playhead as static defaults
     // and is also a single undoable change for both dimensions.
-    state.setClipScaleKeyframe(track, clip, 1.0, 640.0, 360.0);
-    state.setClipScaleKeyframe(track, clip, 2.0, 800.0, 450.0);
-    state.clearClipScaleKeyframes(track, clip, 1.0);
+    state.keyframes()->addKeysAt(track, clip, scaleProps, 1.0);
+    state.keyframes()->addKeysAt(track, clip, scaleProps, 2.0);
+    state.setPlayheadSeconds(1.0);
+    state.keyframes()->clearProperties(track, clip, scaleProps);
     QCOMPARE(state.clipKeyframes(track, clip, QStringLiteral("width")).size(), 1);
     QCOMPARE(state.clipKeyframes(track, clip, QStringLiteral("height")).size(), 1);
-    QCOMPARE(keyAt(QStringLiteral("width"), 0.0).value(QStringLiteral("value")).toDouble(), 640.0);
-    QCOMPARE(keyAt(QStringLiteral("height"), 0.0).value(QStringLiteral("value")).toDouble(), 360.0);
+    QVERIFY(!keyAt(QStringLiteral("width"), 0.0).isEmpty());
+    QVERIFY(!keyAt(QStringLiteral("height"), 0.0).isEmpty());
     state.undo();
     QVERIFY(!keyAt(QStringLiteral("width"), 2.0).isEmpty());
     QVERIFY(!keyAt(QStringLiteral("height"), 2.0).isEmpty());

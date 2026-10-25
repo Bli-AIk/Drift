@@ -8399,6 +8399,8 @@ void AppController::duplicateSelectedClip()
     // Sharing the original's linkId would pair the copy with the original's partners.
     copy.linkId.clear();
     copy.linkLoose = false;
+    // Likewise the video an extracted audio clip came from: the copy is not that video's audio.
+    copy.sourceVideoClipId.clear();
     copy.timelineStart = drift::resolveClipStart(
         m_project, track, -1, original.timelineEnd(), original.timelineDuration, m_snapEnabled, m_playheadUs);
 
@@ -16016,87 +16018,6 @@ void AppController::setClipKeyframe(int trackIndex, int clipIndex, const QString
     finishEdit(tr("Keyframe set"));
 }
 
-void AppController::setClipScaleKeyframe(int trackIndex, int clipIndex, double atSeconds,
-                                         double width, double height)
-{
-    if (!isValidClipIndex(trackIndex, clipIndex))
-        return;
-
-    drift::Clip &clip = m_project.tracks()[trackIndex].clips[clipIndex];
-    const drift::Project before = m_project;
-    const drift::TimeUs rel = qBound<drift::TimeUs>(
-        0, drift::secondsToUs(atSeconds) - clip.timelineStart, clip.timelineDuration);
-    const bool wroteWidth = writeClipPropValue(clip, QStringLiteral("width"), rel, width,
-                                                m_autoKeyEnabled, /*force=*/true);
-    const bool wroteHeight = writeClipPropValue(clip, QStringLiteral("height"), rel, height,
-                                                 m_autoKeyEnabled, /*force=*/true);
-    if (!wroteWidth && !wroteHeight)
-        return;
-
-    pushProjectEdit(before, tr("Add scale keyframe"));
-    finishEdit(tr("Scale keyframe set"));
-}
-
-void AppController::removeClipScaleKeyframe(int trackIndex, int clipIndex, double atSeconds)
-{
-    if (!isValidClipIndex(trackIndex, clipIndex))
-        return;
-
-    drift::Clip &clip = m_project.tracks()[trackIndex].clips[clipIndex];
-    const drift::Project before = m_project;
-    const drift::TimeUs rel = qMax<drift::TimeUs>(0, drift::secondsToUs(atSeconds) - clip.timelineStart);
-    bool removed = false;
-    for (const QString &prop : {QStringLiteral("width"), QStringLiteral("height")}) {
-        drift::KeyframeTrack<double> *kt = keyframeTrackForProp(clip, prop, /*createIfMissing=*/false);
-        if (!kt)
-            continue;
-        const drift::TimeUs nearest = kt->nearestKeyframe(rel, kKeyframeToleranceUs);
-        if (nearest >= 0) {
-            kt->removeKeyframe(nearest);
-            removed = true;
-        }
-    }
-    if (!removed)
-        return;
-
-    pushProjectEdit(before, tr("Remove scale keyframe"));
-    finishEdit(tr("Scale keyframe removed"));
-}
-
-void AppController::clearClipScaleKeyframes(int trackIndex, int clipIndex, double atSeconds)
-{
-    if (!isValidClipIndex(trackIndex, clipIndex))
-        return;
-
-    drift::Clip &clip = m_project.tracks()[trackIndex].clips[clipIndex];
-    const drift::TimeUs rel = qBound<drift::TimeUs>(
-        0, drift::secondsToUs(atSeconds) - clip.timelineStart, clip.timelineDuration);
-    const drift::Project before = m_project;
-    bool changed = false;
-    for (const QString &prop : {QStringLiteral("width"), QStringLiteral("height")}) {
-        drift::KeyframeTrack<double> *kt = keyframeTrackForProp(clip, prop, /*createIfMissing=*/false);
-        if (!kt || kt->isEmpty())
-            continue;
-
-        // Keep the visible scale at the playhead while removing the animation.
-        // A single key at zero is the static layout value for this property.
-        const double current = kt->evaluateAt(rel);
-        if (kt->keyframes().size() == 1 && kt->keyframes().firstKey() == 0
-            && qFuzzyCompare(kt->keyframes().first().value, current))
-            continue;
-
-        drift::KeyframeTrack<double> staticTrack;
-        staticTrack.setKeyframe(0, current);
-        *kt = staticTrack;
-        changed = true;
-    }
-    if (!changed)
-        return;
-
-    pushProjectEdit(before, tr("Clear scale keyframes"));
-    finishEdit(tr("Scale animation cleared"));
-}
-
 void AppController::setClipColorKeyframe(int trackIndex, int clipIndex, const QString &prop,
                                          double atSeconds, const QColor &color)
 {
@@ -20361,6 +20282,9 @@ void AppController::pasteAtPlayhead()
             ++linkCounts[item.clip.linkId];
     }
     QHash<QString, QString> pastedLinkIds;
+    // An extracted audio clip follows its video to the pasted copy; one pasted without it loses
+    // the reference rather than pointing at the original.
+    QHash<QString, QString> pastedClipIds;
 
     for (const ClipboardItem &item : m_clipboard) {
         // Composites live on the main timeline only, and never outlive their sequence.
@@ -20369,6 +20293,7 @@ void AppController::pasteAtPlayhead()
             continue;
         drift::Clip clip = item.clip;
         clip.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        pastedClipIds.insert(item.clip.id, clip.id);
         clip.timelineStart = qMax<drift::TimeUs>(0, clip.timelineStart + shift);
         if (linkCounts.value(clip.linkId) > 1) {
             auto it = pastedLinkIds.find(clip.linkId);
@@ -20406,6 +20331,20 @@ void AppController::pasteAtPlayhead()
 
     if (inserted.isEmpty())
         return;
+    // Second pass: the audio can sit before its video in the clipboard, and a video that was
+    // skipped above has no copy to point at.
+    const QSet<QString> insertedIds(inserted.begin(), inserted.end());
+    for (const QString &id : std::as_const(inserted)) {
+        int trackIndex = -1;
+        int clipIndex = -1;
+        if (!findClipById(m_project, id, &trackIndex, &clipIndex))
+            continue;
+        QString &source = m_project.tracks()[trackIndex].clips[clipIndex].sourceVideoClipId;
+        if (source.isEmpty())
+            continue;
+        const QString mapped = pastedClipIds.value(source);
+        source = insertedIds.contains(mapped) ? mapped : QString();
+    }
     pushProjectEdit(before, tr("Paste"));
     m_selection.clear();
     for (const QString &id : inserted) {

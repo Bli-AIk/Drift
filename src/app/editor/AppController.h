@@ -1164,11 +1164,6 @@ public:
                                           double atSeconds, const QColor &color);
     Q_INVOKABLE void setClipKeyframe(int trackIndex, int clipIndex, const QString &prop, double atSeconds,
                                      double value);
-    // Linked Scale keys width and height together in a single undoable edit.
-    Q_INVOKABLE void setClipScaleKeyframe(int trackIndex, int clipIndex, double atSeconds,
-                                         double width, double height);
-    Q_INVOKABLE void removeClipScaleKeyframe(int trackIndex, int clipIndex, double atSeconds);
-    Q_INVOKABLE void clearClipScaleKeyframes(int trackIndex, int clipIndex, double atSeconds);
     // A vec2 effect param ("fx.<i>.<key>") keys its two axis tracks (<prop>.x/.y) as one undo step.
     Q_INVOKABLE void setClipVec2Keyframe(int trackIndex, int clipIndex, const QString &prop,
                                          double atSeconds, double x, double y);
