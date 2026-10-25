@@ -217,7 +217,9 @@ jobs:
           Copy-Item vcpkg\installed\${{ matrix.arch }}-windows\bin\*.dll dist\bin -Force
           Copy-Item .deps\ffmpeg\bin\*.dll dist\bin -Force
           foreach ($dir in "effects", "transitions", "effect-templates", "audio-effects") {
-            Copy-Item "build\Release\$dir" dist\bin -Recurse -Force
+            if (Test-Path "build\Release\$dir") {
+              Copy-Item "build\Release\$dir" dist\bin -Recurse -Force
+            }
           }
 
       # An MSIX cannot run vc_redist.${{ matrix.arch }}.exe at install time, so the CRT goes in app-local.

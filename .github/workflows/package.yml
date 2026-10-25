@@ -80,7 +80,6 @@ jobs:
     name: Flatpak bundle (${{ matrix.arch }})
     runs-on: ${{ matrix.runner }}
     if: inputs.platforms == 'all' || inputs.platforms == 'flatpak'
-    timeout-minutes: 120
     strategy:
       # Each arch reports its own result: a failing aarch64 build should not hide x86_64's.
       fail-fast: false
@@ -175,7 +174,6 @@ jobs:
     name: Linux AppImage (${{ matrix.arch }})
     runs-on: ${{ matrix.runner }}
     if: inputs.platforms == 'all' || inputs.platforms == 'linux'
-    timeout-minutes: 90
     strategy:
       # Each arch reports its own result: a failing aarch64 build should not hide x86_64's.
       fail-fast: false
@@ -507,8 +505,6 @@ jobs:
     name: Windows installer (${{ matrix.arch }})
     runs-on: ${{ matrix.runner }}
     if: inputs.platforms == 'all' || inputs.platforms == 'windows'
-    # 180, not 120: a cold vcpkg binary cache now also compiles Skia and a static ICU.
-    timeout-minutes: 180
     strategy:
       # Each arch reports its own result: a failing arm64 build should not hide x64's.
       fail-fast: false
@@ -789,7 +785,9 @@ jobs:
           # Bundled effect/transition/template packages: a POST_BUILD step already put them beside
           # the exe, and the app resolves them relative to it.
           foreach ($dir in "effects", "transitions", "effect-templates", "audio-effects") {
-            Copy-Item "build\Release\$dir" dist\bin -Recurse -Force
+            if (Test-Path "build\Release\$dir") {
+              Copy-Item "build\Release\$dir" dist\bin -Recurse -Force
+            }
           }
 
       # The one part of this package that can break silently. QAudioSink gets its devices from Qt's
@@ -885,7 +883,6 @@ jobs:
     name: macOS disk image (${{ matrix.arch }})
     runs-on: ${{ matrix.runner }}
     if: inputs.platforms == 'all' || inputs.platforms == 'macos'
-    timeout-minutes: 120
     strategy:
       # Separate per-arch images, not a universal one: Homebrew bottles are single-architecture.
       # Each arch reports its own result: a failing x86_64 build should not hide arm64's.
@@ -1130,7 +1127,6 @@ jobs:
     name: Arch package (${{ matrix.arch }})
     runs-on: ${{ matrix.runner }}
     if: inputs.platforms == 'all' || inputs.platforms == 'arch'
-    timeout-minutes: 60
     strategy:
       # Each arch reports its own result: a failing aarch64 build should not hide x86_64's.
       fail-fast: false
@@ -1305,7 +1301,6 @@ jobs:
     name: Android APK (${{ matrix.abi }})
     runs-on: ubuntu-24.04
     if: inputs.platforms == 'all' || inputs.platforms == 'android'
-    timeout-minutes: 240
     strategy:
       # Every ABI reports its own result: one failing arch should not hide whether the
       # other two compile.
