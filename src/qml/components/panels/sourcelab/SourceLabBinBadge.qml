@@ -1,7 +1,7 @@
 import QtQuick
 import Drift
 
-// Source Lab marks on a bin item: favorite or reject, and how many ranges it holds.
+// Source Lab marks on a Source Lab bin row: favorite or reject, and how many ranges it holds.
 Row {
     id: root
 

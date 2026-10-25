@@ -22,8 +22,6 @@ Column {
     required property string thumbnailPath
     required property string filmstripPath
     required property int assetIndex
-    required property int rating
-    required property int rangeCount
 
     required property var host
     required property real cardSize
@@ -107,8 +105,6 @@ Column {
         duration: root.duration
         thumbnailPath: root.thumbnailPath
         assetIndex: root.assetIndex
-        rating: root.rating
-        rangeCount: root.rangeCount
         liveThumbnailPath: root.liveThumbnailPath
         thumbnailRevision: root.thumbnailRevision
         cardSize: root.cardSize

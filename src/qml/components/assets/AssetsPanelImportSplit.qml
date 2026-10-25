@@ -7,6 +7,7 @@ Rectangle {
     id: root
 
     property bool importing: false
+    property bool showCollect: true
 
     signal importFilesRequested()
     signal importFolderRequested()
@@ -69,6 +70,7 @@ Rectangle {
     AssetsPanelImportMenu {
         id: importMenu
         collecting: EditorState.projectFile.collectingMedia
+        showCollect: root.showCollect
         onImportFilesRequested: root.importFilesRequested()
         onImportFolderRequested: root.importFolderRequested()
         onCollectMediaRequested: root.collectMediaRequested()

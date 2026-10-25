@@ -11332,25 +11332,6 @@
     </message>
 </context>
 <context>
-    <name>MediaAssetsLabFilterRow</name>
-    <message>
-        <source>All</source>
-        <translation type="unfinished">所有</translation>
-    </message>
-    <message>
-        <source>Favorites</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has ranges</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hide rejected</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>MediaAssetsListLabels</name>
     <message>
         <source>Linked proxy</source>
@@ -11423,10 +11404,6 @@
     </message>
     <message>
         <source>Try a different name.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Nothing matches this filter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -16784,6 +16761,91 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>The noise-removal model is not installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceLabBinFilterRow</name>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">所有</translation>
+    </message>
+    <message>
+        <source>Favorites</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has ranges</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide rejected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceLabBinPanel</name>
+    <message>
+        <source>Sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn’t import that folder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No media yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import video, audio or image files to start.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing matches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try a different name or filter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceLabBinRow</name>
+    <message>
+        <source>%1 kHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 · %2 fps</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -22733,6 +22795,10 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sources</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -33,6 +33,7 @@ const PanelType kPanelTypes[] = {
     {"timeline", QT_TRANSLATE_NOOP("WorkspaceStore", "Timeline")},
     {"audioMixer", QT_TRANSLATE_NOOP("WorkspaceStore", "Audio Mixer")},
     {"sourceViewer", QT_TRANSLATE_NOOP("WorkspaceStore", "Source Viewer")},
+    {"sourceLab.bin", QT_TRANSLATE_NOOP("WorkspaceStore", "Sources")},
     {"sourceLab.viewer", QT_TRANSLATE_NOOP("WorkspaceStore", "Source Lab Viewer")},
     {"sourceLab.trim", QT_TRANSLATE_NOOP("WorkspaceStore", "Source Lab Trim")},
     {"sourceLab.ranges", QT_TRANSLATE_NOOP("WorkspaceStore", "Ranges & Markers")},
@@ -266,6 +267,7 @@ WorkspaceStore::WorkspaceStore(QObject *parent)
         migrateOldFractions();
     loadUser();
     migrateCutTrim();
+    migrateSourceLabBin();
     m_activeId = QSettings().value(QLatin1String(kActiveKey), QLatin1String(kDefaultId)).toString();
     fixActive();
 }
@@ -342,6 +344,25 @@ void WorkspaceStore::migrateCutTrim()
     }
     if (settings.value(QLatin1String(kActiveKey)).toString() == oldId)
         settings.setValue(QLatin1String(kActiveKey), QStringLiteral("source-lab"));
+}
+
+// Source Lab used the generic media bin until it got its own sourceLab.bin panel; a saved
+// override of the preset would keep the old panel.
+void WorkspaceStore::migrateSourceLabBin()
+{
+    QSettings settings;
+    const QString flag = QStringLiteral("ui/workspaces/migratedSourceLabBin");
+    if (settings.value(flag).toBool())
+        return;
+    settings.setValue(flag, true);
+
+    const QString id = QStringLiteral("source-lab");
+    const auto isLab = [&](const QVariant &v) { return v.toMap().value(QStringLiteral("id")).toString() == id; };
+    const auto end = std::remove_if(m_user.begin(), m_user.end(), isLab);
+    if (end != m_user.end()) {
+        m_user.erase(end, m_user.end());
+        persist();
+    }
 }
 
 void WorkspaceStore::migrateOldFractions()

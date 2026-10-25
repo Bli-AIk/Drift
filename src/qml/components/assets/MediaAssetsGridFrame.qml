@@ -15,8 +15,6 @@ Rectangle {
     required property string duration
     required property string thumbnailPath
     required property int assetIndex
-    required property int rating
-    required property int rangeCount
     required property string liveThumbnailPath
     required property int thumbnailRevision
     required property real cardSize
@@ -158,16 +156,6 @@ Rectangle {
 
     MediaAssetsDurationBadge {
         label: !root.isFolder ? duration : ""
-    }
-
-    MediaAssetsLabBadge {
-        z: 4
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.margins: Theme.spacingSm
-        visible: !root.isFolder && (root.rating !== 0 || root.rangeCount > 0)
-        rating: root.rating
-        rangeCount: root.rangeCount
     }
 
     // Like CapCut's media bin: the label reflects actual clip references rather

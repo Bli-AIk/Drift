@@ -1653,8 +1653,6 @@ qt_add_qml_module(drift
         src/qml/components/assets/MediaAssetsFolderMenu.qml
         src/qml/components/assets/MediaAssetsEmptyState.qml
         src/qml/components/assets/MediaAssetsDurationBadge.qml
-        src/qml/components/assets/MediaAssetsLabBadge.qml
-        src/qml/components/assets/MediaAssetsLabFilterRow.qml
         src/qml/components/assets/MaskPresetCard.qml
         src/qml/components/assets/MarketSectionTab.qml
         src/qml/components/assets/EffectTemplateCard.qml
@@ -1725,6 +1723,10 @@ qt_add_qml_module(drift
         src/qml/components/panels/HistoryPanel.qml
         src/qml/components/panels/SourceViewerPanel.qml
         src/qml/components/panels/sourcelab/SourceLabViewerPanel.qml
+        src/qml/components/panels/sourcelab/SourceLabBinPanel.qml
+        src/qml/components/panels/sourcelab/SourceLabBinRow.qml
+        src/qml/components/panels/sourcelab/SourceLabBinBadge.qml
+        src/qml/components/panels/sourcelab/SourceLabBinFilterRow.qml
         src/qml/components/panels/sourcelab/SourceLabTrimPanel.qml
         src/qml/components/panels/sourcelab/SourceLabRangesPanel.qml
         src/qml/components/panels/sourcelab/SourceLabProcessPanel.qml

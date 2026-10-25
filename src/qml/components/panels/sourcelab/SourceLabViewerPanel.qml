@@ -23,7 +23,6 @@ PanelFrame {
     readonly property bool isAudio: root.lab.kind === "audio"
     readonly property bool isImage: root.lab.kind === "image"
     readonly property bool keysActive: root.shown && root.hasAsset && !root.isImage
-    readonly property var selectedIds: ShellBridge.main?.assetsPanel?.selectedMediaAssetIds ?? []
 
     readonly property string tool: {
         const r = root.recipe
@@ -39,12 +38,6 @@ PanelFrame {
         const r = root.recipe
         return JSON.stringify([r.speed, r.keepPitch, r.gainDb, r.normalizeLufs, r.denoise,
                                r.stabilize, r.crop?.x, r.crop?.y, r.crop?.width, r.crop?.height])
-    }
-
-    function followSelection() {
-        if (!root.shown || root.selectedIds.length !== 1 || root.selectedIds[0] === root.assetId)
-            return
-        root.lab.load(root.selectedIds[0])
     }
 
     function applyRecipe() {
@@ -139,12 +132,10 @@ PanelFrame {
     }
 
     onShownChanged: {
-        root.followSelection()
         root.syncSession()
     }
     onAssetIdChanged: root.syncSession()
     onRecipeChanged: root.applyRecipe()
-    onSelectedIdsChanged: root.followSelection()
     onKeysActiveChanged: {
         if (root.keysActive)
             ShellBridge.sourceLabActionHandler = root

@@ -28,6 +28,7 @@ private slots:
     void colorPresetHasGradingPanels();
     void subtitlesPresetHasSubtitlePanels();
     void migratesCutTrimToSourceLab();
+    void migratesSourceLabBinOverride();
 
 private:
     QString m_org;
@@ -269,6 +270,19 @@ void WorkspaceStoreTest::migratesCutTrimToSourceLab()
     const QVariantMap preset = store.workspace("source-lab");
     QCOMPARE(preset.value("name").toString(), QStringLiteral("Source Lab"));
     QVERIFY(preset.value("builtin").toBool());
+}
+
+void WorkspaceStoreTest::migratesSourceLabBinOverride()
+{
+    const QJsonArray list{QJsonObject::fromVariantMap(workspaceWith(slot("assets.media"), "source-lab"))};
+    QSettings().setValue("ui/workspaces/list",
+                         QString::fromUtf8(QJsonDocument(list).toJson(QJsonDocument::Compact)));
+
+    WorkspaceStore store;
+    QVERIFY(QSettings().value("ui/workspaces/migratedSourceLabBin").toBool());
+    const QVariantMap ws = store.workspace("source-lab");
+    QVERIFY(!ws.value("modified").toBool());
+    QVERIFY(ws.value("builtin").toBool());
 }
 
 QTEST_MAIN(WorkspaceStoreTest)

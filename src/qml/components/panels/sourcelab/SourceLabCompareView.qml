@@ -74,8 +74,8 @@ Rectangle {
             segPlayer.pause()
     }
 
-    color: Theme.c.mediaPreviewWindow.stageBackground
-    radius: Theme.c.mediaPreviewWindow.stageRadius
+    // No stage fill: the picture's own edges are the frame, so nothing outside reads as canvas.
+    color: "transparent"
     clip: true
 
     onEnhanceActiveChanged: {
@@ -179,7 +179,8 @@ Rectangle {
             Rectangle {
                 anchors.fill: parent
                 visible: root.wipe || root.mode === "toggle"
-                color: root.color
+                // Hides A behind B's letterbox in the wipe and toggle views.
+                color: Theme.c.panelFrame.background
             }
 
             Image {

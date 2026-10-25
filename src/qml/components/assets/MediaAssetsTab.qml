@@ -59,10 +59,6 @@ Item {
     // Kind visibility filter supplied by the parent (depends on the active tab).
     property var assetVisibleFn: function(kind) { return true }
     property alias searchText: search.text
-    // Source Lab's triage filter: all | favorites | ranges | hideRejected. Only applies there.
-    property string labFilter: "all"
-    readonly property bool labActive: Workspaces.activeId === "source-lab"
-    readonly property bool labFiltering: root.labActive && root.labFilter !== "all"
     readonly property string query: search.text.trim().toLowerCase()
 
     // Emitted from the card/row context menu — adds the selected asset(s) to the timeline in
@@ -311,17 +307,6 @@ Item {
         function onAssetCardChanged(assetId) { root._requestRefresh() }
     }
 
-    function _labPasses(asset) {
-        if (!root.labFiltering)
-            return true
-        switch (root.labFilter) {
-        case "favorites": return asset.rating > 0 || asset.favoriteRangeCount > 0
-        case "ranges": return asset.rangeCount > 0
-        case "hideRejected": return asset.rating >= 0
-        }
-        return true
-    }
-
     // Tree view's flattened rows: the current folder's contents, with each open folder's
     // own contents spliced in right after it. `folderCount`/`assetCount` are handed in
     // rather than read here so the binding below registers a dependency on them — a
@@ -340,7 +325,7 @@ Item {
         const childAssets = {}
         for (let i = 0; i < assetCount; ++i) {
             const asset = AssetLibrary.assetAt(i)
-            if (!root.assetVisibleFn(asset.kind) || !root._labPasses(asset))
+            if (!root.assetVisibleFn(asset.kind))
                 continue
             if (!childAssets[asset.folderId])
                 childAssets[asset.folderId] = []
@@ -397,8 +382,6 @@ Item {
                     path: "",
                     thumbnailPath: "",
                     filmstripPath: "",
-                    rating: 0,
-                    rangeCount: 0,
                     depth: depth,
                     expanded: open,
                     expandable: hasChildren
@@ -423,8 +406,6 @@ Item {
                     path: asset.path,
                     thumbnailPath: asset.thumbnailPath,
                     filmstripPath: asset.filmstripPath,
-                    rating: asset.rating,
-                    rangeCount: asset.rangeCount,
                     depth: depth,
                     expanded: false,
                     expandable: false
@@ -468,8 +449,6 @@ Item {
                 path: "",
                 thumbnailPath: "",
                 filmstripPath: "",
-                rating: 0,
-                rangeCount: 0,
                 depth: 0,
                 expanded: false,
                 expandable: false
@@ -480,7 +459,7 @@ Item {
             const asset = AssetLibrary.assetAt(i)
             if (asset.folderId !== currentFolder)
                 continue
-            if (!root.assetVisibleFn(asset.kind) || !root._labPasses(asset))
+            if (!root.assetVisibleFn(asset.kind))
                 continue
             if (q.length > 0 && asset.name.toLowerCase().indexOf(q) < 0)
                 continue
@@ -496,8 +475,6 @@ Item {
                 path: asset.path,
                 thumbnailPath: asset.thumbnailPath,
                 filmstripPath: asset.filmstripPath,
-                rating: asset.rating,
-                rangeCount: asset.rangeCount,
                 depth: 0,
                 expanded: false,
                 expandable: false
@@ -546,24 +523,10 @@ Item {
         }
     }
 
-    MediaAssetsLabFilterRow {
-        id: labRow
-        anchors.top: search.visible ? search.bottom : parent.top
-        anchors.topMargin: visible ? Theme.spacingSm : 0
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.leftMargin: Theme.pagePadding
-        anchors.rightMargin: Theme.pagePadding
-        visible: root.labActive && (AssetLibrary.count > 0)
-        height: visible ? implicitHeight : 0
-        filter: root.labFilter
-        onFilterChanged: root.labFilter = filter
-    }
-
     // Where you are in the bin, and — in tree view — what the whole tree does at once.
     Item {
         id: binNavRow
-        anchors.top: labRow.visible ? labRow.bottom : (search.visible ? search.bottom : parent.top)
+        anchors.top: search.visible ? search.bottom : parent.top
         anchors.topMargin: visible ? Theme.spacingSm : 0
         anchors.left: parent.left
         anchors.right: parent.right
@@ -633,9 +596,9 @@ Item {
         visible: root.query.length === 0 && root.combinedItems.length === 0
                  && (AssetLibrary.count > 0 || BinFolderModel.count > 0)
         compact: true
-        glyph: root.labFiltering ? Theme.icons.search : Theme.icons.folder
-        title: root.labFiltering ? qsTr("Nothing matches this filter") : qsTr("This folder is empty")
-        hint: root.labFiltering ? "" : qsTr("Drag media here, or import more.")
+        glyph: Theme.icons.folder
+        title: qsTr("This folder is empty")
+        hint: qsTr("Drag media here, or import more.")
     }
 
     // Proxy jobs run in the background; this is their one progress surface and the way to stop

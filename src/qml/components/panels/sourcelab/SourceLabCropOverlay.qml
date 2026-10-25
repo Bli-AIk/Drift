@@ -60,7 +60,7 @@ Item {
         const cy = root.cropY + root.cropH / 2
         let w = Math.min(root.cropW, root.cropH * k)
         let h = w / k
-        w = Math.max(host.minFrac, Math.min(1, w))
+        w = Math.max(cropHost.minFrac, Math.min(1, w))
         h = w / k
         if (h > 1) {
             h = 1
@@ -74,11 +74,12 @@ Item {
     }
 
     onRecipeChanged: loadFromRecipe()
-    onLockedRatioChanged: fitToRatio()
+    // Deferred: lockedRatio follows the recipe, and fitting writes the recipe back.
+    onLockedRatioChanged: Qt.callLater(root.fitToRatio)
     Component.onCompleted: loadFromRecipe()
 
     Item {
-        id: host
+        id: cropHost
 
         x: (root.width - root.paintedWidth) / 2
         y: (root.height - root.paintedHeight) / 2
@@ -94,7 +95,7 @@ Item {
         // The grips propose a free-form box; with a locked shape the other side follows and the
         // edge the user is not dragging stays put.
         function setCrop(nx, ny, nw, nh) {
-            const min = host.minFrac
+            const min = cropHost.minFrac
             const k = root.lockedRatio
             const eps = 1e-6
             nw = Math.max(min, Math.min(1, nw))
@@ -148,11 +149,11 @@ Item {
         }
 
         MediaPreviewCropScrim {
-            host: host
+            host: cropHost
         }
 
         MediaPreviewCropFrame {
-            host: host
+            host: cropHost
             editor: root
             editing: root.editing
         }
@@ -169,7 +170,7 @@ Item {
                 { x: 1, y: 1, dx: 1, dy: 1 }
             ]
             MediaPreviewCropGrip {
-                host: host
+                host: cropHost
                 editor: root
                 editing: root.editing
             }

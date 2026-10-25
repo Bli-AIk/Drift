@@ -5,6 +5,10 @@
 #   scripts/package-macos.sh --identity "Developer ID Application: ..." --notarize
 #   scripts/package-macos.sh --build-dir build-macos --skip-build
 #   scripts/package-macos.sh --channel nightly --build-id 20260922.ac5601e
+#   scripts/package-macos.sh --qt-prefix ~/Qt/6.10.3/macos --ffmpeg-dir .deps/ffmpeg
+#
+# --ffmpeg-dir is for an official Qt, which ships its own FFmpeg dylibs under the same install
+# names as the FFmpeg Drift links: that directory's lib/ copies replace Qt's in the bundle.
 #
 # --channel nightly builds "Drift Nightly.app" with its own bundle id, so it installs beside a
 # stable copy. Signing is ad-hoc unless --identity is given. --notarize submits to Apple and
@@ -21,6 +25,7 @@ SKIP_BUILD=0
 NOTARIZE=0
 QT_PREFIX=""
 CHANNEL="stable"
+FFMPEG_DIR=""
 BUILD_ID=""
 
 while [[ $# -gt 0 ]]; do
@@ -28,11 +33,12 @@ while [[ $# -gt 0 ]]; do
     --identity)   IDENTITY="$2"; shift 2 ;;
     --build-dir)  BUILD_DIR="$ROOT/$2"; shift 2 ;;
     --qt-prefix)  QT_PREFIX="$2"; shift 2 ;;
+    --ffmpeg-dir) FFMPEG_DIR="$2"; shift 2 ;;
     --channel)    CHANNEL="$2"; shift 2 ;;
     --build-id)   BUILD_ID="$2"; shift 2 ;;
     --skip-build) SKIP_BUILD=1; shift ;;
     --notarize)   NOTARIZE=1; shift ;;
-    -h|--help)    sed -n '2,13p' "$0"; exit 0 ;;
+    -h|--help)    sed -n '2,17p' "$0"; exit 0 ;;
     *) echo "unknown option: $1" >&2; exit 2 ;;
   esac
 done
@@ -120,6 +126,17 @@ done < <(rpaths)
 # LC_RPATH only: the dependencies are spelled the same way, so a plain grep always matches.
 if ! rpaths | grep -qx "@executable_path/../Frameworks"; then
   install_name_tool -add_rpath "@executable_path/../Frameworks" "$EXE"
+fi
+
+# Only the soname files (libavcodec.61.dylib), which are what every load command names; -L because
+# they are symlinks to the fully versioned file.
+if [[ -n "$FFMPEG_DIR" ]]; then
+  while IFS= read -r -d '' LIB; do
+    NAME="$(basename "$LIB")"
+    [[ "$NAME" =~ ^lib[a-z]+\.[0-9]+\.dylib$ ]] || continue
+    cp -fL "$LIB" "$APP/Contents/Frameworks/$NAME"
+    chmod u+w "$APP/Contents/Frameworks/$NAME"
+  done < <(find "$FFMPEG_DIR/lib" -maxdepth 1 -name "lib*.dylib" -print0)
 fi
 
 # macdeployqt copies every plugin in a category, including ones belonging to Qt modules Drift does

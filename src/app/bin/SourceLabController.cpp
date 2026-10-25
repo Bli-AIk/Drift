@@ -342,10 +342,11 @@ bool SourceLabController::load(const QString &assetId)
     m_assetId = assetId;
     if (!m_recipes.contains(assetId))
         m_recipes.insert(assetId, recipeFor(*m_app->m_project.asset(assetId)));
-    emit currentAssetIdChanged();
+    // The id goes last: its listeners read kind and recipe, which must already be the new asset's.
     refresh();
     emit recipeChanged();
     emit availabilityChanged();
+    emit currentAssetIdChanged();
     return true;
 }
 
@@ -374,9 +375,9 @@ void SourceLabController::clear()
         return;
     discardPreview();
     m_assetId.clear();
-    emit currentAssetIdChanged();
     refresh();
     emit recipeChanged();
+    emit currentAssetIdChanged();
 }
 
 void SourceLabController::refresh()

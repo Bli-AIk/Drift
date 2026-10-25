@@ -1832,6 +1832,7 @@ QVariantMap AssetLibrary::assetAt(int index) const
         {QStringLiteral("width"), asset->width},
         {QStringLiteral("height"), asset->height},
         {QStringLiteral("fps"), asset->fps},
+        {QStringLiteral("sampleRate"), asset->sampleRate},
         {QStringLiteral("rotationDegrees"), asset->rotationDegrees},
         {QStringLiteral("rotationOverride"), asset->rotationOverride},
         {QStringLiteral("effectiveRotation"), drift::effectiveRotation(*asset)},

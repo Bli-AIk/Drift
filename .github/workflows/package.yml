@@ -893,19 +893,58 @@ jobs:
             runner: macos-26
             skia_target: mac-arm64
             ort_pkg: onnxruntime.cpu.osx-arm64-1.0.0.driftpkg
+            homebrew_qt: true
+          # Homebrew no longer bottles anything for Intel macOS, so its Qt would be built from
+          # source (past the 6 h job limit). Intel takes the official Qt and the pinned FFmpeg
+          # instead, the way the Windows job does.
           - arch: x86_64
             runner: macos-15-intel
             skia_target: mac-x64
             ort_pkg: onnxruntime.cpu.osx-x64-1.0.0.driftpkg
+            homebrew_qt: false
+            ffmpeg_platform: macos64
     steps:
       - uses: actions/checkout@v4
 
       # Homebrew, not install-qt-action: its Qt links the same FFmpeg Drift does, so unlike the
       # other jobs there is no second libavcodec in the process to keep ABI-compatible.
       - name: Install dependencies
+        if: matrix.homebrew_qt
         run: |
           brew update
           brew install qt ffmpeg zstd openssl@3 sound-touch ninja
+
+      # No brew update: the runner image's formula versions are the ones that still have bottles,
+      # and an update would turn every installed formula into a source build.
+      - name: Install dependencies (Intel)
+        if: ${{ !matrix.homebrew_qt }}
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+        run: brew install zstd openssl@3 sound-touch ninja
+
+      - name: Install Qt
+        if: ${{ !matrix.homebrew_qt }}
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: mac
+          target: desktop
+          arch: clang_64
+          modules: ${{ env.QT_MODULES }}
+          cache: true
+
+      # Built by CutWire-Studios/CI-Builder's ffmpeg-macos64 workflow and mirrored to the n7.1
+      # release. Same pin and reason as the Linux and Windows jobs (see FFMPEG_TAG): Qt's FFmpeg
+      # backend brings its own libavcodec under the same names.
+      - name: Fetch pinned FFmpeg
+        if: ${{ !matrix.homebrew_qt }}
+        run: |
+          rm -rf "${GITHUB_WORKSPACE}/.deps/ffmpeg"
+          mkdir -p "${GITHUB_WORKSPACE}/.deps/ffmpeg"
+          curl -fsSL "https://github.com/${FFMPEG_REPO}/releases/download/${FFMPEG_TAG}/ffmpeg-${FFMPEG_TAG}-${{ matrix.ffmpeg_platform }}-gpl-shared.tar.xz" \
+            | tar -xJf - --strip-components=1 -C "${GITHUB_WORKSPACE}/.deps/ffmpeg"
+          test -x "${GITHUB_WORKSPACE}/.deps/ffmpeg/bin/ffmpeg"
 
       # Same content, same reason, same layout as the tests.yml macOS job.
       - name: Check out addon content
@@ -949,17 +988,20 @@ jobs:
       # Homebrew's Qt has no FFmpeg multimedia backend on macOS; the script builds it against the
       # Homebrew Qt and FFmpeg just installed, so the cache is keyed on both versions.
       - name: Resolve Qt FFmpeg plugin cache key
+        if: matrix.homebrew_qt
         id: qt-ffmpeg-key
         run: |
           echo "key=v1-qt-ffmpeg-plugin-${{ matrix.arch }}-$(brew list --versions qtmultimedia | awk '{print $NF}')-ffmpeg-$(brew list --versions ffmpeg | awk '{print $NF}')-${{ hashFiles('third_party/build-qt-ffmpeg-plugin.sh') }}" >> "$GITHUB_OUTPUT"
 
       - name: Restore Qt FFmpeg plugin
+        if: matrix.homebrew_qt
         uses: actions/cache@v4
         with:
           path: third_party/prebuilt/qt-ffmpeg-plugin/${{ matrix.arch }}
           key: ${{ steps.qt-ffmpeg-key.outputs.key }}
 
       - name: Build Qt FFmpeg plugin
+        if: matrix.homebrew_qt
         run: third_party/build-qt-ffmpeg-plugin.sh
 
       # Skia for macOS is compiled here from the pinned commit (Homebrew has no Skia) and cached
@@ -980,9 +1022,14 @@ jobs:
 
       - name: Configure
         run: |
+          if [ "${{ matrix.homebrew_qt }}" = true ]; then
+            qt_ffmpeg="$(brew --prefix qt)"
+          else
+            qt_ffmpeg="${QT_ROOT_DIR};${GITHUB_WORKSPACE}/.deps/ffmpeg"
+          fi
           cmake -B build-macos -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_PREFIX_PATH="$(brew --prefix qt);$(brew --prefix openssl@3);$(brew --prefix)" \
+            -DCMAKE_PREFIX_PATH="${qt_ffmpeg};$(brew --prefix openssl@3);$(brew --prefix)" \
             -DFETCHCONTENT_BASE_DIR="${FETCHCONTENT_BASE_DIR}" \
             -DDRIFT_BUNDLE_ONNXRUNTIME=OFF \
             -DDRIFT_BUNDLE_CORE_PACKAGES_ONLY=ON \
@@ -1000,8 +1047,14 @@ jobs:
         env:
           DRIFT_ONNXRUNTIME_DIR: ${{ github.workspace }}/.ort/runtime
           DRIFT_STICKERS_DIR: ${{ github.workspace }}/drift-addons/staging/stickers-harmonyos/stickers
-        # Passing suites keep their output so the SKIP lines reach the junit report.
+        # Passing suites keep their output so the SKIP lines reach the junit report. On Intel the
+        # pinned FFmpeg is put ahead of the copy in Qt's lib dir, which has the same install names,
+        # and supplies the ffmpeg binary the clip-synthesizing tests run.
         run: |
+          if [ "${{ matrix.homebrew_qt }}" != true ]; then
+            export DYLD_LIBRARY_PATH="${GITHUB_WORKSPACE}/.deps/ffmpeg/lib"
+            export PATH="${GITHUB_WORKSPACE}/.deps/ffmpeg/bin:${PATH}"
+          fi
           ctest --test-dir build-macos --output-on-failure --output-log ctest.log \
             --output-junit ctest-junit.xml --test-output-size-passed 20000000 --test-output-size-failed 20000000
 
@@ -1052,6 +1105,9 @@ jobs:
           # --channel has to match the Configure step: it is how the script knows the bundle is
           # "Drift Nightly.app" rather than "Drift.app".
           CHANNEL_ARGS=(--channel "${{ inputs.channel }}" --build-id "${{ inputs.build_id }}")
+          if [ "${{ matrix.homebrew_qt }}" != true ]; then
+            CHANNEL_ARGS+=(--qt-prefix "$QT_ROOT_DIR" --ffmpeg-dir "${GITHUB_WORKSPACE}/.deps/ffmpeg")
+          fi
 
           package_adhoc() {
             scripts/package-macos.sh --build-dir build-macos --skip-build "${CHANNEL_ARGS[@]}"

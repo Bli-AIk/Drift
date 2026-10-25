@@ -41,8 +41,6 @@ Rectangle {
     required property string duration
     required property string thumbnailPath
     required property int assetIndex
-    required property int rating
-    required property int rangeCount
     required property int depth
     required property bool expanded
     required property bool expandable
@@ -229,16 +227,6 @@ Rectangle {
                 rowMenu.popup()
             }
         }
-    }
-
-    MediaAssetsLabBadge {
-        z: 4
-        visible: !root.isFolder && (root.rating !== 0 || root.rangeCount > 0)
-        anchors.right: parent.right
-        anchors.rightMargin: Theme.spacingLg * 2 + quickAdd.width + (root.alreadyOnTimeline ? 78 : 0)
-        anchors.verticalCenter: parent.verticalCenter
-        rating: root.rating
-        rangeCount: root.rangeCount
     }
 
     // Match the grid thumbnail's quick-add action in list and tree modes.

@@ -5,6 +5,7 @@ ThemedContextMenu {
     id: root
 
     property bool collecting: false
+    property bool showCollect: true
 
     signal importFilesRequested()
     signal importFolderRequested()
@@ -27,12 +28,12 @@ ThemedContextMenu {
     }
 
     ThemedMenuSeparator {
-        visible: FileDialogs.supportsDirectoryPicker()
+        visible: root.showCollect && FileDialogs.supportsDirectoryPicker()
         height: visible ? implicitHeight : 0
     }
 
     ThemedMenuItem {
-        visible: FileDialogs.supportsDirectoryPicker()
+        visible: root.showCollect && FileDialogs.supportsDirectoryPicker()
         height: visible ? implicitHeight : 0
         text: qsTr("Collect Media to Folder…")
         icon.name: Theme.icons.folderOutput

@@ -11375,25 +11375,6 @@
     </message>
 </context>
 <context>
-    <name>MediaAssetsLabFilterRow</name>
-    <message>
-        <source>All</source>
-        <translation type="unfinished">Todo</translation>
-    </message>
-    <message>
-        <source>Favorites</source>
-        <translation type="unfinished">Favoritos</translation>
-    </message>
-    <message>
-        <source>Has ranges</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hide rejected</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>MediaAssetsListLabels</name>
     <message>
         <source>Linked proxy</source>
@@ -11467,10 +11448,6 @@
     <message>
         <source>Try a different name.</source>
         <translation>Prueba con un nombre diferente.</translation>
-    </message>
-    <message>
-        <source>Nothing matches this filter</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Creating proxy for %1 (%2 more)</source>
@@ -16849,6 +16826,91 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     </message>
     <message>
         <source>The noise-removal model is not installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceLabBinFilterRow</name>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Todo</translation>
+    </message>
+    <message>
+        <source>Favorites</source>
+        <translation type="unfinished">Favoritos</translation>
+    </message>
+    <message>
+        <source>Has ranges</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide rejected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation type="unfinished">Vídeo</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished">Audio</translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <translation type="unfinished">Imagen</translation>
+    </message>
+</context>
+<context>
+    <name>SourceLabBinPanel</name>
+    <message>
+        <source>Sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Media</source>
+        <translation type="unfinished">Importar medios</translation>
+    </message>
+    <message>
+        <source>All Files (*)</source>
+        <translation type="unfinished">Todos los archivos (*)</translation>
+    </message>
+    <message>
+        <source>Import Folder</source>
+        <translation type="unfinished">Importar carpeta</translation>
+    </message>
+    <message>
+        <source>Couldn’t import that folder.</source>
+        <translation type="unfinished">No se pudo importar esa carpeta.</translation>
+    </message>
+    <message>
+        <source>Search media</source>
+        <translation type="unfinished">Buscar medios</translation>
+    </message>
+    <message>
+        <source>No media yet</source>
+        <translation type="unfinished">Aún no hay medios</translation>
+    </message>
+    <message>
+        <source>Import video, audio or image files to start.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing matches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try a different name or filter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceLabBinRow</name>
+    <message>
+        <source>%1 kHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 · %2 fps</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -22817,6 +22879,10 @@ Si la reproducción se corta, prueba con otra opción.</translation>
     </message>
     <message>
         <source>History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sources</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

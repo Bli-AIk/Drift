@@ -39,7 +39,7 @@ Item {
 
     readonly property bool sourceViewerShown: root._shownOf("sourceViewer")
 
-    readonly property bool sourceLabShown: root._shownOf("sourceLab.viewer") || root._shownOf("sourceLab.trim")
+    readonly property bool sourceLabShown: root._shownOf("sourceLab.bin") || root._shownOf("sourceLab.viewer") || root._shownOf("sourceLab.trim")
         || root._shownOf("sourceLab.ranges") || root._shownOf("sourceLab.process") || root._shownOf("sourceLab.output")
 
     readonly property bool denoiseShown: root._shownOf("denoise")
@@ -81,6 +81,7 @@ Item {
         "keyframes": keyframesC,
         "undoHistory": historyC,
         "sourceViewer": sourceViewerC,
+        "sourceLab.bin": sourceLabBinC,
         "sourceLab.viewer": sourceLabViewerC,
         "sourceLab.trim": sourceLabTrimC,
         "sourceLab.ranges": sourceLabRangesC,
@@ -106,6 +107,7 @@ Item {
     Component { id: keyframesC; LazyPanel { panel: KeyframesPanel {} } }
     Component { id: historyC; LazyPanel { panel: HistoryPanel {} } }
     Component { id: sourceViewerC; LazyPanel { panel: SourceViewerPanel {} } }
+    Component { id: sourceLabBinC; LazyPanel { panel: SourceLabBinPanel {} } }
     Component { id: sourceLabViewerC; LazyPanel { panel: SourceLabViewerPanel {} } }
     Component { id: sourceLabTrimC; LazyPanel { panel: SourceLabTrimPanel {} } }
     Component { id: sourceLabRangesC; LazyPanel { panel: SourceLabRangesPanel {} } }

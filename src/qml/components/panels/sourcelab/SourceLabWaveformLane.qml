@@ -11,16 +11,16 @@ Canvas {
     property real viewDur: 1
     property bool perChannel: false
 
-    property var data: ({ channels: 0 })
+    property var peaks: ({ channels: 0 })
     readonly property int bucketCount: Math.max(1, Math.min(4096, Math.ceil(root.width)))
     readonly property color wave: Theme.c.sourceLabStrip.waveform
 
     function refresh() {
         if (root.path.length === 0 || root.viewDur <= 0 || root.width <= 0) {
-            root.data = { channels: 0 }
+            root.peaks = { channels: 0 }
             return
         }
-        root.data = EditorState.waveformChannelPeaksRange(root.path, root.viewStart, root.viewDur,
+        root.peaks = EditorState.waveformChannelPeaksRange(root.path, root.viewStart, root.viewDur,
                                                           root.bucketCount)
     }
 
@@ -30,7 +30,7 @@ Canvas {
     onViewDurChanged: settle.restart()
     onWidthChanged: settle.restart()
     onPathChanged: settle.restart()
-    onDataChanged: root.requestPaint()
+    onPeaksChanged: root.requestPaint()
     onHeightChanged: root.requestPaint()
     onPerChannelChanged: root.requestPaint()
     onWaveChanged: root.requestPaint()
@@ -52,7 +52,7 @@ Canvas {
     onPaint: {
         const ctx = getContext("2d")
         ctx.clearRect(0, 0, width, height)
-        const d = root.data
+        const d = root.peaks
         if (!d || !d.channels || d.channels <= 0 || !d.peaks)
             return
         const rows = root.perChannel ? d.channels : 1
