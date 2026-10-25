@@ -43,6 +43,16 @@ Column {
             visible: packDrag.hovered && !packDrag.active
         }
 
+        AssetQuickAddButton {
+            z: 5
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.margins: 4
+            revealed: packDrag.hovered
+            tooltip: qsTr("Add at playhead")
+            onClicked: packDrag.tapped()
+        }
+
         ThemedContextMenu {
             id: cardMenu
 

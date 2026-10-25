@@ -113,6 +113,19 @@ class PreferencesController : public QObject
     Q_PROPERTY(QString interfaceShell READ interfaceShell WRITE setInterfaceShell NOTIFY interfaceShellChanged)
     Q_PROPERTY(QString appliedShell READ appliedShell CONSTANT)
     Q_PROPERTY(bool interfaceShellNeedsRestart READ interfaceShellNeedsRestart NOTIFY interfaceShellChanged)
+    // Power-user performance knobs, QSettings("performance/*"). The values live in
+    // drift::tuning (engine/EngineTuning.h) as atomics so the playback hot paths never read
+    // settings; every setter writes them through. 0 means off / unlimited / automatic per knob.
+    Q_PROPERTY(int staleFrameLagMs READ staleFrameLagMs WRITE setStaleFrameLagMs NOTIFY performanceChanged)
+    Q_PROPERTY(int readAheadMs READ readAheadMs WRITE setReadAheadMs NOTIFY performanceChanged)
+    Q_PROPERTY(int targetPoolMax READ targetPoolMax WRITE setTargetPoolMax NOTIFY performanceChanged)
+    Q_PROPERTY(int targetPoolMiB READ targetPoolMiB WRITE setTargetPoolMiB NOTIFY performanceChanged)
+    Q_PROPERTY(int uploadCacheMax READ uploadCacheMax WRITE setUploadCacheMax NOTIFY performanceChanged)
+    Q_PROPERTY(int uploadCacheMiB READ uploadCacheMiB WRITE setUploadCacheMiB NOTIFY performanceChanged)
+    Q_PROPERTY(int readerHistoryMiB READ readerHistoryMiB WRITE setReaderHistoryMiB NOTIFY performanceChanged)
+    Q_PROPERTY(int frameCacheMiB READ frameCacheMiB WRITE setFrameCacheMiB NOTIFY performanceChanged)
+    Q_PROPERTY(bool continuousReadAhead READ continuousReadAhead WRITE setContinuousReadAhead NOTIFY performanceChanged)
+    Q_PROPERTY(bool preferHardwareExport READ preferHardwareExport WRITE setPreferHardwareExport NOTIFY performanceChanged)
     // False inside Flatpak: the sandbox dies with its first process, taking a relaunched child
     // with it, so the UI asks for a manual restart instead.
     Q_PROPERTY(bool canRestart READ canRestart CONSTANT)
@@ -182,6 +195,29 @@ public:
     void setStillDurationSeconds(double seconds);
     double transitionDurationSeconds() const { return m_transitionDurationSeconds; }
     void setTransitionDurationSeconds(double seconds);
+    // Performance tunables (see the properties above).
+    int staleFrameLagMs() const;
+    void setStaleFrameLagMs(int value);
+    int readAheadMs() const;
+    void setReadAheadMs(int value);
+    int targetPoolMax() const;
+    void setTargetPoolMax(int value);
+    int targetPoolMiB() const;
+    void setTargetPoolMiB(int value);
+    int uploadCacheMax() const;
+    void setUploadCacheMax(int value);
+    int uploadCacheMiB() const;
+    void setUploadCacheMiB(int value);
+    int readerHistoryMiB() const;
+    void setReaderHistoryMiB(int value);
+    int frameCacheMiB() const;
+    void setFrameCacheMiB(int value);
+    bool continuousReadAhead() const;
+    void setContinuousReadAhead(bool enabled);
+    bool preferHardwareExport() const;
+    void setPreferHardwareExport(bool enabled);
+    Q_INVOKABLE void resetPerformanceDefaults();
+
     qint64 cacheSizeBytes() const { return m_cacheSizeBytes; }
     bool cacheBusy() const { return m_cacheBusy; }
     QString cacheLocation() const;
@@ -250,6 +286,7 @@ signals:
     void uiLanguageChanged();
     void uiScaleChanged();
     void interfaceShellChanged();
+    void performanceChanged();
     // setVaapiZeroCopy, setMediaCodecZeroCopy and setPreferredGpu take effect on the next
     // launch. AppController turns this into a status toast.
     void restartNoticeRequested(const QString &text);
@@ -290,4 +327,5 @@ private:
     bool m_cacheBusy = false;
 
     void runCacheJob(bool clear);
+    void loadPerformanceSettings();
 };

@@ -160,6 +160,20 @@ Item {
         width: Math.max(0, toolbar.width - rightControls.width - Theme.spacingLg * 3)
         clip: true
 
+        ThemedButton {
+            variant: "primary"
+            glyph: Theme.icons.plus
+            text: qsTr("Import media")
+            tooltip: qsTr("Add video or audio files directly to the timeline at the playhead")
+            height: Math.min(Theme.controlHeightSm, toolbar.height - Theme.spacingXs * 2)
+            topPadding: Theme.spacingXs
+            bottomPadding: Theme.spacingXs
+            enabled: !MediaImport.importing
+            onClicked: toolbar.panel.importMediaDirectlyToTimeline()
+        }
+
+        TimelineToolbarSeparator { }
+
         TimelineToolbarToolButton {
             glyph: EditorState.playing ? Theme.icons.pause : Theme.icons.play
             tooltip: EditorState.playing ? qsTr("Pause") : qsTr("Play")
@@ -204,18 +218,6 @@ Item {
         spacing: Theme.spacingSm
 
         TimelineToolbarToolButton {
-            glyph: Theme.icons.magnet
-            tooltip: qsTr("Toggle snapping")
-            active: EditorState.snapEnabled
-            onClicked: EditorState.snapEnabled = !EditorState.snapEnabled
-        }
-        TimelineToolbarToolButton {
-            glyph: Theme.icons.foldHorizontal
-            tooltip: qsTr("Close gaps when trimming")
-            active: EditorState.rippleEnabled
-            onClicked: EditorState.rippleEnabled = !EditorState.rippleEnabled
-        }
-        TimelineToolbarToolButton {
             glyph: Theme.icons.option
             tooltip: qsTr("Allow clip overlap")
             active: EditorState.allowClipOverlap
@@ -229,6 +231,20 @@ Item {
         }
 
         TimelineToolbarSeparator { }
+
+        // Keep the magnetic tools next to zoom, where CapCut users expect them.
+        TimelineToolbarToolButton {
+            glyph: Theme.icons.magnet
+            tooltip: qsTr("Magnetic snapping: align video and audio edges across tracks")
+            active: EditorState.snapEnabled
+            onClicked: EditorState.snapEnabled = !EditorState.snapEnabled
+        }
+        TimelineToolbarToolButton {
+            glyph: Theme.icons.foldHorizontal
+            tooltip: qsTr("Ripple editing: keep following clips together when trimming")
+            active: EditorState.rippleEnabled
+            onClicked: EditorState.rippleEnabled = !EditorState.rippleEnabled
+        }
 
         TimelineToolbarZoomControl {
             host: toolbar

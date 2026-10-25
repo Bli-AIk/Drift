@@ -3,7 +3,7 @@ import Drift
 
 // ----- Before / after ---------------------------------------------------------------
 Column {
-    required property RestoreWindow tool
+    required property var tool
     property real sidebarWidth
     property alias stage: stage
     property alias frameSlider: frameSlider

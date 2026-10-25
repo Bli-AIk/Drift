@@ -8,7 +8,6 @@
 #include <QSet>
 #include <QThread>
 
-#include <array>
 #include <atomic>
 #include <memory>
 
@@ -57,11 +56,9 @@ private:
 // ring is what keeps the scene graph from sampling a target that is being drawn into, and
 // its depth is therefore what caps how many composites may run at once.
 //
-// During playback up to GpuCompositor::kMaxPreviewComposites run concurrently. That is stage
-// parallelism, not throughput: GL work cannot overlap GL work, because every composite funnels
-// through the one GL thread. What it does overlap is one frame's wait on a decoder with
-// another frame's GL work, which is where the pipeline previously sat idle. Outside playback
-// the depth drops back to one, so scrubbing and seeking behave exactly as before.
+// Preview composites run sequentially on one worker. This keeps video decoder sessions
+// and their forward-read cursors stable across frames and across adjacent video clips.
+// New playback requests replace the pending timestamp while a composite is running.
 class CompositorService : public QObject
 {
     Q_OBJECT
@@ -149,10 +146,8 @@ private:
     // PlaybackEngine, and onWorkerFrameReady is a queued slot), so this needs no atomic.
     int m_inFlight = 0;
     quint64 m_nextSequence = 1;
-    // Highest sequence already put on screen. A completion below it has been overtaken —
-    // either it finished out of order, or the playhead moved past it while it rendered — and
-    // showing it would step the picture backwards. This replaces the old wall-clock staleness
-    // test, which threw away finished frames that had nothing newer to replace them with.
+    // Highest sequence already put on screen. Completions older than this are overtaken;
+    // playback also rejects frames lagging far behind the latest requested timestamp.
     quint64 m_lastPresentedSequence = 0;
     // Dispatch time per sequence, for request-to-screen latency. Filled only under perf logging.
     QHash<quint64, qint64> m_perfDispatchNs;
@@ -178,12 +173,10 @@ private:
 
     PlaybackStats *m_stats = nullptr;
 
-    // One thread per possible in-flight composite. Each worker owns its own FrameCompositor,
-    // which is safe because that class holds nothing but a project pointer and every cache it
-    // reaches is either mutex-guarded (the still-image cache) or serialised on the GL thread.
-    std::array<QThread, GpuCompositor::kMaxPreviewComposites> m_threads;
-    std::array<CompositorWorker *, GpuCompositor::kMaxPreviewComposites> m_workers{};
-    int m_nextWorker = 0;
+    // Preview composites run on one persistent thread so decoder cursors survive cuts.
+    // The GPU presentation ring retains its own independent capacity.
+    QThread m_thread;
+    CompositorWorker *m_worker = nullptr;
 
 public:
     // Call when the live project has been mutated so the next dispatch recopies.

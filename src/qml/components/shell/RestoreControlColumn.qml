@@ -3,7 +3,7 @@ import Drift
 
 Item {
     id: sidebar
-    required property RestoreWindow tool
+    required property var tool
     property Item pickerPanel
     property alias decompressBox: decompressBox
     width: 300

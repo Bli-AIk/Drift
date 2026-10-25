@@ -7,8 +7,8 @@ import Drift
 Platform.MenuBar {
     id: menuBar
     property ApplicationWindow appWindow
-    property EditorHeader header
-    property AssetsPanel assets
+    property var header
+    property var assets
     property LazyLoader downloadsLoader
     window: menuBar.appWindow
 

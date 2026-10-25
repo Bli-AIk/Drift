@@ -3,7 +3,7 @@ import Drift
 
 // Live voiceover recording block, waveform, and REC badge on a track.
 Rectangle {
-    property TimelinePanel panel
+    property var panel
     property int trackIndex: -1
     id: liveRecordingBlock
     visible: EditorState.isRecordingAudio && EditorState.recordingTrackIndex === trackIndex

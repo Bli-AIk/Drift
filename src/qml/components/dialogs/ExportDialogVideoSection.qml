@@ -5,7 +5,7 @@ import QtQuick.Layouts
 // ---- Video mode ----
 Column {
     id: section
-    required property ExportDialog dialog
+    required property var dialog
     property alias frameRateCombo: frameRateCombo
     property alias videoCodecCombo: videoCodecCombo
     property alias audioCodecCombo: audioCodecCombo
@@ -97,6 +97,13 @@ Column {
             height: visible ? implicitHeight : 0
             text: qsTr("Exporting above the project rate pulls extra frames from the source footage where it has them — this is what makes slowed clips look smooth. Where it doesn't, frames repeat.")
         }
+    }
+
+    ThemedLabel {
+        width: parent.width
+        size: "sm"
+        visible: dialog.currentVideoCodec && dialog.currentVideoCodec.hardware
+        text: qsTr("Hardware-accelerated export: %1").arg(dialog.currentVideoCodec.label || "")
     }
 
     Item {
@@ -226,7 +233,9 @@ Column {
                 ThemedSlider {
                     width: parent.width
                     label: qsTr("Quality (RF)")
-                    from: 0
+                    // H.264 High profile rejects lossless RF 0; RF 1 is its
+                    // highest compatible quality setting.
+                    from: dialog.videoCodecId === "h264" ? 1 : 0
                     to: 51
                     stepSize: 1
                     value: dialog.crf

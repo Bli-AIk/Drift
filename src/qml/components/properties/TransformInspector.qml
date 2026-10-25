@@ -69,6 +69,35 @@ Item {
         return ScaleMath.scaleOf(w, h, canvasW, canvasH)
     }
 
+    // Scale is presented as a single control, but the project stores its animation as two
+    // independent width/height curves. Keep the navigation and add/remove button in sync
+    // with either curve, including clips that were keyed while the dimensions were unlinked.
+    readonly property var scaleWidthKeys: (clipData && clipData.keyframes && clipData.keyframes.width
+                                           && clipData.keyframes.width.points) || []
+    readonly property var scaleHeightKeys: (clipData && clipData.keyframes && clipData.keyframes.height
+                                            && clipData.keyframes.height.points) || []
+    readonly property var scaleKeyTimes: {
+        const times = scaleWidthKeys.concat(scaleHeightKeys).map(k => Number(k.seconds)).filter(t => isFinite(t))
+        times.sort((a, b) => a - b)
+        return times.filter((t, i) => i === 0 || t - times[i - 1] > 1 / 30)
+    }
+    readonly property bool hasPreviousScaleKey: {
+        const t = EditorState.inspectorPlayheadSeconds
+        return scaleKeyTimes.some(k => k < t - 1 / 30)
+    }
+    readonly property bool hasNextScaleKey: {
+        const t = EditorState.inspectorPlayheadSeconds
+        return scaleKeyTimes.some(k => k > t + 1 / 30)
+    }
+
+    function moveToScaleKey(previous) {
+        const t = EditorState.playheadSeconds
+        const candidates = scaleKeyTimes.filter(k => previous ? k < t - 1 / 30 : k > t + 1 / 30)
+        if (candidates.length > 0)
+            EditorState.playheadSeconds = previous ? candidates[candidates.length - 1] : candidates[0]
+        EditorState.showKeyframeGraphProperty("width")
+    }
+
     property var scaleDragStart: null
     // Fractions of the box (0, 0.5, 1 per axis) the scale keeps fixed on the canvas. Not saved.
     property point scaleAnchor: Qt.point(0.5, 0.5)
@@ -275,13 +304,45 @@ Item {
             Row {
                 visible: root.sizeLinked
                 width: parent.width
-                spacing: 8
+                spacing: 4
+
+                IconButton {
+                    buttonSize: 20
+                    iconSize: 12
+                    anchors.verticalCenter: parent.verticalCenter
+                    glyph: Theme.icons.chevronLeft
+                    enabled: root.hasPreviousScaleKey
+                    tooltip: qsTr("Previous scale keyframe")
+                    onClicked: root.moveToScaleKey(true)
+                }
+
+                IconButton {
+                    buttonSize: 20
+                    iconSize: 12
+                    anchors.verticalCenter: parent.verticalCenter
+                    glyph: Theme.icons.chevronRight
+                    enabled: root.hasNextScaleKey
+                    tooltip: qsTr("Next scale keyframe")
+                    onClicked: root.moveToScaleKey(false)
+                }
+
+                IconButton {
+                    buttonSize: 20
+                    iconSize: 12
+                    anchors.verticalCenter: parent.verticalCenter
+                    glyph: Theme.icons.trash
+                    enabled: root.scaleKeyTimes.length > 0
+                    tooltip: qsTr("Clear all scale keyframes, keeping the current scale")
+                    onClicked: EditorState.keyframes.clearProperties(
+                                   EditorState.selectedTrack, EditorState.selectedClip,
+                                   ["width", "height"])
+                }
 
                 ThemedSlider {
                     id: scaleSlider
                     lockWhilePlaying: true
                     label: qsTr("Scale")
-                    width: parent.width - scaleReadout.width - scaleKey.width - 2 * parent.spacing
+                    width: parent.width - scaleReadout.width - scaleKey.width - 20 * 3 - parent.spacing * 5
                     anchors.verticalCenter: parent.verticalCenter
                     from: 0.05
                     to: 4

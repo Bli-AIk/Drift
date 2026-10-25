@@ -410,7 +410,7 @@ private:
 
     std::multimap<uint64_t, std::unique_ptr<QOpenGLFramebufferObject>> m_targetPool;
     size_t m_pooledTargets = 0;
-    static constexpr size_t kMaxPooledTargets = 32;
+    size_t m_pooledTargetBytes = 0;
 
     GlTarget m_presentRing[kPresentRingSize];
     GLsync m_presentFence[kPresentRingSize] = {};
@@ -439,7 +439,7 @@ private:
     };
     std::unordered_map<qint64, std::list<CachedUpload>::iterator> m_imageUploadIndex;
     std::list<CachedUpload> m_imageUploadLru;
-    static constexpr size_t kMaxCachedUploads = 48;
+    size_t m_imageUploadBytes = 0;
 
     // Converted RGBA of recent preview video frames, keyed by the decoded frame object itself:
     // a paused playhead gets the same AVFrame back from the reader's cache on every composite,

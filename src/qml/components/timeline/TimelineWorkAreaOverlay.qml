@@ -5,7 +5,7 @@ import Drift
 Item {
     id: workAreaOverlay
 
-    property TimelinePanel panel
+    property var panel
     property Flickable view
     property real headerHeight: 0
     z: 1

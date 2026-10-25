@@ -2,7 +2,7 @@ import QtQuick
 import Drift
 
 Column {
-    required property DebugInfoDialog dialog
+    required property var dialog
     id: playbackTab
     width: parent.width
     spacing: Theme.spacingXl

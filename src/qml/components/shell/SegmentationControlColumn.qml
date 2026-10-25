@@ -3,7 +3,7 @@ import Drift
 
 Column {
     id: sidebar
-    required property SegmentationWindow tool
+    required property var tool
     property alias backendBox: backendBox
     property alias qualityBox: qualityBox
     width: 260

@@ -39,6 +39,7 @@ constexpr double kWaveformWindowMax = 4096.0;
 constexpr double kFilmstripTileWidth = 120.0;
 constexpr int kFilmstripFrameCount = 8;
 constexpr int kMaxCachedTextures = 160;
+constexpr qsizetype kMaxCachedTextureBytes = 64ll * 1024 * 1024;
 
 Vertex vertex(double x, double y, const QColor &c, double alphaScale = 1.0)
 {
@@ -275,6 +276,8 @@ public:
     QSGNode *texts = nullptr;
     QHash<QString, QSGTexture *> textures;
     QHash<QString, int> textureStamps;
+    QHash<QString, qsizetype> textureBytes;
+    qsizetype cachedTextureBytes = 0;
     QList<QSGImageNode *> images;
     // Several clips can carry the same label (a split clip keeps its name), so each look maps to
     // a list of placed nodes. The transform owns its text node.
@@ -1052,6 +1055,11 @@ void TimelineTrackItem::appendClip(int index, const QRectF &baseRect, bool selec
     appendFade(rect.left(), fadeInW, false);
     appendFade(rect.right() - fadeOutW, fadeOutW, true);
 
+    // Give adjacent clips a visible edge even when neither is selected.
+    QColor clipEdge = s.scrim;
+    clipEdge.setAlpha(185);
+    appendOutline(m_over, rect, s.radiusSm, 1.25, clipEdge, ox);
+
     // --- effect drop and selection -----------------------------------------------------------
     const bool dropTarget = m_viewState->effectDropTrack() == m_trackIndex
                             && m_viewState->effectDropClip() == index;
@@ -1281,6 +1289,11 @@ QSGNode *TimelineTrackItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDat
                 continue;
             texture->setFiltering(QSGTexture::Linear);
             root->textures.insert(tile.key, texture);
+            // Approximate the backing upload size using the source image. A count
+            // alone keeps an excessive amount of texture memory for tall filmstrips.
+            const qsizetype bytes = tile.image.sizeInBytes();
+            root->textureBytes.insert(tile.key, bytes);
+            root->cachedTextureBytes += bytes;
         }
         if (!texture)
             continue;
@@ -1299,10 +1312,12 @@ QSGNode *TimelineTrackItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDat
         node->setRect(tile.target);
         node->setSourceRect(tile.source);
     }
-    if (root->textures.size() > kMaxCachedTextures) {
+    if (root->textures.size() > kMaxCachedTextures
+        || root->cachedTextureBytes > kMaxCachedTextureBytes) {
         for (auto it = root->textures.begin(); it != root->textures.end();) {
             if (root->textureStamps.value(it.key()) != m_frameCounter) {
                 root->textureStamps.remove(it.key());
+                root->cachedTextureBytes -= root->textureBytes.take(it.key());
                 delete it.value();
                 it = root->textures.erase(it);
             } else {

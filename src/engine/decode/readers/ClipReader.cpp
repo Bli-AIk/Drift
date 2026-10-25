@@ -1,4 +1,5 @@
 #include "engine/decode/readers/ClipReader.h"
+#include "engine/EngineTuning.h"
 
 #include "engine/gpu/GlRuntime.h"
 #include "engine/compositor/GpuCompositor.h"
@@ -69,6 +70,14 @@ bool isHardwarePixelFormat(AVPixelFormat fmt)
 int swsFlagsForResize(int srcW, int srcH, int dstW, int dstH)
 {
     return (srcW != dstW || srcH != dstH) ? SWS_LANCZOS : SWS_BICUBIC;
+}
+
+// Preview is downscaled to the viewport and can change size every playback tick.
+// Bilinear resizing is substantially cheaper than Lanczos here; full-quality
+// QImage conversion (including effects/export paths) still uses swsFlagsForResize.
+int swsPreviewFlagsForResize(int srcW, int srcH, int dstW, int dstH)
+{
+    return (srcW != dstW || srcH != dstH) ? SWS_BILINEAR : SWS_BICUBIC;
 }
 
 // Prefer the hardware surface format when the decoder offers it; otherwise pick the
@@ -194,7 +203,7 @@ AVFrame *softwareFrameToNv12(const AVFrame *frame, SwsContext *&sws, int targetW
         && frame->height == targetHeight)
         return av_frame_clone(frame);
 
-    const int flags = swsFlagsForResize(frame->width, frame->height, targetWidth, targetHeight);
+    const int flags = swsPreviewFlagsForResize(frame->width, frame->height, targetWidth, targetHeight);
     sws = sws_getCachedContext(sws, frame->width, frame->height,
                                drift::swsSourceFormat(static_cast<AVPixelFormat>(frame->format)), targetWidth,
                                targetHeight, AV_PIX_FMT_NV12, flags, nullptr, nullptr, nullptr);
@@ -232,7 +241,7 @@ AVFrame *softwareFrameToRgba(const AVFrame *frame, SwsContext *&sws, int targetW
         && frame->height == targetHeight)
         return av_frame_clone(frame);
 
-    const int flags = swsFlagsForResize(frame->width, frame->height, targetWidth, targetHeight);
+    const int flags = swsPreviewFlagsForResize(frame->width, frame->height, targetWidth, targetHeight);
     sws = sws_getCachedContext(sws, frame->width, frame->height,
                                drift::swsSourceFormat(static_cast<AVPixelFormat>(frame->format)), targetWidth,
                                targetHeight, AV_PIX_FMT_RGBA, flags, nullptr, nullptr, nullptr);
@@ -611,6 +620,20 @@ void ClipReader::storeCachedFrame(drift::TimeUs ptsUs, const QImage &image)
     m_videoCache.prepend(CachedFrame{ptsUs, image});
     while (m_videoCache.size() > kMaxCachedFrames)
         m_videoCache.removeLast();
+
+    // Optional byte cap on CPU-side history; a 4K reader can otherwise hold half a gigabyte.
+    // Always keeps the newest frame.
+    const qsizetype budget = qsizetype(drift::tuning::readerHistoryMiB.load(std::memory_order_relaxed))
+                             * qsizetype(drift::tuning::kMiB);
+    if (budget > 0) {
+        qsizetype used = 0;
+        for (const CachedFrame &cached : std::as_const(m_videoCache))
+            used += cached.image.sizeInBytes();
+        while (used > budget && m_videoCache.size() > 1) {
+            used -= m_videoCache.constLast().image.sizeInBytes();
+            m_videoCache.removeLast();
+        }
+    }
 }
 
 bool ClipReader::lookupCachedPreview(drift::TimeUs sourceUs, PreviewVideoFrame &out) const
@@ -659,11 +682,16 @@ qint64 physicalMemoryBytes()
     return 0;
 }
 
-// Decoded frames held for preview, across every reader. An eighth of physical memory (a
-// sixteenth on Android, which shares it with the GPU and everything else on the phone), never
+// Decoded frames held for preview, across every reader. Automatic is an eighth of physical memory
+// (a sixteenth on Android, which shares it with the GPU and everything else on the phone), never
 // less than the old fixed 128 MB: that figure was ~10 frames of 4K and left no read-ahead at all.
+// The automatic figure is computed once; the tunable is re-read so a change applies live.
 qsizetype previewCacheBudgetBytes()
 {
+    const int overrideMiB = drift::tuning::frameCacheMiB.load(std::memory_order_relaxed);
+    if (overrideMiB > 0)
+        return qsizetype(overrideMiB) * qsizetype(drift::tuning::kMiB);
+
     static const qsizetype budget = [] {
         constexpr qsizetype floor = 128ll * 1024 * 1024;
 #ifdef Q_OS_ANDROID
@@ -742,12 +770,13 @@ int ClipReader::previewCacheCapacity() const
         return frames;
     }
 
-    if (m_readAheadUs <= 0 || m_sourceFrameDurationUs <= 0)
-        return kMaxCachedFrames;
-
-    // Bounded by bytes below, not by a frame count.
-    const qsizetype aheadFrames = qMax<qsizetype>(0, m_readAheadUs / m_sourceFrameDurationUs);
-    qsizetype capacity = historyFrames + aheadFrames;
+    // Even readers with read-ahead disabled can hold enormous software frames,
+    // so the byte budget applies to their history as well.
+    qsizetype capacity = kMaxCachedFrames;
+    if (m_readAheadUs > 0 && m_sourceFrameDurationUs > 0) {
+        const qsizetype aheadFrames = qMax<qsizetype>(0, m_readAheadUs / m_sourceFrameDurationUs);
+        capacity = historyFrames + aheadFrames;
+    }
 
     qsizetype frameBytes = 0;
     if (!m_previewCache.isEmpty() && m_previewCache.constFirst().frame.frame) {
@@ -755,7 +784,8 @@ int ClipReader::previewCacheCapacity() const
         frameBytes = av_image_get_buffer_size(static_cast<AVPixelFormat>(f->format), f->width, f->height, 1);
     }
     if (frameBytes > 0) {
-        const int readers = qMax(1, g_readAheadReaders.load(std::memory_order_relaxed));
+        const int readers = std::max({1, g_readAheadReaders.load(std::memory_order_relaxed),
+                                       g_activeVideoStreams.load(std::memory_order_relaxed)});
         const qsizetype budget = previewCacheBudgetBytes() / readers;
         capacity = qMin<qsizetype>(capacity, qMax<qsizetype>(kMinCachedFrames, budget / frameBytes));
     }
@@ -935,13 +965,14 @@ bool ClipReader::openSoftwareVideoDecoder()
         return false;
     }
 
-    // The cores split between the streams the timeline is reading at once, never under two
-    // each. One stream still gets every core — caps used to leave 4K software decode short of
-    // realtime — but five overlapping clips each spawning a thread per core oversubscribed the
-    // machine several times over, and every extra frame thread is another frame of latency.
+    // Keep per-decoder parallelism bounded even on machines reporting many logical cores.
+    // FF_THREAD_FRAME buffers roughly one frame per thread before output: asking for 24
+    // threads can stall the first frame of a new clip while the preceding clip is playing,
+    // and opening two such decoders oversubscribes the CPU. Eight threads can still decode
+    // high-resolution footage while keeping cold-start latency and concurrent work bounded.
     const int cores = qMax(1, QThread::idealThreadCount());
     const int streams = g_activeVideoStreams.load(std::memory_order_relaxed);
-    m_videoCtx->thread_count = qBound(qMin(2, cores), cores / streams, cores);
+    m_videoCtx->thread_count = qBound(1, cores / streams, qMin(8, cores));
     m_videoCtx->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
 
     if (avcodec_open2(m_videoCtx, codec, nullptr) < 0) {

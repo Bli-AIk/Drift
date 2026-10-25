@@ -255,6 +255,7 @@ private slots:
     void linkedAudioUnlinkAndMove();
     void linkUnrelatedClipsMoveTogetherKeepTiming();
     void pastedAndDuplicatedClipsAreNotLinkedToTheOriginal();
+    void copiedExtractedAudioPointsAtTheCopiedVideo();
     void deleteLinkedPairTogetherAndUnlinkedClipAlone();
     void linkedFadeCurveSyncsPartner();
     void customFadeCurveSessionApplyAndCancel();
@@ -262,6 +263,7 @@ private slots:
     void transitionCurveSessionApplyAndCancel();
     void keyframeGraphPropertySelection();
     void keyframesCanBeDisabledPerProperty();
+    void linkedScaleKeyframesUndoTogether();
     void linkedPositionKeyframesAndTangents();
     void segmentEasingAppliesAndUndoes();
     void segmentEasingFunctionRoundTrip();
@@ -1496,6 +1498,7 @@ void EditorStateTest::compositeSeparateAudioAndRemoval()
     QVERIFY(audio);
     QCOMPARE(audio->sequenceId, composite.sequenceId);
     QVERIFY(!audio->linkId.isEmpty());
+    QCOMPARE(audio->sourceVideoClipId, composite.id);
 
     // Removing the composite from the bin takes its instances, its sequence and its tab with it.
     state.openCompositeClip(0, 0);
@@ -1638,6 +1641,22 @@ void EditorStateTest::bookmarkNavigationAndToggle()
     QCOMPARE(state.bookmarks().size(), 2);
 
     state.setPlayheadSeconds(4.0);
+    state.toggleBookmarkAtPlayhead();
+    QCOMPARE(state.bookmarks().size(), 3);
+
+    // A bookmark three frames after another is within the 150 ms snap radius,
+    // but toggling it must add a second mark, not delete the nearby first one.
+    state.setPlayheadSeconds(4.1);
+    state.toggleBookmarkAtPlayhead();
+    QCOMPARE(state.bookmarks().size(), 4);
+    QCOMPARE(state.bookmarks().at(2).toMap().value(QStringLiteral("seconds")).toDouble(), 4.0);
+    // Timeline storage uses integer microseconds, which can truncate a sub-microsecond
+    // fraction when converting a decimal playhead position.
+    QVERIFY(qAbs(state.bookmarks().at(3).toMap().value(QStringLiteral("seconds")).toDouble()
+                 - 4.1) < 0.000002);
+
+    // Toggling an existing mark still removes that exact frame's bookmark.
+    state.setPlayheadSeconds(4.1);
     state.toggleBookmarkAtPlayhead();
     QCOMPARE(state.bookmarks().size(), 3);
 }
@@ -5606,10 +5625,48 @@ void EditorStateTest::separateAudioFromCombinedClip()
     // The video must stop playing the audio it just handed over.
     QCOMPARE(state.project()->tracks().at(0).clips.at(0).suppressEmbeddedAudio, true);
 
-    // The two halves come out linked, so there is now something to unlink.
+    const QString videoId = state.project()->tracks().at(0).clips.at(0).id;
+    const QString audioId = state.project()->tracks().at(1).clips.at(0).id;
+    QCOMPARE(state.project()->tracks().at(1).clips.at(0).sourceVideoClipId, videoId);
+    const QString linkId = state.project()->tracks().at(1).clips.at(0).linkId;
+    QVERIFY(!linkId.isEmpty());
+    QCOMPARE(state.project()->tracks().at(0).clips.at(0).linkId, linkId);
+
+    // The two halves come out linked: selecting and moving the video carries the audio.
     state.selectClip(0, 0);
     QVERIFY(state.canUnlinkSelection());
     QVERIFY(!state.canSeparateAudioSelection());
+    QVERIFY(!state.canSeparateAudioClip(0, 0));
+    QVERIFY(state.selectionContains(1, 0));
+    state.moveClip(0, 0, 4.0);
+    QCOMPARE(state.project()->tracks().at(0).clips.at(0).timelineStart, drift::secondsToUs(4.0));
+    QCOMPARE(state.project()->tracks().at(1).clips.at(0).timelineStart, drift::secondsToUs(4.0));
+
+    // A saved project keeps both the link and the source association.
+    QString parseError;
+    const drift::Project reopened = drift::Project::fromJson(state.project()->toJson(), &parseError);
+    QVERIFY2(parseError.isEmpty(), qPrintable(parseError));
+    QCOMPARE(reopened.tracks().at(1).clips.at(0).sourceVideoClipId, videoId);
+    QCOMPARE(reopened.tracks().at(1).clips.at(0).linkId, linkId);
+
+    // Once unlinked, the audio moves, trims and deletes on its own.
+    state.unlinkSelectedClips();
+    state.selectClip(1, 0);
+    QVERIFY(state.selectionContains(1, 0));
+    QVERIFY(!state.selectionContains(0, 0));
+    state.moveClip(1, 0, 8.0);
+    QCOMPARE(state.project()->tracks().at(1).clips.at(0).timelineStart, drift::secondsToUs(8.0));
+    QCOMPARE(state.project()->tracks().at(0).clips.at(0).timelineStart, drift::secondsToUs(4.0));
+    const drift::TimeUs videoDuration = state.project()->tracks().at(0).clips.at(0).timelineDuration;
+    state.setClipDuration(1, 0, 2.0);
+    QCOMPARE(state.project()->tracks().at(1).clips.at(0).timelineDuration, drift::secondsToUs(2.0));
+    QCOMPARE(state.project()->tracks().at(0).clips.at(0).timelineDuration, videoDuration);
+    state.deleteSelectedClip();
+    QVERIFY(state.project()->tracks().at(1).clips.isEmpty());
+    QCOMPARE(state.project()->tracks().at(0).clips.at(0).id, videoId);
+    QVERIFY(state.project()->tracks().at(0).clips.at(0).suppressEmbeddedAudio);
+    state.undo();
+    QCOMPARE(state.project()->tracks().at(1).clips.at(0).id, audioId);
 }
 
 
@@ -5839,7 +5896,7 @@ void EditorStateTest::customFadeCurveSessionApplyAndCancel()
 //     Audio 2
 //     Audio 3
 //
-// Each audio clip also keeps the linkId of its corresponding video.
+// Each audio clip knows its source video without being linked for editing.
 void EditorStateTest::separatedAudioTracksMirrorVideoHierarchy()
 {
     AssetLibrary library;
@@ -5936,8 +5993,8 @@ void EditorStateTest::separatedAudioTracksMirrorVideoHierarchy()
         QCOMPARE(audio.assetId, video.assetId);
 
         QVERIFY(!video.linkId.isEmpty());
-
         QCOMPARE(audio.linkId, video.linkId);
+        QCOMPARE(audio.sourceVideoClipId, video.id);
 
         QVERIFY(video.suppressEmbeddedAudio);
     }
@@ -5962,8 +6019,8 @@ void EditorStateTest::separatedAudioTracksMirrorVideoHierarchy()
             drift::TrackType::Audio);
 
         QCOMPARE(
-            project->tracks().at(3 + i).clips.at(0).linkId,
-            project->tracks().at(i).clips.at(0).linkId);
+            project->tracks().at(3 + i).clips.at(0).sourceVideoClipId,
+            project->tracks().at(i).clips.at(0).id);
     }
 }
 
@@ -6067,6 +6124,7 @@ void EditorStateTest::pastedAndDuplicatedClipsAreNotLinkedToTheOriginal()
     AppController state(&library);
     appendLinkedVideoAudioPair(*state.project());
     const QString originalLink = state.project()->tracks().at(0).clips.at(0).linkId;
+    state.project()->tracks()[1].clips[0].sourceVideoClipId = QStringLiteral("clip-video");
 
     // The pasted pair is linked to itself, not to the pair it was copied from.
     state.selectClip(0, 0);
@@ -6081,14 +6139,62 @@ void EditorStateTest::pastedAndDuplicatedClipsAreNotLinkedToTheOriginal()
     QCOMPARE(state.project()->tracks().at(1).clips.at(1).linkId, pastedLink);
     QCOMPARE(state.project()->tracks().at(0).clips.at(0).linkId, originalLink);
     QCOMPARE(state.project()->tracks().at(1).clips.at(0).linkId, originalLink);
+    QCOMPARE(state.project()->tracks().at(1).clips.at(1).sourceVideoClipId,
+             state.project()->tracks().at(0).clips.at(1).id);
 
     // A duplicate comes in on its own, and moving it leaves the original's audio alone.
     state.selectClip(0, 0);
     state.duplicateSelectedClip();
     QCOMPARE(state.project()->tracks().at(0).clips.size(), 3);
     QVERIFY(state.project()->tracks().at(0).clips.at(2).linkId.isEmpty());
+    state.selectClip(1, 0);
+    state.duplicateSelectedClip();
+    QVERIFY(state.project()->tracks().at(1).clips.at(2).linkId.isEmpty());
+    QVERIFY(state.project()->tracks().at(1).clips.at(2).sourceVideoClipId.isEmpty());
     state.moveClip(0, 2, 20.0);
     QCOMPARE(state.project()->tracks().at(1).clips.at(0).timelineStart, 0);
+}
+
+void EditorStateTest::copiedExtractedAudioPointsAtTheCopiedVideo()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    appendLinkedVideoAudioPair(*state.project());
+    // An extracted pair: the audio remembers its video but the two are not A/V linked.
+    for (drift::Track &track : state.project()->tracks()) {
+        for (drift::Clip &clip : track.clips)
+            clip.linkId.clear();
+    }
+    state.project()->tracks()[1].clips[0].sourceVideoClipId = QStringLiteral("clip-video");
+
+    // Pasted together, the audio copy follows the video copy.
+    state.selectClip(0, 0);
+    state.addToSelection(1, 0);
+    state.copySelection();
+    state.setPlayheadSeconds(10.0);
+    state.pasteAtPlayhead();
+    QCOMPARE(state.project()->tracks().at(0).clips.size(), 2);
+    QCOMPARE(state.project()->tracks().at(1).clips.size(), 2);
+    const drift::Clip &videoCopy = state.project()->tracks().at(0).clips.at(1);
+    const drift::Clip &audioCopy = state.project()->tracks().at(1).clips.at(1);
+    QVERIFY(videoCopy.id != QStringLiteral("clip-video"));
+    QCOMPARE(audioCopy.sourceVideoClipId, videoCopy.id);
+    QCOMPARE(state.project()->tracks().at(1).clips.at(0).sourceVideoClipId, QStringLiteral("clip-video"));
+
+    // Pasting the audio alone must not point it at the original video.
+    state.selectClip(1, 0);
+    state.copySelection();
+    state.setPlayheadSeconds(20.0);
+    state.pasteAtPlayhead();
+    QCOMPARE(state.project()->tracks().at(1).clips.size(), 3);
+    QVERIFY(state.project()->tracks().at(1).clips.at(2).sourceVideoClipId.isEmpty());
+
+    // Neither does duplicating it.
+    state.selectClip(1, 0);
+    state.duplicateSelectedClip();
+    QCOMPARE(state.project()->tracks().at(1).clips.size(), 4);
+    QVERIFY(state.project()->tracks().at(1).clips.at(3).sourceVideoClipId.isEmpty());
+    QCOMPARE(state.project()->tracks().at(1).clips.at(0).sourceVideoClipId, QStringLiteral("clip-video"));
 }
 
 // The editor drives one session for two different shapes, so the mode has to survive begin/apply
@@ -6955,6 +7061,74 @@ void EditorStateTest::keyframesCanBeDisabledPerProperty()
     QVERIFY(!state.clipPropertyKeyframesEnabled(track, clip, QStringLiteral("rotation")));
     state.toggleClipPropertyKeyframesEnabled(track, clip, QStringLiteral("rotation"));
     QVERIFY(state.clipPropertyKeyframesEnabled(track, clip, QStringLiteral("rotation")));
+}
+
+void EditorStateTest::linkedScaleKeyframesUndoTogether()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Scale animation"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    QVERIFY(track >= 0);
+    QVERIFY(clip >= 0);
+
+    const auto widthBefore = state.clipKeyframes(track, clip, QStringLiteral("width"));
+    const auto heightBefore = state.clipKeyframes(track, clip, QStringLiteral("height"));
+
+    auto keyAt = [&](const QString &prop, double seconds) -> QVariantMap {
+        for (const QVariant &v : state.clipKeyframes(track, clip, prop)) {
+            const QVariantMap key = v.toMap();
+            if (qAbs(key.value(QStringLiteral("seconds")).toDouble() - seconds) < 0.001)
+                return key;
+        }
+        return {};
+    };
+
+    const QStringList scaleProps{QStringLiteral("width"), QStringLiteral("height")};
+    const auto xBefore = state.clipKeyframes(track, clip, QStringLiteral("x"));
+    state.keyframes()->addKeysAt(track, clip, scaleProps, 1.0);
+    QVERIFY(!keyAt(QStringLiteral("width"), 1.0).isEmpty());
+    QVERIFY(!keyAt(QStringLiteral("height"), 1.0).isEmpty());
+    QVERIFY(!keyAt(QStringLiteral("x"), 1.0).isEmpty());
+
+    state.undo();
+    QCOMPARE(state.clipKeyframes(track, clip, QStringLiteral("width")), widthBefore);
+    QCOMPARE(state.clipKeyframes(track, clip, QStringLiteral("height")), heightBefore);
+    QCOMPARE(state.clipKeyframes(track, clip, QStringLiteral("x")), xBefore);
+
+    state.redo();
+    QVERIFY(!keyAt(QStringLiteral("width"), 1.0).isEmpty());
+    QVERIFY(!keyAt(QStringLiteral("height"), 1.0).isEmpty());
+
+    state.keyframes()->removeKeysAt(track, clip, scaleProps, 1.0);
+    QVERIFY(keyAt(QStringLiteral("width"), 1.0).isEmpty());
+    QVERIFY(keyAt(QStringLiteral("height"), 1.0).isEmpty());
+
+    state.undo();
+    QVERIFY(!keyAt(QStringLiteral("width"), 1.0).isEmpty());
+    QVERIFY(!keyAt(QStringLiteral("height"), 1.0).isEmpty());
+
+    state.redo();
+    QVERIFY(keyAt(QStringLiteral("width"), 1.0).isEmpty());
+    QVERIFY(keyAt(QStringLiteral("height"), 1.0).isEmpty());
+
+    // Clearing animation leaves the values seen at the playhead as static defaults
+    // and is also a single undoable change for both dimensions.
+    state.keyframes()->addKeysAt(track, clip, scaleProps, 1.0);
+    state.keyframes()->addKeysAt(track, clip, scaleProps, 2.0);
+    state.setPlayheadSeconds(1.0);
+    state.keyframes()->clearProperties(track, clip, scaleProps);
+    QCOMPARE(state.clipKeyframes(track, clip, QStringLiteral("width")).size(), 1);
+    QCOMPARE(state.clipKeyframes(track, clip, QStringLiteral("height")).size(), 1);
+    QVERIFY(!keyAt(QStringLiteral("width"), 0.0).isEmpty());
+    QVERIFY(!keyAt(QStringLiteral("height"), 0.0).isEmpty());
+    state.undo();
+    QVERIFY(!keyAt(QStringLiteral("width"), 2.0).isEmpty());
+    QVERIFY(!keyAt(QStringLiteral("height"), 2.0).isEmpty());
+    state.redo();
+    QCOMPARE(state.clipKeyframes(track, clip, QStringLiteral("width")).size(), 1);
+    QCOMPARE(state.clipKeyframes(track, clip, QStringLiteral("height")).size(), 1);
 }
 
 void EditorStateTest::linkedPositionKeyframesAndTangents()
@@ -9102,7 +9276,7 @@ void EditorStateTest::multiTrackAudioSelectionAndExtraction()
         if (track.type != drift::TrackType::Audio)
             continue;
         for (const drift::Clip &clip : track.clips) {
-            if (clip.linkId == videoClip.linkId) {
+            if (clip.sourceVideoClipId == videoClip.id && clip.linkId == videoClip.linkId) {
                 if (clip.audioStreamIndex == 0)
                     hasAudioTrack1 = true;
                 else if (clip.audioStreamIndex == 1)

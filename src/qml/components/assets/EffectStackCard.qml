@@ -74,6 +74,17 @@ Column {
             }
         }
 
+        AssetQuickAddButton {
+            z: 5
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.margins: 4
+            revealed: cardDrag.hovered
+            tooltip: qsTr("Apply to selected clip")
+            enabled: EditorState.selectedClip >= 0
+            onClicked: applyRequested(root.modelData)
+        }
+
         IconButton {
             anchors.top: parent.top
             anchors.right: parent.right

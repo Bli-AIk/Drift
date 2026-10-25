@@ -2,7 +2,7 @@ import QtQuick
 import Drift
 
 Row {
-    required property ExportDialog dialog
+    required property var dialog
     spacing: Theme.spacingMd
 
     ThemedToggleButton {

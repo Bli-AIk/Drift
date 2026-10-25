@@ -362,6 +362,15 @@
       "focusBorderWidth": "$metrics.borderWidthFocus",
       "radius": "$metrics.radius.sm"
     },
+    "assetQuickAddButton": {
+      "background": "$semantic.primary",
+      "backgroundHover": "$semantic.primary",
+      "backgroundPressed": "$semantic.primary",
+      "backgroundDisabled": "$semantic.panel.accent",
+      "foreground": "$semantic.primaryForeground",
+      "foregroundDisabled": "$semantic.mutedForeground",
+      "focusRing": "$semantic.panel.foreground"
+    },
     "iconButton": {
       "foreground": "$semantic.mutedForeground",
       "foregroundActive": "$semantic.panel.secondary.foreground",

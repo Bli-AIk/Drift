@@ -3,7 +3,7 @@ import Drift
 
 // Tint over one track a selected transform clip moves.
 Rectangle {
-    property TransformCoverageOverlay overlay
+    property var overlay
     required property var modelData
     visible: overlay.draggingTrack !== modelData
     x: overlay.layerClip ? overlay.layerClip.start * overlay.pxPerSecond : 0

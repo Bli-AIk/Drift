@@ -49,12 +49,14 @@ public:
         // reader clears its frame caches whenever this changes, so a warm at one value and a read
         // at another would decode every frame twice and cache nothing.
         int rotationCorrection = 0;
+        // Upcoming clip: decode its first frame once, without enqueuing the same
+        // cold-open on every playback tick leading up to the cut.
+        bool upcoming = false;
     };
 
-    // Kick every request off on its own worker thread without waiting. Each path
-    // has its own thread, so the decodes run concurrently; the readVideoFrame
-    // calls that follow then hit each reader's cache instead of decoding one
-    // clip after another on the caller's thread.
+    // Record the active streams and asynchronously warm the first frame of upcoming clips.
+    // Active frames are read by the compositor immediately afterward; enqueuing those again
+    // would make the decode queue lag behind playback on repeated preview ticks.
     void warmVideoFrames(const QList<VideoRequest> &requests);
 
     // How far past the frame being composited each reader keeps decoding, in
@@ -183,6 +185,9 @@ private:
     QSet<QString> m_activeVideoPaths;
     // Per session, the streams on each path its last warmVideoFrames read.
     QHash<quintptr, QHash<QString, QList<quint64>>> m_activeVideoStreams;
+    // Protected by m_mutex. Each compositor thread tracks its own upcoming clips:
+    // interleaved render sessions must not reset one another's deduplication.
+    QHash<quintptr, std::map<VideoKey, VideoRequest>> m_upcomingVideoWarm;
     QSet<QString> m_activeAudioPaths;
 
     std::thread m_idleSweepThread;

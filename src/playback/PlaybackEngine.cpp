@@ -1,6 +1,7 @@
 #include "playback/PlaybackEngine.h"
 
 #include "playback/stats/PerfLog.h"
+#include "engine/EngineTuning.h"
 
 #include <cstdio>
 
@@ -85,15 +86,6 @@ constexpr int kGpuProbeDelayMs = 300;
 constexpr int kGpuProbeIntervalMs = 250;
 constexpr int kGpuProbeMaxAttempts = 20;
 
-// How much decoded source each clip's reader keeps buffered ahead of the
-// playhead during fast playback. This absorbs frames that decode slower than
-// realtime (long GOPs, a heavy transition) by spending the slack on either side
-// of them. The byte budget in ClipReader, sized from physical memory, bounds it too — that is
-// what gives 4K room to read ahead at all. Not longer than this: 5 s was measured slower after a
-// seek (two 1080p30 software streams dropped from ~15 to ~12 fps), because the prefetch then
-// competes with the frames playback actually needs. Every edit or seek discards the part of the
-// buffer past the change.
-constexpr drift::TimeUs kReadAheadUs = 2 * drift::kUsPerSecond;
 constexpr qint64 kScopeIntervalMs = 100;
 constexpr int kScopeReadbackWidth = 256;
 
@@ -1009,7 +1001,8 @@ FrameCompositor::RenderOptions PlaybackEngine::playbackRenderOptions() const
     // Buffer decoded frames ahead of the playhead only while playback is actually
     // running: paused frames have no deadline to miss, and read-ahead during
     // editing is thrown away by the next edit.
-    options.readAheadUs = m_playing ? kReadAheadUs : 0;
+    options.readAheadUs =
+        m_playing ? drift::TimeUs(drift::tuning::readAheadMs.load(std::memory_order_relaxed)) * 1000 : 0;
 
     // Never while playing: the editor is a paused-preview tool, and the rest pose would be wrong.
     if (!m_playing)

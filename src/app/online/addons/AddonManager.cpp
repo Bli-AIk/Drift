@@ -98,8 +98,12 @@ AddonManager::AddonManager(QObject *parent)
 
     // Serve whatever we already know immediately, then go and check.
     QFile cached(cachedIndexPath());
-    if (cached.open(QIODevice::ReadOnly))
-        applyIndex(cached.readAll(), true);
+    if (cached.open(QIODevice::ReadOnly)) {
+        const bool validCache = applyIndex(cached.readAll(), true);
+        cached.close();
+        if (!validCache)
+            QFile::remove(cachedIndexPath());
+    }
 
     refresh();
 }
@@ -413,12 +417,24 @@ void AddonManager::refresh(bool force)
         }
 
         const QByteArray body = reply->readAll();
+        if (!applyIndex(body, false)) {
+            // A 200 response can still be an HTML error or a malformed index.
+            // Keep the last valid catalog and let queued installs fail visibly.
+            const QString error = status();
+            const QStringList waiting = std::exchange(m_awaitingFreshIndex, {});
+            for (const QString &id : waiting) {
+                m_failures.insert(id, error);
+                emit transferFailed(id, error);
+            }
+            if (!waiting.isEmpty())
+                emit catalogChanged();
+            return;
+        }
         QSaveFile cache(cachedIndexPath());
         if (cache.open(QIODevice::WriteOnly)) {
             cache.write(body);
             cache.commit();
         }
-        applyIndex(body, false);
         setStatus(QString());
 
         const QStringList waiting = std::exchange(m_awaitingFreshIndex, {});
@@ -427,13 +443,14 @@ void AddonManager::refresh(bool force)
     });
 }
 
-void AddonManager::applyIndex(const QByteArray &json, bool fromCache)
+bool AddonManager::applyIndex(const QByteArray &json, bool fromCache)
 {
     const QJsonObject root = QJsonDocument::fromJson(json).object();
-    if (root.value(QStringLiteral("schema")).toInt() != 1) {
+    if (root.value(QStringLiteral("schema")).toInt() != 1
+        || !root.value(QStringLiteral("addons")).isArray()) {
         if (!fromCache)
             setStatus(QStringLiteral("The download store returned something this version can’t read."));
-        return;
+        return false;
     }
 
     // One index serves every platform, so rows that carry native code declare which ones they are
@@ -450,6 +467,7 @@ void AddonManager::applyIndex(const QByteArray &json, bool fromCache)
     }
 
     emit catalogChanged();
+    return true;
 }
 
 void AddonManager::install(const QString &id)

@@ -3,7 +3,7 @@ import Drift
 
 // Voice waveform of mixed video/audio timeline audio, pinned to a texture-sized window.
 Canvas {
-    property SubtitleCueLane lane
+    property var lane
     property Item viewItem
     id: voiceWaveform
     readonly property real rangeX0: lane.mediaWaveformRange.start * lane.pxPerSecond

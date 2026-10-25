@@ -7,7 +7,7 @@ Item {
     id: mode
 
     // The PreviewViewport this view navigates.
-    property PreviewViewport viewport
+    property var viewport
 
     MouseArea {
         anchors.fill: parent

@@ -202,6 +202,7 @@ void ClipReaderPool::releaseAll()
     std::vector<std::unique_ptr<WorkerEntry>> evicted;
     {
         QMutexLocker lock(&m_mutex);
+        m_upcomingVideoWarm.clear();
         const auto keepNone = [](const auto &, const WorkerEntry &) { return false; };
         evicted = detachIdleLocked(m_videoWorkers, keepNone, 0);
         std::vector<std::unique_ptr<WorkerEntry>> audio = detachIdleLocked(m_audioWorkers, keepNone, 0);
@@ -217,6 +218,9 @@ void ClipReaderPool::releasePath(const QString &path)
     std::vector<std::unique_ptr<WorkerEntry>> evicted;
     {
         QMutexLocker lock(&m_mutex);
+        for (auto &session : m_upcomingVideoWarm)
+            for (auto it = session.begin(); it != session.end();)
+                it = it->first.first == path ? session.erase(it) : std::next(it);
         // A busy worker cannot be stopped under its reader, but it can stop being found: leaving
         // it in the map would let the next read of this path reuse a decoder still holding the
         // file it opened, which after an in-place rewrite is the old content.
@@ -265,6 +269,7 @@ void ClipReaderPool::setReadAheadUs(drift::TimeUs readAheadUs)
 void ClipReaderPool::resetVideoDecoders()
 {
     QMutexLocker lock(&m_mutex);
+    m_upcomingVideoWarm.clear();
     for (auto &entry : m_videoWorkers) {
         QMetaObject::invokeMethod(entry.second->worker, "resetVideoDecoders",
                                   Qt::BlockingQueuedConnection);
@@ -308,6 +313,13 @@ void ClipReaderPool::warmVideoFrames(const QList<VideoRequest> &requests)
     // the idle release from deleting a worker between resolving it and posting to it.
     QMutexLocker lock(&m_mutex);
     m_activeVideoStreams.insert(session, streamsByPath);
+    // A future clip's first frame has the same source timestamp for up to one
+    // second. Sending a decode every tick can create a queue of cold opens ahead
+    // of the outgoing clip's blocking reads, making playback crawl before cuts.
+    // Retain only futures from this session's call; a seek away or a clip
+    // becoming active must permit a fresh warm when we approach it again.
+    std::map<VideoKey, VideoRequest> upcoming;
+    const auto previousUpcoming = m_upcomingVideoWarm.constFind(session);
     for (const VideoRequest &request : requests) {
         if (request.path.isEmpty())
             continue;
@@ -316,7 +328,26 @@ void ClipReaderPool::warmVideoFrames(const QList<VideoRequest> &requests)
         QMetaObject::invokeMethod(worker, "setActiveStreams", Qt::QueuedConnection,
                                   Q_ARG(quintptr, session),
                                   Q_ARG(QList<quint64>, streamsByPath.value(request.path)));
-        // Prefer the preview decode path so warm hits the same cache as composite.
+        // The current frame is read synchronously by the compositor immediately after this call.
+        // Queuing an additional active-frame decode here only places old frames ahead of that
+        // blocking read. With two compositor sessions it can build a backlog at every cut, making
+        // the outgoing clip appear to play in slow motion. Only future clips need async warming.
+        if (!request.upcoming)
+            continue;
+
+        const VideoKey key{request.path, request.streamId};
+        upcoming[key] = request;
+        const auto previous = previousUpcoming == m_upcomingVideoWarm.cend()
+                                  ? upcoming.end() : previousUpcoming->find(key);
+        if (previousUpcoming != m_upcomingVideoWarm.cend()
+            && previous != previousUpcoming->end()
+            && previous->second.sourceUs == request.sourceUs
+            && previous->second.maxWidth == request.maxWidth
+            && previous->second.maxHeight == request.maxHeight
+            && previous->second.rotationCorrection == request.rotationCorrection)
+            continue;
+
+        // Future frame enters the same preview cache the compositor will read at the cut.
         QMetaObject::invokeMethod(worker, "decodePreviewVideo",
                                   Qt::QueuedConnection,
                                   Q_ARG(quint64, request.streamId), Q_ARG(drift::TimeUs, request.sourceUs),
@@ -324,6 +355,7 @@ void ClipReaderPool::warmVideoFrames(const QList<VideoRequest> &requests)
                                   Q_ARG(int, request.rotationCorrection), Q_ARG(bool, approximate),
                                   Q_ARG(quintptr, session));
     }
+    m_upcomingVideoWarm.insert(session, std::move(upcoming));
 }
 
 namespace {

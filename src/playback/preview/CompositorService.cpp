@@ -1,6 +1,7 @@
 #include "playback/preview/CompositorService.h"
 
 #include "playback/stats/PerfLog.h"
+#include "engine/EngineTuning.h"
 #include "playback/PlaybackClock.h"
 #include "playback/stats/PlaybackStats.h"
 #include "engine/decode/readers/ClipReaderPool.h"
@@ -67,23 +68,19 @@ CompositorService::CompositorService(QObject *parent)
     qRegisterMetaType<FrameCompositor::RenderOptions>("FrameCompositor::RenderOptions");
     qRegisterMetaType<GpuFrameTexture>("GpuFrameTexture");
     qRegisterMetaType<CompositeTiming>("CompositeTiming");
-    for (int i = 0; i < GpuCompositor::kMaxPreviewComposites; ++i) {
-        m_workers[i] = new CompositorWorker;
-        m_workers[i]->moveToThread(&m_threads[i]);
-        connect(m_workers[i], &CompositorWorker::frameReady, this,
-                &CompositorService::onWorkerFrameReady, Qt::QueuedConnection);
-        m_threads[i].start();
-    }
+    m_worker = new CompositorWorker;
+    m_worker->moveToThread(&m_thread);
+    connect(m_worker, &CompositorWorker::frameReady, this,
+            &CompositorService::onWorkerFrameReady, Qt::QueuedConnection);
+    m_thread.start();
 }
 
 CompositorService::~CompositorService()
 {
-    for (int i = 0; i < GpuCompositor::kMaxPreviewComposites; ++i) {
-        m_threads[i].quit();
-        m_threads[i].wait();
-        delete m_workers[i];
-        m_workers[i] = nullptr;
-    }
+    m_thread.quit();
+    m_thread.wait();
+    delete m_worker;
+    m_worker = nullptr;
 }
 
 void CompositorService::setProject(const drift::Project *project)
@@ -189,13 +186,10 @@ void CompositorService::noteFrameLate(bool late)
 
 int CompositorService::maxInFlight() const
 {
-    // Pipelining exists to keep realtime playback fed. Scrubbing and seeking issue one
-    // request at a time by nature, and running two decoders against a moving playhead would
-    // only make them fight over the same cursor, so outside playback the depth stays at one.
-    // Old Intel iGPUs cannot keep two composites off the texture on screen either.
-    if (!m_playbackActive || GpuCompositor::previewGpuIsLimited())
-        return 1;
-    return GpuCompositor::kMaxPreviewComposites;
+    // A single persistent worker owns the preview's decoder cursors. Two concurrent
+    // timeline composites contend over the same sources near cuts and cause repeated
+    // seeks; letting the newer timestamp replace the pending one keeps playback live.
+    return 1;
 }
 
 void CompositorService::setPreviewBypass(const QSet<QString> &clipIds, const QSet<QString> &catalogIds)
@@ -247,15 +241,13 @@ void CompositorService::dispatch(drift::TimeUs timeUs, const FrameCompositor::Re
     if (m_stats)
         m_stats->noteInFlight(m_inFlight);
 
-    // Round-robin rather than "first idle": the workers are interchangeable, and alternating
-    // keeps a long composite on one of them from starving the other's warm decoder caches.
+    // Keep every playback frame on the same compositor thread. ClipReaderPool keys
+    // stream sessions by that thread, so round-robin dispatches would create two
+    // independent decoder cursors for alternating frames even with one in flight.
     if (drift::perf::enabled())
         m_perfDispatchNs.insert(m_nextSequence, PlaybackClock::nowNs());
 
-    CompositorWorker *worker = m_workers[m_nextWorker];
-    m_nextWorker = (m_nextWorker + 1) % GpuCompositor::kMaxPreviewComposites;
-
-    QMetaObject::invokeMethod(worker, "composite", Qt::QueuedConnection,
+    QMetaObject::invokeMethod(m_worker, "composite", Qt::QueuedConnection,
                               Q_ARG(drift::TimeUs, timeUs),
                               Q_ARG(FrameCompositor::RenderOptions, options),
                               Q_ARG(std::shared_ptr<const drift::Project>, m_sharedSnapshot),
@@ -330,7 +322,6 @@ void CompositorService::requestComposite(drift::TimeUs timeUs, FrameCompositor::
 void CompositorService::onWorkerFrameReady(const GpuFrameTexture &frame, drift::TimeUs timeUs,
                                            CompositeTiming timing, quint64 sequence)
 {
-    Q_UNUSED(timeUs);
     m_inFlight = qMax(0, m_inFlight - 1);
     if (m_stats)
         m_stats->noteComposite(timing.compositeMs, timing.decodeWaitMs);
@@ -343,27 +334,29 @@ void CompositorService::onWorkerFrameReady(const GpuFrameTexture &frame, drift::
     if (m_adaptiveQuality && m_dropLateFrames && m_playbackActive)
         noteFrameLate(timing.compositeMs > double(m_lateFrameBudgetMs));
 
-    // Present unless something newer already got there. That covers both ways a finished
-    // frame can be worthless — it completed out of order behind a later one, or the playhead
-    // moved past it and a newer request beat it to the screen — without the old behaviour of
-    // discarding a frame purely for being late when nothing existed to replace it. Paying for
-    // a composite and then showing nothing is a hitch; showing it slightly late is not.
+    // Present unless something newer already got there. Optionally also drop a frame that finished
+    // far behind the playhead (a slow decoder open at a cut can otherwise show the outgoing clip
+    // in slow motion). Off by default: a late frame is usually better than none.
     const bool overtaken = sequence <= m_lastPresentedSequence;
+    const drift::TimeUs allowedLagUs =
+        drift::TimeUs(drift::tuning::staleFrameLagMs.load(std::memory_order_relaxed)) * 1000;
+    const bool stale = allowedLagUs > 0 && m_playbackActive && m_dropLateFrames
+        && m_pendingTimeUs > timeUs && m_pendingTimeUs - timeUs > allowedLagUs;
     if (drift::perf::enabled()) {
         const qint64 dispatchedNs = m_perfDispatchNs.take(sequence);
         drift::perf::record(m_pendingOptions.approximateSeek ? "composite.work.approx" : "composite.work",
                             timing.compositeMs);
         drift::perf::record("decode.wait", timing.decodeWaitMs);
-        if (!overtaken && dispatchedNs > 0)
+        if (!overtaken && !stale && dispatchedNs > 0)
             drift::perf::record(m_playbackActive ? "frame.latency.play" : "frame.latency.seek",
                                 double(PlaybackClock::nowNs() - dispatchedNs) / 1'000'000.0);
     }
-    if (!overtaken && frame.isValid()) {
+    if (!overtaken && !stale && frame.isValid()) {
         m_lastPresentedSequence = sequence;
         if (m_stats)
             m_stats->noteDelivered();
         emit frameReady(frame);
-    } else if (overtaken && frame.isValid() && m_stats) {
+    } else if ((overtaken || stale) && frame.isValid() && m_stats) {
         m_stats->noteDropped();
     }
 

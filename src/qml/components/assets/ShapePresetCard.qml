@@ -72,6 +72,16 @@ Column {
             }
         }
 
+        AssetQuickAddButton {
+            z: 5
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.margins: 4
+            revealed: shapeDrag.hovered
+            tooltip: qsTr("Add at playhead")
+            onClicked: shapeDrag.tapped()
+        }
+
         ThemedContextMenu {
             id: cardMenu
 

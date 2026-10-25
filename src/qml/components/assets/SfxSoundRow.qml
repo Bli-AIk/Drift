@@ -137,10 +137,11 @@ Rectangle {
             tooltip: qsTr("Add to the media bin")
             onClicked: keepRequested(root.modelData)
         }
-        IconButton {
+        AssetQuickAddButton {
             anchors.verticalCenter: parent.verticalCenter
             visible: !root.busy
-            glyph: justAddedId === root.modelData.id ? Theme.icons.check : Theme.icons.plus
+            revealed: rowHover.hovered
+            done: justAddedId === root.modelData.id
             tooltip: qsTr("Add to the timeline")
             onClicked: useRequested(root.modelData)
         }

@@ -5,7 +5,7 @@ import Drift
 IconGlyph {
     id: channelLanesToggle
 
-    property TrackHeaderColumn column
+    property var column
     property int trackIndex: -1
     property bool shown: false
     readonly property bool lanesOn: column.tracks[trackIndex].showChannelWaveforms === true

@@ -3,7 +3,7 @@ import Drift
 
 // Time chip on the snap guide, naming what the clip snapped to.
 Rectangle {
-    property TimelinePanel panel
+    property var panel
     visible: parent.opacity > 0
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.top: parent.top

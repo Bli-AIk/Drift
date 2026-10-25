@@ -52,6 +52,9 @@ struct Clip
     QString assetId;
     // Shared by linked video/audio companions; empty when unlinked.
     QString linkId;
+    // Source video used only for positioning extracted audio tracks in the timeline.
+    // Unlike linkId, it does not bind selection, editing or deletion.
+    QString sourceVideoClipId;
     // A loose link (created by Link on unrelated clips) moves, splits, selects and deletes
     // together with its partners, and a trim moves their matching edge by the same amount, but
     // it keeps its own duration, speed and fades.

@@ -989,6 +989,8 @@ public:
     Q_INVOKABLE void convertSelectionToSubtitle();
     Q_INVOKABLE bool canSeparateAudioSelection() const;
     Q_INVOKABLE void separateAudioFromSelection();
+    Q_INVOKABLE bool canSeparateAudioClip(int trackIndex, int clipIndex) const;
+    Q_INVOKABLE void separateAudioFromClip(int trackIndex, int clipIndex);
 
     // Composite clips: a nested timeline played as one clip. Making one moves the selection (and
     // its linked partners) into a new sequence and leaves a composite clip in its place.

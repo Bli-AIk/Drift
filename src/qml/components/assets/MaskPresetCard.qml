@@ -94,6 +94,17 @@ Column {
             }
         }
 
+        AssetQuickAddButton {
+            z: 5
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.margins: 4
+            revealed: maskDrag.hovered
+            tooltip: qsTr("Apply to selected clip")
+            enabled: hasVisualSelection
+            onClicked: maskDrag.tapped()
+        }
+
         ThemedContextMenu {
             id: cardMenu
 

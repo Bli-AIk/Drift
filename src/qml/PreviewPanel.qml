@@ -276,7 +276,20 @@ PanelFrame {
                 DropArea {
                     anchors.fill: parent
                     enabled: previewDrop.enabled
-                    keys: AssetDrag.allKeys()
+                    keys: AssetDrag.allKeys().concat(["text/uri-list"])
+
+                    function isFileDrag(drop) {
+                        return drop.keys.indexOf("text/uri-list") !== -1
+                    }
+
+                    function hoverDrop(drop) {
+                        if (isFileDrag(drop)) {
+                            previewDrop.hoverUrls(drop.hasUrls ? drop.urls : null, drop.x, drop.y)
+                            return
+                        }
+                        const kind = kindOf(drop)
+                        previewDrop.hover(kind, payloadOf(drop, kind), drop.x, drop.y)
+                    }
 
                     function kindOf(drop) {
                         return AssetDrag.kindFromKeys(drop.keys)
@@ -287,17 +300,15 @@ PanelFrame {
                         return AssetDrag.payloadFromDrop(drop, kind)
                     }
 
-                    onEntered: (drop) => {
-                        const kind = kindOf(drop)
-                        previewDrop.hover(kind, payloadOf(drop, kind), drop.x, drop.y)
-                    }
-                    onPositionChanged: (drop) => {
-                        const kind = kindOf(drop)
-                        previewDrop.hover(kind, payloadOf(drop, kind), drop.x, drop.y)
-                    }
+                    onEntered: (drop) => hoverDrop(drop)
+                    onPositionChanged: (drop) => hoverDrop(drop)
                     onExited: previewDrop.clear()
                     onDropped: (drop) => {
                         drop.accept(Qt.CopyAction)
+                        if (isFileDrag(drop)) {
+                            previewDrop.dropUrls(drop.hasUrls ? drop.urls : [], drop.x, drop.y)
+                            return
+                        }
                         const kind = kindOf(drop)
                         previewDrop.drop(kind, payloadOf(drop, kind), AssetDrag.labelFromDrop(drop, kind),
                                          drop.x, drop.y)

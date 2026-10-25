@@ -23,7 +23,7 @@ Column {
     required property string filmstripPath
     required property int assetIndex
 
-    required property MediaAssetsTab host
+    required property var host
     required property real cardSize
 
     readonly property bool selected: !isFolder && host.isAssetSelected(assetId)

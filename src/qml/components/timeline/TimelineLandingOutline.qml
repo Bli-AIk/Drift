@@ -3,7 +3,7 @@ import Drift
 
 // Landing preview outline for a library drop or a clip move.
 Rectangle {
-    property TimelinePanel panel
+    property var panel
     property int trackIndex: -1
     visible: panel.dropTrackIndex === trackIndex
              && !panel.dropCreatesNewTrack

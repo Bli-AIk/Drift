@@ -1,4 +1,5 @@
 #include "engine/encode/export/Exporter.h"
+#include "engine/EngineTuning.h"
 
 #include "engine/audio/AudioMixer.h"
 #include "engine/decode/readers/ClipReaderPool.h"
@@ -877,7 +878,11 @@ void applyVideoRateControl(AVCodecContext *vctx, const VideoCodecDef &def, const
         settings.rateControl == QLatin1String("bitrate") && def.rateMode != RateMode::Lossless;
 
     if (useCrf) {
-        const int crf = settings.crf;
+        // x264 High profile cannot encode lossless (CRF 0). The export dialog
+        // used to allow RF 0 and saved it, causing avcodec_open2 to fail on
+        // subsequent launches. RF 1 is the highest compatible quality here.
+        const int crf = id == QLatin1String("h264") ? qBound(1, settings.crf, 51)
+                                                    : settings.crf;
         if (id.startsWith(QLatin1String("av1"))) {
             vctx->bit_rate = 0;
             av_opt_set_int(vctx->priv_data, "crf", crf, 0);
@@ -913,6 +918,20 @@ void applyVideoPreset(AVCodecContext *vctx, const VideoCodecDef &def, const Expo
     QByteArray preset = settings.videoPreset.toUtf8();
     if (preset.isEmpty() && def.defaultPreset)
         preset = def.defaultPreset;
+    // The export dialog remembers the previous codec's preset. If a project
+    // switches encoders (or loads older preferences), a preset such as NVENC's
+    // "p4" must never be handed to x264, which refuses to initialize with it.
+    if (def.presets) {
+        bool supported = false;
+        for (const char *const *p = def.presets; *p; ++p) {
+            if (preset == *p) {
+                supported = true;
+                break;
+            }
+        }
+        if (!supported && def.defaultPreset)
+            preset = def.defaultPreset;
+    }
 
     if (def.hw == HwBackend::Amf) {
         av_opt_set(vctx->priv_data, "quality", preset.constData(), 0);
@@ -1900,9 +1919,15 @@ bool Exporter::gifAvailable()
 ExportSettings Exporter::defaultSettings()
 {
     ExportSettings s;
-    // Prefer first available CRF codec starting at h264.
-    const QStringList prefer = {QStringLiteral("h264"), QStringLiteral("h265"), QStringLiteral("vp9"),
-                                QStringLiteral("av1_svt")};
+    // Software H.264 first by default. "Prefer hardware encoder" puts a supported GPU H.264
+    // encoder ahead of it, falling back to the software list on machines without one.
+    QStringList prefer;
+    if (drift::tuning::preferHardwareExport.load(std::memory_order_relaxed))
+        prefer = {QStringLiteral("h264_nvenc"), QStringLiteral("h264_qsv"), QStringLiteral("h264_amf"),
+                  QStringLiteral("h264_videotoolbox"), QStringLiteral("h264_vaapi"),
+                  QStringLiteral("h264_mediacodec")};
+    prefer += {QStringLiteral("h264"), QStringLiteral("h265"), QStringLiteral("vp9"),
+               QStringLiteral("av1_svt")};
     for (const QString &id : prefer) {
         const QVariantMap m = videoCodecById(id);
         if (m.value(QStringLiteral("available")).toBool()) {
@@ -2159,6 +2184,15 @@ bool Exporter::run(const drift::Project &project, const ExportSettings &settings
         applyVideoRateControl(vctx, *vdef, settings);
         applyVideoPreset(vctx, *vdef, settings);
 
+        // The regular MP4 H.264 preset must be playable by common Windows/media
+        // decoders. Explicitly constrain x264 to 8-bit 4:2:0 High profile: relying
+        // on the encoder's default has produced High 4:4:4 Predictive stream
+        // headers even for yuv420p output, which some players display as black.
+        if (std::strcmp(vdef->id, "h264") == 0 && vctx->pix_fmt == AV_PIX_FMT_YUV420P) {
+            vctx->profile = AV_PROFILE_H264_HIGH;
+            av_opt_set(vctx->priv_data, "profile", "high", 0);
+        }
+
         const AVSampleFormat audioFmt = pickSampleFmt(acodec);
         actx->sample_fmt = audioFmt;
         actx->sample_rate = sampleRate;
@@ -2169,7 +2203,15 @@ bool Exporter::run(const drift::Project &project, const ExportSettings &settings
         if (fmt->oformat->flags & AVFMT_GLOBALHEADER)
             actx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
-        if (avcodec_open2(vctx, vcodec, nullptr) < 0) {
+        if (const int rc = avcodec_open2(vctx, vcodec, nullptr); rc < 0) {
+            const QString details = QStringLiteral("%1: %2 (%3x%4, %5, %6 fps)")
+                                        .arg(QString::fromUtf8(vcodec->name), avErrorText(rc))
+                                        .arg(outW)
+                                        .arg(outH)
+                                        .arg(QString::fromUtf8(av_get_pix_fmt_name(vctx->pix_fmt)
+                                                                   ? av_get_pix_fmt_name(vctx->pix_fmt)
+                                                                   : "unknown"))
+                                        .arg(fpsValue, 0, 'g', 6);
             if (vdef->hw == HwBackend::MediaCodec) {
                 // No driver to blame on a phone: the device advertises a maximum size and a fixed
                 // pool of codec instances, and a refusal is nearly always one of those two.
@@ -2184,10 +2226,12 @@ bool Exporter::run(const drift::Project &project, const ExportSettings &settings
             } else {
                 error = QStringLiteral("Could not open the video encoder");
             }
+            error += QStringLiteral(" [%1]").arg(details);
             goto cleanup;
         }
-        if (avcodec_open2(actx, acodec, nullptr) < 0) {
-            error = QStringLiteral("Could not open the audio encoder");
+        if (const int rc = avcodec_open2(actx, acodec, nullptr); rc < 0) {
+            error = QStringLiteral("Could not open the audio encoder [%1: %2]")
+                        .arg(QString::fromUtf8(acodec->name), avErrorText(rc));
             goto cleanup;
         }
 

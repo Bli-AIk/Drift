@@ -240,6 +240,7 @@ QJsonObject clipToJson(const Clip &clip)
         {QStringLiteral("id"), clip.id},
         {QStringLiteral("assetId"), clip.assetId},
         {QStringLiteral("linkId"), clip.linkId},
+        {QStringLiteral("sourceVideoClipId"), clip.sourceVideoClipId},
         {QStringLiteral("linkLoose"), clip.linkLoose},
         {QStringLiteral("suppressEmbeddedAudio"), clip.suppressEmbeddedAudio},
         {QStringLiteral("audioStreamIndex"), clip.audioStreamIndex},
@@ -369,6 +370,7 @@ Clip clipFromJsonV2(const QJsonObject &object, int canvasW = 1920, int canvasH =
     clip.id = object.value(QStringLiteral("id")).toString(QUuid::createUuid().toString(QUuid::WithoutBraces));
     clip.assetId = object.value(QStringLiteral("assetId")).toString();
     clip.linkId = object.value(QStringLiteral("linkId")).toString();
+    clip.sourceVideoClipId = object.value(QStringLiteral("sourceVideoClipId")).toString();
     clip.linkLoose = object.value(QStringLiteral("linkLoose")).toBool(false);
     clip.suppressEmbeddedAudio = object.value(QStringLiteral("suppressEmbeddedAudio")).toBool(false);
     clip.audioStreamIndex = object.value(QStringLiteral("audioStreamIndex")).toInt(0);

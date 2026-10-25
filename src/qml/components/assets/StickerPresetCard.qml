@@ -82,6 +82,16 @@ Column {
             }
         }
 
+        AssetQuickAddButton {
+            z: 5
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.margins: 4
+            revealed: stickerDrag.hovered
+            tooltip: qsTr("Add at playhead")
+            onClicked: stickerDrag.tapped()
+        }
+
         ThemedContextMenu {
             id: cardMenu
 

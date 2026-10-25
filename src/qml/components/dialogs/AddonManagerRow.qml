@@ -2,7 +2,7 @@ import QtQuick
 import Drift
 
 Rectangle {
-    required property AddonManagerDialog dialog
+    required property var dialog
     id: row
 
     required property var modelData

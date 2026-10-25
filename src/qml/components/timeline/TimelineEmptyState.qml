@@ -6,7 +6,7 @@ EmptyState {
     id: empty
 
     property var view
-    property TimelinePanel panel
+    property var panel
 
     x: view.contentX + (view.width - width) / 2
     y: view.contentY + view.headerHeight

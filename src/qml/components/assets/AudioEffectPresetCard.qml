@@ -143,14 +143,12 @@ Column {
             itemId: root.modelData.id
         }
 
-        IconButton {
+        AssetQuickAddButton {
+            z: 5
             anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.margins: 3
-            glyph: Theme.icons.plus
-            variant: "ghost"
-            buttonSize: 18
-            iconSize: 12
+            anchors.bottom: parent.bottom
+            anchors.margins: 4
+            revealed: cardHover.hovered
             tooltip: qsTr("Apply to selected clip")
             enabled: EditorState.selectedClip >= 0
             onClicked: applyRequested(root.modelData.id)

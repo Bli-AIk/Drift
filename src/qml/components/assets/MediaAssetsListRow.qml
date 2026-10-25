@@ -45,7 +45,9 @@ Rectangle {
     required property bool expanded
     required property bool expandable
 
-    required property MediaAssetsTab host
+    // A typed reference to MediaAssetsTab creates a QML type-resolution cycle
+    // because the tab also instantiates this delegate.
+    required property var host
 
     // Tree rows step in by depth, and every row leaves room for a disclosure
     // arrow so names still line up under folders that have none.
@@ -56,6 +58,11 @@ Rectangle {
         !isFolder && EditorState.bin.replacingAssetId.length > 0
         && EditorState.bin.replacingAssetId === AssetLibrary.assetIdAt(assetIndex)
     readonly property bool selected: !isFolder && host.isAssetSelected(assetId)
+    readonly property bool alreadyOnTimeline: {
+        void EditorState.tracksRevision
+        return !root.isFolder && root.assetIndex >= 0
+               && EditorState.clipCountForAsset(root.assetIndex) > 0
+    }
 
     // See the matching property on gridDelegate's cardRoot: lets a rotate/trim edit
     // refresh just this row's thumbnail without MediaAssetsTab rebuilding the whole list.
@@ -119,7 +126,9 @@ Rectangle {
             editFriendly: !root.isFolder && host.editFriendlyOf(root.assetId)
             // Derived from the actual thumbnail width
             // rather than a magic constant.
-            width: parent.width - listThumbFrame.width - listRowContent.spacing
+            width: Math.max(0, parent.width - listThumbFrame.width
+                            - listRowContent.spacing - (root.isFolder ? 0 : quickAdd.width + Theme.spacingLg)
+                            - (root.alreadyOnTimeline ? 78 : 0))
         }
     }
 
@@ -217,6 +226,40 @@ Rectangle {
                 host.ensureAssetSelected(root.assetId)
                 rowMenu.popup()
             }
+        }
+    }
+
+    // Match the grid thumbnail's quick-add action in list and tree modes.
+    AssetQuickAddButton {
+        id: quickAdd
+        z: 5
+        visible: !root.isFolder
+        revealed: rowHover.hovered
+        enabled: !root.replaceBusy && root.assetIndex >= 0
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: Theme.spacingLg
+        tooltip: qsTr("Add to timeline")
+        onClicked: root.host.addToTimelineRequested([root.assetId])
+    }
+
+    Rectangle {
+        z: 4
+        visible: root.alreadyOnTimeline
+        anchors.right: quickAdd.left
+        anchors.rightMargin: 5
+        anchors.verticalCenter: parent.verticalCenter
+        width: rowAddedText.implicitWidth + 10
+        height: rowAddedText.implicitHeight + 4
+        radius: 3
+        color: "#D9000000"
+        Text {
+            id: rowAddedText
+            anchors.centerIn: parent
+            text: qsTr("Added")
+            color: "white"
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeTiny
         }
     }
 
