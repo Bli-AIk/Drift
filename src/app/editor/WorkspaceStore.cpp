@@ -33,11 +33,18 @@ const PanelType kPanelTypes[] = {
     {"timeline", QT_TRANSLATE_NOOP("WorkspaceStore", "Timeline")},
     {"audioMixer", QT_TRANSLATE_NOOP("WorkspaceStore", "Audio Mixer")},
     {"sourceViewer", QT_TRANSLATE_NOOP("WorkspaceStore", "Source Viewer")},
-    {"subtitles", QT_TRANSLATE_NOOP("WorkspaceStore", "Subtitles")},
+    {"subtitles", QT_TRANSLATE_NOOP("WorkspaceStore", "Subtitle cues")},
+    {"subtitleLane", QT_TRANSLATE_NOOP("WorkspaceStore", "Subtitle lane")},
+    {"subtitleText", QT_TRANSLATE_NOOP("WorkspaceStore", "Subtitle text")},
+    {"subtitleTiming", QT_TRANSLATE_NOOP("WorkspaceStore", "Subtitle timing")},
     {"undoHistory", QT_TRANSLATE_NOOP("WorkspaceStore", "History")},
     {"agentLog", QT_TRANSLATE_NOOP("WorkspaceStore", "Agent Log")},
     {"recorder", QT_TRANSLATE_NOOP("WorkspaceStore", "Recorder")},
     {"denoise", QT_TRANSLATE_NOOP("WorkspaceStore", "Noise Removal")},
+    {"color", QT_TRANSLATE_NOOP("WorkspaceStore", "Color")},
+    {"looks", QT_TRANSLATE_NOOP("WorkspaceStore", "Looks")},
+    {"scopes", QT_TRANSLATE_NOOP("WorkspaceStore", "Scopes")},
+    {"keyframes", QT_TRANSLATE_NOOP("WorkspaceStore", "Keyframes")},
 };
 
 // Tab ids and labels mirror AssetsPanel.qml / PropertiesPanel.qml.

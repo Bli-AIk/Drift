@@ -146,7 +146,7 @@ ApplicationWindow {
             workspaceId: root.workspaceId
             windowId: root.windowId
             sideMargin: (ShellBridge.main?.previewFullscreen ?? false) && ShellBridge.main.fullscreenWindow === root
-                        ? 0 : Theme.pagePadding
+                        ? 0 : Theme.panelGap
         }
     }
 }

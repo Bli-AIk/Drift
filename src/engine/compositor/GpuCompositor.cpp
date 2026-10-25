@@ -665,6 +665,7 @@ GlTarget buildLayerTarget(GlRuntime &rt, QOpenGLExtraFunctions *gl, const GpuLay
         // Audio goes after the track inputs: rendering one can run a layer that uploads its own
         // analysis under the same key.
         PipelineAux aux{layer.depth, clipMask.isValid() ? clipMask.texture() : 0u};
+        aux.frameRate = layer.frameRate;
         std::vector<GlTarget> inputTargets;
         bindTrackInputs(rt, gl, layer, effectIndex, def->gpu, canvasSize, aux.paramTextures, inputTargets);
         bindAudioInputs(rt, gl, layer, effectIndex, def->gpu, aux);
@@ -1735,7 +1736,8 @@ void composeOnGlThread(GlRuntime &rt, const GpuScene &scene, GlTarget &outCanvas
         GlTarget mixed;
         if (item.transitionGpu && item.transitionGpu->valid) {
             const std::vector<const GlTarget *> sources{&fromTarget, &toTarget};
-            const PipelineAux aux{nullptr, fromMask.isValid() ? fromMask.texture() : 0u};
+            PipelineAux aux{nullptr, fromMask.isValid() ? fromMask.texture() : 0u};
+            aux.frameRate = item.from.frameRate;
             mixed = runPipeline(rt, gl, item.transitionKey, *item.transitionGpu, sources,
                                 item.transitionParams, item.transitionTimeUs, item.progress, canvasSize,
                                 &aux);
@@ -1907,6 +1909,8 @@ GpuFrameTexture renderToTexture(const GpuScene &scene)
             // convert back would both be pure waste on this path.
             out.image = canvas.fbo->toImage(false);
             out.size = out.image.size();
+            if (scene.scopeReadbackWidth > 0)
+                out.scopeImage = out.image.scaledToWidth(scene.scopeReadbackWidth, Qt::FastTransformation);
             rt.releaseTarget(std::move(canvas));
         });
         return out;
@@ -1927,6 +1931,15 @@ GpuFrameTexture renderToTexture(const GpuScene &scene)
         // composite is already on its way — a repeat reads as a dropped frame, not a flash.
         if (lostVideo)
             return;
+
+        if (scene.scopeReadbackWidth > 0) {
+            const int w = scene.scopeReadbackWidth;
+            const int h = qMax(1, qRound(double(w) * canvas.height / canvas.width));
+            GlTarget scope = rt.acquireTarget(w, h);
+            if (blitTextureToTarget(rt, rt.functions(), canvas.texture(), scope))
+                out.scopeImage = rt.readTarget(scope);
+            rt.releaseTarget(std::move(scope));
+        }
 
         // Insert a present fence without waiting: Qt Quick samples on the next
         // vsync. acquirePresentTarget waits this fence before reusing the slot.

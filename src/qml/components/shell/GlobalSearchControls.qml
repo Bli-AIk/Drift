@@ -6,6 +6,8 @@ QtObject {
     readonly property string properties: qsTr("Properties")
     readonly property string assets: qsTr("Assets")
     readonly property string settings: qsTr("Settings")
+    readonly property string grading: qsTr("Color")
+    readonly property string subtitles: qsTr("Subtitles")
 
     readonly property string anyClip: qsTr("Select a clip")
     readonly property string visualClip: qsTr("Select a video, image, text or shape clip")
@@ -23,6 +25,14 @@ QtObject {
 
     function setting(pageId, label, keywords) {
         return { label: label, path: [settings], hint: "", keywords: keywords, page: pageId }
+    }
+
+    function color(label, hint, keywords, tab) {
+        return { label: label, path: [grading], hint: hint, keywords: keywords, workspace: "color", colorTab: tab }
+    }
+
+    function subtitle(label, keywords) {
+        return { label: label, path: [subtitles], hint: qsTr("Open the Subtitles workspace"), keywords: keywords, workspace: "subtitles" }
     }
 
     readonly property var entries: [
@@ -78,6 +88,42 @@ QtObject {
         prop(qsTr("PDF"), qsTr("PDF page"), qsTr("Select a PDF clip"), "scroll"),
         prop(qsTr("3D Model"), qsTr("3D model"), qsTr("Select a 3D model clip"), "mesh"),
 
+        color(qsTr("Exposure"), anyClip, "light brightness", 0),
+        color(qsTr("Contrast"), anyClip, "light", 0),
+        color(qsTr("Highlights"), anyClip, "light bright", 0),
+        color(qsTr("Shadows"), anyClip, "light dark", 0),
+        color(qsTr("Whites"), anyClip, "light", 0),
+        color(qsTr("Blacks"), anyClip, "light", 0),
+        color(qsTr("Temperature"), anyClip, "white balance warm cool kelvin", 0),
+        color(qsTr("Tint"), anyClip, "white balance green magenta", 0),
+        color(qsTr("Saturation"), anyClip, "color intensity", 0),
+        color(qsTr("Vibrance"), anyClip, "color saturation", 0),
+        color(qsTr("Color wheels"), anyClip, "lift gamma gain shadows midtones highlights", 1),
+        color(qsTr("Curves"), anyClip, "rgb curve", 2),
+        color(qsTr("Hue curves"), anyClip, "hue vs hue saturation luminance curve", 2),
+        color(qsTr("HSL"), anyClip, "hsl hue saturation luminance color band red orange yellow green aqua blue purple magenta", 3),
+        color(qsTr("Color grade"), visualClip, "grade color workspace open"),
+        color(qsTr("Looks"), anyClip, "lut filter preset cube"),
+        color(qsTr("Import looks"), anyClip, "import cube lut look"),
+        color(qsTr("Scopes"), qsTr("Open the Color workspace"), "histogram waveform vectorscope parade"),
+        color(qsTr("Film Grain"), anyClip, "grain noise film", 4),
+        color(qsTr("Glow"), anyClip, "bloom glow halation", 4),
+        color(qsTr("Vignette"), anyClip, "dark corners edges", 4),
+        color(qsTr("Chromatic Aberration"), anyClip, "color fringe lens", 4),
+        color(qsTr("Compare"), anyClip, "before after bypass original"),
+        color(qsTr("Apply to all clips"), anyClip, "grade timeline all clips copy"),
+
+        { label: qsTr("Keyframe editor"), path: [qsTr("Animation")], hint: qsTr("Open the Keyframes workspace"),
+          keywords: "keyframes animation curves graph editor dope sheet", workspace: "keyframes" },
+
+        subtitle(qsTr("Subtitle lane"), "captions cues timeline drag waveform zoom"),
+        subtitle(qsTr("Subtitle timing"), "captions tools shift offset sync frame rate speed gaps durations"),
+        subtitle(qsTr("Shift times"), "captions offset delay early late move"),
+        subtitle(qsTr("Two-point sync"), "captions resync stretch scale align drift"),
+        subtitle(qsTr("Frame rate conversion"), "captions fps 23.976 24 25 29.97 30 speed"),
+        subtitle(qsTr("Bridge gaps"), "captions minimum gap lead in out duration overlap"),
+        subtitle(qsTr("Subtitle text editor"), "captions srt vtt paste edit import export source"),
+
         setting("general", qsTr("General"), "language locale startup autosave recovery cache backup"),
         setting("appearance", qsTr("Appearance"), "theme dark light color workspace layout translucency"),
         setting("workspaces", qsTr("Workspaces"), "workspace layout panel window monitor screen dock preset"),
@@ -97,6 +143,7 @@ QtObject {
         "transitions": [assets, qsTr("Transitions")],
         "audio-effects": [assets, qsTr("Audio FX")],
         "effect-templates": [assets, qsTr("Templates")],
+        "looks": [qsTr("Color"), qsTr("Looks")],
         "stickers": [assets, qsTr("Stickers")],
         "fonts": [properties, qsTr("Text"), qsTr("Font")],
         "whisper-model": [assets, qsTr("Subtitles")],

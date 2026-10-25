@@ -56,7 +56,7 @@ public:
         FadeHandlesRole,
         EffectsRole,
         AudioEffectsRole,
-        VolumeRole,
+        VolumeKeysRole,
     };
     Q_ENUM(Role)
 
@@ -87,17 +87,17 @@ public:
         QVariantList fadeHandles;
         QVariantList effects;
         QVariantList audioEffects;
-
-        // Clip-relative audio gain, including its animation and interpolation.
-        // The native waveform renderer uses the same curve as audio playback.
-        drift::KeyframeTrack<double> volumeCurve;
+        QVariantList volumeKeys;
 
         // Not roles: typed copies for the scene-graph renderer, derived from the fields above so
         // any change to them already arrives as a changed row.
         drift::FadeCurve fadeCurveTyped = drift::FadeCurve::Smooth;
         drift::FadeShape fadeShapeTyped;
+        drift::KeyframeTrack<double> volumeTyped;
         // The effect stack as one line, "(off)" marks included; empty when there are none.
         QString effectsLabel;
+        // "-6.0 dB" for a constant gain off unity; empty when keyframed or at unity.
+        QString volumeLabel;
     };
 
     // Empty time between two clips, in seconds.

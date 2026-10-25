@@ -5,6 +5,7 @@
 
 #include <QHash>
 #include <QObject>
+#include <QSet>
 #include <QThread>
 
 #include <atomic>
@@ -97,6 +98,10 @@ public:
 
     void setPlaybackActive(bool active);
 
+    // Preview-only: effects whose clip is in clipIds and whose catalog id is in catalogIds are
+    // skipped when the snapshot is taken. Nothing in the live project changes.
+    void setPreviewBypass(const QSet<QString> &clipIds, const QSet<QString> &catalogIds);
+
     // Wall-clock budget for one composite before it counts against the adaptive
     // scale. Callers derive it from the display cadence so it tracks project fps
     // and playback rate rather than assuming 30 fps at 1x.
@@ -134,6 +139,8 @@ private:
     int m_snapshotGeneration = 0;
     int m_liveGeneration = 0;
     quint64 m_snapshotSerial = 0;
+    QSet<QString> m_bypassClipIds;
+    QSet<QString> m_bypassCatalogIds;
 
     // Requests and completions are both GUI-thread only (every requestComposite caller is
     // PlaybackEngine, and onWorkerFrameReady is a queued slot), so this needs no atomic.

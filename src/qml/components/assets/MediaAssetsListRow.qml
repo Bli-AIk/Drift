@@ -114,6 +114,7 @@ Rectangle {
             kind: root.kind
             replaceBusy: root.replaceBusy
             showVfr: !root.isFolder && root.kind === "video" && host.vfrWarningOf(root.assetId)
+            showMissing: !root.isFolder && host.missingOf(root.assetId)
         }
 
         MediaAssetsListLabels {

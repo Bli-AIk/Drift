@@ -1,5 +1,6 @@
 import QtQuick
 import Drift
+import "../keyframes/EasingCache.js" as EasingCache
 
 Canvas {
     property var host
@@ -38,12 +39,13 @@ Canvas {
             const isLinkedPartner = EditorState.positionLinked
                 && ((host.dragProp === "x" && entry.prop === "y") || (host.dragProp === "y" && entry.prop === "x"))
 
-            const live = entry.points.map(function (p, i) {
+            const affected = entry.prop === host.dragProp || isLinkedPartner
+            const live = !affected ? null : entry.points.map(function (p, i) {
                 if (entry.prop === host.dragProp) {
                     if (i === host.dragTangentIndex) {
                         // Handle being dragged: same key, reshaped.
                         return {
-                            seconds: p.seconds, value: p.value, hold: p.hold,
+                            seconds: p.seconds, value: p.value, hold: p.hold, fn: p.fn, fnAmp: p.fnAmp, fnPeriod: p.fnPeriod,
                             inDx: host.dragTangentInDx, inDy: host.dragTangentInDy,
                             outDx: host.dragTangentOutDx, outDy: host.dragTangentOutDy
                         }
@@ -54,7 +56,7 @@ Canvas {
                         return {
                             seconds: host.dragSeconds, value: host.dragValue,
                             inDx: p.inDx, inDy: p.inDy,
-                            outDx: p.outDx, outDy: p.outDy, hold: p.hold
+                            outDx: p.outDx, outDy: p.outDy, hold: p.hold, fn: p.fn, fnAmp: p.fnAmp, fnPeriod: p.fnPeriod
                         }
                     }
                 } else if (isLinkedPartner) {
@@ -77,7 +79,7 @@ Canvas {
                                     partnerInDy = host.dragTangentInDy * (sSpan / mSpan)
                             }
                             return {
-                                seconds: p.seconds, value: p.value, hold: p.hold,
+                                seconds: p.seconds, value: p.value, hold: p.hold, fn: p.fn, fnAmp: p.fnAmp, fnPeriod: p.fnPeriod,
                                 inDx: host.dragTangentInDx, inDy: partnerInDy,
                                 outDx: host.dragTangentOutDx, outDy: partnerOutDy
                             }
@@ -89,14 +91,14 @@ Canvas {
                             return {
                                 seconds: host.dragSeconds, value: p.value,
                                 inDx: p.inDx, inDy: p.inDy,
-                                outDx: p.outDx, outDy: p.outDy, hold: p.hold
+                                outDx: p.outDx, outDy: p.outDy, hold: p.hold, fn: p.fn, fnAmp: p.fnAmp, fnPeriod: p.fnPeriod
                             }
                         }
                     }
                 }
                 return p
             })
-            const sorted = live.sort((a, b) => a.seconds - b.seconds)
+            const sorted = affected ? live.sort((a, b) => a.seconds - b.seconds) : EasingCache.sortedPoints(entry)
 
             // The focused series is the one being edited; the rest are
             // context and are drawn thinner and faded. A series whose
@@ -141,6 +143,16 @@ Canvas {
                     // Step: hold the outgoing value, then jump.
                     ctx.lineTo(bx, ay)
                     ctx.lineTo(bx, by)
+                    continue
+                }
+                if (a.fn) {
+                    // A Penner function ignores the handles; the engine's samples are the curve.
+                    const samples = EasingCache.samples(host.easingFnSpec(a), 48, (s, n) => EditorState.easingSamples(s, n))
+                    for (let k = 0; k < samples.length; ++k) {
+                        const u = samples[k].x
+                        const f = samples[k].y
+                        ctx.lineTo(ax + (bx - ax) * u, host.yForValue(a.value + (b.value - a.value) * f, entry))
+                    }
                     continue
                 }
                 // Handles are clamped into the segment exactly as the

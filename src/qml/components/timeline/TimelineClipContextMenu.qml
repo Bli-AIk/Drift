@@ -236,6 +236,25 @@ ThemedContextMenu {
         onTriggered: owner.panel.requestSaveEffectPreset(owner.trackIndex,
                                                              owner.clipIndex)
     }
+    ThemedMenuItem {
+        text: qsTr("Color grade…")
+        icon.name: Theme.icons.blend
+        visible: owner.clipData.kind !== "audio" && owner.clipData.kind !== "subtitle"
+        onTriggered: {
+            if (!owner.selected)
+                EditorState.selectClip(owner.trackIndex, owner.clipIndex)
+            Workspaces.activeId = "color"
+        }
+    }
+    ThemedMenuItem {
+        text: qsTr("Edit keyframes…")
+        icon.name: Theme.icons.diamondPlus
+        onTriggered: {
+            if (!owner.selected)
+                EditorState.selectClip(owner.trackIndex, owner.clipIndex)
+            Workspaces.activeId = "keyframes"
+        }
+    }
     ThemedMenuSeparator { visible: owner.clipData.kind === "adjustment" && !owner.isTransformClip }
     ThemedMenuItem {
         text: qsTr("Unlink from clip")

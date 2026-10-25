@@ -21,8 +21,14 @@ SettingsPage {
                 }
             }
         }
+        page.applyTheme(themeId)
+    }
+
+    function applyTheme(themeId) {
         if (!ThemeManager.select(themeId))
             Toasts.error(ThemeManager.lastError || qsTr("Could not use that theme."))
+        else if (ThemeManager.lastWarning)
+            Toasts.warning(ThemeManager.lastWarning)
     }
 
     readonly property bool activeHasVariants: {
@@ -96,12 +102,10 @@ SettingsPage {
 
             onTrustChosen: {
                 ThemeManager.setThemeTrusted(trustDialog.themeId, true)
-                if (!ThemeManager.select(trustDialog.themeId))
-                    Toasts.error(ThemeManager.lastError || qsTr("Could not use that theme."))
+                page.applyTheme(trustDialog.themeId)
             }
             onSkipChosen: {
-                if (!ThemeManager.select(trustDialog.themeId))
-                    Toasts.error(ThemeManager.lastError || qsTr("Could not use that theme."))
+                page.applyTheme(trustDialog.themeId)
             }
         }
     }

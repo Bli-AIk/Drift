@@ -22,8 +22,9 @@ SkBlendMode toSkBlendMode(BlendMode mode);
 // The layer's own paint source — solid, gradient over `box`, texture or shader effect — into
 // `paint`, with `alpha` folded into the colour. A texture or effect that fails to build falls
 // back to the tint. `progress` feeds progress-driven effects (a text wipe); -1 when there is none.
+// `frameRate` is the project's, for frame-stepped effects; 0 reads as 30.
 void applyShadingPaint(SkPaint &paint, const TextPaint &source, const QRectF &box, double timeSec, double alpha,
-                       double progress = -1.0);
+                       double progress = -1.0, double frameRate = 0.0);
 
 // Trim → dash → sketch, composed inner-to-outer so the write-on trims the original outline, the
 // dash runs along what is left and the jitter is applied last. Null when none applies.

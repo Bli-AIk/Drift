@@ -37,7 +37,7 @@ SkRect toSkRect(const QRectF &r)
 const char kEffectPreamble[] =
     "uniform shader base;"
     "uniform float2 uOrigin; uniform float2 uSize;"
-    "uniform float uTime; uniform float uProgress; uniform float uSeed;"
+    "uniform float uTime; uniform float uFrameRate; uniform float uProgress; uniform float uSeed;"
     "uniform float uSpeed; uniform float uIntensity; uniform float uScale;"
     "uniform float uWidth; uniform float uAngle; uniform float uAmount; uniform float uBlock;"
     "uniform float uBands; uniform float uFlicker; uniform float uEdge;"
@@ -80,7 +80,7 @@ const EffectSource kEffects[] = {
      "half4 main(float2 p) {"
      "  half4 c = base.eval(p);"
      "  float k = 0.5 + 0.5 * sin(uTime * uSpeed * 6.28318 + uSeed);"
-     "  float n = hash1(floor(uTime * 24.0) + uSeed);"
+     "  float n = hash1(floor(uTime * uFrameRate + 0.5) + uSeed);"
      "  float drop = step(1.0 - uFlicker * 0.12, n);"
      "  half4 r = c * half(1.0 - uIntensity * 0.5 * (1.0 - k)) * half(1.0 - 0.6 * drop)"
      "          + uColorA * half(k * uIntensity * 0.3) * c.a;"
@@ -258,7 +258,8 @@ bool textEffectIsAnimated(const TextShaderEffect &effect)
         params.insert(p.id, p.defaultValue);
     for (auto it = effect.params.constBegin(); it != effect.params.constEnd(); ++it)
         params.insert(it.key(), *it);
-    return scalarParam(params, QStringLiteral("speed"), 0.0) > 0.0;
+    return scalarParam(params, QStringLiteral("speed"), 0.0) > 0.0
+        || (effect.id == QLatin1String("neon-pulse") && scalarParam(params, QStringLiteral("flicker"), 0.0) > 0.0);
 }
 
 QString textEffectCompileError(const QString &id)
@@ -267,7 +268,7 @@ QString textEffectCompileError(const QString &id)
 }
 
 sk_sp<SkShader> effectShaderFor(const TextShaderEffect &effect, sk_sp<SkShader> base, const QRectF &box,
-                                double timeSec, double progress)
+                                double timeSec, double progress, double frameRate)
 {
     const CompiledEffect *compiled = compiledEffect(effect.id);
     if (!compiled->effect || !base)
@@ -286,6 +287,7 @@ sk_sp<SkShader> effectShaderFor(const TextShaderEffect &effect, sk_sp<SkShader> 
     builder.uniform("uOrigin") = SkV2{float(box.x()), float(box.y())};
     builder.uniform("uSize") = SkV2{float(box.width()), float(box.height())};
     builder.uniform("uTime") = float(timeSec);
+    builder.uniform("uFrameRate") = float(frameRate > 0.0 ? frameRate : 30.0);
     builder.uniform("uProgress") = float(progress >= 0.0 ? progress : scalar("progress", 1.0));
     builder.uniform("uSeed") = scalar("seed", 1.0);
     builder.uniform("uSpeed") = scalar("speed", 0.0);

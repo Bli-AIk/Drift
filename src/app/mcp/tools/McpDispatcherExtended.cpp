@@ -16,6 +16,7 @@
 #include "app/bin/AssetLibrary.h"
 #include "app/editor/ProjectFileController.h"
 #include "ui/preview/PreviewController.h"
+#include "ui/theme/ThemeManager.h"
 #include "engine/render3d/scene/EditorView3d.h"
 #include "engine/render3d/scene/SceneCamera3d.h"
 
@@ -3221,6 +3222,99 @@ QJsonObject McpDispatcher::applyOneExtended(const QString &tool, const QJsonObje
         return authoring::exportPackage(args);
     if (tool == QLatin1String("import_effect"))
         return authoring::importPackage(m_controller, args);
+
+    if (tool == QLatin1String("list_themes")) {
+        ThemeManager *themes = ThemeManager::shared();
+        QJsonArray list;
+        for (const QVariant &v : themes->themes()) {
+            const QVariantMap row = v.toMap();
+            list.append(QJsonObject{
+                {QStringLiteral("id"), row.value(QStringLiteral("id")).toString()},
+                {QStringLiteral("name"), row.value(QStringLiteral("name")).toString()},
+                {QStringLiteral("variant"), row.value(QStringLiteral("variant")).toString()},
+                {QStringLiteral("builtIn"), row.value(QStringLiteral("builtIn")).toBool()},
+                {QStringLiteral("hasVariants"), row.value(QStringLiteral("hasVariants")).toBool()},
+                {QStringLiteral("hasOverrides"), row.value(QStringLiteral("hasOverrides")).toBool()},
+            });
+        }
+        QJsonObject result{{QStringLiteral("themes"), list},
+                           {QStringLiteral("selection"), themes->selection()},
+                           {QStringLiteral("current"), themes->currentTheme()},
+                           {QStringLiteral("schemaVersion"), ThemeManager::kSchemaVersion},
+                           {QStringLiteral("themesFolder"), themes->themesFolderUrl().toLocalFile()}};
+        if (!themes->lastWarning().isEmpty())
+            result.insert(QStringLiteral("warning"), themes->lastWarning());
+        return ok(result);
+    }
+
+    if (tool == QLatin1String("export_theme")) {
+        ThemeManager *themes = ThemeManager::shared();
+        const QString path = localPath(argString(args, QStringLiteral("path")));
+        if (path.isEmpty() || !QDir::isAbsolutePath(path))
+            return err("bad_args", QStringLiteral("path must be absolute"));
+        const QString name = argString(args, QStringLiteral("name"));
+        if (name.isEmpty())
+            return err("bad_args", QStringLiteral("name required"));
+        QString source = argString(args, QStringLiteral("theme"));
+        if (source.isEmpty())
+            source = themes->currentTheme();
+        const QString mode = argString(args, QStringLiteral("mode"));
+        if (!mode.isEmpty() && mode != QLatin1String("copy") && mode != QLatin1String("starter"))
+            return err("bad_args", QStringLiteral("mode must be copy or starter"));
+        if (mode == QLatin1String("starter") && name == source)
+            return err("bad_args", QStringLiteral("A starter cannot extend itself; use mode copy to edit "
+                                                  "an installed theme under the same name"));
+        QString error;
+        const QByteArray bytes = themes->themeTemplate(source, name, mode == QLatin1String("starter"), &error);
+        if (bytes.isEmpty())
+            return err("bad_args", error.isEmpty() ? QStringLiteral("Could not read theme \"%1\"").arg(source) : error);
+        QDir().mkpath(QFileInfo(path).absolutePath());
+        QFile out(path);
+        if (!out.open(QIODevice::WriteOnly | QIODevice::Truncate) || out.write(bytes) != bytes.size())
+            return err("bad_args", QStringLiteral("Could not write %1").arg(path));
+        return ok({{QStringLiteral("path"), path},
+                   {QStringLiteral("name"), name},
+                   {QStringLiteral("from"), source},
+                   {QStringLiteral("mode"), mode.isEmpty() ? QStringLiteral("copy") : mode}});
+    }
+
+    if (tool == QLatin1String("import_theme")) {
+        ThemeManager *themes = ThemeManager::shared();
+        const QString path = localPath(argString(args, QStringLiteral("path")));
+        if (path.isEmpty() || !QDir::isAbsolutePath(path))
+            return err("bad_args", QStringLiteral("path must be absolute"));
+        if (!QFileInfo::exists(path))
+            return err("not_found", QStringLiteral("%1 does not exist").arg(path));
+        const bool replace = jsonBool(args.value(QStringLiteral("replace")));
+        const QString id = themes->importTheme(QUrl::fromLocalFile(path), replace);
+        if (id.isEmpty()) {
+            const QString detail = themes->lastError();
+            return err(detail.contains(QLatin1String("already installed")) ? "exists" : "bad_args", detail);
+        }
+        QJsonObject result{{QStringLiteral("id"), id}};
+        if (jsonBool(args.value(QStringLiteral("select")))) {
+            if (!themes->select(id))
+                return err("bad_args", themes->lastError());
+            result.insert(QStringLiteral("selected"), true);
+        }
+        if (themes->currentTheme() == id && !themes->lastWarning().isEmpty())
+            result.insert(QStringLiteral("warning"), themes->lastWarning());
+        return ok(result);
+    }
+
+    if (tool == QLatin1String("select_theme")) {
+        ThemeManager *themes = ThemeManager::shared();
+        const QString theme = argString(args, QStringLiteral("theme"));
+        if (theme.isEmpty())
+            return err("bad_args", QStringLiteral("theme required"));
+        if (!themes->select(theme))
+            return err("not_found", themes->lastError());
+        QJsonObject result{{QStringLiteral("selection"), themes->selection()},
+                           {QStringLiteral("current"), themes->currentTheme()}};
+        if (!themes->lastWarning().isEmpty())
+            result.insert(QStringLiteral("warning"), themes->lastWarning());
+        return ok(result);
+    }
 
     if (tool == QLatin1String("list_addons"))
         return m_controller->mcp()->listAddons();

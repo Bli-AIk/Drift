@@ -14,9 +14,9 @@ namespace AndroidUri {
 
 bool isContentUri(const QUrl &url);
 
-// A string QFile accepts: the local path for file:// URLs, and the fully encoded URI for
-// content:// ones, which Qt's AndroidContentFileEngine knows how to open. Empty for anything
-// else.
+// The local path for file:// URLs, and the fully encoded URI for content:// ones. Qt's
+// AndroidContentFileEngine opens the latter, but it re-encodes some document ids and the provider
+// then refuses them, so prefer openForRead/openForWrite. Empty for anything else.
 QString filePath(const QUrl &url);
 
 // The real filesystem path, or empty when there is none — which is every content:// URI. This

@@ -22,5 +22,6 @@ public:
     static QImage applyEffects(const QImage &input, const QList<drift::Effect> &effects,
                                drift::TimeUs timeUs = 0,
                                const QList<drift::FaceAnchors> &faceSlots = {},
-                               const std::shared_ptr<const drift::DepthFrame> &depth = nullptr);
+                               const std::shared_ptr<const drift::DepthFrame> &depth = nullptr,
+                               int frameRate = 0);
 };

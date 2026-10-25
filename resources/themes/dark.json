@@ -1,5 +1,6 @@
 {
   "name": "dark",
+  "schemaVersion": 1,
   "variant": "dark",
   "palette": {
     "appBackground": "#0d0d0d",
@@ -40,8 +41,8 @@
     "exportGradientTop": "#ffcf4a",
     "exportGradientBottom": "#f59e0b",
     "exportGlow": "#fbbf24",
-    "scrim": "#00000066",
-    "scrimStrong": "#000000b3",
+    "scrim": "#66000000",
+    "scrimStrong": "#b3000000",
     "overlay": "#000000",
     "guideStrong": "#99ffffff",
     "guideMedium": "#80ffffff",
@@ -87,6 +88,22 @@
     "rampSky": "#38bdf8",
     "rampGreen": "#4ade80",
     "rampViolet": "#c084fc",
+    "gradeHslRed": "#e5484d",
+    "gradeHslOrange": "#f76b15",
+    "gradeHslYellow": "#f5d90a",
+    "gradeHslGreen": "#30a46c",
+    "gradeHslAqua": "#12a594",
+    "gradeHslBlue": "#3e63dd",
+    "gradeHslPurple": "#8e4ec6",
+    "gradeHslMagenta": "#d6409f",
+    "gradeHue": "#f59e0b",
+    "gradeSat": "#22d3ee",
+    "gradeLum": "#e5e7eb",
+    "gradeCurveRed": "#ef5350",
+    "gradeCurveGreen": "#66bb6a",
+    "gradeCurveBlue": "#42a5f5",
+    "scopesBackground": "#101114",
+    "scopesLabel": "#8a8d94",
     "rampRose": "#fb7185",
     "rampIndigo": "#818cf8",
     "categoryAmber": "#f59e0b",
@@ -602,6 +619,25 @@
     "toolWindow": {
       "background": "$semantic.surface.app"
     },
+    "easingPicker": {
+      "background": "$semantic.surface.panel",
+      "border": "$semantic.panel.border",
+      "borderWidth": "$metrics.borderWidth",
+      "curve": "$semantic.primary",
+      "curveMuted": "$semantic.mutedForeground",
+      "curveWidth": "$metrics.borderWidthFocus",
+      "foreground": "$semantic.panel.foreground",
+      "foregroundMuted": "$semantic.mutedForeground",
+      "gridLine": "$semantic.panel.border",
+      "handle": "$semantic.primary",
+      "handleLine": "$semantic.mutedForeground",
+      "radius": "$metrics.radius.sm",
+      "radiusPopup": "$metrics.radius.md",
+      "tileBackground": "$semantic.panel.secondary.background",
+      "tileBackgroundHover": "$semantic.panel.accent",
+      "tileBackgroundSelected": "$semantic.panel.accent",
+      "tileBorderSelected": "$semantic.primary"
+    },
     "editorHeader": {
       "background": "$semantic.surface.app"
     },
@@ -619,7 +655,7 @@
       "radius": "$metrics.radius.pill"
     },
     "editorHeaderExportButton": {
-      "radius": "$metrics.radius.md",
+      "radius": "$metrics.radius.sm",
       "glow": "$semantic.export.glow",
       "gradientTop": "$semantic.export.gradientTop",
       "gradientBottom": "$semantic.export.gradientBottom",
@@ -779,7 +815,7 @@
       "foregroundMuted": "$semantic.mutedForeground"
     },
     "editorHeaderProjectsButton": {
-      "radius": "$metrics.radius.pill",
+      "radius": "$metrics.radius.sm",
       "backgroundHover": "$semantic.popoverHover",
       "background": "$semantic.accent",
       "statusRadius": 4,
@@ -811,7 +847,7 @@
       "border": "$semantic.destructive"
     },
     "editorHeaderSearchField": {
-      "radius": "$metrics.radius.pill",
+      "radius": "$metrics.radius.sm",
       "background": "$semantic.panel.accent",
       "borderWidthFocus": "$metrics.borderWidthFocus",
       "borderWidth": 0,
@@ -898,6 +934,11 @@
     "vfrWarning": {
       "radius": "$metrics.radius.pill",
       "background": "$semantic.warning",
+      "foreground": "$semantic.onMedia"
+    },
+    "missingMediaWarning": {
+      "radius": "$metrics.radius.pill",
+      "background": "$semantic.destructive",
       "foreground": "$semantic.onMedia"
     },
     "shortcutCaptureField": {
@@ -1273,6 +1314,7 @@
       "editFriendlyBackground": "$semantic.clip.editFriendly",
       "editFriendlyForeground": "$semantic.clip.editFriendlyForeground",
       "warning": "$semantic.warning",
+      "missing": "$semantic.destructive",
       "radius": "$metrics.radius.sm",
       "radiusXs": "$metrics.radius.xs",
       "selectionBorderWidth": "$metrics.timeline.clipSelectionRingWidth",
@@ -1764,6 +1806,29 @@
       "icon": "$semantic.mutedForeground",
       "radius": "$metrics.radius.sm"
     },
+    "scopes": {
+      "background": "$palette.scopesBackground",
+      "label": "$palette.scopesLabel"
+    },
+    "colorGradeBands": {
+      "red": "$palette.gradeHslRed",
+      "orange": "$palette.gradeHslOrange",
+      "yellow": "$palette.gradeHslYellow",
+      "green": "$palette.gradeHslGreen",
+      "aqua": "$palette.gradeHslAqua",
+      "blue": "$palette.gradeHslBlue",
+      "purple": "$palette.gradeHslPurple",
+      "magenta": "$palette.gradeHslMagenta"
+    },
+    "colorGradeCurveChannels": {
+      "master": "$palette.panelForeground",
+      "r": "$palette.gradeCurveRed",
+      "g": "$palette.gradeCurveGreen",
+      "b": "$palette.gradeCurveBlue",
+      "hue": "$palette.gradeHue",
+      "sat": "$palette.gradeSat",
+      "lum": "$palette.gradeLum"
+    },
     "fadeCurveCanvas": {
       "curve": "$semantic.primary",
       "curveLineWidth": "$metrics.borderWidthFocus",
@@ -1922,6 +1987,163 @@
     "keyframeGraphValueAxis": {
       "border": "$semantic.panel.border",
       "borderWidth": "$metrics.borderWidth"
+    },
+    "subtitleLane": {
+      "background": "$semantic.surface.panel",
+      "gapShade": "$semantic.panel.muted",
+      "opacityGap": 0.35,
+      "clipSpan": "$semantic.panel.accent",
+      "opacityClipSpan": 0.35,
+      "waveformBand": "$semantic.panel.muted",
+      "opacityWaveformBand": 0.25,
+      "waveform": "$semantic.clip.panelWaveform",
+      "opacityWaveform": 0.75,
+      "border": "$semantic.panel.border",
+      "borderWidth": "$metrics.borderWidth",
+      "foregroundMuted": "$semantic.mutedForeground",
+      "ghost": "$semantic.primary",
+      "opacityGhost": 0.18
+    },
+    "subtitleLaneCue": {
+      "radius": "$metrics.radius.sm",
+      "background": "$semantic.clip.subtitle",
+      "opacityIdle": 0.7,
+      "opacityActive": 0.88,
+      "border": "$semantic.primary",
+      "borderWidth": "$metrics.borderWidthFocus",
+      "foreground": "$semantic.onMedia",
+      "index": "$semantic.onMedia",
+      "opacityIndex": 0.65,
+      "grip": "$semantic.primary",
+      "overlap": "$semantic.warning",
+      "opacityOverlap": 0.45
+    },
+    "subtitleCueGrid": {
+      "background": "$semantic.surface.panel",
+      "rowAlt": "$semantic.panel.accent",
+      "opacityRowAlt": 0.45,
+      "rowActive": "$semantic.clip.subtitle",
+      "opacityRowActive": 0.3,
+      "rowSelected": "$semantic.primary",
+      "opacityRowSelected": 0.28,
+      "activeMarker": "$semantic.clip.subtitle",
+      "selectedMarker": "$semantic.primary",
+      "markerWidth": 3,
+      "headerBackground": "$semantic.panel.secondary.background",
+      "headerForeground": "$semantic.panel.secondary.foreground",
+      "border": "$semantic.panel.border",
+      "borderWidth": "$metrics.borderWidth",
+      "borderWidthFocus": "$metrics.borderWidthFocus",
+      "borderFocus": "$semantic.primary",
+      "foreground": "$semantic.panel.foreground",
+      "foregroundMuted": "$semantic.mutedForeground",
+      "foregroundOverlap": "$semantic.warning"
+    },
+    "subtitleTextPanel": {
+      "background": "$semantic.surface.panel",
+      "gutterBackground": "$semantic.panel.accent",
+      "gutterForeground": "$semantic.mutedForeground",
+      "gutterForegroundError": "$semantic.destructive",
+      "border": "$semantic.panel.border",
+      "borderWidth": "$metrics.borderWidth",
+      "foreground": "$semantic.panel.foreground",
+      "foregroundMuted": "$semantic.mutedForeground",
+      "foregroundError": "$semantic.destructive",
+      "bannerBackground": "$semantic.panel.accent",
+      "bannerForeground": "$semantic.panel.foreground",
+      "selection": "$semantic.primary",
+      "selectionForeground": "$semantic.primaryForeground"
+    },
+    "subtitleTimingPanel": {
+      "background": "$semantic.surface.panel",
+      "stickyBackground": "$semantic.panel.accent",
+      "border": "$semantic.panel.border",
+      "borderWidth": "$metrics.borderWidth",
+      "foreground": "$semantic.panel.foreground",
+      "foregroundMuted": "$semantic.mutedForeground",
+      "foregroundError": "$semantic.destructive"
+    },
+    "keyframesCurves": {
+      "background": "$semantic.surface.panel",
+      "grid": "$semantic.panel.border",
+      "opacityGrid": 0.6,
+      "clipSpan": "$semantic.panel.accent",
+      "opacityClipSpan": 0.25,
+      "label": "$semantic.mutedForeground",
+      "opacityContext": 0.55
+    },
+    "keyframesKeyDot": {
+      "border": "$semantic.onMedia",
+      "borderWidth": "$metrics.borderWidth",
+      "borderSelected": "$semantic.primary",
+      "borderWidthSelected": 2,
+      "size": 10,
+      "radius": 1,
+      "scaleHover": 1.15,
+      "scaleSelected": 1.3,
+      "summary": "$semantic.mutedForeground",
+      "opacityDisabled": 0.35
+    },
+    "keyframesLane": {
+      "backgroundAlt": "$semantic.panel.muted",
+      "opacityAlt": 0.3,
+      "clipSpan": "$semantic.panel.accent",
+      "opacityClipSpan": 0.35,
+      "groupBackground": "$semantic.panel.secondary.background",
+      "border": "$semantic.panel.border"
+    },
+    "keyframesMarquee": {
+      "background": "$semantic.primary",
+      "backgroundOpacity": 0.12,
+      "border": "$semantic.primary",
+      "borderWidth": "$metrics.borderWidth"
+    },
+    "keyframesRuler": {
+      "background": "$semantic.surface.panel",
+      "border": "$semantic.panel.border",
+      "borderWidth": "$metrics.borderWidth",
+      "outside": "$semantic.panel.border",
+      "opacityOutside": 0.4
+    },
+    "keyframesStretchBox": {
+      "background": "$semantic.primary",
+      "backgroundOpacity": 0.06,
+      "border": "$semantic.primary",
+      "borderWidth": "$metrics.borderWidth",
+      "grip": "$semantic.primary",
+      "gripBorder": "$semantic.primaryForeground",
+      "gripWidth": 8,
+      "gripHeight": 28,
+      "radius": 2
+    },
+    "keyframesPanel": {
+      "splitter": "$semantic.panel.border",
+      "splitterHover": "$semantic.primary",
+      "foregroundMuted": "$semantic.mutedForeground"
+    },
+    "keyframesScrubber": {
+      "background": "$semantic.panel.accent",
+      "backgroundHover": "$semantic.panel.muted",
+      "border": "$semantic.focusRing",
+      "borderWidth": "$metrics.borderWidthFocus",
+      "fill": "$semantic.primary",
+      "foreground": "$semantic.panel.foreground",
+      "foregroundMuted": "$semantic.mutedForeground",
+      "radius": "$metrics.radius.sm"
+    },
+    "keyframesToolbar": {
+      "border": "$semantic.panel.border",
+      "separator": "$semantic.panel.border"
+    },
+    "keyframesTreeRow": {
+      "backgroundFocused": "$semantic.panel.accent",
+      "backgroundHover": "$semantic.panel.accent",
+      "border": "$semantic.panel.border",
+      "foreground": "$semantic.panel.foreground",
+      "foregroundMuted": "$semantic.mutedForeground",
+      "groupBackground": "$semantic.panel.secondary.background",
+      "groupForeground": "$semantic.panel.secondary.foreground",
+      "radius": "$metrics.radius.sm"
     },
     "masksInspector": {
       "foregroundMuted": "$semantic.mutedForeground"
@@ -2605,6 +2827,12 @@
     "previewOptionsRowLabel": {
       "foreground": "$semantic.mutedForeground"
     },
+    "previewOriginalBadge": {
+      "background": "$semantic.surface.panel",
+      "border": "$semantic.primary",
+      "borderWidth": "$metrics.borderWidth",
+      "foreground": "$semantic.panel.foreground"
+    },
     "previewOsdCluster": {
       "background": "$semantic.surface.panel",
       "border": "$semantic.panel.border",
@@ -2967,7 +3195,7 @@
       "foregroundMuted": "$semantic.mutedForeground",
       "formatsBorder": "$semantic.panel.border",
       "formatsBorderWidth": "$metrics.borderWidth",
-      "formatsRadius": "$metrics.radius.md",
+      "formatsRadius": "$metrics.radius.sm",
       "icon": "$semantic.mutedForeground",
       "iconBackground": "$semantic.panel.accent",
       "iconRadius": "$metrics.radius.md"
@@ -3707,7 +3935,7 @@
       "margin": 32
     },
     "headerHeight": 54.4,
-    "panelGap": 3,
+    "panelGap": 6,
     "pagePadding": 12,
     "panelHeaderHeight": {
       "pointer": 44,

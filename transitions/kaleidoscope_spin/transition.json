@@ -2,6 +2,7 @@
   "id": "kaleidoscope_spin",
   "displayName": "Kaleidoscope Spin",
   "category": "cinematic",
+  "previewStrip": "preview_strip.webp",
   "order": 530,
   "parameters": [
     {

@@ -73,7 +73,7 @@ QImage GpuEffectExecutor::apply(const EffectPresetEntry &def, const QImage &inpu
 }
 
 QImage GpuEffectExecutor::applyChain(const QList<ChainStep> &steps, const QImage &input,
-                                     drift::TimeUs timeUs)
+                                     drift::TimeUs timeUs, int frameRate)
 {
     if (input.isNull() || steps.isEmpty() || !ensureContext())
         return input;
@@ -121,7 +121,8 @@ QImage GpuEffectExecutor::applyChain(const QList<ChainStep> &steps, const QImage
                 continue;
 
             const std::vector<const GlTarget *> sources{&current};
-            const PipelineAux aux{step.depth};
+            PipelineAux aux{step.depth};
+            aux.frameRate = frameRate;
             GlTarget next = runPipeline(rt, gl, step.cacheKey, *step.gpu, sources, step.parameters,
                                         timeUs, 0.0, canvasSize, &aux);
             if (!next.isValid())

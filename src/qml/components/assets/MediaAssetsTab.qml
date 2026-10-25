@@ -122,9 +122,15 @@ Item {
         return AssetLibrary.isEditFriendly(assetId)
     }
     // Converted media is constant-rate by construction, so the warning never sits beside the pill.
+    // A missing file gets its own badge instead, so only one of the two shows.
     function vfrWarningOf(assetId) {
         void root._badgeRevision
-        return !AssetLibrary.isEditFriendly(assetId) && AssetLibrary.isVariableFrameRate(assetId)
+        return !AssetLibrary.isEditFriendly(assetId) && !AssetLibrary.isMissing(assetId)
+               && AssetLibrary.isVariableFrameRate(assetId)
+    }
+    function missingOf(assetId) {
+        void root._badgeRevision
+        return AssetLibrary.isMissing(assetId)
     }
 
     // The selected assets whose proxy state is one of `states`.

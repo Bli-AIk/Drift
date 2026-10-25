@@ -169,7 +169,7 @@ struct TextEffectSpec
     QString id;
     QString label;
     QList<TextAnimParamSpec> params;
-    bool timeDriven = true; // redraws every frame while its speed is non-zero
+    bool timeDriven = true; // redraws every frame while its speed is non-zero (neon-pulse: or its flicker)
 };
 const QList<TextEffectSpec> &textShaderEffectSpecs();
 const TextEffectSpec *textShaderEffectSpec(const QString &id);

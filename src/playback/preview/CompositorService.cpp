@@ -191,6 +191,15 @@ int CompositorService::maxInFlight() const
     return 1;
 }
 
+void CompositorService::setPreviewBypass(const QSet<QString> &clipIds, const QSet<QString> &catalogIds)
+{
+    if (clipIds == m_bypassClipIds && catalogIds == m_bypassCatalogIds)
+        return;
+    m_bypassClipIds = clipIds;
+    m_bypassCatalogIds = catalogIds;
+    invalidateSnapshot();
+}
+
 std::shared_ptr<const drift::Project> CompositorService::snapshot()
 {
     if (!m_project)
@@ -200,7 +209,20 @@ std::shared_ptr<const drift::Project> CompositorService::snapshot()
         // the shared_ptr. Plain Project copy would keep sharing QMap/QList with
         // the live tree — unsafe once the GUI mutates while the worker reads.
         const drift::perf::Scope perfScope("snapshot.copy");
-        m_sharedSnapshot = std::make_shared<drift::Project>(m_project->detachedCopy());
+        auto snapshot = std::make_shared<drift::Project>(m_project->detachedCopy());
+        if (!m_bypassClipIds.isEmpty() && !m_bypassCatalogIds.isEmpty()) {
+            for (drift::Track &track : snapshot->tracks()) {
+                for (drift::Clip &clip : track.clips) {
+                    if (!m_bypassClipIds.contains(clip.id))
+                        continue;
+                    for (drift::Effect &effect : clip.effects) {
+                        if (m_bypassCatalogIds.contains(effect.catalogId))
+                            effect.enabled = false;
+                    }
+                }
+            }
+        }
+        m_sharedSnapshot = std::move(snapshot);
         m_snapshotGeneration = m_liveGeneration;
         ++m_snapshotSerial;
     }
@@ -242,6 +264,7 @@ bool CompositorService::isRedundantRequest(drift::TimeUs time,
            && options.readAheadUs == last.readAheadUs
            && options.textEdit == last.textEdit
            && options.allowProxies == last.allowProxies
+           && options.scopeReadbackWidth <= last.scopeReadbackWidth
            && options.editor.active == last.editor.active
            && options.editor.serial == last.editor.serial
            && options.editor.target == last.editor.target

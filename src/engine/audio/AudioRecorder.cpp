@@ -119,12 +119,25 @@ void AudioRecorder::setGain(float gain)
     emit gainChanged(m_gain);
 }
 
-QVariantList AudioRecorder::livePeaks() const
+QVariantList AudioRecorder::livePeakColumns(double first, double count, int columns) const
 {
     QVariantList list;
-    list.reserve(static_cast<qsizetype>(m_livePeaks.size()));
-    for (float p : m_livePeaks) {
-        list.append(p);
+    const qsizetype total = static_cast<qsizetype>(m_livePeaks.size());
+    if (columns <= 0 || total == 0) {
+        return list;
+    }
+    list.reserve(columns);
+    for (int x = 0; x < columns; ++x) {
+        const qsizetype i0 = static_cast<qsizetype>(std::floor(first + x * count / columns));
+        qsizetype i1 = static_cast<qsizetype>(std::floor(first + (x + 1) * count / columns));
+        if (i1 <= i0) {
+            i1 = std::min(total, i0 + 1);
+        }
+        float peak = 0.0f;
+        for (qsizetype i = std::max<qsizetype>(i0, 0); i < i1 && i < total; ++i) {
+            peak = std::max(peak, m_livePeaks[static_cast<size_t>(i)]);
+        }
+        list.append(peak);
     }
     return list;
 }

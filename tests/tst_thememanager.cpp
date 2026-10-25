@@ -33,6 +33,7 @@ private slots:
     void init();
 
     void builtinsLoadDarkAndLight();
+    void graphiteAndFrostAreBuiltins();
     void resolvesReferences();
     void extendsMergesOverBase();
     void referenceCycleDoesNotHang();
@@ -53,6 +54,8 @@ private slots:
     void importJsonFolderZipAndRejectsTraversal();
     void removeAndExportRoundTrip();
     void exampleThemesLoad();
+    void schemaVersionMigratesAndWarns();
+    void templateExportAndReplaceImport();
     void sessionOverrideIsNotPersisted();
     void darkModeBindingDoesNotLoop();
 
@@ -139,7 +142,7 @@ void ThemeManagerTest::builtinsLoadDarkAndLight()
     QVERIFY(manager.availableThemes().contains(QStringLiteral("light")));
     QCOMPARE(tokenColor(manager, "semantic.surface.app"), QColor(QStringLiteral("#0d0d0d")));
     QCOMPARE(tokenColor(manager, "semantic.primary"), QColor(QStringLiteral("#F8B81C")));
-    QCOMPARE(tokenColor(manager, "semantic.scrim"), QColor(QStringLiteral("#00000066")));
+    QCOMPARE(tokenColor(manager, "semantic.scrim"), QColor(QStringLiteral("#66000000")));
     QCOMPARE(tokenColor(manager, "semantic.clip.audio"), QColor(QStringLiteral("#8F5DBA")));
     QCOMPARE(tokenColor(manager, "semantic.gizmo.x"), QColor(QStringLiteral("#f0475a")));
     QCOMPARE(tokenColor(manager, "semantic.clip.waveform"), QColor(QStringLiteral("#ffffffb3")));
@@ -188,6 +191,51 @@ void ThemeManagerTest::builtinsLoadDarkAndLight()
     QCOMPARE(spy.count(), 1);
     manager.setVariant(QStringLiteral("nope"));
     QCOMPARE(manager.currentTheme(), QStringLiteral("light"));
+}
+
+void ThemeManagerTest::graphiteAndFrostAreBuiltins()
+{
+    QVERIFY(writeJson("graphite-copy/theme.json", R"({
+        "name": "graphite",
+        "extends": "dark"
+    })"));
+    ThemeManager manager;
+    const QStringList available = manager.availableThemes();
+    QCOMPARE(available.mid(0, 4), (QStringList{QStringLiteral("dark"), QStringLiteral("light"),
+                                               QStringLiteral("graphite"), QStringLiteral("frost")}));
+    QCOMPARE(available.count(QStringLiteral("graphite")), 1);
+
+    QStringList builtInIds;
+    for (const QVariant &row : manager.themes()) {
+        const QVariantMap map = row.toMap();
+        if (map.value(QStringLiteral("builtIn")).toBool())
+            builtInIds.append(map.value(QStringLiteral("id")).toString());
+        else
+            QVERIFY(map.value(QStringLiteral("id")).toString() != QLatin1String("graphite"));
+    }
+    QCOMPARE(builtInIds, (QStringList{QStringLiteral("dark"), QStringLiteral("light"),
+                                      QStringLiteral("graphite"), QStringLiteral("frost")}));
+
+    const struct {
+        const char *id;
+        const char *variant;
+        const char *primary;
+    } cases[] = {{"graphite", "dark", "#f2f2f2"}, {"frost", "light", "#111111"}};
+    for (const auto &c : cases) {
+        const QString id = QString::fromLatin1(c.id);
+        QVERIFY(manager.select(id));
+        QCOMPARE(manager.selection(), id);
+        QCOMPARE(manager.currentTheme(), id);
+        QCOMPARE(manager.effectiveVariant(), QString::fromLatin1(c.variant));
+        QCOMPARE(manager.token(QStringLiteral("window.translucent")).toBool(), true);
+        QCOMPARE(tokenColor(manager, "semantic.primary"), QColor(QString::fromLatin1(c.primary)));
+        QVERIFY(!manager.previewColors(id).isEmpty());
+        manager.setVariant(QStringLiteral("light"));
+        QCOMPARE(manager.currentTheme(), id);
+        manager.setVariant(QStringLiteral("dark"));
+        QCOMPARE(manager.currentTheme(), id);
+        QVERIFY(!manager.removeTheme(id));
+    }
 }
 
 void ThemeManagerTest::resolvesReferences()
@@ -912,7 +960,10 @@ void ThemeManagerTest::importJsonFolderZipAndRejectsTraversal()
     const QString link = outside.filePath(QStringLiteral("linked.json"));
     QVERIFY(QFile::link(jsonPath, link));
     QCOMPARE(manager.importTheme(QUrl::fromLocalFile(link)), QString());
+#ifndef Q_OS_WIN
+    // On Windows QFile::link makes a .lnk shortcut, which the import reads as (invalid) JSON.
     QVERIFY(manager.lastError().contains(QStringLiteral("symlink")));
+#endif
 }
 
 void ThemeManagerTest::removeAndExportRoundTrip()
@@ -987,6 +1038,109 @@ void ThemeManagerTest::exampleThemesLoad()
     QVERIFY(manager.overrideUrl(QStringLiteral("ThemedButtonBackground")).isEmpty());
     manager.setThemeTrusted(QStringLiteral("override-example"), true);
     QVERIFY(!manager.overrideUrl(QStringLiteral("ThemedButtonBackground")).isEmpty());
+}
+
+void ThemeManagerTest::schemaVersionMigratesAndWarns()
+{
+    // Pre-versioning standalone theme: no extends, no schemaVersion, most tokens missing.
+    QVERIFY(writeJson("legacy.json", R"({
+        "name": "legacy",
+        "variant": "light",
+        "palette": { "primary": "#123456" }
+    })"));
+    QVERIFY(writeJson("future.json", R"({
+        "name": "future",
+        "schemaVersion": 999,
+        "extends": "dark",
+        "somethingNew": { "x": 1 }
+    })"));
+    QVERIFY(writeJson("badversion.json", R"({
+        "name": "badversion",
+        "schemaVersion": "two"
+    })"));
+
+    ThemeManager manager;
+    QSignalSpy warnings(&manager, &ThemeManager::lastWarningChanged);
+    QVERIFY(manager.loadTheme(QStringLiteral("legacy")));
+    QVERIFY(manager.lastWarning().isEmpty());
+    QCOMPARE(tokenColor(manager, "semantic.primary"), QColor(QStringLiteral("#123456")));
+    QCOMPARE(manager.token(QStringLiteral("metrics.radius.sm")),
+             manager.builtinToken(QStringLiteral("light"), QStringLiteral("metrics.radius.sm")));
+    QCOMPARE(tokenColor(manager, "components.themedButton.background"),
+             manager.builtinToken(QStringLiteral("light"), QStringLiteral("components.themedButton.background"))
+                 .value<QColor>());
+    QCOMPARE(manager.token(QStringLiteral("schemaVersion")).toInt(), 1);
+
+    QVERIFY(manager.loadTheme(QStringLiteral("future")));
+    QCOMPARE(manager.currentTheme(), QStringLiteral("future"));
+    QVERIFY(!manager.lastWarning().isEmpty());
+    QCOMPARE(warnings.count(), 1);
+
+    QVERIFY(manager.loadTheme(QStringLiteral("legacy")));
+    QVERIFY(manager.lastWarning().isEmpty());
+    QCOMPARE(warnings.count(), 2);
+
+    QVERIFY(!manager.loadTheme(QStringLiteral("badversion")));
+
+    QTemporaryDir outside;
+    QVERIFY(outside.isValid());
+    const QString exported = outside.filePath(QStringLiteral("legacy-export.json"));
+    QVERIFY(manager.exportTheme(QUrl::fromLocalFile(exported)));
+    QFile exportedFile(exported);
+    QVERIFY(exportedFile.open(QIODevice::ReadOnly));
+    const QJsonObject object = QJsonDocument::fromJson(exportedFile.readAll()).object();
+    QCOMPARE(object.value(QStringLiteral("schemaVersion")).toInt(), 1);
+}
+
+void ThemeManagerTest::templateExportAndReplaceImport()
+{
+    ThemeManager manager;
+    QString error;
+    QVERIFY(manager.themeTemplate(QStringLiteral("dark"), QStringLiteral("light"), false, &error).isEmpty());
+
+    QTemporaryDir outside;
+    QVERIFY(outside.isValid());
+    const QString starterPath = outside.filePath(QStringLiteral("ocean.json"));
+    const QByteArray starter = manager.themeTemplate(QStringLiteral("dark"), QStringLiteral("ocean"), true, &error);
+    QJsonObject object = QJsonDocument::fromJson(starter).object();
+    QCOMPARE(object.value(QStringLiteral("extends")).toString(), QStringLiteral("dark"));
+    QCOMPARE(object.value(QStringLiteral("name")).toString(), QStringLiteral("ocean"));
+    QVERIFY(object.value(QStringLiteral("palette")).toObject().contains(QStringLiteral("primary")));
+    QVERIFY(!object.value(QStringLiteral("palette")).toObject().contains(QStringLiteral("curveX")));
+    QVERIFY(!object.contains(QStringLiteral("semantic")));
+    QVERIFY(!object.contains(QStringLiteral("components")));
+    QVERIFY(object.contains(QStringLiteral("metrics")));
+    QVERIFY(object.contains(QStringLiteral("typography")));
+    QVERIFY(object.contains(QStringLiteral("motion")));
+    QCOMPARE(object.value(QStringLiteral("window")).toObject().value(QStringLiteral("translucent")).toBool(), false);
+
+    QJsonObject palette = object.value(QStringLiteral("palette")).toObject();
+    palette.insert(QStringLiteral("primary"), QStringLiteral("#00aaff"));
+    object.insert(QStringLiteral("palette"), palette);
+    QFile file(starterPath);
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.write(QJsonDocument(object).toJson());
+    file.close();
+    QCOMPARE(manager.importTheme(QUrl::fromLocalFile(starterPath)), QStringLiteral("ocean"));
+    QVERIFY(manager.select(QStringLiteral("ocean")));
+    QCOMPARE(tokenColor(manager, "semantic.primary"), QColor(QStringLiteral("#00aaff")));
+
+    palette.insert(QStringLiteral("primary"), QStringLiteral("#ff5500"));
+    object.insert(QStringLiteral("palette"), palette);
+    QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    file.write(QJsonDocument(object).toJson());
+    file.close();
+    QVERIFY(manager.importTheme(QUrl::fromLocalFile(starterPath)).isEmpty());
+    QCOMPARE(manager.importTheme(QUrl::fromLocalFile(starterPath), true), QStringLiteral("ocean"));
+    QCOMPARE(tokenColor(manager, "semantic.primary"), QColor(QStringLiteral("#ff5500")));
+
+    const QByteArray copy = manager.themeTemplate(QStringLiteral("ocean"), QStringLiteral("ocean2"), false, &error);
+    object = QJsonDocument::fromJson(copy).object();
+    QVERIFY(!object.contains(QStringLiteral("extends")));
+    QCOMPARE(object.value(QStringLiteral("schemaVersion")).toInt(), ThemeManager::kSchemaVersion);
+    QCOMPARE(object.value(QStringLiteral("palette")).toObject().value(QStringLiteral("primary")).toString().toLower(),
+             QStringLiteral("#ff5500"));
+    QVERIFY(object.contains(QStringLiteral("components")));
 }
 
 void ThemeManagerTest::sessionOverrideIsNotPersisted()

@@ -26,7 +26,7 @@ class AudioRecorder : public QObject
     Q_PROPERTY(float audioLevel READ audioLevel NOTIFY audioLevelChanged)
     Q_PROPERTY(float gain READ gain WRITE setGain NOTIFY gainChanged)
     Q_PROPERTY(double recordedSeconds READ recordedSeconds NOTIFY recordedSecondsChanged)
-    Q_PROPERTY(QVariantList livePeaks READ livePeaks NOTIFY livePeaksChanged)
+    Q_PROPERTY(int livePeakCount READ livePeakCount NOTIFY livePeaksChanged)
     Q_PROPERTY(QVariantList availableDevices READ availableDevices NOTIFY availableDevicesChanged)
     Q_PROPERTY(QString currentDeviceName READ currentDeviceName NOTIFY currentDeviceChanged)
 
@@ -41,7 +41,8 @@ public:
     float gain() const { return m_gain; }
     void setGain(float gain);
     double recordedSeconds() const { return m_recordedSeconds; }
-    QVariantList livePeaks() const;
+    int livePeakCount() const { return static_cast<int>(m_livePeaks.size()); }
+    Q_INVOKABLE QVariantList livePeakColumns(double first, double count, int columns) const;
     QVariantList availableDevices() const;
     QString currentDeviceName() const;
 

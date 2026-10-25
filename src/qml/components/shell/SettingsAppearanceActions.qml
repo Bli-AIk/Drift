@@ -9,9 +9,16 @@ Column {
     width: parent ? parent.width : 0
     spacing: Theme.spacingMd
 
-    readonly property bool userThemeSelected: ThemeManager.selection !== "system"
-                                               && ThemeManager.selection !== "dark"
-                                               && ThemeManager.selection !== "light"
+    readonly property bool userThemeSelected: {
+        if (ThemeManager.selection === "system")
+            return false
+        const themes = ThemeManager.themes
+        for (let i = 0; i < themes.length; ++i) {
+            if (themes[i].id === ThemeManager.selection)
+                return !themes[i].builtIn
+        }
+        return true
+    }
 
     function importUrl(url) {
         if (!url || String(url) === "")

@@ -2,7 +2,7 @@
 
 Drift paints from a JSON theme. `ThemeManager` (a C++ singleton) loads the document, resolves references, and exposes the result as `QQmlPropertyMap`s. `Theme.qml` is the facade the rest of the QML already binds to (`Theme.appBackground`, `Theme.c.themedButton.background`, and so on).
 
-Built-in themes live in `resources/themes/dark.json` and `resources/themes/light.json`. The shape is `resources/themes/theme.schema.json`. User themes live in `QStandardPaths::AppDataLocation + "/themes"`.
+Built-in themes (`dark`, `light`, `graphite`, `frost`) live in `resources/themes/<id>.json`. `graphite` and `frost` extend `dark` and `light` and use a translucent window. The shape is `resources/themes/theme.schema.json`. User themes live in `QStandardPaths::AppDataLocation + "/themes"`.
 
 ## Layers
 
@@ -16,6 +16,10 @@ A document is deep-merged in this order, then references are resolved:
 
 `extends` names another theme (usually `dark` or `light`). The base is merged underneath this file. Missing keys fall through. `exportTheme` writes the fully resolved document with `extends` omitted, which is the starting point for a theme that should not track future built-in edits.
 
+After `extends` and variants are applied, the built-in theme of the document's variant is merged underneath once more, so a token added in a later Drift release is filled with its default instead of going missing. That is the migration path for older themes; the file on disk is not rewritten.
+
+`schemaVersion` is the theme format the document was written for (currently `1`; omitted means a theme from before versioning). A theme whose version is newer than the running build still loads, with unknown keys ignored, and `ThemeManager.lastWarning` asks the user to update Drift. Bump `ThemeManager::kSchemaVersion` in `ThemeManager.h` when a release adds tokens or changes what a key means. `exportTheme` writes the current version.
+
 References are strings: `$palette.primary`, `$semantic.panel.border`, `$metrics.radius.sm`. Cycles and unknown paths are left as the original string and logged. Colors are `#RGB`, `#RRGGBB`, or `#AARRGGBB`. Eight-digit colors are Qt order: alpha first, then red, green, blue.
 
 ## Selection
@@ -26,6 +30,7 @@ References are strings: `$palette.primary`, `$semantic.panel.border`, `$metrics.
 | --- | --- |
 | `system` (default) | Built-in dark or light, following `Theme.darkMode` (the appearance preference, otherwise the OS). |
 | `dark` / `light` | That built-in, pinned. `Theme.darkMode` follows the pin, so the header Light/Dark checkmarks match the theme on screen. The header toggle moves the pin to the other built-in. `setVariant` does not unpin it. |
+| `graphite` / `frost` | That built-in, pinned. `setVariant` does not unpin it. Built-in ids cannot be used by user themes. |
 | a user theme id | That theme. |
 
 An unknown saved id is logged and the selection falls back to `system`.

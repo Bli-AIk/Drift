@@ -82,6 +82,7 @@ void TimelineViewState::setStyle(const QVariantMap &style)
     color("editFriendlyPill", m_style.editFriendlyPill);
     color("editFriendlyPillForeground", m_style.editFriendlyPillForeground);
     color("warning", m_style.warning);
+    color("missing", m_style.missing);
     text("fontFamily", m_style.fontFamily);
     real("fontSizeTiny", m_style.fontSizeTiny);
     real("fontSizeXs", m_style.fontSizeXs);
@@ -103,6 +104,7 @@ void TimelineViewState::setStyle(const QVariantMap &style)
     text("editFriendlyLabel", m_style.editFriendlyLabel);
     text("editFriendlyTooltip", m_style.editFriendlyTooltip);
     text("vfrTooltip", m_style.vfrTooltip);
+    text("missingTooltip", m_style.missingTooltip);
     text("spanToolTip", m_style.spanToolTip);
     emit styleChanged();
 }

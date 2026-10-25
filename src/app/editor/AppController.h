@@ -63,6 +63,9 @@ struct MediaEditSpec;
 #include "ui/preview/PreviewController.h"
 #include "app/bin/AssetPreviewController.h"
 #include "app/editor/sessions/CurveEditorController.h"
+#include "app/editor/sessions/KeyframeController.h"
+#include "app/editor/sessions/SubtitleController.h"
+#include "app/color/ColorController.h"
 #include "app/jobs/audio/DenoiseController.h"
 #include "app/jobs/vision/DepthController.h"
 #include "app/jobs/vision/FaceTrackingController.h"
@@ -96,6 +99,9 @@ class AppController : public QObject
     friend class SceneDetectController;
     friend class DepthController;
     friend class DenoiseController;
+    friend class ColorController;
+    friend class KeyframeController;
+    friend class SubtitleController;
     friend class RestoreController;
     friend class FaceTrackingController;
     friend class StabilizeController;
@@ -129,6 +135,11 @@ class AppController : public QObject
     Q_PROPERTY(DepthController *depth READ depth CONSTANT)
     // Noise removal for a clip's audio. QML: EditorState.denoise.
     Q_PROPERTY(DenoiseController *denoise READ denoise CONSTANT)
+    // Colour grade, finishing effects and looks. QML: EditorState.color.
+    Q_PROPERTY(ColorController *color READ color CONSTANT)
+    // Keyframe panel editing and clip property rows. QML: EditorState.keyframes.
+    Q_PROPERTY(KeyframeController *keyframes READ keyframes CONSTANT)
+    Q_PROPERTY(SubtitleController *subtitles READ subtitles CONSTANT)
     // Video restore and enhance (decompression, upscaling). QML: EditorState.restore.
     Q_PROPERTY(RestoreController *restore READ restore CONSTANT)
     // Face landmark tracking and Face Swap source ingest. QML: EditorState.faces.
@@ -150,7 +161,7 @@ class AppController : public QObject
     Q_PROPERTY(float audioRecordLevel READ audioRecordLevel NOTIFY audioRecordLevelChanged)
     Q_PROPERTY(float audioRecordGain READ audioRecordGain WRITE setAudioRecordGain NOTIFY audioRecordGainChanged)
     Q_PROPERTY(double audioRecordSeconds READ audioRecordSeconds NOTIFY audioRecordSecondsChanged)
-    Q_PROPERTY(QVariantList audioRecordLivePeaks READ audioRecordLivePeaks NOTIFY audioRecordLivePeaksChanged)
+    Q_PROPERTY(int audioRecordLivePeakCount READ audioRecordLivePeakCount NOTIFY audioRecordLivePeaksChanged)
     Q_PROPERTY(QVariantList availableMicrophones READ availableMicrophones NOTIFY availableMicrophonesChanged)
     Q_PROPERTY(QString currentMicrophoneName READ currentMicrophoneName NOTIFY currentMicrophoneChanged)
     Q_PROPERTY(QVariantList tracks READ tracks NOTIFY tracksChanged)
@@ -194,6 +205,7 @@ class AppController : public QObject
     Q_PROPERTY(bool projectPortrait READ projectPortrait NOTIFY tracksChanged)
     Q_PROPERTY(bool autoKeyEnabled READ autoKeyEnabled WRITE setAutoKeyEnabled NOTIFY autoKeyEnabledChanged)
     Q_PROPERTY(bool positionLinked READ positionLinked WRITE setPositionLinked NOTIFY positionLinkedChanged)
+    Q_PROPERTY(bool sizeLinked READ sizeLinked WRITE setSizeLinked NOTIFY sizeLinkedChanged)
     Q_PROPERTY(double masterVolume READ masterVolume
                    WRITE setMasterVolume NOTIFY masterVolumeChanged)
     Q_PROPERTY(bool masterMuted READ masterMuted
@@ -236,6 +248,8 @@ class AppController : public QObject
     Q_PROPERTY(bool reverseRendering READ reverseRendering NOTIFY reverseRenderingChanged)
     Q_PROPERTY(double reverseRenderProgress READ reverseRenderProgress NOTIFY reverseRenderProgressChanged)
     Q_PROPERTY(QString reverseRenderStatus READ reverseRenderStatus NOTIFY reverseRenderStatusChanged)
+    Q_PROPERTY(bool loudnessBusy READ loudnessBusy NOTIFY loudnessBusyChanged)
+    Q_PROPERTY(double loudnessProgress READ loudnessProgress NOTIFY loudnessProgressChanged)
     // Multicam punching session. The live project is not touched until Save; switches rewrite a
     // staged copy that playback is pointed at so the program monitor shows the mix.
     Q_PROPERTY(bool multicamActive READ multicamActive NOTIFY multicamChanged)
@@ -261,6 +275,7 @@ class AppController : public QObject
     Q_PROPERTY(int selectionRevision READ selectionRevision NOTIFY selectionChanged)
     Q_PROPERTY(int selectionCount READ selectionCount NOTIFY selectionChanged)
     Q_PROPERTY(QVariantMap selectedClipData READ selectedClipData NOTIFY selectedClipDataChanged)
+    Q_PROPERTY(double selectedClipRotationAtPlayhead READ selectedClipRotationAtPlayhead NOTIFY selectedClipRotationAtPlayheadChanged)
     Q_PROPERTY(QVariantList selectedClipEffects READ selectedClipEffects NOTIFY selectedClipDataChanged)
     Q_PROPERTY(QVariantList selectedClipAudioEffects READ selectedClipAudioEffects NOTIFY selectedClipDataChanged)
     Q_PROPERTY(QVariantMap selectedTransitionData READ selectedTransitionData NOTIFY selectedTransitionDataChanged)
@@ -327,6 +342,9 @@ public:
     SceneDetectController *scenes() const { return m_sceneDetect; }
     DepthController *depth() const { return m_depth; }
     DenoiseController *denoise() const { return m_denoise; }
+    ColorController *color() const { return m_color; }
+    KeyframeController *keyframes() const { return m_keyframes; }
+    SubtitleController *subtitles() const { return m_subtitles; }
     RestoreController *restore() const { return m_restore; }
     FaceTrackingController *faces() const { return m_faces; }
     StabilizeController *stabilize() const { return m_stabilize; }
@@ -344,7 +362,8 @@ public:
     float audioRecordGain() const;
     Q_INVOKABLE void setAudioRecordGain(float gain);
     double audioRecordSeconds() const;
-    QVariantList audioRecordLivePeaks() const;
+    int audioRecordLivePeakCount() const;
+    Q_INVOKABLE QVariantList audioRecordLivePeakColumns(double first, double count, int columns) const;
     QVariantList availableMicrophones() const;
     QString currentMicrophoneName() const;
 
@@ -356,8 +375,8 @@ public:
     Q_INVOKABLE void cancelAudioRecording();
     Q_INVOKABLE void selectMicrophone(const QString &id);
     // Act on the focused clip, the same scope as the MCP analyze_loudness / normalize_volume tools.
-    Q_INVOKABLE QVariantMap analyzeFocusedClipLoudness() const;
-    Q_INVOKABLE QVariantMap normalizeFocusedClipLoudness(double targetLufs);
+    Q_INVOKABLE void startFocusedClipLoudness(bool normalize, double targetLufs);
+    Q_INVOKABLE void cancelFocusedClipLoudness();
     // Handing out a mutable pointer is the point past which this object can no longer know what
     // happened to the project, so the derived caches are dropped here rather than trusted. Two
     // bool writes, and nothing in src/ takes this overload — it exists for tests and for code
@@ -395,6 +414,8 @@ public:
     bool autoKeyEnabled() const { return m_autoKeyEnabled; }
     bool positionLinked() const { return m_positionLinked; }
     void setPositionLinked(bool linked);
+    bool sizeLinked() const { return m_sizeLinked; }
+    void setSizeLinked(bool linked);
     double masterVolume() const;
     void setMasterVolume(double volume);
     bool masterMuted() const;
@@ -426,6 +447,8 @@ public:
     bool reverseRendering() const { return m_reverseRendering; }
     double reverseRenderProgress() const { return m_reverseProgress; }
     QString reverseRenderStatus() const { return m_reverseStatus; }
+    bool loudnessBusy() const { return m_loudnessBusy; }
+    double loudnessProgress() const { return m_loudnessProgress; }
     int selectedTrack() const { return m_selectedTrack; }
     int selectedClip() const { return m_selectedClip; }
     QVariantList selection() const;
@@ -440,6 +463,7 @@ public:
     QString filmstripTilePath(const QString &path, int level, qint64 index,
                               int rotationCorrection) const;
     QVariantMap selectedClipData() const;
+    double selectedClipRotationAtPlayhead() const;
     QVariantList selectedClipEffects() const;
     QVariantList selectedClipAudioEffects() const;
     QVariantMap selectedTransitionData() const;
@@ -737,6 +761,8 @@ public:
                                            const QString &key, double value);
     Q_INVOKABLE void previewSetEffectVec2Param(int trackIndex, int clipIndex, int effectIndex,
                                                const QString &key, double x, double y);
+    Q_INVOKABLE void previewSetEffectTextParam(int trackIndex, int clipIndex, int effectIndex,
+                                               const QString &key, const QString &value);
     // Needs an explicit beginPreviewDrag; the colour eyedropper bypasses the effect it is picking
     // for (a chroma key would otherwise sample its own keyed-out output) and then cancels.
     Q_INVOKABLE void previewSetEffectEnabled(int trackIndex, int clipIndex, int effectIndex,
@@ -1184,6 +1210,24 @@ public:
                                               const QString &mode);
     Q_INVOKABLE void setKeyframeEasingAt(int trackIndex, int clipIndex, const QString &prop,
                                          double atSeconds, const QString &mode);
+    // Curve-editor easing, addressed by key time. A spec is an EasingSpec::toJson() map. The
+    // `preview` variant skips the undo entry; the QML wraps it in begin/commitPreviewDrag.
+    Q_INVOKABLE QVariantList easingPresets() const;
+    Q_INVOKABLE QVariantList easingSamples(const QVariantMap &spec, int n) const;
+    Q_INVOKABLE QVariantMap keyframeSegmentEasing(int trackIndex, int clipIndex, const QString &prop,
+                                                  double atSeconds) const;
+    Q_INVOKABLE void setKeyframeSegmentEasing(int trackIndex, int clipIndex, const QString &prop,
+                                              double atSeconds, const QVariantMap &spec);
+    Q_INVOKABLE void previewSetKeyframeSegmentEasing(int trackIndex, int clipIndex,
+                                                     const QString &prop, double atSeconds,
+                                                     const QVariantMap &spec);
+    Q_INVOKABLE void applyEasingToAllSegments(int trackIndex, int clipIndex, const QString &prop,
+                                              const QVariantMap &spec);
+    Q_INVOKABLE QString saveEasingPreset(const QString &label, const QVariantMap &spec);
+    Q_INVOKABLE bool renameEasingPreset(const QString &id, const QString &label);
+    Q_INVOKABLE bool deleteEasingPreset(const QString &id);
+    Q_INVOKABLE void copyEasingToClipboard(const QVariantMap &spec) const;
+    Q_INVOKABLE QVariantMap easingFromClipboard() const;
     Q_INVOKABLE void resetClipTransform(int trackIndex, int clipIndex);
     Q_INVOKABLE QVariantList effectCatalog() const;
     Q_INVOKABLE QVariantList effectCategories() const;
@@ -1200,6 +1244,10 @@ public:
                                         const QString &key, double x, double y);
     Q_INVOKABLE bool setEffectColorParam(int trackIndex, int clipIndex, int effectIndex,
                                          const QString &key, const QString &value);
+    // Curve, gradient and look params: the value is a JSON string (curve, gradient) or a look id
+    // (lut). Commit-once; previewSetEffectTextParam is the drag stream for curve editors.
+    Q_INVOKABLE bool setEffectTextParam(int trackIndex, int clipIndex, int effectIndex,
+                                        const QString &key, const QString &value);
     // File-path params (model3d .glb). Same commit-once path as colour — no preview stream.
     // Takes a QUrl like bin().replaceSource / importSubtitleFile so the portal and native
     // dialogs hand us a real local path without QML having to call toLocalFile().
@@ -1445,6 +1493,9 @@ public:
     Q_INVOKABLE int trackMaxChannelCount(int trackIndex) const;
     Q_INVOKABLE QVariantList subtitleWaveformPeaks(double startSeconds, double durSeconds,
                                                    int sampleCount = 240) const;
+    // subtitleWaveformPeaks reduced to one max-peak per drawn column, so QML only draws.
+    Q_INVOKABLE QList<float> subtitleWaveformColumns(double startSeconds, double durSeconds,
+                                                     int sampleCount, int columns) const;
     // Beat / onset detection over the mixed timeline audio in [startSeconds, +durSeconds).
     // Explicitly triggered from the keyframe strip: it renders the mix, so it must never
     // fire off a mere selection change. Result lands in `beatAnalysis`.
@@ -1514,6 +1565,7 @@ public:
 
 signals:
     void userTextAnimationPresetsChanged();
+    void easingPresetsChanged();
 
     // A text clip was added with no text; the preview should open its inline
     // editor so the user can type straight onto the canvas.
@@ -1549,6 +1601,7 @@ signals:
     void mediaViewModeChanged();
     void autoKeyEnabledChanged();
     void positionLinkedChanged();
+    void sizeLinkedChanged();
     void masterVolumeChanged();
     void masterMutedChanged();
     // Carries the finished benchmark, merged into whatever the dialog already collected.
@@ -1573,6 +1626,9 @@ signals:
     void reverseRenderProgressChanged();
     void reverseRenderStatusChanged();
     void reverseRenderFinished(bool ok, const QString &message);
+    void loudnessBusyChanged();
+    void loudnessProgressChanged();
+    void loudnessFinished(const QVariantMap &result);
     void reverseConfirmRequested(int trackIndex, int clipIndex, double seconds);
     void multicamChanged();
     void multicamFramesChanged();
@@ -1582,6 +1638,7 @@ signals:
     void editCapabilitiesChanged();
     void sequenceTabsChanged();
     void selectedClipDataChanged();
+    void selectedClipRotationAtPlayheadChanged();
     void selectedTransitionDataChanged();
     void bookmarksChanged();
     void workAreaChanged();
@@ -1705,6 +1762,8 @@ protected:
                               double outDy, bool corner);
     void syncLinkedTangents(int trackIndex, int clipIndex, const QString &prop, double atSeconds,
                             double inDx, double inDy, double outDx, double outDy, bool corner);
+    bool shapeKeyframeSegments(int trackIndex, int clipIndex, const QString &prop, double atSeconds,
+                               const drift::EasingSpec &spec, bool allSegments);
     // Recollects m_beatSnapTargets from whichever layers are currently visible.
     void rebuildBeatSnapTargets();
     // Beat onsets plus project bookmarks — anything clips should magnet to when snap is on.
@@ -1746,6 +1805,8 @@ protected:
     std::optional<QList<drift::SubtitleCue>> cuesFromStoredTranscripts(const QList<SubtitleSource> &sources,
                                                                        drift::TimeUs rangeStart,
                                                                        int maxWordsPerCue) const;
+    void commitSubtitleCues(int trackIndex, int clipIndex, QList<drift::SubtitleCue> cues,
+                            const QString &undoText);
     bool generateSubtitlesForSources(QList<SubtitleSource> sources, const QString &language,
                                      int maxWordsPerCue);
     void finalizeGeneratedSubtitles(drift::TimeUs timelineStart, drift::TimeUs timelineDuration,
@@ -1974,6 +2035,7 @@ protected:
     QString m_mediaViewMode = QStringLiteral("grid");
     bool m_autoKeyEnabled = false;
     bool m_positionLinked = true;
+    bool m_sizeLinked = true;
     // One benchmark at a time: it drives the shared decoders and the GL thread, and two
     // sweeps interleaved would measure each other rather than the pipeline.
     std::atomic<bool> m_benchmarkRunning{false};
@@ -2030,6 +2092,10 @@ protected:
     QString m_reverseStatus;
     QAtomicInt m_reverseCancel = 0;
 
+    bool m_loudnessBusy = false;
+    double m_loudnessProgress = 0.0;
+    std::shared_ptr<std::atomic<bool>> m_loudnessCancel;
+
     // Playhead per timeline, so switching tabs returns to where each was left. "" = main.
     QHash<QString, drift::TimeUs> m_sequencePlayheads;
     int m_selectedTrack = -1;
@@ -2057,6 +2123,9 @@ protected:
     SceneDetectController *m_sceneDetect = nullptr;
     DepthController *m_depth = nullptr;
     DenoiseController *m_denoise = nullptr;
+    ColorController *m_color = nullptr;
+    KeyframeController *m_keyframes = nullptr;
+    SubtitleController *m_subtitles = nullptr;
     RestoreController *m_restore = nullptr;
     FaceTrackingController *m_faces = nullptr;
     StabilizeController *m_stabilize = nullptr;
@@ -2176,10 +2245,17 @@ protected:
     bool m_projectLayoutChosen = false;
 
     McpController *m_mcpController = nullptr;
-    // Protected wrappers for this TU's file-local clip writers. McpController calls them.
+    // Protected wrappers for this TU's file-local clip writers. McpController and KeyframeController call them.
     bool writeClipProp(drift::Clip &clip, const QString &prop, drift::TimeUs relative, double value,
                        bool autoKey, bool force);
     drift::KeyframeTrack<double> *transformTrack(drift::Clip &clip, const QString &prop);
+    drift::KeyframeTrack<double> *propKeyframeTrack(drift::Clip &clip, const QString &prop,
+                                                    bool create);
+    const drift::KeyframeTrack<double> *propKeyframeTrack(const drift::Clip &clip,
+                                                          const QString &prop) const;
+    static drift::TimeUs keyframeToleranceUs();
+    static drift::TimeUs keyframeWriteSnapUs();
+    static drift::EasingSpec easingSpecFromMap(const QVariantMap &spec);
     void clearPose3d(drift::Clip &clip);
     // Freeze frames and full-size MCP captures share one media path.
     static QString newFreezeFramePath(const QString &projectId);

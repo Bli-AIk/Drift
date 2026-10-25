@@ -119,6 +119,7 @@ void ProjectFileController::sweepExtractionDirs()
 
     QSet<QString> live;
     QSet<QString> liveFiles; // files outside any bundle that a known project still points at
+    bool unreadableRecent = false;
 
     // A project's own id is not the only directory it depends on: a Save As copy gets a fresh id
     // but inherits the original's freeze frames, captures and media edits, which stay where they
@@ -140,8 +141,10 @@ void ProjectFileController::sweepExtractionDirs()
         const QString path = entry.toMap().value(QStringLiteral("path")).toString();
         QString error;
         const auto info = drift::bundle::readManifest(path, &error);
-        if (!info)
+        if (!info) {
+            unreadableRecent = true;
             continue;
+        }
         live.insert(info->projectId);
         for (const drift::bundle::MediaEntry &media : info->media) {
             // Only referencing entries name a path on this machine; an embedded one records where
@@ -173,8 +176,11 @@ void ProjectFileController::sweepExtractionDirs()
     live.insert(m_app->m_project.id());
 #endif
 
+    // A recent project whose manifest can't be read right now (a Flatpak document-portal path
+    // after a reboot, say) may still reference media under projects, so nothing is reclaimed
+    // until every recent can be read.
     QDir root(QDir(base).filePath(QStringLiteral("projects")));
-    if (root.exists()) {
+    if (root.exists() && !unreadableRecent) {
         const QFileInfoList dirs = root.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
         for (const QFileInfo &dir : dirs) {
             if (!live.contains(dir.fileName()))
@@ -621,25 +627,24 @@ void ProjectFileController::writeProjectBundle(const QUrl &url, const std::optio
 
 void ProjectFileController::saveProjectJson(const QUrl &url)
 {
-    // Not toLocalFile: Qt's Android content file engine opens the encoded URI directly, so the
-    // plain QFile below works on a SAF document with no staging copy in between.
+    // Not toLocalFile: a content:// URI has no local path, so the write goes through AndroidUri,
+    // which opens the SAF document itself (Qt's engine mangles some document ids).
     const QString path = AndroidUri::filePath(url);
     if (path.isEmpty()) {
         m_app->setLastMessage(tr("That save location isn’t valid"), QStringLiteral("error"));
         return;
     }
 
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        m_app->setLastMessage(tr("Couldn’t write %1: %2").arg(QFileInfo(path).fileName(),
-                                                       file.errorString()),
+    std::unique_ptr<QFile> file = AndroidUri::openForWrite(url);
+    if (!file) {
+        m_app->setLastMessage(tr("Couldn’t write %1").arg(QFileInfo(path).fileName()),
                        QStringLiteral("error"));
         return;
     }
     const QByteArray json = m_app->serializeProjectJson();
-    if (file.write(json) != json.size() || !file.flush()) {
+    if (file->write(json) != json.size() || !file->flush()) {
         m_app->setLastMessage(tr("Couldn’t write %1: %2").arg(QFileInfo(path).fileName(),
-                                                       file.errorString()),
+                                                       file->errorString()),
                        QStringLiteral("error"));
         return;
     }
@@ -648,14 +653,26 @@ void ProjectFileController::saveProjectJson(const QUrl &url)
 
 namespace {
 
+// Qt's content file engine re-encodes some SAF document ids, so content:// paths go through AndroidUri.
+std::unique_ptr<QFile> openProjectFile(const QString &path)
+{
+    const QUrl url(path);
+    if (AndroidUri::isContentUri(url))
+        return AndroidUri::openForRead(url);
+    auto file = std::make_unique<QFile>(path);
+    if (!file->open(QIODevice::ReadOnly))
+        return {};
+    return file;
+}
+
 // saveProjectJson writes a JSON object; a .drift bundle starts with the "DRIFTPRJ" magic.
 // Peeking lets loadProject accept a dropped / CLI / MCP JSON path without relying on the suffix.
 bool fileStartsWithJsonObject(const QString &path)
 {
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly))
+    const std::unique_ptr<QFile> file = openProjectFile(path);
+    if (!file)
         return false;
-    QByteArray head = file.read(64);
+    QByteArray head = file->read(64);
     if (head.startsWith("\xEF\xBB\xBF"))
         head.remove(0, 3);
     for (int i = 0; i < head.size(); ++i) {
@@ -670,13 +687,13 @@ bool fileStartsWithJsonObject(const QString &path)
 // Thread-safe: runs on the load worker.
 std::optional<AppController::ParsedProject> readProjectJsonFile(const QString &path, QString *error)
 {
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly)) {
-        *error = QCoreApplication::translate("ProjectFileController", "Couldn’t read %1: %2")
-                     .arg(QFileInfo(path).fileName(), file.errorString());
+    const std::unique_ptr<QFile> file = openProjectFile(path);
+    if (!file) {
+        *error = QCoreApplication::translate("ProjectFileController", "Couldn’t read %1")
+                     .arg(QFileInfo(path).fileName());
         return std::nullopt;
     }
-    return AppController::parseProjectJson(file.readAll(), error);
+    return AppController::parseProjectJson(file->readAll(), error);
 }
 
 } // namespace
@@ -1331,8 +1348,11 @@ void ProjectFileController::finishLoad(int generation, const QUrl &url,
         setDirty(true);
         deleteRecoveryFile();
         m_app->setProjectLayoutChosen(true);
-        const QString message = tr("Project JSON loaded");
-        m_app->setLastMessage(message, QStringLiteral("success"));
+        const int missing = m_app->m_assetLibrary->missingCount();
+        const QString message = missing > 0
+            ? tr("Project JSON loaded, but %n media file(s) could not be found", nullptr, missing)
+            : tr("Project JSON loaded");
+        m_app->setLastMessage(message, missing > 0 ? QStringLiteral("warning") : QStringLiteral("success"));
         finishProjectLoad(true, message);
         return;
     }
@@ -1357,8 +1377,11 @@ void ProjectFileController::finishLoad(int generation, const QUrl &url,
     addRecentProject(location);
     deleteRecoveryFile();
     m_app->setProjectLayoutChosen(true);
-    const QString message = tr("Project loaded");
-    m_app->setLastMessage(message, QStringLiteral("success"));
+    const int missing = m_app->m_assetLibrary->missingCount();
+    const QString message = missing > 0
+        ? tr("Project loaded, but %n media file(s) could not be found", nullptr, missing)
+        : tr("Project loaded");
+    m_app->setLastMessage(message, missing > 0 ? QStringLiteral("warning") : QStringLiteral("success"));
     reportMissingAddons(bundle.addons);
     finishProjectLoad(true, message);
 }

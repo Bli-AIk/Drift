@@ -8,18 +8,25 @@
       "id": "main",
       "root": {
         "split": "v",
-        "sizes": [0.65, 0.35],
+        "sizes": [0.6, 0.4],
         "children": [
           {
             "split": "h",
-            "sizes": [0.2, 0.55, 0.25],
+            "sizes": [0.22, 0.53, 0.25],
             "children": [
-              { "panels": [ { "type": "assets.effects" } ], "active": 0 },
+              { "panels": [ { "type": "looks" } ], "active": 0 },
               { "panels": [ { "type": "preview" } ], "active": 0 },
-              { "panels": [ { "type": "properties.effects" } ], "active": 0 }
+              { "panels": [ { "type": "scopes" } ], "active": 0 }
             ]
           },
-          { "panels": [ { "type": "timeline" } ], "active": 0 }
+          {
+            "split": "h",
+            "sizes": [0.45, 0.55],
+            "children": [
+              { "panels": [ { "type": "color" }, { "type": "properties.effects" } ], "active": 0 },
+              { "panels": [ { "type": "timeline" } ], "active": 0 }
+            ]
+          }
         ]
       }
     }

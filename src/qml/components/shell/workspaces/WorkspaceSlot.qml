@@ -25,15 +25,8 @@ Item {
             const panel = root.pool.panel(entry.type)
             panel.parent = body
             panel.anchors.fill = body
-            if (entry.tab) {
-                if (entry.type === "assets") {
-                    panel.showTab(entry.tab)
-                } else if (entry.type === "properties") {
-                    const index = panel.tabIndexOf(entry.tab)
-                    if (index >= 0)
-                        panel.activeTab = index
-                }
-            }
+            if (entry.tab && "tab" in panel)
+                panel.tab = entry.tab
         }
         root.applyActive()
     }

@@ -35,6 +35,8 @@ enum class EffectParamType {
     Gradient,
     // Curve keys stored as a JSON string; baked to a 256x1 sampler2D.
     Curve,
+    // A colour look id (not a path) resolved to a .cube file; baked to a tiled 1089x33 sampler2D.
+    Lut,
     // Another track's picture, by track id ("" = none); bound as a sampler2D.
     Track,
     // Another track's folded mask lanes, by track id; bound as a sampler2D.
@@ -82,6 +84,8 @@ struct EffectParamSpec
     QString regionShape = QStringLiteral("rect");
     // Colour params: carries opacity, so the stored hex is #rrggbbaa and the uniform is a vec4.
     bool alpha = false;
+    // Curve params: "hue" for a curve over hue, which wraps at red and rests flat at y = 0.5.
+    QString curveMode;
 
     bool isBoolean() const { return type == EffectParamType::Bool; }
     bool isColor() const { return type == EffectParamType::Color; }
@@ -94,7 +98,8 @@ struct EffectParamSpec
     bool isSampler() const
     {
         return type == EffectParamType::Image || type == EffectParamType::Gradient
-               || type == EffectParamType::Curve || type == EffectParamType::Track
+               || type == EffectParamType::Curve || type == EffectParamType::Lut
+               || type == EffectParamType::Track
                || type == EffectParamType::TrackMask || type == EffectParamType::Audio;
     }
     // Strings on the parameter map rather than numbers: never keyframed, never bound as uniforms.
@@ -119,6 +124,7 @@ struct EffectParamSpec
         case EffectParamType::Image:
         case EffectParamType::Gradient:
         case EffectParamType::Curve:
+        case EffectParamType::Lut:
             return QVariant(defaultString);
         case EffectParamType::Vec2:
         case EffectParamType::Region:
@@ -180,6 +186,8 @@ struct EffectParamSpec
             return QStringLiteral("gradient");
         case EffectParamType::Curve:
             return QStringLiteral("curve");
+        case EffectParamType::Lut:
+            return QStringLiteral("lut");
         case EffectParamType::Track:
             return QStringLiteral("track");
         case EffectParamType::TrackMask:

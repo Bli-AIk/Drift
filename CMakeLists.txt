@@ -6,7 +6,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Oldest macOS release Drift 
 
 # C is enabled for JUCE only: its modules compile a handful of C sources (zlib, flac, oggvorbis)
 # and its CMake refuses to configure without it.
-project(Drift VERSION 0.8.0 LANGUAGES CXX C)
+project(Drift VERSION 0.9.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -40,9 +40,11 @@ option(DRIFT_AUTO_UPDATE_TRANSLATIONS "Run lupdate as part of the default build"
 #
 # Effects and transitions are the exception: they are small, they are source (GLSL reviewed
 # alongside the engine that runs them), and an editor with an empty effects browser is broken
-# rather than merely bare — so they still ship next to the binary. They are *also* addons, and an
-# installed package outranks the bundled one of the same id (see defaultSearchPaths), which is
-# what lets a shader fix go out without an app release.
+# rather than merely bare — so a small core set still ships next to the binary. Packaged builds
+# (DRIFT_BUNDLE_CORE_PACKAGES_ONLY=ON) ship only that set and the rest comes from addons; dev
+# builds stage everything so the tests and tools have the full catalog. Every package is *also*
+# an addon, and an installed package outranks the bundled one of the same id (see
+# defaultSearchPaths), which is what lets a shader fix go out without an app release.
 #
 # For development without downloading, point DRIFT_EFFECTS_DIR, DRIFT_TRANSITIONS_DIR,
 # DRIFT_FONTS_DIR, DRIFT_STICKERS_DIR, DRIFT_EMOJI_FONT_DIR or DRIFT_WHISPER_MODEL_DIR at a local
@@ -321,6 +323,15 @@ else()
 endif()
 option(DRIFT_BUNDLE_ONNXRUNTIME
     "Stage a CPU ONNX Runtime into the build tree for development" ${_drift_bundle_ort})
+
+option(DRIFT_BUNDLE_CORE_PACKAGES_ONLY
+    "Ship only the core effect/transition packages in the drift app (the rest are addons)" OFF)
+set(DRIFT_CORE_EFFECTS
+    color_grade film_grain chromatic_aberration adjust_brightness adjust_contrast adjust_gamma
+    adjust_hue adjust_saturation adjust_temperature gaussian_blur bloom_glow halation stylize_vignette)
+set(DRIFT_CORE_TRANSITIONS crossfade dip dip_white)
+set(DRIFT_CORE_AUDIO_EFFECTS "")
+set(DRIFT_CORE_EFFECT_TEMPLATES "")
 find_package(OnnxRuntime QUIET)
 if(DRIFT_BUNDLE_ONNXRUNTIME AND OnnxRuntime_FOUND AND NOT ONNXRUNTIME_RUNTIME_LIBS
    AND DRIFT_FETCH_ONNXRUNTIME)
@@ -538,16 +549,25 @@ add_library(driftcore STATIC
     src/core/animation/SpeedCurve.cpp
     src/core/animation/FadeShape.h
     src/core/animation/FadeShape.cpp
+    src/core/animation/Easing.h
+    src/core/animation/Easing.cpp
+    src/core/animation/EasingPresetStore.h
+    src/core/animation/EasingPresetStore.cpp
     src/core/animation/ClipAnimation.h
     src/core/animation/ClipAnimation.cpp
     src/core/project/SubtitleCue.h
     src/core/project/SubtitleCue.cpp
+    src/core/project/SubtitleTiming.h
+    src/core/project/SubtitleTiming.cpp
     src/core/project/Transcript.h
     src/core/project/Transcript.cpp
     src/core/project/GuideSet.h
     src/core/project/GuideSet.cpp
+    src/core/interchange/subtitles/SubtitleParse.h
     src/core/interchange/subtitles/SrtIO.h
     src/core/interchange/subtitles/SrtIO.cpp
+    src/core/interchange/subtitles/VttIO.h
+    src/core/interchange/subtitles/VttIO.cpp
     src/core/effects/Mask.h
     src/core/effects/Mask.cpp
     src/core/project/Transition.h
@@ -775,6 +795,10 @@ add_library(driftengine STATIC
     src/engine/gpu/effects/GpuEffectExecutor.cpp
     src/engine/gpu/effects/LookupTextures.h
     src/engine/gpu/effects/LookupTextures.cpp
+    src/engine/color/CubeLut.h
+    src/engine/color/CubeLut.cpp
+    src/engine/color/ScopeAnalysis.h
+    src/engine/color/ScopeAnalysis.cpp
     src/engine/compositor/effects/CompositorFrameHistory.h
     src/engine/compositor/effects/CompositorFrameHistory.cpp
     src/engine/compositor/FrameCompositor.h
@@ -785,6 +809,10 @@ add_library(driftengine STATIC
     src/engine/packages/audio/AudioEffectCatalog.cpp
     src/engine/packages/effects/EffectTemplateCatalog.h
     src/engine/packages/effects/EffectTemplateCatalog.cpp
+    src/engine/packages/looks/LookCatalog.h
+    src/engine/packages/looks/LookCatalog.cpp
+    src/engine/packages/looks/LookImport.h
+    src/engine/packages/looks/LookImport.cpp
     src/engine/audio/AudioMixer.h
     src/engine/audio/AudioMixer.cpp
     src/engine/ml/speech/transcription/WhisperTokenizer.h
@@ -984,6 +1012,14 @@ qt_add_executable(drift
     src/ui/imageproviders/TextStylePreviewImageProvider.cpp
     src/ui/imageproviders/ShapePreviewImageProvider.h
     src/ui/imageproviders/ShapePreviewImageProvider.cpp
+    src/ui/imageproviders/color/ColorImageProvider.h
+    src/ui/imageproviders/color/ColorImageProvider.cpp
+    src/app/color/LookThumbnailService.h
+    src/app/color/ColorController.cpp
+    src/app/color/ColorController.h
+    src/app/color/ScopesController.h
+    src/app/color/ScopesController.cpp
+    src/app/color/LookThumbnailService.cpp
     src/app/online/addons/AddonEndpoint.h
     src/app/online/addons/AddonManager.h
     src/app/online/addons/AddonManager.cpp
@@ -1019,6 +1055,14 @@ qt_add_executable(drift
     src/app/editor/sessions/SpeedCurveController.cpp
     src/app/editor/sessions/CurveEditorController.h
     src/app/editor/sessions/CurveEditorController.cpp
+    src/app/editor/sessions/KeyframeController.h
+    src/app/editor/sessions/KeyframeController.cpp
+    src/app/editor/sessions/SubtitleController.h
+    src/app/editor/sessions/SubtitleController.cpp
+    src/app/editor/sessions/SubtitleCueModel.h
+    src/app/editor/sessions/SubtitleCueModel.cpp
+    src/app/editor/sessions/SubtitleCueFilterModel.h
+    src/app/editor/sessions/SubtitleCueFilterModel.cpp
     src/app/jobs/vision/SegmentationController.h
     src/app/jobs/vision/SegmentationController.cpp
     src/app/jobs/vision/SceneDetectController.h
@@ -1271,6 +1315,8 @@ qt_add_resources(drift "drift_themes"
     FILES
         resources/themes/dark.json
         resources/themes/light.json
+        resources/themes/graphite.json
+        resources/themes/frost.json
         resources/themes/theme.schema.json
 )
 
@@ -1288,6 +1334,7 @@ qt_add_resources(drift "drift_workspaces"
         resources/workspaces/subtitles.json
         resources/workspaces/ai.json
         resources/workspaces/color.json
+        resources/workspaces/keyframes.json
 )
 
 set_source_files_properties(src/qml/Theme.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
@@ -1351,6 +1398,7 @@ endif()
 qt_add_qml_module(drift
     URI Drift
     VERSION 1.0
+    DISCARD_QML_CONTENTS
     SOURCES
         src/ui/theme/ThemeManager.h
         src/ui/theme/ThemeManager.cpp
@@ -1374,6 +1422,7 @@ qt_add_qml_module(drift
         src/qml/AndroidMain.qml
         src/qml/AndroidMoreToolsSheet.qml
         src/qml/AndroidFadeSheet.qml
+        src/qml/AndroidEasingSheet.qml
         src/qml/AndroidProjectSheet.qml
         src/qml/AndroidHome.qml
         src/qml/AndroidEditor.qml
@@ -1531,6 +1580,8 @@ qt_add_qml_module(drift
         src/qml/components/properties/EffectsOccludeSection.qml
         src/qml/components/properties/EffectsHueParam.qml
         src/qml/components/properties/EffectsFileParam.qml
+        src/qml/components/properties/EffectsCurveParam.qml
+        src/qml/components/properties/EffectsLookParam.qml
         src/qml/components/properties/EffectsFaceSection.qml
         src/qml/components/properties/EffectsFaceIndexParam.qml
         src/qml/components/properties/EffectsEnumParam.qml
@@ -1624,6 +1675,44 @@ qt_add_qml_module(drift
         src/qml/components/panels/SubtitlesPanel.qml
         src/qml/components/panels/RecorderPanel.qml
         src/qml/components/panels/DenoisePanel.qml
+        src/qml/components/panels/ColorPanel.qml
+        src/qml/components/panels/LooksPanel.qml
+        src/qml/components/panels/ScopesPanel.qml
+        src/qml/components/panels/KeyframesPanel.qml
+        src/qml/components/panels/SubtitleLanePanel.qml
+        src/qml/components/panels/SubtitleTextPanel.qml
+        src/qml/components/subtitles/SubtitleLaneToolbar.qml
+        src/qml/components/subtitles/SubtitleLaneWaveform.qml
+        src/qml/components/subtitles/SubtitleLaneCueBlock.qml
+        src/qml/components/subtitles/SubtitleLaneView.qml
+        src/qml/components/subtitles/SubtitleLaneInteraction.qml
+        src/qml/components/subtitles/SubtitleCueGridToolbar.qml
+        src/qml/components/subtitles/SubtitleCueGridHeader.qml
+        src/qml/components/subtitles/SubtitleCueGridRow.qml
+        src/qml/components/subtitles/SubtitleTime.js
+        src/qml/components/panels/SubtitleTimingPanel.qml
+        src/qml/components/keyframes/KeyframesModel.js
+        src/qml/components/keyframes/KeyframesContextMenu.qml
+        src/qml/components/keyframes/KeyframesCurvesInteraction.qml
+        src/qml/components/keyframes/KeyframesCurvesView.qml
+        src/qml/components/keyframes/KeyframesInteractionSurface.qml
+        src/qml/components/keyframes/KeyframesKeyDot.qml
+        src/qml/components/keyframes/KeyframesLanesView.qml
+        src/qml/components/keyframes/KeyframesMarquee.qml
+        src/qml/components/keyframes/KeyframesPlayheadLine.qml
+        src/qml/components/keyframes/KeyframesRuler.qml
+        src/qml/components/keyframes/KeyframesStretchBox.qml
+        src/qml/components/keyframes/KeyframesTimeView.qml
+        src/qml/components/keyframes/KeyframesSelection.qml
+        src/qml/components/keyframes/KeyframesToolbar.qml
+        src/qml/components/keyframes/KeyframesTreeRow.qml
+        src/qml/components/keyframes/KeyframesValueScrubber.qml
+        src/qml/components/keyframes/ScaleMath.js
+        src/qml/components/keyframes/EasingCache.js
+        src/qml/components/color/GradeSlider.qml
+        src/qml/components/color/ColorWheel.qml
+        src/qml/components/color/CurveEditor.qml
+        src/qml/components/color/CurveMath.js
         src/qml/components/panels/HistoryPanel.qml
         src/qml/components/panels/SourceViewerPanel.qml
         src/qml/components/panels/AgentLogPanel.qml
@@ -1762,6 +1851,10 @@ qt_add_qml_module(drift
         src/qml/components/ChannelKeyButton.qml
         src/qml/components/Vec2Param.qml
         src/qml/components/PropertyKeyframeRow.qml
+        src/qml/components/EasingPicker.qml
+        src/qml/components/EasingPickerPopup.qml
+        src/qml/components/EasingThumb.qml
+        src/qml/components/EasingTile.qml
         src/qml/components/KeyframeGraph.qml
         src/qml/components/SubtitleCueLane.qml
         src/qml/components/shell/ShortcutCaptureField.qml
@@ -2205,17 +2298,41 @@ if(ANDROID OR EMSCRIPTEN)
          "effects/*/effect.json"
          "effects/*/*.frag"
          "effects/*/*.png"
+         "effects/*/*.webp"
          "effects/*/*.bin"
          "effects/*/NOTICE"
          "effects/*/LICENSE*"
          "transitions/*/*.json"
          "transitions/*/*.frag"
          "transitions/*/*.png"
+         "transitions/*/*.webp"
          "audio-effects/*/audio-effect.json"
          "audio-effects/*/thumbnail.png"
+         "audio-effects/*/thumbnail.webp"
          "effect-templates/*/template.json"
          "effect-templates/*/thumbnail.png")
     list(REMOVE_DUPLICATES DRIFT_PACKAGE_FILES)
+    if(DRIFT_BUNDLE_CORE_PACKAGES_ONLY)
+        set(_drift_keep "")
+        foreach(_kind effects transitions audio-effects effect-templates)
+            string(TOUPPER "${_kind}" _upper)
+            string(REPLACE "-" "_" _upper "${_upper}")
+            foreach(_id ${DRIFT_CORE_${_upper}})
+                list(APPEND _drift_keep "${_kind}/${_id}/")
+            endforeach()
+        endforeach()
+        set(_drift_filtered "")
+        foreach(_file ${DRIFT_PACKAGE_FILES})
+            foreach(_prefix ${_drift_keep})
+                string(FIND "${_file}" "${_prefix}" _pos)
+                if(_pos EQUAL 0)
+                    list(APPEND _drift_filtered "${_file}")
+                    break()
+                endif()
+            endforeach()
+        endforeach()
+        set(DRIFT_PACKAGE_FILES ${_drift_filtered})
+    endif()
     qt_add_resources(drift "drift_packages"
         PREFIX "/packages"
         BASE "${CMAKE_SOURCE_DIR}"
@@ -2261,6 +2378,7 @@ if(Qt6LinguistTools_FOUND)
             src/core/project/Transcript.cpp
             src/core/project/GuideSet.cpp
             src/core/interchange/subtitles/SrtIO.cpp
+            src/core/interchange/subtitles/VttIO.cpp
             src/core/shapes/ShapeStyle.cpp
             src/core/text/TextStyle.cpp
             src/core/project/SubtitleCue.cpp
@@ -2363,14 +2481,28 @@ target_compile_definitions(drift PRIVATE
 # target: two `cmake -E copy_directory` processes writing the same tree concurrently — which is
 # what `cmake --build --parallel` does — fail with "Error copying directory".
 function(drift_stage_packages target assetdir)
+    # ONLY <ids...> stages just those package directories (possibly none) instead of the whole tree.
+    set(_ids ${ARGN})
+    list(FIND _ids ONLY _only)
+    list(REMOVE_ITEM _ids ONLY)
+
     # Only drift is a bundle, so the shared output directory guarded against below cannot happen.
     get_target_property(_bundle ${target} MACOSX_BUNDLE)
     if(_bundle)
-        add_custom_command(TARGET ${target} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_directory
-                    "${CMAKE_SOURCE_DIR}/${assetdir}"
-                    "$<TARGET_BUNDLE_CONTENT_DIR:${target}>/Resources/${assetdir}"
-            COMMENT "Copy ${assetdir} packages into ${target}.app/Contents/Resources")
+        set(_dest "$<TARGET_BUNDLE_CONTENT_DIR:${target}>/Resources/${assetdir}")
+        if(_only EQUAL -1)
+            add_custom_command(TARGET ${target} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_directory
+                        "${CMAKE_SOURCE_DIR}/${assetdir}" "${_dest}"
+                COMMENT "Copy ${assetdir} packages into ${target}.app/Contents/Resources")
+        else()
+            foreach(_id ${_ids})
+                add_custom_command(TARGET ${target} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                            "${CMAKE_SOURCE_DIR}/${assetdir}/${_id}" "${_dest}/${_id}"
+                    COMMENT "Copy ${assetdir}/${_id} into ${target}.app/Contents/Resources")
+            endforeach()
+        endif()
         return()
     endif()
 
@@ -2387,12 +2519,22 @@ function(drift_stage_packages target assetdir)
         set(_outdir "${_outdir}/$<CONFIG>")
     endif()
     if(NOT TARGET ${_stage})
-        add_custom_target(${_stage}
-            COMMAND ${CMAKE_COMMAND} -E copy_directory
-                    "${CMAKE_SOURCE_DIR}/${assetdir}"
-                    "${_outdir}/${assetdir}"
-            COMMENT "Copy ${assetdir} packages into ${_outdir}"
-        )
+        if(_only EQUAL -1)
+            add_custom_target(${_stage}
+                COMMAND ${CMAKE_COMMAND} -E copy_directory
+                        "${CMAKE_SOURCE_DIR}/${assetdir}"
+                        "${_outdir}/${assetdir}"
+                COMMENT "Copy ${assetdir} packages into ${_outdir}"
+            )
+        else()
+            add_custom_target(${_stage} COMMENT "Copy core ${assetdir} packages into ${_outdir}")
+            foreach(_id ${_ids})
+                add_custom_command(TARGET ${_stage} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                            "${CMAKE_SOURCE_DIR}/${assetdir}/${_id}"
+                            "${_outdir}/${assetdir}/${_id}")
+            endforeach()
+        endif()
     endif()
     add_dependencies(${target} ${_stage})
 endfunction()
@@ -2440,10 +2582,17 @@ endfunction()
 
 # Android and wasm get these through qt_add_resources above; there is no <appDir> to stage into.
 if(NOT ANDROID AND NOT EMSCRIPTEN)
-    drift_copy_effects(drift)
-    drift_copy_effect_templates(drift)
-    drift_copy_transitions(drift)
-    drift_copy_audio_effects(drift)
+    if(DRIFT_BUNDLE_CORE_PACKAGES_ONLY)
+        drift_stage_packages(drift effects ONLY ${DRIFT_CORE_EFFECTS})
+        drift_stage_packages(drift effect-templates ONLY ${DRIFT_CORE_EFFECT_TEMPLATES})
+        drift_stage_packages(drift transitions ONLY ${DRIFT_CORE_TRANSITIONS})
+        drift_stage_packages(drift audio-effects ONLY ${DRIFT_CORE_AUDIO_EFFECTS})
+    else()
+        drift_copy_effects(drift)
+        drift_copy_effect_templates(drift)
+        drift_copy_transitions(drift)
+        drift_copy_audio_effects(drift)
+    endif()
     drift_bundle_onnxruntime(drift)
 endif()
 
@@ -2487,8 +2636,17 @@ else()
     # them here (rather than via the DRIFT_*_DIR env vars) keeps installed addons able to
     # supersede the bundled copies.
     foreach(_assetdir effects transitions effect-templates audio-effects)
-        install(DIRECTORY ${CMAKE_SOURCE_DIR}/${_assetdir}
-                DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT drift)
+        if(DRIFT_BUNDLE_CORE_PACKAGES_ONLY)
+            string(TOUPPER "${_assetdir}" _upper)
+            string(REPLACE "-" "_" _upper "${_upper}")
+            foreach(_id ${DRIFT_CORE_${_upper}})
+                install(DIRECTORY ${CMAKE_SOURCE_DIR}/${_assetdir}/${_id}
+                        DESTINATION ${CMAKE_INSTALL_BINDIR}/${_assetdir} COMPONENT drift)
+            endforeach()
+        else()
+            install(DIRECTORY ${CMAKE_SOURCE_DIR}/${_assetdir}
+                    DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT drift)
+        endif()
     endforeach()
 
     # Desktop integration for Flatpak / freedesktop. Every one of these is installed under the

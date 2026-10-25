@@ -5,7 +5,9 @@ Item {
     property var editor
     id: cueDelegate
     required property int index
-    required property var modelData
+    required property real start
+    required property real end
+    required property string text
     readonly property bool isActive: index === editor.activeCueIndex
     readonly property bool isSelected: index === editor.selectedCueIndex
 
@@ -46,8 +48,8 @@ Item {
             spacing: 2
 
             Text {
-                text: editor.formatCueTime(cueDelegate.modelData.start) + "  →  "
-                      + editor.formatCueTime(cueDelegate.modelData.end)
+                text: editor.formatCueTime(cueDelegate.start) + "  →  "
+                      + editor.formatCueTime(cueDelegate.end)
                 color: Theme.c.subtitleCueCard.foregroundMuted
                 font.family: Theme.monoFontFamily
                 font.pixelSize: Theme.fontSizeXs
@@ -58,12 +60,11 @@ Item {
             Text {
                 width: parent.width
                 wrapMode: Text.WordWrap
-                text: (cueDelegate.modelData.text && cueDelegate.modelData.text.length)
-                      ? cueDelegate.modelData.text : qsTr("(empty)")
+                text: cueDelegate.text.length ? cueDelegate.text : qsTr("(empty)")
                 font.family: Theme.fontFamily
                 font.pixelSize: cueDelegate.isActive ? Theme.fontSizeBase : Theme.fontSizeSm
                 font.weight: cueDelegate.isActive ? Font.DemiBold : Font.Normal
-                font.italic: !(cueDelegate.modelData.text && cueDelegate.modelData.text.length)
+                font.italic: !cueDelegate.text.length
                 color: cueDelegate.isActive ? Theme.c.subtitleCueCard.accentClip
                        : (cueDelegate.isSelected || rowHover.containsMouse ? Theme.c.subtitleCueCard.foreground : Theme.c.subtitleCueCard.foregroundBase)
                 opacity: (cueDelegate.isActive || cueDelegate.isSelected) ? 1.0 : (rowHover.containsMouse ? 0.95 : 0.82)

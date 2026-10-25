@@ -30,6 +30,11 @@ QJsonObject keyframesToJson(const KeyframeTrack<double> &track)
             object.insert(QStringLiteral("corner"), true);
         if (key.hold)
             object.insert(QStringLiteral("hold"), true);
+        if (key.fn != EasingFn::None) {
+            object.insert(QStringLiteral("fn"), easingFnToString(key.fn));
+            object.insert(QStringLiteral("fnAmp"), key.fnAmplitude);
+            object.insert(QStringLiteral("fnPeriod"), key.fnPeriod);
+        }
         keyframes.append(object);
     }
     QJsonObject out{{QStringLiteral("keyframes"), keyframes}};
@@ -60,6 +65,9 @@ KeyframeTrack<double> keyframesFromJson(const QJsonObject &object)
         key.outDy = keyframe.value(QStringLiteral("outDy")).toDouble(0.0);
         key.corner = keyframe.value(QStringLiteral("corner")).toBool(false);
         key.hold = keyframe.value(QStringLiteral("hold")).toBool(false);
+        key.fn = easingFnFromString(keyframe.value(QStringLiteral("fn")).toString());
+        key.fnAmplitude = keyframe.value(QStringLiteral("fnAmp")).toDouble(1.0);
+        key.fnPeriod = keyframe.value(QStringLiteral("fnPeriod")).toDouble(0.3);
         track.setKeyframe(static_cast<TimeUs>(keyframe.value(QStringLiteral("timeUs")).toDouble()),
                           key);
     }

@@ -1,3 +1,7 @@
+# qt_standard_project_setup points Windows executables at the top build dir, which would share
+# drift's staged effects/ — core-only in packaged builds — and the tests need the full set.
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+
 qt_add_executable(tst_mediaprobe tst_mediaprobe.cpp)
 target_link_libraries(tst_mediaprobe PRIVATE Qt6::Test driftengine)
 add_test(NAME MediaProbe COMMAND tst_mediaprobe)
@@ -29,10 +33,18 @@ qt_add_executable(tst_editorstate
     ../src/app/bin/AssetPreviewController.cpp
     ../src/app/editor/sessions/SpeedCurveController.cpp
     ../src/app/editor/sessions/CurveEditorController.cpp
+    ../src/app/editor/sessions/KeyframeController.cpp
+    ../src/app/editor/sessions/SubtitleController.cpp
+    ../src/app/editor/sessions/SubtitleCueModel.cpp
+    ../src/app/editor/sessions/SubtitleCueFilterModel.cpp
     ../src/app/jobs/vision/SegmentationController.cpp
     ../src/app/jobs/vision/SceneDetectController.cpp
     ../src/app/jobs/vision/DepthController.cpp
     ../src/app/jobs/audio/DenoiseController.cpp
+    ../src/app/color/ColorController.cpp
+    ../src/app/color/ScopesController.cpp
+    ../src/app/color/LookThumbnailService.cpp
+    ../src/ui/imageproviders/color/ColorImageProvider.cpp
     ../src/app/jobs/vision/RestoreController.cpp
     ../src/app/jobs/vision/FaceTrackingController.cpp
     ../src/app/jobs/vision/StabilizeController.cpp
@@ -64,6 +76,7 @@ qt_add_executable(tst_editorstate
     ../src/app/mcp/transport/McpHttp.cpp
     ../src/app/mcp/tools/McpDispatcher.cpp
     ../src/app/mcp/tools/McpDispatcherExtended.cpp
+    ../src/ui/theme/ThemeManager.cpp
     ../src/app/mcp/tools/McpEffectAuthoring.cpp
     ../src/app/mcp/protocol/McpValidate.cpp
     ../src/app/mcp/tools/McpMarket.cpp
@@ -211,10 +224,18 @@ qt_add_executable(tst_mcp
     ../src/app/bin/AssetPreviewController.cpp
     ../src/app/editor/sessions/SpeedCurveController.cpp
     ../src/app/editor/sessions/CurveEditorController.cpp
+    ../src/app/editor/sessions/KeyframeController.cpp
+    ../src/app/editor/sessions/SubtitleController.cpp
+    ../src/app/editor/sessions/SubtitleCueModel.cpp
+    ../src/app/editor/sessions/SubtitleCueFilterModel.cpp
     ../src/app/jobs/vision/SegmentationController.cpp
     ../src/app/jobs/vision/SceneDetectController.cpp
     ../src/app/jobs/vision/DepthController.cpp
     ../src/app/jobs/audio/DenoiseController.cpp
+    ../src/app/color/ColorController.cpp
+    ../src/app/color/ScopesController.cpp
+    ../src/app/color/LookThumbnailService.cpp
+    ../src/ui/imageproviders/color/ColorImageProvider.cpp
     ../src/app/jobs/vision/RestoreController.cpp
     ../src/app/jobs/vision/FaceTrackingController.cpp
     ../src/app/jobs/vision/StabilizeController.cpp
@@ -239,6 +260,7 @@ qt_add_executable(tst_mcp
     ../src/playback/preview/ClipPreviewPlayer.cpp
     ../src/app/mcp/tools/McpDispatcher.cpp
     ../src/app/mcp/tools/McpDispatcherExtended.cpp
+    ../src/ui/theme/ThemeManager.cpp
     ../src/app/mcp/tools/McpEffectAuthoring.cpp
     ../src/app/mcp/protocol/McpValidate.cpp
     ../src/app/mcp/tools/McpMarket.cpp
@@ -250,7 +272,7 @@ qt_add_executable(tst_mcp
     ../src/app/mcp/transport/McpStdioServer.cpp
 )
 target_include_directories(tst_mcp PRIVATE ../src)
-target_link_libraries(tst_mcp PRIVATE Qt6::Test Qt6::Gui Qt6::Network Qt6::Multimedia Qt6::Concurrent driftcore driftengine)
+target_link_libraries(tst_mcp PRIVATE Qt6::Test Qt6::Gui Qt6::Quick Qt6::Network Qt6::Multimedia Qt6::Concurrent driftcore driftengine)
 target_compile_definitions(tst_mcp PRIVATE DRIFT_VERSION="${PROJECT_VERSION}"
     DRIFT_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
 add_test(NAME Mcp COMMAND tst_mcp)
@@ -273,6 +295,8 @@ qt_add_resources(tst_thememanager "drift_themes"
     FILES
         "${CMAKE_SOURCE_DIR}/resources/themes/dark.json"
         "${CMAKE_SOURCE_DIR}/resources/themes/light.json"
+        "${CMAKE_SOURCE_DIR}/resources/themes/graphite.json"
+        "${CMAKE_SOURCE_DIR}/resources/themes/frost.json"
         "${CMAKE_SOURCE_DIR}/resources/themes/theme.schema.json"
 )
 add_test(NAME ThemeManager COMMAND tst_thememanager)
@@ -318,6 +342,8 @@ qt_add_resources(tst_windowbackdrop "drift_themes"
     FILES
         "${CMAKE_SOURCE_DIR}/resources/themes/dark.json"
         "${CMAKE_SOURCE_DIR}/resources/themes/light.json"
+        "${CMAKE_SOURCE_DIR}/resources/themes/graphite.json"
+        "${CMAKE_SOURCE_DIR}/resources/themes/frost.json"
         "${CMAKE_SOURCE_DIR}/resources/themes/theme.schema.json"
 )
 add_test(NAME WindowBackdrop COMMAND tst_windowbackdrop)
@@ -338,5 +364,6 @@ qt_add_resources(tst_workspacestore "workspace_presets"
         ../resources/workspaces/subtitles.json
         ../resources/workspaces/ai.json
         ../resources/workspaces/color.json
+        ../resources/workspaces/keyframes.json
 )
 add_test(NAME WorkspaceStore COMMAND tst_workspacestore)

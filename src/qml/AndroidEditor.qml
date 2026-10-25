@@ -98,6 +98,20 @@ Item {
             fadeSheet.open()
     }
 
+    function openEasingSheet(track, clip, prop, label, seconds) {
+        composer.close()
+        preview.textEditor.commit()
+        if (assetsSheet.opened)
+            assetsSheet.dismiss()
+        if (propertiesSheet.opened)
+            propertiesSheet.dismiss()
+        if (moreToolsSheet.opened)
+            moreToolsSheet.dismiss()
+        if (fadeSheet.opened)
+            fadeSheet.dismiss()
+        easingSheet.openFor(track, clip, prop, label, seconds)
+    }
+
     // Typing on a phone happens on the clip in the preview, with a slim bar above the keyboard:
     // the sheets are put away so they do not sit under it, and the preview shrinks into the
     // space the keyboard leaves.
@@ -552,6 +566,13 @@ Item {
         function onHistoryRequested() { notificationsSheet.open() }
     }
 
+    Connections {
+        target: ShellBridge
+        function onEasingSheetRequested(track, clip, prop, label, seconds) {
+            root.openEasingSheet(track, clip, prop, label, seconds)
+        }
+    }
+
     AndroidLinkImport {
         id: linkImportSheet
     }
@@ -563,6 +584,10 @@ Item {
 
     AndroidFadeSheet {
         id: fadeSheet
+    }
+
+    AndroidEasingSheet {
+        id: easingSheet
     }
 
     AndroidBottomSheet {

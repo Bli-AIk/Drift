@@ -934,7 +934,8 @@ const QList<Op> &ops()
         { "set_keyframe_interpolation", "keyframes", "Set linear/hold/ease on a key",
           "Set the easing preset on the key nearest `at`. SIDE EFFECT: this moves the playhead to `at`, "
           "which changes the default time of later ops in the same apply batch and the target of "
-          "set_transform — seek back if that matters.",
+          "set_transform — seek back if that matters. For custom beziers, elastic or bounce curves, "
+          "or saved presets, use set_keyframe_easing.",
           objectSchema(mergeProps(
               {{QStringLiteral("prop"), animPropProp()},
                {QStringLiteral("at"), numberProp(QStringLiteral("Timeline seconds; the playhead is moved here"))},
@@ -943,6 +944,30 @@ const QList<Op> &ops()
                                                  QStringLiteral("ease")})}},
               clipRefProps()),
                        {QStringLiteral("prop"), QStringLiteral("at"), QStringLiteral("mode")}) },
+        { "list_easing_presets", "keyframes", "See the easing presets",
+          "List built-in and saved easing presets for keyframe segments.",
+          objectSchema({}), true, false, true },
+        { "set_keyframe_easing", "keyframes", "Ease a segment with a preset or custom curve",
+          "Shape the segment that leaves the key at `at` (on the last key, the segment that arrives "
+          "there). Give exactly one of `preset` (an id from list_easing_presets; linear and hold are "
+          "presets too), `bezier` [x1, y1, x2, y2] with x in 0..1, or `fn` (elastic or bounce, with "
+          "optional amplitude and period). `all:true` applies the curve to every segment of the "
+          "property and `at` is then not needed. Does NOT move the playhead.",
+          objectSchema(mergeProps(
+              {{QStringLiteral("prop"), animPropProp()},
+               {QStringLiteral("at"), numberProp(QStringLiteral("Timeline seconds of the key whose outgoing segment is shaped"))},
+               {QStringLiteral("preset"), stringProp(QStringLiteral("Easing preset id from list_easing_presets, e.g. cubicOut"))},
+               {QStringLiteral("bezier"), arrayProp({{QStringLiteral("type"), QStringLiteral("number")}},
+                                                    QStringLiteral("Four numbers x1, y1, x2, y2; x in 0..1, y may overshoot"))},
+               {QStringLiteral("fn"), enumProp(QStringLiteral("Penner curve"),
+                                               {QStringLiteral("elasticIn"), QStringLiteral("elasticOut"),
+                                                QStringLiteral("elasticInOut"), QStringLiteral("bounceIn"),
+                                                QStringLiteral("bounceOut"), QStringLiteral("bounceInOut")})},
+               {QStringLiteral("amplitude"), numberProp(QStringLiteral("Elastic amplitude (defaults to 1)"))},
+               {QStringLiteral("period"), numberProp(QStringLiteral("Elastic period, above 0 (defaults to 0.3)"))},
+               {QStringLiteral("all"), boolProp(QStringLiteral("Apply to every segment of the property; at is ignored"))}},
+              clipRefProps()),
+                       {QStringLiteral("prop")}) },
         { "set_keyframe_tangents", "keyframes", "Shape bezier handles",
           "Set tangent handles on the key at `at`, relative to it. Omitted handle fields are sent as 0, "
           "not left alone — pass all four to avoid flattening the ones you skip.",
@@ -1003,6 +1028,51 @@ const QList<Op> &ops()
           "set_ui_preferences({followSystem:true}). Not undoable.",
           objectSchema({{QStringLiteral("dark"), boolProp(QStringLiteral("true = dark, false = light"))}},
                        {QStringLiteral("dark")}) },
+        { "list_themes", "ui", "List installed UI themes",
+          "Returns {themes:[{id, name, variant, builtIn, hasVariants, hasOverrides}], selection, current, "
+          "schemaVersion (theme format this build writes), themesFolder, warning?}. selection is system, dark, light, graphite, frost or a user theme id; "
+          "current is the theme on screen. To make a theme: export_theme a copy, edit the JSON file "
+          "yourself, then import_theme it. There is no tool that edits theme tokens directly.",
+          objectSchema({}), true, false, true },
+        { "export_theme", "ui", "Write a theme JSON to edit outside Drift",
+          "Write theme `theme` (default: the one on screen) to `path` renamed to `name`. mode copy "
+          "(default) writes every resolved token (palette, semantic, components, metrics, typography, "
+          "motion, window), about 3800 lines — edit any value and drop the rest unchanged. mode "
+          "starter writes {name, schemaVersion, extends: theme, variant, palette, metrics, typography, "
+          "motion, window}, palette trimmed to ~40 core surface/text/accent/status keys — the small "
+          "option when restyling; add more palette, semantic or components keys to override them, "
+          "missing keys fall through to the base. window: translucent (bool, needs the user's "
+          "translucent-windows setting and a restart), backdrop (none, blur; mica or acrylic on "
+          "Windows), backgroundOpacity (0..1); surfaces that should show it need alpha "
+          "appBackground, panelBackground and accent. Values: colors #RGB/#RRGGBB/#AARRGGBB (alpha "
+          "first), numbers, or "
+          "references like \"$palette.primary\". A dual-variant theme exports the side on screen. "
+          "Then call import_theme. To fix a theme you already imported, export it with theme and name "
+          "both set to its id (mode copy), or re-edit your file, and import_theme with replace:true. "
+          "Returns {path, name, from, mode}.",
+          objectSchema({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute .json output path"))},
+                        {QStringLiteral("name"), stringProp(QStringLiteral("Name of the new theme; becomes its id on import. Not a built-in id (dark, light, graphite, frost) or system"))},
+                        {QStringLiteral("theme"), stringProp(QStringLiteral("Theme id from list_themes to start from (default: current)"))},
+                        {QStringLiteral("mode"), enumProp(QStringLiteral("copy = all tokens, starter = extends + core palette, metrics, typography, motion, window"),
+                                                          {QStringLiteral("copy"), QStringLiteral("starter")})}},
+                       {QStringLiteral("path"), QStringLiteral("name")}),
+          false, false, true },
+        { "import_theme", "ui", "Install a theme file",
+          "Validate and install a theme .json, a theme folder (theme.json, optional theme.dark.json / "
+          "theme.light.json) or a .zip into the user themes folder. The theme's name is its id. Fails "
+          "exists when that name is installed unless replace:true; replace also re-applies it if it "
+          "is on screen. select:true switches to it. On bad JSON or wrong value types the error says "
+          "where; fix the file and import again. Returns {id, selected?, warning?}. Not undoable.",
+          objectSchema({{QStringLiteral("path"), stringProp(QStringLiteral("Absolute path to the .json, folder or .zip"))},
+                        {QStringLiteral("replace"), boolProp(QStringLiteral("Overwrite an installed theme with the same name"))},
+                        {QStringLiteral("select"), boolProp(QStringLiteral("Switch to the theme after installing"))}},
+                       {QStringLiteral("path")}) },
+        { "select_theme", "ui", "Switch the UI theme",
+          "Put a theme on screen and remember it. theme is system (follow light/dark preference), dark, "
+          "light, graphite, frost, or a user theme id from list_themes. Returns {selection, current, warning?}. Not undoable.",
+          objectSchema({{QStringLiteral("theme"), stringProp(QStringLiteral("system, dark, light, graphite, frost or a theme id"))}},
+                       {QStringLiteral("theme")}),
+          false, false, true },
         { "list_shortcuts", "ui", "List action bindings",
           "Returns {actions:[{id, label, shortcut}], n} for every editor action.",
           objectSchema({{QStringLiteral("q"), stringProp(QStringLiteral("Case-insensitive substring over id/label/shortcut"))}}),
@@ -1114,6 +1184,8 @@ QStringList undoExemptOps()
         QStringLiteral("export_video"),
         QStringLiteral("save_project"),        QStringLiteral("set_theme"),        QStringLiteral("set_preview_view"),
         QStringLiteral("set_shortcut"),        QStringLiteral("reset_shortcuts"),
+        QStringLiteral("export_theme"),        QStringLiteral("import_theme"),
+        QStringLiteral("select_theme"),
         QStringLiteral("set_beat_layers"),     QStringLiteral("detect_beats"),
         QStringLiteral("list_speed_curve"),    QStringLiteral("list_fade_curve"),
         QStringLiteral("install_addon"),       QStringLiteral("cancel_addon_install"),

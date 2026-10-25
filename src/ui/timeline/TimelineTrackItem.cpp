@@ -897,18 +897,24 @@ void TimelineTrackItem::appendClip(int index, const QRectF &baseRect, bool selec
         appendRect(m_over, bandRect, proxy ? s.proxyBand : s.scrim, ox);
 
         QString assetId;
+        if (m_assets && !row.path.isEmpty())
+            assetId = m_assets->assetIdForPath(row.path);
+        const bool missing = !assetId.isEmpty() && m_assets->isMissing(assetId);
         bool editFriendly = false;
         bool vfr = false;
         if (m_assets && row.kind == QLatin1String("video")) {
-            assetId = m_assets->assetIdForPath(row.path);
             editFriendly = !assetId.isEmpty() && m_assets->isEditFriendly(assetId);
-            vfr = !assetId.isEmpty() && !editFriendly && m_assets->isVariableFrameRate(assetId);
+            vfr = !assetId.isEmpty() && !editFriendly && !missing
+                  && m_assets->isVariableFrameRate(assetId);
         }
 
         const double rowLeft = rect.left() + 6.0;
-        const double rowWidth = std::max(0.0, rect.width() - 12.0);
         const double centerY = rect.top() + band / 2.0;
         const double spacing = 4.0;
+        const double volumeWidth = tinyMetrics.horizontalAdvance(row.volumeLabel);
+        const bool showVolume = volumeWidth > 0.0 && rect.width() - 12.0 > volumeWidth * 3.0;
+        const double volumeReserve = showVolume ? volumeWidth + spacing : 0.0;
+        const double rowWidth = std::max(0.0, rect.width() - 12.0 - volumeReserve);
 
         const QFont pillFont = labelFont(m_fontFamily, s.fontSizeTiny, true);
         const QFontMetricsF pillMetrics(pillFont);
@@ -926,19 +932,23 @@ void TimelineTrackItem::appendClip(int index, const QRectF &baseRect, bool selec
                                   + (showEditPill ? editSize.width() + spacing : 0.0);
 
         double x = rowLeft;
-        if (vfr) {
+        const auto drawBadge = [&](const QColor &fill, const QString &tip) {
             const double size = std::min(s.iconSizeSm, band - 2.0);
             const QRectF badge(x, centerY - size / 2.0, size, size);
-            appendRoundedRect(m_over, badge, size / 2.0, s.warning, ox);
+            appendRoundedRect(m_over, badge, size / 2.0, fill, ox);
             const QFont bangFont = labelFont(m_fontFamily, size * 0.75, true);
             const QFontMetricsF bangMetrics(bangFont);
             m_labels.append({QStringLiteral("!"),
                              QPointF(badge.center().x() - bangMetrics.horizontalAdvance(QLatin1Char('!')) / 2.0 - ox,
                                      badge.center().y() - bangMetrics.height() / 2.0),
                              size * 0.75, s.onMedia, true});
-            visual.toolTips.append({badge, s.vfrTooltip});
+            visual.toolTips.append({badge, tip});
             x += size + spacing;
-        }
+        };
+        if (vfr)
+            drawBadge(s.warning, s.vfrTooltip);
+        if (missing)
+            drawBadge(s.missing, s.missingTooltip);
 
         const double nameRoom = std::max(0.0, rowLeft + rowWidth - x - pillsWidth);
         const QString name = tinyMetrics.elidedText(row.name, Qt::ElideRight, nameRoom);
@@ -966,6 +976,12 @@ void TimelineTrackItem::appendClip(int index, const QRectF &baseRect, bool selec
         if (showEditPill)
             appendPill(s.editFriendlyLabel, editSize, s.editFriendlyPill,
                        s.editFriendlyPillForeground, s.editFriendlyTooltip);
+        if (showVolume) {
+            m_labels.append({row.volumeLabel,
+                             QPointF(rect.right() - 6.0 - volumeWidth - ox,
+                                     centerY - tinyMetrics.height() / 2.0),
+                             s.fontSizeTiny, s.onMedia, false});
+        }
     }
 
     if (isAdjustment) {
@@ -1113,15 +1129,6 @@ void TimelineTrackItem::buildWaveform(int index, const QRectF &area, double clip
     const double left = area.left() + span.left;
     const int w = std::max(1, int(std::floor(span.width)));
     const QColor color = s.waveform;
-    // Use clip-relative time: source peaks remain cached even when volume keys
-    // change, while the visible envelope follows the gain heard during playback.
-    const auto gainAt = [&row, clipWidth, &span](int x) {
-        if (row.volumeCurve.isEmpty())
-            return 1.0;
-        const double withinClip = std::clamp((span.left + x + 0.5) / clipWidth, 0.0, 1.0);
-        const drift::TimeUs relativeUs = drift::secondsToUs(withinClip * row.duration);
-        return qBound(0.0, row.volumeCurve.evaluateAt(relativeUs), 2.0);
-    };
     const auto columnPeak = [w](const QVector<float> &values, int x) {
         const int n = values.size();
         int i0 = int(qint64(x) * n / w);
@@ -1134,6 +1141,13 @@ void TimelineTrackItem::buildWaveform(int index, const QRectF &area, double clip
         return double(peak);
     };
 
+    const auto volumeAt = [&row, clipWidth, &span](int x) {
+        if (row.volumeTyped.isEmpty())
+            return 1.0;
+        const double seconds = (span.left + x + 0.5) / clipWidth * row.duration;
+        return std::clamp(row.volumeTyped.evaluateAt(drift::secondsToUs(seconds)), 0.0, 2.0);
+    };
+
     if (laneCount > 1 && cached.lanes.size() == laneCount) {
         const double laneH = area.height() / laneCount;
         for (int c = 0; c < laneCount; ++c) {
@@ -1143,7 +1157,8 @@ void TimelineTrackItem::buildWaveform(int index, const QRectF &area, double clip
             const double mid = area.top() + c * laneH + laneH / 2.0;
             const double half = (laneH / 2.0) * 0.85;
             for (int x = 0; x < w; ++x) {
-                const double amp = std::max(0.5, columnPeak(values, x) * gainAt(x) * half);
+                const double amp = std::max(0.5, std::min(columnPeak(values, x) * half * volumeAt(x),
+                                                          laneH / 2.0));
                 const double x0 = left + x - ox;
                 appendQuad(m_over, vertex(x0, mid - amp, color), vertex(x0 + 1.0, mid - amp, color),
                            vertex(x0 + 1.0, mid + amp, color), vertex(x0, mid + amp, color));
@@ -1173,7 +1188,8 @@ void TimelineTrackItem::buildWaveform(int index, const QRectF &area, double clip
     const double mid = area.top() + area.height() / 2.0;
     const double halfHeight = area.height() / 2.0;
     for (int x = 0; x < w; ++x) {
-        const double amp = columnPeak(cached.peaks, x) * gainAt(x) * halfHeight * 0.9;
+        const double amp = std::min(columnPeak(cached.peaks, x) * halfHeight * 0.9 * volumeAt(x),
+                                    halfHeight);
         if (amp <= 0.5)
             continue;
         const double x0 = left + x - ox;

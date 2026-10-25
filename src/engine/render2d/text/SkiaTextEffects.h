@@ -22,7 +22,7 @@ sk_sp<SkShader> textureShaderFor(const TextTexture &texture, const QRectF &box);
 // The effect over `base` (the layer's own paint). Compiled once per id and cached; null for an
 // unknown id or a compile failure (the caller falls back to the tint).
 sk_sp<SkShader> effectShaderFor(const TextShaderEffect &effect, sk_sp<SkShader> base, const QRectF &box,
-                                double timeSec, double progress);
+                                double timeSec, double progress, double frameRate);
 bool textEffectIsAnimated(const TextShaderEffect &effect);
 
 // Compile error text for an id, empty when the effect compiles (tests).

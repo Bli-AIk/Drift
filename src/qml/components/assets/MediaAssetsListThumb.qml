@@ -11,6 +11,7 @@ Rectangle {
     property string kind: ""
     property bool replaceBusy: false
     property bool showVfr: false
+    property bool showMissing: false
 
     width: 56
     height: 32
@@ -80,5 +81,17 @@ Rectangle {
         anchors.margins: 1
         size: Theme.iconSizeSm
         visible: root.showVfr
+    }
+
+    VfrWarning {
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: 1
+        size: Theme.iconSizeSm
+        background: Theme.c.missingMediaWarning.background
+        foreground: Theme.c.missingMediaWarning.foreground
+        cornerRadius: Theme.c.missingMediaWarning.radius
+        tip: qsTr("Media file not found. Use Replace media… on this item to point it at the file again.")
+        visible: root.showMissing
     }
 }

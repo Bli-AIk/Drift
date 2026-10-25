@@ -189,13 +189,14 @@ jobs:
             target: linux-x64
             ffmpeg_platform: linux64
             libdir: /usr/lib/x86_64-linux-gnu
-          - arch: aarch64
-            runner: ubuntu-22.04-arm
-            qt_host: linux_arm64
-            qt_arch: linux_gcc_arm64
-            target: linux-arm64
-            ffmpeg_platform: linuxarm64
-            libdir: /usr/lib/aarch64-linux-gnu
+          # Disabled: the FFmpeg-Builds n7.1 release has no linuxarm64 asset yet.
+          # - arch: aarch64
+          #   runner: ubuntu-22.04-arm
+          #   qt_host: linux_arm64
+          #   qt_arch: linux_gcc_arm64
+          #   target: linux-arm64
+          #   ffmpeg_platform: linuxarm64
+          #   libdir: /usr/lib/aarch64-linux-gnu
     steps:
       - uses: actions/checkout@v4
 
@@ -341,6 +342,7 @@ jobs:
             -DCMAKE_PREFIX_PATH="${QT_ROOT_DIR};${GITHUB_WORKSPACE}/.deps/ffmpeg" \
             -DFETCHCONTENT_BASE_DIR="${FETCHCONTENT_BASE_DIR}" \
             -DDRIFT_BUNDLE_ONNXRUNTIME=OFF \
+            -DDRIFT_BUNDLE_CORE_PACKAGES_ONLY=ON \
             -DDRIFT_WITH_SKIA=ON \
             -DDRIFT_DISTRIBUTION=appimage \
             ${DRIFT_CHANNEL_ARGS}
@@ -518,14 +520,15 @@ jobs:
             qt_arch: win64_msvc2022_64
             cmake_arch: x64
             ffmpeg_platform: win64
-          - arch: arm64
-            runner: windows-11-arm
-            # Native arm64 host kit: Qt 6.10 ships win64_msvc2022_arm64 for windows_arm64, so
-            # moc/rcc/qmlcachegen run natively and no desktop host Qt (autodesktop) is needed.
-            qt_host: windows_arm64
-            qt_arch: win64_msvc2022_arm64
-            cmake_arch: ARM64
-            ffmpeg_platform: winarm64
+          # Disabled: vcpkg's skia[gl] is unsupported on arm64-windows.
+          # - arch: arm64
+          #   runner: windows-11-arm
+          #   # Native arm64 host kit: Qt 6.10 ships win64_msvc2022_arm64 for windows_arm64, so
+          #   # moc/rcc/qmlcachegen run natively and no desktop host Qt (autodesktop) is needed.
+          #   qt_host: windows_arm64
+          #   qt_arch: win64_msvc2022_arm64
+          #   cmake_arch: ARM64
+          #   ffmpeg_platform: winarm64
     steps:
       - uses: actions/checkout@v4
 
@@ -663,6 +666,7 @@ jobs:
             -DZLIB_INCLUDE_DIR=${{ github.workspace }}\vcpkg\installed\${{ matrix.arch }}-windows-static-md\include `
             -DZLIB_LIBRARY=${{ github.workspace }}\vcpkg\installed\${{ matrix.arch }}-windows-static-md\lib\zs.lib `
             -DDRIFT_BUNDLE_ONNXRUNTIME=OFF `
+            -DDRIFT_BUNDLE_CORE_PACKAGES_ONLY=ON `
             -DDRIFT_WITH_SKIA=ON `
             -DDRIFT_DISTRIBUTION=windows `
             ${{ env.DRIFT_CHANNEL_ARGS }}
@@ -984,6 +988,7 @@ jobs:
             -DCMAKE_PREFIX_PATH="$(brew --prefix qt);$(brew --prefix openssl@3);$(brew --prefix)" \
             -DFETCHCONTENT_BASE_DIR="${FETCHCONTENT_BASE_DIR}" \
             -DDRIFT_BUNDLE_ONNXRUNTIME=OFF \
+            -DDRIFT_BUNDLE_CORE_PACKAGES_ONLY=ON \
             -DDRIFT_WITH_SKIA=ON \
             -DDRIFT_DISTRIBUTION=macos \
             ${DRIFT_CHANNEL_ARGS}
@@ -1135,9 +1140,10 @@ jobs:
             runner: ubuntu-24.04
             # Also the ONNX Runtime addon suffix.
             target: linux-x64
-          - arch: aarch64
-            runner: ubuntu-24.04-arm
-            target: linux-arm64
+          # Disabled: pacman's sandbox (Landlock/alpm user) fails in the Arch Linux ARM container.
+          # - arch: aarch64
+          #   runner: ubuntu-24.04-arm
+          #   target: linux-arm64
     # Arch Linux ARM publishes no Docker image, so on aarch64 the job runs on the bare runner
     # and every step is routed into a container imported from the official rootfs (the
     # "Start Arch Linux ARM container" step) by defaults.run.shell. x86_64 keeps the job-level

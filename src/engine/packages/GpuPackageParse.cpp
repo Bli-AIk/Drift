@@ -173,6 +173,8 @@ bool parseParameters(const QJsonArray &params, QList<drift::EffectParamSpec> *ou
             spec.type = drift::EffectParamType::Gradient;
         else if (type == QLatin1String("curve"))
             spec.type = drift::EffectParamType::Curve;
+        else if (type == QLatin1String("lut"))
+            spec.type = drift::EffectParamType::Lut;
         else if (type == QLatin1String("track"))
             spec.type = drift::EffectParamType::Track;
         else if (type == QLatin1String("trackMask"))
@@ -230,6 +232,8 @@ bool parseParameters(const QJsonArray &params, QList<drift::EffectParamSpec> *ou
                                    .arg(spec.key, spec.regionShape));
                 return false;
             }
+        } else if (spec.type == drift::EffectParamType::Lut) {
+            spec.defaultString = defV.toString();
         } else {
             spec.defaultValue = defV.toDouble(0.0);
         }
@@ -250,6 +254,8 @@ bool parseParameters(const QJsonArray &params, QList<drift::EffectParamSpec> *ou
         spec.desktopGlOnly = p.value(QStringLiteral("desktopGlOnly")).toBool(false);
         spec.group = p.value(QStringLiteral("group")).toString();
         spec.groupCollapsed = p.value(QStringLiteral("groupCollapsed")).toBool(false);
+        if (spec.type == drift::EffectParamType::Curve)
+            spec.curveMode = p.value(QStringLiteral("curveMode")).toString();
 
         if (spec.key.isEmpty()) {
             fail(errorOut, QStringLiteral("parameter missing identifier"));
@@ -343,7 +349,7 @@ bool parseParameters(const QJsonArray &params, QList<drift::EffectParamSpec> *ou
         } else if (spec.type == drift::EffectParamType::Curve) {
             static const QStringList kEases{QStringLiteral("linear"), QStringLiteral("smooth"),
                                             QStringLiteral("in"), QStringLiteral("out"),
-                                            QStringLiteral("hold")};
+                                            QStringLiteral("hold"), QStringLiteral("spline")};
             QJsonArray keys;
             for (const QJsonValue &kv : defV.toArray()) {
                 const QJsonObject point = kv.toObject();
@@ -414,7 +420,7 @@ void collectRuntimeParams(const QList<drift::EffectParamSpec> &params, drift::Gp
     out->regionParams.clear();
     for (const drift::EffectParamSpec &spec : params) {
         if (spec.isSampler())
-            out->samplerParams.append({spec.key, spec.type});
+            out->samplerParams.append({spec.key, spec.type, spec.curveMode == QLatin1String("hue")});
         else if (spec.isRegion())
             out->regionParams.append(spec.key);
     }
@@ -427,6 +433,7 @@ bool checkNextFeatures(const QJsonObject &root, QString *errorOut)
         QStringLiteral("param:choice"),     QStringLiteral("param:seed"),
         QStringLiteral("param:region"),     QStringLiteral("param:image"),
         QStringLiteral("param:gradient"),   QStringLiteral("param:curve"),
+        QStringLiteral("param:lut"),        QStringLiteral("curve:spline"),
         QStringLiteral("param:track"),      QStringLiteral("param:trackMask"),
         QStringLiteral("param:audio"),      QStringLiteral("param:color-alpha"),
         QStringLiteral("uniform:audio"),    QStringLiteral("requires:mask"),

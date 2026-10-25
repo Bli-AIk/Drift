@@ -38,7 +38,8 @@ Canvas {
         void EditorState.tracksRevision
         void lane.waveformRevision
         return (lane.visible && waveDuration > 0)
-            ? EditorState.subtitleWaveformPeaks(waveStart, waveDuration, peakCount)
+            ? EditorState.subtitleWaveformColumns(waveStart, waveDuration, peakCount,
+                                                  Math.max(1, Math.floor(width)))
             : []
     }
     onPeaksChanged: requestPaint()
@@ -66,19 +67,8 @@ Canvas {
         // One filled column per screen pixel so bars stay contiguous at any zoom.
         ctx.fillStyle = wave;
         var mid = height / 2;
-        var w = Math.max(1, Math.floor(width));
-        var n = peaks.length;
-        for (var x = 0; x < w; x++) {
-            var i0 = Math.floor(x * n / w);
-            var i1 = Math.floor((x + 1) * n / w);
-            if (i1 <= i0)
-                i1 = Math.min(n, i0 + 1);
-            var peak = 0;
-            for (var i = i0; i < i1; i++) {
-                if (peaks[i] > peak)
-                    peak = peaks[i];
-            }
-            var amp = peak * mid * 0.9;
+        for (var x = 0; x < peaks.length; x++) {
+            var amp = peaks[x] * mid * 0.9;
             if (amp > 0.5)
                 ctx.fillRect(x, mid - amp, 1, amp * 2);
         }

@@ -34,8 +34,8 @@ Rectangle {
             Haptics.drop()
     }
 
-    implicitWidth: horizontal ? Theme.spacingMd : (view ? view.width : 0)
-    implicitHeight: horizontal ? (view ? view.height : 0) : Theme.spacingMd
+    implicitWidth: horizontal ? Theme.panelGap : (view ? view.width : 0)
+    implicitHeight: horizontal ? (view ? view.height : 0) : Theme.panelGap
     color: handlePressed ? Theme.c.panelSplitHandle.backgroundPressed
                          : (handleHovered ? Theme.c.panelSplitHandle.backgroundHover : "transparent")
 

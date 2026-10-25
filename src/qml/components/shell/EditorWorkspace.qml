@@ -41,7 +41,7 @@ Column {
             pool: panelPool
             windowId: "main"
             // Edge-to-edge in fullscreen; the usual page padding otherwise.
-            sideMargin: ShellBridge.main?.mainPreviewFullscreen ? 0 : Theme.pagePadding
+            sideMargin: ShellBridge.main?.mainPreviewFullscreen ? 0 : Theme.panelGap
         }
     }
 

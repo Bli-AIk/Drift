@@ -44,6 +44,7 @@
 #include "engine/decode/readers/ClipReaderPool.h"
 #include "app/editor/AppController.h"
 #include "app/editor/TimelineClipsModel.h"
+#include "app/editor/sessions/SubtitleCueFilterModel.h"
 #include "ui/timeline/TimelineLayout.h"
 #include "ui/timeline/TimelineTrackItem.h"
 #include "ui/timeline/TimelineViewState.h"
@@ -53,6 +54,7 @@
 #include "ui/imageproviders/multicam/MulticamImageStore.h"
 
 #include "core/project/clip/Clip.h"
+#include "core/animation/EasingPresetStore.h"
 #include "core/effects/EffectStackStore.h"
 #include "core/interchange/premiere/MogrtReader.h"
 #include "core/interchange/KdenliveReader.h"
@@ -155,6 +157,10 @@ private slots:
     void splitLeftRightKeepOuterFades();
     void audioTrackTakesTransitions();
     void videoTransitionMirrorsToLinkedAudio();
+    void colorGradeCreatedOnFirstDragIsOneUndoStep();
+    void colorApplyToAllReplacesExistingGrade();
+    void colorBypassLeavesUndoAndDirtyUntouched();
+    void setEffectTextParamRejectsNonTextParams();
     void deleteLeftRightActionsCutAtThePlayhead();
     void playbackRateStepsThroughTheOfferedRates();
     void previewQualityEighthRendersAtOneEighth();
@@ -235,6 +241,15 @@ private slots:
     void mergeAllSubtitlesOnTrackIgnoresSelection();
     void mergeTwoMediaClipsUnchanged();
     void exportSubtitleFileTimelineTimes();
+    void subtitleApplyTextIsOneUndoStep();
+    void subtitleApplyTextKeepsSourceWhenStartMatches();
+    void subtitleApplyTextExtendsClipDuration();
+    void subtitleToolsScopePreviewAndUndo();
+    void subtitleSelectionModes();
+    void subtitleActiveCueFollowsPlayhead();
+    void subtitleCueModelNotifications();
+    void subtitleCueFilterModel();
+    void subtitleFileRoundTripVtt();
     void generateSubtitlesRefusesOverlappingSources();
     void separatedAudioTracksMirrorVideoHierarchy();
     void linkedAudioUnlinkAndMove();
@@ -249,7 +264,21 @@ private slots:
     void keyframesCanBeDisabledPerProperty();
     void linkedScaleKeyframesUndoTogether();
     void linkedPositionKeyframesAndTangents();
+    void segmentEasingAppliesAndUndoes();
+    void segmentEasingFunctionRoundTrip();
+    void segmentEasingMirrorsLinkedPosition();
+    void easingPresetStoreSaveRenameDelete();
     void effectParamKeyframes();
+    void keyframeRowsListEffectParamsAndChannels();
+    void keyframeStaticChannelsReadTheStoredValue();
+    void keyframeBatchOpsAreOneUndoStep();
+    void keyframeAddMirrorsPositionAndPinsScale();
+    void keyframeClearRestoresStaticHome();
+    void keyframeMoveKeepsTangentsAndHold();
+    void keyframePreviewMoveRoundTripKeepsKeys();
+    void keyframePreviewMoveIsOneUndoStep();
+    void keyframePreviewStretchScalesOffsetAndTangent();
+    void keyframeCopyPasteRemapsEffectsAndSkipsOutOfRange();
     void depthEffectEditorStateResolvesHandles();
     void behindSubjectTargetsAChosenClip();
     void effectRemovalRemapsGraphSelection();
@@ -4293,6 +4322,389 @@ void EditorStateTest::effectParamKeyframes()
     QCOMPARE(state.clipKeyframes(track, clip, QStringLiteral("fx.9.contrast")).size(), 0);
 }
 
+void EditorStateTest::keyframeRowsListEffectParamsAndChannels()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Rows"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+
+    auto findRow = [](const QVariantList &rows, const QString &prop) {
+        for (const QVariant &row : rows) {
+            if (row.toMap().value(QStringLiteral("prop")).toString() == prop)
+                return row.toMap();
+        }
+        return QVariantMap{};
+    };
+
+    // A fresh clip offers the transform group, unanimated.
+    const QVariantList fresh = state.keyframes()->animatableProperties(track, clip);
+    const QVariantMap x = findRow(fresh, QStringLiteral("x"));
+    QCOMPARE(x.value(QStringLiteral("group")).toString(), QStringLiteral("transform"));
+    QCOMPARE(x.value(QStringLiteral("animated")).toBool(), false);
+    QVERIFY(state.keyframes()->animatableProperties(track, 99).isEmpty());
+
+    // An un-keyed effect param is listed under its effect's group, and a colour expands to four channels.
+    state.addEffect(track, clip, QStringLiteral("adjust.contrast"));
+    state.addEffect(track, clip, QStringLiteral("stylize.vignette"));
+    const QVariantList rows = state.keyframes()->animatableProperties(track, clip);
+    const QVariantMap contrast = findRow(rows, QStringLiteral("fx.0.contrast"));
+    QCOMPARE(contrast.value(QStringLiteral("group")).toString(), QStringLiteral("fx.0"));
+    QCOMPARE(contrast.value(QStringLiteral("kind")).toString(), QStringLiteral("scalar"));
+    QCOMPARE(contrast.value(QStringLiteral("animated")).toBool(), false);
+    QCOMPARE(contrast.value(QStringLiteral("keyProp")).toString(), QStringLiteral("fx.0.contrast"));
+
+    const QVariantMap color = findRow(rows, QStringLiteral("fx.1.color"));
+    QCOMPARE(color.value(QStringLiteral("kind")).toString(), QStringLiteral("color"));
+    QCOMPARE(color.value(QStringLiteral("tracks")).toStringList(),
+             (QStringList{QStringLiteral("fx.1.color.r"), QStringLiteral("fx.1.color.g"),
+                          QStringLiteral("fx.1.color.b"), QStringLiteral("fx.1.color.a")}));
+}
+
+void EditorStateTest::keyframeStaticChannelsReadTheStoredValue()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Channels"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    // The vignette has a colour param (fx.0.color) and a vec2 param (fx.0.center).
+    state.addEffect(track, clip, QStringLiteral("stylize.vignette"));
+    QVERIFY(state.setEffectColorParam(track, clip, 0, QStringLiteral("color"), QStringLiteral("#3366cc")));
+    QVERIFY(state.setEffectVec2Param(track, clip, 0, QStringLiteral("center"), 0.25, 0.75));
+
+    const QStringList colorProps{QStringLiteral("fx.0.color.r"), QStringLiteral("fx.0.color.g"),
+                                 QStringLiteral("fx.0.color.b"), QStringLiteral("fx.0.color.a")};
+    QVERIFY(qAbs(state.propertyBaseValue(track, clip, QStringLiteral("fx.0.color.r"), -1.0) - 0x33 / 255.0) < 1e-6);
+    state.keyframes()->addKeysAt(track, clip, colorProps, 1.0);
+    const double expected[4] = {0x33 / 255.0, 0x66 / 255.0, 0xcc / 255.0, 1.0};
+    for (int i = 0; i < colorProps.size(); ++i) {
+        const double value = state.propertyValueAt(track, clip, colorProps.at(i), 1.0, -1.0);
+        QVERIFY2(qAbs(value - expected[i]) < 1e-6, qPrintable(colorProps.at(i)));
+    }
+
+    state.keyframes()->addKeysAt(track, clip, {QStringLiteral("fx.0.center.x"), QStringLiteral("fx.0.center.y")}, 2.0);
+    QVERIFY(qAbs(state.propertyValueAt(track, clip, QStringLiteral("fx.0.center.x"), 2.0, -1.0) - 0.25) < 1e-6);
+    QVERIFY(qAbs(state.propertyValueAt(track, clip, QStringLiteral("fx.0.center.y"), 2.0, -1.0) - 0.75) < 1e-6);
+}
+
+void EditorStateTest::keyframeBatchOpsAreOneUndoStep()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Batch"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString x = QStringLiteral("x");
+    const QString rotation = QStringLiteral("rotation");
+    state.setPositionLinked(false);
+    state.setClipKeyframe(track, clip, x, 1.0, 10.0);
+    state.setClipKeyframe(track, clip, rotation, 1.0, 5.0);
+    const int xCount = state.clipKeyframes(track, clip, x).size();
+    const int rotationCount = state.clipKeyframes(track, clip, rotation).size();
+
+    QVariantList refs;
+    refs << QVariantMap{{QStringLiteral("prop"), x}, {QStringLiteral("seconds"), 1.0}};
+    refs << QVariantMap{{QStringLiteral("prop"), rotation}, {QStringLiteral("seconds"), 1.0}};
+    state.keyframes()->removeKeys(track, clip, refs);
+    QCOMPARE(state.clipKeyframes(track, clip, x).size(), xCount - 1);
+    QCOMPARE(state.clipKeyframes(track, clip, rotation).size(), rotationCount - 1);
+
+    state.undo();
+    QCOMPARE(state.clipKeyframes(track, clip, x).size(), xCount);
+    QCOMPARE(state.clipKeyframes(track, clip, rotation).size(), rotationCount);
+}
+
+void EditorStateTest::keyframeAddMirrorsPositionAndPinsScale()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Linked keys"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString x = QStringLiteral("x");
+    const QString y = QStringLiteral("y");
+    const QString width = QStringLiteral("width");
+    const QString height = QStringLiteral("height");
+
+    const auto keyAt = [](const QVariantList &keys, double seconds) {
+        for (const QVariant &key : keys) {
+            if (qAbs(key.toMap().value(QStringLiteral("seconds")).toDouble() - seconds) < 1e-3)
+                return key.toMap();
+        }
+        return QVariantMap{};
+    };
+
+    state.setPositionLinked(true);
+    state.keyframes()->addKeysAt(track, clip, {x}, 1.0);
+    QVERIFY(!keyAt(state.clipKeyframes(track, clip, x), 1.0).isEmpty());
+    QVERIFY(!keyAt(state.clipKeyframes(track, clip, y), 1.0).isEmpty());
+
+    const double xNow = state.propertyValueAt(track, clip, x, 2.0, 0.0);
+    state.keyframes()->addKeysAt(track, clip, {width, height}, 2.0);
+    QVERIFY(!keyAt(state.clipKeyframes(track, clip, width), 2.0).isEmpty());
+    QVERIFY(!keyAt(state.clipKeyframes(track, clip, height), 2.0).isEmpty());
+    const QVariantMap pinnedX = keyAt(state.clipKeyframes(track, clip, x), 2.0);
+    QVERIFY(!pinnedX.isEmpty());
+    QVERIFY(qAbs(pinnedX.value(QStringLiteral("value")).toDouble() - xNow) < 1e-6);
+    QVERIFY(!keyAt(state.clipKeyframes(track, clip, y), 2.0).isEmpty());
+
+    state.keyframes()->removeKeysAt(track, clip, {width, height}, 2.0);
+    QVERIFY(keyAt(state.clipKeyframes(track, clip, width), 2.0).isEmpty());
+    QVERIFY(!keyAt(state.clipKeyframes(track, clip, x), 2.0).isEmpty());
+}
+
+void EditorStateTest::keyframeClearRestoresStaticHome()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Clear"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString x = QStringLiteral("x");
+    const QString contrast = QStringLiteral("fx.0.contrast");
+
+    state.setPositionLinked(false);
+    state.setClipKeyframe(track, clip, x, 0.0, 0.0);
+    state.setClipKeyframe(track, clip, x, 2.0, 100.0);
+    state.setPlayheadSeconds(1.0);
+    state.keyframes()->clearProperties(track, clip, {x});
+    const QVariantList xKeys = state.clipKeyframes(track, clip, x);
+    QCOMPARE(xKeys.size(), 1);
+    QCOMPARE(xKeys.first().toMap().value(QStringLiteral("seconds")).toDouble(), 0.0);
+    QVERIFY(qAbs(xKeys.first().toMap().value(QStringLiteral("value")).toDouble() - 50.0) < 1e-6);
+
+    state.addEffect(track, clip, QStringLiteral("adjust.contrast"));
+    state.setClipKeyframe(track, clip, contrast, 0.0, 0.2);
+    state.setClipKeyframe(track, clip, contrast, 2.0, 0.8);
+    state.keyframes()->clearProperties(track, clip, {contrast});
+    QCOMPARE(state.clipKeyframes(track, clip, contrast).size(), 0);
+    const QVariantList params = state.selectedClipData().value(QStringLiteral("effects")).toList()
+                                    .first().toMap().value(QStringLiteral("params")).toList();
+    QVERIFY(qAbs(params.first().toMap().value(QStringLiteral("value")).toDouble() - 0.5) < 1e-6);
+}
+
+void EditorStateTest::keyframeMoveKeepsTangentsAndHold()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Move"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString rotation = QStringLiteral("rotation");
+
+    const auto keyAt = [](const QVariantList &keys, double seconds) {
+        for (const QVariant &key : keys) {
+            if (qAbs(key.toMap().value(QStringLiteral("seconds")).toDouble() - seconds) < 1e-3)
+                return key.toMap();
+        }
+        return QVariantMap{};
+    };
+
+    state.setPositionLinked(false);
+    state.setClipKeyframe(track, clip, rotation, 1.0, 10.0);
+    state.setClipKeyframe(track, clip, rotation, 2.0, 20.0);
+    state.setKeyframeTangents(track, clip, rotation, 1.0, 0.1, 2.0, 0.3, 4.0, false);
+    state.setKeyframeHold(track, clip, rotation, 1.0, true);
+    const QVariantMap before = keyAt(state.clipKeyframes(track, clip, rotation), 1.0);
+    QVERIFY(!before.isEmpty());
+
+    const QVariantList refs = state.keyframes()->moveKeys(
+        track, clip, {QVariantMap{{QStringLiteral("prop"), rotation}, {QStringLiteral("seconds"), 1.0}}}, 0.25);
+    QCOMPARE(refs.size(), 1);
+    QCOMPARE(refs.first().toMap().value(QStringLiteral("seconds")).toDouble(), 1.25);
+
+    const QVariantList keys = state.clipKeyframes(track, clip, rotation);
+    QVERIFY(keyAt(keys, 1.0).isEmpty());
+    const QVariantMap after = keyAt(keys, 1.25);
+    QVERIFY(!after.isEmpty());
+    for (const char *field : {"value", "inDx", "inDy", "outDx", "outDy"})
+        QCOMPARE(after.value(QString::fromLatin1(field)).toDouble(), before.value(QString::fromLatin1(field)).toDouble());
+    QCOMPARE(after.value(QStringLiteral("hold")).toBool(), true);
+}
+
+void EditorStateTest::keyframePreviewMoveRoundTripKeepsKeys()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Round trip"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString rotation = QStringLiteral("rotation");
+
+    const auto keyAt = [](const QVariantList &keys, double seconds) {
+        for (const QVariant &key : keys) {
+            if (qAbs(key.toMap().value(QStringLiteral("seconds")).toDouble() - seconds) < 1e-3)
+                return key.toMap();
+        }
+        return QVariantMap{};
+    };
+
+    state.setPositionLinked(false);
+    state.setClipKeyframe(track, clip, rotation, 1.0, 10.0);
+    state.setClipKeyframe(track, clip, rotation, 2.0, 20.0);
+    state.setKeyframeTangents(track, clip, rotation, 1.0, 0.1, 2.0, 0.3, 4.0, false);
+    state.setKeyframeHold(track, clip, rotation, 1.0, true);
+    const QVariantMap first = keyAt(state.clipKeyframes(track, clip, rotation), 1.0);
+    const QVariantMap second = keyAt(state.clipKeyframes(track, clip, rotation), 2.0);
+    QVERIFY(!first.isEmpty());
+    QVERIFY(!second.isEmpty());
+
+    const QVariantList press{QVariantMap{{QStringLiteral("prop"), rotation}, {QStringLiteral("seconds"), 1.0}}};
+    // Landing on the key at 2.0 overwrites it while the drag is live.
+    state.keyframes()->previewMoveKeys(track, clip, press, 1.0);
+    QVERIFY(keyAt(state.clipKeyframes(track, clip, rotation), 1.0).isEmpty());
+    state.keyframes()->previewMoveKeys(track, clip, press, 0.0);
+    state.commitPreviewDrag();
+
+    const QVariantList keys = state.clipKeyframes(track, clip, rotation);
+    QCOMPARE(keys.size(), 2);
+    const QVariantMap restored = keyAt(keys, 1.0);
+    for (const char *field : {"value", "inDx", "inDy", "outDx", "outDy"})
+        QCOMPARE(restored.value(QString::fromLatin1(field)).toDouble(), first.value(QString::fromLatin1(field)).toDouble());
+    QCOMPARE(restored.value(QStringLiteral("hold")).toBool(), true);
+    QCOMPARE(keyAt(keys, 2.0).value(QStringLiteral("value")).toDouble(), second.value(QStringLiteral("value")).toDouble());
+}
+
+void EditorStateTest::keyframePreviewMoveIsOneUndoStep()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Drag undo"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString rotation = QStringLiteral("rotation");
+
+    const auto keyAt = [](const QVariantList &keys, double seconds) {
+        for (const QVariant &key : keys) {
+            if (qAbs(key.toMap().value(QStringLiteral("seconds")).toDouble() - seconds) < 1e-3)
+                return key.toMap();
+        }
+        return QVariantMap{};
+    };
+
+    state.setPositionLinked(false);
+    state.setClipKeyframe(track, clip, rotation, 1.0, 10.0);
+    state.setClipKeyframe(track, clip, rotation, 3.0, 30.0);
+    const int count = state.clipKeyframes(track, clip, rotation).size();
+
+    const QVariantList press{QVariantMap{{QStringLiteral("prop"), rotation}, {QStringLiteral("seconds"), 1.0}}};
+    state.keyframes()->previewMoveKeys(track, clip, press, 0.25);
+    state.keyframes()->previewMoveKeys(track, clip, press, 0.5);
+    state.keyframes()->previewMoveKeys(track, clip, press, 0.75);
+    state.commitPreviewDrag();
+    QVERIFY(!keyAt(state.clipKeyframes(track, clip, rotation), 1.75).isEmpty());
+
+    state.undo();
+    const QVariantList undone = state.clipKeyframes(track, clip, rotation);
+    QCOMPARE(undone.size(), count);
+    QVERIFY(!keyAt(undone, 1.0).isEmpty());
+    QVERIFY(keyAt(undone, 1.75).isEmpty());
+}
+
+void EditorStateTest::keyframePreviewStretchScalesOffsetAndTangent()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Stretch"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    const QString rotation = QStringLiteral("rotation");
+
+    const auto keyAt = [](const QVariantList &keys, double seconds) {
+        for (const QVariant &key : keys) {
+            if (qAbs(key.toMap().value(QStringLiteral("seconds")).toDouble() - seconds) < 1e-3)
+                return key.toMap();
+        }
+        return QVariantMap{};
+    };
+
+    state.setPositionLinked(false);
+    state.setClipKeyframe(track, clip, rotation, 1.0, 10.0);
+    state.setClipKeyframe(track, clip, rotation, 2.0, 20.0);
+    state.setKeyframeTangents(track, clip, rotation, 2.0, -0.1, 0.0, 0.3, 0.0, false);
+    const QVariantMap second = keyAt(state.clipKeyframes(track, clip, rotation), 2.0);
+    QVERIFY(second.value(QStringLiteral("outDx")).toDouble() > 0.0);
+
+    const auto ref = [&rotation](double seconds) {
+        return QVariantMap{{QStringLiteral("prop"), rotation}, {QStringLiteral("seconds"), seconds}};
+    };
+    state.keyframes()->previewStretchKeys(track, clip, {ref(1.0), ref(2.0)}, 1.0, 2.0);
+    state.commitPreviewDrag();
+
+    const QVariantList keys = state.clipKeyframes(track, clip, rotation);
+    QVERIFY(!keyAt(keys, 1.0).isEmpty());
+    QVERIFY(keyAt(keys, 2.0).isEmpty());
+    const QVariantMap moved = keyAt(keys, 3.0);
+    QVERIFY(!moved.isEmpty());
+    QCOMPARE(moved.value(QStringLiteral("value")).toDouble(), 20.0);
+    QCOMPARE(moved.value(QStringLiteral("inDx")).toDouble(), 2.0 * second.value(QStringLiteral("inDx")).toDouble());
+    QCOMPARE(moved.value(QStringLiteral("outDx")).toDouble(), 2.0 * second.value(QStringLiteral("outDx")).toDouble());
+}
+
+void EditorStateTest::keyframeCopyPasteRemapsEffectsAndSkipsOutOfRange()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.setPositionLinked(false);
+    state.addTextClip(QStringLiteral("Source"), 0.0);
+    const int track = state.selectedTrack();
+    const int source = state.selectedClip();
+    state.addEffect(track, source, QStringLiteral("adjust.contrast"));
+    const QString x = QStringLiteral("x");
+    const QString contrast = QStringLiteral("fx.0.contrast");
+    state.setClipKeyframe(track, source, x, 1.0, 10.0);
+    state.setClipKeyframe(track, source, contrast, 1.5, 0.7);
+
+    const auto ref = [](const QString &prop, double seconds) {
+        return QVariantMap{{QStringLiteral("prop"), prop}, {QStringLiteral("seconds"), seconds}};
+    };
+    QCOMPARE(state.keyframes()->copyKeys(track, source, {ref(x, 1.0), ref(contrast, 1.5)}), 2);
+    QCOMPARE(state.keyframes()->clipboardCount(), 2);
+
+    // The target's contrast lands on fx.1: its vignette comes first, so the catalogId index differs.
+    state.addTextClip(QStringLiteral("Target"), 10.0, QString(), track);
+    const int target = state.selectedClip();
+    state.addEffect(track, target, QStringLiteral("stylize.vignette"));
+    state.addEffect(track, target, QStringLiteral("adjust.contrast"));
+    const QString remappedContrast = QStringLiteral("fx.1.contrast");
+    const drift::Clip &targetClip = state.project()->tracks().at(track).clips.at(target);
+    const double start = drift::usToSeconds(targetClip.timelineStart);
+    const double end = drift::usToSeconds(targetClip.timelineStart + targetClip.timelineDuration);
+
+    const auto keyAt = [](const QVariantList &keys, double seconds) {
+        for (const QVariant &key : keys) {
+            if (qAbs(key.toMap().value(QStringLiteral("seconds")).toDouble() - seconds) < 1e-3)
+                return key.toMap();
+        }
+        return QVariantMap{};
+    };
+    const int xBefore = state.clipKeyframes(track, target, x).size();
+    const int contrastBefore = state.clipKeyframes(track, target, remappedContrast).size();
+
+    const QVariantList pasted = state.keyframes()->pasteKeys(track, target, start + 0.5);
+    QCOMPARE(pasted.size(), 2);
+    const QVariantMap xKey = keyAt(state.clipKeyframes(track, target, x), start + 0.5);
+    QVERIFY(!xKey.isEmpty());
+    QCOMPARE(xKey.value(QStringLiteral("value")).toDouble(), 10.0);
+    const QVariantMap contrastKey = keyAt(state.clipKeyframes(track, target, remappedContrast), start + 1.0);
+    QVERIFY(!contrastKey.isEmpty());
+    QCOMPARE(contrastKey.value(QStringLiteral("value")).toDouble(), 0.7);
+    QCOMPARE(state.clipKeyframes(track, target, QStringLiteral("fx.0.contrast")).size(), 0);
+
+    state.undo();
+    QCOMPARE(state.clipKeyframes(track, target, x).size(), xBefore);
+    QCOMPARE(state.clipKeyframes(track, target, remappedContrast).size(), contrastBefore);
+
+    // Only x fits before the clip's end, so the contrast key is skipped and nothing else is written.
+    const QVariantList partial = state.keyframes()->pasteKeys(track, target, end - 0.25);
+    QCOMPARE(partial.size(), 1);
+    QCOMPARE(partial.first().toMap().value(QStringLiteral("prop")).toString(), x);
+    QVERIFY(!keyAt(state.clipKeyframes(track, target, x), end - 0.25).isEmpty());
+    QCOMPARE(state.clipKeyframes(track, target, remappedContrast).size(), contrastBefore);
+}
+
 void EditorStateTest::depthEffectEditorStateResolvesHandles()
 {
     AssetLibrary library;
@@ -4617,15 +5029,15 @@ void EditorStateTest::multiSelectClipboardGuidesAndShortcuts()
     QVERIFY(!state.guideItems().isEmpty());
 
     // Shortcut/action layer wiring.
-    state.setShortcut(QStringLiteral("nudgeRight"), QStringLiteral("Ctrl+Alt+Right"));
-    QCOMPARE(state.shortcutFor(QStringLiteral("nudgeRight")), QStringLiteral("Ctrl+Alt+Right"));
+    state.setShortcut(QStringLiteral("nudgeRight"), QStringLiteral("Ctrl+Alt+Shift+Right"));
+    QCOMPARE(state.shortcutFor(QStringLiteral("nudgeRight")), QStringLiteral("Ctrl+Alt+Shift+Right"));
 
     bool found = false;
     for (const QVariant &entry : state.actions()) {
         const QVariantMap action = entry.toMap();
         if (action.value(QStringLiteral("id")).toString() != QStringLiteral("nudgeRight"))
             continue;
-        QCOMPARE(action.value(QStringLiteral("shortcut")).toString(), QStringLiteral("Ctrl+Alt+Right"));
+        QCOMPARE(action.value(QStringLiteral("shortcut")).toString(), QStringLiteral("Ctrl+Alt+Shift+Right"));
         found = true;
     }
     QVERIFY(found);
@@ -4847,6 +5259,296 @@ void EditorStateTest::exportSubtitleFileTimelineTimes()
     };
     QVERIFY(read(local).contains(QStringLiteral("00:00:00,000 --> 00:00:01,000")));
     QVERIFY(read(absolute).contains(QStringLiteral("00:01:30,000 --> 00:01:31,000")));
+}
+
+static void fillCues(drift::Project &project, int count)
+{
+    appendSubtitleLane(project);
+    drift::Clip &clip = project.tracks()[0].clips[0];
+    clip.timelineDuration = drift::secondsToUs(60.0);
+    clip.subtitleCues.clear();
+    for (int i = 0; i < count; ++i) {
+        clip.subtitleCues.append(drift::SubtitleCue{drift::secondsToUs(i * 2.0), drift::secondsToUs(i * 2.0 + 1.0),
+                                                    QStringLiteral("cue %1").arg(i)});
+    }
+}
+
+void EditorStateTest::subtitleApplyTextIsOneUndoStep()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 3);
+    SubtitleController *subs = state.subtitles();
+
+    const QString srt = QStringLiteral("1\n00:00:00,000 --> 00:00:01,500\nhello\n\n2\n00:00:03,000 --> 00:00:04,000\nworld\n");
+    QCOMPARE(subs->detectFormat(srt), QStringLiteral("srt"));
+    QCOMPARE(subs->parseText(srt, QStringLiteral("srt")).value(QStringLiteral("count")).toInt(), 2);
+    QVERIFY(subs->applyText(0, 0, srt, QStringLiteral("srt"), false));
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.size(), 2);
+    QCOMPARE(subs->cues(0, 0).size(), 2);
+    state.undo();
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.size(), 3);
+
+    const QString vtt = QStringLiteral("WEBVTT\n\n00:00.000 --> 00:01.000\nonly\n");
+    QCOMPARE(subs->detectFormat(QStringLiteral("\n  WEBVTT\n")), QStringLiteral("vtt"));
+    QVERIFY(subs->applyText(0, 0, vtt, QStringLiteral("vtt"), false));
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.size(), 1);
+    state.undo();
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.size(), 3);
+
+    QVERIFY(!subs->applyText(0, 0, QStringLiteral("garbage"), QStringLiteral("srt"), false));
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.size(), 3);
+
+    const QString text = subs->cuesText(0, 0, QStringLiteral("srt"), false);
+    QVERIFY(subs->applyText(0, 0, text, QStringLiteral("srt"), false));
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.size(), 3);
+}
+
+void EditorStateTest::subtitleApplyTextExtendsClipDuration()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 2);
+    const drift::TimeUs before = state.project()->tracks()[0].clips[0].timelineDuration;
+
+    const QString srt = QStringLiteral("1\n00:00:00,000 --> 00:01:30,000\nlong\n");
+    QVERIFY(state.subtitles()->applyText(0, 0, srt, QStringLiteral("srt"), false));
+    QCOMPARE(state.project()->tracks()[0].clips[0].timelineDuration, drift::secondsToUs(90.0));
+    QCOMPARE(state.project()->tracks()[0].clips[0].srcOut, drift::secondsToUs(90.0));
+    state.undo();
+    QCOMPARE(state.project()->tracks()[0].clips[0].timelineDuration, before);
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.size(), 2);
+}
+
+void EditorStateTest::subtitleApplyTextKeepsSourceWhenStartMatches()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 2);
+    auto &cues = state.project()->tracks()[0].clips[0].subtitleCues;
+    cues[0].source = QStringLiteral("a");
+    cues[1].source = QStringLiteral("b");
+
+    const QString srt = QStringLiteral("1\n00:00:00,010 --> 00:00:01,000\nx\n\n2\n00:00:05,000 --> 00:00:06,000\ny\n");
+    QVERIFY(state.subtitles()->applyText(0, 0, srt, QStringLiteral("srt"), false));
+    const auto &after = state.project()->tracks()[0].clips[0].subtitleCues;
+    QCOMPARE(after.at(0).source, QStringLiteral("a"));
+    QVERIFY(after.at(1).source.isEmpty());
+}
+
+void EditorStateTest::subtitleToolsScopePreviewAndUndo()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 4);
+    SubtitleController *subs = state.subtitles();
+    state.selectClip(0, 0);
+
+    subs->setSelectedCues({1, 2});
+    QCOMPARE(subs->previewShift(0, 0, 1, 0.5, 0), 2);
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.at(1).startUs, drift::secondsToUs(2.0));
+    QCOMPARE(subs->applyShift(0, 0, 1, 0.5, 0), 2);
+    const auto &cues = state.project()->tracks()[0].clips[0].subtitleCues;
+    QCOMPARE(cues.at(0).startUs, drift::secondsToUs(0.0));
+    QCOMPARE(cues.at(1).startUs, drift::secondsToUs(2.5));
+    QCOMPARE(cues.at(2).startUs, drift::secondsToUs(4.5));
+    state.undo();
+    QCOMPARE(state.project()->tracks()[0].clips[0].subtitleCues.at(1).startUs, drift::secondsToUs(2.0));
+
+    QCOMPARE(subs->applyShift(0, 0, 0, 0.0, 0), 0);
+    QCOMPARE(subs->previewShift(0, 0, 0, 1.0, 0), 4);
+    QCOMPARE(subs->previewShift(0, 0, 0, 1.0, 0), subs->applyShift(0, 0, 0, 1.0, 0));
+}
+
+void EditorStateTest::subtitleSelectionModes()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 6);
+    SubtitleController *subs = state.subtitles();
+    state.selectClip(0, 0);
+
+    subs->selectCue(2, 0);
+    QCOMPARE(subs->selectedCues(), QVariantList{2});
+    QCOMPARE(state.selectedSubtitleCue(), 2);
+    subs->selectCue(4, 1);
+    QCOMPARE(subs->selectedCues(), (QVariantList{2, 4}));
+    subs->selectCue(2, 1);
+    QCOMPARE(subs->selectedCues(), QVariantList{4});
+    subs->selectCue(1, 0);
+    subs->selectCue(3, 2);
+    QCOMPARE(subs->selectedCues(), (QVariantList{1, 2, 3}));
+    QCOMPARE(subs->anchorCue(), 1);
+    subs->selectAll(0, 0);
+    QCOMPARE(subs->selectedCues().size(), 6);
+
+    state.setSelectedSubtitleCue(5);
+    QCOMPARE(subs->selectedCues(), QVariantList{5});
+
+    state.selectClip(0, 1);
+    QVERIFY(subs->selectedCues().isEmpty());
+    QCOMPARE(state.selectedSubtitleCue(), -1);
+}
+
+void EditorStateTest::subtitleActiveCueFollowsPlayhead()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 3);
+    SubtitleController *subs = state.subtitles();
+    QSignalSpy changed(subs, &SubtitleController::activeCueChanged);
+
+    QCOMPARE(subs->activeCue(), -1);
+    state.selectClip(0, 0);
+    state.setPlayheadSeconds(0.5);
+    QCOMPARE(subs->activeCue(), 0);
+    QCOMPARE(changed.count(), 1);
+    state.setPlayheadSeconds(0.75);
+    QCOMPARE(changed.count(), 1);
+    state.setPlayheadSeconds(1.5);
+    QCOMPARE(subs->activeCue(), -1);
+    state.setPlayheadSeconds(2.5);
+    QCOMPARE(subs->activeCue(), 1);
+    state.setPlayheadSeconds(3.0);
+    QCOMPARE(subs->activeCue(), -1);
+
+    state.setPlayheadSeconds(4.5);
+    QCOMPARE(subs->activeCue(), 2);
+    const QString srt = QStringLiteral("1\n00:00:04,000 --> 00:00:06,000\nonly\n");
+    QVERIFY(subs->applyText(0, 0, srt, QStringLiteral("srt"), false));
+    QCOMPARE(subs->activeCue(), 0);
+
+    state.clearSelection();
+    QCOMPARE(subs->activeCue(), -1);
+}
+
+void EditorStateTest::subtitleCueModelNotifications()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 3);
+    SubtitleController *subs = state.subtitles();
+    auto *model = qobject_cast<QAbstractItemModel *>(subs->cueModel());
+    QVERIFY(model);
+    QCOMPARE(model->rowCount(), 0);
+
+    state.selectClip(0, 0);
+    QCOMPARE(model->rowCount(), 3);
+    QCOMPARE(subs->count(), 3);
+    const QHash<int, QByteArray> roles = model->roleNames();
+    const int textRole = roles.key("text");
+    const int endRole = roles.key("end");
+    QCOMPARE(model->data(model->index(1, 0), textRole).toString(), QStringLiteral("cue 1"));
+    QCOMPARE(model->data(model->index(1, 0), endRole).toDouble(), 3.0);
+
+    QSignalSpy dataChanged(model, &QAbstractItemModel::dataChanged);
+    QSignalSpy reset(model, &QAbstractItemModel::modelReset);
+    QSignalSpy countChanged(subs, &SubtitleController::countChanged);
+
+    state.setPlayheadSeconds(1.0);
+    emit state.tracksChanged();
+    QCOMPARE(dataChanged.count(), 0);
+    QCOMPARE(reset.count(), 0);
+
+    const QString srt = QStringLiteral("1\n00:00:00,000 --> 00:00:01,000\ncue 0\n\n2\n00:00:02,000 --> 00:00:03,000\nchanged\n\n3\n00:00:04,000 --> 00:00:05,000\ncue 2\n");
+    QVERIFY(subs->applyText(0, 0, srt, QStringLiteral("srt"), false));
+    QCOMPARE(reset.count(), 0);
+    QCOMPARE(dataChanged.count(), 1);
+    QCOMPARE(dataChanged.first().at(0).toModelIndex().row(), 1);
+    QCOMPARE(model->data(model->index(1, 0), textRole).toString(), QStringLiteral("changed"));
+
+    state.undo();
+    QCOMPARE(dataChanged.count(), 2);
+    QCOMPARE(reset.count(), 0);
+
+    QVERIFY(subs->applyText(0, 0, QStringLiteral("1\n00:00:00,000 --> 00:00:01,000\nonly\n"),
+                            QStringLiteral("srt"), false));
+    QCOMPARE(reset.count(), 1);
+    QCOMPARE(model->rowCount(), 1);
+    QCOMPARE(subs->count(), 1);
+    QVERIFY(countChanged.count() >= 1);
+
+    state.clearSelection();
+    QCOMPARE(model->rowCount(), 0);
+}
+
+void EditorStateTest::subtitleCueFilterModel()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 4);
+    SubtitleController *subs = state.subtitles();
+    auto *filtered = qobject_cast<SubtitleCueFilterModel *>(subs->filteredCueModel());
+    QVERIFY(filtered);
+    QCOMPARE(filtered->count(), 0);
+
+    state.selectClip(0, 0);
+    QCOMPARE(filtered->rowCount(), 4);
+    QCOMPARE(filtered->count(), 4);
+
+    const int cueIndexRole = filtered->roleNames().key("cueIndex");
+    const int textRole = filtered->roleNames().key("text");
+    QSignalSpy countChanged(filtered, &SubtitleCueFilterModel::countChanged);
+
+    filtered->setFilterText(QStringLiteral("CUE 2"));
+    QCOMPARE(filtered->count(), 1);
+    QVERIFY(countChanged.count() >= 1);
+    QCOMPARE(filtered->data(filtered->index(0, 0), cueIndexRole).toInt(), 2);
+    QCOMPARE(filtered->rowForCue(2), 0);
+    QCOMPARE(filtered->rowForCue(1), -1);
+    QCOMPARE(filtered->cueAt(0), 2);
+    QCOMPARE(filtered->cueAt(1), -1);
+
+    filtered->setFilterText(QStringLiteral(" 3 "));
+    QCOMPARE(filtered->count(), 1);
+    QCOMPARE(filtered->cueAt(0), 3);
+
+    filtered->setFilterText(QStringLiteral("nothing"));
+    QCOMPARE(filtered->count(), 0);
+
+    filtered->setFilterText(QStringLiteral("cue"));
+    QCOMPARE(filtered->count(), 4);
+    QCOMPARE(filtered->rowForCue(3), 3);
+
+    const QString srt = QStringLiteral("1\n00:00:00,000 --> 00:00:01,000\ncue 0\n\n2\n00:00:02,000 --> 00:00:03,000\ncue 1\n\n3\n00:00:04,000 --> 00:00:05,000\nother\n\n4\n00:00:06,000 --> 00:00:07,000\ncue 3\n");
+    QVERIFY(subs->applyText(0, 0, srt, QStringLiteral("srt"), false));
+    QCOMPARE(filtered->count(), 3);
+    QCOMPARE(filtered->rowForCue(2), -1);
+    QCOMPARE(filtered->rowForCue(3), 2);
+    QCOMPARE(filtered->cueAt(2), 3);
+    QCOMPARE(filtered->data(filtered->index(2, 0), textRole).toString(), QStringLiteral("cue 3"));
+
+    filtered->setFilterText(QStringLiteral("other"));
+    QCOMPARE(filtered->count(), 1);
+    QCOMPARE(filtered->cueAt(0), 2);
+
+    filtered->setFilterText({});
+    QCOMPARE(filtered->count(), 4);
+}
+
+void EditorStateTest::subtitleFileRoundTripVtt()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    fillCues(*state.project(), 3);
+    SubtitleController *subs = state.subtitles();
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QUrl vtt = QUrl::fromLocalFile(dir.filePath(QStringLiteral("a.vtt")));
+    QVERIFY(subs->exportFile(0, 0, vtt, false));
+    QFile file(vtt.toLocalFile());
+    QVERIFY(file.open(QIODevice::ReadOnly));
+    QVERIFY(file.readAll().startsWith("WEBVTT"));
+    file.close();
+
+    state.project()->tracks()[0].clips[0].subtitleCues.clear();
+    state.project()->tracks()[0].clips[0].subtitleCues.append(drift::SubtitleCue{0, 1000, QStringLiteral("x")});
+    QVERIFY(subs->importFile(0, 0, vtt));
+    const auto &cues = state.project()->tracks()[0].clips[0].subtitleCues;
+    QCOMPARE(cues.size(), 3);
+    QCOMPARE(cues.at(2).text, QStringLiteral("cue 2"));
+    QCOMPARE(cues.at(2).startUs, drift::secondsToUs(4.0));
 }
 
 void EditorStateTest::generateSubtitlesRefusesOverlappingSources()
@@ -6446,6 +7148,123 @@ void EditorStateTest::linkedPositionKeyframesAndTangents()
     QVERIFY(!foundYAt0_5);
 }
 
+// Segment easings are written through the curve editor's entry points and read back by the same
+// preset id, so these pin the whole round trip: write, classify, and undo.
+void EditorStateTest::segmentEasingAppliesAndUndoes()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Easing"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    state.setPositionLinked(false);
+    const QString prop = QStringLiteral("x");
+    state.setClipKeyframe(track, clip, prop, 0.0, 0.0);
+    state.setClipKeyframe(track, clip, prop, 2.0, 100.0);
+
+    QCOMPARE(state.keyframeSegmentEasing(track, clip, prop, 0.0).value(QStringLiteral("presetId")).toString(),
+             QStringLiteral("linear"));
+
+    const QVariantMap cubicOut = drift::findBuiltinEasingPreset(QStringLiteral("cubicOut"))->spec.toJson().toVariantMap();
+    state.setKeyframeSegmentEasing(track, clip, prop, 0.0, cubicOut);
+    const QVariantMap segment = state.keyframeSegmentEasing(track, clip, prop, 0.0);
+    QCOMPARE(segment.value(QStringLiteral("presetId")).toString(), QStringLiteral("cubicOut"));
+    QVERIFY(segment.value(QStringLiteral("hasSegment")).toBool());
+    QCOMPARE(segment.value(QStringLiteral("samples")).toList().size(), 25);
+
+    state.undo();
+    QCOMPARE(state.keyframeSegmentEasing(track, clip, prop, 0.0).value(QStringLiteral("presetId")).toString(),
+             QStringLiteral("linear"));
+}
+
+void EditorStateTest::segmentEasingFunctionRoundTrip()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Bounce"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    state.setPositionLinked(false);
+    const QString prop = QStringLiteral("x");
+    state.setClipKeyframe(track, clip, prop, 0.0, 0.0);
+    state.setClipKeyframe(track, clip, prop, 2.0, 100.0);
+
+    const QVariantMap bounce = drift::findBuiltinEasingPreset(QStringLiteral("bounceOut"))->spec.toJson().toVariantMap();
+    state.setKeyframeSegmentEasing(track, clip, prop, 0.0, bounce);
+    QCOMPARE(state.keyframeSegmentEasing(track, clip, prop, 0.0).value(QStringLiteral("presetId")).toString(),
+             QStringLiteral("bounceOut"));
+    // Bounce Out is well ahead of the straight line at the midpoint, so the value must move.
+    QVERIFY(std::abs(state.propertyValueAt(track, clip, prop, 1.0, 0.0) - 50.0) > 1.0);
+    QVERIFY(std::abs(state.propertyValueAt(track, clip, prop, 0.0, 0.0)) < 1e-6);
+    QVERIFY(std::abs(state.propertyValueAt(track, clip, prop, 2.0, 0.0) - 100.0) < 1e-6);
+}
+
+void EditorStateTest::segmentEasingMirrorsLinkedPosition()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    state.addTextClip(QStringLiteral("Linked"), 0.0);
+    const int track = state.selectedTrack();
+    const int clip = state.selectedClip();
+    state.setPositionLinked(true);
+    state.setClipKeyframe(track, clip, QStringLiteral("x"), 0.0, 0.0);
+    state.setClipKeyframe(track, clip, QStringLiteral("x"), 2.0, 100.0);
+    state.setClipKeyframe(track, clip, QStringLiteral("y"), 0.0, 0.0);
+    state.setClipKeyframe(track, clip, QStringLiteral("y"), 2.0, 50.0);
+
+    const QVariantMap cubicOut = drift::findBuiltinEasingPreset(QStringLiteral("cubicOut"))->spec.toJson().toVariantMap();
+    state.setKeyframeSegmentEasing(track, clip, QStringLiteral("x"), 0.0, cubicOut);
+    QCOMPARE(state.keyframeSegmentEasing(track, clip, QStringLiteral("y"), 0.0).value(QStringLiteral("presetId")).toString(),
+             QStringLiteral("cubicOut"));
+}
+
+void EditorStateTest::easingPresetStoreSaveRenameDelete()
+{
+    const QString org = QCoreApplication::organizationName();
+    const QString app = QCoreApplication::applicationName();
+    QStandardPaths::setTestModeEnabled(true);
+    QCoreApplication::setOrganizationName(QStringLiteral("DriftTest"));
+    QCoreApplication::setApplicationName(QStringLiteral("DriftTestEasingPresets"));
+    QFile::remove(drift::EasingPresetStore::storePath());
+    drift::EasingPresetStore::instance().reload();
+
+    AssetLibrary library;
+    AppController state(&library);
+    auto userPresets = [&state] {
+        QVariantList out;
+        for (const QVariant &preset : state.easingPresets()) {
+            if (preset.toMap().value(QStringLiteral("user")).toBool())
+                out.append(preset);
+        }
+        return out;
+    };
+    QSignalSpy changed(&state, &AppController::easingPresetsChanged);
+
+    const QVariantMap spec = drift::findBuiltinEasingPreset(QStringLiteral("cubicOut"))->spec.toJson().toVariantMap();
+    const QString id = state.saveEasingPreset(QStringLiteral("Punchy"), spec);
+    QVERIFY(!id.isEmpty());
+    QCOMPARE(changed.count(), 1);
+    QCOMPARE(userPresets().size(), 1);
+    QCOMPARE(userPresets().first().toMap().value(QStringLiteral("label")).toString(), QStringLiteral("Punchy"));
+    QCOMPARE(userPresets().first().toMap().value(QStringLiteral("family")).toString(), QStringLiteral("user"));
+
+    QVERIFY(state.renameEasingPreset(id, QStringLiteral("Snappy")));
+    QCOMPARE(changed.count(), 2);
+    QCOMPARE(userPresets().first().toMap().value(QStringLiteral("label")).toString(), QStringLiteral("Snappy"));
+
+    QVERIFY(state.deleteEasingPreset(id));
+    QCOMPARE(changed.count(), 3);
+    QCOMPARE(userPresets().size(), 0);
+    QVERIFY(!state.deleteEasingPreset(id));
+    QCOMPARE(changed.count(), 3);
+
+    QFile::remove(drift::EasingPresetStore::storePath());
+    drift::EasingPresetStore::instance().reload();
+    QCoreApplication::setOrganizationName(org);
+    QCoreApplication::setApplicationName(app);
+    QStandardPaths::setTestModeEnabled(false);
+}
+
 // End-to-end noise removal through the controller: the whole clip is rendered on a worker thread
 // and the result lands on a new audio track directly above the source, as one undoable edit.
 void EditorStateTest::denoiseAddsCleanedClipOnTrackAbove()
@@ -6540,7 +7359,7 @@ void EditorStateTest::audioRecordingVoiceoverWorkflow()
     QCOMPARE(state.audioRecordLevel(), 0.0f);
     QCOMPARE(state.audioRecordSeconds(), 0.0);
     QCOMPARE(state.audioRecordGain(), 1.0f);
-    QVERIFY(state.audioRecordLivePeaks().isEmpty());
+    QCOMPARE(state.audioRecordLivePeakCount(), 0);
 
     // Gain adjustment
     state.setAudioRecordGain(1.25f);
@@ -6592,7 +7411,7 @@ void EditorStateTest::audioRecordingVoiceoverWorkflow()
         QCOMPARE(state.playing(), false);
         QCOMPARE(state.playheadSeconds(), 2.5);
         QCOMPARE(project.tracks().at(0).clips.size(), 1);
-        QVERIFY(state.audioRecordLivePeaks().isEmpty());
+        QCOMPARE(state.audioRecordLivePeakCount(), 0);
 
         // Start recording again to test commit and undo/redo
         state.setPlayheadSeconds(3.0);
@@ -6609,7 +7428,7 @@ void EditorStateTest::audioRecordingVoiceoverWorkflow()
         QCOMPARE(state.isAudioRecordingPaused(), false);
         QCOMPARE(state.playing(), false);
         QCOMPARE(project.tracks().at(0).clips.size(), 2);
-        QVERIFY(state.audioRecordLivePeaks().isEmpty());
+        QCOMPARE(state.audioRecordLivePeakCount(), 0);
 
         const drift::Clip &newClip = project.tracks().at(0).clips.at(1);
         QCOMPARE(newClip.type, drift::ClipType::Audio);
@@ -10768,6 +11587,119 @@ void EditorStateTest::videoTransitionMirrorsToLinkedAudio()
     state.addTransition(vt, 0, QStringLiteral("crossfade"), 0.5, false);
     QCOMPARE(state.project()->tracks().at(vt).transitions.size(), 1);
     QCOMPARE(state.project()->tracks().at(at).transitions.size(), 0);
+}
+
+void EditorStateTest::colorGradeCreatedOnFirstDragIsOneUndoStep()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    appendTwoVideoClips(*state.project());
+    state.selectClip(0, 0);
+    const int tracksBefore = state.project()->tracks().size();
+    const int undoBefore = state.undoIndex();
+
+    state.color()->beginEdit(QStringLiteral("x"));
+    state.color()->setParam(QStringLiteral("exposure"), 1.0);
+    state.color()->commitEdit();
+
+    const QList<drift::Effect> grades = videoEffectsOf(*state.project(), mediaClip(*state.project(), 0, 0));
+    QCOMPARE(grades.size(), 1);
+    QCOMPARE(grades.at(0).catalogId, QStringLiteral("color.grade"));
+    QCOMPARE(grades.at(0).parameters.value(QStringLiteral("exposure")).toDouble(), 1.0);
+    QCOMPARE(state.undoIndex(), undoBefore + 1);
+
+    state.undo();
+    QVERIFY(videoEffectsOf(*state.project(), mediaClip(*state.project(), 0, 0)).isEmpty());
+    QCOMPARE(state.project()->tracks().size(), tracksBefore);
+    QCOMPARE(state.undoIndex(), undoBefore);
+}
+
+void EditorStateTest::colorApplyToAllReplacesExistingGrade()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    appendTwoVideoClips(*state.project());
+    const auto gradesOf = [&](int clipIndex) {
+        return videoEffectsOf(*state.project(), mediaClip(*state.project(), 0, clipIndex));
+    };
+    const auto gradeCount = [&](int clipIndex) {
+        int count = 0;
+        for (const drift::Effect &effect : gradesOf(clipIndex))
+            count += effect.catalogId == QStringLiteral("color.grade");
+        return count;
+    };
+
+    state.selectClip(0, 0);
+    state.color()->beginEdit(QStringLiteral("a"));
+    state.color()->setParam(QStringLiteral("exposure"), 0.5);
+    state.color()->commitEdit();
+
+    state.selectClip(0, 1);
+    state.color()->beginEdit(QStringLiteral("b"));
+    state.color()->setParam(QStringLiteral("exposure"), -1.0);
+    state.color()->commitEdit();
+    QCOMPARE(gradeCount(1), 1);
+
+    state.selectClip(0, 0);
+    const int undoBefore = state.undoIndex();
+    QCOMPARE(state.color()->applyToAll(false), 1);
+    QCOMPARE(state.undoIndex(), undoBefore + 1);
+
+    QCOMPARE(gradeCount(1), 1);
+    const drift::Effect copied = gradesOf(1).at(0);
+    QCOMPARE(copied.parameters.value(QStringLiteral("exposure")).toDouble(), 0.5);
+
+    state.undo();
+    QCOMPARE(gradeCount(1), 1);
+    QCOMPARE(gradesOf(1).at(0).parameters.value(QStringLiteral("exposure")).toDouble(), -1.0);
+}
+
+void EditorStateTest::colorBypassLeavesUndoAndDirtyUntouched()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    appendTwoVideoClips(*state.project());
+    state.selectClip(0, 0);
+    state.color()->beginEdit(QStringLiteral("x"));
+    state.color()->setParam(QStringLiteral("exposure"), 1.0);
+    state.color()->commitEdit();
+
+    state.projectFile()->setDirty(false);
+    const int undoBefore = state.undoIndex();
+    state.color()->setBypass(true);
+    QVERIFY(state.color()->bypass());
+    QCOMPARE(state.undoIndex(), undoBefore);
+    QVERIFY(!state.projectFile()->hasUnsavedChanges());
+
+    state.color()->setBypass(false);
+    QVERIFY(!state.color()->bypass());
+    QCOMPARE(state.undoIndex(), undoBefore);
+    QVERIFY(!state.projectFile()->hasUnsavedChanges());
+}
+
+void EditorStateTest::setEffectTextParamRejectsNonTextParams()
+{
+    AssetLibrary library;
+    AppController state(&library);
+    appendTwoVideoClips(*state.project());
+    state.selectClip(0, 0);
+    state.color()->beginEdit(QStringLiteral("x"));
+    state.color()->setParam(QStringLiteral("exposure"), 0.25);
+    state.color()->commitEdit();
+
+    const QList<drift::Effect> effects = videoEffectsOf(*state.project(), mediaClip(*state.project(), 0, 0));
+    int grade = -1;
+    for (int i = 0; i < effects.size(); ++i) {
+        if (effects.at(i).catalogId == QStringLiteral("color.grade"))
+            grade = i;
+    }
+    QVERIFY(grade >= 0);
+
+    QVERIFY(!state.setEffectTextParam(0, 0, grade, QStringLiteral("exposure"), QStringLiteral("1")));
+    QVERIFY(state.setEffectTextParam(0, 0, grade, QStringLiteral("look"), QStringLiteral("warm_tone")));
+    QCOMPARE(videoEffectsOf(*state.project(), mediaClip(*state.project(), 0, 0)).at(grade)
+                 .parameters.value(QStringLiteral("look")).toString(),
+             QStringLiteral("warm_tone"));
 }
 
 QTEST_MAIN(EditorStateTest)

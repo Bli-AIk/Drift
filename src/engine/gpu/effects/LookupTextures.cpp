@@ -3,6 +3,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QPointF>
 
 #include <algorithm>
 #include <array>
@@ -59,6 +60,58 @@ uint8_t toByte(double v)
 
 } // namespace
 
+double evalMonotoneSpline(const std::vector<QPointF> &keys, double x)
+{
+    const size_t n = keys.size();
+    if (n == 0)
+        return 0.0;
+    if (x <= keys.front().x())
+        return keys.front().y();
+    if (x >= keys.back().x())
+        return keys.back().y();
+
+    const size_t segments = n - 1;
+    std::vector<double> d(segments);
+    for (size_t j = 0; j < segments; ++j) {
+        const double dx = keys[j + 1].x() - keys[j].x();
+        d[j] = dx > 0.0 ? (keys[j + 1].y() - keys[j].y()) / dx : 0.0;
+    }
+    std::vector<double> m(n);
+    m.front() = d.front();
+    m.back() = d.back();
+    for (size_t j = 1; j < segments; ++j)
+        m[j] = d[j - 1] * d[j] <= 0.0 ? 0.0 : (d[j - 1] + d[j]) / 2.0;
+    for (size_t j = 0; j < segments; ++j) {
+        if (d[j] == 0.0) {
+            m[j] = 0.0;
+            m[j + 1] = 0.0;
+            continue;
+        }
+        const double a = m[j] / d[j];
+        const double b = m[j + 1] / d[j];
+        const double s = a * a + b * b;
+        if (s > 9.0) {
+            const double t = 3.0 / std::sqrt(s);
+            m[j] = t * a * d[j];
+            m[j + 1] = t * b * d[j];
+        }
+    }
+
+    size_t k = 0;
+    while (k + 2 < n && keys[k + 1].x() <= x)
+        ++k;
+    const double h = keys[k + 1].x() - keys[k].x();
+    const double t = (x - keys[k].x()) / h;
+    const double t2 = t * t;
+    const double t3 = t2 * t;
+    const double h00 = 2.0 * t3 - 3.0 * t2 + 1.0;
+    const double h10 = t3 - 2.0 * t2 + t;
+    const double h01 = -2.0 * t3 + 3.0 * t2;
+    const double h11 = t3 - t2;
+    const double y = h00 * keys[k].y() + h10 * h * m[k] + h01 * keys[k + 1].y() + h11 * h * m[k + 1];
+    return std::clamp(y, 0.0, 1.0);
+}
+
 QByteArray bakeGradient(const QString &json)
 {
     QJsonParseError error;
@@ -106,29 +159,63 @@ QByteArray bakeGradient(const QString &json)
     return out;
 }
 
-QByteArray bakeCurve(const QString &json)
+namespace {
+
+struct CurveKey
+{
+    double x;
+    double y;
+    QString ease;
+};
+
+std::vector<CurveKey> parseCurveKeys(const QString &json)
 {
     QJsonParseError error;
     const QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &error);
     if (error.error != QJsonParseError::NoError || !doc.isArray())
         return {};
-
-    struct Key
-    {
-        double x;
-        double y;
-        QString ease;
-    };
-    std::vector<Key> keys;
+    std::vector<CurveKey> keys;
     for (const QJsonValue &value : doc.array()) {
         const QJsonObject key = value.toObject();
         keys.push_back({key.value(QStringLiteral("x")).toDouble(),
                         key.value(QStringLiteral("y")).toDouble(),
                         key.value(QStringLiteral("ease")).toString(QStringLiteral("linear"))});
     }
+    std::stable_sort(keys.begin(), keys.end(), [](const CurveKey &a, const CurveKey &b) { return a.x < b.x; });
+    return keys;
+}
+
+} // namespace
+
+QByteArray bakeCurve(const QString &json, bool periodic)
+{
+    std::vector<CurveKey> keys = parseCurveKeys(json);
     if (keys.empty())
         return {};
-    std::stable_sort(keys.begin(), keys.end(), [](const Key &a, const Key &b) { return a.x < b.x; });
+
+    // A hue curve is evaluated over copies of its keys one period either side, so the spline's
+    // tangents at red see the keys across the wrap. A key at 1 tied to the one at 0 is the same
+    // key, and keeping both would flatten the tangent there.
+    if (periodic) {
+        if (keys.size() > 1 && keys.front().x <= 0.0 && keys.back().x >= 1.0
+            && std::abs(keys.back().y - keys.front().y) < 1e-9) {
+            keys.pop_back();
+        }
+        std::vector<CurveKey> extended;
+        extended.reserve(keys.size() * 3);
+        for (const double shift : {-1.0, 0.0, 1.0}) {
+            for (const CurveKey &key : keys)
+                extended.push_back({key.x + shift, key.y, key.ease});
+        }
+        std::stable_sort(extended.begin(), extended.end(),
+                         [](const CurveKey &a, const CurveKey &b) { return a.x < b.x; });
+        keys = std::move(extended);
+    }
+
+    std::vector<QPointF> points;
+    points.reserve(keys.size());
+    for (const CurveKey &key : keys)
+        points.emplace_back(key.x, key.y);
 
     QByteArray out(kTexels * 4, Qt::Uninitialized);
     for (int i = 0; i < kTexels; ++i) {
@@ -140,10 +227,16 @@ QByteArray bakeCurve(const QString &json)
             y = keys.back().y;
         } else {
             const auto right = std::lower_bound(keys.begin(), keys.end(), t,
-                                                [](const Key &k, double v) { return k.x < v; });
-            const Key &left = *(right - 1);
-            const double k = (t - left.x) / (right->x - left.x);
-            y = left.y + (right->y - left.y) * applyEase(left.ease, k);
+                                                [](const CurveKey &k, double v) { return k.x < v; });
+            const CurveKey &left = *(right - 1);
+            if (left.ease == QLatin1String("spline")) {
+                y = evalMonotoneSpline(points, t);
+            } else if (right->x > left.x) {
+                const double k = (t - left.x) / (right->x - left.x);
+                y = left.y + (right->y - left.y) * applyEase(left.ease, k);
+            } else {
+                y = right->y;
+            }
         }
         const char value = char(toByte(y));
         out[i * 4 + 0] = value;
@@ -152,6 +245,23 @@ QByteArray bakeCurve(const QString &json)
         out[i * 4 + 3] = char(255);
     }
     return out;
+}
+
+bool curveIsIdentity(const QString &json, bool hue)
+{
+    const std::vector<CurveKey> keys = parseCurveKeys(json);
+    if (keys.empty())
+        return false;
+    for (size_t i = 0; i < keys.size(); ++i) {
+        const CurveKey &key = keys[i];
+        if (std::abs(key.y - (hue ? 0.5 : key.x)) > 1e-9)
+            return false;
+        if (hue)
+            continue;
+        if (i + 1 < keys.size() && key.ease != QLatin1String("linear") && key.ease != QLatin1String("spline"))
+            return false;
+    }
+    return hue || (keys.front().x <= 0.0 && keys.back().x >= 1.0);
 }
 
 } // namespace drift

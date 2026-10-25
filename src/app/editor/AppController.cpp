@@ -11,6 +11,7 @@
 #include "core/project/clip/Clip.h"
 #include "core/effects/Mask.h"
 #include "core/animation/SpeedCurve.h"
+#include "core/animation/EasingPresetStore.h"
 #include "core/interchange/premiere/PrprojReader.h"
 #include "core/interchange/premiere/MogrtReader.h"
 #include "core/interchange/KdenliveReader.h"
@@ -20,6 +21,7 @@
 #include "core/shapes/ShapePath.h"
 #include "core/project/SubtitleCue.h"
 #include "core/interchange/subtitles/SrtIO.h"
+#include "core/interchange/subtitles/VttIO.h"
 #include "core/project/sources/DotLottie.h"
 #include "core/text/animation/LottieTextImport.h"
 #include "core/text/animation/TextAnimationPreset.h"
@@ -42,6 +44,7 @@
 #include "engine/packages/audio/AudioEffectCatalog.h"
 #include "engine/packages/effects/EffectCatalog.h"
 #include "engine/packages/effects/EffectTemplateCatalog.h"
+#include "engine/packages/looks/LookCatalog.h"
 #include "engine/encode/export/Exporter.h"
 #include "engine/packages/assets/EmojiCatalog.h"
 #include "engine/packages/assets/FontCatalog.h"
@@ -50,6 +53,7 @@
 // caches have no other owner outside src/engine to ask. A one-line forwarder on GpuCompositor
 // would restore the boundary.
 #include "engine/gpu/GlRuntime.h"
+#include "engine/color/CubeLut.h"
 #include "engine/media/thumbnails/MediaThumbnail.h"
 #include "engine/ml/vision/detection/ObjectDetector.h"
 #include "engine/ml/runtime/OrtRuntime.h"
@@ -97,6 +101,7 @@
 #include <QClipboard>
 #include <QColor>
 #include <QCoreApplication>
+#include <QPointer>
 #include <QCryptographicHash>
 #include <QCursor>
 #include <QDateTime>
@@ -239,7 +244,7 @@ QString readTargetPath(const QUrl &url)
         if (!dst.open(QIODevice::WriteOnly | QIODevice::Truncate))
             return {};
         constexpr qint64 kChunk = 1024 * 1024;
-        while (!src->atEnd()) {
+        for (;;) {
             const QByteArray chunk = src->read(kChunk);
             if (chunk.isEmpty())
                 break;
@@ -728,6 +733,8 @@ void AppController::setAddonManager(AddonManager *manager)
     m_addonManager = manager;
     if (manager && m_tts)
         connect(manager, &AddonManager::kindChanged, m_tts, &TtsController::refreshAvailability);
+    if (manager && m_color)
+        connect(manager, &AddonManager::kindChanged, m_color, &ColorController::refreshForKind);
     if (manager) {
         connect(manager, &AddonManager::kindChanged, this, [this](const QString &kind) {
             if (kind != QLatin1String(drift::pdfium::kPdfiumKind))
@@ -772,6 +779,9 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
     m_sceneDetect = new SceneDetectController(this, this);
     m_depth = new DepthController(this, this);
     m_denoise = new DenoiseController(this, this);
+    m_color = new ColorController(this, this);
+    m_keyframes = new KeyframeController(this, this);
+    m_subtitles = new SubtitleController(this, this);
     m_restore = new RestoreController(this, this);
     m_faces = new FaceTrackingController(this, this);
     m_stabilize = new StabilizeController(this, this);
@@ -795,6 +805,10 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
     // WYSIWYG preview drag emits only tracksChanged). This keeps the Clip
     // Properties panel in sync with the preview in both directions.
     connect(this, &AppController::selectionChanged, this, &AppController::selectedClipDataChanged);
+    connect(this, &AppController::selectedClipDataChanged, this,
+            &AppController::selectedClipRotationAtPlayheadChanged);
+    connect(this, &AppController::inspectorPlayheadChanged, this,
+            &AppController::selectedClipRotationAtPlayheadChanged);
     connect(this, &AppController::selectionChanged, this, &AppController::editCapabilitiesChanged);
     connect(this, &AppController::tracksChanged, this, &AppController::editCapabilitiesChanged);
     connect(this, &AppController::tracksChanged, this, &AppController::selectedClipDataChanged);
@@ -2887,6 +2901,33 @@ bool parseAudioEffectProp(const QString &prop, int *effectIndex, QString *paramK
     return parseIndexedProp(prop, QLatin1String("afx."), effectIndex, paramKey);
 }
 
+// A colour animates as "<key>.r/.g/.b/.a" in 0..1, but its static value is one "#rrggbb[aa]" hex
+// on the base key. This is the static channel the unkeyed curve starts from.
+bool staticColorChannel(const QMap<QString, QVariant> &params, const QString &paramKey, double *out)
+{
+    if (paramKey.size() < 3 || paramKey.at(paramKey.size() - 2) != QLatin1Char('.'))
+        return false;
+    const QString hex = params.value(paramKey.chopped(2)).toString();
+    if (!hex.startsWith(QLatin1Char('#')) || (hex.size() != 7 && hex.size() != 9))
+        return false;
+    const QColor color(hex.left(7));
+    switch (paramKey.back().toLatin1()) {
+    case 'r':
+        *out = color.redF();
+        return true;
+    case 'g':
+        *out = color.greenF();
+        return true;
+    case 'b':
+        *out = color.blueF();
+        return true;
+    case 'a':
+        *out = hex.size() == 9 ? hex.right(2).toInt(nullptr, 16) / 255.0 : 1.0;
+        return true;
+    }
+    return false;
+}
+
 // A mask scalar is addressed as "mask.<key>" — no index, because a Mask adjustment carries
 // exactly one mask. The prop resolves against the adjustment clip itself; redirectToKeyframeHost
 // is what walks there from the media clip the user actually has selected.
@@ -3376,6 +3417,24 @@ bool writeClipPropValue(drift::Clip &clip, const QString &prop, drift::TimeUs re
     return true;
 }
 
+static drift::EasingSpec easingSpecFromVariant(const QVariantMap &spec)
+{
+    return drift::EasingSpec::fromJson(QJsonObject::fromVariantMap(spec));
+}
+
+static QVariantMap easingSpecToVariant(const drift::EasingSpec &spec)
+{
+    return spec.toJson().toVariantMap();
+}
+
+static QVariantList easingSamplesToVariant(const drift::EasingSpec &spec, int n)
+{
+    QVariantList out;
+    for (const QPointF &point : drift::sampleEasing(spec, n))
+        out.append(point);
+    return out;
+}
+
 QVariantList keyframeListToVariant(const drift::KeyframeTrack<double> &track, drift::TimeUs timelineStart)
 {
     QVariantList out;
@@ -3394,6 +3453,9 @@ QVariantList keyframeListToVariant(const drift::KeyframeTrack<double> &track, dr
             {QStringLiteral("hold"), key.hold},
             {QStringLiteral("easing"), drift::interpolationToString(track.easingAt(it.key()))},
             {QStringLiteral("custom"), track.hasCustomTangents(it.key())},
+            {QStringLiteral("fn"), drift::easingFnToString(key.fn)},
+            {QStringLiteral("fnAmp"), key.fnAmplitude},
+            {QStringLiteral("fnPeriod"), key.fnPeriod},
         });
     }
     return out;
@@ -3461,10 +3523,19 @@ QVariantMap effectToMap(const drift::Effect &effect, int effectIndex, drift::Tim
             }
             if (paramDef.isEnum())
                 param.insert(QStringLiteral("options"), paramDef.options);
+            if (paramDef.type == drift::EffectParamType::Lut) {
+                const QString look = value.toString();
+                const std::optional<drift::LookEntry> entry = drift::lookForId(look);
+                param.insert(QStringLiteral("lookLabel"), entry ? entry->label : look);
+                param.insert(QStringLiteral("missing"),
+                             !look.isEmpty() && drift::resolveLutPath(look).isEmpty());
+            }
             if (paramDef.step > 0.0)
                 param.insert(QStringLiteral("step"), paramDef.step);
             if (paramDef.isColor())
                 param.insert(QStringLiteral("alpha"), paramDef.alpha);
+            if (paramDef.type == drift::EffectParamType::Curve)
+                param.insert(QStringLiteral("curveMode"), paramDef.curveMode);
             if (paramDef.isFilePath()) {
                 param.insert(QStringLiteral("fileFilters"), paramDef.fileFilters);
                 const QString path = value.toString();
@@ -3764,6 +3835,33 @@ bool AppController::writeClipProp(drift::Clip &clip, const QString &prop, drift:
 drift::KeyframeTrack<double> *AppController::transformTrack(drift::Clip &clip, const QString &prop)
 {
     return transformTrackForProp(clip, prop);
+}
+
+drift::KeyframeTrack<double> *AppController::propKeyframeTrack(drift::Clip &clip, const QString &prop,
+                                                               bool create)
+{
+    return keyframeTrackForProp(clip, prop, create);
+}
+
+const drift::KeyframeTrack<double> *AppController::propKeyframeTrack(const drift::Clip &clip,
+                                                                     const QString &prop) const
+{
+    return keyframeTrackForProp(clip, prop);
+}
+
+drift::TimeUs AppController::keyframeToleranceUs()
+{
+    return kKeyframeToleranceUs;
+}
+
+drift::TimeUs AppController::keyframeWriteSnapUs()
+{
+    return kKeyframeWriteSnapUs;
+}
+
+drift::EasingSpec AppController::easingSpecFromMap(const QVariantMap &spec)
+{
+    return easingSpecFromVariant(spec);
 }
 
 void AppController::clearPose3d(drift::Clip &clip)
@@ -4828,7 +4926,6 @@ TimelineClipsModel::Row AppController::clipRow(const drift::Clip &clip,
     row.outPoint = drift::usToSeconds(clip.srcOut);
     row.sourceDuration = sourceAsset ? drift::usToSeconds(sourceAsset->durationUs) : 0.0;
     row.audioStreamIndex = clip.audioStreamIndex;
-    row.volumeCurve = clip.volume;
     // For the waveform bar: not once the audio has been separated, nor when the source has no
     // audio stream. An unprobed source gets the benefit of the doubt; its waveform stays empty.
     row.hasEmbeddedAudio = clip.type == drift::ClipType::Video && !clip.suppressEmbeddedAudio
@@ -4867,6 +4964,23 @@ TimelineClipsModel::Row AppController::clipRow(const drift::Clip &clip,
         }
     }
     row.effectsLabel = effectNames.join(QStringLiteral(" · "));
+    for (const auto &kv : clip.volume.keyframes().asKeyValueRange())
+        row.volumeKeys.append(QVariantMap{
+            {QStringLiteral("t"), drift::usToSeconds(kv.first)},
+            {QStringLiteral("v"), kv.second.value},
+        });
+    row.volumeTyped = clip.volume;
+    const bool carriesAudio = clip.type == drift::ClipType::Audio
+                              || (clip.type == drift::ClipType::Video && row.hasEmbeddedAudio);
+    if (carriesAudio && clip.volume.keyframes().size() <= 1) {
+        const double gain = clip.volume.isEmpty() ? 1.0 : clip.volume.keyframes().constBegin()->value;
+        if (gain <= 0.0) {
+            row.volumeLabel = tr("-inf dB");
+        } else if (const double db = 20.0 * std::log10(gain); std::abs(db) >= 0.05) {
+            row.volumeLabel = tr("%1 dB").arg((db > 0.0 ? QStringLiteral("+") : QString())
+                                              + QString::number(db, 'f', 1));
+        }
+    }
     return row;
 }
 
@@ -5348,9 +5462,6 @@ QVariantMap AppController::selectedClipData() const
         if (data.isEmpty() || !isValidClipIndex(trackIndex, clipIndex))
             return data;
         const drift::Clip &clip = m_project.tracks().at(trackIndex).clips.at(clipIndex);
-        const drift::TimeUs relative = qMax<drift::TimeUs>(0, m_playheadUs - clip.timelineStart);
-        data.insert(QStringLiteral("rotationAtPlayhead"),
-                    clipTransformValue(clip.rotation, relative, 0.0));
         data.insert(QStringLiteral("caps"),
                     inspectorCaps(clip, m_project.tracks().at(trackIndex).type));
         return data;
@@ -5367,6 +5478,22 @@ QVariantMap AppController::selectedClipData() const
             return data;
     }
     return {};
+}
+
+double AppController::selectedClipRotationAtPlayhead() const
+{
+    auto rotation = [this](int trackIndex, int clipIndex) {
+        const drift::Clip &clip = m_project.tracks().at(trackIndex).clips.at(clipIndex);
+        const drift::TimeUs relative = qMax<drift::TimeUs>(0, m_playheadUs - clip.timelineStart);
+        return clipTransformValue(clip.rotation, relative, 0.0);
+    };
+    if (isValidClipIndex(m_selectedTrack, m_selectedClip))
+        return rotation(m_selectedTrack, m_selectedClip);
+    for (const QPair<int, int> &pair : m_selection) {
+        if (isValidClipIndex(pair.first, pair.second))
+            return rotation(pair.first, pair.second);
+    }
+    return 0.0;
 }
 
 QVariantList AppController::selectedClipEffects() const
@@ -5646,6 +5773,14 @@ void AppController::setPositionLinked(bool linked)
         return;
     m_positionLinked = linked;
     emit positionLinkedChanged();
+}
+
+void AppController::setSizeLinked(bool linked)
+{
+    if (m_sizeLinked == linked)
+        return;
+    m_sizeLinked = linked;
+    emit sizeLinkedChanged();
 }
 
 double AppController::masterVolume() const
@@ -6122,18 +6257,93 @@ void AppController::selectMicrophone(const QString &id)
     m_audioRecorder.selectDevice(id);
 }
 
-QVariantMap AppController::analyzeFocusedClipLoudness() const
+void AppController::startFocusedClipLoudness(bool normalize, double targetLufs)
 {
-    if (m_selectedTrack < 0 || m_selectedClip < 0)
-        return {{QStringLiteral("ok"), false}, {QStringLiteral("detail"), tr("Select a clip to measure")}};
-    return m_mcpController->analyzeLoudness(m_selectedTrack, m_selectedClip, 0, 0).toVariantMap();
+    if (m_loudnessBusy)
+        return;
+    if (!isValidClipIndex(m_selectedTrack, m_selectedClip)) {
+        emit loudnessFinished({{QStringLiteral("ok"), false},
+                               {QStringLiteral("detail"),
+                                normalize ? tr("Select a clip to normalize")
+                                          : tr("Select a clip to measure")}});
+        return;
+    }
+    // The clip is tracked by id: the selection indices can move while the measurement runs.
+    const QString clipId = m_project.tracks().at(m_selectedTrack).clips.at(m_selectedClip).id;
+    auto job = std::make_shared<const McpController::LoudnessJob>(
+        m_mcpController->clipLoudnessJob(m_selectedTrack, m_selectedClip));
+    m_loudnessCancel = std::make_shared<std::atomic<bool>>(false);
+    m_loudnessBusy = true;
+    m_loudnessProgress = 0.0;
+    emit loudnessBusyChanged();
+    emit loudnessProgressChanged();
+
+    QPointer<AppController> self(this);
+    (void)QtConcurrent::run([self, job, cancel = m_loudnessCancel, clipId, normalize, targetLufs]() {
+        double reported = 0.0;
+        const drift::LoudnessResult measured = McpController::measureLoudnessJob(
+            *job, [&](double fraction) {
+                if (cancel->load())
+                    return false;
+                if (fraction - reported >= 0.01) {
+                    reported = fraction;
+                    QMetaObject::invokeMethod(
+                        QCoreApplication::instance(),
+                        [self, fraction]() {
+                            if (!self)
+                                return;
+                            self->m_loudnessProgress = fraction;
+                            emit self->loudnessProgressChanged();
+                        },
+                        Qt::QueuedConnection);
+                }
+                return true;
+            });
+        QMetaObject::invokeMethod(
+            QCoreApplication::instance(),
+            [self, cancel, clipId, normalize, targetLufs, measured]() {
+                if (!self)
+                    return;
+                self->m_loudnessBusy = false;
+                self->m_loudnessProgress = 0.0;
+                emit self->loudnessBusyChanged();
+                emit self->loudnessProgressChanged();
+                // A cancelled run stopped mid-file, so its numbers are partial and it reports nothing.
+                if (cancel->load())
+                    return;
+                QVariantMap result;
+                if (!measured.ok) {
+                    result = QVariantMap{{QStringLiteral("ok"), false},
+                                         {QStringLiteral("detail"), tr("No audio in range")}};
+                } else if (!normalize) {
+                    result = QVariantMap{{QStringLiteral("ok"), true},
+                                         {QStringLiteral("lufs"), measured.integratedLufs},
+                                         {QStringLiteral("true_peak_db"), measured.truePeakDb},
+                                         {QStringLiteral("duration"), measured.durationSeconds}};
+                } else {
+                    const QPair<int, int> at = self->m_mcpController->locateClip(clipId);
+                    if (at.first < 0) {
+                        result = QVariantMap{{QStringLiteral("ok"), false},
+                                             {QStringLiteral("detail"),
+                                              tr("The clip is no longer in the timeline")}};
+                    } else {
+                        result = self->m_mcpController
+                                     ->applyNormalizeGain(at.first, at.second,
+                                                          measured.integratedLufs,
+                                                          measured.truePeakDb, targetLufs)
+                                     .toVariantMap();
+                    }
+                }
+                emit self->loudnessFinished(result);
+            },
+            Qt::QueuedConnection);
+    });
 }
 
-QVariantMap AppController::normalizeFocusedClipLoudness(double targetLufs)
+void AppController::cancelFocusedClipLoudness()
 {
-    if (m_selectedTrack < 0 || m_selectedClip < 0)
-        return {{QStringLiteral("ok"), false}, {QStringLiteral("detail"), tr("Select a clip to normalize")}};
-    return m_mcpController->normalizeVolume(m_selectedTrack, m_selectedClip, targetLufs).toVariantMap();
+    if (m_loudnessBusy)
+        m_loudnessCancel->store(true);
 }
 
 bool AppController::isAudioRecordingPaused() const
@@ -6151,9 +6361,14 @@ void AppController::setAudioRecordGain(float gain)
     m_audioRecorder.setGain(gain);
 }
 
-QVariantList AppController::audioRecordLivePeaks() const
+int AppController::audioRecordLivePeakCount() const
 {
-    return m_audioRecorder.livePeaks();
+    return m_audioRecorder.livePeakCount();
+}
+
+QVariantList AppController::audioRecordLivePeakColumns(double first, double count, int columns) const
+{
+    return m_audioRecorder.livePeakColumns(first, count, columns);
 }
 
 void AppController::pauseAudioRecording()
@@ -8498,6 +8713,11 @@ void AppController::addSubtitleClip(double atSeconds)
 
 namespace {
 
+bool isVttPath(const QString &path)
+{
+    return path.endsWith(QLatin1String(".vtt"), Qt::CaseInsensitive);
+}
+
 drift::TimeUs subtitleClipDurationForCues(const QList<drift::SubtitleCue> &cues)
 {
     drift::TimeUs duration = drift::kSubtitleClipDurationUs;
@@ -8518,7 +8738,8 @@ bool AppController::importSubtitleFile(const QUrl &url, double atSeconds)
 
     QList<drift::SubtitleCue> cues;
     QString error;
-    if (!drift::parseSrtFile(path, &cues, &error)) {
+    if (!(isVttPath(path) ? drift::parseVttFile(path, &cues, &error)
+                              : drift::parseSrtFile(path, &cues, &error))) {
         setLastMessage(error.isEmpty() ? tr("Could not read subtitle file") : error, QStringLiteral("error"));
         return false;
     }
@@ -8581,7 +8802,8 @@ bool AppController::importSubtitleFileIntoClip(int trackIndex, int clipIndex, co
 
     QList<drift::SubtitleCue> cues;
     QString error;
-    if (!drift::parseSrtFile(path, &cues, &error)) {
+    if (!(isVttPath(path) ? drift::parseVttFile(path, &cues, &error)
+                              : drift::parseSrtFile(path, &cues, &error))) {
         setLastMessage(error.isEmpty() ? tr("Could not read subtitle file") : error, QStringLiteral("error"));
         return false;
     }
@@ -8634,7 +8856,8 @@ bool AppController::exportSubtitleFile(int trackIndex, int clipIndex, const QUrl
     }
 
     QString error;
-    if (!drift::writeSrtFile(path, cues, &error)) {
+    if (!(isVttPath(path) ? drift::writeVttFile(path, cues, &error)
+                         : drift::writeSrtFile(path, cues, &error))) {
         setLastMessage(error.isEmpty() ? tr("Could not write subtitle file") : error, QStringLiteral("error"));
         return false;
     }
@@ -11860,6 +12083,12 @@ int AppController::inlineLineEdge(int pos, bool toEnd) const
 
 void AppController::setSubtitleCues(int trackIndex, int clipIndex, const QVariantList &cues)
 {
+    commitSubtitleCues(trackIndex, clipIndex, subtitleCuesFromMap(cues), tr("Subtitles updated"));
+}
+
+void AppController::commitSubtitleCues(int trackIndex, int clipIndex, QList<drift::SubtitleCue> cues,
+                                       const QString &undoText)
+{
     if (trackIndex < 0 || trackIndex >= m_project.tracks().size())
         return;
 
@@ -11872,10 +12101,10 @@ void AppController::setSubtitleCues(int trackIndex, int clipIndex, const QVarian
         return;
 
     const drift::Project before = m_project;
-    clip.subtitleCues = subtitleCuesFromMap(cues);
+    clip.subtitleCues = std::move(cues);
     clip.name = drift::subtitleClipName(clip.subtitleCues);
-    pushProjectEdit(before, tr("Subtitles updated"));
-    finishEdit(tr("Subtitles updated"));
+    pushProjectEdit(before, undoText);
+    finishEdit(undoText);
 }
 
 void AppController::previewSetSubtitleCues(int trackIndex, int clipIndex, const QVariantList &cues)
@@ -16115,15 +16344,29 @@ double AppController::propertyBaseValue(int trackIndex, int clipIndex, const QSt
             QString paramKey;
             if (parseEffectProp(prop, &effectIndex, &paramKey)
                 && effectIndex >= 0 && effectIndex < clip.effects.size()) {
-                const QVariant value = clip.effects.at(effectIndex).parameters.value(paramKey);
+                const drift::Effect &effect = clip.effects.at(effectIndex);
+                const QVariant value = effect.parameters.value(paramKey);
                 if (value.isValid())
                     return value.toDouble();
+                // Channel and vec2 keys have no stored entry of their own, so read the catalog-resolved
+                // map that the compositor builds for the same effect.
+                const EffectPresetEntry *def = effectDefForId(effect.catalogId);
+                const QMap<QString, QVariant> params = def ? resolvedEffectParameters(effect, *def) : effect.parameters;
+                if (params.value(paramKey).isValid())
+                    return params.value(paramKey).toDouble();
+                double channel = 0.0;
+                if (staticColorChannel(params, paramKey, &channel))
+                    return channel;
             }
             if (parseAudioEffectProp(prop, &effectIndex, &paramKey)
                 && effectIndex >= 0 && effectIndex < clip.audioEffects.size()) {
-                const QVariant value = clip.audioEffects.at(effectIndex).parameters.value(paramKey);
+                const drift::Effect &effect = clip.audioEffects.at(effectIndex);
+                const QVariant value = effect.parameters.value(paramKey);
                 if (value.isValid())
                     return value.toDouble();
+                double channel = 0.0;
+                if (staticColorChannel(effect.parameters, paramKey, &channel))
+                    return channel;
             }
             // Same rule for a mask scalar: the static member is what the rasterizer reads when
             // the track is empty, so it is the curve's baseline.
@@ -16434,6 +16677,197 @@ void AppController::setKeyframeEasingAt(int trackIndex, int clipIndex, const QSt
 
     pushProjectEdit(before, tr("Keyframe easing changed"));
     finishEdit(tr("Keyframe easing updated"));
+}
+
+QVariantList AppController::easingPresets() const
+{
+    constexpr int kSamples = 24;
+    QVariantList out;
+    for (const drift::EasingPreset &preset : drift::builtinEasingPresets()) {
+        out.append(QVariantMap{
+            {QStringLiteral("id"), preset.id},
+            {QStringLiteral("label"),
+             QCoreApplication::translate("EasingPresets", preset.label.toUtf8().constData())},
+            {QStringLiteral("family"), preset.family},
+            {QStringLiteral("user"), false},
+            {QStringLiteral("spec"), easingSpecToVariant(preset.spec)},
+            {QStringLiteral("samples"), easingSamplesToVariant(preset.spec, kSamples)},
+        });
+    }
+    for (const drift::UserEasingPreset &preset : drift::EasingPresetStore::instance().all()) {
+        out.append(QVariantMap{
+            {QStringLiteral("id"), preset.id},
+            {QStringLiteral("label"), preset.label},
+            {QStringLiteral("family"), QStringLiteral("user")},
+            {QStringLiteral("user"), true},
+            {QStringLiteral("spec"), easingSpecToVariant(preset.spec)},
+            {QStringLiteral("samples"), easingSamplesToVariant(preset.spec, kSamples)},
+        });
+    }
+    return out;
+}
+
+QVariantList AppController::easingSamples(const QVariantMap &spec, int n) const
+{
+    return easingSamplesToVariant(easingSpecFromVariant(spec), n);
+}
+
+QVariantMap AppController::keyframeSegmentEasing(int trackIndex, int clipIndex, const QString &prop,
+                                                 double atSeconds) const
+{
+    if (trackIndex < 0 || trackIndex >= m_project.tracks().size())
+        return {};
+    redirectToKeyframeHost(&trackIndex, &clipIndex, prop);
+
+    const drift::Track &track = m_project.tracks().at(trackIndex);
+    if (clipIndex < 0 || clipIndex >= track.clips.size())
+        return {};
+
+    const drift::Clip &clip = track.clips.at(clipIndex);
+    const drift::KeyframeTrack<double> *kt = keyframeTrackForProp(clip, prop);
+    if (!kt || kt->isEmpty())
+        return {};
+
+    const drift::TimeUs local = drift::secondsToUs(atSeconds) - clip.timelineStart;
+    const drift::TimeUs at = kt->nearestKeyframe(local, drift::kUsPerSecond / 60);
+    if (at < 0)
+        return {};
+
+    const drift::EasingSpec spec = kt->segmentEasing(at);
+    QString presetId = drift::matchBuiltinEasingPreset(spec);
+    if (presetId.isEmpty()) {
+        for (const drift::UserEasingPreset &preset : drift::EasingPresetStore::instance().all()) {
+            if (preset.spec.approxEquals(spec)) {
+                presetId = preset.id;
+                break;
+            }
+        }
+    }
+
+    return {
+        {QStringLiteral("spec"), easingSpecToVariant(spec)},
+        {QStringLiteral("presetId"), presetId},
+        {QStringLiteral("samples"), easingSamplesToVariant(spec, 24)},
+        {QStringLiteral("hasSegment"), kt->keyframes().size() >= 2},
+    };
+}
+
+bool AppController::shapeKeyframeSegments(int trackIndex, int clipIndex, const QString &prop,
+                                          double atSeconds, const drift::EasingSpec &spec,
+                                          bool allSegments)
+{
+    if (trackIndex < 0 || trackIndex >= m_project.tracks().size())
+        return false;
+    redirectToKeyframeHost(&trackIndex, &clipIndex, prop);
+
+    drift::Track &track = m_project.tracks()[trackIndex];
+    if (clipIndex < 0 || clipIndex >= track.clips.size())
+        return false;
+
+    drift::Clip &clip = track.clips[clipIndex];
+    drift::KeyframeTrack<double> *kt = keyframeTrackForProp(clip, prop, /*createIfMissing=*/false);
+    if (!kt || kt->isEmpty())
+        return false;
+
+    const drift::TimeUs local = drift::secondsToUs(atSeconds) - clip.timelineStart;
+    drift::TimeUs at = -1;
+    if (!allSegments) {
+        at = kt->nearestKeyframe(local, drift::kUsPerSecond / 60);
+        if (at < 0)
+            return false;
+    }
+
+    auto shape = [&](drift::KeyframeTrack<double> *target) {
+        if (allSegments)
+            target->setSegmentEasingAll(spec);
+        else
+            target->setSegmentEasing(at, spec);
+    };
+    shape(kt);
+
+    if (m_positionLinked && (prop == QLatin1String("x") || prop == QLatin1String("y"))) {
+        const QString otherProp = (prop == QLatin1String("x")) ? QStringLiteral("y") : QStringLiteral("x");
+        drift::KeyframeTrack<double> *otherKt = keyframeTrackForProp(clip, otherProp, /*createIfMissing=*/false);
+        if (otherKt && !otherKt->isEmpty()) {
+            if (allSegments) {
+                shape(otherKt);
+            } else {
+                const drift::TimeUs otherAt = otherKt->nearestKeyframe(local, drift::kUsPerSecond / 60);
+                if (otherAt >= 0)
+                    otherKt->setSegmentEasing(otherAt, spec);
+            }
+        }
+    }
+    return true;
+}
+
+void AppController::setKeyframeSegmentEasing(int trackIndex, int clipIndex, const QString &prop,
+                                             double atSeconds, const QVariantMap &spec)
+{
+    // Snapshot first, for the same reason as setKeyframeTangents.
+    const drift::Project before = m_project;
+    if (!shapeKeyframeSegments(trackIndex, clipIndex, prop, atSeconds, easingSpecFromVariant(spec), false))
+        return;
+    pushProjectEdit(before, tr("Keyframe easing changed"));
+    finishEdit(tr("Keyframe easing updated"));
+}
+
+void AppController::previewSetKeyframeSegmentEasing(int trackIndex, int clipIndex, const QString &prop,
+                                                    double atSeconds, const QVariantMap &spec)
+{
+    if (!shapeKeyframeSegments(trackIndex, clipIndex, prop, atSeconds, easingSpecFromVariant(spec), false))
+        return;
+    notifyTracksChanged();
+    emit selectedClipDataChanged();
+    emit projectMutated();
+}
+
+void AppController::applyEasingToAllSegments(int trackIndex, int clipIndex, const QString &prop,
+                                             const QVariantMap &spec)
+{
+    const drift::Project before = m_project;
+    if (!shapeKeyframeSegments(trackIndex, clipIndex, prop, 0.0, easingSpecFromVariant(spec), true))
+        return;
+    pushProjectEdit(before, tr("Keyframe easing changed"));
+    finishEdit(tr("Keyframe easing updated"));
+}
+
+QString AppController::saveEasingPreset(const QString &label, const QVariantMap &spec)
+{
+    const QString id = drift::EasingPresetStore::instance().add(label, easingSpecFromVariant(spec));
+    if (!id.isEmpty())
+        emit easingPresetsChanged();
+    return id;
+}
+
+bool AppController::renameEasingPreset(const QString &id, const QString &label)
+{
+    if (!drift::EasingPresetStore::instance().rename(id, label))
+        return false;
+    emit easingPresetsChanged();
+    return true;
+}
+
+bool AppController::deleteEasingPreset(const QString &id)
+{
+    if (!drift::EasingPresetStore::instance().remove(id))
+        return false;
+    emit easingPresetsChanged();
+    return true;
+}
+
+void AppController::copyEasingToClipboard(const QVariantMap &spec) const
+{
+    QGuiApplication::clipboard()->setText(easingSpecFromVariant(spec).toCssString());
+}
+
+QVariantMap AppController::easingFromClipboard() const
+{
+    const std::optional<drift::EasingSpec> spec =
+        drift::EasingSpec::parseCss(QGuiApplication::clipboard()->text());
+    if (!spec)
+        return {};
+    return easingSpecToVariant(*spec);
 }
 
 void AppController::syncLinkedTangents(int trackIndex, int clipIndex, const QString &prop,
@@ -17519,6 +17953,34 @@ void AppController::previewSetEffectVec2Param(int trackIndex, int clipIndex, int
     previewSetEffectParam(trackIndex, clipIndex, effectIndex, key + QLatin1String(".y"), y);
 }
 
+void AppController::previewSetEffectTextParam(int trackIndex, int clipIndex, int effectIndex,
+                                              const QString &key, const QString &value)
+{
+    if (trackIndex < 0 || trackIndex >= m_project.tracks().size())
+        return;
+    const int announceTrack = trackIndex;
+    const int announceClip = clipIndex;
+    if (!redirectToEffectHost(&trackIndex, &clipIndex, drift::AdjustmentKind::VideoEffects,
+                              /*create=*/false)) {
+        return;
+    }
+
+    drift::Track &track = m_project.tracks()[trackIndex];
+    if (clipIndex < 0 || clipIndex >= track.clips.size())
+        return;
+
+    drift::Clip &clip = track.clips[clipIndex];
+    if (effectIndex < 0 || effectIndex >= clip.effects.size())
+        return;
+    if (key.isEmpty())
+        return;
+
+    beginImplicitPreviewDrag(tr("Edit effect"));
+    clip.effects[effectIndex].parameters.insert(key, value);
+    emitPreviewEdit(announceTrack, announceClip,
+                    {QStringLiteral("fx.%1.%2").arg(effectIndex).arg(key)});
+}
+
 // Colour params take this path rather than widening setEffectParam, which every existing QML call
 // site passes a double to. There is no preview variant on purpose: a swatch commits once, so there
 // is no drag stream to coalesce the way a slider needs.
@@ -17705,6 +18167,51 @@ QVariantMap AppController::effectClipTarget(int trackIndex, int clipIndex, int e
     return {};
 }
 
+bool AppController::setEffectTextParam(int trackIndex, int clipIndex, int effectIndex,
+                                      const QString &key, const QString &value)
+{
+    if (trackIndex < 0 || trackIndex >= m_project.tracks().size())
+        return false;
+    if (!redirectToEffectHost(&trackIndex, &clipIndex, drift::AdjustmentKind::VideoEffects,
+                              /*create=*/false)) {
+        return false;
+    }
+
+    drift::Track &track = m_project.tracks()[trackIndex];
+    if (clipIndex < 0 || clipIndex >= track.clips.size())
+        return false;
+
+    drift::Clip &clip = track.clips[clipIndex];
+    if (effectIndex < 0 || effectIndex >= clip.effects.size())
+        return false;
+
+    const EffectPresetEntry *def = effectDefForId(clip.effects[effectIndex].catalogId);
+    if (!def)
+        return false;
+    const auto specIt = std::find_if(def->meta.parameters.cbegin(), def->meta.parameters.cend(),
+                                     [&](const drift::EffectParamSpec &p) { return p.key == key; });
+    if (specIt == def->meta.parameters.cend()
+        || (specIt->type != drift::EffectParamType::Curve && specIt->type != drift::EffectParamType::Gradient
+            && specIt->type != drift::EffectParamType::Lut)) {
+        return false;
+    }
+    if (specIt->type == drift::EffectParamType::Curve) {
+        QJsonParseError parseError;
+        const QJsonDocument keys = QJsonDocument::fromJson(value.toUtf8(), &parseError);
+        if (parseError.error != QJsonParseError::NoError || !keys.isArray())
+            return false;
+    }
+
+    const QString undoText = specIt->type == drift::EffectParamType::Lut     ? tr("Change look")
+                             : specIt->type == drift::EffectParamType::Curve ? tr("Edit curve")
+                                                                             : tr("Edit gradient");
+    const drift::Project before = m_project;
+    clip.effects[effectIndex].parameters.insert(key, value);
+    pushProjectEdit(before, undoText);
+    finishEdit(tr("Effect updated"));
+    return true;
+}
+
 bool AppController::setEffectStringParam(int trackIndex, int clipIndex, int effectIndex,
                                          const QString &key, const QUrl &url)
 {
@@ -17792,8 +18299,11 @@ QVariantMap AppController::importFaceProps(const QUrl &url)
             setLastMessage(tr("Could not read the selected file"), QStringLiteral("error"));
             return {};
         }
-        while (!src->atEnd()) {
-            if (copy.write(src->read(1 << 20)) < 0) {
+        for (;;) {
+            const QByteArray chunk = src->read(1 << 20);
+            if (chunk.isEmpty())
+                break;
+            if (copy.write(chunk) != chunk.size()) {
                 setLastMessage(tr("Could not read the selected file"), QStringLiteral("error"));
                 return {};
             }
@@ -20669,6 +21179,28 @@ int AppController::trackMaxChannelCount(int trackIndex) const
     return widest;
 }
 
+QList<float> AppController::subtitleWaveformColumns(double startSeconds, double durSeconds,
+                                                    int sampleCount, int columns) const
+{
+    const QVariantList peaks = subtitleWaveformPeaks(startSeconds, durSeconds, sampleCount);
+    const int n = static_cast<int>(peaks.size());
+    if (n == 0 || columns <= 0)
+        return {};
+    QList<float> out;
+    out.reserve(columns);
+    for (int x = 0; x < columns; ++x) {
+        const int i0 = static_cast<int>(static_cast<qint64>(x) * n / columns);
+        int i1 = static_cast<int>(static_cast<qint64>(x + 1) * n / columns);
+        if (i1 <= i0)
+            i1 = qMin(n, i0 + 1);
+        float peak = 0.0f;
+        for (int i = i0; i < i1; ++i)
+            peak = qMax(peak, peaks.at(i).toFloat());
+        out.append(peak);
+    }
+    return out;
+}
+
 QVariantList AppController::subtitleWaveformPeaks(double startSeconds, double durSeconds,
                                                   int sampleCount) const
 {
@@ -20820,8 +21352,12 @@ void AppController::applyBeatAnalysis(const AudioBeatAnalysis &analysis, double 
 
     QVariantList onsets;
     for (const AudioOnset &o : analysis.onsets) {
+        const auto next = std::lower_bound(analysis.beats.cbegin(), analysis.beats.cend(),
+                                           o.seconds - 0.06);
+        const bool nearBeat = next != analysis.beats.cend() && std::abs(*next - o.seconds) < 0.06;
         onsets.append(QVariantMap{{QStringLiteral("seconds"), o.seconds},
-                                  {QStringLiteral("strength"), o.strength}});
+                                  {QStringLiteral("strength"), o.strength},
+                                  {QStringLiteral("nearBeat"), nearBeat}});
     }
 
     m_beatAnalysis = QVariantMap{

@@ -110,6 +110,8 @@ private:
     QJsonObject opSetKeyframeInterpolation(const QJsonObject &args);
     QJsonObject opSetKeyframeTangents(const QJsonObject &args);
     QJsonObject opSetKeyframeHold(const QJsonObject &args);
+    QJsonObject opSetKeyframeEasing(const QJsonObject &args);
+    QJsonObject opListEasingPresets() const;
     QJsonObject opSetPropertyKeyframesEnabled(const QJsonObject &args);
     QJsonObject opListSpeedCurve(const QJsonObject &args);
     QJsonObject opSetSpeedCurve(const QJsonObject &args);

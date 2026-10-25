@@ -22,6 +22,8 @@ private slots:
     void setSizesIsQuiet();
     void duplicateAndRemove();
     void migratesOldFractions();
+    void colorPresetHasGradingPanels();
+    void subtitlesPresetHasSubtitlePanels();
 
 private:
     QString m_org;
@@ -47,6 +49,14 @@ QVariantMap mainRoot(const QVariantMap &ws)
     return ws.value("windows").toList().first().toMap().value("root").toMap();
 }
 
+void collectPanelTypes(const QVariantMap &node, QStringList &out)
+{
+    for (const QVariant &child : node.value("children").toList())
+        collectPanelTypes(child.toMap(), out);
+    for (const QVariant &panel : node.value("panels").toList())
+        out << panel.toMap().value("type").toString();
+}
+
 } // namespace
 
 void WorkspaceStoreTest::init()
@@ -70,7 +80,7 @@ void WorkspaceStoreTest::presetsLoadAndValidate()
 {
     WorkspaceStore store;
     const QVariantList list = store.workspaces();
-    QCOMPARE(list.size(), 8);
+    QCOMPARE(list.size(), 9);
     QCOMPARE(list.at(0).toMap().value("id").toString(), QStringLiteral("edit"));
     QCOMPARE(list.at(1).toMap().value("id").toString(), QStringLiteral("edit-portrait"));
     for (const QVariant &v : list)
@@ -89,7 +99,7 @@ void WorkspaceStoreTest::everyBuiltinPresetValidates()
         ++builtins;
         QCOMPARE(store.validate(ws), QString());
     }
-    QCOMPARE(builtins, 8);
+    QCOMPARE(builtins, 9);
 }
 
 void WorkspaceStoreTest::roundTripAndOverride()
@@ -106,7 +116,7 @@ void WorkspaceStoreTest::roundTripAndOverride()
     QCOMPARE(again.value("name").toString(), QStringLiteral("Mine"));
     QVERIFY(again.value("modified").toBool());
     QVERIFY(again.value("builtin").toBool());
-    QCOMPARE(reloaded.workspaces().size(), 8);
+    QCOMPARE(reloaded.workspaces().size(), 9);
 
     reloaded.resetPreset("edit");
     QCOMPARE(reloaded.workspace("edit").value("name").toString(), QStringLiteral("Edit"));
@@ -119,7 +129,7 @@ void WorkspaceStoreTest::rejectsDuplicatePanels()
                            {"children", QVariantList{slot("preview"), slot("preview")}}};
     QVERIFY(!store.saveWorkspace(workspaceWith(root)).isEmpty());
     QVERIFY(!store.saveWorkspace(workspaceWith(slot("bogus"))).isEmpty());
-    QCOMPARE(store.workspaces().size(), 8);
+    QCOMPARE(store.workspaces().size(), 9);
 }
 
 void WorkspaceStoreTest::acceptsTabPanelTypes()
@@ -210,6 +220,31 @@ void WorkspaceStoreTest::migratesOldFractions()
     QCOMPARE(portrait.value("sizes").toList().at(1).toDouble(), 0.3);
     QVERIFY(settings.contains("ui/workspaces/list"));
     QVERIFY(settings.contains("ui/layout/landscape/assets"));
+}
+
+void WorkspaceStoreTest::colorPresetHasGradingPanels()
+{
+    WorkspaceStore store;
+    QStringList types;
+    collectPanelTypes(mainRoot(store.workspace("color")), types);
+    QVERIFY(types.contains("color"));
+    QVERIFY(types.contains("looks"));
+    QVERIFY(types.contains("scopes"));
+}
+
+void WorkspaceStoreTest::subtitlesPresetHasSubtitlePanels()
+{
+    WorkspaceStore store;
+    QStringList types;
+    collectPanelTypes(mainRoot(store.workspace("subtitles")), types);
+    for (const char *type : {"subtitles", "subtitleLane", "subtitleText", "subtitleTiming", "timeline"})
+        QVERIFY2(types.contains(QLatin1String(type)), type);
+
+    QStringList known;
+    for (const QVariant &v : store.panelTypes())
+        known << v.toMap().value("type").toString();
+    for (const QString &type : types)
+        QVERIFY2(known.contains(type), qPrintable(type));
 }
 
 QTEST_MAIN(WorkspaceStoreTest)

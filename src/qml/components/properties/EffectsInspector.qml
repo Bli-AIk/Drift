@@ -214,6 +214,16 @@ Item {
                                     effectIndex: effectCard.index
                                 }
 
+                                EffectsCurveParam {
+                                    row: paramRow
+                                    effectIndex: effectCard.index
+                                }
+
+                                EffectsLookParam {
+                                    row: paramRow
+                                    effectIndex: effectCard.index
+                                }
+
                                 Vec2Param {
                                     visible: paramRow.paramData.type === "vec2"
                                     width: parent.width

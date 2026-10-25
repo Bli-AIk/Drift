@@ -45,9 +45,9 @@ Item {
         return EditorState.mediaExtentSeconds()
     }
 
-    // The Repeater always renders `displayCues` (a stable snapshot). We refresh it from the
-    // live cues only while NOT dragging, so live preview updates during a drag don't swap
-    // the model reference and rebuild the delegates (which would interrupt the drag).
+    // The Repeater renders EditorState.subtitles.cueModel, which only changes rows in place, so a
+    // drag never rebuilds the delegates. `displayCues` is the snapshot the drag maths (bounds,
+    // snapping, commit) works from; it is refreshed from the live cues only while NOT dragging.
     property bool anyDragging: false
     property var displayCues: []
 
@@ -93,49 +93,16 @@ Item {
             return b[index + 1].start
         return clipDuration > 0 ? clipDuration : b[index].end + 3600
     }
-    // One playhead-dependent binding for the whole lane instead of one per cue: during playback
-    // only the lane re-evaluates, and only the two cues whose state flips repaint.
-    readonly property int activeCueIndex: {
-        const cues = displayCues
-        const ph = EditorState.playheadSeconds - clipStart
-        for (let i = 0; i < cues.length; i++) {
-            if (ph >= cues[i].start && ph < cues[i].end)
-                return i
-        }
-        return -1
-    }
+    // Resolved in C++ so playback does not walk the cues from QML on every frame.
+    readonly property int activeCueIndex: EditorState.subtitles.activeCue
     function clampVal(v, lo, hi) {
         return Math.max(lo, Math.min(hi, v))
     }
-    function snapTargets(excludeIndex) {
-        const arr = []
+    function snap(v, excludeIndex) {
         const ph = EditorState.playheadSeconds - clipStart
-        if (ph >= 0 && (clipDuration <= 0 || ph <= clipDuration))
-            arr.push(ph)
-        arr.push(0)
-        if (clipDuration > 0)
-            arr.push(clipDuration)
-        const b = baseCues()
-        for (let i = 0; i < b.length; i++) {
-            if (i === excludeIndex)
-                continue
-            arr.push(b[i].start)
-            arr.push(b[i].end)
-        }
-        return arr
-    }
-    function snap(v, targets) {
+        const inRange = ph >= 0 && (clipDuration <= 0 || ph <= clipDuration)
         const thr = 6 / Math.max(1e-6, pxPerSecond)
-        let best = v
-        let bestD = thr
-        for (let i = 0; i < targets.length; i++) {
-            const d = Math.abs(v - targets[i])
-            if (d < bestD) {
-                bestD = d
-                best = targets[i]
-            }
-        }
-        return best
+        return EditorState.subtitles.snapCueTime(v, thr, inRange ? ph : -1, clipDuration, [excludeIndex])
     }
     function commitCue(index, newStart, newEnd) {
         const b = baseCues()
@@ -195,7 +162,7 @@ Item {
                 }
 
                 Repeater {
-                    model: root.displayCues
+                    model: EditorState.subtitles.cueModel
 
                     delegate: SubtitleCueBlock {
                         lane: root

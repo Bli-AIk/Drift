@@ -46,8 +46,10 @@ PanelFrame {
     Item {
         id: viewportOuter
         anchors.top: parent.top
-        width: parent.width
-        height: root.previewFullscreen ? parent.height : parent.height - bottomBar.height
+        anchors.topMargin: root.border.width
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width - root.border.width * 2
+        height: (root.previewFullscreen ? parent.height : parent.height - bottomBar.height) - root.border.width * 2
         clip: true
 
         PreviewViewport {
@@ -95,6 +97,32 @@ PanelFrame {
         }
     }
 
+    // Shown while the grade is bypassed, so the picture is not taken for the graded one.
+    Rectangle {
+        id: originalBadge
+        anchors.top: viewportOuter.top
+        anchors.left: viewportOuter.left
+        anchors.margins: Theme.spacingMd
+        z: 2
+        visible: EditorState.color.bypass
+        height: 22
+        width: originalText.implicitWidth + Theme.spacingLg * 2
+        radius: height / 2
+        color: Theme.c.previewOriginalBadge.background
+        border.width: Theme.c.previewOriginalBadge.borderWidth
+        border.color: Theme.c.previewOriginalBadge.border
+
+        Text {
+            id: originalText
+            anchors.centerIn: parent
+            text: qsTr("Original")
+            color: Theme.c.previewOriginalBadge.foreground
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeXs
+            font.weight: Font.Medium
+        }
+    }
+
     // In fullscreen the bar sits over the picture, so it needs a surface of its own.
     PreviewFullscreenTransportScrim {
         anchors.fill: bottomBar
@@ -107,7 +135,9 @@ PanelFrame {
     Column {
         id: bottomBar
         anchors.bottom: parent.bottom
-        width: parent.width
+        anchors.bottomMargin: root.border.width
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width - root.border.width * 2
         z: 1
         opacity: !root.previewFullscreen || osd.shown ? 1 : 0
         visible: opacity > 0

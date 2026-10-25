@@ -313,16 +313,17 @@ Item {
     readonly property bool beatLaneVisible: beatGridOn || onsetsOn
     readonly property real beatLaneHeight: beatLaneVisible ? 14 : 0
 
-    // An onset this close to a grid line is already drawn as one.
-    function nearAnyBeat(seconds) {
-        const list = beatData ? beatData.beats : null
-        if (!list)
-            return false
-        for (var i = 0; i < list.length; i++) {
-            if (Math.abs(list[i] - seconds) < 0.06)
-                return true
+    function lowerBound(list, value, key) {
+        var lo = 0
+        var hi = list.length
+        while (lo < hi) {
+            const mid = (lo + hi) >> 1
+            if ((key ? list[mid][key] : list[mid]) < value)
+                lo = mid + 1
+            else
+                hi = mid
         }
-        return false
+        return lo
     }
 
     // Both beat canvases are viewport-sized and shifted by contentX rather than sized
@@ -339,7 +340,11 @@ Item {
         if (root.beatGridOn) {
             const perBar = a.beatsPerBar || 4
             const first = a.firstDownbeat || 0
-            for (var i = 0; i < a.beats.length; i++) {
+            const t0 = (flick.contentX - 3) / root.pxPerSecond
+            const t1 = (flick.contentX + w + 3) / root.pxPerSecond
+            for (var i = Math.max(0, root.lowerBound(a.beats, t0) - 1); i < a.beats.length; i++) {
+                if (a.beats[i] > t1)
+                    break
                 const px = localX(a.beats[i])
                 if (px < -2 || px > w + 2)
                     continue
@@ -351,8 +356,12 @@ Item {
         if (root.onsetsOn) {
             ctx.fillStyle = String(Theme.c.androidTimeline.beatOnset)
             const onsets = a.onsets || []
-            for (var j = 0; j < onsets.length; j++) {
-                if (root.beatGridOn && root.nearAnyBeat(onsets[j].seconds))
+            const t0 = (flick.contentX - 3) / root.pxPerSecond
+            const t1 = (flick.contentX + w + 3) / root.pxPerSecond
+            for (var j = Math.max(0, root.lowerBound(onsets, t0, "seconds") - 1); j < onsets.length; j++) {
+                if (onsets[j].seconds > t1)
+                    break
+                if (root.beatGridOn && onsets[j].nearBeat)
                     continue
                 const ox = localX(onsets[j].seconds)
                 if (ox < -2 || ox > w + 2)

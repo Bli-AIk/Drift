@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Drift
+import "keyframes/EasingCache.js" as EasingCache
 
 // Keyframe strip aligned with the timeline: left gutter matches track labels,
 // graph scroll + playhead share the timeline's contentX / pxPerSecond.
@@ -135,6 +136,11 @@ Item {
         return clip.kind !== "audio"
     }
 
+    // The engine's spec for a key's outgoing segment when that segment is a Penner function.
+    function easingFnSpec(key) {
+        return { kind: "function", fn: key.fn, amplitude: key.fnAmp, period: key.fnPeriod }
+    }
+
     // Each series is normalized against its own value range, so curves in wildly
     // different units (px vs. 0–1 opacity) stay comparable when overlaid.
     function valueRangeFor(id, pts, base) {
@@ -157,6 +163,16 @@ Item {
             const v = Number(pts[i].value)
             lo = Math.min(lo, v)
             hi = Math.max(hi, v)
+            // A Penner function overshoots its endpoints, so the lane has to make room for its peak.
+            if (pts[i].fn && i + 1 < pts.length) {
+                const span = Number(pts[i + 1].value) - v
+                const samples = EasingCache.samples(root.easingFnSpec(pts[i]), 48, (s, n) => EditorState.easingSamples(s, n))
+                for (let k = 0; k < samples.length; ++k) {
+                    const w = v + span * samples[k].y
+                    lo = Math.min(lo, w)
+                    hi = Math.max(hi, w)
+                }
+            }
         }
         // With no keys there is nothing to fit, so centre the axis on the value the property
         // actually holds — otherwise a 1920px width would be drawn far off the top of a 0..100 lane.
@@ -269,11 +285,11 @@ Item {
         const entry = series[focusedIndex]
         const pts = entry.points
         for (let i = 0; i < pts.length; ++i) {
-            if (pts[i].hold)
-                continue // a step has no tangents to shape
-            if (i > 0)
+            // A step or a Penner function ignores its handles, so neither end of its segment has one.
+            const leavesShaped = pts[i].hold || !!pts[i].fn
+            if (i > 0 && !(pts[i - 1].hold || !!pts[i - 1].fn))
                 out.push({ pointIndex: i, outgoing: false, color: entry.color, point: pts[i] })
-            if (i < pts.length - 1)
+            if (i < pts.length - 1 && !leavesShaped)
                 out.push({ pointIndex: i, outgoing: true, color: entry.color, point: pts[i] })
         }
         return out
@@ -316,16 +332,17 @@ Item {
         EditorState.analyzeBeats(root.clipStart, root.clipDuration)
     }
 
-    // An onset this close to a grid line is already represented by it — drawing both
-    // would just thicken the same line.
-    function nearAnyBeat(seconds) {
-        if (!beats || !beats.beats)
-            return false
-        for (let i = 0; i < beats.beats.length; ++i) {
-            if (Math.abs(beats.beats[i] - seconds) < 0.06)
-                return true
+    function lowerBound(list, value, key) {
+        let lo = 0
+        let hi = list.length
+        while (lo < hi) {
+            const mid = (lo + hi) >> 1
+            if ((key ? list[mid][key] : list[mid]) < value)
+                lo = mid + 1
+            else
+                hi = mid
         }
-        return false
+        return lo
     }
 
     // Drag the bottom edge or wheel over the header to grow the lane.
@@ -389,7 +406,10 @@ Item {
     function openKeyMenu(dot, x, y) {
         keyMenu.keyProp = dot.modelData.prop
         keyMenu.keySeconds = dot.modelData.seconds
-        keyMenu.point = dot.entry.points[dot.modelData.pointIndex]
+        keyMenu.keyDot = dot
+        keyMenu.segment = EditorState.keyframeSegmentEasing(EditorState.selectedTrack,
+                                                            EditorState.selectedClip,
+                                                            keyMenu.keyProp, keyMenu.keySeconds)
         keyMenu.popup(dot, x, y)
     }
 
@@ -593,36 +613,64 @@ Item {
         host: root
     }
 
-    // Right-click on a key: how the segment leaving it moves. Checks the key's current choice.
+    // Right-click on a key: how the segment leaving it moves. Checks the segment's current choice.
     ThemedContextMenu {
         id: keyMenu
 
         property string keyProp: ""
         property real keySeconds: 0
-        property var point: null
+        property Item keyDot: null
+        property var segment: ({})
+        readonly property string segmentKind: segment.spec ? segment.spec.kind : ""
 
-        function isEasing(mode) {
-            return !!point && !point.custom && point.easing === mode
+        function isPreset(id) {
+            return segment.presetId === id
         }
-        function setEasing(mode) {
-            EditorState.setKeyframeEasingAt(EditorState.selectedTrack, EditorState.selectedClip,
-                                            keyProp, keySeconds, mode)
+        function setSegment(spec) {
+            EditorState.setKeyframeSegmentEasing(EditorState.selectedTrack, EditorState.selectedClip,
+                                                 keyProp, keySeconds, spec)
+        }
+        function openEasing() {
+            if (ShellBridge.phoneShell) {
+                ShellBridge.easingSheetRequested(EditorState.selectedTrack, EditorState.selectedClip,
+                                                 keyProp, root.propertyLabel(keyProp), keySeconds)
+                return
+            }
+            easingPopupLoader.active = true
+            easingPopupLoader.item.anchorItem = keyDot
+            easingPopupLoader.item.propLabel = root.propertyLabel(keyProp)
+            easingPopupLoader.item.openFor(EditorState.selectedTrack, EditorState.selectedClip,
+                                           keyProp, keySeconds)
+        }
+        function saveCurrentAsPreset() {
+            const n = EditorState.easingPresets().filter(p => p.user).length + 1
+            EditorState.saveEasingPreset(qsTr("My easing %1").arg(n), segment.spec)
         }
 
         ThemedMenuItem {
             text: qsTr("Straight")
-            icon.name: keyMenu.isEasing("linear") ? Theme.icons.check : ""
-            onTriggered: keyMenu.setEasing("linear")
-        }
-        ThemedMenuItem {
-            text: qsTr("Ease")
-            icon.name: keyMenu.isEasing("ease") ? Theme.icons.check : ""
-            onTriggered: keyMenu.setEasing("ease")
+            icon.name: keyMenu.isPreset("linear") ? Theme.icons.check : ""
+            onTriggered: keyMenu.setSegment({ kind: "linear" })
         }
         ThemedMenuItem {
             text: qsTr("Jump")
-            icon.name: keyMenu.isEasing("hold") ? Theme.icons.check : ""
-            onTriggered: keyMenu.setEasing("hold")
+            icon.name: keyMenu.isPreset("hold") ? Theme.icons.check : ""
+            onTriggered: keyMenu.setSegment({ kind: "hold" })
         }
+        ThemedMenuItem {
+            text: qsTr("Easing…")
+            onTriggered: keyMenu.openEasing()
+        }
+        ThemedMenuItem {
+            text: qsTr("Save curve as preset…")
+            enabled: keyMenu.segmentKind === "bezier" || keyMenu.segmentKind === "function"
+            onTriggered: keyMenu.saveCurrentAsPreset()
+        }
+    }
+
+    Loader {
+        id: easingPopupLoader
+        active: false
+        sourceComponent: EasingPickerPopup { }
     }
 }

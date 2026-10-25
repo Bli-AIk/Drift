@@ -148,7 +148,7 @@ QImage applyLibavFilterGraph(const QImage &input, const QString &filters)
 
 QImage EffectProcessor::applyEffects(const QImage &input, const QList<drift::Effect> &effects,
                                      drift::TimeUs timeUs, const QList<drift::FaceAnchors> &faceSlots,
-                                     const std::shared_ptr<const drift::DepthFrame> &depth)
+                                     const std::shared_ptr<const drift::DepthFrame> &depth, int frameRate)
 {
     if (input.isNull() || effects.isEmpty())
         return input;
@@ -171,7 +171,7 @@ QImage EffectProcessor::applyEffects(const QImage &input, const QList<drift::Eff
     auto flushGpu = [&]() {
         if (gpuChain.isEmpty())
             return;
-        result = GpuEffectExecutor::instance().applyChain(gpuChain, result, timeUs);
+        result = GpuEffectExecutor::instance().applyChain(gpuChain, result, timeUs, frameRate);
         gpuChain.clear();
     };
 

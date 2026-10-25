@@ -230,6 +230,7 @@ PanelFrame {
     Item {
         id: content
         anchors.fill: parent
+        anchors.margins: root.border.width
         visible: root.hasSelection && root.tabApplies
 
         // === Phone: a labelled tab strip across the top ===============================

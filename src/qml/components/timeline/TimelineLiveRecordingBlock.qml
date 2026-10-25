@@ -46,16 +46,16 @@ Rectangle {
         onPaint: {
             var ctx = getContext("2d");
             ctx.clearRect(0, 0, width, height);
-            var peaks = EditorState.audioRecordLivePeaks;
-            if (!peaks || peaks.length === 0)
+            var total = EditorState.audioRecordLivePeakCount;
+            if (total === 0)
                 return;
 
             var mid = height / 2;
             var half = mid * 0.85;
             var w = Math.max(1, Math.floor(width));
             var full = Math.max(w, liveRecordingBlock.width - 2);
-            var first = peaks.length * (full - w) / full;
-            var n = peaks.length - first;
+            var first = total * (full - w) / full;
+            var cols = EditorState.audioRecordLivePeakColumns(first, total - first, w);
 
             // Centerline guideline
             ctx.strokeStyle = waveformGuide;
@@ -69,27 +69,13 @@ Rectangle {
             ctx.fillStyle = waveform;
             ctx.beginPath();
             for (var x = 0; x < w; x++) {
-                var i0 = Math.floor(first + x * n / w);
-                var i1 = Math.floor(first + (x + 1) * n / w);
-                if (i1 <= i0) i1 = Math.min(peaks.length, i0 + 1);
-                var peak = 0;
-                for (var i = i0; i < i1; i++) {
-                    if (peaks[i] > peak) peak = peaks[i];
-                }
-                var amp = Math.max(1.0, peak * half);
+                var amp = Math.max(1.0, cols[x] * half);
                 if (x === 0) ctx.moveTo(x, mid - amp);
                 else ctx.lineTo(x, mid - amp);
                 ctx.lineTo(x + 1, mid - amp);
             }
             for (var xb = w - 1; xb >= 0; xb--) {
-                var j0 = Math.floor(first + xb * n / w);
-                var j1 = Math.floor(first + (xb + 1) * n / w);
-                if (j1 <= j0) j1 = Math.min(peaks.length, j0 + 1);
-                var peakB = 0;
-                for (var j = j0; j < j1; j++) {
-                    if (peaks[j] > peakB) peakB = peaks[j];
-                }
-                var ampB = Math.max(1.0, peakB * half);
+                var ampB = Math.max(1.0, cols[xb] * half);
                 ctx.lineTo(xb + 1, mid + ampB);
                 ctx.lineTo(xb, mid + ampB);
             }

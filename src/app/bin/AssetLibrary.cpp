@@ -820,6 +820,7 @@ void AssetLibrary::syncToProject()
         beginResetModel();
         endResetModel();
         refreshSidecars();
+        refreshMissing();
         return;
     }
 
@@ -864,6 +865,7 @@ void AssetLibrary::syncToProject()
     m_syncedPaths = paths;
     m_syncedFolderIds = folderIds;
     m_syncedEdits = edits;
+    refreshMissing();
     if (!movedIds.isEmpty())
         refreshSidecars(movedIds);
 }
@@ -882,6 +884,7 @@ void AssetLibrary::setProject(drift::Project *project, bool newDocument)
     m_frameRateProbePending.clear();
     endResetModel();
     refreshSidecars();
+    refreshMissing();
 }
 
 int AssetLibrary::rowCount(const QModelIndex &parent) const
@@ -1231,6 +1234,7 @@ bool AssetLibrary::applyProbedSource(const QString &assetId, const drift::MediaA
     emit assetMetadataChanged(assetId);
     emit assetCardChanged(assetId);
     refreshSidecars({assetId});
+    refreshMissing();
     return true;
 }
 
@@ -1345,6 +1349,26 @@ void AssetLibrary::bumpBadges()
     emit badgeRevisionChanged();
 }
 
+void AssetLibrary::refreshMissing()
+{
+    QSet<QString> missing;
+    if (m_project) {
+        for (const QString &id : m_project->assetOrder()) {
+            const drift::MediaAsset *asset = m_project->asset(id);
+            if (!asset || asset->path.isEmpty() || asset->kind == drift::MediaKind::Composite)
+                continue;
+            // An image sequence's path is a pattern, not a file, so it has no single file to check.
+            if (drift::parseImageSequencePath(asset->path) || QFileInfo::exists(asset->path))
+                continue;
+            missing.insert(id);
+        }
+    }
+    if (missing == m_missing)
+        return;
+    m_missing = missing;
+    bumpBadges();
+}
+
 QString AssetLibrary::assetIdForPath(const QString &path) const
 {
     const int index = path.isEmpty() ? -1 : indexOfPath(path);
@@ -1355,6 +1379,11 @@ bool AssetLibrary::isEditFriendly(const QString &assetId) const
 {
     const drift::MediaAsset *asset = m_project ? m_project->asset(assetId) : nullptr;
     return asset && asset->editFriendly;
+}
+
+bool AssetLibrary::isMissing(const QString &assetId) const
+{
+    return m_missing.contains(assetId);
 }
 
 bool AssetLibrary::isVariableFrameRate(const QString &assetId)
@@ -2071,6 +2100,7 @@ void AssetLibrary::clear()
     m_thumbPending.clear();
     m_audioProbePending.clear();
     endResetModel();
+    refreshMissing();
 }
 
 QJsonArray AssetLibrary::toJsonArray() const

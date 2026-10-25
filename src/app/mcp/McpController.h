@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/project/Project.h"
+#include "engine/audio/analysis/LoudnessMeter.h"
 
 #include <QHash>
 #include <QJsonArray>
@@ -13,6 +14,7 @@
 #include <QStringList>
 #include <QVariant>
 
+#include <functional>
 #include <memory>
 
 class AppController;
@@ -220,6 +222,18 @@ public:
     QJsonObject removeSilence(int trackIndex, int clipIndex, double threshold,
                                  double minDuration, double padding, double declick = 0.03,
                                  const QString &method = QStringLiteral("energy"));
+    struct LoudnessJob {
+        drift::Project snap;
+        double startSeconds = 0.0;
+        double durSeconds = 0.0;
+    };
+    LoudnessJob clipLoudnessJob(int trackIndex, int clipIndex) const;
+    // keepGoing receives the fraction done before each block; returning false stops early and the
+    // result is then partial, so the caller must discard it.
+    static drift::LoudnessResult measureLoudnessJob(const LoudnessJob &job,
+                                                    const std::function<bool(double)> &keepGoing = {});
+    QJsonObject applyNormalizeGain(int trackIndex, int clipIndex, double lufs, double peakDb,
+                                   double targetLufs);
     QJsonObject analyzeLoudness(int trackIndex, int clipIndex, double startSeconds,
                                    double durSeconds) const;
     QJsonObject normalizeVolume(int trackIndex, int clipIndex, double targetLufs);

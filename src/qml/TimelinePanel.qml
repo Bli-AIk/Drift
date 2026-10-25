@@ -187,6 +187,7 @@ PanelFrame {
             "editFriendlyPill": Theme.c.timelineClipItem.editFriendlyBackground,
             "editFriendlyPillForeground": Theme.c.timelineClipItem.editFriendlyForeground,
             "warning": Theme.c.timelineClipItem.warning,
+            "missing": Theme.c.timelineClipItem.missing,
             "fontFamily": Theme.fontFamily,
             "fontSizeTiny": Theme.fontSizeTiny,
             "fontSizeXs": Theme.fontSizeXs,
@@ -208,6 +209,7 @@ PanelFrame {
             "editFriendlyLabel": qsTr("Edit-friendly"),
             "editFriendlyTooltip": qsTr("Converted to a constant frame rate for smooth editing"),
             "vfrTooltip": qsTr("Variable frame rate. This clip can drift out of sync with its audio. Right-click it and choose Convert to edit-friendly format."),
+            "missingTooltip": qsTr("Media file not found. Use Replace media… on this item to point it at the file again."),
             "spanToolTip": qsTr("Transform layer: moves, scales and turns every track its bracket covers")
         })
     }
@@ -455,19 +457,26 @@ PanelFrame {
             return null
         const seconds = xPixels / pxPerSecond
         const clips = track.clips
+        const order = []
+        for (let i = 0; i < clips.length; i++)
+            order.push(i)
+        order.sort((a, b) => clips[a].start - clips[b].start || a - b)
         let best = null
         let bestDist = 1e9
-        for (let i = 0; i < clips.length; i++) {
+        let bestRight = -1
+        let groupStart = 0
+        for (let p = 0; p < order.length; p++) {
+            const i = order[p]
             const left = clips[i]
-            for (let j = 0; j < clips.length; j++) {
-                if (i === j)
-                    continue
+            while (clips[order[groupStart]].start < left.start)
+                groupStart++
+            const leftEnd = left.start + left.duration
+            for (let q = groupStart; q < order.length; q++) {
+                const j = order[q]
                 const right = clips[j]
-                if (right.start < left.start)
-                    continue
-                const leftEnd = left.start + left.duration
-                const gap = right.start - leftEnd
-                if (gap > 0.001)
+                if (right.start - leftEnd > 0.001)
+                    break
+                if (i === j)
                     continue
                 let regionStart
                 let regionEnd
@@ -479,10 +488,12 @@ PanelFrame {
                     regionEnd = leftEnd + 0.25
                 }
                 if (seconds >= regionStart && seconds <= regionEnd) {
-                    const mid = (regionStart + regionEnd) / 2
-                    const dist = Math.abs(seconds - mid)
-                    if (dist < bestDist) {
+                    const dist = Math.abs(seconds - (regionStart + regionEnd) / 2)
+                    const earlier = best !== null && dist === bestDist
+                            && (i < best.leftClip || (i === best.leftClip && j < bestRight))
+                    if (dist < bestDist || earlier) {
                         bestDist = dist
+                        bestRight = j
                         best = {
                             leftClip: i,
                             start: Math.max(left.start, regionStart),
@@ -1285,6 +1296,7 @@ PanelFrame {
 
     Column {
         anchors.fill: parent
+        anchors.margins: root.border.width
 
         // === toolbar =================================================================
         TimelineToolbar {

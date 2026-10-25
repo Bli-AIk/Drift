@@ -10,7 +10,7 @@ SplitView {
     property var path: []
 
     anchors.fill: parent
-    spacing: Theme.panelGap
+    spacing: 0
 
     handle: PanelSplitHandle { view: root }
 

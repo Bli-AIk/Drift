@@ -50,11 +50,11 @@ Item {
                 text: qsTr("Import subtitle file")
                 variant: "secondary"
                 glyph: Theme.icons.upload
-                tooltip: qsTr("Import a .srt file as a subtitle clip")
+                tooltip: qsTr("Import a .srt or .vtt file as a subtitle clip")
                 onClicked: {
                     const url = FileDialogs.openFile(
                         qsTr("Import Subtitles"),
-                        [qsTr("SubRip subtitles (*.srt)"), qsTr("All files (*)")])
+                        [qsTr("Subtitles (*.srt *.vtt)"), qsTr("All files (*)")])
                     if (url != "") {
                         EditorState.importSubtitleFile(url, -1)
                         root.added()

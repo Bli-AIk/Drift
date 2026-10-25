@@ -61,6 +61,10 @@
 #include "engine/render3d/editor/EditorOverlay.h"
 #include "engine/compositor/layers/TransformLayer.h"
 #include "engine/compositor/GpuCompositor.h"
+#include "engine/color/ScopeAnalysis.h"
+#include "engine/color/CubeLut.h"
+#include "engine/packages/looks/LookCatalog.h"
+#include "engine/packages/looks/LookImport.h"
 #include "engine/media/thumbnails/MediaThumbnail.h"
 #include "engine/media/waveforms/MediaWaveform.h"
 #include "playback/stats/PlaybackDiagnostics.h"
@@ -344,6 +348,7 @@ private slots:
     void bloomGlowZeroIntensityPassthrough();
     void bloomGlowDarkFrameUnchanged();
     void bloomGlowBrightSpotBleedsToNeighbors();
+    void bloomGlowKeepsPremultipliedAlpha();
     void rippleWaterZeroAmplitudePassthrough();
     void rippleWaterNonzeroDisplacementChangesOutput();
     void edgeNeonZeroIntensityUnchanged();
@@ -494,6 +499,18 @@ private slots:
     void glStatusIdsAreStableAndOnlyShareContextRetries();
     void softwareRenderersAreRecognisedByName();
     void limitedPreviewGpusAreRecognised();
+    void scopeAnalysisHistogramCounts();
+    void cubeLutParsesSizeDomainAndComments();
+    void cubeLutToleratesBomCrlfTabsAndTrailingComments();
+    void cubeLutRejectsMalformed();
+    void cubeLutResampleKeepsIdentity();
+    void cubeLutDomainMapsInput();
+    void bakeCurveSplineIsMonotoneAndHitsKeys();
+    void effectPackageLutParamAndNextFeatures();
+    void colorGradePackageLoads();
+    void colorGradeDefaultsAreIdentity();
+    void vignetteDefaultsMatchLegacy();
+    void lookCatalogFindsPacksAndUserLooks();
 
 private:
     static QString makeColorSegmentsVideo(QTemporaryDir &dir);
@@ -8500,6 +8517,7 @@ void EngineTest::effectPresetStableIds()
         QStringLiteral("strobe_flash"),    QStringLiteral("super8_film"),
         QStringLiteral("time_echo"),       QStringLiteral("vhs_crt"),
         QStringLiteral("wave_warp"),       QStringLiteral("zoom_pulse"),
+        QStringLiteral("chromatic_aberration"), QStringLiteral("film_grain"),
     };
 
     // absolutePath() because the macro points out of the source tree with a ".." segment, while
@@ -8894,8 +8912,9 @@ void EngineTest::gpuMultiPassPreservesVerticalOrientation()
     QVERIFY2(qBlue(blurred.pixel(16, 27)) > qRed(blurred.pixel(16, 27)),
              "blur: bottom should stay predominantly blue");
 
-    // Bloom composites an FBO blur buffer with the source texture — both must share Y.
-    QImage bloomSrc(32, 32, QImage::Format_RGBA8888);
+    // Bloom composites an FBO blur buffer with the source texture — both must share Y. 1080 lines
+    // tall, as bloom's radius is in pixels of a 1080-line frame.
+    QImage bloomSrc(32, 1080, QImage::Format_RGBA8888);
     bloomSrc.fill(QColor(0, 0, 0));
     for (int x = 8; x < 24; ++x)
         bloomSrc.setPixel(x, 4, qRgba(255, 255, 255, 255)); // bright bar near top only
@@ -8910,8 +8929,8 @@ void EngineTest::gpuMultiPassPreservesVerticalOrientation()
     QCOMPARE(bloomed.size(), bloomSrc.size());
     const int topGlow = qRed(bloomed.pixel(16, 6)) + qGreen(bloomed.pixel(16, 6))
                         + qBlue(bloomed.pixel(16, 6));
-    const int bottomGlow = qRed(bloomed.pixel(16, 28)) + qGreen(bloomed.pixel(16, 28))
-                           + qBlue(bloomed.pixel(16, 28));
+    const int bottomGlow = qRed(bloomed.pixel(16, 1073)) + qGreen(bloomed.pixel(16, 1073))
+                           + qBlue(bloomed.pixel(16, 1073));
     QVERIFY2(topGlow > bottomGlow + 20,
              qPrintable(QStringLiteral(
                  "bloom glow should stay near the bright top bar, not mirrored to the bottom "
@@ -9377,7 +9396,8 @@ void EngineTest::bloomGlowBrightSpotBleedsToNeighbors()
     if (!GpuEffectExecutor::instance().isAvailable())
         QSKIP("OpenGL offscreen context unavailable");
 
-    QImage image(32, 32, QImage::Format_RGBA8888);
+    // 1080 lines tall: bloom's radius is in pixels of a 1080-line frame.
+    QImage image(64, 1080, QImage::Format_RGBA8888);
     image.fill(QColor(10, 10, 10));
     // A small bright block (not a single pixel) so separable blur keeps
     // measurable energy after H+V dilution in 8-bit.
@@ -9414,6 +9434,38 @@ void EngineTest::bloomGlowBrightSpotBleedsToNeighbors()
     QVERIFY(def);
     QVERIFY(def->isGpu);
     QCOMPARE(buildFilterGraphForEffect({.catalogId = QStringLiteral("bloom_glow")}), QString());
+}
+
+void EngineTest::bloomGlowKeepsPremultipliedAlpha()
+{
+    if (!GpuEffectExecutor::instance().isAvailable())
+        QSKIP("OpenGL offscreen context unavailable");
+
+    QImage image(64, 1080, QImage::Format_RGBA8888_Premultiplied);
+    image.fill(Qt::transparent);
+    for (int y = 10; y <= 22; ++y) {
+        for (int x = 10; x <= 22; ++x)
+            image.setPixel(x, y, qRgba(128, 128, 128, 128));
+    }
+    for (int y = 14; y <= 18; ++y) {
+        for (int x = 14; x <= 18; ++x)
+            image.setPixel(x, y, qRgba(128, 128, 128, 128));
+    }
+
+    const QImage out = EffectProcessor::applyEffects(image, {makeBloomGlowEffect()})
+                           .convertToFormat(QImage::Format_RGBA8888_Premultiplied);
+    bool bled = false;
+    for (int y = 0; y < out.height(); ++y) {
+        const QRgb *row = reinterpret_cast<const QRgb *>(out.constScanLine(y));
+        for (int x = 0; x < out.width(); ++x) {
+            const int a = qAlpha(row[x]);
+            QVERIFY2(qRed(row[x]) <= a && qGreen(row[x]) <= a && qBlue(row[x]) <= a,
+                     "premultiplied rgb must not exceed alpha");
+            if (y < 10 && a > 0)
+                bled = true;
+        }
+    }
+    QVERIFY2(bled, "glow should extend past the shape's edge");
 }
 
 static drift::Effect makeRippleWaterEffect()
@@ -13445,7 +13497,8 @@ void EngineTest::audioEffectCatalogLoadsPackages()
     QCOMPARE(telephone->category, QStringLiteral("transmission"));
     QCOMPARE(telephone->processorId, QStringLiteral("bandlimit"));
     QCOMPARE(telephone->icon, QStringLiteral("phone"));
-    QVERIFY2(!telephone->thumbnailPath.isEmpty(), "telephone package should ship thumbnail.png");
+    QVERIFY2(!telephone->thumbnailPath.isEmpty(), "telephone package should ship thumbnail.webp");
+    QCOMPARE(QFileInfo(telephone->thumbnailPath).fileName(), QStringLiteral("thumbnail.webp"));
     QVERIFY(QFileInfo::exists(telephone->thumbnailPath));
 
     const AudioEffectEntry *chipmunk = audioEffectDefForId(QStringLiteral("voice.chipmunk"));
@@ -16333,6 +16386,392 @@ void EngineTest::audioFrameTextureLayout()
     QCOMPARE(texel(7, 1)[0], 0);
     QCOMPARE(texel(8, 1)[0], 255);
     QCOMPARE(texel(8, 1)[3], 255);
+}
+
+void EngineTest::scopeAnalysisHistogramCounts()
+{
+    QImage img(4, 2, QImage::Format_ARGB32);
+    const QRgb pixels[8] = {qRgb(255, 0, 0), qRgb(0, 255, 0), qRgb(0, 0, 255), qRgb(255, 255, 255),
+                            qRgb(0, 0, 0),   qRgb(255, 0, 0), qRgb(255, 0, 0), qRgb(128, 128, 128)};
+    for (int i = 0; i < 8; ++i)
+        img.setPixel(i % 4, i / 4, pixels[i]);
+
+    const drift::HistogramData h = drift::computeHistogram(img);
+    QCOMPARE(h.r[255], 4u);
+    QCOMPARE(h.r[0], 3u);
+    QCOMPARE(h.r[128], 1u);
+    QCOMPARE(h.g[255], 2u);
+    QCOMPARE(h.g[0], 5u);
+    QCOMPARE(h.g[128], 1u);
+    QCOMPARE(h.b[255], 2u);
+    QCOMPARE(h.b[0], 5u);
+    QCOMPARE(h.b[128], 1u);
+    QCOMPARE(h.y[54], 3u);
+    QCOMPARE(h.y[182], 1u);
+    QCOMPARE(h.y[18], 1u);
+    QCOMPARE(h.y[255], 1u);
+    QCOMPARE(h.y[0], 1u);
+    QCOMPARE(h.y[128], 1u);
+
+    QCOMPARE(drift::renderHistogram(h).size(), QSize(256, 128));
+    QCOMPARE(drift::renderWaveform(img, false, QSize(256, 256)).size(), QSize(256, 256));
+    QCOMPARE(drift::renderWaveform(img, true, QSize(300, 128)).size(), QSize(300, 128));
+    QCOMPARE(drift::renderVectorscope(img, QSize(256, 256)).size(), QSize(256, 256));
+}
+
+void EngineTest::cubeLutParsesSizeDomainAndComments()
+{
+    const QByteArray text = R"CUBE(# exported by a grading app
+TITLE "Warm Film"
+
+DOMAIN_MIN 0 0 0
+DOMAIN_MAX 2 2 2
+LUT_3D_SIZE 2
+# red varies fastest
+0 0 0
+1 0 0
+
+0 1 0
+1 1 0
+0 0 1
+1 0 1
+0 1 1
+1 1 1
+)CUBE";
+    drift::CubeLut lut;
+    QString error;
+    QVERIFY2(drift::parseCube(text, &lut, &error), qPrintable(error));
+    QVERIFY(lut.isValid());
+    QCOMPARE(lut.size, 2);
+    QCOMPARE(lut.title, QStringLiteral("Warm Film"));
+    for (int c = 0; c < 3; ++c) {
+        QCOMPARE(lut.domainMin[c], 0.0f);
+        QCOMPARE(lut.domainMax[c], 2.0f);
+    }
+    QCOMPARE(lut.rgb.size(), size_t(24));
+    for (size_t c = 0; c < 3; ++c) {
+        QCOMPARE(lut.rgb[c], 0.0f);
+        QCOMPARE(lut.rgb[lut.rgb.size() - 3 + c], 1.0f);
+    }
+}
+
+void EngineTest::cubeLutToleratesBomCrlfTabsAndTrailingComments()
+{
+    const QByteArray text = "\xEF\xBB\xBFTITLE \"Bom # Look\"\r\nLUT_3D_SIZE 2 # size\r\n"
+                            "0\t0\t0\r\n1 0 0 # red\r\n0 1 0\r\n1 1 0\r\n0 0 1\r\n1 0 1\r\n0 1 1\r\n1 1 1\r\n";
+    drift::CubeLut lut;
+    QString error;
+    QVERIFY2(drift::parseCube(text, &lut, &error), qPrintable(error));
+    QCOMPARE(lut.size, 2);
+    QCOMPARE(lut.title, QStringLiteral("Bom # Look"));
+    QCOMPARE(lut.rgb.size(), size_t(24));
+}
+
+void EngineTest::cubeLutRejectsMalformed()
+{
+    const auto rejects = [](const QByteArray &text) {
+        drift::CubeLut lut;
+        QString error;
+        QVERIFY(!drift::parseCube(text, &lut, &error));
+        QVERIFY(!error.isEmpty());
+    };
+    const QByteArray eightRows = "0 0 0\n1 0 0\n0 1 0\n1 1 0\n0 0 1\n1 0 1\n0 1 1\n1 1 1\n";
+
+    rejects("LUT_3D_SIZE 2\n" + eightRows.left(eightRows.size() - 6));
+    rejects("LUT_3D_SIZE 2\n0 0 0\n0 nan 0\n1 0 0\n0 1 0\n1 1 0\n0 0 1\n1 0 1\n0 1 1\n1 1 1\n");
+    rejects(eightRows);
+    rejects("TITLE \"No size\"\n" + eightRows);
+    rejects("LUT_3D_SIZE 1\n0 0 0\n");
+}
+
+void EngineTest::cubeLutResampleKeepsIdentity()
+{
+    const drift::CubeLut resampled = drift::resampledLut(drift::identityLut(17), 33);
+    const drift::CubeLut expected = drift::identityLut(33);
+    QCOMPARE(resampled.size, 33);
+    QCOMPARE(resampled.rgb.size(), expected.rgb.size());
+    for (size_t i = 0; i < expected.rgb.size(); ++i)
+        QVERIFY(std::abs(resampled.rgb[i] - expected.rgb[i]) <= 1e-5f);
+
+    const drift::CubeLut identity = drift::identityLut(17);
+    const QRgb colors[] = {qRgb(0, 0, 0), qRgb(255, 255, 255), qRgb(200, 40, 90), qRgb(12, 128, 250)};
+    for (QRgb px : colors) {
+        const QRgb out = drift::applyLut(identity, px, 1.0f);
+        QVERIFY(std::abs(qRed(out) - qRed(px)) <= 1);
+        QVERIFY(std::abs(qGreen(out) - qGreen(px)) <= 1);
+        QVERIFY(std::abs(qBlue(out) - qBlue(px)) <= 1);
+        QCOMPARE(drift::applyLut(identity, px, 0.0f), px);
+    }
+}
+
+void EngineTest::cubeLutDomainMapsInput()
+{
+    // The lattice spans 0..2, so input 0.5 sits at 0.25 of the lattice and the identity lattice
+    // returns that fraction: 128 maps to 64, and 255 (input 1.0 of 0..2) maps to 128.
+    drift::CubeLut lut = drift::identityLut(2);
+    for (int c = 0; c < 3; ++c)
+        lut.domainMax[c] = 2.0f;
+    const QRgb mid = drift::applyLut(lut, qRgb(128, 128, 128), 1.0f);
+    QVERIFY(std::abs(qRed(mid) - 64) <= 1);
+    QVERIFY(std::abs(qGreen(mid) - 64) <= 1);
+    QVERIFY(std::abs(qBlue(mid) - 64) <= 1);
+    QVERIFY(std::abs(qRed(drift::applyLut(lut, qRgb(255, 255, 255), 1.0f)) - 128) <= 1);
+}
+
+void EngineTest::bakeCurveSplineIsMonotoneAndHitsKeys()
+{
+    const std::vector<QPointF> keys{{0.0, 0.0}, {0.3, 0.5}, {0.7, 0.6}, {1.0, 1.0}};
+    for (const QPointF &key : keys)
+        QVERIFY(std::abs(drift::evalMonotoneSpline(keys, key.x()) - key.y()) < 1e-9);
+
+    double previous = -1.0;
+    for (int i = 0; i <= 255; ++i) {
+        const double y = drift::evalMonotoneSpline(keys, i / 255.0);
+        QVERIFY(y >= previous - 1e-12);
+        previous = y;
+    }
+
+    const QByteArray baked = drift::bakeCurve(QStringLiteral(
+        R"([{"x":0,"y":0,"ease":"spline"},{"x":0.3,"y":0.5,"ease":"spline"},{"x":0.7,"y":0.6,"ease":"spline"},{"x":1,"y":1,"ease":"spline"}])"));
+    QCOMPARE(baked.size(), qsizetype(256 * 4));
+    for (int i = 0; i < 256; ++i) {
+        QVERIFY(std::abs(texelChannel(baked, i, 0) - drift::evalMonotoneSpline(keys, i / 255.0) * 255.0) <= 1.0);
+        if (i > 0)
+            QVERIFY(texelChannel(baked, i, 0) >= texelChannel(baked, i - 1, 0));
+    }
+}
+
+void EngineTest::effectPackageLutParamAndNextFeatures()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const auto writePackage = [&](const QString &name, const QByteArray &nextFeatures) {
+        const QString pkg = dir.filePath(name);
+        QDir().mkpath(pkg);
+        QFile json(QDir(pkg).filePath(QStringLiteral("effect.json")));
+        if (!json.open(QIODevice::WriteOnly | QIODevice::Text))
+            qFatal("cannot write %s", qPrintable(json.fileName()));
+        json.write(R"({"id": "test.)" + name.toUtf8() + R"(", "backend": "gpu", "nextFeatures": )"
+                   + nextFeatures + R"(, "parameters": [
+          {"identifier": "look", "displayName": "Look", "type": "lut", "defaultValue": ""},
+          {"identifier": "curve", "displayName": "Curve", "type": "curve",
+           "defaultValue": [{"x": 0, "y": 0, "ease": "spline"}, {"x": 1, "y": 1, "ease": "spline"}]}],
+          "pipeline": {"intermediateBuffers": [], "passes": [
+            {"passIndex": 0, "fragmentShader": "x.frag",
+             "inputs": [{"type": "source_texture"}], "output": {"type": "canvas"}}]}})");
+        json.close();
+        QFile frag(QDir(pkg).filePath(QStringLiteral("x.frag")));
+        if (!frag.open(QIODevice::WriteOnly | QIODevice::Text))
+            qFatal("cannot write %s", qPrintable(frag.fileName()));
+        frag.write("#version 330 core\nin vec2 v_texCoord; out vec4 fragColor;\n"
+                   "uniform sampler2D u_currentTexture;\n"
+                   "void main(){ fragColor = texture(u_currentTexture, v_texCoord); }\n");
+        frag.close();
+        return pkg;
+    };
+
+    QString error;
+    const EffectPresetEntry entry =
+        EffectPackageLoader::loadPackage(writePackage(QStringLiteral("lut_ok"), R"(["param:lut","curve:spline"])"), &error);
+    QVERIFY2(entry.gpu.valid, qPrintable(error));
+    QCOMPARE(entry.meta.parameters.size(), 2);
+    QVERIFY(entry.meta.parameters.at(0).type == drift::EffectParamType::Lut);
+    QCOMPARE(entry.meta.parameters.at(0).defaultString, QString());
+    QVERIFY(entry.meta.parameters.at(1).type == drift::EffectParamType::Curve);
+
+    const EffectPresetEntry future = EffectPackageLoader::loadPackage(
+        writePackage(QStringLiteral("lut_future"), R"(["param:lut","curve:bezier"])"), &error);
+    QVERIFY(!future.gpu.valid);
+    QVERIFY(error.contains(QStringLiteral("unsupported: curve:bezier")));
+}
+
+void EngineTest::colorGradePackageLoads()
+{
+    const QString pkg = QDir(QString::fromUtf8(DRIFT_TEST_EFFECTS_DIR)).filePath(QStringLiteral("color_grade"));
+    QString error;
+    const EffectPresetEntry entry = EffectPackageLoader::loadPackage(pkg, &error);
+    QVERIFY2(entry.gpu.valid, qPrintable(error));
+    QCOMPARE(entry.meta.id, QStringLiteral("color.grade"));
+    QVERIFY(effectDefForId(QStringLiteral("color.grade")));
+
+    const auto find = [&](const QString &key) -> const drift::EffectParamSpec * {
+        for (const drift::EffectParamSpec &spec : entry.meta.parameters) {
+            if (spec.key == key)
+                return &spec;
+        }
+        return nullptr;
+    };
+    const drift::EffectParamSpec *exposure = find(QStringLiteral("exposure"));
+    QVERIFY(exposure);
+    QVERIFY(exposure->type == drift::EffectParamType::Float);
+    const drift::EffectParamSpec *look = find(QStringLiteral("look"));
+    QVERIFY(look);
+    QVERIFY(look->type == drift::EffectParamType::Lut);
+    const drift::EffectParamSpec *curve = find(QStringLiteral("curveMaster"));
+    QVERIFY(curve);
+    QVERIFY(curve->type == drift::EffectParamType::Curve);
+    const drift::EffectParamSpec *lift = find(QStringLiteral("lift"));
+    QVERIFY(lift);
+    QVERIFY(lift->isVec2());
+}
+
+void EngineTest::colorGradeDefaultsAreIdentity()
+{
+    if (!GpuEffectExecutor::instance().isAvailable())
+        QSKIP("OpenGL offscreen context unavailable");
+    const EffectPresetEntry *def = effectDefForId(QStringLiteral("color.grade"));
+    QVERIFY(def);
+    QVERIFY(def->gpu.valid);
+
+    drift::Effect effect;
+    effect.catalogId = def->meta.id;
+    for (const drift::EffectParamSpec &spec : def->meta.parameters)
+        spec.insertDefault(effect.parameters);
+
+    QImage frame(64, 16, QImage::Format_RGBA8888);
+    for (int y = 0; y < frame.height(); ++y) {
+        for (int x = 0; x < frame.width(); ++x)
+            frame.setPixelColor(x, y, QColor(x * 4, y * 16, 255 - x * 4));
+    }
+
+    GpuEffectExecutor::ChainStep step;
+    step.cacheKey = QStringLiteral("test.color_grade_defaults");
+    step.gpu = &def->gpu;
+    step.parameters = resolvedEffectParameters(effect, *def);
+    const QImage out = GpuEffectExecutor::instance().applyChain({step}, frame, 0);
+    QVERIFY(!out.isNull());
+    for (int y = 0; y < frame.height(); ++y) {
+        for (int x = 0; x < frame.width(); ++x) {
+            const QColor in = frame.pixelColor(x, y);
+            const QColor got = out.pixelColor(x, y);
+            QVERIFY2(got.red() == in.red() && got.green() == in.green() && got.blue() == in.blue(),
+                     qPrintable(QStringLiteral("(%1,%2) in %3,%4,%5 out %6,%7,%8").arg(x).arg(y)
+                                    .arg(in.red()).arg(in.green()).arg(in.blue())
+                                    .arg(got.red()).arg(got.green()).arg(got.blue())));
+        }
+    }
+}
+
+void EngineTest::vignetteDefaultsMatchLegacy()
+{
+    if (!GpuEffectExecutor::instance().isAvailable())
+        QSKIP("OpenGL offscreen context unavailable");
+    const EffectPresetEntry *def = effectDefForId(QStringLiteral("stylize.vignette"));
+    QVERIFY(def);
+    QVERIFY(def->gpu.valid);
+
+    drift::Effect effect;
+    effect.catalogId = def->meta.id;
+    for (const drift::EffectParamSpec &spec : def->meta.parameters)
+        spec.insertDefault(effect.parameters);
+
+    QImage frame(48, 32, QImage::Format_RGBA8888);
+    frame.fill(QColor(200, 150, 100));
+    GpuEffectExecutor::ChainStep step;
+    step.cacheKey = QStringLiteral("test.vignette_defaults");
+    step.gpu = &def->gpu;
+    step.parameters = resolvedEffectParameters(effect, *def);
+    const QImage out = GpuEffectExecutor::instance().applyChain({step}, frame, 0);
+    QVERIFY(!out.isNull());
+
+    // The legacy shader: rgb * clamp(1 - 0.55 * dot(p, p), 0, 1) with p = uv * 2 - 1.
+    for (int y = 0; y < frame.height(); ++y) {
+        for (int x = 0; x < frame.width(); ++x) {
+            const double px = (x + 0.5) / frame.width() * 2.0 - 1.0;
+            const double py = (y + 0.5) / frame.height() * 2.0 - 1.0;
+            const double vig = qBound(0.0, 1.0 - 0.55 * (px * px + py * py), 1.0);
+            const QColor got = out.pixelColor(x, y);
+            QVERIFY2(std::abs(got.red() - 200 * vig) <= 2 && std::abs(got.green() - 150 * vig) <= 2
+                         && std::abs(got.blue() - 100 * vig) <= 2,
+                     qPrintable(QStringLiteral("(%1,%2) out %3,%4,%5 expected vig %6")
+                                    .arg(x).arg(y).arg(got.red()).arg(got.green()).arg(got.blue())
+                                    .arg(vig)));
+        }
+    }
+}
+
+void EngineTest::lookCatalogFindsPacksAndUserLooks()
+{
+    QTemporaryDir tmp;
+    QVERIFY(tmp.isValid());
+    const QByteArray cube = "LUT_3D_SIZE 2\n0 0 0\n1 0 0\n0 1 0\n1 1 0\n0 0 1\n1 0 1\n0 1 1\n1 1 1\n";
+    const auto put = [](const QString &path, const QByteArray &data) {
+        QVERIFY(QDir().mkpath(QFileInfo(path).absolutePath()));
+        QFile file(path);
+        QVERIFY(file.open(QIODevice::WriteOnly));
+        file.write(data);
+    };
+
+    // The same id in both roots: the first root wins.
+    const QString builtin = tmp.filePath(QStringLiteral("builtin"));
+    const QString packs = tmp.filePath(QStringLiteral("packs"));
+    put(builtin + "/warm_tone/look.cube", cube);
+    put(builtin + "/warm_tone/look.json", R"({"name": "Warm Tone Pro", "category": "Film", "order": 2})");
+    put(builtin + "/cool/look.cube", cube);
+    put(packs + "/warm_tone/look.cube", cube);
+    put(packs + "/teal_orange/look.cube", cube);
+    put(packs + "/not_a_look/readme.txt", "no cube here");
+
+    drift::reloadLookCatalog({builtin, packs});
+    QStringList ids;
+    for (const drift::LookEntry &look : drift::lookCatalog())
+        ids << look.id;
+    QCOMPARE(ids, (QStringList{QStringLiteral("cool"), QStringLiteral("teal_orange"), QStringLiteral("warm_tone")}));
+
+    const auto warm = drift::lookForId(QStringLiteral("warm_tone"));
+    QVERIFY(warm);
+    QCOMPARE(warm->label, QStringLiteral("Warm Tone Pro"));
+    QCOMPARE(warm->category, QStringLiteral("Film"));
+    QCOMPARE(warm->order, 2);
+    QVERIFY(warm->packageDir.startsWith(builtin));
+    QVERIFY(!warm->userInstalled);
+    QCOMPARE(drift::lookForId(QStringLiteral("cool"))->label, QStringLiteral("Cool"));
+    QCOMPARE(drift::lookForId(QStringLiteral("teal_orange"))->label, QStringLiteral("Teal Orange"));
+    QVERIFY(!drift::lookForId(QStringLiteral("not_a_look")));
+    QVERIFY(drift::lookCubePathForId(QStringLiteral("warm_tone")).startsWith(builtin));
+    QCOMPARE(drift::lookCubePathForId(QStringLiteral("nope")), QString());
+
+    // Import: the stem becomes the id and label, a second import of the same name gets a suffix.
+    const QString incoming = tmp.filePath(QStringLiteral("incoming"));
+    put(incoming + "/My Look.cube", cube);
+    put(incoming + "/broken.cube", "LUT_3D_SIZE 2\n0 0 0\n");
+    const QString userRoot = tmp.filePath(QStringLiteral("user"));
+    const drift::LookImportResult first = drift::importCubeFiles(
+        {incoming + "/My Look.cube", incoming + "/broken.cube"}, userRoot);
+    QCOMPARE(first.importedIds.size(), 1);
+    const QString myLookId = first.importedIds.first();
+    QVERIFY(myLookId.startsWith(QStringLiteral("user.my-look-")));
+    QCOMPARE(first.errors.size(), 1);
+    QVERIFY(QFileInfo::exists(userRoot + "/" + myLookId + "/look.cube"));
+    QFile manifest(userRoot + "/" + myLookId + "/look.json");
+    QVERIFY(manifest.open(QIODevice::ReadOnly));
+    QCOMPARE(QJsonDocument::fromJson(manifest.readAll()).object().value(QStringLiteral("name")).toString(),
+             QStringLiteral("My Look"));
+    // Windows cannot delete a file that is still open, and removeUserLook runs below.
+    manifest.close();
+
+    const drift::LookImportResult second = drift::importCubeFiles({incoming + "/My Look.cube"}, userRoot);
+    QCOMPARE(second.importedIds, (QStringList{myLookId}));
+    QVERIFY(second.errors.isEmpty());
+
+    put(incoming + "/Other.cube", cube + "\n# different bytes\n");
+    const drift::LookImportResult third = drift::importCubeFiles({incoming + "/Other.cube"}, userRoot);
+    QCOMPARE(third.importedIds.size(), 1);
+    QVERIFY(third.importedIds.first() != myLookId);
+
+    drift::reloadLookCatalog({userRoot});
+    QCOMPARE(drift::lookCubePathForId(myLookId), userRoot + "/" + myLookId + "/look.cube");
+    QVERIFY(drift::lookForId(third.importedIds.first()));
+
+    // Only user.* folders under the user root can be removed.
+    QVERIFY(!drift::removeUserLook(QStringLiteral("warm_tone"), builtin));
+    QVERIFY(QFileInfo::exists(builtin + "/warm_tone/look.cube"));
+    QVERIFY(!drift::removeUserLook(QStringLiteral("user."), userRoot));
+    QVERIFY(drift::removeUserLook(myLookId, userRoot));
+    QVERIFY(!QFileInfo::exists(userRoot + "/" + myLookId));
+    QCOMPARE(drift::importCubeFiles({incoming + "/My Look.cube"}, userRoot).importedIds, (QStringList{myLookId}));
+
+    drift::reloadLookCatalog();
 }
 
 QTEST_MAIN(EngineTest)

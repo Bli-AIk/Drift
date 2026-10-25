@@ -74,9 +74,16 @@ TransitionPresetEntry TransitionPackageLoader::loadPackage(const QString &packag
     }
 
     QString stripRel = root.value(QStringLiteral("previewStrip")).toString();
-    if (stripRel.isEmpty())
-        stripRel = QStringLiteral("preview_strip.png");
-    entry.previewStripPath = GpuPackageParse::resolvePackageAsset(packageDir, stripRel);
+    if (!stripRel.isEmpty()) {
+        entry.previewStripPath = GpuPackageParse::resolvePackageAsset(packageDir, stripRel);
+    } else {
+        entry.previewStripPath =
+            GpuPackageParse::resolvePackageAsset(packageDir, QStringLiteral("preview_strip.webp"));
+        if (entry.previewStripPath.isEmpty()) {
+            entry.previewStripPath = GpuPackageParse::resolvePackageAsset(
+                packageDir, QStringLiteral("preview_strip.png"));
+        }
+    }
     if (!entry.previewStripPath.isEmpty()) {
         entry.previewFrames = root.value(QStringLiteral("previewFrames")).toInt(0);
         if (entry.previewFrames <= 0) {

@@ -5,6 +5,7 @@
 #include "engine/encode/writers/AudioFileWriter.h"
 #include "engine/packages/effects/EffectCatalog.h"
 #include "engine/packages/assets/FontCatalog.h"
+#include "engine/packages/looks/LookCatalog.h"
 #include "engine/encode/MediaEditor.h"
 #include "engine/packages/transitions/TransitionCatalog.h"
 #include "core/project/media/ImageSequence.h"
@@ -168,6 +169,8 @@ QList<MediaEntry> collectMedia(const Project &project, bool embedSource)
     // bin assets that still live in this cache directory.
     const QString stabilizationDir = stabilizationCacheDir();
     const QString emojiDir = emojiCacheDir();
+    const QString base = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    const QString projectMediaDir = base.isEmpty() ? QString() : QDir(base).filePath(QStringLiteral("projects"));
 
     QList<MediaEntry> media;
     QSet<QString> seen;
@@ -207,12 +210,12 @@ QList<MediaEntry> collectMedia(const Project &project, bool embedSource)
         const MediaAsset *asset = project.asset(id);
         if (!asset || isUnder(asset->path, emojiDir))
             continue;
-        // Denoised audio is an ordinary asset, but its file lives in a cache directory that gets
-        // swept — it is a post-process result, so it travels with the project either way. Same
-        // for a stabilized render from before those were project media.
+        // Post-process results in swept cache directories, and Drift's own media edits under
+        // <AppData>/projects (conversions, crops, restores, stabilized renders), travel with the project.
         append(asset->path, MediaRole::Source,
                embedSource || isUnder(asset->path, denoiseDir)
-                   || isUnder(asset->path, stabilizationDir));
+                   || isUnder(asset->path, stabilizationDir)
+                   || isUnder(asset->path, projectMediaDir));
     }
 
     QList<Track> allTracks;
@@ -225,7 +228,8 @@ QList<MediaEntry> collectMedia(const Project &project, bool embedSource)
             // Clips carry their own copy of the asset path; a text or shape clip has none.
             append(clip.path, MediaRole::Source,
                    embedSource || isUnder(clip.path, denoiseDir)
-                       || isUnder(clip.path, stabilizationDir));
+                       || isUnder(clip.path, stabilizationDir)
+                       || isUnder(clip.path, projectMediaDir));
         }
     }
 
@@ -289,6 +293,13 @@ QList<AddonRef> collectAddons(const Project &project)
                         const QString modelPath = effect.parameters.value(spec.key).toString();
                         if (!modelPath.isEmpty())
                             addForPath(modelPath, QStringLiteral("face-props"));
+                    }
+                    for (const drift::EffectParamSpec &spec : def->meta.parameters) {
+                        if (spec.type != drift::EffectParamType::Lut)
+                            continue;
+                        const QString look = effect.parameters.value(spec.key).toString();
+                        if (!look.isEmpty())
+                            addForPath(drift::lookCubePathForId(look), QStringLiteral("looks"));
                     }
                 }
             }

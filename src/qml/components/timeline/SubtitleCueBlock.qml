@@ -6,7 +6,9 @@ Rectangle {
     property var lane
     id: block
     required property int index
-    required property var modelData
+    required property real start
+    required property real end
+    required property string text
 
     readonly property bool isSelected: index === EditorState.selectedSubtitleCue
     readonly property bool isActive: index === lane.activeCueIndex
@@ -28,9 +30,9 @@ Rectangle {
 
     height: parent.height - 16
     anchors.verticalCenter: parent.verticalCenter
-    x: dragging ? dragX : lane.xForSeconds(modelData.start)
+    x: dragging ? dragX : lane.xForSeconds(start)
     width: Math.max(3, dragging ? dragW
-                                 : (modelData.end - modelData.start) * lane.pxPerSecond)
+                                 : (end - start) * lane.pxPerSecond)
     radius: Theme.c.subtitleCueBlock.radius
     color: isSelected ? Theme.c.subtitleCueBlock.backgroundSelected
                       : (isActive ? Qt.lighter(Theme.c.subtitleCueBlock.background, 1.15) : Theme.c.subtitleCueBlock.background)
@@ -42,8 +44,8 @@ Rectangle {
     Behavior on opacity { NumberAnimation { duration: 120 } }
 
     function startEdit() {
-        editStart = modelData.start
-        editEnd = modelData.end
+        editStart = start
+        editEnd = end
         dragX = lane.xForSeconds(editStart)
         dragW = (editEnd - editStart) * lane.pxPerSecond
         dragging = true
@@ -56,9 +58,8 @@ Rectangle {
     function moveBy(dx) {
         const d = editEnd - editStart
         const raw = editStart + dx / lane.pxPerSecond
-        const targets = lane.snapTargets(index)
-        const snS = lane.snap(raw, targets)
-        const snE = lane.snap(raw + d, targets) - d
+        const snS = lane.snap(raw, index)
+        const snE = lane.snap(raw + d, index) - d
         let ns = Math.abs(snS - raw) <= Math.abs(snE - raw) ? snS : snE
         ns = lane.clampVal(ns, lane.loBound(index), lane.hiBound(index) - d)
         dragX = lane.xForSeconds(ns)
@@ -76,12 +77,11 @@ Rectangle {
         anchors.rightMargin: 6
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideRight
-        text: (block.modelData.text && block.modelData.text.length)
-              ? block.modelData.text : qsTr("(empty)")
+        text: block.text.length ? block.text : qsTr("(empty)")
         color: Theme.c.subtitleCueBlock.foreground
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeXs
-        font.italic: !(block.modelData.text && block.modelData.text.length)
+        font.italic: !block.text.length
     }
 
     // Body: click to select, drag to move (keeps duration).

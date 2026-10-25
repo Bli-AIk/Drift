@@ -17,6 +17,7 @@ struct ShapePaintRequest
     QRectF layoutRect;
     double renderScale = 1.0;
     double timeSec = 0.0; // since the clip start; drives time-based paints
+    double frameRate = 0.0; // the project's, for frame-stepped paints; 0 reads as 30
 };
 
 struct ShapePainterResult
