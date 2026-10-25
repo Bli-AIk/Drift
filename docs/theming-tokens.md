@@ -319,6 +319,13 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | themedButton | focusBorder | $semantic.focusRing | $semantic.focusRing |
 | themedButton | focusBorderWidth | $metrics.borderWidthFocus | $metrics.borderWidthFocus |
 | themedButton | radius | $metrics.radius.sm | $metrics.radius.sm |
+| assetQuickAddButton | background | $semantic.primary | $semantic.primary |
+| assetQuickAddButton | backgroundHover | $semantic.primary | $semantic.primary |
+| assetQuickAddButton | backgroundPressed | $semantic.primary | $semantic.primary |
+| assetQuickAddButton | backgroundDisabled | $semantic.panel.accent | $semantic.panel.accent |
+| assetQuickAddButton | foreground | $semantic.primaryForeground | $semantic.primaryForeground |
+| assetQuickAddButton | foregroundDisabled | $semantic.mutedForeground | $semantic.mutedForeground |
+| assetQuickAddButton | focusRing | $semantic.panel.foreground | $semantic.panel.foreground |
 | iconButton | foreground | $semantic.mutedForeground | $semantic.mutedForeground |
 | iconButton | foregroundActive | $semantic.panel.secondary.foreground | $semantic.panel.secondary.foreground |
 | iconButton | labelForeground | $semantic.foreground | $semantic.foreground |

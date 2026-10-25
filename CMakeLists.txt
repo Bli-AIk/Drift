@@ -1624,6 +1624,7 @@ qt_add_qml_module(drift
         src/qml/components/assets/AssetCategoryChips.qml
         src/qml/components/assets/EffectStacksSection.qml
         src/qml/components/assets/AssetFavoriteButton.qml
+        src/qml/components/assets/AssetQuickAddButton.qml
         src/qml/components/assets/TransitionPresetCard.qml
         src/qml/components/assets/TextStyleUserCard.qml
         src/qml/components/assets/TextStylePackCard.qml

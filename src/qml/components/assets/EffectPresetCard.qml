@@ -176,23 +176,22 @@ Column {
             itemId: root.modelData.id
         }
 
-        IconButton {
+        AssetQuickAddButton {
+            z: 5
             anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.margins: 3
-            glyph: Theme.icons.plus
-            variant: "ghost"
-            buttonSize: 18
-            iconSize: 12
-            tooltip: qsTr("Apply to selected clip")
-            enabled: EditorState.selectedClip >= 0
+            anchors.bottom: parent.bottom
+            anchors.margins: 4
+            revealed: cardHover.hovered
+            tooltip: EditorState.selectedClip >= 0 ? qsTr("Apply to selected clip")
+                                                   : qsTr("Add as adjustment layer")
             onClicked: applyRequested(root.modelData.id)
         }
 
         // Imported effects only: built-in and add-on ones aren't the user's to delete.
+        // Top-right, since the quick-add button owns the bottom-right corner.
         IconButton {
             anchors.right: parent.right
-            anchors.bottom: parent.bottom
+            anchors.top: parent.top
             anchors.margins: 3
             visible: root.modelData.user === true
                      && (cardHover.hovered || Theme.touchUi)

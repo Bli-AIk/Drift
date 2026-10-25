@@ -174,7 +174,7 @@ Rectangle {
         Text {
             id: addedLabel
             anchors.centerIn: parent
-            text: qsTr("Adicionado")
+            text: qsTr("Added")
             color: "white"
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeTiny
@@ -182,49 +182,17 @@ Rectangle {
         }
     }
 
-    Button {
+    AssetQuickAddButton {
         id: addToTimelineButton
         z: 5
-        visible: !root.isFolder && root.hovered
+        visible: !root.isFolder
+        revealed: root.hovered
         enabled: !busyOverlay.busy && root.assetIndex >= 0
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: 4
-        width: 24
-        height: 24
-        padding: 0
-        hoverEnabled: true
-        focusPolicy: Qt.StrongFocus
-        Accessible.name: qsTr("Adicionar à timeline")
+        tooltip: qsTr("Add to timeline")
         onClicked: root.host.addToTimelineRequested([root.assetId])
-
-        background: Rectangle {
-            radius: width / 2
-            color: !addToTimelineButton.enabled ? Qt.darker(Theme.c.themedButton.primaryBackground, 1.5)
-                   : addToTimelineButton.down ? Qt.darker(Theme.c.themedButton.primaryBackground, 1.12)
-                   : addToTimelineButton.hovered ? Qt.lighter(Theme.c.themedButton.primaryBackground, 1.08)
-                                                 : Theme.c.themedButton.primaryBackground
-        }
-        contentItem: Item {
-            // Draw the cross geometrically: a font glyph can have uneven
-            // side bearings and look off-centre inside a small circle.
-            Rectangle {
-                anchors.centerIn: parent
-                width: 12
-                height: 2
-                color: Theme.c.themedButton.primaryForeground
-            }
-            Rectangle {
-                anchors.centerIn: parent
-                width: 2
-                height: 12
-                color: Theme.c.themedButton.primaryForeground
-            }
-        }
-        ThemedToolTip {
-            text: qsTr("Adicionar à timeline")
-            visible: addToTimelineButton.hovered || addToTimelineButton.visualFocus
-        }
     }
 
     MediaAssetsSelectionRing {
@@ -248,12 +216,6 @@ Rectangle {
         enabled: !assetDrag.active
         onTapped: {
             if (root.isFolder)
-                return
-
-            // A click on the + is a one-file timeline action, not a selection
-            // gesture on the underlying tile.
-            if (leftTap.point.position.x >= addToTimelineButton.x
-                    && leftTap.point.position.y >= addToTimelineButton.y)
                 return
 
             // The most recently interacted editing surface owns Delete.

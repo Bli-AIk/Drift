@@ -127,7 +127,7 @@ Rectangle {
             // Derived from the actual thumbnail width
             // rather than a magic constant.
             width: Math.max(0, parent.width - listThumbFrame.width
-                            - listRowContent.spacing - (root.isFolder ? 0 : 32)
+                            - listRowContent.spacing - (root.isFolder ? 0 : quickAdd.width + Theme.spacingLg)
                             - (root.alreadyOnTimeline ? 78 : 0))
         }
     }
@@ -150,12 +150,6 @@ Rectangle {
             enabled: !rowDrag.active
             onTapped: {
                 if (root.isFolder)
-                    return
-
-                // The + inserts this media directly; it does not change row selection.
-                if (leftRowTap.point.position.x >= quickAdd.x
-                        && leftRowTap.point.position.y >= quickAdd.y
-                        && leftRowTap.point.position.y < quickAdd.y + quickAdd.height)
                     return
 
                 // Keep keyboard actions scoped to this surface.
@@ -236,45 +230,17 @@ Rectangle {
     }
 
     // Match the grid thumbnail's quick-add action in list and tree modes.
-    Button {
+    AssetQuickAddButton {
         id: quickAdd
         z: 5
-        visible: !root.isFolder && rowHover.hovered
+        visible: !root.isFolder
+        revealed: rowHover.hovered
         enabled: !root.replaceBusy && root.assetIndex >= 0
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: Theme.spacingLg
-        width: 24
-        height: 24
-        padding: 0
-        hoverEnabled: true
-        Accessible.name: qsTr("Adicionar à timeline")
+        tooltip: qsTr("Add to timeline")
         onClicked: root.host.addToTimelineRequested([root.assetId])
-        background: Rectangle {
-            radius: width / 2
-            color: !quickAdd.enabled ? Qt.darker(Theme.c.themedButton.primaryBackground, 1.5)
-                   : quickAdd.down ? Qt.darker(Theme.c.themedButton.primaryBackground, 1.12)
-                   : quickAdd.hovered ? Qt.lighter(Theme.c.themedButton.primaryBackground, 1.08)
-                                      : Theme.c.themedButton.primaryBackground
-        }
-        contentItem: Item {
-            Rectangle {
-                anchors.centerIn: parent
-                width: 12
-                height: 2
-                color: Theme.c.themedButton.primaryForeground
-            }
-            Rectangle {
-                anchors.centerIn: parent
-                width: 2
-                height: 12
-                color: Theme.c.themedButton.primaryForeground
-            }
-        }
-        ThemedToolTip {
-            text: qsTr("Adicionar à timeline")
-            visible: quickAdd.hovered || quickAdd.visualFocus
-        }
     }
 
     Rectangle {
@@ -290,7 +256,7 @@ Rectangle {
         Text {
             id: rowAddedText
             anchors.centerIn: parent
-            text: qsTr("Adicionado")
+            text: qsTr("Added")
             color: "white"
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeTiny

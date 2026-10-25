@@ -59,6 +59,16 @@ Column {
             onClicked: cardMenu.popup()
         }
 
+        AssetQuickAddButton {
+            z: 5
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.margins: 4
+            revealed: userDrag.hovered
+            tooltip: qsTr("Add at playhead")
+            onClicked: userDrag.tapped()
+        }
+
         ThemedContextMenu {
             id: cardMenu
 
