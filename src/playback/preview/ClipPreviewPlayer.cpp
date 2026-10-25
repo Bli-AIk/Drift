@@ -5,6 +5,7 @@
 #include "engine/decode/readers/ClipReaderPool.h"
 #include "engine/encode/proxies/ReverseProxyCache.h"
 
+#include <cmath>
 #include <cstring>
 
 namespace {
@@ -213,6 +214,37 @@ void ClipPreviewPlayer::seek(drift::TimeUs us)
     requestFrame(m_positionUs);
 }
 
+void ClipPreviewPlayer::applyClockRate()
+{
+    const double rate = qBound(0.1, m_previewRate.load() * m_shuttleRate.load(), 8.0);
+    if (!m_playing) {
+        m_clock.setRate(rate);
+        return;
+    }
+    // The clock's rate may only change while stopped, so re-anchor at the heard position.
+    m_positionUs = m_clock.currentTimeUs();
+    m_clock.setRate(rate);
+    m_clock.reset(m_positionUs, m_sampleRate);
+    m_clock.start();
+}
+
+void ClipPreviewPlayer::setPreviewRate(double rate)
+{
+    m_previewRate = qBound(0.25, rate, 4.0);
+    applyClockRate();
+}
+
+void ClipPreviewPlayer::setShuttleRate(double rate)
+{
+    m_shuttleRate = qBound(0.25, rate, 8.0);
+    applyClockRate();
+}
+
+void ClipPreviewPlayer::setGainDb(double db)
+{
+    m_gain = static_cast<float>(std::pow(10.0, db / 20.0));
+}
+
 void ClipPreviewPlayer::onPositionTick()
 {
     if (!m_playing)
@@ -281,13 +313,27 @@ int ClipPreviewPlayer::fillAudio(float *buffer, int sampleCount)
         return sampleCount;
     }
 
+    if (m_shuttleRate.load() != 1.0) {
+        std::memset(buffer, 0, static_cast<size_t>(sampleCount) * 2 * sizeof(float));
+        m_clock.onAudioSamplesRendered(sampleCount);
+        m_clock.syncPlaybackUs(static_cast<drift::TimeUs>(m_audio.processedUSecs()));
+        return sampleCount;
+    }
+
     drift::Clip clip;
     {
         QMutexLocker lock(&m_clipMutex);
         clip = m_clip;
     }
 
-    const drift::TimeUs timeUs = m_clock.produceTimeUs();
+    // The clock counts in clip time; a retimed clip is addressed in its own (stretched) timeline.
+    drift::TimeUs timeUs = m_clock.produceTimeUs();
+    const double rate = m_previewRate.load();
+    if (rate != 1.0) {
+        clip.speed = rate;
+        clip.timelineDuration = qMax<drift::TimeUs>(1, std::llround(static_cast<double>(clip.timelineDuration) / rate));
+        timeUs = std::llround(static_cast<double>(timeUs) / rate);
+    }
     // Salted off the timeline's id for this clip: the auditioner scrubs its own range while the
     // timeline may be playing the same file, and one decode cursor cannot serve both.
     const quint64 streamId = kPreviewStreamSalt ^ ClipReaderPool::streamIdForClip(clip.id);
@@ -298,6 +344,11 @@ int ClipPreviewPlayer::fillAudio(float *buffer, int sampleCount)
     if (frames < sampleCount) {
         std::memset(buffer + static_cast<size_t>(frames) * 2, 0,
                     static_cast<size_t>(sampleCount - frames) * 2 * sizeof(float));
+    }
+    const float gain = m_gain.load();
+    if (gain != 1.0f) {
+        for (int i = 0; i < frames * 2; ++i)
+            buffer[i] *= gain;
     }
 
     m_clock.onAudioSamplesRendered(sampleCount);

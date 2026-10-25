@@ -10,6 +10,8 @@
 #include <QStringList>
 #include <QUrl>
 
+#include <functional>
+
 class AppController;
 
 namespace drift {
@@ -86,6 +88,12 @@ public:
     // is — its position, trim, effects and transitions all survive. Asynchronous: true only means
     // the probe started, and the outcome arrives as replaceFinished.
     Q_INVOKABLE bool replaceSource(int assetIndex, const QUrl &url);
+    // replaceSource for a caller that renders the replacement itself (Source Lab). `adjust` runs on
+    // the probed asset, and may edit the project's clips, before the swap, so what it does lands
+    // in the swap's own undo step. The caller keeps the asset's name, ranges and so on by copying
+    // them over from the project's current row, which is untouched until after `adjust`.
+    bool replaceSourceWith(int assetIndex, const QUrl &url,
+                           std::function<void(drift::MediaAsset &replacement)> adjust);
     // Re-reads a bin row's own file after it changed in place: new duration and media, with the
     // name, trim and rotation the user gave the row kept, and every cache of the old content
     // dropped. Undoable. Asynchronous: true only means the probe started — the row stays
@@ -116,9 +124,13 @@ public:
     // arrives as copyRendered, a failure as editFinished(false, ...).
     Q_INVOKABLE bool renderCopy(int assetIndex, double inSeconds, double outSeconds,
                                 double cropX, double cropY, double cropW, double cropH);
-    // Adds a bin item for the video's [inSeconds, outSeconds] range: same file, no copy, the range
+    // The undo-free core of addSubclip, for callers that batch several into one edit. `name`
+    // empty = "<source> (<range>)"; `rating` is the new row's own. Accepts video and audio.
+    QString appendSubclip(const QString &assetId, drift::TimeUs inUs, drift::TimeUs outUs,
+                          const QString &name, int rating);
+    // Adds a bin item for the video's or audio's [inSeconds, outSeconds] range: same file, no copy, the range
     // stored as its trim. Placed right after the source. Returns the new id, or empty when the
-    // asset is not a video or the range is empty.
+    // asset is neither video nor audio or the range is empty.
     Q_INVOKABLE QString addSubclip(const QString &assetId, double inSeconds, double outSeconds);
     // "Convert to edit-friendly format": re-encodes each video asset onto a constant, standard
     // frame rate and swaps it in, one at a time, the same undoable way a crop does, marking the
@@ -163,6 +175,7 @@ private:
     // The content:// URI the in-flight replace picked, held across the probe so it can be put back
     // on the asset once applyProbedSource has overwritten the struct.
     QString m_replacingAssetSourceUri;
+    std::function<void(drift::MediaAsset &)> m_replaceAdjust;
     QSet<QString> m_refreshFailed;
     bool m_editing = false;
     double m_editProgress = 0.0;

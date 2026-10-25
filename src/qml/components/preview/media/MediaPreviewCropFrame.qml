@@ -24,6 +24,10 @@ Rectangle {
         cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
         property real grabX: 0
         property real grabY: 0
+        onReleased: {
+            if (frame.editor.commitCrop)
+                frame.editor.commitCrop()
+        }
         onPressed: (mouse) => {
             grabX = mouse.x
             grabY = mouse.y

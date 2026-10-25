@@ -9,6 +9,8 @@
 
 #include <functional>
 
+#include "core/base/Time.h"
+
 class AppController;
 
 // Clip stabilization, reached from QML as EditorState.stabilize.
@@ -25,6 +27,14 @@ public:
     Q_INVOKABLE void setSmoothing(int trackIndex, int clipIndex, int value);
     Q_INVOKABLE void setTripod(int trackIndex, int clipIndex, bool enabled);
     Q_INVOKABLE void setMode(int trackIndex, int clipIndex, const QString &mode);
+
+    // The two vid.stab passes' filter chains and the cached motion-analysis file for a source
+    // range, shared with the clip stabilizer so a range analysed by one is not scanned again by
+    // the other. The analysis path does not exist until a scan has been stored there.
+    static QString detectFilter();
+    static QString transformFilter(int smoothing, bool tripod);
+    static QString analysisPath(const QString &sourcePath, drift::TimeUs rangeIn,
+                                drift::TimeUs rangeOut);
 
     // Projects saved before stabilized videos were bin assets kept the render on the clip; this
     // makes each one a "(stabilized)" asset the clip reads instead. Runs on load, after bundle

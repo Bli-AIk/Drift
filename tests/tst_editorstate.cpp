@@ -49,6 +49,8 @@
 #include "ui/timeline/TimelineTrackItem.h"
 #include "ui/timeline/TimelineViewState.h"
 #include "app/bin/AssetLibrary.h"
+#include "app/bin/SourceLabController.h"
+#include "app/jobs/JobRegistry.h"
 #include "app/online/assets/DriftAssetStore.h"
 #include "ui/imageproviders/multicam/MulticamImageProvider.h"
 #include "ui/imageproviders/multicam/MulticamImageStore.h"
@@ -199,6 +201,13 @@ private slots:
     void projectJsonImportRejectsGarbageAndLeavesTimeline();
     void legacyStabilizedRenderBecomesBinAsset();
     void stabilizeRendersRangeIntoBinAndSwapsClip();
+    void sourceLabRangeCrudUndoRedo();
+    void sourceLabMakeSubclipsIsOneUndoStep();
+    void sourceLabRecipePureTrimCrop();
+    void sourceLabPureTrimCropReplaceIsOneUndoStep();
+    void sourceLabPureTrimCropCopyKeepsCrop();
+    void sourceLabReplaceWithSpeedRebasesEverything();
+    void sourceLabStreamCopyPlanReportsSnappedIn();
     void mogrtImportIntoExistingProject();
     void newProjectClearsEverything();
     void projectSetupOnPristineProjectStaysClean();
@@ -3291,6 +3300,395 @@ void EditorStateTest::legacyStabilizedRenderBecomesBinAsset()
 
     state.projectFile()->saveProjectJson(QUrl::fromLocalFile(jsonPath));
     QVERIFY(!readFile(jsonPath).contains("stabilizePath"));
+}
+
+namespace {
+QString addSourceLabAsset(AppController &state, AssetLibrary &library, const QString &path,
+                          drift::MediaKind kind)
+{
+    drift::MediaAsset asset;
+    asset.kind = kind;
+    asset.path = path;
+    asset.name = QStringLiteral("take");
+    asset.durationUs = drift::secondsToUs(10);
+    const QString id = state.project()->addAsset(asset);
+    library.syncToProject();
+    return id;
+}
+} // namespace
+
+void EditorStateTest::sourceLabRangeCrudUndoRedo()
+{
+    QTemporaryFile file;
+    QVERIFY(file.open());
+    AssetLibrary library;
+    AppController state(&library);
+    const QString id = addSourceLabAsset(state, library, file.fileName(), drift::MediaKind::Video);
+    SourceLabController *lab = state.sourceLab();
+    QVERIFY(lab->load(id));
+    QCOMPARE(lab->durationSeconds(), 10.0);
+
+    const QString late = lab->addRange(5, 8);
+    const QString early = lab->addRange(1, 20);
+    QVERIFY(!late.isEmpty());
+    QVERIFY(!early.isEmpty());
+    QVERIFY(lab->addRange(4, 4).isEmpty());
+    QCOMPARE(lab->ranges().size(), 2);
+    QCOMPARE(lab->ranges().at(0).toMap().value(QStringLiteral("id")).toString(), early);
+    // Clamped to the asset's length.
+    QCOMPARE(lab->ranges().at(0).toMap().value(QStringLiteral("out")).toDouble(), 10.0);
+
+    QVERIFY(lab->updateRange(late, 0, 2));
+    QCOMPARE(lab->ranges().at(0).toMap().value(QStringLiteral("id")).toString(), late);
+    QVERIFY(lab->setRangeRating(late, 1));
+    QVERIFY(lab->renameRange(late, QStringLiteral("hero")));
+    const QModelIndex row = library.index(0, 0);
+    QCOMPARE(library.data(row, AssetLibrary::RangeCountRole).toInt(), 2);
+    QCOMPARE(library.data(row, AssetLibrary::FavoriteRangeCountRole).toInt(), 1);
+    QVERIFY(lab->setAssetRating(1));
+    QCOMPARE(library.data(row, AssetLibrary::RatingRole).toInt(), 1);
+    // The map the bin's QML filter reads agrees with the roles.
+    const QVariantMap card = library.assetAt(0);
+    QCOMPARE(card.value(QStringLiteral("rating")).toInt(), 1);
+    QCOMPARE(card.value(QStringLiteral("rangeCount")).toInt(), 2);
+    QCOMPARE(card.value(QStringLiteral("favoriteRangeCount")).toInt(), 1);
+
+    QVERIFY(lab->removeRange(early));
+    QCOMPARE(lab->ranges().size(), 1);
+    state.undo();
+    QCOMPARE(lab->ranges().size(), 2);
+    state.redo();
+    QCOMPARE(lab->ranges().size(), 1);
+    for (int i = 0; i < 5; ++i)
+        state.undo();
+    QCOMPARE(library.data(row, AssetLibrary::FavoriteRangeCountRole).toInt(), 0);
+    QCOMPARE(lab->ranges().at(0).toMap().value(QStringLiteral("name")).toString(), QString());
+
+    QVERIFY(lab->replaceRanges({QVariantMap{{QStringLiteral("in"), 6}, {QStringLiteral("out"), 7}},
+                                QVariantMap{{QStringLiteral("in"), 1}, {QStringLiteral("out"), 2}},
+                                QVariantMap{{QStringLiteral("in"), 3}, {QStringLiteral("out"), 3}}}));
+    QCOMPARE(lab->ranges().size(), 2);
+    QCOMPARE(lab->ranges().at(0).toMap().value(QStringLiteral("in")).toDouble(), 1.0);
+    state.undo();
+    QCOMPARE(lab->ranges().size(), 2);
+    QCOMPARE(lab->ranges().at(0).toMap().value(QStringLiteral("in")).toDouble(), 1.0);
+}
+
+void EditorStateTest::sourceLabMakeSubclipsIsOneUndoStep()
+{
+    QTemporaryFile file;
+    QVERIFY(file.open());
+    AssetLibrary library;
+    AppController state(&library);
+    const QString id = addSourceLabAsset(state, library, file.fileName(), drift::MediaKind::Audio);
+    SourceLabController *lab = state.sourceLab();
+    QVERIFY(lab->load(id));
+
+    const QString a = lab->addRange(1, 2);
+    const QString b = lab->addRange(3, 4);
+    lab->addRange(5, 6);
+    lab->renameRange(a, QStringLiteral("intro"));
+    lab->setRangeRating(a, 1);
+    lab->setRangeRating(b, -1);
+
+    const QStringList made = lab->makeSubclips({a, b});
+    QCOMPARE(made.size(), 2);
+    QCOMPARE(state.project()->assetOrder().size(), 3);
+    const drift::MediaAsset *first = state.project()->asset(made.at(0));
+    QCOMPARE(first->name, QStringLiteral("intro"));
+    QCOMPARE(first->rating, 1);
+    QCOMPARE(first->trimInUs, drift::secondsToUs(1));
+    QCOMPARE(first->trimOutUs, drift::secondsToUs(2));
+    QVERIFY(first->ranges.isEmpty());
+    QCOMPARE(state.project()->asset(made.at(1))->rating, -1);
+
+    state.undo();
+    QCOMPARE(state.project()->assetOrder().size(), 1);
+    state.redo();
+    QCOMPARE(state.project()->assetOrder().size(), 3);
+}
+
+void EditorStateTest::sourceLabRecipePureTrimCrop()
+{
+    QTemporaryFile file;
+    QVERIFY(file.open());
+    AssetLibrary library;
+    AppController state(&library);
+    const QString id = addSourceLabAsset(state, library, file.fileName(), drift::MediaKind::Video);
+    SourceLabController *lab = state.sourceLab();
+    QVERIFY(lab->load(id));
+    QVERIFY(lab->recipeIsPureTrimCrop());
+    QVERIFY(!lab->recipeDirty());
+
+    lab->setRecipeValue(QStringLiteral("trimIn"), 2.0);
+    lab->setRecipeValue(QStringLiteral("crop"), QRectF(0.1, 0.1, 0.5, 0.5));
+    QVERIFY(lab->recipeIsPureTrimCrop());
+    QVERIFY(lab->recipeDirty());
+
+    lab->setRecipeValue(QStringLiteral("speed"), 2.0);
+    QVERIFY(!lab->recipeIsPureTrimCrop());
+    lab->resetRecipe(QStringLiteral("speed"));
+    QVERIFY(lab->recipeIsPureTrimCrop());
+    lab->setRecipeValue(QStringLiteral("denoise"), true);
+    QVERIFY(!lab->recipeIsPureTrimCrop());
+    lab->resetRecipe(QStringLiteral("audio"));
+    QVERIFY(lab->recipeIsPureTrimCrop());
+
+    // Survives switching away and back.
+    const QString other = addSourceLabAsset(state, library, file.fileName(), drift::MediaKind::Video);
+    QVERIFY(lab->load(other));
+    QCOMPARE(lab->recipe().value(QStringLiteral("trimIn")).toDouble(), 0.0);
+    QVERIFY(lab->load(id));
+    QCOMPARE(lab->recipe().value(QStringLiteral("trimIn")).toDouble(), 2.0);
+
+    lab->resetRecipe(QStringLiteral("all"));
+    QCOMPARE(lab->recipe().value(QStringLiteral("crop")).toRectF(), QRectF(0, 0, 1, 1));
+    QVERIFY(!lab->recipeDirty());
+}
+
+void EditorStateTest::sourceLabPureTrimCropReplaceIsOneUndoStep()
+{
+    QTemporaryFile file;
+    QVERIFY(file.open());
+    AssetLibrary library;
+    AppController state(&library);
+    const QString id = addSourceLabAsset(state, library, file.fileName(), drift::MediaKind::Video);
+    SourceLabController *lab = state.sourceLab();
+    QVERIFY(lab->load(id));
+
+    lab->setRecipeValue(QStringLiteral("trimIn"), 2.0);
+    lab->setRecipeValue(QStringLiteral("trimOut"), 8.0);
+    lab->setRecipeValue(QStringLiteral("crop"), QRectF(0.1, 0.2, 0.5, 0.5));
+    QVERIFY(lab->recipeIsPureTrimCrop());
+    QVERIFY(lab->plan(QStringLiteral("replace")).value(QStringLiteral("encode")).toBool() == false);
+
+    const qsizetype jobsBefore = state.jobRegistry()->jobs().size();
+    QVERIFY(lab->apply(QStringLiteral("replace")).isEmpty());
+    QVERIFY(!lab->busy());
+    QVERIFY(lab->lastError().isEmpty());
+    QCOMPARE(state.jobRegistry()->jobs().size(), jobsBefore);
+
+    const drift::MediaAsset *asset = state.project()->asset(id);
+    QCOMPARE(asset->trimInUs, drift::secondsToUs(2));
+    QCOMPARE(asset->trimOutUs, drift::secondsToUs(8));
+    QCOMPARE(asset->sourceFrame, QRectF(0.1, 0.2, 0.5, 0.5));
+    QVERIFY(!lab->recipeDirty());
+
+    state.undo();
+    asset = state.project()->asset(id);
+    QCOMPARE(asset->trimInUs, 0);
+    QCOMPARE(asset->trimOutUs, -1);
+    QCOMPARE(asset->sourceFrame, QRectF(0, 0, 1, 1));
+}
+
+void EditorStateTest::sourceLabPureTrimCropCopyKeepsCrop()
+{
+    QTemporaryFile file;
+    QVERIFY(file.open());
+    AssetLibrary library;
+    AppController state(&library);
+    const QString id = addSourceLabAsset(state, library, file.fileName(), drift::MediaKind::Video);
+    SourceLabController *lab = state.sourceLab();
+    QVERIFY(lab->load(id));
+
+    lab->setRecipeValue(QStringLiteral("trimIn"), 1.0);
+    lab->setRecipeValue(QStringLiteral("trimOut"), 4.0);
+    lab->setRecipeValue(QStringLiteral("crop"), QRectF(0, 0, 0.5, 1));
+    QVERIFY(lab->apply(QStringLiteral("copy")).isEmpty());
+    QCOMPARE(state.project()->assetOrder().size(), 2);
+
+    const drift::MediaAsset *copy = state.project()->asset(state.project()->assetOrder().at(1));
+    QCOMPARE(copy->name, QStringLiteral("take (edited)"));
+    QCOMPARE(copy->trimInUs, drift::secondsToUs(1));
+    QCOMPARE(copy->trimOutUs, drift::secondsToUs(4));
+    QCOMPARE(copy->sourceFrame, QRectF(0, 0, 0.5, 1));
+    // The source itself is untouched.
+    QCOMPARE(state.project()->asset(id)->trimInUs, 0);
+    QCOMPARE(state.project()->asset(id)->sourceFrame, QRectF(0, 0, 1, 1));
+
+    state.undo();
+    QCOMPARE(state.project()->assetOrder().size(), 1);
+}
+
+namespace {
+bool makeSourceLabFixture(const QString &path)
+{
+    const QString ffmpeg = QStandardPaths::findExecutable(QStringLiteral("ffmpeg"));
+    if (ffmpeg.isEmpty())
+        return false;
+    QProcess process;
+    process.start(ffmpeg, {QStringLiteral("-y"), QStringLiteral("-loglevel"), QStringLiteral("error"),
+                           QStringLiteral("-f"), QStringLiteral("lavfi"), QStringLiteral("-i"),
+                           QStringLiteral("testsrc=d=4:r=30:s=320x240"),
+                           QStringLiteral("-f"), QStringLiteral("lavfi"), QStringLiteral("-i"),
+                           QStringLiteral("sine=d=4"), QStringLiteral("-pix_fmt"),
+                           QStringLiteral("yuv420p"), QStringLiteral("-c:v"), QStringLiteral("libx264"),
+                           QStringLiteral("-c:a"), QStringLiteral("aac"), QStringLiteral("-shortest"),
+                           path});
+    return process.waitForFinished(60'000) && process.exitCode() == 0;
+}
+} // namespace
+
+void EditorStateTest::sourceLabReplaceWithSpeedRebasesEverything()
+{
+    QStandardPaths::setTestModeEnabled(true);
+    const auto restore = qScopeGuard([] { QStandardPaths::setTestModeEnabled(false); });
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("take.mp4"));
+    if (!makeSourceLabFixture(source))
+        QSKIP("ffmpeg not available to make a fixture");
+
+    AssetLibrary library;
+    AppController state(&library);
+    drift::Project &project = *state.project();
+    drift::MediaAsset asset;
+    asset.kind = drift::MediaKind::Video;
+    asset.path = source;
+    asset.name = QStringLiteral("take");
+    asset.durationUs = 4 * drift::kUsPerSecond;
+    asset.width = 320;
+    asset.height = 240;
+    asset.fps = 30.0;
+    asset.hasAudio = true;
+    asset.hasAudioKnown = true;
+    asset.rating = 1;
+    asset.ranges.append({QStringLiteral("inside"), 1'500'000, 2'500'000, 0, {}, {}});
+    asset.ranges.append({QStringLiteral("outside"), 3'200'000, 3'800'000, 0, {}, {}});
+    asset.markers.append({QStringLiteral("keep"), 2'000'000, {}, {}});
+    asset.markers.append({QStringLiteral("drop"), 3'500'000, {}, {}});
+    const QString assetId = project.addAsset(asset);
+    library.syncToProject();
+
+    const auto makeClip = [&](const QString &clipId, drift::TimeUs in, drift::TimeUs out,
+                              drift::TimeUs start) {
+        drift::Clip clip;
+        clip.id = clipId;
+        clip.type = drift::ClipType::Video;
+        clip.assetId = assetId;
+        clip.path = source;
+        clip.timelineStart = start;
+        clip.timelineDuration = out - in;
+        clip.srcIn = in;
+        clip.srcOut = out;
+        return clip;
+    };
+    project.tracks().clear();
+    project.tracks().append(drift::Track{.type = drift::TrackType::Video});
+    project.tracks()[0].clips.append(makeClip(QStringLiteral("mid"), 1'500'000, 2'500'000, 0));
+    project.tracks()[0].clips.append(makeClip(QStringLiteral("early"), 0, 500'000, 2'000'000));
+
+    SourceLabController *lab = state.sourceLab();
+    QVERIFY(lab->load(assetId));
+    lab->setRecipeValue(QStringLiteral("trimIn"), 1.0);
+    lab->setRecipeValue(QStringLiteral("trimOut"), 3.0);
+    lab->setRecipeValue(QStringLiteral("speed"), 2.0);
+    QVERIFY(!lab->recipeIsPureTrimCrop());
+
+    const QVariantMap plan = lab->plan(QStringLiteral("replace"));
+    QVERIFY(plan.value(QStringLiteral("encode")).toBool());
+    QCOMPARE(plan.value(QStringLiteral("outputDuration")).toDouble(), 1.0);
+    QVERIFY(plan.contains(QStringLiteral("enhanceSeconds")));
+
+    const QString jobId = lab->apply(QStringLiteral("replace"));
+    QVERIFY(!jobId.isEmpty());
+    QVERIFY(lab->busy());
+    QTRY_VERIFY_WITH_TIMEOUT(!lab->busy(), 120'000);
+    QVERIFY2(lab->lastError().isEmpty(), qPrintable(lab->lastError()));
+    QVERIFY(state.jobRegistry()->job(jobId).value(QStringLiteral("ok")).toBool());
+
+    const drift::MediaAsset *replaced = state.project()->asset(assetId);
+    QVERIFY(replaced->path != source);
+    QCOMPARE(replaced->name, QStringLiteral("take"));
+    QCOMPARE(replaced->rating, 1);
+    QVERIFY(qAbs(replaced->durationUs - drift::kUsPerSecond) <= 100'000);
+    QCOMPARE(replaced->trimInUs, 0);
+    QCOMPARE(replaced->trimOutUs, -1);
+    QCOMPARE(replaced->sourceFrame, QRectF(0, 0, 1, 1));
+    QCOMPARE(replaced->ranges.size(), 1);
+    QCOMPARE(replaced->ranges.at(0).id, QStringLiteral("inside"));
+    QCOMPARE(replaced->ranges.at(0).inUs, 250'000);
+    QCOMPARE(replaced->ranges.at(0).outUs, 750'000);
+    QCOMPARE(replaced->markers.size(), 1);
+    QCOMPARE(replaced->markers.at(0).timeUs, 500'000);
+    const drift::TimeUs newDuration = replaced->durationUs;
+
+    const drift::Clip &mid = state.project()->tracks().at(0).clips.at(0);
+    QCOMPARE(mid.path, replaced->path);
+    QCOMPARE(mid.srcIn, 250'000);
+    QCOMPARE(mid.srcOut, 750'000);
+    QCOMPARE(mid.timelineDuration, 500'000);
+    // Before the kept range: held as one frame at the start rather than removed.
+    const drift::Clip &early = state.project()->tracks().at(0).clips.at(1);
+    QCOMPARE(early.srcIn, 0);
+    QCOMPARE(early.srcOut, 33'333);
+    QVERIFY(early.srcOut <= newDuration);
+    // The recipe starts over from what the replaced asset is.
+    QCOMPARE(lab->recipe().value(QStringLiteral("speed")).toDouble(), 1.0);
+    QCOMPARE(lab->recipe().value(QStringLiteral("trimIn")).toDouble(), 0.0);
+    QVERIFY(!lab->recipeDirty());
+
+    state.undo();
+    const drift::MediaAsset *restored = state.project()->asset(assetId);
+    QCOMPARE(restored->path, source);
+    QCOMPARE(restored->ranges.size(), 2);
+    QCOMPARE(restored->markers.size(), 2);
+    const drift::Clip &midBack = state.project()->tracks().at(0).clips.at(0);
+    QCOMPARE(midBack.path, source);
+    QCOMPARE(midBack.srcIn, 1'500'000);
+    QCOMPARE(midBack.srcOut, 2'500'000);
+    QCOMPARE(midBack.timelineDuration, 1'000'000);
+    QCOMPARE(state.project()->tracks().at(0).clips.at(1).srcOut, 500'000);
+}
+
+void EditorStateTest::sourceLabStreamCopyPlanReportsSnappedIn()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("take.mp4"));
+    if (!makeSourceLabFixture(source))
+        QSKIP("ffmpeg not available to make a fixture");
+
+    AssetLibrary library;
+    AppController state(&library);
+    drift::MediaAsset asset;
+    asset.kind = drift::MediaKind::Video;
+    asset.path = source;
+    asset.name = QStringLiteral("take");
+    asset.durationUs = 4 * drift::kUsPerSecond;
+    asset.width = 320;
+    asset.height = 240;
+    asset.fps = 30.0;
+    const QString id = state.project()->addAsset(asset);
+    library.syncToProject();
+    SourceLabController *lab = state.sourceLab();
+    QVERIFY(lab->load(id));
+    lab->setRecipeValue(QStringLiteral("trimIn"), 1.3);
+    lab->setRecipeValue(QStringLiteral("trimOut"), 3.0);
+
+    const QVariantMap copyPlan = lab->plan(QStringLiteral("export"), {{QStringLiteral("streamCopy"), true}});
+    QVERIFY(copyPlan.value(QStringLiteral("streamCopy")).toBool());
+    QVERIFY(!copyPlan.value(QStringLiteral("encode")).toBool());
+    const double snapped = copyPlan.value(QStringLiteral("snappedIn")).toDouble();
+    QVERIFY(snapped <= 1.3);
+    QCOMPARE(snapped, drift::usToSeconds(drift::keyframeAtOrBefore(source, drift::secondsToUs(1.3))));
+    QVERIFY(!copyPlan.value(QStringLiteral("steps")).toStringList().isEmpty());
+
+    // A crop rules stream copy out.
+    lab->setRecipeValue(QStringLiteral("crop"), QRectF(0, 0, 0.5, 0.5));
+    QVERIFY(!lab->plan(QStringLiteral("export"), {{QStringLiteral("streamCopy"), true}})
+                 .value(QStringLiteral("streamCopy")).toBool());
+    lab->resetRecipe(QStringLiteral("crop"));
+
+    QSignalSpy exported(lab, &SourceLabController::exported);
+    const QString out = dir.filePath(QStringLiteral("cut.mp4"));
+    QVERIFY(!lab->apply(QStringLiteral("export"), {{QStringLiteral("streamCopy"), true},
+                                                  {QStringLiteral("path"), out}}).isEmpty());
+    QTRY_COMPARE_WITH_TIMEOUT(exported.size(), 1, 60'000);
+    QVERIFY2(lab->lastError().isEmpty(), qPrintable(lab->lastError()));
+    const MediaInfo info = MediaProbe::probe(out);
+    QVERIFY(info.ok);
+    QVERIFY(qAbs(info.durationUs - drift::secondsToUs(3.0 - snapped)) <= 200'000);
 }
 
 // Bake mode renders only the clip's source range, with its audio, into a "(stabilized)" bin asset,

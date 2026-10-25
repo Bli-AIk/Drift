@@ -2,8 +2,8 @@
 
 #include "app/editor/AppController.h"
 #include "engine/encode/writers/AudioFileWriter.h"
-#include "engine/decode/readers/ClipReaderPool.h"
 #include "engine/ml/speech/DeepFilterDenoiser.h"
+#include "engine/ml/speech/DenoiseAudio.h"
 
 #include <QFile>
 #include <QMetaObject>
@@ -17,12 +17,6 @@ DenoiseController::DenoiseController(AppController *app, QObject *parent)
     , m_app(app)
 {
 }
-
-namespace {
-
-constexpr quint64 kDenoiseScanStreamId = 0xA5'11'5C'A4'00'00'00'02ull;
-
-} // namespace
 
 // ---- Noise removal ----------------------------------------------------------------------
 
@@ -44,11 +38,6 @@ bool DenoiseController::renderAudio(const QString &path, drift::TimeUs srcIn,
                                     const QString &originalPath, double progressFrom,
                                     double progressTo, QString *errorOut)
 {
-    const auto fail = [&](const QString &message) {
-        if (errorOut)
-            *errorOut = message;
-        return false;
-    };
     const auto setProgress = [this](double fraction, const QString &status) {
         QMetaObject::invokeMethod(
             this,
@@ -66,85 +55,24 @@ bool DenoiseController::renderAudio(const QString &path, drift::TimeUs srcIn,
         return progressFrom + (progressTo - progressFrom) * std::clamp(f, 0.0, 1.0);
     };
 
-    drift::DeepFilterDenoiser &dn = drift::DeepFilterDenoiser::instance();
-    setProgress(span01(0.0), tr("Getting noise removal ready…"));
-    if (!dn.available())
-        return fail(dn.lastError());
-
-    const int rate = drift::DeepFilterDenoiser::sampleRate();
-    const int64_t totalFrames = (span * rate) / drift::kUsPerSecond;
-    if (totalFrames <= 0)
-        return fail(tr("Clip is too short to process"));
-
-    // Decode the raw source window. Speed and reverse are deliberately not applied: the derived
-    // clip inherits them, so the render has to stay in the source's own time base.
-    setProgress(span01(0.05), tr("Reading audio…"));
-    std::vector<float> interleaved(size_t(totalFrames) * 2, 0.0f);
-    int64_t have = 0;
-    const int chunkFrames = rate * 10;
-    while (have < totalFrames) {
-        if (m_cancel.loadRelaxed())
-            return fail(tr("Noise removal cancelled"));
-        const drift::TimeUs at = srcIn + drift::TimeUs((have * drift::kUsPerSecond) / rate);
-        const int want = int(std::min<int64_t>(chunkFrames, totalFrames - have));
-        const int got = ClipReaderPool::instance().readAudioInterleaved(
-            path, kDenoiseScanStreamId, at, want, rate, interleaved.data() + size_t(have) * 2);
-        if (got <= 0)
-            break;
-        have += got;
-        setProgress(span01(0.05 + 0.20 * double(have) / double(totalFrames)),
-                    tr("Reading audio…"));
-    }
-    if (have <= 0)
-        return fail(tr("No audio decoded"));
-    interleaved.resize(size_t(have) * 2);
-
-    // The A/B source for the preview window, written before the model runs so a cancel still
-    // leaves nothing half-made.
-    if (!originalPath.isEmpty()) {
-        drift::AudioFileWriter orig;
-        QString error;
-        if (!orig.open(originalPath, rate, 2, &error))
-            return fail(error);
-        if (!orig.writeFrames(interleaved.data(), int(have), &error) || !orig.finish(&error)) {
-            orig.abort();
-            return fail(error);
-        }
-    }
-
-    // The model is mono, so each channel goes through separately and the stereo image is kept.
-    std::vector<float> mono(size_t(have), 0.0f);
-    for (int ch = 0; ch < 2; ++ch) {
-        for (int64_t i = 0; i < have; ++i)
-            mono[size_t(i)] = interleaved[size_t(i) * 2 + ch];
-
-        const double base = 0.25 + 0.35 * ch;
-        const std::vector<float> clean = dn.denoise(mono, [&](double f) {
-            setProgress(span01(base + 0.35 * f),
-                        ch == 0 ? tr("Removing noise (left)…")
-                                : tr("Removing noise (right)…"));
-            return m_cancel.loadRelaxed() == 0;
-        });
-        if (clean.empty()) {
-            return fail(m_cancel.loadRelaxed() ? tr("Noise removal cancelled")
-                                                      : dn.lastError());
-        }
-        for (int64_t i = 0; i < have; ++i)
-            interleaved[size_t(i) * 2 + ch] = clean[size_t(i)];
-    }
-
-    setProgress(span01(0.95), tr("Writing audio…"));
-    drift::AudioFileWriter writer;
-    QString error;
-    if (!writer.open(outPath, rate, 2, &error))
-        return fail(error);
-    if (!writer.writeFrames(interleaved.data(), int(have), &error) || !writer.finish(&error)) {
-        writer.abort();
-        return fail(error);
-    }
-
-    setProgress(span01(1.0), QString());
-    return true;
+    // The phase boundaries are denoiseAudioRange's: decode, left channel, right channel, write.
+    const auto onProgress = [&](double f) {
+        QString status;
+        if (f < 0.05)
+            status = tr("Getting noise removal ready…");
+        else if (f < 0.25)
+            status = tr("Reading audio…");
+        else if (f < 0.60)
+            status = tr("Removing noise (left)…");
+        else if (f < 0.95)
+            status = tr("Removing noise (right)…");
+        else if (f < 1.0)
+            status = tr("Writing audio…");
+        setProgress(span01(f), status);
+        return m_cancel.loadRelaxed() == 0;
+    };
+    return drift::denoiseAudioRange(path, srcIn, srcIn + span, outPath, errorOut, onProgress,
+                                    originalPath);
 }
 
 // Both entry points share this: validate the clip, latch the busy state, and hand the work to a

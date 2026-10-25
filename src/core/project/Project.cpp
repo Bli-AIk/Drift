@@ -545,6 +545,20 @@ QJsonObject assetToJson(const MediaAsset &asset)
     }
     if (asset.sourceFrame != QRectF(0, 0, 1, 1))
         object.insert(QStringLiteral("sourceFrame"), drift::sourceFrameToJson(asset.sourceFrame));
+    if (asset.rating != 0)
+        object.insert(QStringLiteral("rating"), asset.rating);
+    if (!asset.ranges.isEmpty()) {
+        QJsonArray ranges;
+        for (const drift::SourceRange &range : asset.ranges)
+            ranges.append(drift::toJson(range));
+        object.insert(QStringLiteral("ranges"), ranges);
+    }
+    if (!asset.markers.isEmpty()) {
+        QJsonArray markers;
+        for (const drift::SourceMarker &marker : asset.markers)
+            markers.append(drift::toJson(marker));
+        object.insert(QStringLiteral("markers"), markers);
+    }
     return object;
 }
 
@@ -577,6 +591,11 @@ MediaAsset assetFromJsonV2(const QJsonObject &object)
     asset.sourceSize = static_cast<qint64>(object.value(QStringLiteral("sourceSize")).toDouble());
     asset.sourceModifiedMs =
         static_cast<qint64>(object.value(QStringLiteral("sourceModifiedMs")).toDouble());
+    asset.rating = qBound(-1, object.value(QStringLiteral("rating")).toInt(), 1);
+    for (const QJsonValue &value : object.value(QStringLiteral("ranges")).toArray())
+        asset.ranges.append(drift::sourceRangeFromJson(value.toObject()));
+    for (const QJsonValue &value : object.value(QStringLiteral("markers")).toArray())
+        asset.markers.append(drift::sourceMarkerFromJson(value.toObject()));
     if (object.contains(QStringLiteral("variableFrameRate"))) {
         asset.frameRateKnown = true;
         asset.variableFrameRate = object.value(QStringLiteral("variableFrameRate")).toBool();

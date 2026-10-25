@@ -49,6 +49,9 @@ public:
         ThumbnailPathRole,
         FilmstripPathRole,
         FolderIdRole,
+        RatingRole,
+        RangeCountRole,
+        FavoriteRangeCountRole,
     };
     Q_ENUM(Role)
 
@@ -171,6 +174,9 @@ public:
     bool applyProbedSource(const QString &assetId, const drift::MediaAsset &filled);
     // Re-reads the project after undo/redo has swapped it wholesale.
     void syncToProject();
+    // Emits dataChanged for the rows whose rating or range counts moved since the last call.
+    // syncToProject runs it for undo/redo; Source Lab calls it after its own edits.
+    void refreshLabRoles();
 
     QJsonArray toJsonArray() const;
     void loadFromJsonArray(const QJsonArray &assets);
@@ -297,6 +303,10 @@ private:
     QList<QString> currentPaths() const;
     QList<QString> currentFolderIds() const;
     QList<QString> currentEdits() const;
+    // Rating and range counts per asset, in order: what the bin filters read. Separate from
+    // currentEdits so a rating change does not look like a trim and regenerate thumbnails.
+    QList<QString> currentLabState() const;
+    QList<QString> m_syncedLab;
     const drift::MediaAsset *assetAtIndex(int index) const;
     drift::MediaAsset *assetAtIndex(int index);
 

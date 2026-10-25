@@ -66,6 +66,7 @@ private:
     void loadPresets();
     void loadUser();
     void migrateOldFractions();
+    void migrateCutTrim();
     void fixActive();
     bool editQuietly(const QString &id, const std::function<bool(QVariantMap &)> &edit);
 

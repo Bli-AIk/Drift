@@ -3,7 +3,9 @@
 #include "app/editor/AppController.h"
 #include "app/mcp/McpDetail.h"
 
+#include <QPointer>
 #include <QSettings>
+#include <QtConcurrent>
 
 using drift::mcpdetail::sceneRowsFromAnalysis;
 
@@ -99,6 +101,61 @@ drift::SceneDetectRequest SceneDetectController::sceneRequestFor(const drift::Cl
     if (minSceneSeconds > 0.0)
         request.options.minSceneSeconds = minSceneSeconds;
     return request;
+}
+
+void SceneDetectController::detectSource(
+    const QString &path, int rotationCorrection, drift::TimeUs sourceIn, drift::TimeUs sourceOut,
+    double minSceneSeconds, double threshold, const QSharedPointer<QAtomicInt> &cancel,
+    const std::function<void(double, const QString &)> &progress,
+    const std::function<void(bool, const drift::SceneAnalysis &, const QString &)> &done)
+{
+    drift::SceneDetectRequest request;
+    request.path = path;
+    request.rotationCorrection = rotationCorrection;
+    request.sourceIn = sourceIn;
+    request.sourceOut = sourceOut;
+    request.options.threshold = threshold > 0.0 ? threshold : this->threshold();
+    if (minSceneSeconds > 0.0)
+        request.options.minSceneSeconds = minSceneSeconds;
+
+    drift::SceneAnalysis cached;
+    if (drift::loadCachedAnalysis(request, &cached)) {
+        done(true, cached, QString());
+        return;
+    }
+
+    m_app->setPlaying(false);
+    QPointer<SceneDetectController> self(this);
+    (void)QtConcurrent::run([self, request, cancel, progress, done]() {
+        QString error;
+        const drift::SceneAnalysis analysis = drift::detectScenes(
+            request,
+            [&](double fraction, const QString &status) {
+                if (cancel->loadRelaxed() != 0)
+                    return false;
+                QMetaObject::invokeMethod(
+                    self.data(),
+                    [self, progress, fraction, status]() {
+                        if (self)
+                            progress(fraction, status);
+                    },
+                    Qt::QueuedConnection);
+                return true;
+            },
+            &error);
+        const bool cancelled = cancel->loadRelaxed() != 0;
+        if (!analysis.isEmpty() && !cancelled)
+            drift::storeCachedAnalysis(request, analysis);
+        QMetaObject::invokeMethod(
+            self.data(),
+            [self, done, analysis, cancelled, error]() {
+                if (!self)
+                    return;
+                const bool ok = !analysis.isEmpty() && !cancelled;
+                done(ok, analysis, cancelled ? QString() : error);
+            },
+            Qt::QueuedConnection);
+    });
 }
 
 void SceneDetectController::detect(int trackIndex, int clipIndex, bool withObjects,

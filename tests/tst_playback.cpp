@@ -4,6 +4,7 @@
 
 #include "playback/AudioOutputChannel.h"
 #include "playback/PlaybackClock.h"
+#include "playback/preview/FrameGrid.h"
 
 class PlaybackTest : public QObject
 {
@@ -26,6 +27,10 @@ private slots:
     void downmixesToMono();
     void silencesChannelsBeyondStereo();
     void negotiatesAFormatTheDeviceAccepts();
+    void frameGridSnapsAndIndexes();
+    void frameGridHandlesFractionalRates();
+    void frameGridClampsToLastFrame();
+    void shuttleEscalates();
 };
 
 void PlaybackTest::clockPausedPosition()
@@ -271,6 +276,62 @@ void PlaybackTest::negotiatesAFormatTheDeviceAccepts()
     QVERIFY(format.isValid());
     QVERIFY(format.sampleRate() > 0);
     QVERIFY(format.channelCount() > 0);
+}
+
+void PlaybackTest::frameGridSnapsAndIndexes()
+{
+    QCOMPARE(drift::frameTimeUs(30, 30.0), drift::TimeUs(1'000'000));
+    QCOMPARE(drift::frameIndexAt(drift::frameTimeUs(7, 25.0), 25.0), 7);
+    QCOMPARE(drift::frameIndexAt(drift::frameTimeUs(7, 25.0) - 1, 25.0), 7); // rounding hair
+    QCOMPARE(drift::frameIndexAt(drift::frameTimeUs(7, 25.0) + 39'000, 25.0), 7);
+    QCOMPARE(drift::frameIndexAt(drift::frameTimeUs(8, 25.0), 25.0), 8);
+    // Nearest, not floor: 0.49 of a frame in rounds down, 0.51 rounds up.
+    QCOMPARE(drift::snapToFrameUs(19'600, 25.0), drift::TimeUs(0));
+    QCOMPARE(drift::snapToFrameUs(20'400, 25.0), drift::TimeUs(40'000));
+    // Unknown rate falls back to 30.
+    QCOMPARE(drift::frameTimeUs(3, 0.0), drift::frameTimeUs(3, 30.0));
+}
+
+void PlaybackTest::frameGridHandlesFractionalRates()
+{
+    const double fps = 30000.0 / 1001.0;
+    for (int n : {0, 1, 2, 29, 30, 1000, 54321}) {
+        QCOMPARE(drift::frameIndexAt(drift::frameTimeUs(n, fps), fps), n);
+        QCOMPARE(drift::snapToFrameUs(drift::frameTimeUs(n, fps), fps), drift::frameTimeUs(n, fps));
+    }
+}
+
+void PlaybackTest::frameGridClampsToLastFrame()
+{
+    // Ten frames at 25 fps cover exactly 400 ms; the last one starts at 360 ms.
+    QCOMPARE(drift::lastFrameIndex(400'000, 25.0), 9);
+    QCOMPARE(drift::lastFrameIndex(400'100, 25.0), 10);
+    QCOMPARE(drift::lastFrameIndex(0, 25.0), 0);
+}
+
+void PlaybackTest::shuttleEscalates()
+{
+    int rate = 0;
+    const int forward[] = {1, 2, 4, 8, 8};
+    for (int expected : forward) {
+        rate = drift::shuttleNext(rate, true);
+        QCOMPARE(rate, expected);
+    }
+    // The opposite key stops first, then reverses on the next press.
+    rate = drift::shuttleNext(rate, false);
+    QCOMPARE(rate, 0);
+    rate = drift::shuttleNext(rate, false);
+    QCOMPARE(rate, -1);
+    rate = drift::shuttleNext(rate, false);
+    QCOMPARE(rate, -2);
+    rate = drift::shuttleNext(-8, false);
+    QCOMPARE(rate, -8);
+    QCOMPARE(drift::shuttleNext(-4, true), 0);
+
+    for (int ok : {-8, -4, -2, -1, 0, 1, 2, 4, 8})
+        QVERIFY(drift::isShuttleRate(ok));
+    for (int bad : {-3, 3, 5, 16, -16})
+        QVERIFY(!drift::isShuttleRate(bad));
 }
 
 QTEST_MAIN(PlaybackTest)

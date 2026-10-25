@@ -74,6 +74,7 @@ struct MediaEditSpec;
 #include "app/jobs/vision/SceneDetectController.h"
 #include "app/jobs/vision/SegmentationController.h"
 #include "app/bin/MediaBinController.h"
+#include "app/bin/SourceLabController.h"
 #include "app/jobs/vision/StabilizeController.h"
 #include "app/jobs/audio/TtsController.h"
 #include "app/jobs/audio/VoiceLibrary.h"
@@ -106,6 +107,7 @@ class AppController : public QObject
     friend class FaceTrackingController;
     friend class StabilizeController;
     friend class MediaBinController;
+    friend class SourceLabController;
     friend class TtsController;
     friend class VoiceLibrary;
 
@@ -114,6 +116,8 @@ class AppController : public QObject
     Q_PROPERTY(AssetLibrary *assetLibrary READ assetLibrary CONSTANT)
     Q_PROPERTY(CloudProviders *cloudProviders READ cloudProviders CONSTANT)
     Q_PROPERTY(MediaBinController *bin READ bin CONSTANT)
+    // Source Lab: ranges, markers, ratings and the transient edit recipe. QML: EditorState.sourceLab.
+    Q_PROPERTY(SourceLabController *sourceLab READ sourceLab CONSTANT)
     Q_PROPERTY(PlaybackEngine *playback READ playback CONSTANT)
     // The preview area's editor state, tools and overlay maths.
     Q_PROPERTY(PreviewController *preview READ preview CONSTANT)
@@ -331,6 +335,7 @@ public:
     AssetLibrary *assetLibrary() const { return m_assetLibrary; }
     CloudProviders *cloudProviders() const { return m_cloud; }
     MediaBinController *bin() const { return m_bin; }
+    SourceLabController *sourceLab() const { return m_sourceLab; }
     PlaybackEngine *playback() { return &m_playback; }
     PreviewController *preview() const { return m_preview; }
     PreferencesController *preferences() const { return m_preferences; }
@@ -1954,6 +1959,10 @@ protected:
     // The same without the undo step, for a caller folding it into an edit of its own.
     QString insertRenderedVideoAsset(const QString &path, const QString &name,
                                      const QString &folderId, const MediaInfo &info);
+    // Audio counterpart of addRenderedVideoAsset.
+    QString addRenderedAudioAsset(const QString &path, const QString &name,
+                                  const QString &folderId, const MediaInfo &info,
+                                  const QString &undoText);
     QList<int> subtitleMergeIndices(const QList<QPair<int, int>> &pairs) const;
     void mergeSubtitleClipsAt(int trackIndex, QList<int> clipIndices);
 
@@ -2129,6 +2138,7 @@ protected:
     FaceTrackingController *m_faces = nullptr;
     StabilizeController *m_stabilize = nullptr;
     MediaBinController *m_bin = nullptr;
+    SourceLabController *m_sourceLab = nullptr;
     TtsController *m_tts = nullptr;
     VoiceLibrary *m_voices = nullptr;
     QStringList m_activeGuideSets{QStringLiteral("thirds")};

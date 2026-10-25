@@ -50,6 +50,37 @@ std::optional<StabilizeOrigin> stabilizeOrigin(const drift::Project &project, co
 
 } // namespace
 
+QString StabilizeController::detectFilter()
+{
+    return QStringLiteral("vidstabdetect=shakiness=5:accuracy=15");
+}
+
+QString StabilizeController::transformFilter(int smoothing, bool tripod)
+{
+    return QStringLiteral("vidstabtransform=smoothing=%1:tripod=%2:optzoom=1")
+        .arg(smoothing)
+        .arg(tripod ? 1 : 0);
+}
+
+QString StabilizeController::analysisPath(const QString &sourcePath, drift::TimeUs rangeIn,
+                                          drift::TimeUs rangeOut)
+{
+    const QString dir = drift::stabilizationCacheDir();
+    if (dir.isEmpty())
+        return {};
+    const QFileInfo sourceInfo(sourcePath);
+    const QByteArray key = QStringLiteral("%1|%2|%3|%4|%5")
+                               .arg(sourceInfo.absoluteFilePath())
+                               .arg(sourceInfo.size())
+                               .arg(sourceInfo.lastModified().toMSecsSinceEpoch())
+                               .arg(rangeIn)
+                               .arg(rangeOut)
+                               .toUtf8();
+    return QDir(dir).filePath(
+        QStringLiteral("stabilize-%1.trf")
+            .arg(QString::fromLatin1(QCryptographicHash::hash(key, QCryptographicHash::Sha1).toHex())));
+}
+
 void StabilizeController::migrateLegacyClips()
 {
     // Clips split from one stabilized clip share its render, and so share one asset.
@@ -206,18 +237,7 @@ void StabilizeController::run(int trackIndex, int clipIndex)
 
     // The motion analysis depends only on the frames, not on smoothing or tripod, so it is cached
     // per source range and a settings change re-renders without re-scanning.
-    const QFileInfo sourceInfo(origin->path);
-    const QByteArray trfKey = QStringLiteral("%1|%2|%3|%4|%5")
-                                  .arg(sourceInfo.absoluteFilePath())
-                                  .arg(sourceInfo.size())
-                                  .arg(sourceInfo.lastModified().toMSecsSinceEpoch())
-                                  .arg(rangeIn)
-                                  .arg(rangeOut)
-                                  .toUtf8();
-    const QString trfPath = QDir(dir).filePath(
-        QStringLiteral("stabilize-%1.trf")
-            .arg(QString::fromLatin1(
-                QCryptographicHash::hash(trfKey, QCryptographicHash::Sha1).toHex())));
+    const QString trfPath = analysisPath(origin->path, rangeIn, rangeOut);
 
     m_cancelRequested.remove(clipId);
     m_app->m_project.tracks()[trackIndex].clips[clipIndex].stabilizing = true;
@@ -403,9 +423,7 @@ void StabilizeController::run(int trackIndex, int clipIndex)
         spec.kind = QStringLiteral("video");
         spec.inSeconds = inSeconds;
         spec.outSeconds = outSeconds;
-        spec.videoFilter = QStringLiteral("vidstabtransform=smoothing=%1:tripod=%2:optzoom=1")
-                               .arg(sourceClip.stabilizeSmoothing)
-                               .arg(sourceClip.stabilizeTripod ? 1 : 0);
+        spec.videoFilter = transformFilter(sourceClip.stabilizeSmoothing, sourceClip.stabilizeTripod);
         spec.videoFilterOptions = {{"vidstabtransform", "input", trfPath}};
 
         QJsonObject generator{{QStringLiteral("kind"), QStringLiteral("stabilize")},
@@ -586,7 +604,7 @@ void StabilizeController::run(int trackIndex, int clipIndex)
                              trfPath, partPath, runPass2, finishStabilizeFailure]() {
         QString error;
         const bool ok = drift::analyzeVideo(
-            inputPath, rangeIn, rangeOut, QStringLiteral("vidstabdetect=shakiness=5:accuracy=15"),
+            inputPath, rangeIn, rangeOut, detectFilter(),
             {{"vidstabdetect", "result", partPath}}, &error, onProgress);
         QMetaObject::invokeMethod(
             this,

@@ -48,6 +48,7 @@
 #include "engine/audio/AudioMixer.h"
 #include "engine/audio/analysis/AudioFrameAnalysis.h"
 #include "engine/decode/readers/ClipReader.h"
+#include "playback/preview/FrameGrid.h"
 #include "engine/audio/analysis/LoudnessMeter.h"
 #include "engine/decode/probe/StillImage.h"
 #include "engine/diagnostics/DebugReport.h"
@@ -90,6 +91,7 @@
 #include "engine/diagnostics/sheets/FrameSheet.h"
 #include "engine/diagnostics/sheets/WaveformSheet.h"
 #include "engine/ml/speech/DeepFilterDenoiser.h"
+#include "engine/ml/speech/DenoiseAudio.h"
 #include "engine/packages/effects/EffectCatalog.h"
 #include "engine/packages/effects/EffectPackageLoader.h"
 #include "engine/compositor/effects/EffectProcessor.h"
@@ -161,6 +163,7 @@ private slots:
     void chatterboxVoiceConditioningRoundTrips();
     void chatterboxSynthesizesWithSplitDecoder();
     void matteWriterRoundTripsThroughClipReader();
+    void frameGridTimesLandOnTheirFrame();
     void matteWriterPreservesSoftAlpha();
     void matteWriterRoundTripsColourForeground();
     void reverseRendererPlaysSourceBackwards();
@@ -174,6 +177,12 @@ private slots:
     void mediaEditorConformsVariableFrameRate();
     void mediaEditorKeepsTenBitAndColourTags();
     void mediaEditorStabilizesInProcess();
+    void mediaEditorChangesSpeed();
+    void mediaEditorAppliesGainAndNormalizes();
+    void mediaEditorDownscalesAndChoosesContainers();
+    void mediaEditorMuxesReplacementAudio();
+    void mediaEditorRemuxStartsOnAKeyframe();
+    void denoiseAudioRangeWritesFlac();
     void reverseProxyLookupIsByContainmentAndSourceIdentity();
     void resolveVideoReadMirrorsTheClipOntoTheProxy();
     void faceTrackRoundTripsAndInterpolates();
@@ -5117,6 +5126,54 @@ void EngineTest::matteWriterRoundTripsThroughClipReader()
     }
 }
 
+// The asset player seeks to frameTimeUs(n) for frame n, forward and backward. Landing a frame
+// early would show the wrong picture on a frame step, and only on some rates.
+void EngineTest::frameGridTimesLandOnTheirFrame()
+{
+    if (!Exporter::videoCodecById(QStringLiteral("h264")).value(QStringLiteral("available")).toBool())
+        QSKIP("No H.264 encoder available in this FFmpeg build");
+
+    const int frames = 12;
+    for (const auto &rate : {std::pair<int, int>{30, 1}, std::pair<int, int>{30000, 1001}}) {
+        QTemporaryDir dir;
+        QVERIFY(dir.isValid());
+        const QString path = dir.filePath(QStringLiteral("grid.mp4"));
+        const QSize size(320, 240);
+        drift::MatteWriter writer;
+        QString error;
+        QVERIFY2(writer.open(path, size, rate.first, rate.second, &error), qPrintable(error));
+        for (int i = 0; i < frames; ++i) {
+            QImage mask(size, QImage::Format_Grayscale8);
+            mask.fill(0);
+            QPainter p(&mask);
+            p.fillRect(QRect(0, i * 20, size.width(), 20), Qt::white);
+            p.end();
+            QVERIFY2(writer.writeFrame(mask, &error), qPrintable(error));
+        }
+        QVERIFY2(writer.finish(&error), qPrintable(error));
+
+        const double fps = double(rate.first) / rate.second;
+        const auto bandOf = [&](int frame) {
+            const QImage image = ClipReaderPool::instance().readVideoFrame(
+                path, 7, drift::frameTimeUs(frame, fps), 0, 0);
+            for (int b = 0; b < frames; ++b) {
+                if (!image.isNull() && qRed(image.pixel(size.width() / 2, b * 20 + 10)) > 200)
+                    return b;
+            }
+            return -1;
+        };
+        // Forward a frame at a time, then back from the end, then a jump: the three ways the
+        // transport reaches a frame.
+        for (int i = 0; i < frames; ++i)
+            QCOMPARE(bandOf(i), i);
+        for (int i = frames - 1; i >= 0; --i)
+            QCOMPARE(bandOf(i), i);
+        QCOMPARE(bandOf(5), 5);
+        QCOMPARE(bandOf(10), 10);
+        QCOMPARE(bandOf(2), 2);
+    }
+}
+
 // A binary mask survives a limited-range round trip by accident: 0 and 255 clamp back to
 // themselves. A soft alpha does not — untagged, ClipReader expands 16..235 out to 0..255 and every
 // midtone shifts by about 7%. RVM's whole advantage over SAM2 is the soft edge, so the full-range
@@ -5699,6 +5756,424 @@ void EngineTest::mediaEditorStabilizesInProcess()
     const MediaInfo rangeInfo = MediaProbe::probe(rangeOut);
     QVERIFY(rangeInfo.ok);
     QVERIFY(qAbs(rangeInfo.durationUs - 500'000) <= 40'000);
+}
+
+namespace {
+
+QString ffmpegExe()
+{
+    return QStandardPaths::findExecutable(QStringLiteral("ffmpeg"));
+}
+
+bool runProcess(const QString &exe, const QStringList &args, QByteArray *out = nullptr)
+{
+    QProcess process;
+    process.start(exe, args);
+    if (!process.waitForFinished(120'000) || process.exitCode() != 0)
+        return false;
+    if (out)
+        *out = process.readAllStandardOutput();
+    return true;
+}
+
+// 4 s of testsrc with a quiet 440 Hz tone, a keyframe every second.
+bool makeToneVideo(const QString &path, bool withAudio = true, double seconds = 4)
+{
+    QStringList args{QStringLiteral("-y"), QStringLiteral("-loglevel"), QStringLiteral("error"),
+                     QStringLiteral("-f"), QStringLiteral("lavfi"), QStringLiteral("-i"),
+                     QStringLiteral("testsrc=d=%1:r=30:s=320x240").arg(seconds)};
+    if (withAudio)
+        args << QStringLiteral("-f") << QStringLiteral("lavfi") << QStringLiteral("-i")
+             << QStringLiteral("sine=f=440:d=%1:r=48000,volume=0.25,aformat=channel_layouts=stereo")
+                    .arg(seconds);
+    args << QStringLiteral("-c:v") << QStringLiteral("libx264") << QStringLiteral("-pix_fmt")
+         << QStringLiteral("yuv420p") << QStringLiteral("-g") << QStringLiteral("30")
+         << QStringLiteral("-keyint_min") << QStringLiteral("30") << QStringLiteral("-sc_threshold")
+         << QStringLiteral("0");
+    if (withAudio)
+        args << QStringLiteral("-c:a") << QStringLiteral("aac");
+    args << path;
+    return runProcess(ffmpegExe(), args);
+}
+
+bool makeToneWav(const QString &path, double seconds, double amplitude, int frequency = 440)
+{
+    return runProcess(ffmpegExe(),
+                      {QStringLiteral("-y"), QStringLiteral("-loglevel"), QStringLiteral("error"),
+                       QStringLiteral("-f"), QStringLiteral("lavfi"), QStringLiteral("-i"),
+                       QStringLiteral("sine=f=%1:d=%2:r=48000,volume=%3,"
+                                      "aformat=channel_layouts=stereo")
+                           .arg(frequency)
+                           .arg(seconds)
+                           .arg(amplitude * 8.0), // the sine source peaks at 1/8
+                       path});
+}
+
+float peakOf(const QString &path)
+{
+    QByteArray raw;
+    if (!runProcess(ffmpegExe(),
+                    {QStringLiteral("-v"), QStringLiteral("error"), QStringLiteral("-i"), path,
+                     QStringLiteral("-vn"), QStringLiteral("-f"), QStringLiteral("f32le"),
+                     QStringLiteral("-ac"), QStringLiteral("1"), QStringLiteral("-")},
+                    &raw))
+        return -1.0f;
+    const auto *samples = reinterpret_cast<const float *>(raw.constData());
+    float peak = 0.0f;
+    for (qsizetype i = 0; i < raw.size() / 4; ++i)
+        peak = std::max(peak, std::abs(samples[i]));
+    return peak;
+}
+
+QString probeField(const QString &path, const QString &select, const QString &entry)
+{
+    QByteArray out;
+    if (!runProcess(QStandardPaths::findExecutable(QStringLiteral("ffprobe")),
+                    {QStringLiteral("-v"), QStringLiteral("error"), QStringLiteral("-select_streams"),
+                     select, QStringLiteral("-show_entries"), QStringLiteral("stream=") + entry,
+                     QStringLiteral("-of"), QStringLiteral("csv=p=0"), path},
+                    &out))
+        return {};
+    return QString::fromUtf8(out).trimmed();
+}
+
+} // namespace
+
+void EngineTest::mediaEditorChangesSpeed()
+{
+    if (ffmpegExe().isEmpty())
+        QSKIP("ffmpeg not on PATH");
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("source.mp4"));
+    QVERIFY(makeToneVideo(source));
+
+    for (const bool keepPitch : {true, false}) {
+        const QString out = dir.filePath(QStringLiteral("fast-%1.mp4").arg(keepPitch));
+        drift::MediaEditSpec spec;
+        spec.inputPath = source;
+        spec.outputPath = out;
+        spec.kind = QStringLiteral("video");
+        spec.speed = 2.0;
+        spec.keepPitch = keepPitch;
+        QString error;
+        QVERIFY2(drift::editMedia(spec, &error, {}), qPrintable(error));
+        const MediaInfo info = MediaProbe::probe(out);
+        QVERIFY(info.ok);
+        QCOMPARE(info.streams.size(), 2);
+        for (const StreamInfo &stream : info.streams) {
+            QVERIFY2(qAbs(stream.durationUs - 2 * drift::kUsPerSecond) <= 70'000,
+                     qPrintable(QString::number(stream.durationUs)));
+            if (stream.type == StreamInfo::Type::Video)
+                QCOMPARE(stream.fps, 30.0);
+        }
+    }
+
+    // A trimmed range, slowed: (3 - 1) s at half speed lasts 4 s. Audio alone as well.
+    const QString slow = dir.filePath(QStringLiteral("slow.flac"));
+    drift::MediaEditSpec audio;
+    audio.inputPath = source;
+    audio.outputPath = slow;
+    audio.kind = QStringLiteral("audio");
+    audio.inSeconds = 1;
+    audio.outSeconds = 3;
+    audio.speed = 0.5;
+    QString error;
+    QVERIFY2(drift::editMedia(audio, &error, {}), qPrintable(error));
+    const MediaInfo slowInfo = MediaProbe::probe(slow);
+    QVERIFY(slowInfo.ok);
+    QVERIFY2(qAbs(slowInfo.durationUs - 4 * drift::kUsPerSecond) <= 60'000,
+             qPrintable(QString::number(slowInfo.durationUs)));
+
+    // Past the single-stage atempo range: 4x needs two stages.
+    audio.speed = 4.0;
+    audio.inSeconds = 0;
+    audio.outSeconds = -1;
+    audio.outputPath = dir.filePath(QStringLiteral("quad.flac"));
+    QVERIFY2(drift::editMedia(audio, &error, {}), qPrintable(error));
+    QVERIFY(qAbs(MediaProbe::probe(audio.outputPath).durationUs - drift::kUsPerSecond) <= 60'000);
+
+    audio.speed = 0;
+    QVERIFY(!drift::editMedia(audio, &error, {}));
+}
+
+void EngineTest::mediaEditorAppliesGainAndNormalizes()
+{
+    if (ffmpegExe().isEmpty())
+        QSKIP("ffmpeg not on PATH");
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("tone.wav"));
+    QVERIFY(makeToneWav(source, 5.0, 0.1));
+    const float basePeak = peakOf(source);
+    QVERIFY(basePeak > 0.05f);
+
+    drift::MediaEditSpec spec;
+    spec.inputPath = source;
+    spec.outputPath = dir.filePath(QStringLiteral("louder.flac"));
+    spec.kind = QStringLiteral("audio");
+    spec.gainDb = 6.0;
+    QString error;
+    QVERIFY2(drift::editMedia(spec, &error, {}), qPrintable(error));
+    const float ratio = peakOf(spec.outputPath) / basePeak;
+    QVERIFY2(ratio > 1.9f && ratio < 2.1f, qPrintable(QString::number(ratio)));
+
+    // The loudness lands on the target, measured the way the editor measures it.
+    constexpr double kTarget = -16.0;
+    spec.gainDb = 0.0;
+    spec.normalizeLufs = kTarget;
+    spec.outputPath = dir.filePath(QStringLiteral("normalized.flac"));
+    double lastProgress = -1.0;
+    bool monotonic = true;
+    QVERIFY2(drift::editMedia(spec, &error,
+                              [&](double f) {
+                                  monotonic = monotonic && f >= lastProgress - 1e-9;
+                                  lastProgress = f;
+                                  return true;
+                              }),
+             qPrintable(error));
+    QVERIFY(monotonic);
+    QCOMPARE(lastProgress, 1.0);
+    const MediaInfo info = MediaProbe::probe(spec.outputPath);
+    QVERIFY(info.ok);
+    const qint64 frames = (info.durationUs * 48000) / drift::kUsPerSecond;
+    const drift::LoudnessResult result = drift::measureLoudness(
+        frames, 48000, [&](float *out, qint64 offset, int maxFrames) {
+            return ClipReaderPool::instance().readAudioInterleaved(
+                spec.outputPath, 0xBEEF, (offset * drift::kUsPerSecond) / 48000, maxFrames, 48000,
+                out);
+        });
+    QVERIFY(result.ok);
+    QVERIFY2(qAbs(result.integratedLufs - kTarget) <= 1.0,
+             qPrintable(QString::number(result.integratedLufs)));
+
+    // An audio filter runs after the gain.
+    spec.normalizeLufs = qQNaN();
+    spec.audioFilter = QStringLiteral("volume=0.5");
+    spec.gainDb = 0;
+    spec.outputPath = dir.filePath(QStringLiteral("filtered.flac"));
+    QVERIFY2(drift::editMedia(spec, &error, {}), qPrintable(error));
+    QVERIFY(peakOf(spec.outputPath) / basePeak < 0.55f);
+
+    // Cancelling the measurement pass stops the edit and leaves nothing behind.
+    spec.audioFilter.clear();
+    spec.normalizeLufs = kTarget;
+    spec.outputPath = dir.filePath(QStringLiteral("cancelled.flac"));
+    QVERIFY(!drift::editMedia(spec, &error, [](double) { return false; }));
+    QVERIFY(!QFileInfo::exists(spec.outputPath));
+}
+
+void EngineTest::mediaEditorDownscalesAndChoosesContainers()
+{
+    if (ffmpegExe().isEmpty())
+        QSKIP("ffmpeg not on PATH");
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("source.mp4"));
+    QVERIFY(makeToneVideo(source, true, 2));
+
+    const QStringList codecs = drift::availableVideoCodecs();
+    QVERIFY(codecs.contains(QStringLiteral("h264")));
+
+    drift::MediaEditSpec spec;
+    spec.inputPath = source;
+    spec.kind = QStringLiteral("video");
+    spec.output.maxHeight = 120;
+    spec.outputPath = dir.filePath(QStringLiteral("small.mp4"));
+    QString error;
+    QVERIFY2(drift::editMedia(spec, &error, {}), qPrintable(error));
+    MediaInfo info = MediaProbe::probe(spec.outputPath);
+    QVERIFY(info.ok);
+    QCOMPARE(info.streams.first().width, 160);
+    QCOMPARE(info.streams.first().height, 120);
+
+    // A smaller target than the source never upscales.
+    spec.output.maxHeight = 1080;
+    spec.outputPath = dir.filePath(QStringLiteral("same.mp4"));
+    QVERIFY2(drift::editMedia(spec, &error, {}), qPrintable(error));
+    info = MediaProbe::probe(spec.outputPath);
+    QCOMPARE(info.streams.first().height, 240);
+
+    // The same downscale when a frame hook replaces the picture.
+    spec.output.maxHeight = 120;
+    spec.frameHook = [](QImage &, QString *) { return true; };
+    spec.outputPath = dir.filePath(QStringLiteral("hooked.mp4"));
+    QVERIFY2(drift::editMedia(spec, &error, {}), qPrintable(error));
+    info = MediaProbe::probe(spec.outputPath);
+    QCOMPARE(info.streams.first().width, 160);
+    QCOMPARE(info.streams.first().height, 120);
+    spec.frameHook = nullptr;
+    spec.output.maxHeight = 0;
+
+    spec.output.container = QStringLiteral("mkv");
+    spec.output.crf = 30;
+    spec.output.audioBitrateKbps = 96;
+    spec.outputPath = dir.filePath(QStringLiteral("out.mkv"));
+    QVERIFY2(drift::editMedia(spec, &error, {}), qPrintable(error));
+    QCOMPARE(probeField(spec.outputPath, QStringLiteral("v"), QStringLiteral("codec_name")),
+             QStringLiteral("h264"));
+    QCOMPARE(probeField(spec.outputPath, QStringLiteral("a"), QStringLiteral("codec_name")),
+             QStringLiteral("aac"));
+    QVERIFY(QFileInfo(spec.outputPath).size() < QFileInfo(dir.filePath(QStringLiteral("same.mp4"))).size());
+
+    spec.output = {};
+    spec.output.container = QStringLiteral("mov");
+    spec.outputPath = dir.filePath(QStringLiteral("out.mov"));
+    QVERIFY2(drift::editMedia(spec, &error, {}), qPrintable(error));
+    QCOMPARE(probeField(spec.outputPath, QStringLiteral("v"), QStringLiteral("codec_name")),
+             QStringLiteral("h264"));
+
+    if (codecs.contains(QStringLiteral("hevc"))) {
+        spec.output.videoCodec = QStringLiteral("hevc");
+        spec.outputPath = dir.filePath(QStringLiteral("hevc.mov"));
+        QVERIFY2(drift::editMedia(spec, &error, {}), qPrintable(error));
+        QCOMPARE(probeField(spec.outputPath, QStringLiteral("v"), QStringLiteral("codec_name")),
+                 QStringLiteral("hevc"));
+    }
+    if (codecs.contains(QStringLiteral("prores"))) {
+        spec.output = {};
+        spec.output.videoCodec = QStringLiteral("prores");
+        spec.outputPath = dir.filePath(QStringLiteral("prores.mov"));
+        QVERIFY2(drift::editMedia(spec, &error, {}), qPrintable(error));
+        QCOMPARE(probeField(spec.outputPath, QStringLiteral("v"), QStringLiteral("codec_name")),
+                 QStringLiteral("prores"));
+        spec.output.container = QStringLiteral("mp4");
+        QVERIFY(!drift::editMedia(spec, &error, {}));
+    }
+
+    // Audio containers, from an audio source and from a video's track.
+    const QString tone = dir.filePath(QStringLiteral("tone.wav"));
+    QVERIFY(makeToneWav(tone, 2.0, 0.1));
+    drift::MediaEditSpec audio;
+    audio.inputPath = tone;
+    audio.kind = QStringLiteral("audio");
+    audio.outputPath = dir.filePath(QStringLiteral("out.wav"));
+    audio.output.container = QStringLiteral("wav");
+    QVERIFY2(drift::editMedia(audio, &error, {}), qPrintable(error));
+    QCOMPARE(probeField(audio.outputPath, QStringLiteral("a"), QStringLiteral("codec_name")),
+             QStringLiteral("pcm_s16le"));
+    QVERIFY(qAbs(MediaProbe::probe(audio.outputPath).durationUs - 2 * drift::kUsPerSecond) <= 30'000);
+    QVERIFY(peakOf(audio.outputPath) > 0.09f);
+
+    audio.output.wavBitDepth = 24;
+    audio.outputPath = dir.filePath(QStringLiteral("out24.wav"));
+    QVERIFY2(drift::editMedia(audio, &error, {}), qPrintable(error));
+    QCOMPARE(probeField(audio.outputPath, QStringLiteral("a"), QStringLiteral("codec_name")),
+             QStringLiteral("pcm_s24le"));
+
+    audio.output = {};
+    audio.output.container = QStringLiteral("m4a");
+    audio.outputPath = dir.filePath(QStringLiteral("out.m4a"));
+    QVERIFY2(drift::editMedia(audio, &error, {}), qPrintable(error));
+    QCOMPARE(probeField(audio.outputPath, QStringLiteral("a"), QStringLiteral("codec_name")),
+             QStringLiteral("aac"));
+    QVERIFY(qAbs(MediaProbe::probe(audio.outputPath).durationUs - 2 * drift::kUsPerSecond) <= 60'000);
+
+    audio.inputPath = source;
+    audio.kind = QStringLiteral("video");
+    audio.output.container = QStringLiteral("flac");
+    audio.outputPath = dir.filePath(QStringLiteral("from-video.flac"));
+    QVERIFY2(drift::editMedia(audio, &error, {}), qPrintable(error));
+    QCOMPARE(probeField(audio.outputPath, QStringLiteral("a"), QStringLiteral("codec_name")),
+             QStringLiteral("flac"));
+
+    audio.output.container = QStringLiteral("avi");
+    audio.kind = QStringLiteral("audio");
+    audio.inputPath = tone;
+    audio.outputPath = dir.filePath(QStringLiteral("bad.avi"));
+    QVERIFY(!drift::editMedia(audio, &error, {}));
+}
+
+void EngineTest::mediaEditorMuxesReplacementAudio()
+{
+    if (ffmpegExe().isEmpty())
+        QSKIP("ffmpeg not on PATH");
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("source.mp4"));
+    QVERIFY(makeToneVideo(source, true, 4));
+    // Already trimmed to 1..3 s of the source: two seconds, much louder than the original track.
+    const QString replacement = dir.filePath(QStringLiteral("replacement.wav"));
+    QVERIFY(makeToneWav(replacement, 2.0, 0.8, 880));
+
+    drift::MediaEditSpec spec;
+    spec.inputPath = source;
+    spec.outputPath = dir.filePath(QStringLiteral("out.mp4"));
+    spec.kind = QStringLiteral("video");
+    spec.inSeconds = 1;
+    spec.outSeconds = 3;
+    spec.audioSourcePath = replacement;
+    QString error;
+    QVERIFY2(drift::editMedia(spec, &error, {}), qPrintable(error));
+    MediaInfo info = MediaProbe::probe(spec.outputPath);
+    QVERIFY(info.ok);
+    QCOMPARE(info.streams.size(), 2);
+    for (const StreamInfo &stream : info.streams)
+        QVERIFY2(qAbs(stream.durationUs - 2 * drift::kUsPerSecond) <= 70'000,
+                 qPrintable(QString::number(stream.durationUs)));
+    QVERIFY(peakOf(spec.outputPath) > 0.6f);
+
+    // Audio only: the replacement is the whole file, so the source's own range is irrelevant.
+    spec.kind = QStringLiteral("audio");
+    spec.outputPath = dir.filePath(QStringLiteral("out.flac"));
+    QVERIFY2(drift::editMedia(spec, &error, {}), qPrintable(error));
+    info = MediaProbe::probe(spec.outputPath);
+    QVERIFY(qAbs(info.durationUs - 2 * drift::kUsPerSecond) <= 30'000);
+    QVERIFY(peakOf(spec.outputPath) > 0.7f);
+}
+
+void EngineTest::mediaEditorRemuxStartsOnAKeyframe()
+{
+    if (ffmpegExe().isEmpty())
+        QSKIP("ffmpeg not on PATH");
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("source.mp4"));
+    QVERIFY(makeToneVideo(source, true, 6));
+
+    // Keyframes sit on whole seconds.
+    const drift::TimeUs asked = 2'500'000;
+    const drift::TimeUs snapped = drift::keyframeAtOrBefore(source, asked);
+    QVERIFY2(qAbs(snapped - 2 * drift::kUsPerSecond) <= 1000, qPrintable(QString::number(snapped)));
+    QVERIFY(qAbs(drift::keyframeAtOrBefore(source, 2 * drift::kUsPerSecond) - snapped) <= 1000);
+
+    const QString out = dir.filePath(QStringLiteral("cut.mp4"));
+    drift::TimeUs actual = -1;
+    QString error;
+    double lastProgress = 0;
+    QVERIFY2(drift::remuxRange(source, out, asked, 5 * drift::kUsPerSecond, &actual, &error,
+                               [&](double f) {
+                                   lastProgress = f;
+                                   return true;
+                               }),
+             qPrintable(error));
+    QCOMPARE(actual, snapped);
+    QVERIFY(actual <= asked);
+    QCOMPARE(lastProgress, 1.0);
+    QVERIFY(!QFileInfo::exists(out + QStringLiteral(".part")));
+
+    const MediaInfo info = MediaProbe::probe(out);
+    QVERIFY(info.ok);
+    QCOMPARE(info.streams.size(), 2);
+    // From the 2 s keyframe to the 5 s out-point.
+    QVERIFY2(qAbs(info.durationUs - 3 * drift::kUsPerSecond) <= 150'000,
+             qPrintable(QString::number(info.durationUs)));
+    // Rebased to zero and copied, not re-encoded.
+    QCOMPARE(probeField(out, QStringLiteral("v"), QStringLiteral("codec_name")), QStringLiteral("h264"));
+    QVERIFY(drift::keyframeAtOrBefore(out, 0) <= 100'000);
+
+    // To the end of the file, into another container.
+    const QString tail = dir.filePath(QStringLiteral("tail.mkv"));
+    QVERIFY2(drift::remuxRange(source, tail, 4 * drift::kUsPerSecond, -1, &actual, &error, {}),
+             qPrintable(error));
+    QVERIFY(qAbs(MediaProbe::probe(tail).durationUs - 2 * drift::kUsPerSecond) <= 150'000);
+
+    QVERIFY(!drift::remuxRange(source, out, 3 * drift::kUsPerSecond, 3 * drift::kUsPerSecond,
+                               &actual, &error, {}));
+    QVERIFY(!drift::remuxRange(source, dir.filePath(QStringLiteral("c.mp4")), 0, -1, &actual,
+                               &error, [](double) { return false; }));
+    QVERIFY(!QFileInfo::exists(dir.filePath(QStringLiteral("c.mp4"))));
+    QVERIFY(!QFileInfo::exists(dir.filePath(QStringLiteral("c.mp4.part"))));
 }
 
 void EngineTest::reverseProxyLookupIsByContainmentAndSourceIdentity()
@@ -14353,6 +14828,43 @@ std::vector<float> whiteNoise(int samples, float amplitude, uint32_t seed)
 }
 
 } // namespace
+
+void EngineTest::denoiseAudioRangeWritesFlac()
+{
+    if (!denoiseModelAvailable())
+        QSKIP("DeepFilterNet3 model not installed");
+    if (ffmpegExe().isEmpty())
+        QSKIP("ffmpeg not on PATH");
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString source = dir.filePath(QStringLiteral("source.wav"));
+    QVERIFY(makeToneWav(source, 3.0, 0.2));
+
+    const QString out = dir.filePath(QStringLiteral("clean.flac"));
+    const QString original = dir.filePath(QStringLiteral("original.flac"));
+    QString error;
+    double last = 0;
+    QVERIFY2(drift::denoiseAudioRange(source, 500'000, 2'500'000, out, &error,
+                                      [&](double f) {
+                                          last = f;
+                                          return true;
+                                      },
+                                      original),
+             qPrintable(error));
+    QCOMPARE(last, 1.0);
+    for (const QString &path : {out, original}) {
+        const MediaInfo info = MediaProbe::probe(path);
+        QVERIFY(info.ok);
+        QCOMPARE(info.streams.first().channels, 2);
+        QCOMPARE(info.streams.first().sampleRate, drift::DeepFilterDenoiser::sampleRate());
+        QVERIFY(qAbs(info.durationUs - 2 * drift::kUsPerSecond) <= 30'000);
+    }
+
+    const QString cancelled = dir.filePath(QStringLiteral("cancelled.flac"));
+    QVERIFY(!drift::denoiseAudioRange(source, 0, 2'000'000, cancelled, &error,
+                                      [](double f) { return f < 0.3; }));
+    QVERIFY(!QFileInfo::exists(cancelled));
+}
 
 // The auxiliary blob is the model's own ERB geometry. If the forward and inverse matrices do not
 // describe the same 32 bands, every gain lands on the wrong frequencies and the result is

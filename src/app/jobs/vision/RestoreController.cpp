@@ -138,26 +138,14 @@ QString RestoreController::run(const QString &targetId, const QString &decompres
             notify();
 
             QList<std::shared_ptr<drift::Restorer>> chain;
-            for (const QString &model : {decompressModel, upscaleModel}) {
-                if (model.isEmpty())
-                    continue;
-                QString error;
-                std::shared_ptr<drift::Restorer> r = drift::Restorer::load(model, &error);
-                if (!r)
-                    return ctx.fail(QStringLiteral("model_error"), error);
-                *scale *= r->scale();
-                chain.append(r);
-            }
+            QString error;
+            if (!drift::Restorer::loadChain({decompressModel, upscaleModel}, &chain, scale.get(), &error))
+                return ctx.fail(QStringLiteral("model_error"), error);
 
             const auto cancelled = [&ctx](double) { return !ctx.cancelled(); };
-            spec.frameHook = [&](QImage &frame, QString *error) {
-                for (const std::shared_ptr<drift::Restorer> &r : chain) {
-                    if (!r->process(frame, cancelled, error))
-                        return false;
-                }
-                return true;
+            spec.frameHook = [&](QImage &frame, QString *frameError) {
+                return drift::Restorer::processChain(chain, frame, cancelled, frameError);
             };
-            QString error;
             int lastPermille = -1;
             QElapsedTimer timer;
             timer.start();
@@ -321,15 +309,9 @@ QString RestoreController::preview(const QString &targetId, const QString &decom
             notify();
 
             QList<std::shared_ptr<drift::Restorer>> chain;
-            for (const QString &model : {decompressModel, upscaleModel}) {
-                if (model.isEmpty())
-                    continue;
-                QString error;
-                std::shared_ptr<drift::Restorer> r = drift::Restorer::load(model, &error);
-                if (!r)
-                    return ctx.fail(QStringLiteral("model_error"), error);
-                chain.append(r);
-            }
+            QString loadError;
+            if (!drift::Restorer::loadChain({decompressModel, upscaleModel}, &chain, nullptr, &loadError))
+                return ctx.fail(QStringLiteral("model_error"), loadError);
 
             QImage frame = original;
             QElapsedTimer timer;

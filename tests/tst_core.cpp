@@ -141,6 +141,9 @@ private slots:
     void karaokeWordIndexTracksTheCue();
     void shapeStyleSerialization();
     void legacyShapeStyleLoadsWithDefaults();
+    void sourceLabAnnotationsRoundTrip();
+    void assetWithoutSourceLabKeysLoadsEmpty();
+    void sourceLabRebaseMath();
     void shapeCatalogPathsFitBounds();
     void vectorSourceSerialization();
     void dotLottieUnpacks();
@@ -2027,6 +2030,107 @@ void CoreTest::shapeStyleSerialization()
     QCOMPARE(loadedClip.transformY.evaluateAt(0), 200.0);
     QCOMPARE(json.value(QStringLiteral("version")).toInt(),
              drift::Project::kCurrentVersion);
+}
+
+void CoreTest::sourceLabAnnotationsRoundTrip()
+{
+    drift::Project project;
+    drift::MediaAsset asset;
+    asset.id = QStringLiteral("asset-lab");
+    asset.name = QStringLiteral("lab.mp4");
+    asset.kind = drift::MediaKind::Video;
+    asset.durationUs = drift::secondsToUs(30);
+    asset.rating = 1;
+    asset.ranges.append({QStringLiteral("r1"), drift::secondsToUs(1), drift::secondsToUs(4), 1,
+                         QStringLiteral("Intro"), QStringLiteral("good take")});
+    asset.ranges.append({QStringLiteral("r2"), drift::secondsToUs(5), drift::secondsToUs(9), -1, {}, {}});
+    asset.markers.append({QStringLiteral("m1"), drift::secondsToUs(2), QStringLiteral("Cue"), QStringLiteral("note")});
+    project.addAsset(asset);
+
+    const QJsonObject json = project.toJson();
+    QCOMPARE(json.value(QStringLiteral("version")).toInt(), drift::Project::kCurrentVersion);
+    QCOMPARE(drift::Project::kCurrentVersion, 17);
+
+    QString error;
+    const drift::Project loaded = drift::Project::fromJson(json, &error);
+    QVERIFY(error.isEmpty());
+    const drift::MediaAsset *back = loaded.asset(QStringLiteral("asset-lab"));
+    QVERIFY(back);
+    QCOMPARE(back->rating, 1);
+    QCOMPARE(back->ranges.size(), 2);
+    QCOMPARE(back->ranges[0].id, QStringLiteral("r1"));
+    QCOMPARE(back->ranges[0].inUs, drift::secondsToUs(1));
+    QCOMPARE(back->ranges[0].outUs, drift::secondsToUs(4));
+    QCOMPARE(back->ranges[0].rating, 1);
+    QCOMPARE(back->ranges[0].name, QStringLiteral("Intro"));
+    QCOMPARE(back->ranges[0].note, QStringLiteral("good take"));
+    QCOMPARE(back->ranges[1].rating, -1);
+    QCOMPARE(back->markers.size(), 1);
+    QCOMPARE(back->markers[0].id, QStringLiteral("m1"));
+    QCOMPARE(back->markers[0].timeUs, drift::secondsToUs(2));
+    QCOMPARE(back->markers[0].name, QStringLiteral("Cue"));
+    QCOMPARE(back->markers[0].note, QStringLiteral("note"));
+}
+
+void CoreTest::assetWithoutSourceLabKeysLoadsEmpty()
+{
+    drift::Project project;
+    drift::MediaAsset asset;
+    asset.id = QStringLiteral("asset-plain");
+    asset.kind = drift::MediaKind::Video;
+    project.addAsset(asset);
+
+    QJsonObject json = project.toJson();
+    const QJsonObject assetJson = json.value(QStringLiteral("assets")).toArray().at(0).toObject();
+    QVERIFY(!assetJson.contains(QStringLiteral("ranges")));
+    QVERIFY(!assetJson.contains(QStringLiteral("markers")));
+    QVERIFY(!assetJson.contains(QStringLiteral("rating")));
+
+    json[QStringLiteral("version")] = 16;
+    QString error;
+    const drift::Project loaded = drift::Project::fromJson(json, &error);
+    QVERIFY(error.isEmpty());
+    const drift::MediaAsset *back = loaded.asset(QStringLiteral("asset-plain"));
+    QVERIFY(back);
+    QVERIFY(back->ranges.isEmpty());
+    QVERIFY(back->markers.isEmpty());
+    QCOMPARE(back->rating, 0);
+}
+
+void CoreTest::sourceLabRebaseMath()
+{
+    using drift::secondsToUs;
+    const drift::TimeUs trimIn = secondsToUs(2);
+    const drift::TimeUs newDuration = secondsToUs(4);
+    // 2x speed: source 2..10 s becomes 0..4 s.
+    QCOMPARE(drift::rebaseSourceTime(secondsToUs(6), trimIn, 2.0, newDuration), secondsToUs(2));
+    QCOMPARE(drift::rebaseSourceTime(secondsToUs(1), trimIn, 2.0, newDuration), 0);
+    QCOMPARE(drift::rebaseSourceTime(secondsToUs(30), trimIn, 2.0, newDuration), newDuration);
+    // Half speed stretches.
+    QCOMPARE(drift::rebaseSourceTime(secondsToUs(3), trimIn, 0.5, secondsToUs(100)), secondsToUs(2));
+
+    const QList<drift::SourceRange> ranges{
+        {QStringLiteral("in"), secondsToUs(4), secondsToUs(6), 1, QStringLiteral("a"), {}},
+        {QStringLiteral("before"), 0, secondsToUs(1), 0, {}, {}},
+        {QStringLiteral("after"), secondsToUs(11), secondsToUs(12), 0, {}, {}},
+        {QStringLiteral("straddle"), secondsToUs(1), secondsToUs(4), 0, {}, {}}};
+    const QList<drift::SourceRange> kept = drift::rebaseRanges(ranges, trimIn, 2.0, newDuration);
+    QCOMPARE(kept.size(), 2);
+    QCOMPARE(kept[0].id, QStringLiteral("in"));
+    QCOMPARE(kept[0].inUs, secondsToUs(1));
+    QCOMPARE(kept[0].outUs, secondsToUs(2));
+    QCOMPARE(kept[0].rating, 1);
+    QCOMPARE(kept[1].id, QStringLiteral("straddle"));
+    QCOMPARE(kept[1].inUs, 0);
+    QCOMPARE(kept[1].outUs, secondsToUs(1));
+
+    const QList<drift::SourceMarker> markers{{QStringLiteral("m1"), secondsToUs(4), {}, {}},
+                                             {QStringLiteral("m2"), secondsToUs(1), {}, {}},
+                                             {QStringLiteral("m3"), secondsToUs(11), {}, {}}};
+    const QList<drift::SourceMarker> keptMarkers = drift::rebaseMarkers(markers, trimIn, 2.0, newDuration);
+    QCOMPARE(keptMarkers.size(), 1);
+    QCOMPARE(keptMarkers[0].id, QStringLiteral("m1"));
+    QCOMPARE(keptMarkers[0].timeUs, secondsToUs(1));
 }
 
 // A project saved before format 8 carries the flat fill/stroke keys — possibly only the original

@@ -786,6 +786,7 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
     m_faces = new FaceTrackingController(this, this);
     m_stabilize = new StabilizeController(this, this);
     m_bin = new MediaBinController(this, this);
+    m_sourceLab = new SourceLabController(this, this);
     m_tts = new TtsController(this, this);
     m_voices = new VoiceLibrary(this, m_tts, this);
     m_tts->setVoices(m_voices);
@@ -865,6 +866,7 @@ AppController::AppController(AssetLibrary *assetLibrary, QObject *parent)
         if (m_assetLibrary)
             m_assetLibrary->syncToProject();
         m_bin->folderModel()->syncToProject();
+        m_sourceLab->refresh();
         // An undo/redo can restore a project state where the folder currently being viewed no
         // longer exists (its creation was undone) — back the viewer out to root rather than
         // leaving it pointed at nothing.
@@ -9975,6 +9977,29 @@ QString AppController::insertRenderedVideoAsset(const QString &path, const QStri
         m_assetLibrary->syncToProject();
         m_assetLibrary->ensureMedia(m_assetLibrary->indexOfId(assetId));
     }
+    return assetId;
+}
+
+QString AppController::addRenderedAudioAsset(const QString &path, const QString &name,
+                                             const QString &folderId, const MediaInfo &info,
+                                             const QString &undoText)
+{
+    const drift::Project before = m_project.detachedCopy();
+    drift::MediaAsset asset;
+    asset.kind = drift::MediaKind::Audio;
+    asset.path = path;
+    asset.name = name;
+    asset.durationUs = info.durationUs;
+    asset.hasAudio = true;
+    asset.hasAudioKnown = true;
+    asset.folderId = folderId;
+    const QString assetId = m_project.addAsset(asset);
+    if (m_assetLibrary) {
+        m_assetLibrary->syncToProject();
+        m_assetLibrary->ensureMedia(m_assetLibrary->indexOfId(assetId));
+    }
+    pushProjectEdit(before, undoText);
+    finishEdit(undoText);
     return assetId;
 }
 

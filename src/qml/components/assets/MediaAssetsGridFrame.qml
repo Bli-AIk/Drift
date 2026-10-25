@@ -15,6 +15,8 @@ Rectangle {
     required property string duration
     required property string thumbnailPath
     required property int assetIndex
+    required property int rating
+    required property int rangeCount
     required property string liveThumbnailPath
     required property int thumbnailRevision
     required property real cardSize
@@ -158,6 +160,16 @@ Rectangle {
         label: !root.isFolder ? duration : ""
     }
 
+    MediaAssetsLabBadge {
+        z: 4
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.margins: Theme.spacingSm
+        visible: !root.isFolder && (root.rating !== 0 || root.rangeCount > 0)
+        rating: root.rating
+        rangeCount: root.rangeCount
+    }
+
     // Like CapCut's media bin: the label reflects actual clip references rather
     // than only the last click. The + stays available to insert another instance.
     Rectangle {
@@ -169,13 +181,13 @@ Rectangle {
         width: addedLabel.implicitWidth + 10
         height: addedLabel.implicitHeight + 4
         radius: 3
-        color: "#D9000000"
+        color: Theme.c.mediaAssetsAddedBadge.background
 
         Text {
             id: addedLabel
             anchors.centerIn: parent
             text: qsTr("Added")
-            color: "white"
+            color: Theme.c.mediaAssetsAddedBadge.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeTiny
             font.weight: Font.Medium

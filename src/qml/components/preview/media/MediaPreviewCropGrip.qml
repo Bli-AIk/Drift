@@ -35,6 +35,10 @@ Rectangle {
         property real startH: 1
         property real origX: 0
         property real origY: 0
+        onReleased: {
+            if (grip.editor.commitCrop)
+                grip.editor.commitCrop()
+        }
         onPressed: {
             startX = grip.editor.cropX
             startY = grip.editor.cropY

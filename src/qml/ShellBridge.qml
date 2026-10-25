@@ -12,6 +12,8 @@ QtObject {
     property var colorTabRequest: null
     property var keyframesActionHandler: null
     property var subtitleActionHandler: null
+    property var sourceLabActionHandler: null
+    property var sourceLabRangesHandler: null
 
     // The phone shell (AndroidMain) is the one that hosts AndroidEditor's sheets. Touch sizing
     // alone does not decide this: a tablet can run the desktop shell.

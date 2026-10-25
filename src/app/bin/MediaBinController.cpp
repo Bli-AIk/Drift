@@ -384,6 +384,16 @@ bool MediaBinController::replaceSource(int assetIndex, const QUrl &url)
     return true;
 }
 
+bool MediaBinController::replaceSourceWith(int assetIndex, const QUrl &url,
+                                           std::function<void(drift::MediaAsset &)> adjust)
+{
+    m_replaceAdjust = std::move(adjust);
+    if (replaceSource(assetIndex, url))
+        return true;
+    m_replaceAdjust = nullptr;
+    return false;
+}
+
 bool MediaBinController::refreshSource(int assetIndex)
 {
     return m_app->m_assetLibrary && m_app->m_assetLibrary->startRefreshProbe(assetIndex);
@@ -731,15 +741,31 @@ bool MediaBinController::renderCopy(int assetIndex, double inSeconds, double out
 
 QString MediaBinController::addSubclip(const QString &assetId, double inSeconds, double outSeconds)
 {
-    if (!m_app->m_assetLibrary || !std::isfinite(inSeconds) || !std::isfinite(outSeconds))
+    if (!std::isfinite(inSeconds) || !std::isfinite(outSeconds))
+        return {};
+    const drift::Project before = m_app->m_project;
+    const QString id = appendSubclip(assetId, drift::secondsToUs(inSeconds),
+                                     drift::secondsToUs(outSeconds), QString(), 0);
+    if (id.isEmpty())
+        return {};
+    m_app->pushProjectEdit(before, tr("Sub-clip added"));
+    m_app->settleUndoRefresh();
+    return id;
+}
+
+QString MediaBinController::appendSubclip(const QString &assetId, drift::TimeUs inUs,
+                                          drift::TimeUs outUs, const QString &name, int rating)
+{
+    if (!m_app->m_assetLibrary)
         return {};
     const drift::MediaAsset *source = m_app->m_project.asset(assetId);
-    if (!source || source->kind != drift::MediaKind::Video || !QFileInfo(source->path).isFile())
+    if (!source || (source->kind != drift::MediaKind::Video && source->kind != drift::MediaKind::Audio)
+        || !QFileInfo(source->path).isFile())
         return {};
 
     const drift::TimeUs duration = source->durationUs;
-    const drift::TimeUs trimIn = qBound<drift::TimeUs>(0, drift::secondsToUs(inSeconds), duration);
-    drift::TimeUs trimOut = qBound<drift::TimeUs>(trimIn, drift::secondsToUs(outSeconds), duration);
+    const drift::TimeUs trimIn = qBound<drift::TimeUs>(0, inUs, duration);
+    drift::TimeUs trimOut = qBound<drift::TimeUs>(trimIn, outUs, duration);
     if (trimOut <= trimIn)
         return {};
     if (trimOut >= duration)
@@ -750,20 +776,20 @@ QString MediaBinController::addSubclip(const QString &assetId, double inSeconds,
     const QString range = QStringLiteral("%1–%2").arg(clockLabel(drift::usToSeconds(trimIn)),
                                                      clockLabel(drift::usToSeconds(trimOut < 0 ? duration : trimOut)));
     sub.id.clear();
-    sub.name = tr("%1 (%2)").arg(source->name, range);
+    sub.name = name.isEmpty() ? tr("%1 (%2)").arg(source->name, range) : name;
     sub.trimInUs = trimIn;
     sub.trimOutUs = trimOut;
+    sub.ranges.clear();
+    sub.markers.clear();
+    sub.rating = qBound(-1, rating, 1);
     sub.thumbnailPath.clear();
     sub.filmstripPath.clear();
 
-    const drift::Project before = m_app->m_project;
     const QString id = m_app->m_project.addAsset(sub);
     QList<QString> &order = m_app->m_project.assetOrder();
     order.move(order.size() - 1, order.indexOf(assetId) + 1);
     m_app->m_assetLibrary->syncToProject();
     m_app->m_assetLibrary->ensureMedia(m_app->m_assetLibrary->indexOfId(id));
-    m_app->pushProjectEdit(before, tr("Sub-clip added"));
-    m_app->settleUndoRefresh();
     return id;
 }
 
@@ -895,6 +921,10 @@ void MediaBinController::finalizeReplace(const QString &assetId, const drift::Me
     const QString replacementSourceUri =
         refresh ? QString() : std::exchange(m_replacingAssetSourceUri, QString());
 
+    std::function<void(drift::MediaAsset &)> adjust = std::exchange(m_replaceAdjust, nullptr);
+    if (refresh)
+        adjust = nullptr;
+
     const bool fromEdit = (m_editingAssetId == assetId);
     const QString keptEditName = fromEdit ? m_editKeepName : QString();
     auto finishEditJob = [&](bool editOk, const QString &message) {
@@ -970,6 +1000,9 @@ void MediaBinController::finalizeReplace(const QString &assetId, const drift::Me
         replacement.editFriendly = current->editFriendly;
         replacement.trimInUs = current->trimInUs;
         replacement.trimOutUs = current->trimOutUs;
+        replacement.ranges = current->ranges;
+        replacement.markers = current->markers;
+        replacement.rating = current->rating;
         if (replacement.durationUs > 0) {
             if (replacement.trimOutUs > replacement.durationUs)
                 replacement.trimOutUs = -1;
@@ -977,6 +1010,8 @@ void MediaBinController::finalizeReplace(const QString &assetId, const drift::Me
                 replacement.trimInUs = 0;
         }
     }
+    if (adjust)
+        adjust(replacement);
     const QString path = current->path;
     // Captured before applyProbedSource overwrites `current` in place — rebindClipsToAsset needs
     // to know what the bin's correction *was* to rebase each clip's own by how much it changed.

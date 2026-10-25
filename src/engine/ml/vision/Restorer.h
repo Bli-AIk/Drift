@@ -52,6 +52,14 @@ public:
     // Blocks — never call this from the GUI thread.
     static std::shared_ptr<Restorer> load(const QString &id, QString *error);
 
+    // Loads the named models in order (empty ids skipped) for processChain. `scale` receives their
+    // combined factor. Blocks, like load().
+    static bool loadChain(const QStringList &ids, QList<std::shared_ptr<Restorer>> *chain,
+                          int *scale, QString *error);
+    // Runs `frame` through each model of the chain in turn; stops when `progress` returns false.
+    static bool processChain(const QList<std::shared_ptr<Restorer>> &chain, QImage &frame,
+                             const std::function<bool(double)> &progress, QString *error);
+
     int scale() const;
 
     // Replaces `frame` (any format; converted to RGB888) with the restored picture, `scale()` times

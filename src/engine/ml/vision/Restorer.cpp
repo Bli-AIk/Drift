@@ -432,4 +432,33 @@ bool Restorer::process(QImage &frame, const std::function<bool(double)> &progres
     return true;
 }
 
+bool Restorer::loadChain(const QStringList &ids, QList<std::shared_ptr<Restorer>> *chain,
+                         int *scale, QString *error)
+{
+    chain->clear();
+    int total = 1;
+    for (const QString &id : ids) {
+        if (id.isEmpty())
+            continue;
+        std::shared_ptr<Restorer> restorer = load(id, error);
+        if (!restorer)
+            return false;
+        total *= restorer->scale();
+        chain->append(restorer);
+    }
+    if (scale)
+        *scale = total;
+    return true;
+}
+
+bool Restorer::processChain(const QList<std::shared_ptr<Restorer>> &chain, QImage &frame,
+                            const std::function<bool(double)> &progress, QString *error)
+{
+    for (const std::shared_ptr<Restorer> &restorer : chain) {
+        if (!restorer->process(frame, progress, error))
+            return false;
+    }
+    return true;
+}
+
 } // namespace drift

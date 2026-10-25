@@ -5,7 +5,9 @@
 #include <QByteArray>
 #include <QImage>
 #include <QList>
+#include <QtNumeric>
 #include <QString>
+#include <QStringList>
 
 #include <functional>
 
@@ -20,6 +22,22 @@ struct FilterOption
     QByteArray filter; // filter name, e.g. "vidstabdetect"
     QByteArray option;
     QString value;
+};
+
+// Container, codec and quality choices. Every default reproduces the output the editor made
+// before these existed.
+struct MediaOutputOptions
+{
+    // "" = flac for audio, mp4 for video. Video: mp4 | mov | mkv. Audio: m4a (AAC) | wav | flac.
+    // A video source given an audio container is written as audio only.
+    QString container;
+    // Video only. "" or "h264", "hevc", "prores" (needs mov or mkv; "" container then means mov).
+    // See availableVideoCodecs() for what this build can encode.
+    QString videoCodec;
+    int crf = -1;               // -1 = 18; ignored by prores
+    int maxHeight = 0;          // 0 = keep; otherwise downscale to at most this, aspect kept, even sizes
+    int audioBitrateKbps = 0;   // 0 = 192; AAC outputs only
+    int wavBitDepth = 16;       // wav: 16 or 24
 };
 
 // Crop is in display space after rotation, each axis 0..1. A full-frame crop (0,0,1,1) leaves
@@ -51,6 +69,22 @@ struct MediaEditSpec
     // must come back the same size as the first. Forces 8-bit output. Returning false stops the
     // edit with the error it set, or "Cancelled" when it set none.
     std::function<bool(QImage &frame, QString *error)> frameHook;
+    // Video and audio: playback speed of the kept range, > 0. Video stays on its constant-rate
+    // grid (frames repeat or drop); audio keeps its pitch through atempo, or follows the speed
+    // through asetrate when keepPitch is off. The result lasts (out - in) / speed.
+    double speed = 1;
+    bool keepPitch = true;
+    // Audio gain in dB, applied after the speed change.
+    double gainDb = 0;
+    // When set, the kept audio's integrated loudness is measured first and a fixed gain (clamped
+    // to +-24 dB) takes it to this target, on top of gainDb.
+    double normalizeLufs = qQNaN();
+    // Extra libavfilter audio chain (stereo float), applied after speed and gain.
+    QString audioFilter;
+    // When non-empty the audio comes from this file instead of inputPath. It must already be
+    // trimmed to the kept range: it is read from 0 for the length of that range.
+    QString audioSourcePath;
+    MediaOutputOptions output;
 };
 
 // Rewrites `inputPath` into `outputPath` with the requested trim and crop. Images become PNG,
@@ -70,6 +104,20 @@ bool editMedia(const MediaEditSpec &spec, QString *errorOut,
 bool analyzeVideo(const QString &inputPath, TimeUs inUs, TimeUs outUs, const QString &filter,
                   const QList<FilterOption> &filterOptions, QString *errorOut,
                   const std::function<bool(double)> &onProgress);
+
+// Which of "h264", "hevc", "prores" the linked FFmpeg can encode.
+QStringList availableVideoCodecs();
+
+// Stream-copies [inUs, outUs) of `input` into `output` (container from its extension) with every
+// video, audio and subtitle stream, timestamps rebased to 0. Without re-encoding the cut can only
+// start on a keyframe, so it starts at the one at or before inUs; `actualInUs` receives where.
+// outUs < 0 means "through the end".
+bool remuxRange(const QString &input, const QString &output, TimeUs inUs, TimeUs outUs,
+                TimeUs *actualInUs, QString *error, const std::function<bool(double)> &onProgress);
+
+// The start of the keyframe at or before `t` in the first video stream (the first audio stream when
+// there is no video) -- where remuxRange would begin. `t` itself when the file cannot be read.
+TimeUs keyframeAtOrBefore(const QString &path, TimeUs t);
 
 // Whether this build's libavfilter has the named filter (vid.stab's are an optional library).
 bool hasVideoFilter(const char *name);

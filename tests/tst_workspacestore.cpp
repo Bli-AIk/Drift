@@ -1,5 +1,8 @@
 #include <QtTest>
 
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QSettings>
 #include <QStandardPaths>
 
@@ -24,6 +27,7 @@ private slots:
     void migratesOldFractions();
     void colorPresetHasGradingPanels();
     void subtitlesPresetHasSubtitlePanels();
+    void migratesCutTrimToSourceLab();
 
 private:
     QString m_org;
@@ -245,6 +249,26 @@ void WorkspaceStoreTest::subtitlesPresetHasSubtitlePanels()
         known << v.toMap().value("type").toString();
     for (const QString &type : types)
         QVERIFY2(known.contains(type), qPrintable(type));
+}
+
+void WorkspaceStoreTest::migratesCutTrimToSourceLab()
+{
+    const QJsonArray list{QJsonObject::fromVariantMap(workspaceWith(slot("preview"), "cut-trim"))};
+    QSettings().setValue("ui/workspaces/list",
+                         QString::fromUtf8(QJsonDocument(list).toJson(QJsonDocument::Compact)));
+    QSettings().setValue("ui/workspaces/active", "cut-trim");
+
+    WorkspaceStore store;
+    for (const QVariant &v : store.workspaces())
+        QVERIFY(v.toMap().value("id").toString() != QLatin1String("cut-trim"));
+    QCOMPARE(store.activeId(), QStringLiteral("source-lab"));
+    QCOMPARE(QSettings().value("ui/workspaces/active").toString(), QStringLiteral("source-lab"));
+    QVERIFY(QSettings().value("ui/workspaces/migratedSourceLab").toBool());
+    QCOMPARE(store.workspaces().size(), 9);
+
+    const QVariantMap preset = store.workspace("source-lab");
+    QCOMPARE(preset.value("name").toString(), QStringLiteral("Source Lab"));
+    QVERIFY(preset.value("builtin").toBool());
 }
 
 QTEST_MAIN(WorkspaceStoreTest)

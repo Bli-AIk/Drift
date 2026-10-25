@@ -39,6 +39,9 @@ Item {
 
     readonly property bool sourceViewerShown: root._shownOf("sourceViewer")
 
+    readonly property bool sourceLabShown: root._shownOf("sourceLab.viewer") || root._shownOf("sourceLab.trim")
+        || root._shownOf("sourceLab.ranges") || root._shownOf("sourceLab.process") || root._shownOf("sourceLab.output")
+
     readonly property bool denoiseShown: root._shownOf("denoise")
 
     readonly property bool colorShown: root._shownOf("color")
@@ -78,6 +81,11 @@ Item {
         "keyframes": keyframesC,
         "undoHistory": historyC,
         "sourceViewer": sourceViewerC,
+        "sourceLab.viewer": sourceLabViewerC,
+        "sourceLab.trim": sourceLabTrimC,
+        "sourceLab.ranges": sourceLabRangesC,
+        "sourceLab.process": sourceLabProcessC,
+        "sourceLab.output": sourceLabOutputC,
         "agentLog": agentLogC
     })
 
@@ -98,6 +106,11 @@ Item {
     Component { id: keyframesC; LazyPanel { panel: KeyframesPanel {} } }
     Component { id: historyC; LazyPanel { panel: HistoryPanel {} } }
     Component { id: sourceViewerC; LazyPanel { panel: SourceViewerPanel {} } }
+    Component { id: sourceLabViewerC; LazyPanel { panel: SourceLabViewerPanel {} } }
+    Component { id: sourceLabTrimC; LazyPanel { panel: SourceLabTrimPanel {} } }
+    Component { id: sourceLabRangesC; LazyPanel { panel: SourceLabRangesPanel {} } }
+    Component { id: sourceLabProcessC; LazyPanel { panel: SourceLabProcessPanel {} } }
+    Component { id: sourceLabOutputC; LazyPanel { panel: SourceLabOutputPanel {} } }
     Component { id: agentLogC; LazyPanel { panel: AgentLogPanel {} } }
     Component { id: placeholderC; WorkspacePlaceholderPanel {} }
 

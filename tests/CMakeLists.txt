@@ -49,6 +49,7 @@ qt_add_executable(tst_editorstate
     ../src/app/jobs/vision/FaceTrackingController.cpp
     ../src/app/jobs/vision/StabilizeController.cpp
     ../src/app/bin/MediaBinController.cpp
+    ../src/app/bin/SourceLabController.cpp
     ../src/app/jobs/audio/TtsController.cpp
     ../src/app/jobs/audio/VoiceLibrary.cpp
     ../src/ui/preview/PreviewController.cpp
@@ -240,6 +241,7 @@ qt_add_executable(tst_mcp
     ../src/app/jobs/vision/FaceTrackingController.cpp
     ../src/app/jobs/vision/StabilizeController.cpp
     ../src/app/bin/MediaBinController.cpp
+    ../src/app/bin/SourceLabController.cpp
     ../src/app/jobs/audio/TtsController.cpp
     ../src/app/jobs/audio/VoiceLibrary.cpp
     ../src/ui/preview/PreviewController.cpp
@@ -358,7 +360,7 @@ qt_add_resources(tst_workspacestore "workspace_presets"
     FILES
         ../resources/workspaces/edit.json
         ../resources/workspaces/edit-portrait.json
-        ../resources/workspaces/cut-trim.json
+        ../resources/workspaces/source-lab.json
         ../resources/workspaces/audio.json
         ../resources/workspaces/record.json
         ../resources/workspaces/subtitles.json

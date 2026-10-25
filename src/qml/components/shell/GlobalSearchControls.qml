@@ -8,6 +8,7 @@ QtObject {
     readonly property string settings: qsTr("Settings")
     readonly property string grading: qsTr("Color")
     readonly property string subtitles: qsTr("Subtitles")
+    readonly property string sourceLab: qsTr("Source Lab")
 
     readonly property string anyClip: qsTr("Select a clip")
     readonly property string visualClip: qsTr("Select a video, image, text or shape clip")
@@ -33,6 +34,10 @@ QtObject {
 
     function subtitle(label, keywords) {
         return { label: label, path: [subtitles], hint: qsTr("Open the Subtitles workspace"), keywords: keywords, workspace: "subtitles" }
+    }
+
+    function sourceEntry(label, keywords) {
+        return { label: label, path: [sourceLab], hint: qsTr("Open the Source Lab workspace"), keywords: keywords, workspace: "source-lab" }
     }
 
     readonly property var entries: [
@@ -123,6 +128,14 @@ QtObject {
         subtitle(qsTr("Frame rate conversion"), "captions fps 23.976 24 25 29.97 30 speed"),
         subtitle(qsTr("Bridge gaps"), "captions minimum gap lead in out duration overlap"),
         subtitle(qsTr("Subtitle text editor"), "captions srt vtt paste edit import export source"),
+
+        sourceEntry(qsTr("Source Lab"), "source lab workspace cut trim crop reframe ranges subclip favorite reject marker speed denoise stabilize upscale enhance export clip normalize loudness"),
+        sourceEntry(qsTr("Trim source clip"), "trim cut in out start end ranges subclip split scene detection favorite reject marker"),
+        sourceEntry(qsTr("Crop / reframe source"), "crop reframe reframing aspect ratio 9:16 portrait presets"),
+        sourceEntry(qsTr("Speed and loudness"), "speed slow fast motion gain volume loudness normalize"),
+        sourceEntry(qsTr("Denoise and stabilize source"), "denoise noise hiss clean stabilize shake steady"),
+        sourceEntry(qsTr("Upscale source clip"), "upscale enhance restore resolution sharpen a/b compare"),
+        sourceEntry(qsTr("Export trimmed clip"), "export clip file save render container codec quality stream copy replace bin add copy"),
 
         setting("general", qsTr("General"), "language locale startup autosave recovery cache backup"),
         setting("appearance", qsTr("Appearance"), "theme dark light color workspace layout translucency"),

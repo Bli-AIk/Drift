@@ -1,11 +1,13 @@
 #pragma once
 
 #include "core/base/Time.h"
+#include "core/project/media/SourceLab.h"
 
 #include <QDateTime>
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QList>
 #include <QRectF>
 #include <cmath>
 #include <QString>
@@ -76,6 +78,12 @@ struct MediaAsset
     // an actual crop still does that. -1 for trimOutUs = no trim (use the full duration).
     TimeUs trimInUs = 0;
     TimeUs trimOutUs = -1;
+
+    // Source Lab annotations: named spans and point markers on the source's own timeline, and an
+    // asset-wide rating (-1 reject, 0 none, 1 favorite). They never touch the media or any clip.
+    QList<SourceRange> ranges;
+    QList<SourceMarker> markers;
+    int rating = 0;
 
     int sampleRate = 0;
     int channels = 0;

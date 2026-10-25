@@ -5,8 +5,11 @@
 
 #include <QAtomicInt>
 #include <QObject>
+#include <QSharedPointer>
 #include <QString>
 #include <QVariantList>
+
+#include <functional>
 
 class AppController;
 
@@ -52,6 +55,18 @@ public:
     // Sensitivity, persisted in QSettings so a scan does not forget it between sessions.
     Q_INVOKABLE double threshold() const;
     Q_INVOKABLE void setThreshold(double threshold);
+
+    // Scans a file's range for callers that keep their own state (Source Lab): the scene list,
+    // `detecting` and the progress above are left alone. Off the GUI thread; `progress` and `done`
+    // are called back on it (`done` exactly once, with ok false when the scan failed or `cancel`
+    // was set, and the reason, empty for a cancel). A cached analysis is delivered without scanning.
+    // minSceneSeconds <= 0 means "leave the engine default alone".
+    void detectSource(const QString &path, int rotationCorrection, drift::TimeUs sourceIn,
+                      drift::TimeUs sourceOut, double minSceneSeconds, double threshold,
+                      const QSharedPointer<QAtomicInt> &cancel,
+                      const std::function<void(double, const QString &)> &progress,
+                      const std::function<void(bool ok, const drift::SceneAnalysis &analysis,
+                                               const QString &error)> &done);
 
     // The one place a scan request is built, so the GUI and MCP paths cannot disagree about
     // the settings — and therefore about the cache key derived from them.

@@ -5,6 +5,7 @@
 #include "core/project/clip/Clip.h"
 #include "core/project/media/MediaAsset.h"
 #include "core/base/Time.h"
+#include "playback/preview/FrameGrid.h"
 
 #include <algorithm>
 
@@ -20,8 +21,15 @@ AssetPreviewController::AssetPreviewController(AppController *app, QObject *pare
             &AssetPreviewController::frameChanged);
     connect(&m_player, &ClipPreviewPlayer::positionChanged, this,
             &AssetPreviewController::positionChanged);
-    connect(&m_player, &ClipPreviewPlayer::playingChanged, this,
-            &AssetPreviewController::playingChanged);
+    connect(&m_player, &ClipPreviewPlayer::playingChanged, this, [this] {
+        // Fast-forward ran off the end; a reverse shuttle is paused by design.
+        if (!m_player.isPlaying() && m_shuttleRate > 0)
+            clearShuttle();
+        emit playingChanged();
+    });
+    m_reverseTimer.setTimerType(Qt::PreciseTimer);
+    m_reverseTimer.setInterval(33);
+    connect(&m_reverseTimer, &QTimer::timeout, this, &AssetPreviewController::onReverseTick);
     connect(&m_player, &ClipPreviewPlayer::durationChanged, this,
             &AssetPreviewController::sessionChanged);
 }
@@ -77,6 +85,8 @@ void AssetPreviewController::begin(int index)
 
     m_index = index;
     m_active = true;
+    m_fps = drift::frameGridFps(asset->fps);
+    clearShuttle();
     m_player.setClip(clip, m_app->m_project.sampleRate(), m_app->m_project.fps());
 
     emit sessionChanged();
@@ -115,6 +125,8 @@ void AssetPreviewController::beginClip(int track, int index)
     clip.timelineStart = 0;
     clip.timelineDuration = clip.srcOut;
     clip.rotationCorrection = placed.rotationCorrection;
+    m_fps = drift::frameGridFps(asset ? asset->fps : 0.0);
+    clearShuttle();
     m_player.setClip(clip, m_app->m_project.sampleRate(), m_app->m_project.fps());
 
     emit sessionChanged();
@@ -125,6 +137,9 @@ void AssetPreviewController::end()
     if (!m_active)
         return;
 
+    clearShuttle();
+    m_player.setPreviewRate(1.0);
+    m_player.setGainDb(0.0);
     m_player.clear();
     m_active = false;
     m_index = -1;
@@ -146,11 +161,13 @@ void AssetPreviewController::play()
     if (!m_active)
         return;
     m_app->setPlaying(false);
+    clearShuttle();
     m_player.play();
 }
 
 void AssetPreviewController::pause()
 {
+    clearShuttle();
     m_player.pause();
 }
 
@@ -159,4 +176,121 @@ void AssetPreviewController::seek(double seconds)
     if (!m_active)
         return;
     m_player.seek(drift::secondsToUs(std::max(0.0, seconds)));
+}
+
+int AssetPreviewController::positionFrame() const
+{
+    return drift::frameIndexAt(m_player.positionUs(), m_fps);
+}
+
+double AssetPreviewController::snapToFrame(double seconds) const
+{
+    return drift::usToSeconds(
+        drift::snapToFrameUs(drift::secondsToUs(std::max(0.0, seconds)), m_fps));
+}
+
+void AssetPreviewController::seekFrame(int frame)
+{
+    if (!m_active)
+        return;
+    pause();
+    const int last = drift::lastFrameIndex(m_player.durationUs(), m_fps);
+    m_player.seek(drift::frameTimeUs(std::clamp(frame, 0, last), m_fps));
+}
+
+void AssetPreviewController::stepFrames(int delta)
+{
+    if (!m_active)
+        return;
+    pause();
+    seekFrame(positionFrame() + delta);
+}
+
+void AssetPreviewController::setShuttleRate(int rate)
+{
+    if (m_shuttleRate == rate)
+        return;
+    m_shuttleRate = rate;
+    emit shuttleRateChanged();
+}
+
+void AssetPreviewController::clearShuttle()
+{
+    m_reverseTimer.stop();
+    m_player.setShuttleRate(1.0);
+    setShuttleRate(0);
+}
+
+void AssetPreviewController::shuttle(int rate)
+{
+    if (!m_active || !drift::isShuttleRate(rate))
+        return;
+    if (rate == 0) {
+        pause();
+        return;
+    }
+
+    m_app->setPlaying(false);
+    if (rate > 0) {
+        m_reverseTimer.stop();
+        m_player.setShuttleRate(rate);
+        m_player.play();
+        if (!m_player.isPlaying()) {
+            clearShuttle();
+            return;
+        }
+        setShuttleRate(rate);
+        return;
+    }
+
+    m_player.pause();
+    m_player.setShuttleRate(1.0);
+    setShuttleRate(rate);
+    m_reverseOriginUs = m_player.positionUs();
+    m_reverseElapsed.start();
+    m_reverseTimer.start();
+}
+
+void AssetPreviewController::onReverseTick()
+{
+    // Position from elapsed real time rather than a step per tick, so a slow backward decode
+    // drops frames instead of slowing the shuttle down.
+    const double travelled = static_cast<double>(m_reverseElapsed.nsecsElapsed()) / 1000.0
+                             * -m_shuttleRate;
+    const drift::TimeUs target = m_reverseOriginUs - static_cast<drift::TimeUs>(travelled);
+    if (target <= 0) {
+        m_player.seek(0);
+        clearShuttle();
+        return;
+    }
+    const int last = drift::lastFrameIndex(m_player.durationUs(), m_fps);
+    m_player.seek(drift::frameTimeUs(std::clamp(drift::frameIndexAt(target, m_fps), 0, last), m_fps));
+}
+
+void AssetPreviewController::shuttleForward()
+{
+    // Space-bar playback counts as 1x so L from there goes to 2x.
+    const int current = m_shuttleRate == 0 && m_player.isPlaying() ? 1 : m_shuttleRate;
+    shuttle(drift::shuttleNext(current, true));
+}
+
+void AssetPreviewController::shuttleReverse()
+{
+    const int current = m_shuttleRate == 0 && m_player.isPlaying() ? 1 : m_shuttleRate;
+    shuttle(drift::shuttleNext(current, false));
+}
+
+void AssetPreviewController::shuttleStop()
+{
+    shuttle(0);
+}
+
+void AssetPreviewController::setPreviewRate(double speed)
+{
+    m_player.setPreviewRate(speed);
+}
+
+void AssetPreviewController::setPreviewGain(double db)
+{
+    m_player.setGainDb(db);
 }

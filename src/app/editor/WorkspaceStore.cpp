@@ -33,6 +33,11 @@ const PanelType kPanelTypes[] = {
     {"timeline", QT_TRANSLATE_NOOP("WorkspaceStore", "Timeline")},
     {"audioMixer", QT_TRANSLATE_NOOP("WorkspaceStore", "Audio Mixer")},
     {"sourceViewer", QT_TRANSLATE_NOOP("WorkspaceStore", "Source Viewer")},
+    {"sourceLab.viewer", QT_TRANSLATE_NOOP("WorkspaceStore", "Source Lab Viewer")},
+    {"sourceLab.trim", QT_TRANSLATE_NOOP("WorkspaceStore", "Source Lab Trim")},
+    {"sourceLab.ranges", QT_TRANSLATE_NOOP("WorkspaceStore", "Ranges & Markers")},
+    {"sourceLab.process", QT_TRANSLATE_NOOP("WorkspaceStore", "Process")},
+    {"sourceLab.output", QT_TRANSLATE_NOOP("WorkspaceStore", "Output")},
     {"subtitles", QT_TRANSLATE_NOOP("WorkspaceStore", "Subtitle cues")},
     {"subtitleLane", QT_TRANSLATE_NOOP("WorkspaceStore", "Subtitle lane")},
     {"subtitleText", QT_TRANSLATE_NOOP("WorkspaceStore", "Subtitle text")},
@@ -260,6 +265,7 @@ WorkspaceStore::WorkspaceStore(QObject *parent)
     if (!QSettings().contains(QLatin1String(kListKey)))
         migrateOldFractions();
     loadUser();
+    migrateCutTrim();
     m_activeId = QSettings().value(QLatin1String(kActiveKey), QLatin1String(kDefaultId)).toString();
     fixActive();
 }
@@ -315,6 +321,27 @@ void WorkspaceStore::persist() const
         array.append(QJsonObject::fromVariantMap(v.toMap()));
     QSettings().setValue(QLatin1String(kListKey),
                          QString::fromUtf8(QJsonDocument(array).toJson(QJsonDocument::Compact)));
+}
+
+// cut-trim was renamed to source-lab. Its user overrides would otherwise linger as orphan
+// workspaces, and a saved active id would point at nothing.
+void WorkspaceStore::migrateCutTrim()
+{
+    QSettings settings;
+    const QString flag = QStringLiteral("ui/workspaces/migratedSourceLab");
+    if (settings.value(flag).toBool())
+        return;
+    settings.setValue(flag, true);
+
+    const QString oldId = QStringLiteral("cut-trim");
+    const auto isOld = [&](const QVariant &v) { return v.toMap().value(QStringLiteral("id")).toString() == oldId; };
+    const auto end = std::remove_if(m_user.begin(), m_user.end(), isOld);
+    if (end != m_user.end()) {
+        m_user.erase(end, m_user.end());
+        persist();
+    }
+    if (settings.value(QLatin1String(kActiveKey)).toString() == oldId)
+        settings.setValue(QLatin1String(kActiveKey), QStringLiteral("source-lab"));
 }
 
 void WorkspaceStore::migrateOldFractions()

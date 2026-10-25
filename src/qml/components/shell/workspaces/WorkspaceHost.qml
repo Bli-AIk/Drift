@@ -12,8 +12,8 @@ Item {
 
     property var _content: null
 
-    readonly property var _minWidths: ({ "assets": 200, "properties": 240, "preview": 260 })
-    readonly property var _minHeights: ({ "timeline": 140 })
+    readonly property var _minWidths: ({ "assets": 200, "properties": 240, "preview": 260, "sourceLab.viewer": 260, "sourceLab.process": 240 })
+    readonly property var _minHeights: ({ "timeline": 140, "sourceLab.trim": 140 })
 
     Item {
         id: body

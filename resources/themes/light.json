@@ -2697,6 +2697,47 @@
       "border": "$semantic.primary",
       "borderWidth": "$metrics.borderWidth"
     },
+    "sourceLabCompare": {
+      "divider": "$semantic.onMedia",
+      "labelBackground": "$semantic.scrim",
+      "labelForeground": "$semantic.onMedia",
+      "dividerWidth": 2
+    },
+    "sourceLabStrip": {
+      "background": "$semantic.surface.panel",
+      "border": "$semantic.panel.border",
+      "borderWidth": "$metrics.borderWidth",
+      "radius": "$metrics.radius.sm",
+      "waveform": "$semantic.mutedForeground",
+      "waveformOpacity": 0.85,
+      "windowFill": "$semantic.primary",
+      "windowFillOpacity": 0.18,
+      "windowBorder": "$semantic.primary",
+      "rangeNeutral": "$semantic.mutedForeground",
+      "rangeFavorite": "$semantic.constructive",
+      "rangeReject": "$semantic.destructive",
+      "rangeOpacity": 0.28,
+      "marker": "$semantic.warning",
+      "snapGuide": "$semantic.timeline.snapGuide"
+    },
+    "sourceLabPanel": {
+      "rowHover": "$semantic.popoverHover",
+      "rowSelected": "$semantic.panel.accent",
+      "rowSelectedBorder": "$semantic.primary",
+      "rowRadius": "$metrics.radius.sm",
+      "ratingFavorite": "$semantic.constructive",
+      "ratingReject": "$semantic.destructive",
+      "ratingNeutral": "$semantic.mutedForeground",
+      "marker": "$semantic.warning",
+      "dirtyDot": "$semantic.primary",
+      "cardBackground": "$semantic.panel.muted",
+      "cardBorder": "$semantic.panel.border",
+      "cardBorderWidth": "$metrics.borderWidth",
+      "cardRadius": "$metrics.radius.md",
+      "error": "$semantic.destructive",
+      "success": "$semantic.constructive",
+      "warning": "$semantic.warning"
+    },
     "mediaPreviewWindow": {
       "background": "$semantic.surface.app",
       "stageBackground": "$semantic.overlay",
@@ -3191,6 +3232,10 @@
     },
     "masksTab": {
       "foregroundMuted": "$semantic.mutedForeground"
+    },
+    "mediaAssetsAddedBadge": {
+      "background": "$semantic.scrimStrong",
+      "foreground": "$semantic.onMedia"
     },
     "mediaAssetsDurationBadge": {
       "background": "$semantic.scrimStrong",

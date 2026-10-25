@@ -800,12 +800,47 @@ QList<QString> AssetLibrary::currentEdits() const
     return edits;
 }
 
+QList<QString> AssetLibrary::currentLabState() const
+{
+    if (!m_project)
+        return {};
+
+    QList<QString> state;
+    state.reserve(m_project->assetOrder().size());
+    for (const QString &id : m_project->assetOrder()) {
+        const drift::MediaAsset *asset = m_project->asset(id);
+        if (!asset) {
+            state.append(QString{});
+            continue;
+        }
+        int favorites = 0;
+        for (const drift::SourceRange &range : asset->ranges)
+            favorites += range.rating > 0 ? 1 : 0;
+        state.append(QStringLiteral("%1|%2|%3").arg(asset->rating).arg(asset->ranges.size()).arg(favorites));
+    }
+    return state;
+}
+
+void AssetLibrary::refreshLabRoles()
+{
+    const QList<QString> state = currentLabState();
+    if (state == m_syncedLab)
+        return;
+    for (int i = 0; i < state.size(); ++i) {
+        if (i < m_syncedLab.size() && m_syncedLab.at(i) == state.at(i))
+            continue;
+        emitAssetRowChanged(i, {RatingRole, RangeCountRole, FavoriteRangeCountRole});
+    }
+    m_syncedLab = state;
+}
+
 void AssetLibrary::snapshotAssets()
 {
     m_syncedOrder = m_project ? m_project->assetOrder() : QList<QString>{};
     m_syncedPaths = currentPaths();
     m_syncedFolderIds = currentFolderIds();
     m_syncedEdits = currentEdits();
+    m_syncedLab = currentLabState();
 }
 
 void AssetLibrary::syncToProject()
@@ -821,12 +856,14 @@ void AssetLibrary::syncToProject()
         endResetModel();
         refreshSidecars();
         refreshMissing();
+        m_syncedLab = currentLabState();
         return;
     }
 
     // An undone source replace or folder move leaves the order untouched — same row, same id,
     // different file or folder — so both have to be compared too or the card keeps showing stale
     // data. Only the rows that actually changed are re-read.
+    refreshLabRoles();
     const QList<QString> paths = currentPaths();
     const QList<QString> folderIds = currentFolderIds();
     const QList<QString> edits = currentEdits();
@@ -933,6 +970,13 @@ QVariant AssetLibrary::data(const QModelIndex &index, int role) const
         return asset->filmstripPath;
     case FolderIdRole:
         return asset->folderId;
+    case RatingRole:
+        return asset->rating;
+    case RangeCountRole:
+        return asset->ranges.size();
+    case FavoriteRangeCountRole:
+        return static_cast<int>(std::count_if(asset->ranges.cbegin(), asset->ranges.cend(),
+                                              [](const drift::SourceRange &r) { return r.rating > 0; }));
     default:
         return {};
     }
@@ -950,6 +994,9 @@ QHash<int, QByteArray> AssetLibrary::roleNames() const
         {ThumbnailPathRole, "thumbnailPath"},
         {FilmstripPathRole, "filmstripPath"},
         {FolderIdRole, "folderId"},
+        {RatingRole, "rating"},
+        {RangeCountRole, "rangeCount"},
+        {FavoriteRangeCountRole, "favoriteRangeCount"},
     };
 }
 
@@ -1796,6 +1843,11 @@ QVariantMap AssetLibrary::assetAt(int index) const
         {QStringLiteral("assetIndex"), index},
         {QStringLiteral("folderId"), asset->folderId},
         {QStringLiteral("sequenceId"), asset->sequenceId},
+        {QStringLiteral("rating"), asset->rating},
+        {QStringLiteral("rangeCount"), static_cast<int>(asset->ranges.size())},
+        {QStringLiteral("favoriteRangeCount"),
+         static_cast<int>(std::count_if(asset->ranges.cbegin(), asset->ranges.cend(),
+                                        [](const drift::SourceRange &r) { return r.rating > 0; }))},
     };
 }
 

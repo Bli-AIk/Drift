@@ -536,6 +536,7 @@ add_library(driftcore STATIC
     src/core/effects/EffectPreset.h
     src/core/project/BinFolder.h
     src/core/project/media/MediaAsset.h
+    src/core/project/media/SourceLab.h
     src/core/project/media/MediaAsset.cpp
     src/core/project/media/ImageSequence.h
     src/core/project/media/ImageSequence.cpp
@@ -893,6 +894,8 @@ add_library(driftengine STATIC
     src/engine/face/props/FacePropImport.cpp
     src/engine/ml/speech/DeepFilterDenoiser.h
     src/engine/ml/speech/DeepFilterDenoiser.cpp
+    src/engine/ml/speech/DenoiseAudio.h
+    src/engine/ml/speech/DenoiseAudio.cpp
     src/engine/encode/writers/MatteWriter.h
     src/engine/encode/writers/MatteWriter.cpp
     src/engine/encode/proxies/ProxyNaming.h
@@ -1080,6 +1083,8 @@ qt_add_executable(drift
     src/app/jobs/vision/StabilizeController.cpp
     src/app/bin/MediaBinController.h
     src/app/bin/MediaBinController.cpp
+    src/app/bin/SourceLabController.h
+    src/app/bin/SourceLabController.cpp
     src/app/jobs/audio/TtsController.h
     src/app/jobs/audio/TtsController.cpp
     src/app/jobs/audio/VoiceLibrary.h
@@ -1329,7 +1334,7 @@ qt_add_resources(drift "drift_workspaces"
     FILES
         resources/workspaces/edit.json
         resources/workspaces/edit-portrait.json
-        resources/workspaces/cut-trim.json
+        resources/workspaces/source-lab.json
         resources/workspaces/audio.json
         resources/workspaces/record.json
         resources/workspaces/subtitles.json
@@ -1648,6 +1653,8 @@ qt_add_qml_module(drift
         src/qml/components/assets/MediaAssetsFolderMenu.qml
         src/qml/components/assets/MediaAssetsEmptyState.qml
         src/qml/components/assets/MediaAssetsDurationBadge.qml
+        src/qml/components/assets/MediaAssetsLabBadge.qml
+        src/qml/components/assets/MediaAssetsLabFilterRow.qml
         src/qml/components/assets/MaskPresetCard.qml
         src/qml/components/assets/MarketSectionTab.qml
         src/qml/components/assets/EffectTemplateCard.qml
@@ -1717,6 +1724,33 @@ qt_add_qml_module(drift
         src/qml/components/color/CurveMath.js
         src/qml/components/panels/HistoryPanel.qml
         src/qml/components/panels/SourceViewerPanel.qml
+        src/qml/components/panels/sourcelab/SourceLabViewerPanel.qml
+        src/qml/components/panels/sourcelab/SourceLabTrimPanel.qml
+        src/qml/components/panels/sourcelab/SourceLabRangesPanel.qml
+        src/qml/components/panels/sourcelab/SourceLabProcessPanel.qml
+        src/qml/components/panels/sourcelab/SourceLabOutputPanel.qml
+        src/qml/components/panels/sourcelab/SourceLabTime.js
+        src/qml/components/panels/sourcelab/SourceLabCropOverlay.qml
+        src/qml/components/panels/sourcelab/SourceLabCompareView.qml
+        src/qml/components/panels/sourcelab/SourceLabPaneLabel.qml
+        src/qml/components/panels/sourcelab/SourceLabTimecodeField.qml
+        src/qml/components/panels/sourcelab/SourceLabTransport.qml
+        src/qml/components/panels/sourcelab/SourceLabHandle.qml
+        src/qml/components/panels/sourcelab/SourceLabWaveformLane.qml
+        src/qml/components/panels/sourcelab/SourceLabRangeSpan.qml
+        src/qml/components/panels/sourcelab/SourceLabOverview.qml
+        src/qml/components/panels/sourcelab/SourceLabStrip.qml
+        src/qml/components/panels/sourcelab/SourceLabRangeRow.qml
+        src/qml/components/panels/sourcelab/SourceLabSection.qml
+        src/qml/components/panels/sourcelab/SourceLabSliderRow.qml
+        src/qml/components/panels/sourcelab/SourceLabCropSection.qml
+        src/qml/components/panels/sourcelab/SourceLabSpeedSection.qml
+        src/qml/components/panels/sourcelab/SourceLabAudioSection.qml
+        src/qml/components/panels/sourcelab/SourceLabStabilizeSection.qml
+        src/qml/components/panels/sourcelab/SourceLabEnhanceSection.qml
+        src/qml/components/panels/sourcelab/SourceLabPlanCard.qml
+        src/qml/components/panels/sourcelab/SourceLabProgressCard.qml
+        src/qml/components/panels/sourcelab/SourceLabExportOptions.qml
         src/qml/components/panels/AgentLogPanel.qml
         src/qml/components/timeline/TimelineClipItem.qml
         src/qml/components/timeline/PlayheadInterpolator.qml

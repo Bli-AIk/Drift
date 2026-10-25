@@ -67,6 +67,15 @@ public:
     void pause();
     void seek(drift::TimeUs us);
 
+    // Playback speed of the whole clip, audio pitch-preserved through the retimer. Positions stay
+    // in clip time; only how fast the clock moves through them changes.
+    void setPreviewRate(double rate);
+    // Transport multiplier on top of the preview rate (JKL fast-forward). Audio is muted unless
+    // it is exactly 1, because the retimer is not built for 8x.
+    void setShuttleRate(double rate);
+    // Applied to the preview output only; nothing is written back to the clip.
+    void setGainDb(double db);
+
     // Empty id follows the system default.
     void setAudioDeviceId(const QByteArray &id) { m_audio.setDeviceId(id); }
 
@@ -82,6 +91,7 @@ private:
     void ensureAudioSink();
     void onAudioSinkRebuilt();
     void onPositionTick();
+    void applyClockRate();
     void requestFrame(drift::TimeUs positionUs);
     void onDecoded(const QImage &image, quint64 token);
 
@@ -107,6 +117,9 @@ private:
     QSize m_frameSize;
     drift::TimeUs m_positionUs = 0;
     std::atomic<bool> m_playing = false;
+    std::atomic<double> m_previewRate{1.0};
+    std::atomic<double> m_shuttleRate{1.0};
+    std::atomic<float> m_gain{1.0f};
     // The rate the device negotiated, not necessarily the project's — see PlaybackEngine.
     int m_sampleRate = 48000;
     int m_fps = 30;

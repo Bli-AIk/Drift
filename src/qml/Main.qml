@@ -586,6 +586,14 @@ ApplicationWindow {
     }
 
     Connections {
+        target: workspace.pool
+        function onSourceLabShownChanged() {
+            if (!workspace.pool.sourceLabShown)
+                EditorState.sourceLab.clear()
+        }
+    }
+
+    Connections {
         target: EditorState.segmentation
         function onOpenWindowRequested(track, clip, startSeconds, durationSeconds) {
             segmentationWindowLoader.ensure().openFor(track, clip, startSeconds, durationSeconds, true)
@@ -702,6 +710,10 @@ ApplicationWindow {
     }
 
     function openRestoreAsset(assetId) {
+        if (workspace.pool.sourceLabShown) {
+            EditorState.sourceLab.load(assetId)
+            return
+        }
         const w = restoreWindowLoader.ensure()
         w.host = window
         w.openForAsset(assetId)
@@ -722,6 +734,10 @@ ApplicationWindow {
     readonly property bool mediaPreviewWindowOpen: mediaPreviewWindowLoader.shown
 
     function openMediaPreview(assetIndex) {
+        if (workspace.pool.sourceLabShown) {
+            EditorState.sourceLab.load(AssetLibrary.assetIdAt(assetIndex))
+            return
+        }
         // A VideoOutput in a secondary window paints black on Android, so use the in-window page.
         if (Qt.platform.os === "android") {
             if (window.mediaPreviewPage)
@@ -740,6 +756,10 @@ ApplicationWindow {
     }
 
     function openCrop(track, clip) {
+        if (workspace.pool.sourceLabShown) {
+            EditorState.sourceLab.load(EditorState.clipAt(track, clip).assetId ?? "")
+            return
+        }
         // Same reason as openMediaPreview: the secondary window paints black on Android.
         if (Qt.platform.os === "android") {
             if (window.mediaPreviewPage)
@@ -1309,6 +1329,10 @@ ApplicationWindow {
         if (ShellBridge.keyframesActionHandler && ShellBridge.keyframesActionHandler.handleAction(id))
             return
         if (ShellBridge.subtitleActionHandler && ShellBridge.subtitleActionHandler.handleAction(id))
+            return
+        if (ShellBridge.sourceLabActionHandler && ShellBridge.sourceLabActionHandler.handleAction(id))
+            return
+        if (ShellBridge.sourceLabRangesHandler && ShellBridge.sourceLabRangesHandler.handleAction(id))
             return
         if (id === "workspace.restoreWindows") {
             window.restoreWindows()
