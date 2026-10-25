@@ -2960,6 +2960,10 @@
         <translation>تم تغيير القناع</translation>
     </message>
     <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Start updated</source>
         <translation>تم تحديث البداية</translation>
     </message>
@@ -13969,12 +13973,12 @@ If playback stutters, try another.</source>
         <translation>الإطار المفتاحي التالي</translation>
     </message>
     <message>
-        <source>Edit %1</source>
-        <translation>تعديل %1</translation>
+        <source>Drag to adjust, click to type an exact %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click to type an exact %1</source>
-        <translation>انقر لكتابة %1 بدقة</translation>
+        <source>Edit %1</source>
+        <translation>تعديل %1</translation>
     </message>
 </context>
 <context>
@@ -19658,6 +19662,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Enter a number</source>
         <translation>أدخل رقمًا</translation>
+    </message>
+    <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

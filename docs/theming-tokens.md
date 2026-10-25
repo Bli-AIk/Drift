@@ -1592,11 +1592,7 @@ Values are the document text. `$palette` and `$semantic` references are unresolv
 | propertyKeyframeRow | backgroundHover | $semantic.panel.accent | $semantic.panel.accent |
 | propertyKeyframeRow | foreground | $semantic.panel.foreground | $semantic.panel.foreground |
 | propertyKeyframeRow | foregroundMuted | $semantic.mutedForeground | $semantic.mutedForeground |
-| propertyKeyframeRow | popupBackground | $semantic.surface.panel | $semantic.surface.panel |
-| propertyKeyframeRow | popupBorder | $semantic.panel.border | $semantic.panel.border |
-| propertyKeyframeRow | popupBorderWidth | $metrics.borderWidth | $metrics.borderWidth |
 | propertyKeyframeRow | radius | $metrics.radius.sm | $metrics.radius.sm |
-| propertyKeyframeRow | radiusPopup | $metrics.radius.md | $metrics.radius.md |
 | shadingLayerHeader | background | $semantic.panel.accent | $semantic.panel.accent |
 | shadingLayerHeader | foreground | $semantic.panel.foreground | $semantic.panel.foreground |
 | shadingLayerHeader | foregroundDisabled | $semantic.mutedForeground | $semantic.mutedForeground |

@@ -3077,6 +3077,10 @@
         <translation>Zmieniono maskę</translation>
     </message>
     <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Start updated</source>
         <translation>Zaktualizowano początek</translation>
     </message>
@@ -13798,12 +13802,12 @@ Jeśli odtwarzanie się zacina, spróbuj innego.</translation>
         <translation>Następna klatka kluczowa</translation>
     </message>
     <message>
-        <source>Edit %1</source>
-        <translation>Edytuj %1</translation>
+        <source>Drag to adjust, click to type an exact %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click to type an exact %1</source>
-        <translation>Kliknij, aby wpisać dokładne %1</translation>
+        <source>Edit %1</source>
+        <translation>Edytuj %1</translation>
     </message>
 </context>
 <context>
@@ -19460,6 +19464,10 @@ Jeśli odtwarzanie się zacina, spróbuj innego.</translation>
     <message>
         <source>Enter a number</source>
         <translation>Wpisz liczbę</translation>
+    </message>
+    <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

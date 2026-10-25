@@ -3067,6 +3067,10 @@
         <translation>マスクを変更しました</translation>
     </message>
     <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Start updated</source>
         <translation>開始位置を更新しました</translation>
     </message>
@@ -13684,12 +13688,12 @@ If playback stutters, try another.</source>
         <translation>次のキーフレーム</translation>
     </message>
     <message>
-        <source>Edit %1</source>
-        <translation>%1 を編集</translation>
+        <source>Drag to adjust, click to type an exact %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click to type an exact %1</source>
-        <translation>クリックして正確な %1 を入力</translation>
+        <source>Edit %1</source>
+        <translation>%1 を編集</translation>
     </message>
 </context>
 <context>
@@ -19328,6 +19332,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Enter a number</source>
         <translation>数値を入力</translation>
+    </message>
+    <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -772,6 +772,10 @@ public:
     Q_INVOKABLE void previewSetClipFade(int trackIndex, int clipIndex, double fadeInSeconds, double fadeOutSeconds);
     Q_INVOKABLE void commitPreviewDrag();
     Q_INVOKABLE void cancelPreviewDrag();
+    // Folds every committed edit between the two calls into one undo step, for controls that
+    // write through plain setters (a scrubbed number field). Nothing is pushed if nothing changed.
+    Q_INVOKABLE void beginEditGroup();
+    Q_INVOKABLE void endEditGroup(const QString &undoText);
     Q_INVOKABLE void applyCanvasCrop(double x, double y, double width, double height);
     Q_INVOKABLE bool timelineHasVisualClips() const;
     Q_INVOKABLE bool shouldConfigureProjectForAsset(int assetIndex) const;
@@ -2177,6 +2181,7 @@ protected:
     // Begun by a setter rather than a press (keyboard nudges); commits once the nudges stop.
     bool m_previewDragAuto = false;
     QTimer *m_previewAutoCommit = nullptr;
+    int m_editGroupRevision = -1;
     // Set while an edit pushes its own undo step: the undo stack's handler then leaves the
     // timeline and selection refresh owed (m_undoRefreshOwed) for finishEdit to send, instead of
     // sending it twice.

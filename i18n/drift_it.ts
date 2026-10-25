@@ -3072,6 +3072,10 @@
         <translation>Maschera modificata</translation>
     </message>
     <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Start updated</source>
         <translation>Inizio aggiornato</translation>
     </message>
@@ -13741,12 +13745,12 @@ Se la riproduzione va a scatti, prova un&apos;altra opzione.</translation>
         <translation>Fotogramma chiave successivo</translation>
     </message>
     <message>
-        <source>Edit %1</source>
-        <translation>Modifica %1</translation>
+        <source>Drag to adjust, click to type an exact %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click to type an exact %1</source>
-        <translation>Fai clic per digitare un valore esatto per %1</translation>
+        <source>Edit %1</source>
+        <translation>Modifica %1</translation>
     </message>
 </context>
 <context>
@@ -19394,6 +19398,10 @@ Se la riproduzione va a scatti, prova un&apos;altra opzione.</translation>
     <message>
         <source>Enter a number</source>
         <translation>Inserisci un numero</translation>
+    </message>
+    <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

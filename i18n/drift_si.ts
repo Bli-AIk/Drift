@@ -3072,6 +3072,10 @@
         <translation>ආවරණය (Mask) වෙනස් විය</translation>
     </message>
     <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Start updated</source>
         <translation>ආරම්භය යාවත්කාලීන විය</translation>
     </message>
@@ -13741,12 +13745,12 @@ If playback stutters, try another.</source>
         <translation>මීළඟ කීෆ්‍රේමය</translation>
     </message>
     <message>
-        <source>Edit %1</source>
-        <translation>%1 සංස්කරණය කරන්න</translation>
+        <source>Drag to adjust, click to type an exact %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click to type an exact %1</source>
-        <translation>නිශ්චිත %1ක් ඇතුළත් කිරීමට ක්ලික් කරන්න</translation>
+        <source>Edit %1</source>
+        <translation>%1 සංස්කරණය කරන්න</translation>
     </message>
 </context>
 <context>
@@ -19394,6 +19398,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Enter a number</source>
         <translation>සංඛ්‍යාවක් ඇතුළත් කරන්න</translation>
+    </message>
+    <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -3067,6 +3067,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Start updated</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13678,11 +13682,11 @@ If playback stutters, try another.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Edit %1</source>
+        <source>Drag to adjust, click to type an exact %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click to type an exact %1</source>
+        <source>Edit %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -19319,6 +19323,10 @@ If playback stutters, try another.</source>
     </message>
     <message>
         <source>Enter a number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit value</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

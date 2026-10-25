@@ -1869,6 +1869,7 @@ qt_add_qml_module(drift
         src/qml/components/controls/ThemedSlider.qml
         src/qml/components/controls/ThemedTextField.qml
         src/qml/components/controls/ThemedNumberField.qml
+        src/qml/components/controls/ScrubArea.qml
         src/qml/components/controls/ThemedTextArea.qml
         src/qml/components/SubtitleEditor.qml
         src/qml/components/controls/ThemedComboBox.qml

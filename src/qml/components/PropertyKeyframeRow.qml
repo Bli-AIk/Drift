@@ -160,6 +160,58 @@ Column {
         return best
     }
 
+    // Value per pixel of scrub and per arrow/wheel nudge. A continuous slider crosses its range
+    // in about 200 px; a typed field moves by its last displayed digit.
+    readonly property real scrubStep: {
+        const precision = percent ? 0.01 : Math.pow(10, -propDef.decimals)
+        if (!useSlider)
+            return precision
+        return sliderStep > 0 ? sliderStep : Math.max(precision, (sliderTo - sliderFrom) / 200)
+    }
+    readonly property bool scrubLocked: EditorState.playing
+                                        && (!editableWhilePlaying || animated || EditorState.autoKeyEnabled)
+    property real scrubStart: 0
+
+    function limitValue(v) {
+        if (useSlider) {
+            v = Math.max(sliderFrom, Math.min(sliderTo, v))
+            if (sliderStep > 0)
+                v = sliderFrom + Math.round((v - sliderFrom) / sliderStep) * sliderStep
+        }
+        return Number(v.toFixed(percent ? 2 : propDef.decimals))
+    }
+
+    function beginScrub() {
+        editing = true
+        liveValue = currentValue
+        scrubStart = currentValue
+        EditorState.showKeyframeGraphProperty(propDef.key)
+        EditorState.beginPreviewDrag(qsTr("Edit %1").arg(propDef.label))
+    }
+
+    function scrubTo(steps) {
+        liveValue = limitValue(scrubStart + steps * scrubStep)
+        if (!useSlider)
+            valueField.text = formatValue(liveValue)
+        EditorState.previewSetClipKeyframe(EditorState.selectedTrack, EditorState.selectedClip,
+                                           propDef.key, EditorState.playheadSeconds, liveValue)
+    }
+
+    function endScrub() {
+        EditorState.commitPreviewDrag()
+        editing = false
+        syncEditors()
+    }
+
+    // Arrow keys and the wheel while a field is focused: step from what is typed and commit.
+    function nudge(field, steps) {
+        const typed = parseInput(field.text)
+        const v = limitValue((isNaN(typed) ? currentValue : typed) + steps * scrubStep)
+        liveValue = v
+        field.text = formatValue(v)
+        commitValue(v)
+    }
+
     function commitValue(v) {
         if (isNaN(v))
             return
@@ -495,6 +547,22 @@ Column {
                     if (!isNaN(v))
                         root.liveValue = v
                 }
+                Keys.onUpPressed: event => root.nudge(valueField, event.modifiers & Qt.ShiftModifier ? 10 : 1)
+                Keys.onDownPressed: event => root.nudge(valueField, event.modifiers & Qt.ShiftModifier ? -10 : -1)
+
+                ScrubArea {
+                    anchors.fill: parent
+                    enabled: !root.scrubLocked
+                    editing: valueField.activeFocus
+                    onScrubStarted: root.beginScrub()
+                    onScrubbed: steps => root.scrubTo(steps)
+                    onScrubFinished: root.endScrub()
+                    onActivated: {
+                        valueField.forceActiveFocus()
+                        valueField.selectAll()
+                    }
+                    onWheelStepped: steps => root.nudge(valueField, steps)
+                }
             }
 
             Text {
@@ -527,9 +595,10 @@ Column {
                 stepSize: root.sliderStep
                 // Keep the playhead/model binding off while pressed — same as
                 // PreviewPanel scrub — so preview ticks cannot fight the drag.
+                // displayedValue, so a scrub on the readout moves the thumb along with it.
                 Binding on value {
-                    when: !valueSlider.pressed && !root.editing
-                    value: root.currentValue
+                    when: !valueSlider.pressed
+                    value: root.displayedValue
                 }
                 onMoved: {
                     root.liveValue = value
@@ -553,8 +622,9 @@ Column {
                 }
             }
 
-            // The readout doubles as a button: a slider cannot land on an exact
-            // value, so clicking it opens a small editor to type one.
+            // The readout scrubs like a number field: drag to adjust, click to type an exact
+            // value in place (a slider cannot land on one). Enter or clicking away commits,
+            // Escape discards.
             Item {
                 id: readoutBox
                 // The dB readout's width swings with the value ("0.0 dB (100%)" vs "-∞ dB
@@ -565,10 +635,31 @@ Column {
                 height: Theme.controlHeightSm
                 anchors.verticalCenter: parent.verticalCenter
 
+                property bool typing: false
+
+                function startTyping() {
+                    editField.text = root.formatValue(root.currentValue)
+                    typing = true
+                    editField.forceActiveFocus()
+                    editField.selectAll()
+                }
+
+                function finishTyping(apply) {
+                    if (!typing)
+                        return
+                    typing = false
+                    if (apply) {
+                        const v = root.parseInput(editField.text)
+                        if (!isNaN(v))
+                            root.commitValue(root.limitValue(v))
+                    }
+                }
+
                 Rectangle {
                     anchors.fill: parent
+                    visible: !readoutBox.typing
                     radius: Theme.c.propertyKeyframeRow.radius
-                    color: readoutArea.containsMouse || valuePopup.opened
+                    color: readoutArea.containsMouse || readoutArea.scrubbing
                            ? Theme.c.propertyKeyframeRow.backgroundHover : "transparent"
 
                     Behavior on color {
@@ -581,6 +672,7 @@ Column {
                     anchors.right: parent.right
                     anchors.rightMargin: Theme.spacingMd
                     anchors.verticalCenter: parent.verticalCenter
+                    visible: !readoutBox.typing
                     horizontalAlignment: Text.AlignRight
                     text: root.sliderReadout(root.displayedValue)
                     color: Theme.c.propertyKeyframeRow.foreground
@@ -588,147 +680,41 @@ Column {
                     font.pixelSize: Theme.fontSizeSm
                 }
 
-                MouseArea {
+                ThemedTextField {
+                    id: editField
+                    anchors.fill: parent
+                    visible: readoutBox.typing
+                    implicitHeight: Theme.controlHeightSm
+                    topPadding: 0
+                    bottomPadding: 0
+                    leftPadding: Theme.spacingMd
+                    rightPadding: Theme.spacingMd
+                    horizontalAlignment: TextInput.AlignRight
+                    verticalAlignment: TextInput.AlignVCenter
+                    onAccepted: readoutBox.finishTyping(true)
+                    onActiveFocusChanged: if (!activeFocus)
+                        readoutBox.finishTyping(true)
+                    Keys.onEscapePressed: readoutBox.finishTyping(false)
+                    Keys.onUpPressed: event => root.nudge(editField, event.modifiers & Qt.ShiftModifier ? 10 : 1)
+                    Keys.onDownPressed: event => root.nudge(editField, event.modifiers & Qt.ShiftModifier ? -10 : -1)
+                }
+
+                ScrubArea {
                     id: readoutArea
                     anchors.fill: parent
                     hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: valuePopup.openEditor()
-                    onWheel: (wheel) => { wheel.accepted = false }
+                    enabled: valueSlider.enabled
+                    editing: readoutBox.typing
+                    onScrubStarted: root.beginScrub()
+                    onScrubbed: steps => root.scrubTo(steps)
+                    onScrubFinished: root.endScrub()
+                    onActivated: readoutBox.startTyping()
+                    onWheelStepped: steps => root.nudge(editField, steps)
                 }
 
                 ThemedToolTip {
-                    text: qsTr("Click to type an exact %1").arg(root.propDef.label.toLowerCase())
-                    visible: readoutArea.containsMouse && !valuePopup.opened
-                }
-
-                Popup {
-                    id: valuePopup
-
-                    // Right-aligned under the readout, which keeps it inside the
-                    // inspector panel however narrow the panel is docked.
-                    x: readoutBox.width - width
-                    y: readoutBox.height + Theme.spacingXs
-                    width: 172
-                    padding: Theme.spacingLg
-                    modal: false
-                    dim: false
-                    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
-                    // Escape and clicking away discard; only Enter writes a key.
-                    function openEditor() {
-                        editField.text = root.formatValue(root.currentValue)
-                        open()
-                        editField.forceActiveFocus()
-                        editField.selectAll()
-                    }
-
-                    function apply() {
-                        const v = root.parseInput(editField.text)
-                        if (!isNaN(v))
-                            root.commitValue(Math.max(root.sliderFrom,
-                                                      Math.min(root.sliderTo, v)))
-                        close()
-                    }
-
-                    background: Rectangle {
-                        color: Theme.c.propertyKeyframeRow.popupBackground
-                        border.width: Theme.c.propertyKeyframeRow.popupBorderWidth
-                        border.color: Theme.c.propertyKeyframeRow.popupBorder
-                        radius: Theme.c.propertyKeyframeRow.radiusPopup
-                    }
-
-                    // Opacity plus scale, matching ThemedContextMenu.
-                    enter: Transition {
-                        ParallelAnimation {
-                            NumberAnimation {
-                                property: "opacity"
-                                from: 0.0
-                                to: 1.0
-                                duration: Theme.durationBase
-                                easing.type: Theme.easing
-                            }
-                            NumberAnimation {
-                                property: "scale"
-                                from: 0.96
-                                to: 1.0
-                                duration: Theme.durationBase
-                                easing.type: Theme.easing
-                            }
-                        }
-                    }
-
-                    exit: Transition {
-                        ParallelAnimation {
-                            NumberAnimation {
-                                property: "opacity"
-                                from: 1.0
-                                to: 0.0
-                                duration: Theme.durationFast
-                                easing.type: Theme.easing
-                            }
-                            NumberAnimation {
-                                property: "scale"
-                                from: 1.0
-                                to: 0.96
-                                duration: Theme.durationFast
-                                easing.type: Theme.easing
-                            }
-                        }
-                    }
-
-                    contentItem: Column {
-                        spacing: Theme.spacingSm
-
-                        Row {
-                            width: parent.width
-
-                            Text {
-                                width: parent.width / 2
-                                text: root.propDef.label
-                                color: Theme.c.propertyKeyframeRow.foreground
-                                font.family: Theme.fontFamily
-                                font.pixelSize: Theme.fontSizeXs
-                                font.weight: Font.Medium
-                                elide: Text.ElideRight
-                            }
-
-                            Text {
-                                width: parent.width / 2
-                                horizontalAlignment: Text.AlignRight
-                                text: root.displayReadout(root.sliderFrom) + "–"
-                                      + root.displayReadout(root.sliderTo)
-                                color: Theme.c.propertyKeyframeRow.foregroundMuted
-                                font.family: Theme.monoFontFamily
-                                font.pixelSize: Theme.fontSizeTiny
-                            }
-                        }
-
-                        Item {
-                            width: parent.width
-                            height: editField.height
-
-                            ThemedTextField {
-                                id: editField
-                                width: parent.width
-                                verticalAlignment: TextInput.AlignVCenter
-                                rightPadding: root.unit.length > 0 || root.percent
-                                              ? Theme.spacingLg + 14 : Theme.spacingLg
-                                onAccepted: valuePopup.apply()
-                            }
-
-                            Text {
-                                anchors.right: parent.right
-                                anchors.rightMargin: Theme.spacingLg
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: root.unit.length > 0 || root.percent
-                                text: root.percent ? "%" : root.unit
-                                color: Theme.c.propertyKeyframeRow.foregroundMuted
-                                font.family: Theme.fontFamily
-                                font.pixelSize: Theme.fontSizeXs
-                            }
-                        }
-                    }
+                    text: qsTr("Drag to adjust, click to type an exact %1").arg(root.propDef.label.toLowerCase())
+                    visible: readoutArea.containsMouse && !readoutBox.typing && !readoutArea.scrubbing
                 }
             }
         }

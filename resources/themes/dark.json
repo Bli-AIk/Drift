@@ -2208,11 +2208,7 @@
       "backgroundHover": "$semantic.panel.accent",
       "foreground": "$semantic.panel.foreground",
       "foregroundMuted": "$semantic.mutedForeground",
-      "popupBackground": "$semantic.surface.panel",
-      "popupBorder": "$semantic.panel.border",
-      "popupBorderWidth": "$metrics.borderWidth",
-      "radius": "$metrics.radius.sm",
-      "radiusPopup": "$metrics.radius.md"
+      "radius": "$metrics.radius.sm"
     },
     "shadingLayerHeader": {
       "background": "$semantic.panel.accent",

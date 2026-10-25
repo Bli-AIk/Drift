@@ -3067,6 +3067,10 @@
         <translation>마스크가 변경됨</translation>
     </message>
     <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Start updated</source>
         <translation>시작 위치가 업데이트됨</translation>
     </message>
@@ -13678,12 +13682,12 @@ If playback stutters, try another.</source>
         <translation>다음 키프레임</translation>
     </message>
     <message>
-        <source>Edit %1</source>
-        <translation>%1 편집</translation>
+        <source>Drag to adjust, click to type an exact %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click to type an exact %1</source>
-        <translation>클릭하여 정확한 %1 입력</translation>
+        <source>Edit %1</source>
+        <translation>%1 편집</translation>
     </message>
 </context>
 <context>
@@ -19320,6 +19324,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Enter a number</source>
         <translation>숫자를 입력하세요</translation>
+    </message>
+    <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

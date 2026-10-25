@@ -11672,6 +11672,23 @@ void AppController::commitPreviewDrag()
     finishEdit(text);
 }
 
+void AppController::beginEditGroup()
+{
+    if (m_editGroupRevision >= 0)
+        return;
+    m_editGroupRevision = m_mcpController->revision();
+    m_mcpController->beginBatch();
+}
+
+void AppController::endEditGroup(const QString &undoText)
+{
+    if (m_editGroupRevision < 0)
+        return;
+    const bool changed = m_mcpController->revision() != m_editGroupRevision;
+    m_editGroupRevision = -1;
+    m_mcpController->endBatch(undoText.isEmpty() ? tr("Edit value") : undoText, changed);
+}
+
 void AppController::cancelPreviewDrag()
 {
     if (!m_previewDragActive)

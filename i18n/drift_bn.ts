@@ -3072,6 +3072,10 @@
         <translation type="unfinished">মাস্ক পরিবর্তন করা হয়েছে</translation>
     </message>
     <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Start updated</source>
         <translation type="unfinished">আপডেট করা শুরু করুন</translation>
     </message>
@@ -13741,12 +13745,12 @@ If playback stutters, try another.</source>
         <translation type="unfinished">পরবর্তী কীফ্রেম</translation>
     </message>
     <message>
-        <source>Edit %1</source>
-        <translation type="unfinished">সম্পাদনা %1</translation>
+        <source>Drag to adjust, click to type an exact %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click to type an exact %1</source>
-        <translation type="unfinished">সঠিক %1 টাইপ করতে ক্লিক করুন</translation>
+        <source>Edit %1</source>
+        <translation type="unfinished">সম্পাদনা %1</translation>
     </message>
 </context>
 <context>
@@ -19394,6 +19398,10 @@ If playback stutters, try another.</source>
     <message>
         <source>Enter a number</source>
         <translation type="unfinished">একটি নম্বর লিখুন</translation>
+    </message>
+    <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -3067,6 +3067,10 @@
         <translation>Mặt nạ đã thay đổi</translation>
     </message>
     <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Start updated</source>
         <translation>Đã cập nhật điểm đầu</translation>
     </message>
@@ -13684,12 +13688,12 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
         <translation>Keyframe kế tiếp</translation>
     </message>
     <message>
-        <source>Edit %1</source>
-        <translation>Chỉnh sửa %1</translation>
+        <source>Drag to adjust, click to type an exact %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click to type an exact %1</source>
-        <translation>Nhấp để gõ chính xác %1</translation>
+        <source>Edit %1</source>
+        <translation>Chỉnh sửa %1</translation>
     </message>
 </context>
 <context>
@@ -19328,6 +19332,10 @@ Nếu phát lại bị giật, hãy thử cách khác.</translation>
     <message>
         <source>Enter a number</source>
         <translation>Nhập một số</translation>
+    </message>
+    <message>
+        <source>Edit value</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

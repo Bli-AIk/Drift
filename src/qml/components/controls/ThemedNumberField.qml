@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Controls.Basic
 import Drift
 
-// Numeric inspector field: arrow up/down nudges the value; commits on focus loss
-// or Enter. Avoid binding `text` to the model — set `value` from refresh logic
+// Numeric inspector field: drag sideways to scrub, click to type; arrow up/down
+// and the wheel nudge while focused. Commits on focus loss or Enter. Avoid binding `text` to the model — set `value` from refresh logic
 // while the field is not focused.
 //
 // Out-of-range and unparseable input used to be corrected silently, so a user's
@@ -69,6 +69,36 @@ ThemedTextField {
             return
         }
         applyValue(v)
+    }
+
+    // Scrubs clamp quietly: flashing the range hint on every move past the end is noise.
+    property real _scrubStart: 0
+
+    function _scrubTo(v) {
+        let next = clamp(v)
+        next = decimals > 0 ? Number(next.toFixed(decimals)) : Math.round(next)
+        if (Math.abs(next - value) < 1e-9)
+            return
+        value = next
+        text = format(next)
+        edited(next)
+    }
+
+    ScrubArea {
+        anchors.fill: parent
+        enabled: !root.readOnly
+        editing: root.activeFocus
+        onScrubStarted: {
+            root._scrubStart = root.value
+            EditorState.beginEditGroup()
+        }
+        onScrubbed: steps => root._scrubTo(root._scrubStart + steps * root.step)
+        onScrubFinished: EditorState.endEditGroup(qsTr("Edit value"))
+        onActivated: {
+            root.forceActiveFocus()
+            root.selectAll()
+        }
+        onWheelStepped: steps => root.applyValue(root.value + steps * root.step)
     }
 
     // --- Correction feedback ---------------------------------------------------
