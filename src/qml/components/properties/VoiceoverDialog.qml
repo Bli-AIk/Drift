@@ -37,13 +37,30 @@ ThemedDialog {
         width: parent ? parent.width : 360
 
         ThemedLabel {
+            text: qsTr("Engine")
+        }
+
+        // The remote backend needs no downloaded model and speaks Chinese natively;
+        // the local one is only usable once the speech model addon is installed.
+        ThemedComboBox {
+            id: engineBox
+            width: parent.width
+            enabled: !EditorState.tts.running
+            model: [qsTr("Local voice model (Chatterbox)"), qsTr("manbo (online)")]
+            Component.onCompleted:
+                currentIndex = EditorState.tts.backend === "manbo" ? 1 : 0
+            onActivated: EditorState.tts.backend =
+                         currentIndex === 1 ? "manbo" : "chatterbox"
+        }
+
+        ThemedLabel {
             text: qsTr("Voice")
         }
 
         ThemedComboBox {
             id: voiceBox
             width: parent.width
-            enabled: !EditorState.tts.running
+            enabled: !EditorState.tts.running && EditorState.tts.backend !== "manbo"
             model: EditorState.voices
             textRole: "name"
             valueRole: "id"
@@ -56,7 +73,7 @@ ThemedDialog {
         ThemedComboBox {
             id: langBox
             width: parent.width
-            enabled: !EditorState.tts.running
+            enabled: !EditorState.tts.running && EditorState.tts.backend !== "manbo"
             textRole: "label"
             valueRole: "code"
             model: EditorState.tts.languageOptions()

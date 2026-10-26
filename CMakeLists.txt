@@ -1089,6 +1089,8 @@ qt_add_executable(drift
     src/app/bin/SourceLabController.cpp
     src/app/jobs/audio/TtsController.h
     src/app/jobs/audio/TtsController.cpp
+    src/app/jobs/audio/ManboTts.h
+    src/app/jobs/audio/ManboTts.cpp
     src/app/jobs/audio/VoiceLibrary.h
     src/app/jobs/audio/VoiceLibrary.cpp
     src/app/mcp/McpDetail.h

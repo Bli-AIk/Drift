@@ -112,9 +112,28 @@ ComboBox {
     }
 
     popup: Popup {
-        y: root.height + Theme.spacingXs
+        // A phone screen is short and a combo box near the bottom used to open a
+        // 240px list straight off the edge, where the only visible rows were the
+        // ones under the finger. Measure the window, shrink to what actually fits,
+        // and open upwards when there is more room above.
+        readonly property real controlTop: root.mapToItem(null, 0, 0).y
+        readonly property real windowHeight: root.Window.height
+        readonly property real spaceBelow: windowHeight - (controlTop + root.height) - Theme.spacingXs
+        readonly property real spaceAbove: controlTop - Theme.spacingXs
+        readonly property bool flipUp: spaceBelow < Math.min(240, contentItem.implicitHeight + 2)
+                                       && spaceAbove > spaceBelow
+        readonly property real maxHeight: {
+            const wanted = Math.min(240, contentItem.implicitHeight + 2)
+            const room = flipUp ? spaceAbove : spaceBelow
+            // Content height is zero until the popup has laid out once; keep the
+            // floor low enough that a two-row list does not open as an empty slab.
+            if (wanted <= 2)
+                return Math.max(96, Math.min(240, room))
+            return Math.max(48, Math.min(wanted, room))
+        }
+        y: flipUp ? -maxHeight - Theme.spacingXs : root.height + Theme.spacingXs
         width: root.width
-        implicitHeight: Math.min(240, contentItem.implicitHeight + 2)
+        implicitHeight: maxHeight
         padding: 1
 
         contentItem: ListView {

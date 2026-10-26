@@ -3,6 +3,7 @@
 #include "app/editor/AppController.h"
 #include "app/jobs/JobRegistry.h"
 #include "app/jobs/audio/VoiceLibrary.h"
+#include "app/jobs/audio/ManboTts.h"
 #include "engine/addons/AddonRegistry.h"
 #include "engine/encode/writers/AudioFileWriter.h"
 #include "engine/ml/runtime/OrtRuntime.h"
@@ -34,11 +35,12 @@ QString slugFor(const QString &text)
     return slug.isEmpty() ? QStringLiteral("speech") : slug;
 }
 
-QString speechPath(const QString &text)
+QString speechPath(const QString &text, const QString &engine, const QString &suffix)
 {
     return QDir(drift::generatedAudioDir())
-        .filePath(QStringLiteral("tts-chatterbox-%1-%2.flac")
-                      .arg(slugFor(text), QUuid::createUuid().toString(QUuid::Id128).left(8)));
+        .filePath(QStringLiteral("tts-%1-%2-%3.%4")
+                      .arg(engine, slugFor(text),
+                           QUuid::createUuid().toString(QUuid::Id128).left(8), suffix));
 }
 
 QString jobError(const QJsonObject &job)
@@ -69,9 +71,30 @@ TtsController::TtsController(AppController *app, QObject *parent)
     refreshAvailability();
 }
 
+QString TtsController::backend() const
+{
+    const QString stored = QSettings().value(QStringLiteral("tts/backend"), QStringLiteral("chatterbox")).toString();
+    return stored == QLatin1String("manbo") ? QStringLiteral("manbo") : QStringLiteral("chatterbox");
+}
+
+void TtsController::setBackend(const QString &name)
+{
+    const QString next = name == QLatin1String("manbo") ? QStringLiteral("manbo")
+                                                        : QStringLiteral("chatterbox");
+    if (next == backend())
+        return;
+    QSettings().setValue(QStringLiteral("tts/backend"), next);
+    // The remote backend needs no model on disk, so switching frees the app from
+    // requiring a downloaded speech model just to say a line out loud.
+    refreshAvailability();
+    emit backendChanged();
+}
+
 void TtsController::refreshAvailability()
 {
-    const bool now = !drift::resolveChatterboxModelDir().isEmpty() && drift::ort::available();
+    const bool manbo = backend() == QLatin1String("manbo");
+    const bool now = manbo
+        || (!drift::resolveChatterboxModelDir().isEmpty() && drift::ort::available());
     if (now == m_available)
         return;
     m_available = now;
@@ -208,9 +231,12 @@ QString TtsController::generate(const QString &text, const QString &voiceId, con
         return {};
     }
     remember(voiceId, lang, exaggeration);
-    const QString path = speechPath(script);
-    const QString voiceName = m_voices->nameFor(voiceId);
-    const QJsonObject generator{{QStringLiteral("engine"), QStringLiteral("chatterbox")},
+    const bool manbo = backend() == QLatin1String("manbo");
+    const QString engineName = manbo ? QStringLiteral("manbo") : QStringLiteral("chatterbox");
+    const QString path = speechPath(script, engineName,
+                                    manbo ? QStringLiteral("mp3") : QStringLiteral("flac"));
+    const QString voiceName = manbo ? QStringLiteral("manbo") : m_voices->nameFor(voiceId);
+    const QJsonObject generator{{QStringLiteral("engine"), engineName},
                                 {QStringLiteral("voice"), voiceName},
                                 {QStringLiteral("lang"), lang},
                                 {QStringLiteral("exaggeration"), exaggeration},
@@ -222,8 +248,23 @@ QString TtsController::generate(const QString &text, const QString &voiceId, con
     setStatus(tr("Queued"));
     const QPointer<TtsController> self(this);
     m_jobId = m_app->m_jobs->start(
-        QStringLiteral("tts"), QStringLiteral("chatterbox"), JobRegistry::Lane::Model,
-        [this, script, voiceId, lang, exaggeration, path](JobContext &ctx) {
+        QStringLiteral("tts"), engineName,
+        manbo ? JobRegistry::Lane::Network : JobRegistry::Lane::Model,
+        [this, script, voiceId, lang, exaggeration, path, manbo](JobContext &ctx) {
+            if (manbo) {
+                // Remote backend: no model to load and no conditioning step.
+                drift::ManboTts client;
+                const auto result = client.synthesize(
+                    script, path,
+                    [&ctx](double p) {
+                        ctx.progress(0.05 + 0.9 * p, QStringLiteral("Generating speech…"));
+                        return !ctx.cancelled();
+                    });
+                if (result.path.isEmpty())
+                    return ctx.fail(QStringLiteral("internal"), result.error);
+                ctx.succeed({});
+                return;
+            }
             QString err;
             ctx.progress(0.0, QStringLiteral("Loading voice model…"));
             if (!ensureLoaded(&err))
@@ -296,19 +337,22 @@ QString TtsController::voiceoverFromSubtitles(int trackIndex, int clipIndex, con
     }
     const drift::Clip &clip = m_app->m_project.tracks().at(trackIndex).clips.at(clipIndex);
     const drift::TimeUs clipStartUs = clip.timelineStart;
+    const bool manbo = backend() == QLatin1String("manbo");
+    const QString engineName = manbo ? QStringLiteral("manbo") : QStringLiteral("chatterbox");
     auto lines = std::make_shared<QList<CueSpeech>>();
     for (const drift::SubtitleCue &cue : clip.subtitleCues) {
         const QString text = cue.text.simplified();
         if (text.isEmpty())
             continue;
-        lines->append({speechPath(text), text, cue.startUs, drift::usToSeconds(cue.endUs - cue.startUs), 0.0});
+        lines->append({speechPath(text, engineName, manbo ? QStringLiteral("mp3") : QStringLiteral("flac")),
+                       text, cue.startUs, drift::usToSeconds(cue.endUs - cue.startUs), 0.0});
     }
     if (lines->isEmpty()) {
         emit finished(false, tr("This subtitle clip has no text to speak"));
         return {};
     }
     remember(voiceId, lang, exaggeration);
-    const QString voiceName = m_voices->nameFor(voiceId);
+    const QString voiceName = manbo ? QStringLiteral("manbo") : m_voices->nameFor(voiceId);
     m_running = true;
     m_progress = 0.0;
     emit runningChanged();
@@ -316,8 +360,36 @@ QString TtsController::voiceoverFromSubtitles(int trackIndex, int clipIndex, con
     setStatus(tr("Queued"));
     const QPointer<TtsController> self(this);
     m_jobId = m_app->m_jobs->start(
-        QStringLiteral("tts"), QStringLiteral("chatterbox"), JobRegistry::Lane::Model,
-        [this, lines, voiceId, lang, exaggeration](JobContext &ctx) {
+        QStringLiteral("tts"), engineName,
+        manbo ? JobRegistry::Lane::Network : JobRegistry::Lane::Model,
+        [this, lines, voiceId, lang, exaggeration, manbo](JobContext &ctx) {
+            if (manbo) {
+                // One request per caption line. The endpoint rate-limits bursts, so
+                // the Model lane keeps these strictly serial.
+                drift::ManboTts client;
+                const int total = static_cast<int>(lines->size());
+                for (int i = 0; i < total; ++i) {
+                    if (ctx.cancelled())
+                        return;
+                    CueSpeech &line = (*lines)[i];
+                    const QString label =
+                        QStringLiteral("Speaking line %1 of %2…").arg(i + 1).arg(total);
+                    ctx.progress(0.02 + 0.96 * i / qMax(1, total), label);
+                    const auto result = client.synthesize(
+                        line.text, line.path,
+                        [&ctx, i, total, label](double p) {
+                            ctx.progress(0.02 + 0.96 * (i + p) / qMax(1, total), label);
+                            return !ctx.cancelled();
+                        });
+                    if (result.path.isEmpty())
+                        return ctx.fail(QStringLiteral("internal"), result.error);
+                    // No decoder on this lane: the mp3's real length is only known
+                    // once it is imported, so the overrun report stays quiet here.
+                    line.speechSeconds = 0.0;
+                }
+                ctx.succeed({});
+                return;
+            }
             QString err;
             ctx.progress(0.0, QStringLiteral("Loading voice model…"));
             if (!ensureLoaded(&err))
@@ -350,7 +422,7 @@ QString TtsController::voiceoverFromSubtitles(int trackIndex, int clipIndex, con
             }
             ctx.succeed({});
         },
-        [self, lines, lang, exaggeration, voiceName, clipStartUs](const QJsonObject &job) {
+        [self, lines, lang, exaggeration, voiceName, engineName, clipStartUs](const QJsonObject &job) {
             if (!self)
                 return QJsonObject{};
             self->endJob();
@@ -365,7 +437,7 @@ QString TtsController::voiceoverFromSubtitles(int trackIndex, int clipIndex, con
             QList<AppController::GeneratedAudioPlacement> placements;
             int longer = 0;
             for (const CueSpeech &line : std::as_const(*lines)) {
-                const QJsonObject generator{{QStringLiteral("engine"), QStringLiteral("chatterbox")},
+                const QJsonObject generator{{QStringLiteral("engine"), engineName},
                                             {QStringLiteral("voice"), voiceName},
                                             {QStringLiteral("lang"), lang},
                                             {QStringLiteral("exaggeration"), exaggeration},

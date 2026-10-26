@@ -22,6 +22,8 @@ class TtsController : public QObject
     Q_OBJECT
 
     Q_PROPERTY(bool available READ available NOTIFY availableChanged)
+    // "chatterbox" (local ONNX model) or "manbo" (remote HTTP endpoint).
+    Q_PROPERTY(QString backend READ backend WRITE setBackend NOTIFY backendChanged)
     Q_PROPERTY(bool modelLoaded READ modelLoaded NOTIFY loadStateChanged)
     Q_PROPERTY(bool loading READ loading NOTIFY loadStateChanged)
     Q_PROPERTY(bool running READ running NOTIFY runningChanged)
@@ -37,6 +39,8 @@ public:
     void setVoices(VoiceLibrary *voices) { m_voices = voices; }
 
     bool available() const { return m_available; }
+    QString backend() const;
+    void setBackend(const QString &name);
     bool modelLoaded() const { return m_loaded.load(); }
     bool loading() const { return m_loading.load(); }
     bool running() const { return m_running; }
@@ -68,6 +72,7 @@ public slots:
 
 signals:
     void availableChanged();
+    void backendChanged();
     void loadStateChanged();
     void runningChanged();
     void progressChanged();
