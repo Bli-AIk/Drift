@@ -20,6 +20,7 @@
 #include "core/interchange/OtioReader.h"
 #include "core/shapes/ShapePath.h"
 #include "core/project/SubtitleCue.h"
+#include "core/interchange/subtitles/AssIO.h"
 #include "core/interchange/subtitles/SrtIO.h"
 #include "core/interchange/subtitles/VttIO.h"
 #include "core/project/sources/DotLottie.h"
@@ -8734,6 +8735,11 @@ bool isVttPath(const QString &path)
     return path.endsWith(QLatin1String(".vtt"), Qt::CaseInsensitive);
 }
 
+bool isAssPath(const QString &path)
+{
+    return path.endsWith(QLatin1String(".ass"), Qt::CaseInsensitive);
+}
+
 drift::TimeUs subtitleClipDurationForCues(const QList<drift::SubtitleCue> &cues)
 {
     drift::TimeUs duration = drift::kSubtitleClipDurationUs;
@@ -8872,8 +8878,21 @@ bool AppController::exportSubtitleFile(int trackIndex, int clipIndex, const QUrl
     }
 
     QString error;
-    if (!(isVttPath(path) ? drift::writeVttFile(path, cues, &error)
-                         : drift::writeSrtFile(path, cues, &error))) {
+    bool written = false;
+    if (isAssPath(path)) {
+        // ASS carries its own canvas size and style table, so the export takes the
+        // project resolution and name rather than inventing 720p defaults.
+        drift::AssExportStyle style;
+        style.title = m_project.name();
+        style.playResX = m_project.width();
+        style.playResY = m_project.height();
+        written = drift::writeAssFile(path, cues, style, &error);
+    } else if (isVttPath(path)) {
+        written = drift::writeVttFile(path, cues, &error);
+    } else {
+        written = drift::writeSrtFile(path, cues, &error);
+    }
+    if (!written) {
         setLastMessage(error.isEmpty() ? tr("Could not write subtitle file") : error, QStringLiteral("error"));
         return false;
     }

@@ -565,6 +565,8 @@ add_library(driftcore STATIC
     src/core/project/GuideSet.h
     src/core/project/GuideSet.cpp
     src/core/interchange/subtitles/SubtitleParse.h
+    src/core/interchange/subtitles/AssIO.h
+    src/core/interchange/subtitles/AssIO.cpp
     src/core/interchange/subtitles/SrtIO.h
     src/core/interchange/subtitles/SrtIO.cpp
     src/core/interchange/subtitles/VttIO.h

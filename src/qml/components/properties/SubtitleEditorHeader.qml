@@ -10,6 +10,28 @@ Column {
     anchors.margins: 12
     spacing: 4
 
+    // Saves the selected caption clip as .srt, .vtt or .ass. The suffix is what
+    // AppController::exportSubtitleFile keys off to pick a writer, and on Android
+    // it is also what FileDialogs maps to a MIME type for the storage provider —
+    // passing the wrong suffix there writes ASS bytes into a file named .srt.
+    function exportAs(suffix) {
+        var filters = []
+        if (suffix === "ass")
+            filters.push(qsTr("Advanced SubStation Alpha (*.ass)"))
+        else if (suffix === "vtt")
+            filters.push(qsTr("WebVTT subtitles (*.vtt)"))
+        else
+            filters.push(qsTr("SubRip subtitles (*.srt)"))
+
+        const url = FileDialogs.saveFile(
+            qsTr("Export Subtitles"), filters,
+            (editor.clip && editor.clip.name) ? editor.clip.name : EditorState.projectFile.projectName,
+            suffix)
+        if (url != "")
+            EditorState.subtitles.exportFile(
+                editor.trackIndex, editor.clipIndex, url, timelineTimesBox.checked)
+    }
+
     Item {
         width: parent.width
         height: titleText.implicitHeight
@@ -72,17 +94,25 @@ Column {
             text: qsTr("Export")
             variant: "secondary"
             glyph: Theme.icons.save
-            tooltip: qsTr("Save captions as a .srt or .vtt file")
+            tooltip: qsTr("Save captions as a .srt, .vtt or .ass file")
             enabled: editor.cues.length > 0
-            onClicked: {
-                const url = FileDialogs.saveFile(
-                    qsTr("Export Subtitles"),
-                    [qsTr("SubRip subtitles (*.srt)"), qsTr("WebVTT subtitles (*.vtt)")],
-                    (editor.clip && editor.clip.name) ? editor.clip.name : EditorState.projectFile.projectName,
-                    "srt")
-                if (url != "")
-                    EditorState.subtitles.exportFile(
-                        editor.trackIndex, editor.clipIndex, url, timelineTimesBox.checked)
+            onClicked: exportMenu.popup()
+        }
+
+        ThemedContextMenu {
+            id: exportMenu
+
+            ThemedMenuItem {
+                text: qsTr("SubRip subtitles (.srt)")
+                onTriggered: header.exportAs("srt")
+            }
+            ThemedMenuItem {
+                text: qsTr("WebVTT subtitles (.vtt)")
+                onTriggered: header.exportAs("vtt")
+            }
+            ThemedMenuItem {
+                text: qsTr("Advanced SubStation Alpha (.ass)")
+                onTriggered: header.exportAs("ass")
             }
         }
     }
